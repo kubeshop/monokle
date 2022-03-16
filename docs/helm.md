@@ -13,6 +13,37 @@ In Settings, set which Helm command to use when generating Helm previews in Mono
 
 ![Helm Settings](img/helm-settings-1.5.0.png)
 
+## **Helm Preview Configurations**
+
+Each Helm chart has a subsection named **Preview Configurations**. This allows you to configure how to run the Helm Preview and then save the configuration in order to quickly use it at any time.
+
+![Helm Preview Configurations](img/helm-preview-configurations.png)
+
+Hovering over the Preview Configurations section will show a Plus button to the right:
+
+![Plus Button](img/helm-configuration-plus-sign.png)
+
+Clicking on the button will open a Drawer to the right:
+
+![Preview Configuration Drawer](img/preview-configuration-drawer.png)
+
+This form allows you to:
+- Name your configuration.
+- Choose and order which values files to be used for the preview.
+- Choose between using the **helm template** or **helm install** commands.
+- And, optionally, provide options for the command. See more about the options in Helm’s documentation: https://helm.sh/docs/helm/helm_install/.
+
+Finally, you can save your configuration for later use or save it and start previewing the resources right away.
+
+Saved Preview Configurations will show up in the subsection of the Helm chart it was created for:
+
+![My Preview Configuration](img/my-preview-configuration.png)
+
+By hovering over the configuration you will see the Preview, Edit and Delete actions.
+
+If you instead click and select the configuration, the source code editor from the right will be replaced with the Helm Command Pane, which will display the generated command that will be run by Monokle to create the preview:
+
+![Helm Command Pane](img/helm-command-pane.png)
 
 ## **Helm Navigation**
 
