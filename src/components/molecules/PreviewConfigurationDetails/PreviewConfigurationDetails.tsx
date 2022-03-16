@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {PreviewConfigValuesFileItem, PreviewConfigValuesFileItemPropsDefinition} from '@models/appconfig';
+import {PreviewConfigValuesFileItem} from '@models/appconfig';
 
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector} from '@redux/selectors';
@@ -51,7 +51,7 @@ const PreviwConfigurationDetails: React.FC = () => {
             Object.values(previewConfiguration.valuesFileItemMap).filter(
               (item): item is PreviewConfigValuesFileItem => item != null
             ),
-            [PreviewConfigValuesFileItemPropsDefinition.orderPropName]
+            ['order']
           ).map(i => i.filePath)
         : [],
     [previewConfiguration]

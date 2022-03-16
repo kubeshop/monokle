@@ -77,19 +77,12 @@ export type Project = {
   lastOpened?: string;
 };
 
-export const PreviewConfigValuesFileItemPropsDefinition = {
-  idPropName: 'id',
-  orderPropName: 'order',
-  checkedPropName: 'isChecked',
-  textPropName: 'name',
-} as const;
-
 export type PreviewConfigValuesFileItem = {
+  /** the id is created by removing the file extension from the filePath */
+  id: string;
   filePath: string;
-  [PreviewConfigValuesFileItemPropsDefinition.idPropName]: string;
-  [PreviewConfigValuesFileItemPropsDefinition.orderPropName]: number;
-  [PreviewConfigValuesFileItemPropsDefinition.checkedPropName]: boolean;
-  [PreviewConfigValuesFileItemPropsDefinition.textPropName]: string;
+  order: number;
+  isChecked: boolean;
 };
 
 export type HelmPreviewConfiguration = {

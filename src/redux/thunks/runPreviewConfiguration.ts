@@ -6,11 +6,7 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {
-  HelmPreviewConfiguration,
-  PreviewConfigValuesFileItem,
-  PreviewConfigValuesFileItemPropsDefinition,
-} from '@models/appconfig';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
@@ -82,7 +78,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     Object.values(previewConfiguration.valuesFileItemMap).filter(
       (item): item is PreviewConfigValuesFileItem => item != null
     ),
-    [PreviewConfigValuesFileItemPropsDefinition.orderPropName]
+    ['order']
   ).map(i => i.filePath);
 
   const valuesFilePathsNotFound: string[] = [];
