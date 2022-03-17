@@ -184,7 +184,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             <>
               <S.Divider type="vertical" />
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
-                <S.Button type="link" onClick={handleLoadCluster}>
+                <S.Button type="link" disabled={isAccessLoading} onClick={handleLoadCluster}>
                   {createClusterObjectsLabel()}
                 </S.Button>
               </Tooltip>
