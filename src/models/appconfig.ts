@@ -105,6 +105,7 @@ export type ProjectConfig = {
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
+  isAccessLoading?: boolean;
 };
 
 interface AppConfig {

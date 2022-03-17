@@ -37,6 +37,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const isAccessLoading = useAppSelector(state => state.config.projectConfig?.isAccessLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
@@ -121,6 +122,13 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const {icon, tooltip} = useMemo(() => {
+    if (isAccessLoading) {
+      return {
+        icon: <LoadingOutlined />,
+        tooltip: 'Loading...',
+      };
+    }
+
     const hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
     if (hasFullAccess) {
       return {
@@ -133,7 +141,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       icon: <S.ExclamationCircleOutlinedWarning />,
       tooltip: 'You do not have full access to this cluster',
     };
-  }, [clusterAccess]);
+  }, [clusterAccess, isAccessLoading]);
 
   if (!isClusterSelectorVisible) {
     return null;

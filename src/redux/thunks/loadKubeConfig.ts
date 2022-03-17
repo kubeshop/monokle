@@ -9,7 +9,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/appConfig';
+import {setAccessLoading, updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
 import electronStore from '@utils/electronStore';
 import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
@@ -70,6 +70,7 @@ export const loadContexts = async (
         dispatch(updateProjectKubeConfig(kubeConfig));
         try {
           if (isRendererThread()) {
+            dispatch(setAccessLoading(true));
             const namespaces = getNamespaces(selectedContext?.name as string).map(ctx => ctx.namespaceName);
             const clusterAccess = await getKubeAccess(namespaces, kc.currentContext);
             dispatch(updateProjectKubeAccess(clusterAccess));

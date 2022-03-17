@@ -154,6 +154,14 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
+      if (state.projectConfig) {
+        state.projectConfig.isAccessLoading = true;
+      }
+    },
+    setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      if (state.projectConfig) {
+        state.projectConfig.isAccessLoading = action.payload;
+      }
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
@@ -259,6 +267,7 @@ export const configSlice = createSlice({
         state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
 
       state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
+      state.projectConfig.isAccessLoading = false;
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -403,5 +412,6 @@ export const {
   handleFavoriteTemplate,
   toggleEventTracking,
   toggleErrorReporting,
+  setAccessLoading,
 } = configSlice.actions;
 export default configSlice.reducer;
