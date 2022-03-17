@@ -78,7 +78,8 @@ export const Header = styled(RawHeader.default)`
 export const Logo = styled.img`
   height: 45px;
   cursor: pointer;
-  margin-left: -15px;
+  margin-left: -20px;
+  margin-top: -10px;
 `;
 
 export const ModeSpan = styled.span`
