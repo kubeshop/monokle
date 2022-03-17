@@ -1,4 +1,4 @@
-<p align="center" style="margin-top: -40px; margin-bottom: -40px;">
+<p align="center">
   <img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/>
   <img src="src/assets/MonokleLogoDark.svg#gh-dark-mode-only" alt="Monokle Logo Dark" />
 </p>
