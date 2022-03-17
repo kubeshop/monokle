@@ -248,12 +248,14 @@ export const configSlice = createSlice({
         return;
       }
 
-      if (!action.payload || !action.payload.length) {
-        return;
-      }
-
       if (!state.projectConfig) {
         state.projectConfig = {};
+      }
+
+      state.projectConfig.isAccessLoading = false;
+
+      if (!action.payload || !action.payload.length) {
+        return;
       }
 
       // check that update is just for one cluster
@@ -267,7 +269,6 @@ export const configSlice = createSlice({
         state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
 
       state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
-      state.projectConfig.isAccessLoading = false;
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
