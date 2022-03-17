@@ -1,4 +1,4 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import micromatch from 'micromatch';
@@ -16,18 +16,21 @@ export const multiplePathsAdded = createAsyncThunk(
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
-    const fileMap = state.main.fileMap;
 
-    filePaths.forEach((filePath: string) => {
-      let fileEntry = getFileEntryForAbsolutePath(filePath, fileMap);
-      if (fileEntry) {
-        if (getFileStats(filePath)?.isDirectory() === false) {
-          log.info(`added file ${filePath} already exists - updating`);
-          reloadFile(filePath, fileEntry, state.main, projectConfig, userDataDir);
+    const nextMainState = createNextState(state.main, mainState => {
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
+        if (fileEntry) {
+          if (getFileStats(filePath)?.isDirectory() === false) {
+            log.info(`added file ${filePath} already exists - updating`);
+            reloadFile(filePath, fileEntry, mainState, projectConfig, userDataDir);
+          }
+        } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
+          addPath(filePath, mainState, projectConfig, userDataDir);
         }
-      } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
-        addPath(filePath, state.main, projectConfig, userDataDir);
-      }
+      });
     });
+
+    return nextMainState;
   }
 );
