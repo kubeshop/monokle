@@ -1,4 +1,4 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import micromatch from 'micromatch';
 
@@ -14,13 +14,17 @@ export const multiplePathsChanged = createAsyncThunk(
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
 
-    filePaths.forEach((filePath: string) => {
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.main.fileMap);
-      if (fileEntry) {
-        reloadFile(filePath, fileEntry, state.main, projectConfig, userDataDir);
-      } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
-        addPath(filePath, state.main, projectConfig, userDataDir);
-      }
+    const nextMainState = createNextState(state.main, mainState => {
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
+        if (fileEntry) {
+          reloadFile(filePath, fileEntry, mainState, projectConfig, userDataDir);
+        } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
+          addPath(filePath, mainState, projectConfig, userDataDir);
+        }
+      });
     });
+
+    return nextMainState;
   }
 );

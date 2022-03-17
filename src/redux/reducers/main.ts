@@ -24,18 +24,24 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {currentConfigSelector} from '@redux/selectors';
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
-import {findResourcesToReprocess, reprocessOptionalRefs} from '@redux/services/resourceRefs';
+import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
+import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {removeResource} from '@redux/thunks/removeResource';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
@@ -50,7 +56,6 @@ import {
   isFileResource,
   processResources,
   recalculateResourceRanges,
-  reprocessResources,
   saveResource,
 } from '../services/resource';
 import {updateSelectionAndHighlights} from '../services/selection';
@@ -543,58 +548,6 @@ export const mainSlice = createSlice({
         previewConfigurationId: undefined,
       };
     },
-    updateResourceSubAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{
-        parentPayload: UpdateResourcePayload;
-        schemaVersion: string;
-        userDataDir: string;
-      }>
-    ) => {
-      const {schemaVersion, userDataDir} = action.payload;
-      const {isInClusterMode, resourceId, content, preventSelectionAndHighlightsUpdate} = action.payload.parentPayload;
-
-      try {
-        const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
-        const resourceMap = state.resourceMap;
-        const resource = isInClusterMode ? resourceMap[resourceId] : currentResourceMap[resourceId];
-
-        const fileMap = state.fileMap;
-        if (resource) {
-          performResourceContentUpdate(resource, content, fileMap, resourceMap);
-          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(
-            schemaVersion,
-            userDataDir,
-            resourceIds,
-            currentResourceMap,
-            fileMap,
-            state.resourceRefsProcessingOptions
-          );
-          if (!preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(state, resource);
-          }
-        } else {
-          const r = resourceMap[resourceId];
-          // check if this was a kustomization resource updated during a kustomize preview
-          if (
-            r &&
-            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
-            state.previewResourceId &&
-            isKustomizationResource(resourceMap[state.previewResourceId])
-          ) {
-            performResourceContentUpdate(r, content, fileMap, resourceMap);
-            processKustomizations(resourceMap, fileMap);
-          } else {
-            log.warn('Failed to find updated resource during preview', resourceId);
-          }
-        }
-      } catch (e) {
-        log.error(e);
-        throw e;
-      }
-    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -945,6 +898,30 @@ export const mainSlice = createSlice({
       .addCase(replaceSelectedResourceMatches.rejected, state => {
         state.clusterDiff.hasLoaded = true;
       });
+
+    builder.addCase(multiplePathsChanged.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(multiplePathsAdded.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(removeResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateManyResources.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateFileEntry.fulfilled, (state, action) => {
+      return action.payload;
+    });
 
     builder.addMatcher(
       () => true,
