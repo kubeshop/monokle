@@ -158,8 +158,18 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     runCommandInMainThread({
       cmd: `kubectl`,
       args: ['config', 'use-context', clusterName],
-    }).then(() => {
-      dispatch(setCurrentContext(clusterName));
+    }).then(arg => {
+      if (arg?.exitCode === 0) {
+        dispatch(setCurrentContext(clusterName));
+      } else {
+        dispatch(
+          setAlert({
+            title: 'Error changing cluster context',
+            message: arg.stderr as string,
+            type: AlertEnum.Error,
+          })
+        );
+      }
     });
   };
 
