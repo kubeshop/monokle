@@ -118,6 +118,8 @@ export async function getKubeAccess(namespaces: string[], currentContext: string
   const results = await Promise.all(promises);
   const hasErrors = results.length && results.every(result => result.exitCode !== 0);
   if (hasErrors) {
+    const errors = results.map(res => res.stderr).join(',');
+    log.error(`get cluster access errors ${errors}`);
     throw new Error("Couldn't get cluster access for namespaces");
   }
 
