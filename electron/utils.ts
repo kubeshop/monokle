@@ -176,7 +176,7 @@ export function askActionConfirmation({
 }
 
 export const checkMissingDependencies = (dependencies: Array<string>): Array<string> => {
-  log.info(`checking dependencies with process path: ${process.env.PATH}`);
+  log.error(`checking dependencies with process path: ${process.env.PATH}`);
 
   return dependencies.filter(d => {
     try {
