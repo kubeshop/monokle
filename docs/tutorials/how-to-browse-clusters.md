@@ -8,7 +8,7 @@ Let’s get started!
  
 Launch Monokle and ensure that the setting **Show Cluster Selector** box is checked.
 
-![Cluster selector](img/cluster-selector-1.5.0.png)
+![Cluster selector](img/cluster-selector-1.6.0.png)
 
 
 If this is the first time to configure a cluster in Monokle, you will see **No Cluster Configured** and the **Configure** button at the top of the screen:
@@ -21,7 +21,7 @@ Clicking the **Configure** button opens the widget to specify the cluster to loa
 
 After clusters are configured, select the cluster you wish to work with from the drop down list at the top of the screen and click **Load**.
 
-![Cluster mode](img/cluster-mode-1-1.5.0.png)
+![Cluster mode](img/cluster-mode-1-1.6.0.png)
 
 Monokle will switch to the **Cluster Mode**, and the Navigator will reflect all the resources retrieved from the configured cluster. 
 

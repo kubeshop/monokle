@@ -11,7 +11,7 @@ All examples below are from the [Emissary Ingress Charts Folder](https://github.
 
 In Settings, set which Helm command to use when generating Helm previews in Monokle:
 
-![Helm Settings](img/helm-settings-1.5.0.png)
+![Helm Settings](img/helm-settings-1.6.0.png)
 
 ## **Helm Preview Configurations**
 
@@ -50,7 +50,7 @@ If you instead click and select the configuration, the source code editor from t
 When selecting a folder containing Helm charts (identified by Chart.yaml files), these will automatically be displayed in 
 a "Helm Charts" section on top of the Navigator:
 
-![Helm Navigation](img/helm-navigation-1.5.0.png)
+![Helm Navigation](img/helm-navigation-1.6.0.png)
 
 In the screenshot:
 

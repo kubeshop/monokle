@@ -42,7 +42,7 @@ While hovering over a broken link in the Editor, a pop-up window will allow you 
 
 Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the **Delete** or **Deploy** actions are available for both resources.
 
-![Working with Multiple Resources](img/select-multi-resource-1.5.0.png) 
+![Working with Multiple Resources](img/select-multi-resource-1.6.0.png) 
 
 ## **Add Resource**
 
@@ -90,7 +90,7 @@ on how to use the Form Editor for ConfigMaps.**-->
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.5.0.png)
+![Resource Options](img/navigator-resource-options-1.6.0.png)
 
 ### **Rename a Resource**
 

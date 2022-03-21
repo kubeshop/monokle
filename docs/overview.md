@@ -10,13 +10,13 @@ Launch Monokle and, on the welcome screen, there are three options to start work
  - Create an empty project.
  - Start from a template.
  
-![Welcome](img/welcome-1.5.0.png)
+![Welcome](img/welcome-1.6.0.png)
 
 Click **Select an existing folder** to add your project folder containing K8 resources. 
 
 Monokle is laid out like many other desktop applications:
 
-![Monokle UI](img/monokle-ui-1.5.0.png)
+![Monokle UI](img/monokle-ui-1.6.0.png)
 
 On subsequent start-ups, Monokle automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled.
 
@@ -43,7 +43,7 @@ The top right contains the following buttons:
 
 Clicking the Settings icon on the top right opens the settings:
 
-![Monokle Settings](img/monokle-settings-1.5.0.gif)
+![Monokle Settings](img/monokle-settings-1.6.0.gif)
 
 ### **Global Settings** 
   - **Projects Root Path**
@@ -101,7 +101,7 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 
 **Action:** File > New Monokle Window
 
-![Multiple Window](img/multiple-window-1.5.0.png)
+![Multiple Window](img/multiple-window-1.6.0.png)
 
 ## **Keyboard Shortcuts**
 
