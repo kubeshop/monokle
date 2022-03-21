@@ -178,6 +178,13 @@ export function askActionConfirmation({
 export const checkMissingDependencies = (dependencies: Array<string>): Array<string> => {
   log.error(`checking dependencies with process path: ${process.env.PATH}`);
 
+  process.env.PATH = [
+    './node_modules/.bin',
+    '/.nodebrew/current/bin',
+    '/usr/local/bin',
+    process.env.PATH,
+  ].join(':');
+
   return dependencies.filter(d => {
     try {
       execSync(d, {
