@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/kubeshop/monokle/compare/v1.5.2-nightly-2022-03-21.0...v1.6.0) (2022-03-21)
+
+
+### Bug Fixes
+
+* add more paths for mac ([727086b](https://github.com/kubeshop/monokle/commit/727086b4038d66c78d2ac83c1bfed5741b86e1c4))
+* error msg ([4ce056e](https://github.com/kubeshop/monokle/commit/4ce056e498bdfcdf4e25fbda168e0895067e0f91))
+* error msg ([e810864](https://github.com/kubeshop/monokle/commit/e8108644dc93314d65357dadc8100b6bed8126ff))
+
 ### [1.5.1](https://github.com/kubeshop/monokle/compare/v1.5.1-nightly-2022-02-10.0...v1.5.1) (2022-02-10)
 
 
