@@ -15,7 +15,7 @@ import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/sele
 import FilePatternList from '@molecules/FilePatternList';
 
 import {runCommandInMainThread} from '@utils/command';
-import {addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
 
@@ -76,6 +76,11 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
       namespaceName: ns,
       clusterName,
     }));
+
+    const defaultNamespace = kubeConfigContexts.find(ctx => ctx.name === clusterName)?.namespace;
+    if (defaultNamespace && !localCluster.namespaces.includes(defaultNamespace)) {
+      addContextWithRemovedNamespace(clusterName);
+    }
 
     addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
 

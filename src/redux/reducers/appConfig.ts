@@ -21,6 +21,7 @@ import {
 } from '@models/appconfig';
 import {UiState} from '@models/ui';
 
+import {currentKubeContext} from '@redux/selectors';
 import {
   keysToUpdateStateBulk,
   populateProjectConfig,
@@ -254,15 +255,16 @@ export const configSlice = createSlice({
 
       state.projectConfig.isAccessLoading = false;
 
-      if (!action.payload || !action.payload.length) {
-        return;
-      }
-
-      // check that update is just for one cluster
-      const updateForContext = action.payload[0].context;
-      const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
-      if (!isUpdatingOneContext) {
-        return;
+      let updateForContext: string;
+      if (!action.payload.length) {
+        updateForContext = currentKubeContext(state);
+      } else {
+        // check that update is just for one cluster
+        updateForContext = action.payload[0].context;
+        const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
+        if (!isUpdatingOneContext) {
+          return;
+        }
       }
 
       const otherClusterAccesses =

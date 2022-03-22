@@ -12,7 +12,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setAccessLoading, updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
 import electronStore from '@utils/electronStore';
-import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+import {addNamespace, getContextsWithRemovedNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 import {isRendererThread} from '@utils/thread';
 
 function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
@@ -56,8 +56,14 @@ export const loadContexts = async (
           isPathValid: kc.contexts.length > 0,
         };
 
+        const removedNamespaces = getContextsWithRemovedNamespace();
         kc.contexts.forEach(context => {
           if (!context.namespace) {
+            return;
+          }
+
+          // means the user removed this default namespace
+          if (removedNamespaces.includes(context.name)) {
             return;
           }
 

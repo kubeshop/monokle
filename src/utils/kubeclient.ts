@@ -179,3 +179,15 @@ export function getNamespaces(clusterName?: string): ConfigNamespaceStore[] {
 
   return appNamespaces;
 }
+
+export function getContextsWithRemovedNamespace(): string[] {
+  return electronStore.get('kubeConfig.contextsWithRemovedNamespace') ?? [];
+}
+
+export function addContextWithRemovedNamespace(clusterName: string) {
+  const contexts = getContextsWithRemovedNamespace();
+  if (contexts.includes(clusterName)) {
+    return;
+  }
+  return electronStore.set('kubeConfig.contextsWithRemovedNamespace', [...contexts, clusterName]);
+}

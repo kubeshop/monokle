@@ -208,6 +208,12 @@ const schema = {
           },
         },
       },
+      contextsWithRemovedNamespace: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+      },
     },
   },
 };
@@ -252,6 +258,7 @@ const defaults = {
   },
   kubeConfig: {
     namespaces: [],
+    contextsWithRemovedNamespace: [],
   },
 };
 
