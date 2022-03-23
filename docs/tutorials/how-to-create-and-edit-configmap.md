@@ -1,6 +1,6 @@
-# How to Work with ConfigMaps
+# How to Work with the Form Editor
 
-In this Monokle tutorial, we will illustrate how to create and edit ConfigMap resources to store non-confidential 
+In this Monokle tutorial, we will illustrate how to create and edit Form resources to store non-confidential 
 data in key-value pairs.       
 
 Let’s get started! 
@@ -50,7 +50,7 @@ At the bottom of the dialog, you can select the option to:
 
 ## **Use the Source Editor** 
 
-**Step 1:** Navigate and select the ConfigMap resources in the Navigator.  
+**Step 1:** Navigate and select the resource in the Navigator.  
 
 Once you select a resource, its source code will be launched automatically in the Source Editor. 
 
@@ -64,35 +64,35 @@ The Source Editor allows you to view and edit the source code easily.
 
 You can also edit the source code using the Form Editor, which does not require any coding effort.
 
-## **Using the ConfigMap Editor**
+## **Using the Form Editor**
 
-The ConfigMap Editor collects the required information and passes it to another entity. To launch the ConfigMap Editor, click on the **ConfigMap** button. 
+The Form Editor collects the required information and passes it to another entity. To launch the ConfigMap Editor, click on the **Form** button. 
 
-![Image 7](img/image-7-1.5.0.png)
+![Image 7](img/image-7-1.6.0.png)
 
 ### **For Configuration Data**
 
 **Step 1:** Click on the **Add Item** button to create a new text field for data configuration.
 
-![Image 8](img/image-8-1.5.0.png)
+![Image 8](img/image-8-1.6.0.png)
 
 **Step 2:** Enter the text configuration data in key-value pair fields.
 
 <em>**Note:** You can also edit the existing data in the key-value pair fields.</em>
 
-![Image 9](img/image-9.png)
+![Image 9](img/image-9-1.6.0.png)
 
 ### **For Binary Configuration Data** 
 
 **Step 1:** Click on the **Add Item** button to create a new binary data field for binary data configuration.
 
-![Image 10](img/image-10-1.5.0.png)
+![Image 10](img/image-10-1.6.0.png)
 
 **Step 2:** Enter the binary configuration data in key-value pair fields.
 
 <em>**Note:** You can also edit the existing binary configuration data in the fields.</em> 
 
-![Image 11](img/image-11.png)
+![Image 11](img/image-11-1.6.0.png)
 
 **Step 3:** Tick the **Immutable** checkbox to ensure the data stored in the ConfigMap is not updated. 
 
@@ -132,19 +132,19 @@ For editing object metadata, you need to provide a specific name, namespace, ann
 
 <em>**Note:** You can also edit the existing arbitrary metadata data in the fields.</em> 
 
-![Image 16](img/image-16.png)
+![Image 16](img/image-16-1.6.0.png)
 
 ### **Labels**
 
 **Step 1:** Click on **Add Item** button to create the new key-value field for labels.
 
-![Image 17](img/image-17.png)
+![Image 17](img/image-17-1.6.0.png)
 
 **Step 2:** Enter the label's details in the key-value pair field.
 
 <em>**Note:**  You also can edit existing label data in the fields.</em> 
 
-![Image 18](img/image-18.png)
+![Image 18](img/image-18-1.6.0.png)
 
 ### **Cluster Name**
 

@@ -15,7 +15,7 @@ To use Cluster Compare follow these steps:
 - Select the desired cluster context in the Cluster tab to the left.
 - Press the **Cluster Compare** button at the top of the Resource Navigator:
 
-![Cluster Compare](img/cluster-compare-button-1.5.0.png)
+![Cluster Compare](img/cluster-compare-button-1.6.0.png)
 
 Check out the below short video to see it in action:
 
