@@ -112,7 +112,6 @@ export const ProjectsMenuContainer = styled.div`
 `;
 
 export const ProjectTableActions = styled.div`
-  display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;

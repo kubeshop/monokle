@@ -229,11 +229,10 @@ const ProjectSelection = () => {
             render={(value: string) => (value ? getRelativeDate(value) : '-')}
           />
           <Column
-            className="projects-table-column-actions"
             key="projectActions"
             width={1}
             render={(value: any, project: Project) => (
-              <S.ProjectTableActions>
+              <S.ProjectTableActions className="projects-table-column-actions">
                 <S.DeleteOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
