@@ -18,18 +18,18 @@ While creating a resource, it is possible to select an existing resource as a te
 
 Monokle allows the use of templates to start a new project via the **Start from a template** option:
 
-![Start with Template](img/start-with-template-1.5.0.png)
+![Start with Template](img/start-with-template-1.6.0.png)
 
 The **Create a Project from a Template** dialog appears:
 
-![Start with Template](img/name-project-1.5.0.png)
+![Start with Template](img/name-project-1.6.0.png)
 
 Name your project, select its location and click **Next: Select a Template**.
 
 Monokle includes a default set of templates which are installed automatically when starting Monokle
 for the first time and available in the Templates Explorer when working with your Monokle projects:
 
-![Default Templates](img/template-selection-1.5.0.png)
+![Default Templates](img/template-selection-1.6.0.png)
 
 Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
 see the complete list of templates that are included along with their corresponding schemas and manifests.
@@ -38,7 +38,7 @@ see the complete list of templates that are included along with their correspond
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.5.0.png)
+![Resource Options](img/navigator-resource-options-1.6.0.png)
 
 ### **Rename a Resource**
 

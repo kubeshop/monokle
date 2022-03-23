@@ -13,11 +13,11 @@ All examples below are from the [Argo Rollouts Manifest Folder](https://github.c
 
 In Settings, set the defaults for working with Kustomize in Monokle:
 
-![Kustomize Settings](img/kustomize-settings-1.5.0.png)
+![Kustomize Settings](img/kustomize-settings-1.6.0.png)
 
 Use the drop-down selector to select how to invoke Kustomize when previewing or applying kustomization files:
 
-![Invoke Kustomize](img/invoke-kustomize-setting-1.5.0.png)
+![Invoke Kustomize](img/invoke-kustomize-setting-1.6.0.png)
 
 Tick the check box to enable Helm-related functionality when invoking Kustomize.
 
@@ -26,7 +26,7 @@ Tick the check box to enable Helm-related functionality when invoking Kustomize.
 When selecting a folder containing kustomization.yaml files, these files will automatically be displayed in a **Kustomizations** section 
 on top of the Navigator:
 
-![Kustomize Navigation](img/kustomize-navigation-1.5.0.png)
+![Kustomize Navigation](img/kustomize-navigation-1.6.0.png)
 
 In the screenshot:
 

@@ -6,7 +6,7 @@ The Navigator shows all resources found in the current project. Resources are gr
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
-![Resource Navigation](img/resource-navigation-1-1.5.0.png)
+![Resource Navigation](img/resource-navigation-1-1.6.0.png)
 
 In this screenshot: 
 
@@ -67,7 +67,7 @@ Users can also add or remove filters by highlighting and hovering over labels, a
 
 The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
 
-![Quick Filter](img/quick-filter-popup-1.5.0.png)
+![Quick Filter](img/quick-filter-popup-1.6.0.png)
 
 ## **Reload Folder On Startup**
 
@@ -94,7 +94,7 @@ The Recent Projects option has been added to the system menu to make it easy to 
 
 **Action:** File > Recent Projects
 
-![Recent Folders](img/recent-folders-1.5.0.png)
+![Recent Folders](img/recent-folders-1.6.0.png)
 
 ## **Supported Resource Links**
 

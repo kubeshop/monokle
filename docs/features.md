@@ -7,14 +7,14 @@ providing plentiful manifests for us to run Monokle against.
 
 ## **Navigate k8s Objects Easily**
 
-![Navigate k8s objects easily](img/navigator-1.5.0.gif)
+![Navigate k8s objects easily](img/navigator-1.6.0.gif)
 
 Monokle compiles a list of all the objects in your repo (from files you didn't want ignored), to give you a handy
 overview of all your resources - [read more here](resource-navigation.md).
 
 ## **Validate and Follow Links Up- or Downstream through your Manifests**
 
-![Follow links up or downstream through your manifests](img/upstream-downstream-1.5.0.gif)
+![Follow links up or downstream through your manifests](img/upstream-downstream-1.6.0.gif)
 
 Surf up- or downstream through your resources! Monokle highlights other resources that your selection has direct
 relations to and even provides you with the links to go to them quickly - [read more here](resource-navigation.md).
@@ -42,7 +42,7 @@ the resource in the source editor and click the "Apply" button.
 
 ## **Manage Multiple Projects**
 
-![Browse your clusters objects](img/manage-multiple-projects.gif)
+![Browse your clusters objects](img/manage-multiple-projects-1.6.0.gif)
 
 Easily switch in between projects to more efficiently work with multiple projects at the same time.
 
@@ -70,18 +70,18 @@ In the screenshot above:
 
 Monokle allows the use of templates to start a new project via the **Start from a template** option:
 
-![Start with Template](img/start-with-template-1.5.0.png)
+![Start with Template](img/start-with-template-1.6.0.png)
 
 The **Create a Project from a Template** dialog appears:
 
-![Start with Template](img/name-project-1.5.0.png)
+![Start with Template](img/name-project-1.6.0.png)
 
 Name your project, select its location and click **Next: Select a Template**.
 
 Monokle includes a default set of templates which are installed automatically when starting Monokle
 for the first time and available in the Templates Explorer when working with your Monokle projects:
 
-![Default Templates](img/template-selection-1.5.0.png)
+![Default Templates](img/template-selection-1.6.0.png)
 
 Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
 see the complete list of templates that are included along with their corresponding schemas and manifests.

@@ -5,21 +5,21 @@ to a cluster and show all contained resources, providing a convenient and easy w
 
 Monokle will automatically detect the default Kubeconfig file or it can be declared in Settings:
 
-![Kubeconfig Setting](img/kubeconfig-setting-1.5.0.png)
+![Kubeconfig Setting](img/kubeconfig-setting-1.6.0.png)
 
 ## **Using the Cluster Selector**
 
 Choose a cluster to work with by using the Cluster Selector:
 
-![Clusters Tab](img/clusters-tab-1.5.0.png)
+![Clusters Tab](img/clusters-tab-1.6.0.png)
 
 If the Cluster Selector does not appear, ensure that the **Show Cluster Selector** option is checked in the Settings menu:
 
-![Cluster Preview](img/cluster-selector-1.5.0.png)
+![Cluster Preview](img/cluster-selector-1.6.0.png)
 
 Selecting the **Load** button will attempt to populate the Resource Navigator with objects from the configured cluster:
 
-![Cluster Preview](img/cluster-preview-1.5.0.png)
+![Cluster Preview](img/cluster-preview-1.6.0.png)
 
 Monokle is now in **Cluster Mode** (as indicated by the header at the top):
 
@@ -35,11 +35,11 @@ Monokle is now in **Cluster Mode** (as indicated by the header at the top):
 
 In the Navigator, hover over a local resource to display a check box to select one or more resources:
 
-![Cluster Resource Check Box](img/navigator-resource-check-box-1.5.0.png)
+![Cluster Resource Check Box](img/navigator-resource-check-box-1.6.0.png)
 
 Selecting one or more resources brings up the **Action Links** at the top of the Navigator where the **Delete** and **Deploy** options are available:
 
-![Cluster Resource Check Box Select](img/navigator-select-cluster-resources-1.5.0.png)
+![Cluster Resource Check Box Select](img/navigator-select-cluster-resources-1.6.0.png)
 
 This same functionality is available for cluster resources where the **Delete** and **Save to file/folder** are the options:
 
