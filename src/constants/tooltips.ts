@@ -66,3 +66,4 @@ export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration'
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DisableEventTrackingTooltip = 'Disables collection of usage metrics';
 export const DisableErrorReportingTooltip = 'Disables collection of error reports';
+export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
