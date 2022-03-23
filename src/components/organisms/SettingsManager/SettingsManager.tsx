@@ -13,6 +13,7 @@ import {
   AutoLoadLastProjectTooltip,
   DisableErrorReportingTooltip,
   DisableEventTrackingTooltip,
+  TelemetryDocumentationUrl,
 } from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
@@ -213,7 +214,7 @@ const SettingsManager: React.FC = () => {
           </S.Div>
           <S.Div>
             <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
-            <Tooltip title="DOCUMENTATION URL">
+            <Tooltip title={TelemetryDocumentationUrl}>
               <InfoCircleOutlined style={{display: 'inline-block'}} />
             </Tooltip>
             <S.Div style={{marginBottom: '8px'}}>
