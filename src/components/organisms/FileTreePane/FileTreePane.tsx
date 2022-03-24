@@ -498,7 +498,7 @@ const FileTreePane = () => {
       ) : tree ? (
         <S.TreeContainer>
           <S.RootFolderText>
-            <div id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</div>
+            <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
             <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
           </S.RootFolderText>
           <S.TreeDirectoryTree
