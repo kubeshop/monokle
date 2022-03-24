@@ -81,17 +81,14 @@ const PaneManagerSplitView: React.FC = () => {
   }, [leftActive]);
 
   useEffect(() => {
-    if (
-      leftActive &&
-      navPaneWidth + splitViewContainerWidth * leftWidth + splitViewContainerWidth * editWidth > splitViewContainerWidth
-    ) {
+    if (leftActive && splitViewContainerWidth * (navWidth + leftWidth + editWidth) > splitViewContainerWidth) {
       const newEditPaneWidthPercentage = 1 - leftWidth - navWidth;
 
       dispatch(setPaneConfiguration({...paneConfiguration, editWidth: newEditPaneWidthPercentage}));
     }
 
     if (!leftActive) {
-      dispatch(setPaneConfiguration({...paneConfiguration, navWidth: navPaneWidth / (splitViewContainerWidth || 1)}));
+      dispatch(setPaneConfiguration({...paneConfiguration, navWidth: navPaneWidth / splitViewContainerWidth}));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

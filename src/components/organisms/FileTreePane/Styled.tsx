@@ -112,6 +112,12 @@ export const ContextMenuDivider = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 `;
 
+export const FilePathLabel = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 export const NoFilesContainer = styled.div`
   margin-left: 16px;
   margin-top: 10px;
@@ -152,9 +158,6 @@ export const RootFolderText = styled.div`
   line-height: 22px;
   color: ${Colors.grey7};
   margin-left: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
