@@ -2,7 +2,7 @@ import {dialog} from 'electron';
 
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {execSync} from 'child_process';
+import {spawnSync} from 'child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
@@ -180,22 +180,14 @@ export function askActionConfirmation({
 export const checkMissingDependencies = (dependencies: Array<string>): Array<string> => {
   log.info(`checking dependencies with process path: ${process.env.PATH}`);
 
-  if (isMac) {
-    process.env.PATH = _.uniq([
-      './node_modules/.bin',
-      '/.nodebrew/current/bin',
-      '/usr/local/bin',
-      ...process.env.PATH?.split(':') || [],
-    ]).join(':');
-  }
-
   return dependencies.filter(d => {
     try {
-      execSync(d, {
+      const result = spawnSync(d, {
         env: process.env,
+        shell: true,
         windowsHide: true,
       });
-      return false;
+      return Boolean(result.error);
     } catch (e: any) {
       return true;
     }
