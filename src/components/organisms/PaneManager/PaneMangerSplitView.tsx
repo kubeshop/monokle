@@ -81,11 +81,7 @@ const PaneManagerSplitView: React.FC = () => {
   }, [leftActive]);
 
   useEffect(() => {
-    if (
-      leftActive &&
-      navWidth * splitViewContainerWidth + splitViewContainerWidth * leftWidth + splitViewContainerWidth * editWidth >
-        splitViewContainerWidth
-    ) {
+    if (leftActive && splitViewContainerWidth * (navWidth + leftWidth + editWidth) > splitViewContainerWidth) {
       const newEditPaneWidthPercentage = 1 - leftWidth - navWidth;
 
       dispatch(setPaneConfiguration({...paneConfiguration, editWidth: newEditPaneWidthPercentage}));
