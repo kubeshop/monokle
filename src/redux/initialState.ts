@@ -164,7 +164,14 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
-  paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  paneConfiguration: electronStore.get('ui.paneConfiguration') || {
+    leftWidth: 0.3333,
+    navWidth: 0.3333,
+    editWidth: 0.3333,
+    rightWidth: 0,
+    actionsPaneFooterExpandedHeight: 0,
+    recentProjectsPaneWidth: 300,
+  },
   layoutSize: {
     footer: 0,
     header: 0,
