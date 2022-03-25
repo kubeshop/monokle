@@ -47,6 +47,7 @@
     "@types/styled-components": "5.1.12",
     "@types/uuid": "8.3.1",
     "@types/yargs": "17.0.2",
+    "babel-plugin-styled-components": "2.0.6",
     "builder-util-runtime": "9.0.0-alpha.0",
     "concurrently": "6.3.0",
     "craco-alias": "3.0.1",
