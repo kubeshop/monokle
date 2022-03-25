@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.2](https://github.com/kubeshop/monokle/compare/v1.6.1...v1.6.2) (2022-03-25)
+
+
+### Bug Fixes
+
+* electronStore onDidChange error ([d273a31](https://github.com/kubeshop/monokle/commit/d273a31f14b79ce2f25e9cb2c16f1f4ae5455663))
+* make sure paneConfiguration has initial state ([ff8456b](https://github.com/kubeshop/monokle/commit/ff8456b61a344081f1b238858a092c206a4aa77c))
+* thunks that were mutating state directly ([14c8ed4](https://github.com/kubeshop/monokle/commit/14c8ed48018b428360d557e4a664dc4524156e23))
+
 ### [1.6.1](https://github.com/kubeshop/monokle/compare/v1.6.1-nightly-2022-03-25.0...v1.6.1) (2022-03-25)
 
 
