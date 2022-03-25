@@ -43,7 +43,12 @@ function applyK8sResource(
     delete resourceContent.metadata.namespace;
   }
 
-  return applyYamlToCluster(stringify(resourceContent), context, kubeconfig, namespace);
+  return applyYamlToCluster({
+    yaml: stringify(resourceContent),
+    context,
+    kubeconfig,
+    namespace,
+  });
 }
 
 /**
