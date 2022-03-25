@@ -28,13 +28,12 @@ const projectNameChange: ElectronStoreChangePropagate<Project[], ProjectNameChan
   action: (newProjects, oldProjects) => {
     // means that a new project has been created and we should not update that
     if (newProjects.length > oldProjects.length) {
-      return { shouldTriggerAcrossWindows: false };
+      return {shouldTriggerAcrossWindows: false};
     }
 
-    const triggeredForProject = newProjects
-      .find((project, index) => project.name !== oldProjects[index].name);
+    const triggeredForProject = newProjects.find((project, index) => project.name !== oldProjects[index].name);
     if (!triggeredForProject) {
-      return { shouldTriggerAcrossWindows: false };
+      return {shouldTriggerAcrossWindows: false};
     }
 
     return {
@@ -49,6 +48,4 @@ const projectNameChange: ElectronStoreChangePropagate<Project[], ProjectNameChan
   },
 };
 
-export const globalElectronStoreChanges: ElectronStoreChangePropagate<any, any>[] = [
-  projectNameChange,
-];
+export const globalElectronStoreChanges: ElectronStoreChangePropagate<any, any>[] = [projectNameChange];

@@ -186,11 +186,13 @@ const App = () => {
   useEffect(() => {
     globalElectronStoreChanges.forEach(globalElectronStoreChange => {
       electronStore.onDidChange(globalElectronStoreChange.keyName, (newData: any, oldData: any) => {
+        if (!newData || !oldData) {
+          return;
+        }
         const {shouldTriggerAcrossWindows, eventData} = globalElectronStoreChange.action(newData, oldData);
         if (!shouldTriggerAcrossWindows || !eventData) {
           return;
         }
-
         ipcRenderer.send('global-electron-store-update', eventData);
       });
     });
