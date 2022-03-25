@@ -45,7 +45,12 @@ const applyMultipleResources = async (
     }, '');
 
   try {
-    const result = await applyYamlToCluster(yamlToApply, kubeConfigPath, currentContext, namespace);
+    const result = await applyYamlToCluster({
+      yaml: yamlToApply,
+      kubeconfig: kubeConfigPath,
+      context: currentContext,
+      namespace,
+    });
     log.info(`kubectl exited with code ${result.exitCode} and signal ${result.signal}`);
 
     if (result.stdout) {

@@ -40,12 +40,11 @@ export const loadClusterDiff = createAsyncThunk<
   try {
     const currentContext = currentKubeContext(state.config);
     const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    if (!clusterAccess || !clusterAccess.length) {
-      return {};
-    }
     const kc = createKubeClient(state.config);
     try {
-      const res = await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)));
+      const res = clusterAccess.length
+        ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))
+        : await getClusterObjects(kc);
       const results = flatten(res);
       const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 

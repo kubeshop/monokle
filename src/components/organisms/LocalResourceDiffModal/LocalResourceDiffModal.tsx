@@ -198,8 +198,12 @@ const DiffModal = () => {
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {
-        if (!resourceKindHandler || !clusterAccess) {
+        if (!resourceKindHandler) {
           return [];
+        }
+
+        if (!clusterAccess || !clusterAccess.length) {
+          return resourceKindHandler.listResourcesInCluster(kc, {});
         }
 
         const namespacesWithAccess = clusterAccess

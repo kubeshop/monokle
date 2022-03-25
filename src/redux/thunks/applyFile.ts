@@ -18,7 +18,11 @@ import {APPLY_FILE, trackEvent} from '@utils/telemetry';
  */
 
 function applyFileToCluster(filePath: string, kubeconfig: string, context: string) {
-  return applyYamlToCluster(fs.readFileSync(filePath, 'utf8'), kubeconfig, context);
+  return applyYamlToCluster({
+    yaml: fs.readFileSync(filePath, 'utf8'),
+    kubeconfig,
+    context,
+  });
 }
 
 /**
