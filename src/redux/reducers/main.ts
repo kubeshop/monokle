@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import path from 'path';
@@ -149,15 +149,19 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
 
-    electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
-    state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
+    const nextMainState = createNextState(state.main, mainState => {
+      electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
+      state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
 
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-    const resourceMap = getActiveResourceMap(state.main);
+      const projectConfig = currentConfigSelector(state);
+      const schemaVersion = getK8sVersion(projectConfig);
+      const userDataDir = String(state.config.userDataDir);
+      const resourceMap = getActiveResourceMap(mainState);
 
-    reprocessOptionalRefs(schemaVersion, userDataDir, resourceMap, state.main.resourceRefsProcessingOptions);
+      reprocessOptionalRefs(schemaVersion, userDataDir, resourceMap, mainState.resourceRefsProcessingOptions);
+    });
+
+    return nextMainState;
   }
 );
 
@@ -169,19 +173,23 @@ export const addResource = createAsyncThunk(
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
 
-    state.main.resourceMap[resource.id] = resource;
-    const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+    const nextMainState = createNextState(state.main, mainState => {
+      mainState.resourceMap[resource.id] = resource;
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-    processResources(
-      schemaVersion,
-      userDataDir,
-      getActiveResourceMap(state.main),
-      state.main.resourceRefsProcessingOptions,
-      {
-        resourceIds: [resource.id],
-        resourceKinds,
-      }
-    );
+      processResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(mainState),
+        mainState.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
+    });
+
+    return nextMainState;
   }
 );
 
@@ -193,18 +201,22 @@ export const reprocessResource = createAsyncThunk(
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
 
-    const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+    const nextMainState = createNextState(state.main, mainState => {
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-    processResources(
-      schemaVersion,
-      userDataDir,
-      getActiveResourceMap(state.main),
-      state.main.resourceRefsProcessingOptions,
-      {
-        resourceIds: [resource.id],
-        resourceKinds,
-      }
-    );
+      processResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(mainState),
+        mainState.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
+    });
+
+    return nextMainState;
   }
 );
 
@@ -216,20 +228,29 @@ export const reprocessAllResources = createAsyncThunk(
     const userDataDir = String(state.config.userDataDir);
     const schemaVersion = getK8sVersion(projectConfig);
 
-    processResources(schemaVersion, userDataDir, state.main.resourceMap, state.main.resourceRefsProcessingOptions);
+    const nextMainState = createNextState(state.main, mainState => {
+      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions);
+    });
+
+    return nextMainState;
   }
 );
 
 export const multiplePathsRemoved = createAsyncThunk(
   'main/multiplePathsRemoved',
   async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: AppState = thunkAPI.getState().main;
-    filePaths.forEach((filePath: string) => {
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        removePath(filePath, state, fileEntry);
-      }
+    const state: RootState = thunkAPI.getState();
+
+    const nextMainState = createNextState(state.main, mainState => {
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
+        if (fileEntry) {
+          removePath(filePath, mainState, fileEntry);
+        }
+      });
     });
+
+    return nextMainState;
   }
 );
 
@@ -920,6 +941,26 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(addResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(reprocessResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(reprocessAllResources.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
     });
 
