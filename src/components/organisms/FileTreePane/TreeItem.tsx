@@ -1,13 +1,13 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Menu, Modal} from 'antd';
+import {Menu, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -252,12 +252,14 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu overlay={menu} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <S.TitleWrapper>
-          <S.TreeTitleText>{title}</S.TreeTitleText>
-          {canPreview(relativePath) && (
-            <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
-          )}
-        </S.TitleWrapper>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
+          <S.TitleWrapper>
+            <S.TreeTitleText>{title}</S.TreeTitleText>
+            {canPreview(relativePath) && (
+              <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
+            )}
+          </S.TitleWrapper>
+        </Tooltip>
         {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
           <S.SpinnerWrapper>
             <Spinner />

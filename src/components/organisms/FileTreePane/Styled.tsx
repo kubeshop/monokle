@@ -245,6 +245,7 @@ export const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  max-width: 80%;
 `;
 
 export const ActionsWrapper = styled.div`
