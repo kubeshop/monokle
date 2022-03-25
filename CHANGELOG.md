@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/kubeshop/monokle/compare/v1.6.1-nightly-2022-03-25.0...v1.6.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* cluster compare and resource diff when no namespaces is selected ([58d2a4f](https://github.com/kubeshop/monokle/commit/58d2a4fc18176dd931f0aaa8f4e777f11b4155be))
+* upgrade @reduxjs/toolkit from 1.7.2 to 1.8.0 ([f7e254a](https://github.com/kubeshop/monokle/commit/f7e254a3b8f742fae135047e89980b3716d9204c))
+* upgrade antd from 4.18.8 to 4.18.9 ([7577a0f](https://github.com/kubeshop/monokle/commit/7577a0f0492f97695181b7ffe25d7c12ab285c79))
+* upgrade luxon from 2.3.0 to 2.3.1 ([d3583aa](https://github.com/kubeshop/monokle/commit/d3583aa48833fe58d0b21e0e7fd12e8e39e43ff0))
+* upgrade vm2 from 3.9.8 to 3.9.9 ([89a5c4f](https://github.com/kubeshop/monokle/commit/89a5c4ffae5ed79c386ae5e4344d70965403604f))
+
 ## [1.6.0](https://github.com/kubeshop/monokle/compare/v1.5.2-nightly-2022-03-21.0...v1.6.0) (2022-03-21)
 
 
