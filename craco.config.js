@@ -2,7 +2,6 @@ const CracoAlias = require('craco-alias');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
-const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   webpack: {
