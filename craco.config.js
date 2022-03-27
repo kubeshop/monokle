@@ -2,6 +2,7 @@ const CracoAlias = require('craco-alias');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
+const lodash = require('lodash');
 
 module.exports = {
   webpack: {
@@ -23,8 +24,22 @@ module.exports = {
   },
   babel: {
     presets: [],
-    plugins: [process.env.NODE_ENV === 'development' ? ['babel-plugin-styled-components', { displayName: true, namespace: 'dev' }]: [{}]],
-},
+    plugins: [
+      process.env.NODE_ENV === 'development'
+        ? ['babel-plugin-styled-components', {displayName: true, namespace: 'dev'}]
+        : [{}],
+    ],
+  },
+  jest: {
+    configure: jestConfig =>
+      lodash.merge(jestConfig, {
+        setupFilesAfterEnv: ['<rootDir>/jest.env.js'],
+        transform: {
+          // https://github.com/gsoft-inc/craco/issues/353#issuecomment-1003301013
+          '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': './lib/jest-babel-transform.js',
+        },
+      }),
+  },
   plugins: [
     {
       plugin: CracoAlias,
