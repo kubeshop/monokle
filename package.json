@@ -51,6 +51,7 @@
     "@types/uuid": "8.3.4",
     "@types/yargs": "17.0.10",
     "@typescript-eslint/parser": "5.16.0",
+    "babel-plugin-styled-components": "2.0.6",
     "builder-util-runtime": "9.0.0-alpha.0",
     "concurrently": "7.0.0",
     "craco-alias": "3.0.1",
