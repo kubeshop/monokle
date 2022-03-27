@@ -79,6 +79,15 @@ module.exports = {
         string: true,
       },
     ],
+    // react-scripts 5
+    'react/function-component-definition': 'off',
+    'react/jsx-no-constructed-context-values': 'off',
+    'no-restricted-exports': 'off',
+    'react/no-unstable-nested-components': 'off',
+    'react/jsx-no-useless-fragment': 'off',
+    'react/no-unused-prop-types': 'off',
+    'default-param-last': 'off',
+    'react/destructuring-assignment': 'off',
   },
   ignorePatterns: ['package.json', './node_modules', './dist', '**/dist/*.js'],
 };
