@@ -17,6 +17,8 @@ module.exports = {
       webpackConfig.output = {
         filename: 'bundle.[name].js',
       };
+      // Temporary solution until react-scripts 5.0.1 is released
+      webpackConfig.ignoreWarnings = [/Failed to parse source map/];
       return webpackConfig;
     },
   },
