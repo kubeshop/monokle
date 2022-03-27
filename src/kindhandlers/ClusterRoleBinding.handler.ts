@@ -10,6 +10,7 @@ import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/cu
 const ClusterRoleBindingHandler: ResourceKindHandler = {
   kind: 'ClusterRoleBinding',
   apiVersionMatcher: '**',
+  isNamespaced: false,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'ClusterRoleBindings'],
   clusterApiVersion: 'rbac.authorization.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.rbac.v1',
@@ -61,7 +62,12 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
               return !value;
             }
 
-            return value === 'default' || !value
+            // must be ServiceAccount and have a namespace
+            if (siblingValues['kind'] !== 'ServiceAccount' || !value) {
+              return false;
+            }
+
+            return value === 'default'
               ? !targetResource.namespace || targetResource.namespace === 'default'
               : targetResource.namespace === value;
           },

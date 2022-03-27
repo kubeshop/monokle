@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_FILE_NAME, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -52,7 +52,7 @@ export function isKustomizationPatch(r: K8sResource | undefined) {
  */
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
+  if (fileEntry.name.toLowerCase() === KUSTOMIZATION_FILE_NAME) {
     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
@@ -102,25 +102,27 @@ function extractPatches(
   patchPath: string
 ) {
   let strategicMergePatches = getScalarNodes(kustomization, patchPath);
-  strategicMergePatches.forEach((refNode: NodeWrapper) => {
-    let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
-    const fileEntry = fileMap[kpath];
-    if (fileEntry) {
-      let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
-      if (linkedResources.length > 0) {
-        linkedResources.forEach(resource => {
-          if (!resource.name.startsWith('Patch:')) {
-            resource.name = `Patch: ${resource.name}`;
-          }
-        });
+  strategicMergePatches
+    .filter(refNode => refNode.node.type === 'PLAIN')
+    .forEach((refNode: NodeWrapper) => {
+      let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+      const fileEntry = fileMap[kpath];
+      if (fileEntry) {
+        let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+        if (linkedResources.length > 0) {
+          linkedResources.forEach(resource => {
+            if (!resource.name.startsWith('Patch:')) {
+              resource.name = `Patch: ${resource.name}`;
+            }
+          });
+        } else {
+          createFileRef(kustomization, refNode, kpath, fileMap);
+        }
       } else {
+        // this will create an unsatisfied file ref
         createFileRef(kustomization, refNode, kpath, fileMap);
       }
-    } else {
-      // this will create an unsatisfied file ref
-      createFileRef(kustomization, refNode, kpath, fileMap);
-    }
-  });
+    });
 }
 
 /**
@@ -137,9 +139,11 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
         resources = resources.concat(getScalarNodes(kustomization, 'bases'));
       }
 
-      resources.forEach((refNode: NodeWrapper) => {
-        processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
-      });
+      resources
+        .filter(refNode => !refNode.nodeValue().startsWith('http'))
+        .forEach((refNode: NodeWrapper) => {
+          processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
+        });
 
       if (kustomization.content.patchesStrategicMerge) {
         extractPatches(kustomization, fileMap, resourceMap, 'patchesStrategicMerge');

@@ -11,6 +11,7 @@ import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'ServiceAccounts'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
@@ -19,9 +20,11 @@ const ServiceAccountHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedServiceAccount(resource.name, resource.namespace || 'default');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listServiceAccountForAllNamespaces();
+    const response = namespace
+      ? await k8sCoreV1Api.listNamespacedServiceAccount(namespace)
+      : await k8sCoreV1Api.listServiceAccountForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

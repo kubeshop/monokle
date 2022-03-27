@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const DeploymentHandler: ResourceKindHandler = {
   kind: 'Deployment',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'Deployments'],
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
@@ -18,9 +19,11 @@ const DeploymentHandler: ResourceKindHandler = {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     return k8sAppV1Api.readNamespacedDeployment(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    const response = await k8sAppV1Api.listDeploymentForAllNamespaces();
+    const response = namespace
+      ? await k8sAppV1Api.listNamespacedDeployment(namespace)
+      : await k8sAppV1Api.listDeploymentForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

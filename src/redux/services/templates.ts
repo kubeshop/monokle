@@ -1,7 +1,10 @@
+import {ipcRenderer} from 'electron';
+
 import asyncLib from 'async';
 import fs from 'fs';
-import _ from 'lodash';
 import log from 'loglevel';
+
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
@@ -11,6 +14,8 @@ import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template'
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
+
+import electronStore from '@utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createUnsavedResource} from './unsavedResource';
@@ -39,6 +44,12 @@ export const deletePlugin = async (plugin: AnyPlugin, pluginPath: string, dispat
     }
   });
   dispatch(removePlugin(pluginPath));
+
+  let repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+
+  if (repositoryUrl === DEFAULT_TEMPLATES_PLUGIN_URL) {
+    electronStore.set('appConfig.hasDeletedDefaultTemplatesPlugin', true);
+  }
 
   const alert: AlertType = {
     title: `Deleted templates (${deletedTemplates}) successfully`,
@@ -80,11 +91,21 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
 
-export const interpolateTemplate = (text: string, formsData: any[]) => {
-  _.templateSettings.interpolate = /\[\[([\s\S]+?)\]\]/g;
-  const lodashTemplate = _.template(text);
-  const result = lodashTemplate({forms: formsData});
-  return result;
+export type InterpolateTemplateOptions = {
+  templateText: string;
+  formsData: any[];
+};
+
+export const interpolateTemplate = async (templateText: string, formsData: any[]) => {
+  return new Promise<string>(resolve => {
+    ipcRenderer.once('interpolate-vanilla-template-result', (event, arg) => {
+      resolve(arg);
+    });
+    ipcRenderer.send('interpolate-vanilla-template', {
+      templateText,
+      formsData,
+    } as InterpolateTemplateOptions);
+  });
 };
 
 export const createUnsavedResourcesFromVanillaTemplate = async (
@@ -97,7 +118,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     async (manifest: TemplateManifest) => {
       try {
         const manifestText = await fs.promises.readFile(manifest.filePath, 'utf8');
-        const interpolatedTemplateText = interpolateTemplate(manifestText, formsData);
+        const interpolatedTemplateText = await interpolateTemplate(manifestText, formsData);
         return interpolatedTemplateText;
       } catch (e) {
         if (e instanceof Error) {

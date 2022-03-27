@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const DaemonSetHandler: ResourceKindHandler = {
   kind: 'DaemonSet',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'DaemonSets'],
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
@@ -18,9 +19,11 @@ const DaemonSetHandler: ResourceKindHandler = {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     return k8sAppV1Api.readNamespacedDaemonSet(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    const response = await k8sAppV1Api.listDaemonSetForAllNamespaces();
+    const response = namespace
+      ? await k8sAppV1Api.listNamespacedDaemonSet(namespace)
+      : await k8sAppV1Api.listDaemonSetForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

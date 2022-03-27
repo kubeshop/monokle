@@ -1,6 +1,10 @@
 import {Button} from 'antd';
 
-import {FormOutlined as RawFormOutlined} from '@ant-design/icons';
+import {
+  FormOutlined as RawFormOutlined,
+  PushpinFilled as RawPushPinFilled,
+  PushpinOutlined as RawPushPinOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -15,11 +19,12 @@ export const AdditionalInformation = styled.div`
   flex-direction: column;
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{$shouldHaveMarginBottom?: boolean}>`
   display: grid;
   grid-template-columns: max-content 1fr;
   grid-column-gap: 18px;
   position: relative;
+  ${({$shouldHaveMarginBottom}) => $shouldHaveMarginBottom && 'margin-bottom: 16px;'}
 `;
 
 export const Description = styled.span`
@@ -37,8 +42,32 @@ export const InfoContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Name = styled.span`
+export const NameContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
   width: 100%;
+  gap: 6px;
+  justify-content: space-between;
+`;
+
+export const PinTemplateButton = styled(RawPushPinOutlined)`
+  font-size: 24px;
+  opacity: 0.8;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+`;
+
+export const UnPinTemplateButton = styled(RawPushPinFilled)`
+  font-size: 24px;
+  opacity: 0.8;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+`;
+export const Name = styled.span`
   color: ${Colors.whitePure};
   white-space: nowrap;
   overflow: hidden;
@@ -50,9 +79,9 @@ export const FormOutlined = styled(RawFormOutlined)`
   font-size: 30px;
 `;
 
-export const OpenButton = styled(Button)`
+export const OpenButton = styled(Button)<{$noPadding: boolean}>`
   width: max-content;
-  padding: 0px;
+  ${props => props.$noPadding && 'padding: 0px;'}
 `;
 
 export const Footer = styled.div`

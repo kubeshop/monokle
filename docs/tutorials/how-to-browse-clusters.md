@@ -2,64 +2,67 @@
 
 In this Monokle tutorial, we will illustrate the steps to connect to a cluster and navigate/update contained resources.
 
-Let’s get started. 
+Let’s get started! 
 
-## 1. Select Cluster Preview
+## **1. Configure a Cluster**
  
-Launch Monokle and click on the Cluster Preview button in the file explorer.
+Launch Monokle and ensure that the setting **Show Cluster Selector** box is checked.
 
-![Cluster mode](img/cluster-mode-1.png)
+![Cluster selector](img/cluster-selector-1.6.0.png)
 
-## 2. Specify kubeconfig
 
-Click on the Browse button to fetch the kubeconfig file for configuring cluster access. 
+If this is the first time to configure a cluster in Monokle, you will see **No Cluster Configured** and the **Configure** button at the top of the screen:
 
- ![Browse](img/browse-2.png)
+![No cluster configured](img/no-cluster-configured.png)
 
-Alternatively, you can also enter the kubeconfig file path manually in the KUBECONFIG text field. 
+Clicking the **Configure** button opens the widget to specify the cluster to load by inserting its location:
 
- ![Kubeconfig](img/kubeconfig-3.png)
+![Configure Cluster Widget](img/configure-cluster.png)
 
-<em>**Note:** The kubectl command-line tool uses kubeconfig files to find the information it needs to choose a cluster and communicate with the API server.</em>
+After clusters are configured, select the cluster you wish to work with from the drop down list at the top of the screen and click **Load**.
 
-## 3. Retrieve Cluster objects
+![Cluster mode](img/cluster-mode-1-1.6.0.png)
 
-Click on the Show Cluster Objects button to launch the resources in the configured cluster. 
+Monokle will switch to the **Cluster Mode**, and the Navigator will reflect all the resources retrieved from the configured cluster. 
 
-![Show Cluster](img/show-cluster-4.png) 
+## **2. Navigate/Select Resources**
 
-Monokle will switch to the Cluster-Mode, and the Navigator will reflect all the resources retrieved from the configured cluster. 
+Select a resource to view its source code in the Editor. Editing resources in cluster mode allows quick changes to be made and deployed back to the cluster.
 
-## 4. Navigate / Select resources
+ ![Editor](img/editor-5-1.5.0.png)
 
-Select a resource to view its source code in the source editor. You can edit resources in cluster-mode, allowing you to make quick changes and apply them back to your cluster
+## **3. Diff Changes Against Cluster**
 
- ![Editor](img/editor-5.png)
+Click the **Diff** button to analyze and compare the selected resource against the currently configured cluster.
 
-## 5. Diff changes against Cluster
-
-Click the Diff button to analyze and compare the selected resource against the currently configured cluster.
-
-![Diff](img/diff-7.png)
+![Diff](img/diff-7-1.5.0.png)
 
 The comparison table will look like this:
 
-![Diff table](img/diff-tble-8.png)
+![Diff table](img/diff-tble-8-1.5.0.png)
 
-## 6. Apply changes
+## **4. Deploy Changes**
 
-Click on the Apply button to update the resource to the currently configured cluster.
+Click on the **Deploy** button to update the resource to the currently configured cluster.
 
-![Apply](img/apply-6.png)
+![Deploy](img/deploy-1.5.0.png)
 
-Resource applied will be shown in the top-right corner of the console.
+Then select the namespace for deployment. Select an existing namespace from the cluster, create a new namespace, or don't specify a namespace at all.
 
-## 7. Exit Cluster mode
+By selecting **None**, **Deploy** will use the namespaces declared in the resources. 
 
-Click on the Exit button on the top-right corner of the console to restore the resources of the currently selected folder. 
+![Deploy 1](img/deploy-1-1.5.0.png)
 
- ![Exit](img/exit-9.png)
+The resource deployed dialog will be shown in the top-right corner of the console.
 
-Thus you can browse cluster resources. 
+![Deploy 2](img/deploy-2-1.5.0.png)
 
-Got queries? Please feel free to join our open source community on Discord with this [invite link](https://discord.gg/6zupCZFQbe) and start your discussion.
+## **5. Exit Cluster Mode**
+
+Click on the **Exit** button on the top-right corner of the console to restore the resources of the currently selected folder. 
+
+ ![Exit](img/exit-9-1.5.0.png)
+ 
+## **Questions or Comments?**
+
+Please feel free to join our open source community on Discord with this [Invite Link](https://discord.gg/6zupCZFQbe) and start your discussion.

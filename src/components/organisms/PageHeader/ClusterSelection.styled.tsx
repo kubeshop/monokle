@@ -1,6 +1,10 @@
 import {Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
+import {
+  CheckCircleOutlined as RawCheckCircleOutlined,
+  ExclamationCircleOutlined as RawExclamationCircleOutlined,
+} from '@ant-design/icons/lib/icons';
 
 import styled from 'styled-components';
 
@@ -29,8 +33,8 @@ export const ClusterActionButton = styled(RawButton)`
 
 export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
   ${({$highlighted}) => `
-    font-size: ${$highlighted ? '8px' : '12px'};
-    line-height: ${$highlighted ? '32px' : '20px'};
+    font-size: ${$highlighted ? '9px' : '12px'};
+    line-height: ${$highlighted ? '30px' : '20px'};
     color: ${$highlighted ? Colors.whitePure : Colors.blue6};
 `}
 `;
@@ -57,6 +61,20 @@ export const ClusterContainer = styled.div`
   }
 `;
 
+export const ClusterDropdownContainer = styled.div`
+  background-color: ${Colors.grey1};
+  padding: 10px;
+  margin-bottom: 5px;
+`;
+
+export const ClusterDropdownClusterName = styled.div`
+  cursor: pointer;
+  padding: 5px;
+  &:hover {
+    background-color: ${Colors.grey3};
+  }
+`;
+
 export const ClusterContextName = styled.span`
   max-width: 200px;
   text-overflow: ellipsis;
@@ -64,8 +82,14 @@ export const ClusterContextName = styled.span`
   white-space: nowrap;
 `;
 
+export const ClusterAccessContainer = styled.span`
+  padding: 5px;
+  margin-right: 5px;
+`;
+
 export const ClusterOutlined = styled(RawClusterOutlined)`
-  font-size: 10px;
+  font-size: 12px;
+  margin-top: 4px;
   margin-right: 4px;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -82,10 +106,9 @@ export const ClusterStatus = styled.div`
 `;
 
 export const ClusterStatusText = styled.span<{connected: Boolean}>`
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.grey7}`};
+  padding-left: 5px;
+  font-size: 14px;
+  color: ${Colors.grey7};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -95,4 +118,14 @@ export const Divider = styled(RawDivider)`
 
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
+`;
+
+export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
+  color: ${Colors.greenOkay};
+  font-size: 13px;
+`;
+
+export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
+  color: ${Colors.yellowWarning};
+  font-size: 13px;
 `;

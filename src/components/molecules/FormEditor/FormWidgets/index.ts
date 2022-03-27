@@ -6,7 +6,7 @@ import {ResourceSelection} from './ResourceSelection';
 import {SecretKindResourceForm} from './SecretKindResourceForm';
 import {SecretKindSelection} from './SecretKindSelection';
 
-export function getCustomFormWidgets() {
+export function getCustomFormWidgets(): any {
   return {
     namespaceSelection: NamespaceSelection,
     resourceSelection: ResourceSelection,
@@ -15,7 +15,7 @@ export function getCustomFormWidgets() {
   };
 }
 
-export function getCustomFormFields() {
+export function getCustomFormFields(): any {
   return {
     secretKindSelection: SecretKindSelection,
     secretKindForm: SecretKindResourceForm,

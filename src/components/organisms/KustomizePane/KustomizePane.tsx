@@ -1,32 +1,23 @@
-import React, {useContext} from 'react';
+import React from 'react';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import {SectionRenderer, TitleBar} from '@molecules';
 
-import {MonoPaneTitle} from '@components/atoms';
-import {SectionRenderer} from '@components/molecules';
-
-import AppContext from '@src/AppContext';
 import KustomizationSectionBlueprint from '@src/navsections/KustomizationSectionBlueprint';
 import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';
 
 import * as S from './styled';
 
-const HelmPane: React.FC = () => {
-  const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
-
+const KustomizePane: React.FC = () => {
   return (
-    <>
-      <S.TitleBar>
-        <MonoPaneTitle>Kustomize</MonoPaneTitle>
-      </S.TitleBar>
-      <S.List id="kustomize-sections-container" height={navigatorHeight}>
+    <S.KustomizePaneContainer id="KustomizePane">
+      <TitleBar title="Kustomize" />
+
+      <S.List id="kustomize-sections-container">
         <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
         <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
-    </>
+    </S.KustomizePaneContainer>
   );
 };
 
-export default HelmPane;
+export default KustomizePane;

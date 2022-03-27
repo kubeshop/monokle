@@ -1,4 +1,5 @@
 import {AppDispatch} from '@models/appdispatch';
+import {PreviewType} from '@models/appstate';
 
 import {
   clearPreview,
@@ -9,40 +10,39 @@ import {
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-export const startPreview = (
-  targetResourceId: string,
-  type: 'kustomization' | 'cluster' | 'helm',
-  dispatch: AppDispatch
-) => {
+export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());
-  dispatch(startPreviewLoader({previewType: type, targetResourceId}));
+  dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
-    dispatch(previewKustomization(targetResourceId));
+    dispatch(previewKustomization(targetId));
   }
   if (type === 'cluster') {
-    dispatch(previewCluster(targetResourceId));
+    dispatch(previewCluster(targetId));
   }
   if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetResourceId));
+    dispatch(previewHelmValuesFile(targetId));
+  }
+  if (type === 'helm-preview-config') {
+    dispatch(runPreviewConfiguration(targetId));
   }
 };
 
-export const restartPreview = (
-  targetResourceId: string,
-  type: 'kustomization' | 'cluster' | 'helm',
-  dispatch: AppDispatch
-) => {
+export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   dispatch(clearPreview());
-  dispatch(startPreviewLoader({previewType: type, targetResourceId}));
+  dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
-    dispatch(previewKustomization(targetResourceId));
+    dispatch(previewKustomization(targetId));
   }
   if (type === 'cluster') {
-    dispatch(repreviewCluster(targetResourceId));
+    dispatch(repreviewCluster(targetId));
   }
   if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetResourceId));
+    dispatch(previewHelmValuesFile(targetId));
+  }
+  if (type === 'helm-preview-config') {
+    dispatch(runPreviewConfiguration(targetId));
   }
 };
 

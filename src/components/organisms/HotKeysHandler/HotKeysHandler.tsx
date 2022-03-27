@@ -18,14 +18,14 @@ import {
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {
+  currentConfigSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  settingsSelector,
 } from '@redux/selectors';
-import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
+import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -45,7 +45,7 @@ const HotKeysHandler = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const {kustomizeCommand} = useAppSelector(settingsSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -107,7 +107,7 @@ const HotKeysHandler = () => {
     return resource ? [resource] : [];
   }, [mainState.resourceMap, mainState.selectedResourceId]);
 
-  const onClickApplyResource = (namespace?: string) => {
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (!mainState.selectedResourceId) {
       setIsApplyModalVisible(false);
       return;
@@ -126,12 +126,11 @@ const HotKeysHandler = () => {
       mainState.resourceMap,
       mainState.fileMap,
       dispatch,
-      kubeConfigPath,
+      projectConfig,
       kubeConfigContext,
       namespace,
       {
         isClusterPreview,
-        kustomizeCommand,
       }
     );
     setIsApplyModalVisible(false);
@@ -279,7 +278,7 @@ const HotKeysHandler = () => {
           isVisible={isApplyModalVisible}
           resources={applySelectedResource}
           title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}

@@ -10,6 +10,7 @@ import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outg
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Services'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
@@ -18,9 +19,11 @@ const ServiceHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedService(resource.name, resource.namespace || 'default');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listServiceForAllNamespaces();
+    const response = namespace
+      ? await k8sCoreV1Api.listNamespacedService(namespace)
+      : await k8sCoreV1Api.listServiceForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

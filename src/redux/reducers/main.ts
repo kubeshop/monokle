@@ -1,80 +1,76 @@
 // eslint-disable-next-line
-import * as k8s from '@kubernetes/client-node';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
-import {Draft, PayloadAction, createAsyncThunk, createSlice, original} from '@reduxjs/toolkit';
-
-import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parseDocument} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
+  PreviewType,
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
+import {currentConfigSelector} from '@redux/selectors';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {getK8sVersion} from '@redux/services/projectConfig';
+import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
+import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {removeResource} from '@redux/thunks/removeResource';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
-import {getFileStats, getFileTimestamp} from '@utils/files';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
-
-import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+import {DIFF, trackEvent} from '@utils/telemetry';
+import {parseYamlDocument} from '@utils/yaml';
 
 import initialState from '../initialState';
-import {
-  addPath,
-  createFileEntry,
-  getFileEntryForAbsolutePath,
-  getResourcesForPath,
-  reloadFile,
-  removePath,
-  selectFilePath,
-} from '../services/fileEntry';
+import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
 import {
   deleteResource,
-  extractK8sResources,
   getResourceKindsWithTargetingRefs,
   isFileResource,
-  isUnsavedResource,
-  processParsedResources,
+  processResources,
   recalculateResourceRanges,
-  removeResourceFromFile,
-  reprocessResources,
   saveResource,
 } from '../services/resource';
-import {clearResourceSelections, updateSelectionAndHighlights} from '../services/selection';
+import {updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
-  appConfig: AppConfig;
+  projectConfig: ProjectConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   alert?: AlertType;
+  isScanExcludesUpdated: 'outdated' | 'applied';
+  isScanIncludesUpdated: 'outdated' | 'applied';
 };
 
 export type UpdateResourcePayload = {
@@ -108,8 +104,8 @@ export type SetDiffDataPayload = {
 };
 
 export type StartPreviewLoaderPayload = {
-  targetResourceId: string;
-  previewType: 'kustomization' | 'helm' | 'cluster';
+  targetId: string;
+  previewType: PreviewType;
 };
 
 function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
@@ -131,24 +127,130 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   state.currentSelectionHistoryIndex = undefined;
 }
 
-const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
+export const performResourceContentUpdate = (
+  resource: K8sResource,
+  newText: string,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType
+) => {
   if (isFileResource(resource)) {
-    const updatedFileText = saveResource(resource, newText, state.fileMap);
+    const updatedFileText = saveResource(resource, newText, fileMap);
     resource.text = updatedFileText;
-    resource.content = parseDocument(updatedFileText).toJS();
-    recalculateResourceRanges(resource, state);
+    resource.content = parseYamlDocument(updatedFileText).toJS();
+    recalculateResourceRanges(resource, fileMap, resourceMap);
   } else {
     resource.text = newText;
-    resource.content = parseDocument(newText).toJS();
+    resource.content = parseYamlDocument(newText).toJS();
   }
 };
 
 export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
-  async (shouldIgnore: boolean, thunkAPI) => {
-    electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
-    thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinks());
+  async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+
+    const nextMainState = createNextState(state.main, mainState => {
+      electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
+      state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
+
+      const projectConfig = currentConfigSelector(state);
+      const schemaVersion = getK8sVersion(projectConfig);
+      const userDataDir = String(state.config.userDataDir);
+      const resourceMap = getActiveResourceMap(mainState);
+
+      reprocessOptionalRefs(schemaVersion, userDataDir, resourceMap, mainState.resourceRefsProcessingOptions);
+    });
+
+    return nextMainState;
+  }
+);
+
+export const addResource = createAsyncThunk(
+  'main/addResource',
+  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = getK8sVersion(projectConfig);
+    const userDataDir = String(state.config.userDataDir);
+
+    const nextMainState = createNextState(state.main, mainState => {
+      mainState.resourceMap[resource.id] = resource;
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(mainState),
+        mainState.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
+    });
+
+    return nextMainState;
+  }
+);
+
+export const reprocessResource = createAsyncThunk(
+  'main/reprocessResource',
+  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = getK8sVersion(projectConfig);
+    const userDataDir = String(state.config.userDataDir);
+
+    const nextMainState = createNextState(state.main, mainState => {
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(mainState),
+        mainState.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
+    });
+
+    return nextMainState;
+  }
+);
+
+export const reprocessAllResources = createAsyncThunk(
+  'main/reprocessAllResources',
+  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const userDataDir = String(state.config.userDataDir);
+    const schemaVersion = getK8sVersion(projectConfig);
+
+    const nextMainState = createNextState(state.main, mainState => {
+      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions);
+    });
+
+    return nextMainState;
+  }
+);
+
+export const multiplePathsRemoved = createAsyncThunk(
+  'main/multiplePathsRemoved',
+  async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+
+    const nextMainState = createNextState(state.main, mainState => {
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
+        if (fileEntry) {
+          removePath(filePath, mainState, fileEntry);
+        }
+      });
+    });
+
+    return nextMainState;
   }
 );
 
@@ -165,7 +267,7 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
  * Returns a resourceMap containing only active resources depending if we are in preview mode
  */
 
-function getActiveResourceMap(state: Draft<AppState>) {
+export function getActiveResourceMap(state: AppState) {
   if (state.previewResourceId || state.previewValuesFileId) {
     let activeResourceMap: ResourceMapType = {};
     Object.values(state.resourceMap)
@@ -183,7 +285,7 @@ function getActiveResourceMap(state: Draft<AppState>) {
  * Returns a resourceMap containing only local resources
  */
 
-function getLocalResourceMap(state: Draft<AppState>) {
+export function getLocalResourceMap(state: AppState) {
   let localResourceMap: ResourceMapType = {};
   Object.values(state.resourceMap)
     .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
@@ -208,57 +310,6 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
-    addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      const resource = action.payload;
-      state.resourceMap[resource.id] = resource;
-
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceIds: [resource.id],
-        resourceKinds,
-      });
-    },
-    /**
-     * called by the file monitor when multiple paths are added to the file system
-     */
-    multiplePathsAdded: (
-      state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
-    ) => {
-      let filePaths: Array<string> = action.payload.paths;
-      const appConfig = action.payload.appConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state);
-          }
-        } else {
-          addPath(filePath, state, appConfig);
-        }
-      });
-    },
-    /**
-     * called by the file monitor when multiple files are changed in the file system
-     */
-    multipleFilesChanged: (
-      state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
-    ) => {
-      let filePaths = action.payload.paths;
-      const appConfig = action.payload.appConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          reloadFile(filePath, fileEntry, state);
-        } else {
-          addPath(filePath, state, appConfig);
-        }
-      });
-    },
-
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -268,189 +319,8 @@ export const mainSlice = createSlice({
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
           removePath(filePath, state, fileEntry);
-        } else {
-          log.warn(`removed file ${filePath} not known - ignoring..`);
         }
       });
-    },
-    /**
-     * updates the content of the specified path to the specified value
-     */
-    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
-      try {
-        const fileEntry = state.fileMap[action.payload.path];
-        if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-          const filePath = path.join(rootFolder, action.payload.path);
-
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            fs.writeFileSync(filePath, action.payload.content);
-            fileEntry.timestamp = getFileTimestamp(filePath);
-
-            getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-              deleteResource(r, state.resourceMap);
-            });
-
-            const extractedResources = extractK8sResources(
-              action.payload.content,
-              filePath.substring(rootFolder.length)
-            );
-
-            let resourceIds: string[] = [];
-
-            // only recalculate refs for resources that already have refs
-            Object.values(state.resourceMap)
-              .filter(r => r.refs)
-              .forEach(r => resourceIds.push(r.id));
-
-            Object.values(extractedResources).forEach(r => {
-              state.resourceMap[r.id] = r;
-              r.isHighlighted = true;
-              resourceIds.push(r.id);
-            });
-
-            reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-              resourceKinds: extractedResources.map(r => r.kind),
-            });
-          }
-        } else {
-          log.error(`Could not find FileEntry for ${action.payload.path}`);
-        }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    /**
-     * Reprocess all resources - called when changing processing-related options
-     */
-    reprocessResourcesForOptionalLinks: (state: Draft<AppState>) => {
-      // find all resourceKinds with optional refmappers
-      const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
-        const handler = getResourceKindHandler(kind);
-        if (handler && handler.outgoingRefMappers) {
-          return handler.outgoingRefMappers.some(mapper => mapper.source.isOptional);
-        }
-        return false;
-      });
-
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceKinds: resourceKindsWithOptionalRefs,
-        skipValidation: true,
-      });
-    },
-    /**
-     * Reprocesses a resource
-     */
-    reprocessResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      const resource = action.payload;
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceIds: [resource.id],
-        resourceKinds,
-      });
-    },
-    /**
-    /**
-     * Updates the content of the specified resource to the specified value
-     */
-    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
-      try {
-        const isInClusterMode = action.payload.isInClusterMode;
-
-        const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
-        const resource = isInClusterMode
-          ? state.resourceMap[action.payload.resourceId]
-          : currentResourceMap[action.payload.resourceId];
-
-        if (resource) {
-          performResourceContentUpdate(state, resource, action.payload.content);
-          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(resourceIds, currentResourceMap, state.fileMap, state.resourceRefsProcessingOptions);
-          if (!action.payload.preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(state, resource);
-          }
-        } else {
-          const r = state.resourceMap[action.payload.resourceId];
-          // check if this was a kustomization resource updated during a kustomize preview
-          if (
-            r &&
-            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
-            state.previewResourceId &&
-            isKustomizationResource(state.resourceMap[state.previewResourceId])
-          ) {
-            performResourceContentUpdate(state, r, action.payload.content);
-            processKustomizations(state.resourceMap, state.fileMap);
-          } else {
-            log.warn('Failed to find updated resource during preview', action.payload.resourceId);
-          }
-        }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    /**
-     * Updates the content of the specified resources to the specified values
-     */
-    updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
-      try {
-        let resourceIdsToReprocess: string[] = [];
-        const activeResources = getActiveResourceMap(state);
-
-        action.payload.forEach(({resourceId, content}) => {
-          const resource = activeResources[resourceId];
-          if (resource) {
-            performResourceContentUpdate(state, resource, content);
-            let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
-            resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
-          }
-        });
-        reprocessResources(resourceIdsToReprocess, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const resourceId = action.payload;
-      const resource = state.resourceMap[resourceId];
-      if (!resource) {
-        return;
-      }
-
-      updateReferringRefsOnDelete(resource, state.resourceMap);
-
-      if (state.selectedResourceId === resourceId) {
-        clearResourceSelections(state.resourceMap);
-        state.selectedResourceId = undefined;
-      }
-      if (isUnsavedResource(resource)) {
-        deleteResource(resource, state.resourceMap);
-        return;
-      }
-      if (isFileResource(resource)) {
-        removeResourceFromFile(resource, state.fileMap, state.resourceMap);
-        return;
-      }
-      if (state.previewType === 'cluster' && state.previewKubeConfigPath && state.previewKubeConfigContext) {
-        try {
-          const kubeConfig = new k8s.KubeConfig();
-          kubeConfig.loadFromFile(state.previewKubeConfigPath);
-          kubeConfig.setCurrentContext(state.previewKubeConfigContext);
-
-          const kindHandler = getResourceKindHandler(resource.kind);
-          if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeConfig, resource);
-            deleteResource(resource, state.resourceMap);
-          }
-        } catch (err) {
-          log.error(err);
-          return original(state);
-        }
-      }
     },
     /**
      * Marks the specified resource as selected and highlights all related resources
@@ -491,6 +361,12 @@ export const mainSlice = createSlice({
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
+    selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.selectedPreviewConfigurationId = action.payload;
+      state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
+      state.selectedValuesFileId = undefined;
+    },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
@@ -517,12 +393,12 @@ export const mainSlice = createSlice({
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
-      state.previewLoader.targetResourceId = action.payload.targetResourceId;
+      state.previewLoader.targetId = action.payload.targetId;
       state.previewType = action.payload.previewType;
     },
     stopPreviewLoader: (state: Draft<AppState>) => {
       state.previewLoader.isLoading = false;
-      state.previewLoader.targetResourceId = undefined;
+      state.previewLoader.targetId = undefined;
     },
     resetResourceFilter: (state: Draft<AppState>) => {
       state.resourceFilter = {labels: {}, annotations: {}};
@@ -589,9 +465,6 @@ export const mainSlice = createSlice({
       });
       state.resourceFilter = newFilter;
     },
-    setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
-    },
     setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
       state.clusterDiff.diffResourceId = action.payload;
     },
@@ -651,6 +524,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      trackEvent(DIFF);
       state.resourceDiff.targetResourceId = action.payload;
     },
     closeResourceDiffModal: (state: Draft<AppState>) => {
@@ -677,6 +551,24 @@ export const mainSlice = createSlice({
         notification.hasSeen = true;
       });
     },
+    openPreviewConfigurationEditor: (
+      state: Draft<AppState>,
+      action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
+    ) => {
+      const {helmChartId, previewConfigurationId} = action.payload;
+      state.prevConfEditor = {
+        helmChartId,
+        previewConfigurationId,
+        isOpen: true,
+      };
+    },
+    closePreviewConfigurationEditor: (state: Draft<AppState>) => {
+      state.prevConfEditor = {
+        isOpen: false,
+        helmChartId: undefined,
+        previewConfigurationId: undefined,
+      };
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -691,17 +583,18 @@ export const mainSlice = createSlice({
       .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
         state.selectedResourceId = action.payload.previewResourceId;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.selectedPreviewConfigurationId = undefined;
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
 
@@ -709,7 +602,7 @@ export const mainSlice = createSlice({
       .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
@@ -721,7 +614,24 @@ export const mainSlice = createSlice({
       })
       .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
+        state.previewType = undefined;
+      });
+
+    builder
+      .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        resetSelectionHistory(state);
+        state.selectedResourceId = undefined;
+        state.selectedPath = undefined;
+        state.checkedResourceIds = [];
+      })
+      .addCase(runPreviewConfiguration.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
 
@@ -729,11 +639,12 @@ export const mainSlice = createSlice({
       .addCase(previewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
         state.selectedResourceId = undefined;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
@@ -742,7 +653,7 @@ export const mainSlice = createSlice({
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
 
@@ -750,7 +661,7 @@ export const mainSlice = createSlice({
       .addCase(repreviewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         let resource = null;
         if (action && action.payload && action.payload.previewResources && state && state.selectedResourceId) {
           resource = action.payload.previewResources[state.selectedResourceId];
@@ -761,7 +672,7 @@ export const mainSlice = createSlice({
       })
       .addCase(repreviewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
-        state.previewLoader.targetResourceId = undefined;
+        state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
 
@@ -771,16 +682,18 @@ export const mainSlice = createSlice({
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
       state.previewLoader.isLoading = false;
-      state.previewLoader.targetResourceId = undefined;
+      state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
+      state.previewConfigurationId = undefined;
       state.previewType = undefined;
       state.previewValuesFileId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
       state.previewLoader = {
         isLoading: false,
-        targetResourceId: undefined,
+        targetId: undefined,
       };
       state.checkedResourceIds = [];
       state.resourceDiff = {
@@ -810,16 +723,9 @@ export const mainSlice = createSlice({
 
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
-          const resourcesFromFile = Object.values(state.resourceMap).filter(
-            r => r.filePath === resourceFileEntry.filePath
-          );
-          resourcesFromFile.forEach(r => {
-            delete state.resourceMap[r.id];
-          });
         } else {
-          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          const newFileEntry = {...createFileEntry(relativeFilePath, state.fileMap), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
-          state.fileMap[relativeFilePath] = newFileEntry;
           const childFileName = path.basename(relativeFilePath);
           const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
           if (parentPath === path.sep) {
@@ -874,7 +780,10 @@ export const mainSlice = createSlice({
           return;
         }
 
-        const isInPreviewMode = Boolean(state.previewResourceId) || Boolean(state.previewValuesFileId);
+        const isInPreviewMode =
+          Boolean(state.previewResourceId) ||
+          Boolean(state.previewValuesFileId) ||
+          Boolean(state.previewConfigurationId);
 
         // get the local resources from state.resourceMap
         let localResources: K8sResource[] = [];
@@ -1011,6 +920,50 @@ export const mainSlice = createSlice({
         state.clusterDiff.hasLoaded = true;
       });
 
+    builder.addCase(multiplePathsChanged.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(multiplePathsAdded.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(removeResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateManyResources.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateFileEntry.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(addResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(reprocessResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(reprocessAllResources.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
     builder.addMatcher(
       () => true,
       (state, action) => {
@@ -1049,6 +1002,7 @@ function groupResourcesByIdentifier(
 function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResourceId = undefined;
   state.previewValuesFileId = undefined;
+  state.previewConfigurationId = undefined;
 
   if (payload.previewResourceId) {
     if (state.previewType === 'kustomization') {
@@ -1070,6 +1024,9 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
       state.previewKubeConfigPath = payload.previewKubeConfigPath;
       state.previewKubeConfigContext = payload.previewKubeConfigContext;
     }
+    if (state.previewType === 'helm-preview-config') {
+      state.previewConfigurationId = payload.previewResourceId;
+    }
   }
 
   // remove previous preview resources
@@ -1086,23 +1043,15 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
 
 export const {
   setAppRehydrating,
-  addResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,
   setApplyingResource,
-  updateResource,
-  updateManyResources,
-  updateFileEntry,
-  multiplePathsAdded,
-  multipleFilesChanged,
-  multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
   clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
-  removeResource,
   updateResourceFilter,
   extendResourceFilter,
   setDiffResourceInClusterDiff,
@@ -1114,7 +1063,6 @@ export const {
   reloadClusterDiff,
   toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
-  reprocessResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckAllResourceIds,
@@ -1128,5 +1076,8 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  openPreviewConfigurationEditor,
+  closePreviewConfigurationEditor,
+  selectPreviewConfiguration,
 } = mainSlice.actions;
 export default mainSlice.reducer;

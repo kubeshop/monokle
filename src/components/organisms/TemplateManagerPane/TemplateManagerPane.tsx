@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {TEMPLATES_HEIGHT_OFFSET} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -13,9 +13,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
-import {TitleBar} from '@components/molecules';
-
-import {useWindowSize} from '@utils/hooks';
+import {TitleBar} from '@molecules';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
@@ -35,7 +33,13 @@ const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
   return shouldBeFiltered;
 };
 
-const TemplatesPane: React.FC = () => {
+interface IProps {
+  contentHeight?: number;
+}
+
+const TemplatesManagerPane: React.FC<IProps> = props => {
+  const {contentHeight} = props;
+
   const dispatch = useAppDispatch();
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
@@ -45,11 +49,12 @@ const TemplatesPane: React.FC = () => {
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+  const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
   const [searchedValue, setSearchedValue] = useState<string>();
   const [visibleTemplateEntries, setVisibleTemplateEntries] = useState<[string, AnyTemplate][]>();
 
-  const windowSize = useWindowSize();
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const isLoading = useMemo(() => {
     return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;
@@ -58,11 +63,6 @@ const TemplatesPane: React.FC = () => {
   const templates = useMemo(() => {
     return Object.values(templateMap);
   }, [templateMap]);
-
-  const templatesHeight = useMemo(
-    () => windowSize.height - TEMPLATES_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
-    [windowSize.height, isInPreviewMode]
-  );
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);
@@ -93,21 +93,22 @@ const TemplatesPane: React.FC = () => {
   }, [searchedValue, templateMap]);
 
   return (
-    <>
-      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
-      <TitleBar title="Templates">
-        <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
-          <Button
-            disabled={templates.length === 0}
-            onClick={onClickReload}
-            type="link"
-            size="small"
-            icon={<ReloadOutlined />}
-          />
-        </Tooltip>
-      </TitleBar>
+    <S.TemplateManagerPaneContainer id="TemplateManagerPane">
+      <div ref={titleBarRef}>
+        <TitleBar title="Templates">
+          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+            <Button
+              disabled={templates.length === 0}
+              onClick={onClickReload}
+              type="link"
+              size="small"
+              icon={<ReloadOutlined />}
+            />
+          </Tooltip>
+        </TitleBar>
+      </div>
 
-      <S.Container>
+      <S.Container $height={contentHeight ? contentHeight - titleBarHeight : 0}>
         {isLoading ? (
           <S.Skeleton />
         ) : !visibleTemplateEntries ? (
@@ -125,22 +126,30 @@ const TemplatesPane: React.FC = () => {
             {!visibleTemplateEntries.length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
-              <S.TemplatesContainer $height={templatesHeight}>
-                {visibleTemplateEntries.map(([path, template]) => (
-                  <TemplateInformation
-                    key={path}
-                    template={template}
-                    disabled={isInPreviewMode}
-                    onClickOpenTemplate={() => onClickOpenTemplate(template)}
-                  />
-                ))}
+              <S.TemplatesContainer>
+                {visibleTemplateEntries
+                  .sort((a, b) => {
+                    if (favoriteTemplates.includes(a[1].id)) return -1;
+                    if (favoriteTemplates.includes(b[1].id)) return 1;
+                    return 0;
+                  })
+                  .map(([path, template]) => (
+                    <TemplateInformation
+                      key={path}
+                      template={template}
+                      disabled={isInPreviewMode}
+                      onClickOpenTemplate={() => onClickOpenTemplate(template)}
+                    />
+                  ))}
               </S.TemplatesContainer>
             )}
           </>
         )}
       </S.Container>
-    </>
+
+      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
+    </S.TemplateManagerPaneContainer>
   );
 };
 
-export default TemplatesPane;
+export default TemplatesManagerPane;

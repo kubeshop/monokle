@@ -12,8 +12,10 @@ type ItemContainerProps = {
   level: number;
   isLastItem: boolean;
   hasOnClick: boolean;
+  $indentation: number;
   $isSectionCheckable: boolean;
   $hasCustomNameDisplay: boolean;
+  $lastItemMarginBottom?: number;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -21,12 +23,18 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   align-items: center;
   width: 100%;
   user-select: none;
-  padding-left: ${props => (props.$isSectionCheckable ? '32px;' : '26px;')}
+  ${props => {
+    const defaultIndentation = props.$isSectionCheckable ? 32 : 26;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
+  }}
   padding-right: 8px;
   margin-bottom: 2px;
   ${props => props.hasOnClick && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
+      if (props.$lastItemMarginBottom !== undefined) {
+        return `margin-bottom: ${props.$lastItemMarginBottom}px;`;
+      }
       return `margin-bottom: 12px;`;
     }
   }}

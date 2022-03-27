@@ -17,6 +17,7 @@ import {knownResourceKindsSelector} from '@redux/selectors';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
+import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -137,8 +138,10 @@ const QuickSearchActionsV3: React.FC = () => {
       } else if (type === 'resource') {
         if (!filteredResources[option]) {
           selectK8sResourceWithConfirm(option, resourceMap[option].name, dispatch);
-        } else if (selectedResourceId !== option) {
-          dispatch(selectK8sResource({resourceId: option}));
+        } else {
+          if (selectedResourceId !== option) {
+            dispatch(selectK8sResource({resourceId: option}));
+          }
           dispatch(closeQuickSearchActionsPopup());
         }
       }
@@ -246,6 +249,7 @@ const QuickSearchActionsV3: React.FC = () => {
 
   useEffect(() => {
     if (isOpen) {
+      trackEvent(QUICK_SEARCH);
       setSearchingValue('');
     }
   }, [isOpen]);

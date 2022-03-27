@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Form, Input, Modal, Select} from 'antd';
@@ -34,6 +34,13 @@ const SELECT_OPTION_NONE = '<none>';
 const {Option, OptGroup} = Select;
 
 const NewResourceWizard = () => {
+  const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
+  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
@@ -42,7 +49,6 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
-  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -50,12 +56,6 @@ const NewResourceWizard = () => {
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
   lastApiVersionRef.current = form.getFieldValue('apiVersion');
-
-  const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
@@ -297,37 +297,39 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const foldersList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => file.isFolder),
-    [fileMap]
-  );
+  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
+    const folders: string[] = [];
+    const files: string[] = [];
 
-  const fileList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => !file.isFolder),
-    [fileMap]
-  );
+    Object.entries(fileMap).forEach(([key, value]) => {
+      if (value.children) {
+        folders.push(key.replace(path.sep, ''));
+      } else {
+        if (!value.isSupported || value.isExcluded) {
+          return;
+        }
+        files.push(key.replace(path.sep, ''));
+      }
+    });
 
-  const renderFolderSelectOptions = () => {
-    return foldersList.map(folder => (
-      <Option key={folder.folderName} value={folder.folderName}>
-        {folder.folderName}
+    return [folders, files];
+  }, [fileMap]);
+
+  const renderFileSelectOptions = useCallback(() => {
+    return filesList.map(fileName => (
+      <Option key={fileName} value={fileName}>
+        {fileName}
       </Option>
     ));
-  };
+  }, [filesList]);
 
-  const renderFileSelectOptions = () => {
-    return fileList.map(folder => (
-      <Option key={folder.fileName} value={folder.fileName}>
-        {folder.fileName}
+  const renderFolderSelectOptions = useCallback(() => {
+    return foldersList.map(folderName => (
+      <Option key={folderName} value={folderName}>
+        {folderName}
       </Option>
     ));
-  };
+  }, [foldersList]);
 
   const onSelectChange = () => {
     setInputValue('');
@@ -347,7 +349,7 @@ const NewResourceWizard = () => {
 
   return (
     <Modal
-      title="Add New Resource"
+      title="Create Resource"
       visible={newResourceWizardState.isOpen}
       onOk={onOk}
       onCancel={onCancel}
@@ -387,7 +389,7 @@ const NewResourceWizard = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input maxLength={63} placeholder="Enter resource name" />
+          <Input id="resource-name-input" maxLength={63} placeholder="Enter resource name" />
         </Form.Item>
 
         <Form.Item

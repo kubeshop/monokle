@@ -17,13 +17,14 @@ type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
   level: number;
   isLastSection: boolean;
+  parentIndentation?: number;
   itemRendererOptions?: ItemRendererOptions;
 };
 
 function SectionRenderer(props: SectionRendererProps) {
-  const {sectionBlueprint, level, isLastSection, itemRendererOptions} = props;
+  const {sectionBlueprint, level, isLastSection, itemRendererOptions, parentIndentation} = props;
 
-  const {itemBlueprint, name: sectionName, id: sectionId} = sectionBlueprint;
+  const {itemBlueprint, id: sectionId} = sectionBlueprint;
 
   const sectionInstance: SectionInstance | undefined = useAppSelector(
     state => state.navigator.sectionInstanceMap[sectionId]
@@ -45,6 +46,23 @@ function SectionRenderer(props: SectionRendererProps) {
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
+
+  const sectionIndentation = useMemo(() => {
+    const indentation = sectionBlueprint.customization?.indentation;
+    if (!parentIndentation && !indentation) {
+      return undefined;
+    }
+    if (parentIndentation && !indentation) {
+      return parentIndentation;
+    }
+    if (!parentIndentation && indentation) {
+      return indentation;
+    }
+    if (parentIndentation && indentation) {
+      return parentIndentation + indentation;
+    }
+    return undefined;
+  }, [parentIndentation, sectionBlueprint.customization?.indentation]);
 
   const isCollapsedMode = useMemo(() => {
     if (!sectionInstance?.id) {
@@ -171,7 +189,7 @@ function SectionRenderer(props: SectionRendererProps) {
     }
     return (
       <S.EmptyDisplayContainer level={level}>
-        <h1>{sectionBlueprint.name}</h1>
+        <h1>{sectionInstance.name}</h1>
         <p>Section is empty.</p>
       </S.EmptyDisplayContainer>
     );
@@ -180,15 +198,15 @@ function SectionRenderer(props: SectionRendererProps) {
   return (
     <>
       <SectionHeader
-        name={sectionName}
+        name={sectionInstance.name}
         sectionInstance={sectionInstance}
         sectionBlueprint={sectionBlueprint}
         isCollapsed={isCollapsed}
-        isCollapsedMode={isCollapsedMode}
         isLastSection={isLastSection}
         level={level}
         expandSection={expandSection}
         collapseSection={collapseSection}
+        indentation={sectionIndentation || 0}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&
@@ -205,6 +223,7 @@ function SectionRenderer(props: SectionRendererProps) {
             isSectionCheckable={Boolean(sectionInstance.checkable)}
             sectionContainerElementId={sectionBlueprint.containerElementId}
             options={itemRendererOptions}
+            indentation={sectionIndentation || 0}
           />
         ))}
       {sectionInstance?.isVisible &&
@@ -218,21 +237,28 @@ function SectionRenderer(props: SectionRendererProps) {
               <S.SectionContainer style={{color: 'red'}}>
                 <S.Name $level={level + 1}>
                   {group.name}
-                  <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
+                  <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
                 </S.Name>
               </S.SectionContainer>
-              {group.visibleItemIds.map(itemId => (
-                <ItemRenderer
-                  key={itemId}
-                  itemId={itemId}
-                  blueprint={itemBlueprint}
-                  level={level + 2}
-                  isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
-                  isSectionCheckable={Boolean(sectionInstance.checkable)}
-                  sectionContainerElementId={sectionBlueprint.containerElementId}
-                  options={itemRendererOptions}
-                />
-              ))}
+              {group.visibleItemIds.length ? (
+                group.visibleItemIds.map(itemId => (
+                  <ItemRenderer
+                    key={itemId}
+                    itemId={itemId}
+                    blueprint={itemBlueprint}
+                    level={level + 2}
+                    isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
+                    isSectionCheckable={Boolean(sectionInstance.checkable)}
+                    sectionContainerElementId={sectionBlueprint.containerElementId}
+                    options={itemRendererOptions}
+                    indentation={sectionIndentation || 0}
+                  />
+                ))
+              ) : (
+                <S.EmptyGroupText>
+                  {sectionBlueprint.customization?.emptyGroupText || 'No items in this group.'}
+                </S.EmptyGroupText>
+              )}
             </React.Fragment>
           );
         })}
@@ -243,8 +269,12 @@ function SectionRenderer(props: SectionRendererProps) {
             sectionBlueprint={child}
             level={level + 1}
             isLastSection={child.id === lastVisibleChildSectionId}
+            parentIndentation={sectionIndentation}
           />
         ))}
+      {sectionBlueprint.customization?.sectionMarginBottom !== undefined && (
+        <div style={{marginBottom: sectionBlueprint.customization.sectionMarginBottom}} />
+      )}
     </>
   );
 }

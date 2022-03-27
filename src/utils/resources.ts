@@ -41,10 +41,13 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
-    if (!resourceLabels) {
+    const templateLabels = resource.content?.spec?.template?.metadata?.labels;
+    if (!resourceLabels && !templateLabels) {
       return false;
     }
-    const isPassingLabelFilter = isPassingKeyValueFilter(resourceLabels, filters.labels);
+    const isPassingLabelFilter =
+      (resourceLabels && isPassingKeyValueFilter(resourceLabels, filters.labels)) ||
+      (templateLabels && isPassingKeyValueFilter(templateLabels, filters.labels));
     if (!isPassingLabelFilter) {
       return false;
     }
@@ -106,11 +109,14 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   };
 }
 
-export function getDefaultNamespaceForApply(resources: K8sResource[]): {
+export function getDefaultNamespaceForApply(
+  resources: K8sResource[],
+  defaultNamespace = 'default'
+): {
   defaultNamespace: string;
   defaultOption?: string;
 } {
-  let namespace = 'default';
+  let namespace = defaultNamespace;
 
   for (let i = 0; i < resources.length; i += 1) {
     const resourceNamespace = resources[i].namespace;

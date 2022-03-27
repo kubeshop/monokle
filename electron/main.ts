@@ -1,11 +1,21 @@
 /* eslint-disable import/order */
 /* eslint-disable import/first */
+import additionalEnvironmentVariables from './env.json';
+
+Object.keys(additionalEnvironmentVariables).forEach((key: string) => {
+  // @ts-ignore
+  process.env[key] = additionalEnvironmentVariables[key];
+});
+
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
+import { machineIdSync } from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
+import unhandled from 'electron-unhandled';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
-  '@constants': `${__dirname}/../src/constants`,
+  '@constants': `${__dirname}/../src/constants`, 
   '@models': `${__dirname}/../src/models`,
   '@redux': `${__dirname}/../src/redux`,
   '@utils': `${__dirname}/../src/utils`,
@@ -19,17 +29,27 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH, DEFAULT_PLUGINS, ROOT_FILE_ENTRY} from '@constants/constants';
+import {
+  APP_MIN_HEIGHT,
+  APP_MIN_WIDTH,
+  DEFAULT_PLUGINS,
+  DEFAULT_TEMPLATES_PLUGIN_URL,
+  DEPENDENCIES_HELP_URL,
+  ROOT_FILE_ENTRY,
+} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
-import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
+import utilsElectronStore from '@utils/electronStore';
+import {
+  changeCurrentProjectName,
+  setUserDirs,
+  updateNewVersion,
+} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector, activeProjectSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
-import {PROCESS_ENV} from '@utils/env';
 import asyncLib from "async";
 
 import {createMenu, getDockMenu} from './menu';
@@ -38,7 +58,12 @@ import terminal from '../cli/terminal';
 import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
-import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
+import {
+  checkNewVersion,
+  interpolateTemplate, runCommand,
+  saveFileDialog,
+  selectFileDialog,
+} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
@@ -50,14 +75,26 @@ import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplat
 import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
-import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects } from './utils';
+import {
+  askActionConfirmation,
+  checkMissingDependencies,
+  convertRecentFilesToRecentProjects,
+  getSerializedProcessEnv,
+  initNucleus,
+  saveInitialK8sSchema,
+  setDeviceID,
+  setProjectsRootFolder,
+} from './utils';
+import {InterpolateTemplateOptions} from '@redux/services/templates';
+import {StartupFlags} from '@utils/startupFlag';
+import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
+import {CommandOptions} from '@utils/command';
+import { trackEvent, UPDATE_APPLICATION } from '@utils/telemetry';
 
 Object.assign(console, ElectronLog.functions);
 
-const {MONOKLE_RUN_AS_NODE} = process.env;
-
-const isDev = PROCESS_ENV.NODE_ENV === 'development';
+const {MONOKLE_RUN_AS_NODE, NODE_ENV} = process.env;
+const isDev = NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
@@ -67,12 +104,29 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
-ipcMain.on('get-user-home-dir', event => {
+let {disableErrorReports,disableTracking} =  initNucleus(isDev, app);
+unhandled({
+  logger: (error) => {
+      if (!disableErrorReports) {
+        Nucleus.trackError((error && error.name) || 'Unnamed error', error);
+      }
+    },
+    showDialog: false
+});
+
+setProjectsRootFolder(userHomeDir);
+saveInitialK8sSchema(userDataDir);
+setDeviceID(machineIdSync());
+
+ipcMain.on('track-event', async (event: any, { eventName, payload }: any) => {
+    Nucleus.track(eventName, {...payload});
+});
+
+ipcMain.on('get-user-home-dir', (event:any) => {
   event.returnValue = userHomeDir;
 });
 
-
-ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+ipcMain.on(DOWNLOAD_PLUGIN, async (event:any, pluginUrl: string) => {
   try {
     const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
     const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
@@ -87,7 +141,7 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE, async (event:any, templateUrl: string) => {
   try {
     const templateExtension = await downloadTemplate(templateUrl, templatesDir);
     const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
@@ -101,7 +155,7 @@ ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event:any, templatePackUrl: string) => {
   try {
     const templatePackExtension = await downloadTemplatePack(templatePackUrl, templatePacksDir);
     const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
@@ -122,7 +176,7 @@ type UpdateExtensionsPayload = {
   pluginMap: Record<string, AnyPlugin>;
 };
 
-ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) => {
+ipcMain.on(UPDATE_EXTENSIONS, async (event:any, payload: UpdateExtensionsPayload) => {
   const {templateMap, pluginMap, templatePackMap} = payload;
   let errorMessage = '';
 
@@ -195,20 +249,20 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
-  runKustomize(cmdOptions, event);
+ipcMain.on('interpolate-vanilla-template', (event:any, args: InterpolateTemplateOptions) => {
+  interpolateTemplate(args, event);
 });
 
 ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
-ipcMain.handle('save-file', async (event, options: FileOptions) => {
+ipcMain.handle('save-file', async (event:any, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
-ipcMain.on('run-helm', (event, args: any) => {
-  runHelm(args, event);
+ipcMain.on('run-command', (event, args: CommandOptions) => {
+  runCommand(args, event);
 });
 
 ipcMain.on('app-version', event => {
@@ -220,8 +274,22 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
+  trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+});
+
+ipcMain.on('confirm-action', (event:any, args) => {
+  event.returnValue = askActionConfirmation(args);
+});
+
+ipcMain.on('global-electron-store-update', (event, args: any) => {
+  if (args.eventType === StorePropagation.ChangeProjectName) {
+    const payload: ProjectNameChange = args.payload;
+    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+  } else {
+    log.warn(`received invalid event type for global electron store update ${args.eventType}`);
+  }
 });
 
 export const createWindow = (givenPath?: string) => {
@@ -255,6 +323,7 @@ export const createWindow = (givenPath?: string) => {
   };
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
+  let unsavedResourceCount = 0;
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -307,12 +376,20 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
+    Nucleus.appStarted();
+
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
-      setWindowTitle(storeState, win);
+      let projectName = activeProjectSelector(storeState)?.name;
+      setWindowTitle(storeState, win, projectName);
+      unsavedResourceCount = unsavedResourcesSelector(storeState).length;
     });
 
     dispatch(setAppRehydrating(true));
+    if (process.argv.includes(StartupFlags.AUTOMATION)) {
+      win.webContents.send('set-automation');
+    }
+
     dispatch(setUserDirs({
       homeDir: userHomeDir,
       tempDir: userTempDir,
@@ -338,16 +415,22 @@ export const createWindow = (givenPath?: string) => {
       const alert: AlertType = {
         type: AlertEnum.Warning,
         title: 'Missing dependency',
-        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available`,
+        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available.
+        [Read more](${DEPENDENCIES_HELP_URL})`,
       };
       dispatchToWindow(win, setAlert(alert));
     }
-    win.webContents.send('executed-from', {path: givenPath});
+    win.webContents.send('executed-from', {path: givenPath });
+    win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
 
+    const hasDeletedDefaultTemplatesPlugin = Boolean(utilsElectronStore.get('appConfig.hasDeletedDefaultTemplatesPlugin'));
     const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
+      if (hasDeletedDefaultTemplatesPlugin && defaultPlugin.url === DEFAULT_TEMPLATES_PLUGIN_URL) {
+        return false;
+      }
       return !uniquePluginNames.includes(`${defaultPlugin.owner}-${defaultPlugin.name}`);
     });
 
@@ -362,9 +445,18 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
-
     convertRecentFilesToRecentProjects(dispatch);
+  });
 
+  win.on('close', (e) => {
+    const confirmed = askActionConfirmation({
+      unsavedResourceCount,
+      action: "close this window"
+    });
+
+    if (!confirmed) {
+      e.preventDefault();
+    }
   });
 
   return win;
@@ -424,7 +516,7 @@ if (MONOKLE_RUN_AS_NODE) {
 
 terminal().catch(e => log.error(e));
 
-export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
+export const setWindowTitle = (state: RootState, window: BrowserWindow, projectName?: String) => {
   if (window.isDestroyed()) {
     return;
   }
@@ -437,6 +529,14 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   const helmValuesMap = state.main.helmValuesMap;
   const helmChartMap = state.main.helmChartMap;
   const fileMap = state.main.fileMap;
+  disableTracking = state.config.disableEventTracking;
+  disableErrorReports = state.config.disableErrorReporting;
+
+  if (disableTracking) {
+    Nucleus.disableTracking();
+  } else {
+    Nucleus.enableTracking();
+  }
 
   let previewResource: K8sResource | undefined;
   let previewValuesFile: HelmValuesFile | undefined;
@@ -471,7 +571,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   }
   if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
     windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
-    window.setTitle(`Monokle - ${windowTitle}`);
+    window.setTitle(`Monokle - ${projectName} -${windowTitle}`);
     return;
   }
   window.setTitle(windowTitle);

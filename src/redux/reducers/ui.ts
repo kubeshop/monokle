@@ -1,13 +1,19 @@
+import {webFrame} from 'electron';
+
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
+import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT} from '@constants/constants';
+
 import {
   HighlightItems,
+  LayoutSizeType,
   LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
   PaneConfiguration,
+  RightMenuSelectionType,
   UiState,
 } from '@models/ui';
 
@@ -23,6 +29,12 @@ export const uiSlice = createSlice({
   reducers: {
     toggleResourceFilters: (state: Draft<UiState>) => {
       state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
+    },
+    zoomIn: () => {
+      webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+    },
+    zoomOut: () => {
+      webFrame.setZoomFactor(Number(webFrame.getZoomFactor() - 0.1));
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
@@ -49,6 +61,9 @@ export const uiSlice = createSlice({
       state.rightMenu.isActive = !state.rightMenu.isActive;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
     },
+    setLayoutSize: (state: Draft<UiState>, action: PayloadAction<LayoutSizeType>) => {
+      state.layoutSize = action.payload;
+    },
     toggleNotifications: (state: Draft<UiState>) => {
       state.isNotificationsOpen = !state.isNotificationsOpen;
     },
@@ -56,7 +71,7 @@ export const uiSlice = createSlice({
       state.rightMenu.isActive = action.payload;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
     },
-    setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<RightMenuSelectionType>) => {
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
@@ -196,6 +211,8 @@ export const uiSlice = createSlice({
         navWidth: 0.3333,
         editWidth: 0.3333,
         rightWidth: 0,
+        actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+        recentProjectsPaneWidth: 450,
       };
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
@@ -205,6 +222,12 @@ export const uiSlice = createSlice({
       state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
       state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
       state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
+    },
+    openReleaseNotesDrawer: (state: Draft<UiState>) => {
+      state.isReleaseNotesDrawerOpen = true;
+    },
+    closeReleaseNotesDrawer: (state: Draft<UiState>) => {
+      state.isReleaseNotesDrawerOpen = false;
     },
   },
   extraReducers: builder => {
@@ -263,10 +286,15 @@ export const {
   closeCreateProjectModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
+  setLayoutSize,
   highlightItem,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
   openSaveResourcesToFileFolderModal,
   closeSaveResourcesToFileFolderModal,
+  zoomIn,
+  zoomOut,
+  openReleaseNotesDrawer,
+  closeReleaseNotesDrawer,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -2,6 +2,74 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.2](https://github.com/kubeshop/monokle/compare/v1.6.1...v1.6.2) (2022-03-25)
+
+
+### Bug Fixes
+
+* electronStore onDidChange error ([d273a31](https://github.com/kubeshop/monokle/commit/d273a31f14b79ce2f25e9cb2c16f1f4ae5455663))
+* make sure paneConfiguration has initial state ([ff8456b](https://github.com/kubeshop/monokle/commit/ff8456b61a344081f1b238858a092c206a4aa77c))
+* thunks that were mutating state directly ([14c8ed4](https://github.com/kubeshop/monokle/commit/14c8ed48018b428360d557e4a664dc4524156e23))
+
+### [1.6.1](https://github.com/kubeshop/monokle/compare/v1.6.1-nightly-2022-03-25.0...v1.6.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* cluster compare and resource diff when no namespaces is selected ([58d2a4f](https://github.com/kubeshop/monokle/commit/58d2a4fc18176dd931f0aaa8f4e777f11b4155be))
+* upgrade @reduxjs/toolkit from 1.7.2 to 1.8.0 ([f7e254a](https://github.com/kubeshop/monokle/commit/f7e254a3b8f742fae135047e89980b3716d9204c))
+* upgrade antd from 4.18.8 to 4.18.9 ([7577a0f](https://github.com/kubeshop/monokle/commit/7577a0f0492f97695181b7ffe25d7c12ab285c79))
+* upgrade luxon from 2.3.0 to 2.3.1 ([d3583aa](https://github.com/kubeshop/monokle/commit/d3583aa48833fe58d0b21e0e7fd12e8e39e43ff0))
+* upgrade vm2 from 3.9.8 to 3.9.9 ([89a5c4f](https://github.com/kubeshop/monokle/commit/89a5c4ffae5ed79c386ae5e4344d70965403604f))
+
+## [1.6.0](https://github.com/kubeshop/monokle/compare/v1.5.2-nightly-2022-03-21.0...v1.6.0) (2022-03-21)
+
+
+### Bug Fixes
+
+* add more paths for mac ([727086b](https://github.com/kubeshop/monokle/commit/727086b4038d66c78d2ac83c1bfed5741b86e1c4))
+* error msg ([4ce056e](https://github.com/kubeshop/monokle/commit/4ce056e498bdfcdf4e25fbda168e0895067e0f91))
+* error msg ([e810864](https://github.com/kubeshop/monokle/commit/e8108644dc93314d65357dadc8100b6bed8126ff))
+
+### [1.5.1](https://github.com/kubeshop/monokle/compare/v1.5.1-nightly-2022-02-10.0...v1.5.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* added more ignored properties ([0328761](https://github.com/kubeshop/monokle/commit/032876136a920ba5d88da77c706ac512b96547f1))
+* added more properties to ignore during validation ([6a8f16e](https://github.com/kubeshop/monokle/commit/6a8f16ec01b6803a3ae67713c4cbcbd24adadca2))
+* added properties to ignored properties in diff ([182059a](https://github.com/kubeshop/monokle/commit/182059a0f22755a22ef5f45024a31590fe0a40aa))
+* adding/removing Chart.yaml and values files ([ebd7f09](https://github.com/kubeshop/monokle/commit/ebd7f095ab1eb13f900d8f8add5509c52d6c09cd))
+* enable select a template button on back ([b7659d0](https://github.com/kubeshop/monokle/commit/b7659d01a372ab334f0f4acfff509a86fe05649d))
+* reprocess kustomizations on addPath ([121f5fa](https://github.com/kubeshop/monokle/commit/121f5fa6ca91f4a15ad95c69ae2446b49a43f26e))
+
+## [1.5.0](https://github.com/kubeshop/monokle/compare/v1.4.1-nightly-2022-01-31.0...v1.5.0) (2022-01-31)
+
+
+### Features
+
+* implemented logic for removal of default values ([d9ba34f](https://github.com/kubeshop/monokle/commit/d9ba34f5cf83af24d0b31b7f30cd6c6279ad5ee8))
+* set value checker for .monokle file ([91266e2](https://github.com/kubeshop/monokle/commit/91266e204b91933fee55af8a17df6b75978e485d))
+
+
+### Bug Fixes
+
+* check iskustomization for form ([1ce5ae3](https://github.com/kubeshop/monokle/commit/1ce5ae3f15846c8e5265b015354c9efb9b4a4d2b))
+* close dropdown when deleting a project ([99e3749](https://github.com/kubeshop/monokle/commit/99e3749908cc27089de87ed01ce3b8400391dc73))
+* dispatch open project only for different projects ([df57584](https://github.com/kubeshop/monokle/commit/df5758494744097430e17a8e31a488043644e42e))
+* fallback to source editor if no form available ([626f64c](https://github.com/kubeshop/monokle/commit/626f64cb8ed48384222223098ba167316f4568d3))
+* handle both relative and obsolute ([5b91fb0](https://github.com/kubeshop/monokle/commit/5b91fb0aa248029fc62a4cc0a38703040a84a998))
+* improved kustomization reprocessing ([a307bb1](https://github.com/kubeshop/monokle/commit/a307bb1c8504bdeb273c5dc55900f3ff4d20dbe0))
+* Kustomize schema/forms and errors related to conflicts with Flux Kustomize CRD ([8a99bcf](https://github.com/kubeshop/monokle/commit/8a99bcfa9eb008046eea9cff738d07b4e440448d))
+* lazy drawer wrapper ([1479976](https://github.com/kubeshop/monokle/commit/14799766ce38c4afab376a0c080f75992db7aa23))
+* load form only if active ([6b5897a](https://github.com/kubeshop/monokle/commit/6b5897a13d9892c78c25567aa73455f31b5c95e7))
+* merge branch 'main' into mm/bugfix/defaultsourceeditor ([b3b1ae3](https://github.com/kubeshop/monokle/commit/b3b1ae3a7b4ac124ae46c6b3ffb79593139d46f4))
+* mergeConfig issue ([3f57c67](https://github.com/kubeshop/monokle/commit/3f57c6754db8b2c94cd0584e9f97600661cef576))
+* merged main into branch ([36714d0](https://github.com/kubeshop/monokle/commit/36714d023e88b96b76538fb3be6234ba4411d5e1))
+* removed console logs ([e2eab62](https://github.com/kubeshop/monokle/commit/e2eab625b13b956e614585420e9727dffb1b1888))
+* resolve relative path ([da7b185](https://github.com/kubeshop/monokle/commit/da7b185adc504f07b19374d1023530b37f3ba873))
+* update active forms ([49992c2](https://github.com/kubeshop/monokle/commit/49992c2511f94ea04f4d69ed9603988bf6fd3d16))
+
 ## [1.4.0](https://github.com/kubeshop/monokle/compare/v1.3.4-20211202.0...v1.4.0) (2021-12-06)
 
 

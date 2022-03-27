@@ -1,0 +1,23 @@
+{
+    "scanExcludes": [
+        "node_modules",
+        "**/.git",
+        "**/pkg/mod/**",
+        "**/.kube",
+        "**/*.swp"
+    ],
+    "fileIncludes": [
+        "*.yaml",
+        "*.yml"
+    ],
+    "folderReadsMaxDepth": 10,
+    "k8sVersion": "1.23.3",
+    "settings": {
+        "helmPreviewMode": "template",
+        "kustomizeCommand": "kubectl"
+    },
+    "kubeConfig": {
+        "path": "/Users/juliannefermi/.kube/config",
+        "currentContext": "minikube"
+    }
+}

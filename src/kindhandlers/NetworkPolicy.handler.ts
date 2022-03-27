@@ -10,6 +10,7 @@ import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outg
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'NetworkPolicies'],
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
@@ -18,9 +19,11 @@ const NetworkPolicyHandler: ResourceKindHandler = {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     return k8sNetworkingV1Api.readNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    const response = await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
+    const response = namespace
+      ? await k8sNetworkingV1Api.listNamespacedNetworkPolicy(namespace)
+      : await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

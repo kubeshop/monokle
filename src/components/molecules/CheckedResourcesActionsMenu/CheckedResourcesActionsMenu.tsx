@@ -14,11 +14,12 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
+import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
+import {removeResource} from '@redux/thunks/removeResource';
 
 import Colors from '@styles/Colors';
 
@@ -116,7 +117,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplyCheckedResources = (namespace?: string) => {
+  const onClickApplyCheckedResources = (namespace?: {name: string; new: boolean}) => {
     dispatch(applyCheckedResources(namespace));
     setIsApplyModalVisible(false);
   };
@@ -163,7 +164,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           resources={checkedResources}
           isVisible={isApplyModalVisible}
           title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
+          onOk={namespace => onClickApplyCheckedResources(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}

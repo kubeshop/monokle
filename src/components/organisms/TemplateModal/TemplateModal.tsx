@@ -15,10 +15,12 @@ import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@mo
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
+import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
 
 import {TemplateFormRenderer} from '@components/molecules';
+
+import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
 
 import * as S from './styled';
 
@@ -51,14 +53,17 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
       if (projectToCreate) {
+        trackEvent(START_FROM_A_TEMPLATE, {templateID: template.id});
         dispatch(setCreateProject({...projectToCreate}));
         onClose('PREVIEW');
       }
 
+      // remove first entry - which is the intro page
+      formDataList.shift();
+
       if (isVanillaTemplate(template)) {
+        trackEvent(USE_TEMPLATE, {templateID: template.id});
         setIsLoading(true);
-        // remove first entry - which is the intro page
-        formDataList.shift();
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
@@ -76,6 +81,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         return;
       }
       setIsLoading(true);
+      trackEvent(USE_TEMPLATE, {templateID: template.id});
       previewReferencedHelmChart(
         template.chartName,
         template.chartVersion,
@@ -97,7 +103,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
           setIsLoading(false);
         });
     },
-    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
+    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch, onClose, projectToCreate]
   );
 
   const setFormData = useCallback(

@@ -1,3 +1,5 @@
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 const ElectronStore = require('electron-store');
 
 const schema = {
@@ -12,18 +14,27 @@ const schema = {
           },
         },
       },
+      deviceID: {
+        type: 'string',
+      },
     },
   },
   appConfig: {
     type: 'object',
     properties: {
+      hasDeletedDefaultTemplatesPlugin: {
+        type: 'boolean',
+      },
+      lastSeenReleaseNotesVersion: {
+        type: 'string',
+      },
       startupModalVisible: {
         type: 'boolean',
       },
-      kubeconfig: {
-        type: 'string',
+      isClusterSelectorVisible: {
+        type: 'boolean',
       },
-      isKubeconfigPathValid: {
+      loadLastProjectOnStartup: {
         type: 'boolean',
       },
       scanExcludes: {
@@ -56,7 +67,16 @@ const schema = {
           kustomizeCommand: {
             type: 'string',
           },
-          loadLastProjectOnStartup: {
+          hideExcludedFilesInFileExplorer: {
+            type: 'boolean',
+          },
+          enableHelmWithKustomize: {
+            type: 'boolean',
+          },
+          createDefaultObjects: {
+            type: 'boolean',
+          },
+          setDefaultPrimitiveValues: {
             type: 'boolean',
           },
         },
@@ -69,6 +89,9 @@ const schema = {
       },
       newVersion: {
         type: 'number',
+      },
+      k8sVersion: {
+        type: 'string',
       },
       projects: {
         type: 'array',
@@ -89,6 +112,18 @@ const schema = {
             },
           },
         },
+      },
+      projectsRootFolder: {
+        type: 'string',
+      },
+      favoriteTemplates: {
+        type: 'array',
+      },
+      disableEventTracking: {
+        type: 'boolean',
+      },
+      disableErrorReporting: {
+        type: 'boolean',
       },
     },
   },
@@ -156,11 +191,38 @@ const schema = {
       },
     },
   },
+  kubeConfig: {
+    type: 'object',
+    properties: {
+      namespaces: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            namespaceName: {
+              type: 'string',
+            },
+            clusterName: {
+              type: 'string',
+            },
+          },
+        },
+      },
+      contextsWithRemovedNamespace: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
   appConfig: {
     startupModalVisible: true,
+    isClusterSelectorVisible: true,
+    loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
@@ -168,11 +230,13 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastProjectOnStartup: false,
-      isClusterSelectorVisible: true,
+      createDefaultObjects: false,
+      setDefaultPrimitiveValues: true,
     },
     recentFolders: [],
     newVersion: 0,
+    k8sVersion: PREDEFINED_K8S_VERSION,
+    hasDeletedDefaultTemplatesPlugin: false,
   },
   ui: {
     isSettingsOpen: false,
@@ -191,6 +255,10 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
+  },
+  kubeConfig: {
+    namespaces: [],
+    contextsWithRemovedNamespace: [],
   },
 };
 

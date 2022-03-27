@@ -25,7 +25,7 @@ export const Row = styled(RawRow.default)`
 
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
 `;
 
@@ -75,15 +75,10 @@ export const Header = styled(RawHeader.default)`
   height: 30px;
 `;
 
-export const IconContainerSpan = styled.span`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
-  cursor: pointer;
-`;
-
 export const Logo = styled.img`
-  height: 24px;
+  height: 45px;
   cursor: pointer;
+  margin-left: -15px;
 `;
 
 export const ModeSpan = styled.span`
@@ -100,6 +95,8 @@ export const PreviewRow = styled(Row)`
   justify-content: space-between;
 `;
 
+export const PageHeaderContainer = styled.div``;
+
 export const ProjectClusterSelectionContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -111,20 +108,20 @@ export const ResourceSpan = styled.span`
 
 export const SettingsCol = styled(Col)`
   display: grid;
-  grid-template-columns: repeat(4, max-content);
+  grid-template-columns: repeat(4, 18px);
   align-items: center;
-  grid-column-gap: 12px;
+  grid-column-gap: 16px;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
 `;
 
 export const ApiOutlined = styled(RawApiOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
 `;
 

@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {Button, Modal} from 'antd';
 
@@ -20,26 +20,13 @@ const StyledModal = styled(Modal)`
 const UpdateModal = () => {
   const dispatch = useAppDispatch();
   const newVersion = useAppSelector(state => state.config.newVersion);
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleClose = () => {
-    dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
-  };
-
-  const handleInstall = () => {
-    ipcRenderer.send('quit-and-install');
-  };
-
-  useEffect(() => {
-    if (
+  const isModalVisible = useMemo(
+    () =>
       (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
-      newVersion.code === NewVersionCode.Downloaded
-    ) {
-      setIsModalVisible(true);
-    } else {
-      setIsModalVisible(false);
-    }
-  }, [newVersion]);
+      newVersion.code === NewVersionCode.Downloaded,
+    [newVersion]
+  );
 
   const getErrorMessage = useCallback((code: number) => {
     if (code === -2) {
@@ -50,6 +37,14 @@ const UpdateModal = () => {
     }
     return <div>Update process encountered with an error!</div>;
   }, []);
+
+  const handleClose = () => {
+    dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  };
+
+  const handleInstall = () => {
+    ipcRenderer.send('quit-and-install');
+  };
 
   return (
     <StyledModal
@@ -70,9 +65,11 @@ const UpdateModal = () => {
         )
       }
     >
-      {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
-      {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
-      {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
+      <span id="UpdateModal">
+        {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
+        {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
+        {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
+      </span>
     </StyledModal>
   );
 };

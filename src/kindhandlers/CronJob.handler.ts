@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const CronJobHandler: ResourceKindHandler = {
   kind: 'CronJob',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'CronJobs'],
   clusterApiVersion: 'batch/v1',
   validationSchemaPrefix: 'io.k8s.api.batch.v1',
@@ -18,9 +19,11 @@ const CronJobHandler: ResourceKindHandler = {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
     return k8sBatchV1Api.readNamespacedCronJob(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
-    const response = await k8sBatchV1Api.listCronJobForAllNamespaces();
+    const response = namespace
+      ? await k8sBatchV1Api.listNamespacedCronJob(namespace)
+      : await k8sBatchV1Api.listCronJobForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

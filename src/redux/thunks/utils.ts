@@ -8,7 +8,9 @@ import {AlertEnum} from '@models/alert';
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {extractK8sResources, processResources} from '@redux/services/resource';
+
+import {createKubeClient} from '@utils/kubeclient';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -35,6 +37,8 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
  */
 
 export function createPreviewResult(
+  schemaVersion: string,
+  userDataDir: string,
   resourcesYaml: string,
   previewResourceId: string,
   title: string,
@@ -48,7 +52,7 @@ export function createPreviewResult(
     return rm;
   }, {});
 
-  processParsedResources(resourceMap, resourceRefsProcessingOptions);
+  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions);
   return {
     previewResourceId,
     previewResources: resourceMap,
@@ -80,13 +84,14 @@ export async function getResourceFromCluster(resource: K8sResource, kubeconfigPa
   const resourceKindHandler = getResourceKindHandler(resource.kind);
 
   if (resource && resource.text && resourceKindHandler) {
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(kubeconfigPath);
-    if (context && context.length > 0) {
-      kc.setCurrentContext(context);
-    }
-
-    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kc, resource);
+    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
     return resourceFromCluster;
   }
+}
+
+export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
+  const kubeClient = createKubeClient(kubeconfigPath, context);
+  const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
+  await k8sCoreV1Api.deleteNamespace(namespace);
 }

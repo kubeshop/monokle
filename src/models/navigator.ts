@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
@@ -8,6 +8,7 @@ import {RootState} from '@models/rootstate';
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
   options?: ItemCustomComponentOptions;
+  children?: ReactNode;
 };
 
 export type ItemCustomComponent = React.ComponentType<ItemCustomComponentProps>;
@@ -29,6 +30,10 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
+  contextMenuWrapper?: {
+    component: ItemCustomComponent;
+    options?: ItemCustomComponentOptions;
+  };
   contextMenu?: {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
@@ -39,10 +44,12 @@ export interface ItemCustomization {
   };
   disableHoverStyle?: boolean;
   isCheckVisibleOnHover?: boolean;
+  lastItemMarginBottom?: number;
 }
 
 export type SectionCustomComponentProps = {
   sectionInstance: SectionInstance;
+  onClick?: () => void;
 };
 
 export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
@@ -63,9 +70,23 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  namePrefix?: {
+    component: SectionCustomComponent;
+  };
+  /** If no value is provided, default value will be "descendants" */
+  counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
+  /** Number of pixels to indent this section, by default all sections/susections are aligned */
+  indentation?: number;
+  nameColor?: string;
+  nameSize?: number;
+  nameWeight?: number;
+  nameHorizontalPadding?: number;
+  nameVerticalPadding?: number;
+  emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;
+  sectionMarginBottom?: number;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
@@ -95,13 +116,14 @@ export interface ItemGroupBlueprint {
 }
 
 export interface SectionBlueprint<RawItemType, ScopeType = any> {
-  name: string;
   id: string;
+  name: string;
   getScope: (state: RootState) => ScopeType;
   containerElementId: string;
   rootSectionId: string;
   childSectionIds?: string[];
   builder?: {
+    transformName?: (originalName: string, scope: ScopeType) => string;
     getRawItems?: (scope: ScopeType) => RawItemType[];
     getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
     getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
@@ -142,6 +164,7 @@ export interface ItemInstance {
 
 export interface SectionInstance {
   id: string;
+  name: string;
   rootSectionId: string;
   itemIds: string[];
   groups: ItemGroupInstance[];

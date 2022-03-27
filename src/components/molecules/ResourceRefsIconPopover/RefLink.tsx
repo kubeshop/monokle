@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import path from 'path';
 import styled from 'styled-components';
@@ -12,25 +12,7 @@ import {Icon} from '@atoms';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-const StyledRefText = styled.span<{isUnsatisfied: boolean; isDisabled: boolean}>`
-  ${props => {
-    if (!props.isDisabled) {
-      return `
-      cursor: pointer;
-      &:hover {
-        text-decoration: underline;
-      }`;
-    }
-  }}
-  ${props => {
-    if (props.isDisabled) {
-      return `color: ${FontColors.grey}`;
-    }
-    if (props.isUnsatisfied) {
-      return `color: ${FontColors.warning};`;
-    }
-  }}
-`;
+import * as S from './RefLink.styled';
 
 const StyledPositionText = styled.span`
   margin-left: 5px;
@@ -71,19 +53,42 @@ const ResourceRefLink = (props: {
 }) => {
   const {resourceRef, resourceMap, onClick, isDisabled} = props;
 
-  const targetName = getRefTargetName(resourceRef, resourceMap);
-  let linkText = targetName;
+  const linkText = useMemo(() => {
+    const targetName = getRefTargetName(resourceRef, resourceMap);
 
-  if (resourceRef.target?.type === 'file') {
-    linkText = `File: ${targetName}`;
-  } else if (resourceRef.target?.type === 'resource') {
-    if (resourceRef.target.resourceKind) {
-      linkText = `${resourceRef.target.resourceKind}: ${targetName}`;
-    } else if (resourceRef.target.resourceId) {
-      const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
-      linkText = `${resourceKind}: ${targetName}`;
+    if (resourceRef.target?.type === 'file') {
+      return (
+        <S.TargetName $isDisabled={isDisabled} $isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
+          File: {targetName}
+        </S.TargetName>
+      );
     }
-  }
+    if (resourceRef.target?.type === 'resource') {
+      if (resourceRef.target.resourceKind) {
+        return (
+          <>
+            <S.TargetName $isDisabled={isDisabled} $isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
+              {targetName}
+            </S.TargetName>
+            <S.ResourceKindLabel>{resourceRef.target.resourceKind}</S.ResourceKindLabel>
+          </>
+        );
+      }
+      if (resourceRef.target.resourceId) {
+        const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
+        return (
+          <>
+            <S.TargetName $isDisabled={isDisabled} $isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
+              {targetName}
+            </S.TargetName>
+            <S.ResourceKindLabel>{resourceKind}</S.ResourceKindLabel>
+          </>
+        );
+      }
+    }
+
+    return <span>{targetName}</span>;
+  }, [isDisabled, resourceMap, resourceRef]);
 
   const handleClick = () => {
     if (isDisabled || !onClick) {
@@ -93,17 +98,13 @@ const ResourceRefLink = (props: {
   };
 
   return (
-    <div onClick={handleClick}>
+    <S.RefLinkContainer onClick={handleClick}>
       {RefIcon && <RefIcon resourceRef={resourceRef} style={{marginRight: 5}} />}
-      <StyledRefText isDisabled={isDisabled} isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
-        {linkText}
-      </StyledRefText>
-      {resourceRef.position && (
-        <StyledPositionText>
-          {resourceRef.position.line}:{resourceRef.position.column}
-        </StyledPositionText>
-      )}
-    </div>
+
+      {linkText}
+
+      {resourceRef.position && <StyledPositionText>Ln {resourceRef.position.line}</StyledPositionText>}
+    </S.RefLinkContainer>
   );
 };
 

@@ -4,14 +4,23 @@ import {MonoPaneTitle} from '@components/atoms';
 
 import * as S from './styled';
 
-function TitleBar(props: {title: string; children?: React.ReactNode}) {
-  const {title, children} = props;
-  return (
-    <S.Container>
-      <MonoPaneTitle>{title}</MonoPaneTitle>
-      {children && <S.RightButtons>{children}</S.RightButtons>}
-    </S.Container>
-  );
+interface IProps {
+  title: string;
 }
+
+const TitleBar: React.FC<IProps> = props => {
+  const {title, children} = props;
+
+  return (
+    <S.TitleBarContainer>
+      <MonoPaneTitle>
+        <S.Container>
+          {title}
+          {children && <S.RightButtons>{children}</S.RightButtons>}
+        </S.Container>
+      </MonoPaneTitle>
+    </S.TitleBarContainer>
+  );
+};
 
 export default TitleBar;

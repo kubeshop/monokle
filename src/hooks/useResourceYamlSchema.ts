@@ -1,21 +1,38 @@
 import {useEffect} from 'react';
 
-import {ResourceMapType} from '@models/appstate';
+import {FileMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
-import {getResourceSchema} from '@redux/services/schema';
+import {hasSupportedResourceContent} from '@redux/services/resource';
+import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
-function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resourceId: string | undefined) {
+function useResourceYamlSchema(
+  yaml: any,
+  userDataDir: string,
+  k8sVersion: string,
+  resource?: K8sResource,
+  selectedPath?: string,
+  fileMap?: FileMapType
+) {
   useEffect(() => {
+    if (!resource && !selectedPath) {
+      yaml &&
+        yaml.yamlDefaults.setDiagnosticsOptions({
+          validate: false,
+        });
+      return;
+    }
+
     let resourceSchema;
     let validate = true;
 
-    if (resourceId) {
-      const resource = resourceMap[resourceId];
-      if (resource) {
-        resourceSchema = getResourceSchema(resource);
-        validate = !isKustomizationPatch(resource);
-      }
+    if (resource) {
+      resourceSchema = getResourceSchema(resource, k8sVersion, userDataDir);
+      validate = resourceSchema && !isKustomizationPatch(resource) && hasSupportedResourceContent(resource);
+    } else if (selectedPath && fileMap) {
+      resourceSchema = getSchemaForPath(selectedPath, fileMap);
+      validate = resourceSchema !== undefined;
     }
 
     yaml &&
@@ -24,7 +41,7 @@ function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resource
         enableSchemaRequest: true,
         hover: true,
         completion: true,
-        isKubernetes: true,
+        isKubernetes: Boolean(resource),
         format: true,
         schemas: [
           {
@@ -35,7 +52,7 @@ function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resource
         ],
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceId, resourceMap]);
+  }, [resource, selectedPath, fileMap, k8sVersion]);
 }
 
 export default useResourceYamlSchema;

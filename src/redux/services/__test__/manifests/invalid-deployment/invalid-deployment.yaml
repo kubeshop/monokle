@@ -1,0 +1,109 @@
+---
+# Source: redis-ha/charts/redis-ha/templates/redis-haproxy-deployment.yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: argocd-redis-ha-haproxy
+  namespace: "argocd"
+  labels:
+    app: redis-ha
+    heritage: "Helm"
+    release: "argocd"
+    chart: redis-ha-4.12.15
+  uid:
+spec:
+  strategy:
+    type: null
+  revisionHistoryLimit: 1
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis-ha-haproxy
+      release: null
+  template:
+    metadata:
+      name: argocd-redis-ha-haproxy
+      labels:
+        app: redis-ha-haproxy
+        release: argocd
+        revision: "1"
+      annotations:
+        checksum/config: c55502ce732f78a70658dc77f00c02444cd6b6bede4b270f56d082fdaed1dc5f
+    spec:
+      # Needed when using unmodified rbac-setup.yml
+
+      serviceAccountName: argocd-redis-ha-haproxy
+
+      nodeSelector:
+        {}
+      tolerations:
+        null
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: redis-ha-haproxy
+                  release: argocd
+                  revision: "1"
+              topologyKey: kubernetes.io/hostname
+      initContainers:
+        - name: config-init
+          image: haproxy:2.0.25-alpine
+          imagePullPolicy: IfNotPresent
+          resources:
+            {}
+          command:
+            - sh
+          args:
+            - /readonly/haproxy_init.sh
+          volumeMounts:
+            - name: config-volume
+              mountPath: /readonly
+              readOnly: true
+            - name: data
+              mountPath: null
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: haproxy
+          image: haproxy:2.0.25-alpine
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          ports:
+            - name: redis
+              containerPort: 6379
+          resources:
+            {}
+          volumeMounts:
+            - name: data
+              mountPath: /usr/local/etc/haproxy
+            - name: shared-socket
+              mountPath: /run/haproxy
+          lifecycle:
+            {}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: argocd-redis-ha-configmap
+        - name: shared-socket
+          emptyDir:
+            {}
+        - name: data
+          emptyDir:
+            {}
+status:
+  ignored: true

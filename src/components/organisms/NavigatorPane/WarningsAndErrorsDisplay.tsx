@@ -29,7 +29,7 @@ type RefDropdownMenuProps = {
 
 const sortWarnings = (warnings: Warning[]) =>
   warnings.sort((a, b) => {
-    if (a.type !== b.type) {
+    if (a.type && b.type && a.type !== b.type) {
       return a.type.localeCompare(b.type);
     }
     if (a.namespace && !b.namespace) {
@@ -41,7 +41,7 @@ const sortWarnings = (warnings: Warning[]) =>
     if (a.namespace && b.namespace && a.namespace !== b.namespace) {
       return a.namespace.localeCompare(b.namespace);
     }
-    return a.name.localeCompare(b.name);
+    return a.name && b.name ? a.name.localeCompare(b.name) : 0;
   });
 
 const RefDropdownMenu = (props: RefDropdownMenuProps) => {
@@ -55,7 +55,9 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
         <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
           {warning.namespace && <Tag>{warning.namespace}</Tag>}
           <span>{warning.name}</span>
-          <S.WarningCountLabel $type={type}>({warning.count})</S.WarningCountLabel>
+          <S.WarningCountContainer $type={type}>
+            <S.Icon $type={type} name={type} /> {warning.count}
+          </S.WarningCountContainer>
           <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
         </S.StyledMenuItem>
       ))}

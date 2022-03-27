@@ -105,12 +105,11 @@ const generateFullFileName = (
 };
 
 const SaveResourceToFileFolderModal: React.FC = () => {
-  const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
-  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
-
   const dispatch = useAppDispatch();
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
+  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -141,6 +140,9 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       if (value.children) {
         folders.push(key.replace(path.sep, ''));
       } else {
+        if (!value.isSupported || value.isExcluded) {
+          return;
+        }
         files.push(key.replace(path.sep, ''));
       }
     });
@@ -320,6 +322,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
 
   return (
     <Modal
+      className="save-resource"
       title={resourcesIds.length === 1 ? 'Save resource' : `Save resources (${resourcesIds.length})`}
       visible={isVisible}
       onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}

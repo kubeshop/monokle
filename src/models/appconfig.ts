@@ -25,6 +25,8 @@ export type Settings = {
   kustomizeCommand?: KustomizeCommandType;
   hideExcludedFilesInFileExplorer?: boolean;
   enableHelmWithKustomize?: boolean;
+  createDefaultObjects?: boolean;
+  setDefaultPrimitiveValues?: boolean;
 };
 
 export enum NewVersionCode {
@@ -36,6 +38,21 @@ export enum NewVersionCode {
   Downloading = 3,
   Downloaded = 4,
 }
+
+export type KubePermissions = {
+  resourceName: string;
+  verbs: string[];
+};
+
+export type ClusterAccessWithContext = ClusterAccess & {
+  context: string;
+};
+
+export type ClusterAccess = {
+  permissions: KubePermissions[];
+  hasFullAccess: boolean;
+  namespace: string;
+};
 
 // Parsed from kubernetes config file
 export type KubeConfigContext = {
@@ -60,12 +77,35 @@ export type Project = {
   lastOpened?: string;
 };
 
+export type PreviewConfigValuesFileItem = {
+  /** the id is created by removing the file extension from the filePath */
+  id: string;
+  filePath: string;
+  order: number;
+  isChecked: boolean;
+};
+
+export type HelmPreviewConfiguration = {
+  id: string;
+  name: string;
+  helmChartFilePath: string;
+  command: 'install' | 'template';
+  valuesFileItemMap: Record<string, PreviewConfigValuesFileItem | null>;
+  options: Record<string, string | null>;
+};
+
 export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
+  clusterAccess?: ClusterAccessWithContext[];
+  k8sVersion?: string;
+  helm?: {
+    previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
+  };
+  isAccessLoading?: boolean;
 };
 
 interface AppConfig {
@@ -75,6 +115,7 @@ interface AppConfig {
    * Whether the scan excludes list is updated (actual)
    */
   isScanExcludesUpdated: 'outdated' | 'applied';
+  isScanIncludesUpdated: 'outdated' | 'applied';
   /** a list of patterns to match to against files for including */
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
@@ -97,6 +138,11 @@ interface AppConfig {
   userDataDir?: string;
   userTempDir?: string;
   isProjectLoading?: boolean;
+  projectsRootPath: string;
+  k8sVersion: string;
+  favoriteTemplates: string[];
+  disableEventTracking: boolean;
+  disableErrorReporting: boolean;
 }
 
 export type {AppConfig};

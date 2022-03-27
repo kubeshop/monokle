@@ -1,15 +1,15 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree} from 'antd';
+import {Button, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
-import styled from 'styled-components';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
@@ -20,7 +20,7 @@ import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setScanExcludesStatus, updateProjectConfig} from '@redux/reducers/appConfig';
+import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
   openCreateFolderModal,
@@ -31,69 +31,37 @@ import {
 import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
-import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
+import {MonoPaneTitle} from '@atoms';
 
-import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
-import ContextMenu from '@components/molecules/ContextMenu';
 
-import {DeleteEntityCallback, deleteEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
-import {showItemInFolder} from '@utils/shell';
-
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 
-interface TreeNode {
-  key: string;
-  title: React.ReactNode;
-  children: TreeNode[];
-  highlight: boolean;
-  isFolder?: boolean;
-  /**
-   * Whether the TreeNode has children
-   */
-  isLeaf?: boolean;
-  icon?: React.ReactNode;
-  isExcluded?: boolean;
-  isSupported?: boolean;
-}
-
-const StyledNumberOfResources = styled.span`
-  margin-left: 12px;
-  color: ${Colors.grey7};
-`;
-
-const NodeContainer = styled.div`
-  position: relative;
-`;
-
-const NodeTitleContainer = styled.div`
-  padding-right: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
+import * as S from './Styled';
+import TreeItem from './TreeItem';
+import {ProcessingEntity, TreeNode} from './types';
 
 const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
   resourceMap: ResourceMapType,
   hideExcludedFilesInFileExplorer: boolean,
-  fileOrFolderContainedInFilter: string | undefined
+  fileOrFolderContainedInFilter: string | undefined,
+  rootFolderName: string
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const node: TreeNode = {
     key: fileEntry.filePath,
     title: (
-      <NodeContainer>
-        <NodeTitleContainer>
+      <S.NodeContainer>
+        <S.NodeTitleContainer>
           <span
             className={
               fileEntry.isExcluded
@@ -104,17 +72,15 @@ const createNode = (
                 : 'not-supported-file-entry-name'
             }
           >
-            {fileEntry.name}
+            {fileEntry.name === ROOT_FILE_ENTRY ? rootFolderName : fileEntry.name}
           </span>
           {resources.length > 0 ? (
             <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
-              <StyledNumberOfResources className="file-entry-nr-of-resources">
-                {resources.length}
-              </StyledNumberOfResources>
+              <S.NumberOfResources className="file-entry-nr-of-resources">{resources.length}</S.NumberOfResources>
             </Tooltip>
           ) : null}
-        </NodeTitleContainer>
-      </NodeContainer>
+        </S.NodeTitleContainer>
+      </S.NodeContainer>
     ),
     children: [],
     highlight: false,
@@ -128,7 +94,14 @@ const createNode = (
         .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
         .filter(childEntry => childEntry)
         .map(childEntry =>
-          createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter)
+          createNode(
+            childEntry,
+            fileMap,
+            resourceMap,
+            hideExcludedFilesInFileExplorer,
+            fileOrFolderContainedInFilter,
+            rootFolderName
+          )
         )
         .filter(childEntry => {
           if (!hideExcludedFilesInFileExplorer) {
@@ -144,481 +117,6 @@ const createNode = (
   }
 
   return node;
-};
-
-const FileTreeContainer = styled.div`
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  height: 100%;
-
-  & .ant-tree {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    font-variant: tabular-nums;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 22px;
-    color: ${FontColors.darkThemeMainFont};
-  }
-  & .ant-tree-list-scrollbar {
-    width: 8px;
-    background: ${Colors.grey1000};
-    border-radius: 0;
-  }
-
-  & .ant-tree-list-scrollbar-thumb {
-    background: ${Colors.grey4} !important;
-    border-radius: 0 !important;
-  }
-
-  & .ant-tree-treenode {
-    margin-left: 8px;
-    background: transparent;
-  }
-
-  & .ant-tree-switcher-leaf-line::before {
-    border-right: 1px solid #434343;
-  }
-
-  & .ant-tree-switcher-leaf-line::after {
-    border-bottom: 1px solid #434343;
-  }
-
-  & .ant-tree-treenode-selected {
-    vertical-align: center;
-    margin-left: 0px !important;
-    border-left: 8px hidden transparent;
-    padding-left: 8px;
-    padding-bottom: 0px;
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .file-entry-name {
-    color: ${Colors.blue10};
-  }
-  & .ant-tree-treenode-selected .file-entry-name {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .ant-tree-switcher {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .file-entry-nr-of-resources {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .filter-node {
-    font-weight: bold;
-    background: ${Colors.highlightGradient};
-  }
-  & .filter-node .file-entry-name {
-    color: ${FontColors.resourceRowHighlight} !important;
-  }
-  .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    color: ${Colors.blackPure} !important;
-    font-weight: bold;
-  }
-  & .ant-tree-iconEle {
-    flex-shrink: 0;
-  }
-  & .ant-tree-iconEle .anticon {
-    vertical-align: text-bottom;
-  }
-  & .ant-tree-node-content-wrapper {
-    display: flex;
-    overflow: hidden;
-  }
-
-  & .ant-tree-node-content-wrapper .ant-tree-title {
-    overflow: hidden;
-    flex-grow: 1;
-  }
-
-  & .ant-tree-switcher {
-    background: transparent;
-  }
-
-  & .excluded-file-entry-name {
-    color: ${Colors.grey800};
-    font-style: italic;
-  }
-
-  & .not-supported-file-entry-name {
-    color: ${Colors.grey800};
-  }
-`;
-
-const NoFilesContainer = styled.div`
-  margin-left: 16px;
-  margin-top: 10px;
-`;
-
-const StyledTreeContainer = styled.div`
-  margin-left: 2px;
-  margin-top: 10px;
-`;
-
-const StyledRootFolderText = styled.div`
-  font-size: 12px;
-  line-height: 22px;
-  color: ${Colors.grey7};
-  margin-left: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
-  margin-top: 10px;
-  .ant-tree-switcher svg {
-    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
-  }
-
-  opacity: ${props => (props.disabled ? '70%' : '100%')};
-`;
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-const RightButtons = styled.div`
-  display: flex;
-  align-items: center;
-
-  button:not(:last-child),
-  .ant-tooltip-disabled-compatible-wrapper:not(:last-child) {
-    margin-right: 10px;
-  }
-
-  .ant-tooltip-disabled-compatible-wrapper {
-    margin-bottom: 1px;
-  }
-`;
-
-const TreeTitleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  height: 100%;
-
-  & .ant-dropdown-trigger {
-    height: inherit;
-    margin-right: 10px;
-  }
-`;
-
-const TreeTitleText = styled.span`
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  margin: 20px;
-  width: 90%;
-`;
-
-const ReloadButton = styled(Button)``;
-
-const SpinnerWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  width: 100%;
-
-  @supports (backdrop-filter: blur(10px)) or (--webkit-backdrop-filter: blur(10px)) {
-    backdrop-filter: blur(5px);
-    --webkit-backdrop-filter: blur(5px);
-  }
-`;
-
-const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
-interface ProcessingEntity {
-  processingEntityID?: string;
-  processingType?: 'delete' | 'rename';
-}
-
-interface TreeItemProps {
-  title: React.ReactNode;
-  treeKey: string;
-  setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
-  processingEntity: ProcessingEntity;
-  onDelete: (args: DeleteEntityCallback) => void;
-  onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
-  onExcludeFromProcessing: (relativePath: string) => void;
-  onIncludeToProcessing: (relativePath: string) => void;
-  onCreateFolder: (absolutePath: string) => void;
-  onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
-  onFilterByFileOrFolder: (relativePath: string | undefined) => void;
-  onPreview: (relativePath: string) => void;
-  isExcluded?: boolean;
-  isSupported?: boolean;
-  isFolder?: Boolean;
-}
-
-function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
-  const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;
-
-  Modal.confirm({
-    title,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      onOk();
-    },
-    onCancel() {
-      onCancel();
-    },
-  });
-}
-
-const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
-  const {
-    setProcessingEntity,
-    onDelete,
-    onRename,
-    onExcludeFromProcessing,
-    onIncludeToProcessing,
-    onCreateFolder,
-    onCreateResource,
-    onFilterByFileOrFolder,
-    onPreview,
-  } = props;
-
-  const [isTitleHovered, setTitleHoverState] = useState(false);
-
-  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
-  const isFileSelected = useMemo(() => {
-    return treeKey === selectedPath;
-  }, [treeKey, selectedPath]);
-
-  const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
-
-  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
-  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
-  const absolutePath = isRoot
-    ? fileMap[ROOT_FILE_ENTRY].filePath
-    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
-
-  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
-
-  const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'Finder',
-  };
-
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
-
-  const canPreview = useCallback(
-    (entryPath: string): boolean => {
-      const fileEntry = fileMap[entryPath];
-      return (
-        fileEntry &&
-        (isKustomizationFile(fileEntry, resourceMap) || getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
-      );
-    },
-    [fileMap, resourceMap, helmValuesMap]
-  );
-
-  const menu = (
-    <Menu>
-      {canPreview(relativePath) ? (
-        <>
-          <Menu.Item
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onPreview(relativePath);
-            }}
-            key="preview"
-          >
-            Preview
-          </Menu.Item>
-          <ContextMenuDivider />
-        </>
-      ) : null}
-      {isFolder ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
-            }}
-            key="create_directory"
-          >
-            New Folder
-          </Menu.Item>
-        </>
-      ) : null}
-
-      <Menu.Item
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
-        }}
-        key="create_resource"
-      >
-        {isFolder ? 'New Resource' : 'Add Resource'}
-      </Menu.Item>
-      <ContextMenuDivider />
-      <Menu.Item
-        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
-            onFilterByFileOrFolder(undefined);
-          } else {
-            onFilterByFileOrFolder(relativePath);
-          }
-        }}
-      >
-        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
-          ? 'Remove from filter'
-          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              if (isExcluded) {
-                onIncludeToProcessing(relativePath);
-              } else {
-                onExcludeFromProcessing(relativePath);
-              }
-            }}
-            key="add_to_files_exclude"
-          >
-            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-          </Menu.Item>
-        </>
-      ) : null}
-      <ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          navigator.clipboard.writeText(absolutePath);
-        }}
-        key="copy_full_path"
-      >
-        Copy Path
-      </Menu.Item>
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          navigator.clipboard.writeText(relativePath);
-        }}
-        key="copy_relative_path"
-      >
-        Copy Relative Path
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <ContextMenuDivider />
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onRename(absolutePath, osPlatform);
-            }}
-            key="rename_entity"
-          >
-            Rename
-          </Menu.Item>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            key="delete_entity"
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              deleteEntityWizard(
-                {entityAbsolutePath: absolutePath},
-                () => {
-                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                  deleteEntity(absolutePath, onDelete);
-                },
-                () => {}
-              );
-            }}
-          >
-            Delete
-          </Menu.Item>
-        </>
-      ) : null}
-      <ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          showItemInFolder(absolutePath);
-        }}
-        key="reveal_in_finder"
-      >
-        Reveal in {platformFilemanagerName}
-      </Menu.Item>
-    </Menu>
-  );
-
-  return (
-    <TreeTitleWrapper
-      onMouseEnter={() => {
-        setTitleHoverState(true);
-      }}
-      onMouseLeave={() => {
-        setTitleHoverState(false);
-      }}
-    >
-      <TreeTitleText>{title}</TreeTitleText>
-      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
-        <SpinnerWrapper>
-          <Spinner />
-        </SpinnerWrapper>
-      ) : null}
-      {isTitleHovered && !processingEntity.processingType ? (
-        <ContextMenu overlay={menu}>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
-            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
-          </div>
-        </ContextMenu>
-      ) : null}
-    </TreeTitleWrapper>
-  );
 };
 
 const FileTreePane = () => {
@@ -659,9 +157,12 @@ const FileTreePane = () => {
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
+  const rootFolderName = useMemo(() => {
+    return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
+  }, [fileMap]);
+
   const setFolder = useCallback(
     (folder: string) => {
-      dispatch(setScanExcludesStatus('applied'));
       dispatch(setRootFolder(folder));
     },
     [dispatch]
@@ -673,7 +174,6 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-
     const treeData =
       rootEntry &&
       createNode(
@@ -681,7 +181,8 @@ const FileTreePane = () => {
         fileMap,
         resourceMap,
         Boolean(hideExcludedFilesInFileExplorer),
-        fileOrFolderContainedInFilter
+        fileOrFolderContainedInFilter,
+        rootFolderName
       );
 
     setTree(treeData);
@@ -696,6 +197,7 @@ const FileTreePane = () => {
     shouldExpandAllNodes,
     hideExcludedFilesInFileExplorer,
     fileOrFolderContainedInFilter,
+    rootFolderName,
     dispatch,
   ]);
 
@@ -714,7 +216,7 @@ const FileTreePane = () => {
 
     let node: TreeNode | undefined = tree || undefined;
     for (let c = 0; c < keys.length && node; c += 1) {
-      node = node.children.find(i => i.key === keys[c]);
+      node = node.children.find((i: any) => i.key === keys[c]);
     }
 
     if (node) {
@@ -799,11 +301,7 @@ const FileTreePane = () => {
       icon: <ExclamationCircleOutlined />,
       cancelText: 'Not now',
       onOk: () => {
-        setScanExcludesStatus('applied');
         refreshFolder();
-      },
-      onCancel: () => {
-        dispatch(setScanExcludesStatus('outdated'));
       },
     });
   };
@@ -848,6 +346,7 @@ const FileTreePane = () => {
   const onSelectRootFolderFromMainThread = useCallback(
     (_: any, data: string) => {
       if (data) {
+        log.info('setting root folder from main thread', data);
         setFolder(data);
       }
     },
@@ -956,54 +455,53 @@ const FileTreePane = () => {
   };
 
   return (
-    <FileTreeContainer>
-      <Row>
-        <MonoPaneTitleCol>
-          <MonoPaneTitle>
-            <TitleBarContainer>
-              <Title>
-                File Explorer{' '}
-                {isScanExcludesUpdated === 'outdated' ? (
-                  <Tooltip title={FileExplorerChanged}>
-                    <ExclamationCircleOutlined />
-                  </Tooltip>
-                ) : (
-                  ''
-                )}
-              </Title>
-              <RightButtons>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="link"
-                    disabled={isButtonDisabled}
-                  />
+    <S.FileTreeContainer id="FileExplorer">
+      <S.TitleBarContainer>
+        <MonoPaneTitle>
+          <S.TitleContainer>
+            <S.Title>
+              File Explorer{' '}
+              {isScanExcludesUpdated === 'outdated' && (
+                <Tooltip title={FileExplorerChanged}>
+                  <ExclamationCircleOutlined />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" />}
-                    onClick={onToggleTree}
-                    type="link"
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-              </RightButtons>
-            </TitleBarContainer>
-          </MonoPaneTitle>
-        </MonoPaneTitleCol>
-      </Row>
+              )}
+            </S.Title>
+
+            <S.RightButtons>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                <Button
+                  size="small"
+                  onClick={refreshFolder}
+                  icon={<ReloadOutlined />}
+                  type="link"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                <Button
+                  icon={<Icon name="collapse" />}
+                  onClick={onToggleTree}
+                  type="link"
+                  size="small"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+            </S.RightButtons>
+          </S.TitleContainer>
+        </MonoPaneTitle>
+      </S.TitleBarContainer>
+
       {uiState.isFolderLoading ? (
-        <StyledSkeleton active />
+        <S.Skeleton active />
       ) : tree ? (
-        <StyledTreeContainer>
-          <StyledRootFolderText>
-            <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
-            <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
-          </StyledRootFolderText>
-          <StyledTreeDirectoryTree
+        <S.TreeContainer>
+          <S.RootFolderText>
+            <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
+            <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
+          </S.RootFolderText>
+          <S.TreeDirectoryTree
             // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
             height={
               windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
@@ -1015,25 +513,23 @@ const FileTreePane = () => {
             ref={treeRef}
             expandedKeys={expandedKeys}
             onExpand={onExpand}
-            titleRender={event => {
-              return (
-                <TreeItem
-                  treeKey={String(event.key)}
-                  title={event.title}
-                  processingEntity={processingEntity}
-                  setProcessingEntity={setProcessingEntity}
-                  onDelete={onDelete}
-                  onRename={onRename}
-                  onExcludeFromProcessing={onExcludeFromProcessing}
-                  onIncludeToProcessing={onIncludeToProcessing}
-                  onCreateFolder={onCreateFolder}
-                  onCreateResource={onCreateResource}
-                  onFilterByFileOrFolder={onFilterByFileOrFolder}
-                  onPreview={onPreview}
-                  {...event}
-                />
-              );
-            }}
+            titleRender={event => (
+              <TreeItem
+                treeKey={String(event.key)}
+                title={event.title}
+                processingEntity={processingEntity}
+                setProcessingEntity={setProcessingEntity}
+                onDelete={onDelete}
+                onRename={onRename}
+                onExcludeFromProcessing={onExcludeFromProcessing}
+                onIncludeToProcessing={onIncludeToProcessing}
+                onCreateFolder={onCreateFolder}
+                onCreateResource={onCreateResource}
+                onFilterByFileOrFolder={onFilterByFileOrFolder}
+                onPreview={onPreview}
+                {...event}
+              />
+            )}
             autoExpandParent={autoExpandParent}
             selectedKeys={[selectedPath || '-']}
             filterTreeNode={node => {
@@ -1044,13 +540,13 @@ const FileTreePane = () => {
             showIcon
             showLine={{showLeafIcon: false}}
           />
-        </StyledTreeContainer>
+        </S.TreeContainer>
       ) : (
-        <NoFilesContainer>
+        <S.NoFilesContainer>
           Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
-        </NoFilesContainer>
+        </S.NoFilesContainer>
       )}
-    </FileTreeContainer>
+    </S.FileTreeContainer>
   );
 };
 

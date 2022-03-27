@@ -1,5 +1,7 @@
-import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {ipcRenderer} from 'electron';
+
+import {useEffect, useRef, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Dropdown, Modal, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
@@ -23,7 +25,7 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -33,14 +35,19 @@ import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
-  const activeProject = useSelector(activeProjectSelector);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const activeProject = useAppSelector(activeProjectSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
+  const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
+
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+
+  const deleteModalVisible = useRef({visible: false});
+  const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -50,6 +57,11 @@ const ProjectSelection = () => {
     },
     {isDirectoryExplorer: true}
   );
+
+  useHotkeys('escape', () => {
+    setIsDropdownMenuVisible(false);
+    dropdownButtonRef.current?.blur();
+  });
 
   useEffect(() => {
     if (searchText) {
@@ -70,7 +82,18 @@ const ProjectSelection = () => {
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
-    setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    if (activeProject?.rootFolder !== project.rootFolder) {
+      const confirmed = ipcRenderer.sendSync('confirm-action', {
+        unsavedResourceCount,
+        action: 'change the active project',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    }
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -80,7 +103,7 @@ const ProjectSelection = () => {
 
   const handleDeleteProject = (project: Project) => {
     const title = `Do you want to remove ${project?.name}?`;
-
+    deleteModalVisible.current.visible = true;
     Modal.confirm({
       title,
       icon: <ExclamationCircleOutlined />,
@@ -88,12 +111,25 @@ const ProjectSelection = () => {
       zIndex: 9999,
       onOk() {
         return new Promise(resolve => {
+          if (activeProject?.rootFolder === project.rootFolder) {
+            setIsDropdownMenuVisible(false);
+          }
+
           dispatch(setDeleteProject(project));
           resolve({});
+          deleteModalVisible.current.visible = false;
         });
       },
-      onCancel() {},
+      onCancel() {
+        deleteModalVisible.current.visible = false;
+      },
     });
+  };
+
+  const onDropdownVisibleChange = (visible: boolean) => {
+    if (!deleteModalVisible.current.visible) {
+      setIsDropdownMenuVisible(visible);
+    }
   };
 
   const getRelativeDate = (isoDate: string | undefined) => {
@@ -108,11 +144,12 @@ const ProjectSelection = () => {
       <S.ProjectMenu>
         <S.ProjectsMenuContainer>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SearchProjectTooltip} placement="bottomRight">
-            <S.Search placeholder="Search" value={searchText} onChange={handleProjectSearch} />
+            <S.Search id="project-search" placeholder="Search" value={searchText} onChange={handleProjectSearch} />
           </Tooltip>
           <S.ProjectsMenuActionsContainer>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromFolderTooltip} placement="bottomRight">
               <S.ProjectFolderOpenOutlined
+                id="open-new-project"
                 onClick={() => {
                   setIsDropdownMenuVisible(false);
                   openFileExplorer();
@@ -140,14 +177,14 @@ const ProjectSelection = () => {
           })}
           rowClassName={(project: Project) => {
             if (activeProject?.rootFolder === project?.rootFolder) {
-              return 'project-table-active-project';
+              return 'table-active-row';
             }
 
             return '';
           }}
         >
           <Column
-            className="projects-table-column-name"
+            className="table-column-name projects-table-column-name"
             title="All Projects"
             dataIndex="name"
             key="name"
@@ -192,7 +229,7 @@ const ProjectSelection = () => {
             render={(value: string) => (value ? getRelativeDate(value) : '-')}
           />
           <Column
-            className="projects-table-column-actions"
+            className="table-column-actions"
             key="projectActions"
             width={1}
             render={(value: any, project: Project) => (
@@ -216,7 +253,7 @@ const ProjectSelection = () => {
   }
 
   return (
-    <S.ProjectContainer>
+    <S.ProjectContainer id="projects-dropdown-container">
       <Dropdown
         arrow
         disabled={previewLoader.isLoading || isInPreviewMode}
@@ -224,10 +261,10 @@ const ProjectSelection = () => {
         placement="bottomCenter"
         trigger={['click']}
         visible={isDropdownMenuVisible}
-        onVisibleChange={setIsDropdownMenuVisible}
+        onVisibleChange={onDropdownVisibleChange}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <S.Button disabled={previewLoader.isLoading || isInPreviewMode} type="link">
+          <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
             <S.FolderOpenOutlined />
             <S.ProjectName>{activeProject.name}</S.ProjectName>
             <S.DownOutlined />

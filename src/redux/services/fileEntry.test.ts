@@ -1,4 +1,4 @@
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -7,10 +7,12 @@ import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
 import {getK8sResources} from '@redux/services/resource';
 
-import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
+import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
-  let e = createFileEntry(createSafePath('/a/very/long/path'));
+  const fileMap: FileMapType = {};
+  let r = createRootFileEntry('/root', fileMap);
+  let e = createFileEntry(createSafePath('/a/very/long/path'), fileMap);
   expect(e.isExcluded).toBeFalsy();
   expect(e.name).toBe('path');
   expect(e.filePath).toBe(createSafePath('/a/very/long/path'));
@@ -59,5 +61,5 @@ test('read-folder-with-helm-chart', () => {
   expect(helmCharts.length).toBe(1);
   expect(helmCharts[0].valueFileIds.length).toBe(1);
   expect(helmCharts[0].name).toBe('aks-helloworld');
-  expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
+  expect(fileMap[helmCharts[0].filePath].name).toBe(HELM_CHART_ENTRY_FILE);
 });

@@ -16,10 +16,11 @@ import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {closeResourceDiffModal, updateResource} from '@redux/reducers/main';
-import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {closeResourceDiffModal} from '@redux/reducers/main';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
@@ -40,7 +41,7 @@ const ClusterResourceDiffModal = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
@@ -58,7 +59,7 @@ const ClusterResourceDiffModal = () => {
   const windowSize = useWindowSize();
 
   const isDiffModalVisible = useMemo(
-    () => Boolean(targetResourceId) && Boolean(isInClusterMode),
+    () => Boolean(targetResourceId) && isInClusterMode,
     [isInClusterMode, targetResourceId]
   );
 
@@ -77,8 +78,8 @@ const ClusterResourceDiffModal = () => {
   }, [windowSize.width]);
 
   const cleanTargetResourceText = useMemo(() => {
-    if (!targetResource?.content) {
-      return;
+    if (!isDiffModalVisible || !targetResource || !targetResource.content) {
+      return undefined;
     }
 
     if (!shouldDiffIgnorePaths) {
@@ -88,7 +89,7 @@ const ClusterResourceDiffModal = () => {
     return stringify(removeIgnoredPathsFromResourceContent(targetResource.content, targetResource.namespace), {
       sortMapEntries: true,
     });
-  }, [shouldDiffIgnorePaths, targetResource]);
+  }, [isDiffModalVisible, shouldDiffIgnorePaths, targetResource]);
 
   const areResourcesDifferent = useMemo(() => {
     return cleanTargetResourceText !== matchingResourceText;
@@ -107,7 +108,7 @@ const ClusterResourceDiffModal = () => {
   }, [kubeConfigContext, selectedMatchingResourceId, resourceMap]);
 
   const matchingLocalResources = useMemo(() => {
-    if (!targetResource) {
+    if (!isDiffModalVisible || !targetResource) {
       return;
     }
 
@@ -121,7 +122,7 @@ const ClusterResourceDiffModal = () => {
         );
       })
     );
-  }, [resourceMap, targetResource]);
+  }, [isDiffModalVisible, resourceMap, targetResource]);
 
   const onCloseHandler = () => {
     if (isApplyModalVisible) {
@@ -132,11 +133,11 @@ const ClusterResourceDiffModal = () => {
     dispatch(closeResourceDiffModal());
   };
 
-  const onClickApplyResource = (namespace?: string) => {
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (selectedMatchingResourceId) {
       const resource = resourceMap[selectedMatchingResourceId];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+        applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
           isClusterPreview: previewType === 'cluster',
         });
         onCloseHandler();
@@ -178,7 +179,7 @@ const ClusterResourceDiffModal = () => {
   };
 
   useEffect(() => {
-    if (!targetResource || !resourceMap || !matchingLocalResources) {
+    if (!isDiffModalVisible || !targetResource || !targetResource.content || !resourceMap || !matchingLocalResources) {
       return;
     }
 
@@ -235,7 +236,7 @@ const ClusterResourceDiffModal = () => {
     }
 
     setHasDiffModalLoaded(true);
-  }, [dispatch, matchingLocalResources, resourceMap, targetResource]);
+  }, [dispatch, isDiffModalVisible, matchingLocalResources, resourceMap, targetResource]);
 
   return (
     <>
@@ -327,7 +328,7 @@ const ClusterResourceDiffModal = () => {
           isVisible={isApplyModalVisible}
           resources={selectedMatchingResourceId ? [resourceMap[selectedMatchingResourceId]] : []}
           title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}

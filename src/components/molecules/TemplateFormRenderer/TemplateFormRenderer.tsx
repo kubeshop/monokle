@@ -7,6 +7,7 @@ import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
 
 import fs from 'fs';
+import log from 'loglevel';
 import {Primitive} from 'type-fest';
 
 import {TemplateForm} from '@models/template';
@@ -47,8 +48,12 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       setUiSchema(JSON.parse(schemas.uiSchema));
       setErrorMessage(null);
       setIsLoading(false);
-    } catch {
+    } catch (e) {
+      if (e instanceof Error) {
+        log.warn(`[loadTemplateSchemas]: ${e.message}`);
+      }
       setErrorMessage("Couldn't read the schemas for this template form.");
+      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -78,10 +78,15 @@ const StyledPaneDiv = styled.div`
 `;
 
 const Pane: FunctionComponent<{
+  id: string;
   width: number;
   hide: boolean;
-}> = ({children, width, hide}) => {
-  return <StyledPaneDiv style={{display: hide ? 'none' : 'inline-block', width}}>{children}</StyledPaneDiv>;
+}> = ({children, id, width, hide}) => {
+  return (
+    <StyledPaneDiv id={id} style={{display: hide ? 'none' : 'inline-block', width}}>
+      {children}
+    </StyledPaneDiv>
+  );
 };
 
 const SplitView: FunctionComponent<SplitViewProps> = ({
@@ -264,6 +269,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     ) {
       dispatch(
         setPaneConfiguration({
+          ...paneConfiguration,
           leftWidth,
           navWidth,
           editWidth,
@@ -459,7 +465,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
       hideLeft={hideLeft}
       hideRight={hideRight}
     >
-      <Pane width={leftWidth * viewWidth} hide={hideLeft}>
+      <Pane id="LeftPane" width={leftWidth * viewWidth} hide={hideLeft}>
         {left}
       </Pane>
 
@@ -472,7 +478,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={navWidth * viewWidth} hide={false}>
+      <Pane id="NavPane" width={navWidth * viewWidth} hide={false}>
         {nav}
       </Pane>
 
@@ -486,7 +492,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={editWidth * viewWidth} hide={false}>
+      <Pane id="EditorPane" width={editWidth * viewWidth + 5} hide={false}>
         {editor}
       </Pane>
 
@@ -500,7 +506,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={rightWidth * viewWidth} hide={hideRight}>
+      <Pane id="RightPane" width={rightWidth * viewWidth} hide={hideRight}>
         {right}
       </Pane>
     </StyledSplitView>

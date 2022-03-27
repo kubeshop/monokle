@@ -1,4 +1,4 @@
-## Monokle Architecture
+# Monokle Architecture
 
 Monokle is an Electron desktop application built with React & TypeScript.  
 
@@ -9,15 +9,15 @@ Visuals are done using Ant Design.
 Other fairly common libraries/frameworks are used internally for common functionality (see components below).   
 
 This project was bootstrapped from
-https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, 
+<https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder>, 
 which provides:
 - TypeScript support for Electron main process source code.
 - Hot-relaod support for Electron app.
 - Electron-builder support.
 
-See https://www.electron.build/ for more info on Electron-builder.
+See <https://www.electron.build/> for more info on Electron-builder.
 
-## Folder structure
+## **Folder Structure**
 
 - /electron : Electron main thread - contains startup code and some ipc handlers invoked from the UI.
 - /src : Root for monokle UI application - contains App.tsx, Index.tsx, etc.
@@ -29,7 +29,7 @@ See https://www.electron.build/ for more info on Electron-builder.
     - /utils : common utility functions
     - /assets : icons/images/etc
   
-## Core objects
+## **Core Objects**
 
 - Most logic revolves around [K8sResource](https://github.com/kubeshop/monokle/tree/main/src/models/k8sresource.ts) objects which "encapsulate" all 
 data associated with a parsed resource.
@@ -38,7 +38,7 @@ data associated with a parsed resource.
   changes are handled by the [main reducer](https://github.com/kubeshop/monokle/tree/main/src/redux/reducers/main.ts) 
   and corresponding [thunks](https://github.com/kubeshop/monokle/tree/main/src/redux/thunks)
 
-## Main UI Components
+## **Main UI Components**
 
 The content of most high level [organisms](https://github.com/kubeshop/monokle/tree/main/src/components/organisms) and 
 [molecules](https://github.com/kubeshop/monokle/tree/main/src/components/molecules) should be fairly self-explanatory. A few highlights:
@@ -52,7 +52,7 @@ The content of most high level [organisms](https://github.com/kubeshop/monokle/t
   K8sResources using the react-jsonschema-form component (see below), corresponding schemas/uiSchemas are 
   in the [resources/form-schemas](https://github.com/kubeshop/monokle/tree/main/resources/form-schemas) folder.
 
-## 3rd party components used
+## **3rd Party Components Used**
 
 * https://github.com/eemeli/yaml for yaml parsing.
 * https://github.com/react-monaco-editor/react-monaco-editor for source editing.
@@ -66,12 +66,12 @@ The content of most high level [organisms](https://github.com/kubeshop/monokle/t
 * https://github.com/ant-design/ant-design/ for UI.
 * https://github.com/styled-components/styled-components for custom styling.
 
-## Dev Dependencies
+## **Dev Dependencies**
 
 * https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases,
   see https://www.npmjs.com/package/craco-alias#examples.
 
-## K8s Schemas
+## **K8s Schemas**
 
 Monokle currently uses the latest 1.22.1 schemas for validation and editor functionality - 
 see [this issue](https://github.com/kubeshop/monokle/issues/321) for making schema version configurable. 

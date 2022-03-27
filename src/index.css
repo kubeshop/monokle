@@ -6,8 +6,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.custom-modal-handle:active {
+  border-right: 2px solid rgba(23, 125, 220, 0.5);
+  border-left: 2px solid rgba(23, 125, 220, 0.5);
 }
 
 .monokleEditorUnsatisfiedRefGlyphClass {
@@ -107,7 +117,7 @@ code {
   padding: 0 16px;
 }
 
-.projects-table-column-name {
+.table-column-name {
   color: #ffffff;
   font-weight: 600;
   font-size: 14px;
@@ -128,7 +138,7 @@ code {
   font-size: 12px;
 }
 
-.projects-table-column-actions {
+.table-column-actions {
   display: none;
 }
 
@@ -184,7 +194,7 @@ code {
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .projects-table-column-actions {
+.ant-table-body .ant-table-row:hover .table-column-actions {
   display: flex;
 }
 
@@ -192,11 +202,11 @@ code {
   background: #111d2c;
 }
 
-.project-table-active-project td {
+.table-active-row td {
   color: #13a8a8;
 }
 
-.project-table-active-project > :first-child {
+.table-active-row > :first-child {
   box-sizing: content-box;
   border-left: 8px #13a8a8 solid;
   padding-left: 12px !important;
@@ -204,4 +214,8 @@ code {
 
 .cluster-dropdown-item li:hover {
   background: #111d2c;
+}
+
+.ant-notification.ant-notification-topRight {
+  z-index: 1051;
 }

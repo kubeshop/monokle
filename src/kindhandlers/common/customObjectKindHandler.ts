@@ -1,5 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
@@ -32,13 +33,25 @@ function extractResourceVersion(resource: K8sResource, kindVersion: string, kind
   return {version, group};
 }
 
-function extractFormSchema(editorSchema: any) {
-  const schema: any = JSON.parse(JSON.stringify(editorSchema));
+export function extractFormSchema(editorSchema: any) {
+  const schema: any = cloneDeep(editorSchema);
   if (schema && schema.properties) {
     // remove common object properties since these are shown in a separate form
     delete schema.properties['apiVersion'];
     delete schema.properties['kind'];
     delete schema.properties['metadata'];
+
+    // delete incomplete properties at root level, see sealed-secret.yaml
+    Object.keys(schema.properties).forEach(key => {
+      // property without type?
+      if (!schema.properties[key].type) {
+        delete schema.properties[key];
+      }
+      // object without properties?
+      else if (schema.properties[key].type === 'object' && !schema.properties[key].properties) {
+        delete schema.properties[key];
+      }
+    });
   }
 
   return schema;
@@ -96,7 +109,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
 
   if (kindVersion) {
     const kindPlural = spec.names.plural;
-    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
     let refMappers: any[] = [];
@@ -132,6 +145,10 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
               handler.podSelectors.forEach((selector: string[]) => {
                 refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
               });
+            }
+
+            if (handler.editorSchema) {
+              editorSchema = handler.editorSchema;
             }
           }
         }
@@ -184,6 +201,7 @@ const createNamespacedCustomObjectKindHandler = (
   return {
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
+    isNamespaced: true,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
@@ -203,13 +221,20 @@ const createNamespacedCustomObjectKindHandler = (
         resource.name
       );
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
         const defaultVersion = findDefaultVersion(crd.content);
         if (defaultVersion) {
-          return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
+          return options.namespace
+            ? customObjectsApi.listNamespacedCustomObject(
+                kindGroup,
+                defaultVersion || kindVersion,
+                options.namespace,
+                kindPlural
+              )
+            : customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
         }
       }
 
@@ -220,8 +245,14 @@ const createNamespacedCustomObjectKindHandler = (
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
             const defaultVersion = findDefaultVersion(response.body);
-            // use listClusterCustomObject to get objects in all namespaces
-            return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
+            return options.namespace
+              ? customObjectsApi.listNamespacedCustomObject(
+                  kindGroup,
+                  defaultVersion || kindVersion,
+                  options.namespace,
+                  kindPlural
+                )
+              : customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
           () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
@@ -265,6 +296,7 @@ const createClusterCustomObjectKindHandler = (
   return {
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
+    isNamespaced: false,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,
@@ -278,7 +310,7 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       return customObjectsApi.getClusterCustomObject(group, version, kindPlural, resource.name);
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {

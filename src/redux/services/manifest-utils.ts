@@ -1,17 +1,7 @@
 import log from 'loglevel';
-import {
-  Document,
-  LineCounter,
-  ParsedNode,
-  Scalar,
-  isMap,
-  isPair,
-  isScalar,
-  isSeq,
-  parseAllDocuments,
-  parseDocument,
-  visit,
-} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
   const templateNode = findValueNode(templateDoc, path);
@@ -194,7 +184,7 @@ interface PossibleResource {
 
 export function extractObjectsFromYaml(yamlText: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(yamlText, {lineCounter});
+  const documents = parseAllYamlDocuments(yamlText, lineCounter);
   const result: PossibleResource[] = [];
   if (documents) {
     let docIndex = 0;

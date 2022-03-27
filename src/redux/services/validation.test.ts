@@ -1,6 +1,11 @@
+import {join, sep} from 'path';
+
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {validateResource} from '@redux/services/validation';
+import { K8sResource } from '@models/k8sresource';
 
 test('validate-resource', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/invalid-deployment'));
@@ -10,11 +15,15 @@ test('validate-resource', () => {
   const deployment = resources.find(r => r.kind === 'Deployment');
   expect(deployment).toBeDefined();
   // @ts-ignore
-  validateResource(deployment);
+  validateResource(
+    (<K8sResource>deployment),
+    PREDEFINED_K8S_VERSION,
+    join(__dirname, sep, '..', sep, '..', sep, '..', sep, 'resources')
+  );
 
   expect(deployment?.validation).toBeDefined();
   expect(deployment?.validation?.errors).toBeDefined();
-  expect(deployment?.validation?.errors.length).toBe(4);
+  expect(deployment?.validation?.errors.length).toBe(5);
 
   // @ts-ignore
   for (let c = 0; c < deployment.validation.errors.length; c += 1) {

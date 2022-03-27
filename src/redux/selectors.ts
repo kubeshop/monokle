@@ -3,7 +3,7 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
+import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
@@ -13,6 +13,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
+import {isUnsavedResource} from './services/resource';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -24,16 +25,36 @@ export const allResourcesSelector = createSelector(
   resourceMap => Object.values(resourceMap)
 );
 
-export const activeResourcesSelector = createSelector(
-  allResourcesSelector,
-  (state: RootState) => state.main.previewResourceId,
-  (state: RootState) => state.main.previewValuesFileId,
-  (resources, previewResource, previewValuesFile) =>
-    resources.filter(
-      r =>
-        ((previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)) &&
-        !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
-    )
+export const activeResourcesSelector = (state: RootState) => {
+  const resources = Object.values(state.main.resourceMap);
+  const previewResourceId = state.main.previewResourceId;
+  const previewValuesFileId = state.main.previewValuesFileId;
+  const previewConfigurationId = state.main.previewConfigurationId;
+
+  return resources.filter(
+    r =>
+      ((previewResourceId === undefined && previewValuesFileId === undefined && previewConfigurationId === undefined) ||
+        r.filePath.startsWith(PREVIEW_PREFIX)) &&
+      !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+      !r.name.startsWith('Patch:')
+  );
+};
+
+export const unknownResourcesSelector = (state: RootState) => {
+  const isInPreviewMode = isInPreviewModeSelector(state);
+  const unknownResources = Object.values(state.main.resourceMap).filter(
+    resource =>
+      !isKustomizationResource(resource) &&
+      !getResourceKindHandler(resource.kind) &&
+      !resource.name.startsWith('Patch:') &&
+      (isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
+  );
+  return unknownResources;
+};
+
+export const unsavedResourcesSelector = createSelector(
+  (state: RootState) => state.main.resourceMap,
+  resourceMap => Object.values(resourceMap).filter(isUnsavedResource)
 );
 
 export const selectedResourceSelector = createSelector(
@@ -56,10 +77,10 @@ export const helmValuesSelector = createSelector(
   helmValuesMap => helmValuesMap
 );
 
-export const isInPreviewModeSelector = createSelector(
-  (state: RootState) => state.main,
-  appState => Boolean(appState.previewResourceId) || Boolean(appState.previewValuesFileId)
-);
+export const isInPreviewModeSelector = (state: RootState) =>
+  Boolean(state.main.previewResourceId) ||
+  Boolean(state.main.previewValuesFileId) ||
+  Boolean(state.main.previewConfigurationId);
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
@@ -94,8 +115,8 @@ export const currentConfigSelector = createSelector(
 export const settingsSelector = createSelector(
   (state: RootState) => state,
   state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.settings || {};
+    const currentConfig: ProjectConfig = currentConfigSelector(state);
+    return currentConfig.settings || {};
   }
 );
 
@@ -115,16 +136,20 @@ export const fileIncludesSelector = createSelector(
   }
 );
 
+export const currentKubeContext = (configState: AppConfig) => {
+  if (configState.projectConfig?.kubeConfig?.currentContext) {
+    return configState.projectConfig?.kubeConfig?.currentContext;
+  }
+  if (configState.kubeConfig.currentContext) {
+    return configState.kubeConfig.currentContext;
+  }
+  return '';
+};
+
 export const kubeConfigContextSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.currentContext) {
-      return config.projectConfig?.kubeConfig?.currentContext;
-    }
-    if (config.kubeConfig.currentContext) {
-      return config.kubeConfig.currentContext;
-    }
-    return '';
+    return currentKubeContext(config);
   }
 );
 
@@ -138,6 +163,22 @@ export const kubeConfigContextsSelector = createSelector(
       return config.kubeConfig.contexts;
     }
     return [];
+  }
+);
+
+export const currentClusterAccessSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    let currentContext = currentKubeContext(config);
+    if (!currentContext) {
+      return [];
+    }
+
+    if (!config.projectConfig?.kubeConfig?.currentContext) {
+      return [];
+    }
+
+    return config.projectConfig.clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
 );
 

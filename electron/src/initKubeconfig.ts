@@ -8,15 +8,13 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setKubeConfig} from '@redux/reducers/appConfig';
-import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
 import electronStore from '@utils/electronStore';
-import {PROCESS_ENV} from '@utils/env';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
-  if (PROCESS_ENV.KUBECONFIG) {
-    const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
+  if (process.env.KUBECONFIG) {
+    const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
       dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
       monitorKubeConfig(envKubeconfigParts[0], dispatch);
@@ -29,17 +27,12 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
         })
       );
     } else {
-      dispatch(setKubeConfig(getKubeConfigContext(PROCESS_ENV.KUBECONFIG)));
-      monitorKubeConfig(PROCESS_ENV.KUBECONFIG, dispatch);
+      dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
+      monitorKubeConfig(process.env.KUBECONFIG, dispatch);
     }
     return;
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
-  const hasUserPerformedClickOnClusterIcon: boolean = electronStore.get('appConfig.hasUserPerformedClickOnClusterIcon');
-
-  if (hasUserPerformedClickOnClusterIcon) {
-    dispatch(onUserPerformedClickOnClusterIcon());
-  }
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));

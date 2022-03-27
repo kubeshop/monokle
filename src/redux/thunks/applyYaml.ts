@@ -1,28 +1,24 @@
-import {spawn} from 'child_process';
-
-import {PROCESS_ENV} from '@utils/env';
-import {getShellPath} from '@utils/shell';
+import {runCommandInMainThread} from '@utils/command';
 
 /**
  * Invokes kubectl apply for the specified yaml
  */
 
-export function applyYamlToCluster(yaml: string, kubeconfig: string, context: string, namespace?: string) {
-  const spawnArgs = ['--context', context, 'apply', '-f', '-'];
+interface ApplyToClusterParams {
+  yaml: string;
+  context: string;
+  kubeconfig?: string;
+  namespace?: {
+    name: string;
+    new: boolean;
+  };
+}
+
+export function applyYamlToCluster({yaml, context, namespace, kubeconfig}: ApplyToClusterParams) {
+  const kubectlArgs = ['--context', context, 'apply', '-f', '-'];
 
   if (namespace) {
-    spawnArgs.unshift(...['--namespace', namespace]);
+    kubectlArgs.unshift(...['--namespace', namespace.name]);
   }
-
-  const child = spawn('kubectl', spawnArgs, {
-    env: {
-      NODE_ENV: PROCESS_ENV.NODE_ENV,
-      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      PATH: getShellPath(),
-      KUBECONFIG: kubeconfig,
-    },
-  });
-  child.stdin.write(yaml);
-  child.stdin.end();
-  return child;
+  return runCommandInMainThread({args: kubectlArgs, cmd: 'kubectl', input: yaml, env: {KUBECONFIG: kubeconfig}});
 }

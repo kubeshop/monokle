@@ -16,7 +16,7 @@ import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getClusterResourceText} from '@redux/services/clusterResource';
-import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
+import {replaceSelectedMatchesWithConfirm} from '@redux/support/replaceSelectedMatchesWithConfirm';
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
@@ -92,22 +92,22 @@ type ResourceDiffState = {
 
 function ClusterDiffModal() {
   const dispatch = useAppDispatch();
-
-  const hasClusterDiffLoaded = useAppSelector(state => state.main.clusterDiff.hasLoaded);
+  const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
   const hasClusterDiffFailed = useAppSelector(state => state.main.clusterDiff.hasFailed);
+  const hasClusterDiffLoaded = useAppSelector(state => state.main.clusterDiff.hasLoaded);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
-  const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
-  const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
-
   const matches = useAppSelector(state => state.main.clusterDiff.clusterToLocalResourcesMatches);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
+  const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedMatches = useAppSelector(state => state.main.clusterDiff.selectedMatches);
+  const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
   const [canDeploySelectedMatches, canReplaceSelectedMatches] = useAppSelector(state => {
     let canDeployMatchesCount = 0;
     let canReplaceMatchesCount = 0;
@@ -122,9 +122,6 @@ function ClusterDiffModal() {
     });
     return [selectedMatches.length === canDeployMatchesCount, selectedMatches.length === canReplaceMatchesCount];
   });
-
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
 
   const [hasAppliedResource, setHasAppliedResource] = useState<boolean>(false);
   const [isApplyModalVisible, setIsApplyModalVisible] = useState<boolean>(false);
@@ -283,7 +280,7 @@ function ClusterDiffModal() {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplySelectedResourceMatches = (namespace?: string) => {
+  const onClickApplySelectedResourceMatches = (namespace?: {name: string; new: boolean}) => {
     dispatch(applySelectedResourceMatches(namespace));
     setIsApplyModalVisible(false);
   };
@@ -342,7 +339,7 @@ function ClusterDiffModal() {
               isVisible={isApplyModalVisible}
               resources={selectedResources}
               title={confirmModalTitle}
-              onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
+              onOk={namespace => onClickApplySelectedResourceMatches(namespace)}
               onCancel={() => setIsApplyModalVisible(false)}
             />
           )}

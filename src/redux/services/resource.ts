@@ -1,21 +1,23 @@
-import * as k8s from '@kubernetes/client-node';
-
 import fs from 'fs';
+import {uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
 import {
   CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
+  KUSTOMIZATION_API_VERSION,
+  KUSTOMIZATION_FILE_NAME,
   KUSTOMIZATION_KIND,
   PREVIEW_PREFIX,
   UNSAVED_PREFIX,
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
+import {ClusterAccess} from '@models/appconfig';
+import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
@@ -23,6 +25,8 @@ import {isKustomizationPatch, isKustomizationResource, processKustomizations} fr
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
+import {createKubeClient} from '@utils/kubeclient';
+import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
   getDependentResourceKinds,
@@ -56,7 +60,7 @@ const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
 export function getParsedDoc(resource: K8sResource) {
   if (!parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
-    const parsedDoc = parseDocument(resource.text, {lineCounter});
+    const parsedDoc = parseYamlDocument(resource.text, lineCounter);
     parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
@@ -273,23 +277,36 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(kubeconfigPath);
-  kc.setCurrentContext(context);
+export async function getTargetClusterNamespaces(
+  kubeconfigPath: string,
+  context: string,
+  clusterAccess?: ClusterAccess[]
+): Promise<string[]> {
+  const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
+  const clusterAccessNamespaces = clusterAccess?.map(ca => ca.namespace) || [];
+  if (!hasFullAccess) {
+    return clusterAccessNamespaces;
+  }
 
-  const namespaces = await NamespaceHandler.listResourcesInCluster(kc);
+  try {
+    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
 
-  const ns: string[] = [];
-  namespaces.forEach(namespace => {
-    const namespaceName = namespace.metadata?.name;
+    const ns: string[] = [];
+    namespaces.forEach(namespace => {
+      const namespaceName = namespace.metadata?.name;
 
-    if (namespaceName && !ns.includes(namespaceName)) {
-      ns.push(namespaceName);
-    }
-  });
+      if (namespaceName && !ns.includes(namespaceName)) {
+        ns.push(namespaceName);
+      }
+    });
 
-  return ns;
+    ns.push(...clusterAccessNamespaces);
+    return uniq(ns);
+  } catch (e: any) {
+    log.warn(`Failed to get namespaces in selected context. ${e.message}`);
+    return [];
+  }
 }
 
 /**
@@ -411,7 +428,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
  * Reprocess kustomization-specific references for all kustomizations
  */
 
-function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
   Object.values(resourceMap)
     .filter(r => isKustomizationResource(r))
     .forEach(r => {
@@ -428,6 +445,8 @@ function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapT
  */
 
 export function reprocessResources(
+  schemaVersion: string,
+  userDataDir: string,
   resourceIds: string[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
@@ -451,7 +470,6 @@ export function reprocessResources(
   const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
   let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
   resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
-  let hasKustomizations = false;
 
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
@@ -462,13 +480,15 @@ export function reprocessResources(
         resource.name = `Patch: ${resource.name}`;
       }
 
-      resource.kind = resource.content.kind;
-      resource.version = resource.content.apiVersion;
-      resource.namespace = resource.content.metadata?.namespace;
+      const isKustomziationFile = resource.filePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME);
+      const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
 
-      if (isKustomizationResource(resource)) {
-        hasKustomizations = true;
-      }
+      resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
+      resource.version =
+        resource.content.apiVersion ||
+        (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
+
+      resource.namespace = extractNamespace(resource.content);
 
       // clear caches
       parsedDocCache.delete(resource.id);
@@ -476,21 +496,22 @@ export function reprocessResources(
     }
   });
 
-  processParsedResources(resourceMap, processingOptions, {
+  processResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
   });
 
-  if (hasKustomizations) {
-    reprocessKustomizations(resourceMap, fileMap);
-  }
+  // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
+  reprocessKustomizations(resourceMap, fileMap);
 }
 
 /**
  * Establishes refs for all resources in specified resourceMap
  */
 
-export function processParsedResources(
+export function processResources(
+  schemaVersion: string,
+  userHomeDir: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
   options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
@@ -500,7 +521,7 @@ export function processParsedResources(
       Object.values(resourceMap)
         .filter(r => options.resourceIds?.includes(r.id))
         .forEach(resource => {
-          validateResource(resource);
+          validateResource(resource, schemaVersion, userHomeDir);
         });
     }
 
@@ -509,14 +530,14 @@ export function processParsedResources(
         .filter(r => options.resourceKinds?.includes(r.kind))
         .forEach(resource => {
           if (!options.resourceIds || !options.resourceIds.includes(resource.id)) {
-            validateResource(resource);
+            validateResource(resource, schemaVersion, userHomeDir);
           }
         });
     }
 
     if (!options || (!options.resourceIds && !options.resourceKinds)) {
       Object.values(resourceMap).forEach(resource => {
-        validateResource(resource);
+        validateResource(resource, schemaVersion, userHomeDir);
       });
     }
   }
@@ -530,14 +551,14 @@ export function processParsedResources(
  * resource
  */
 
-export function recalculateResourceRanges(resource: K8sResource, state: AppState) {
+export function recalculateResourceRanges(resource: K8sResource, fileMap: FileMapType, resourceMap: ResourceMapType) {
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
   if (resource.range && resource.range.length !== resource.text.length) {
-    const fileEntry = state.fileMap[resource.filePath];
+    const fileEntry = fileMap[resource.filePath];
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesForPath(resource.filePath, state.resourceMap)
+      const resourceIds = getResourcesForPath(resource.filePath, resourceMap)
         .sort((a, b) => {
           return a.range && b.range ? a.range.start - b.range.start : 0;
         })
@@ -551,7 +572,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
         while (resourceIndex < resourceIds.length - 1) {
           resourceIndex += 1;
           let rid = resourceIds[resourceIndex];
-          const r = state.resourceMap[rid];
+          const r = resourceMap[rid];
           if (r && r.range) {
             r.range.start += diff;
           } else {
@@ -626,23 +647,44 @@ export function removeResourceFromFile(
 }
 
 /**
+ * Extracts the namespace from the specified resource content
+ */
+
+function extractNamespace(content: any) {
+  // namespace could be an object if it's a helm template value...
+  return content.metadata?.namespace && typeof content.metadata.namespace === 'string'
+    ? content.metadata.namespace
+    : undefined;
+}
+
+/**
  * Extracts all resources from the specified text content (must be yaml)
  */
 
 export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(fileContent, {lineCounter});
+  const documents = parseAllYamlDocuments(fileContent, lineCounter);
   const result: K8sResource[] = [];
+  let splitDocs: any;
 
   if (documents) {
     let docIndex = 0;
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
+        if (!splitDocs) {
+          splitDocs = fileContent.split('---');
+        }
+
         log.warn(
           `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
-          documents[docIndex]
+          documents[docIndex],
+          splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
         );
       } else {
+        if (doc.warnings.length > 0) {
+          log.warn('[extractK8sResources]: Doc has warnings', doc);
+        }
+
         const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
@@ -686,14 +728,12 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
-            resource.namespace = content.metadata.namespace;
-          }
+          resource.namespace = extractNamespace(content);
 
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (content && relativePath.endsWith('/kustomization.yaml') && documents.length === 1) {
+        else if (content && relativePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
             filePath: relativePath,
@@ -701,7 +741,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
+            version: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
           };
@@ -763,4 +803,15 @@ export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
     targetResourceKindCache.set(resource.kind, resourceKinds);
   }
   return targetResourceKindCache.get(resource.kind);
+}
+
+/**
+ * check if the k8sResource is supported - currently excludes any files
+ * that seem to contain Helm template or Monokle Vanilla template content
+ */
+
+export function hasSupportedResourceContent(resource: K8sResource): boolean {
+  const helmVariableRegex = /{{.*}}/g;
+  const vanillaTemplateVariableRegex = /\[\[.*]]/g;
+  return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }

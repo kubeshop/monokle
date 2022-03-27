@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint} from '@models/navigator';
+import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -24,11 +24,18 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   isLastItem: boolean;
   isSectionCheckable: boolean;
   sectionContainerElementId: string;
+  indentation: number;
   options?: ItemRendererOptions;
 };
 
+const WrapperPlacehoder: React.FC<ItemCustomComponentProps> = props => {
+  const {children} = props;
+  return <div>{children}</div>;
+};
+
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, options} = props;
+  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, indentation, options} =
+    props;
   const {instanceHandler} = blueprint;
 
   const dispatch = useAppDispatch();
@@ -37,7 +44,9 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
+  const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay} = useItemCustomization(
+    blueprint.customization
+  );
 
   const previouslyCheckedResourcesLength = useRef(checkedResourceIds.length);
   const scrollContainer = useRef<ScrollContainerRef>(null);
@@ -68,79 +77,89 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
     scrollContainer.current?.scrollIntoView();
   }, [checkedResourceIds.length, itemInstance.shouldScrollIntoView]);
 
+  const Wrapper = useMemo(
+    () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : WrapperPlacehoder),
+    [ContextMenuWrapper.Component]
+  );
+
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
-      <S.ItemContainer
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        isSelected={itemInstance.isSelected}
-        isHighlighted={itemInstance.isHighlighted}
-        disableHoverStyle={Boolean(blueprint.customization?.disableHoverStyle)}
-        isHovered={isHovered}
-        level={level}
-        isLastItem={isLastItem}
-        hasOnClick={Boolean(instanceHandler?.onClick)}
-        $isSectionCheckable={isSectionCheckable}
-        $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
-      >
-        {itemInstance.isCheckable &&
-          (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
-            <span>
-              <S.Checkbox
-                checked={itemInstance.isChecked}
-                disabled={itemInstance.isDisabled}
-                onChange={() => onCheck()}
-                $level={level}
-              />
-            </span>
-          )}
-
-        {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
-          <S.PrefixContainer>
-            <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
-          </S.PrefixContainer>
-        )}
-
-        {NameDisplay.Component ? (
-          <NameDisplay.Component itemInstance={itemInstance} />
-        ) : (
-          <S.ItemName
-            level={level}
+      {Wrapper && (
+        <Wrapper itemInstance={itemInstance} options={ContextMenuWrapper.options}>
+          <S.ItemContainer
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             isSelected={itemInstance.isSelected}
-            isDirty={itemInstance.isDirty}
             isHighlighted={itemInstance.isHighlighted}
-            isDisabled={itemInstance.isDisabled}
-            onClick={onClick}
+            disableHoverStyle={Boolean(blueprint.customization?.disableHoverStyle)}
+            isHovered={isHovered}
+            level={level}
+            isLastItem={isLastItem}
+            hasOnClick={Boolean(instanceHandler?.onClick)}
+            $indentation={indentation}
+            $isSectionCheckable={isSectionCheckable}
+            $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+            $lastItemMarginBottom={blueprint.customization?.lastItemMarginBottom}
           >
-            {itemInstance.name}
-            {itemInstance.isDirty && <span>*</span>}
-          </S.ItemName>
-        )}
+            {itemInstance.isCheckable &&
+              (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
+                <span>
+                  <S.Checkbox
+                    checked={itemInstance.isChecked}
+                    disabled={itemInstance.isDisabled}
+                    onChange={() => onCheck()}
+                    $level={level}
+                  />
+                </span>
+              )}
 
-        {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
-          <S.SuffixContainer>
-            <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
-          </S.SuffixContainer>
-        )}
+            {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+              <S.PrefixContainer>
+                <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
+              </S.PrefixContainer>
+            )}
 
-        <S.BlankSpace onClick={onClick} />
+            {NameDisplay.Component ? (
+              <NameDisplay.Component itemInstance={itemInstance} />
+            ) : (
+              <S.ItemName
+                level={level}
+                isSelected={itemInstance.isSelected}
+                isDirty={itemInstance.isDirty}
+                isHighlighted={itemInstance.isHighlighted}
+                isDisabled={itemInstance.isDisabled}
+                onClick={onClick}
+              >
+                {itemInstance.name}
+                {itemInstance.isDirty && <span>*</span>}
+              </S.ItemName>
+            )}
 
-        {QuickAction.Component &&
-          !options?.disableQuickAction &&
-          (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
-            <S.QuickActionContainer>
-              <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
-            </S.QuickActionContainer>
-          )}
+            {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
+              <S.SuffixContainer>
+                <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
+              </S.SuffixContainer>
+            )}
 
-        {ContextMenu.Component &&
-          !options?.disableContextMenu &&
-          (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
-            <S.ContextMenuContainer>
-              <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
-            </S.ContextMenuContainer>
-          )}
-      </S.ItemContainer>
+            <S.BlankSpace onClick={onClick} />
+
+            {QuickAction.Component &&
+              !options?.disableQuickAction &&
+              (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
+                <S.QuickActionContainer>
+                  <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
+                </S.QuickActionContainer>
+              )}
+            {ContextMenu.Component &&
+              !options?.disableContextMenu &&
+              (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
+                <S.ContextMenuContainer>
+                  <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
+                </S.ContextMenuContainer>
+              )}
+          </S.ItemContainer>
+        </Wrapper>
+      )}
     </ScrollIntoView>
   );
 }

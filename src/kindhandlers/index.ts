@@ -4,13 +4,14 @@ import {readdir} from 'fs/promises';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
-import {parseAllDocuments} from 'yaml';
 
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
@@ -88,7 +89,7 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
   if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
-    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`, kindHandler);
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
     // we need to store the list of registered kind handlers in the redux store for reactivity
     KindHandlersEventEmitter.emit('register', kindHandler);
@@ -175,7 +176,7 @@ async function readBundledCrdKindHandlers() {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
-        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
+        const documents = parseAllYamlDocuments(crdContent);
         documents.forEach(doc => {
           const crd = doc.toJS({maxAliasCount: -1});
           if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {

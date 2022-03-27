@@ -1,67 +1,38 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
-import {Button, Select} from 'antd';
+import {Button} from 'antd';
 
-import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined} from '@ant-design/icons';
 
 import isDeepEqual from 'fast-deep-equal/es6/react';
-import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
 
-import Colors from '@styles/Colors';
+import {openUrlInExternalBrowser} from '@utils/shell';
 
-const Container = styled.div`
-  max-height: 800px;
-  overflow-y: auto;
-`;
+import KeyValueEntryRenderer from './KeyValueEntryRenderer';
+import {ANY_VALUE} from './constants';
+import {KeyValueData, KeyValueEntry} from './types';
 
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-const TitleLabel = styled.span``;
-
-const KeyValueContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  grid-gap: 8px;
-  align-items: center;
-  margin: 10px 0;
-`;
-
-const KeyValueRemoveButtonContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr max-content;
-  grid-gap: 8px;
-  align-items: center;
-`;
-
-const StyledRemoveButton = styled(Button)`
-  min-width: 24px;
-`;
-
-type KeyValueEntry = {id: string; key?: string; value?: string};
-type KeyValue = Record<string, string | null>;
+import * as S from './styled';
 
 type KeyValueInputProps = {
   disabled?: boolean;
   label: string;
   labelStyle?: React.CSSProperties;
-  data: Record<string, string[]>;
-  value: KeyValue;
-  onChange: (keyValues: KeyValue) => void;
+  schema: Record<string, string>;
+  availableValuesByKey: Record<string, string[]>;
+  value: KeyValueData;
+  docsUrl?: string;
+  onChange: (keyValueData: KeyValueData) => void;
 };
 
-export const ANY_VALUE = '<any>';
-
-function makeKeyValueFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue {
-  const keyValue: KeyValue = {};
+function makeKeyValueDataFromEntries(keyValueEntries: KeyValueEntry[]): KeyValueData {
+  const keyValue: KeyValueData = {};
   keyValueEntries.forEach(({key, value}) => {
-    if (!key || !value) {
+    if (!key) {
       return;
     }
-    if (value === ANY_VALUE) {
+    if (value === ANY_VALUE || value === undefined) {
       keyValue[key] = null;
     } else {
       keyValue[key] = value;
@@ -70,42 +41,63 @@ function makeKeyValueFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue {
   return keyValue;
 }
 
+function createEntriesFromParentKeyValueData(
+  parentKeyValueData: KeyValueData,
+  availableValuesByKey: Record<string, string[]>
+): KeyValueEntry[] {
+  const newEntries: KeyValueEntry[] = [];
+  Object.entries(parentKeyValueData).forEach(([key, value]) => {
+    if (newEntries.some(e => e.key === key)) {
+      return;
+    }
+
+    const availableValues: string[] | undefined = availableValuesByKey[key];
+
+    if (value === null) {
+      newEntries.push({
+        id: uuidv4(),
+        key,
+        value: availableValues?.length ? ANY_VALUE : undefined,
+      });
+    } else {
+      newEntries.push({
+        id: uuidv4(),
+        key,
+        value,
+      });
+    }
+  });
+  return newEntries;
+}
+
 function KeyValueInput(props: KeyValueInputProps) {
-  const {disabled = false, label, labelStyle, data, value: keyValue, onChange} = props;
-  const [entries, setEntries] = useState<KeyValueEntry[]>([]);
-  const [currentKeyValue, setCurrentKeyValue] = useState<KeyValue>(keyValue);
+  const {
+    disabled = false,
+    label,
+    labelStyle,
+    availableValuesByKey,
+    value: parentKeyValueData,
+    schema,
+    docsUrl,
+    onChange,
+  } = props;
+  const [currentKeyValueData, setCurrentKeyValueData] = useState<KeyValueData>(parentKeyValueData);
+  const [entries, setEntries] = useState<KeyValueEntry[]>(
+    createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey)
+  );
 
   useEffect(() => {
-    if (!isDeepEqual(keyValue, currentKeyValue)) {
-      setCurrentKeyValue(keyValue);
-      const newEntries: KeyValueEntry[] = [];
-      Object.entries(keyValue).forEach(([key, value]) => {
-        if (newEntries.some(e => e.key === key)) {
-          return;
-        }
-
-        if (value === null) {
-          newEntries.push({
-            id: uuidv4(),
-            key,
-            value: ANY_VALUE,
-          });
-        } else {
-          newEntries.push({
-            id: uuidv4(),
-            key,
-            value,
-          });
-        }
-      });
+    if (!isDeepEqual(parentKeyValueData, currentKeyValueData)) {
+      setCurrentKeyValueData(parentKeyValueData);
+      const newEntries = createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey);
       setEntries(newEntries);
     }
-  }, [keyValue, currentKeyValue, data]);
+  }, [parentKeyValueData, currentKeyValueData, availableValuesByKey]);
 
   const updateKeyValue = (newEntries: KeyValueEntry[]) => {
-    const newKeyValue = makeKeyValueFromEntries(newEntries);
-    setCurrentKeyValue(newKeyValue);
-    onChange(newKeyValue);
+    const newKeyValueData = makeKeyValueDataFromEntries(newEntries);
+    setCurrentKeyValueData(newKeyValueData);
+    onChange(newKeyValueData);
   };
 
   const createEntry = () => {
@@ -114,6 +106,7 @@ function KeyValueInput(props: KeyValueInputProps) {
     };
     const newEntries = [...entries, newEntry];
     setEntries(newEntries);
+    updateKeyValue(newEntries);
   };
 
   const removeEntry = (entryId: string) => {
@@ -125,10 +118,13 @@ function KeyValueInput(props: KeyValueInputProps) {
   const updateEntryKey = (entryId: string, key: string) => {
     const newEntries = Array.from(entries);
     const entryIndex = newEntries.findIndex(e => e.id === entryId);
+
+    const availableValues: string[] | undefined = availableValuesByKey[key];
+
     newEntries[entryIndex] = {
       id: entryId,
       key,
-      value: ANY_VALUE,
+      value: availableValues?.length ? ANY_VALUE : undefined,
     };
     setEntries(newEntries);
     updateKeyValue(newEntries);
@@ -145,62 +141,49 @@ function KeyValueInput(props: KeyValueInputProps) {
     updateKeyValue(newEntries);
   };
 
+  const getEntryAvailableKeys = useCallback(
+    (entry: KeyValueEntry) => {
+      return Object.keys(schema).filter(key => key === entry.key || !entries.some(e => e.key === key));
+    },
+    [schema, entries]
+  );
+
+  const getEntryAvailableValues = useCallback(
+    (entry: KeyValueEntry) => {
+      if (entry.key && availableValuesByKey[entry.key]) {
+        return availableValuesByKey[entry.key];
+      }
+      return undefined;
+    },
+    [availableValuesByKey]
+  );
+
   return (
-    <Container>
-      <TitleContainer>
-        <TitleLabel style={labelStyle}>{label}</TitleLabel>
-        <Button onClick={createEntry} type="link" icon={<PlusOutlined />} disabled={disabled}>
-          Add
-        </Button>
-      </TitleContainer>
+    <S.Container>
+      <S.TitleContainer>
+        <S.TitleLabel style={labelStyle}>{label}</S.TitleLabel>
+        {docsUrl && (
+          <Button type="link" onClick={() => openUrlInExternalBrowser(docsUrl)} style={{padding: 0}}>
+            Documentation
+          </Button>
+        )}
+      </S.TitleContainer>
       {entries.map(entry => (
-        <KeyValueRemoveButtonContainer key={entry.id}>
-          <KeyValueContainer>
-            <Select
-              value={entry.key}
-              onChange={newKey => updateEntryKey(entry.id, newKey)}
-              showSearch
-              disabled={disabled}
-            >
-              {Object.keys(data)
-                .filter(key => key === entry.key || !entries.some(e => e.key === key))
-                .map(key => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-            </Select>
-
-            {entry.key && (
-              <Select
-                value={entry.value}
-                onChange={newValue => updateEntryValue(entry.id, newValue)}
-                showSearch
-                disabled={disabled}
-              >
-                <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
-                  {ANY_VALUE}
-                </Select.Option>
-                {data[entry.key] &&
-                  data[entry.key].map((value: string) => (
-                    <Select.Option key={value} value={value}>
-                      {value}
-                    </Select.Option>
-                  ))}
-              </Select>
-            )}
-          </KeyValueContainer>
-
-          <StyledRemoveButton
-            disabled={disabled}
-            onClick={() => removeEntry(entry.id)}
-            color={Colors.redError}
-            size="small"
-            icon={<MinusOutlined />}
-          />
-        </KeyValueRemoveButtonContainer>
+        <KeyValueEntryRenderer
+          key={entry.id}
+          entry={entry}
+          valueType={entry.key ? schema[entry.key] : undefined}
+          onKeyChange={newKey => updateEntryKey(entry.id, newKey)}
+          onValueChange={newValue => updateEntryValue(entry.id, newValue)}
+          onEntryRemove={removeEntry}
+          availableKeys={getEntryAvailableKeys(entry)}
+          availableValues={getEntryAvailableValues(entry)}
+        />
       ))}
-    </Container>
+      <Button onClick={createEntry} type="link" icon={<PlusOutlined />} disabled={disabled} style={{paddingLeft: 0}}>
+        Add
+      </Button>
+    </S.Container>
   );
 }
 

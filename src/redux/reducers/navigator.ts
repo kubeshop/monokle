@@ -30,9 +30,17 @@ export const navigatorSlice = createSlice({
     registerSectionBlueprint: (state: Draft<NavigatorState>, action: PayloadAction<string>) => {
       state.registeredSectionBlueprintIds.push(action.payload);
     },
+    removeSectionBlueprint: (state: Draft<NavigatorState>, action: PayloadAction<string>) => {
+      state.registeredSectionBlueprintIds = state.registeredSectionBlueprintIds.filter(id => id !== action.payload);
+    },
   },
 });
 
-export const {updateNavigatorInstanceState, collapseSectionIds, expandSectionIds, registerSectionBlueprint} =
-  navigatorSlice.actions;
+export const {
+  updateNavigatorInstanceState,
+  collapseSectionIds,
+  expandSectionIds,
+  registerSectionBlueprint,
+  removeSectionBlueprint,
+} = navigatorSlice.actions;
 export default navigatorSlice.reducer;

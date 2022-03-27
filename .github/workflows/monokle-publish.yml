@@ -73,10 +73,12 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: build
@@ -102,7 +104,8 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: false
+          allowUpdates: true
+          prerelease: true
           artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
@@ -148,6 +151,10 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
+      - name: Install Tools
+        run: |
+          choco install jq
+
       - name: Get Node Version
         run: |
           Set-PSDebug -Trace 1
@@ -184,17 +191,20 @@ jobs:
           npm list --depth=1
 
       - name: Build
+        shell: PowerShell
         run: |
+          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
         run: |
           $p = get-content package.json | ConvertFrom-Json
-          echo "::set-output name=TAG::$($p.version)"
+          echo "::set-output name=TAG::v$($p.version)"
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -212,7 +222,8 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: false
+          allowUpdates: true
+          prerelease: true
           artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
@@ -270,10 +281,12 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -294,7 +307,8 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: false
+          allowUpdates: true
+          prerelease: true
           artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}

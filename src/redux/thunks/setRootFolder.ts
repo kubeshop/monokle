@@ -1,21 +1,21 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
-import {createFileEntry, readFiles} from '@redux/services/fileEntry';
+import {currentConfigSelector} from '@redux/selectors';
+import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
-import {processParsedResources} from '@redux/services/resource';
+import {getK8sVersion} from '@redux/services/projectConfig';
+import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
+import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 /**
  * Thunk to set the specified root folder
@@ -29,7 +29,8 @@ export const setRootFolder = createAsyncThunk<
     state: RootState;
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
-  const appConfig = thunkAPI.getState().config;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
+  const userDataDir = thunkAPI.getState().config.userDataDir;
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
@@ -38,7 +39,7 @@ export const setRootFolder = createAsyncThunk<
 
   if (!rootFolder) {
     return {
-      appConfig,
+      projectConfig,
       fileMap,
       resourceMap,
       helmChartMap,
@@ -53,16 +54,12 @@ export const setRootFolder = createAsyncThunk<
   if (!stats.isDirectory()) {
     return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
   }
-
-  const rootEntry: FileEntry = createFileEntry(rootFolder);
-  fileMap[ROOT_FILE_ENTRY] = rootEntry;
-
-  fileMap[ROOT_FILE_ENTRY] = rootEntry;
+  const rootEntry = createRootFileEntry(rootFolder, fileMap);
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
-      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+      resolve(readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
     });
   });
   const files = await readFilesPromise;
@@ -70,9 +67,9 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
-  processParsedResources(resourceMap, resourceRefsProcessingOptions);
+  processResources(getK8sVersion(projectConfig), String(userDataDir), resourceMap, resourceRefsProcessingOptions);
 
-  monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
+  monitorRootFolder(rootFolder, thunkAPI.dispatch);
 
   const generatedAlert = {
     title: 'Folder Import',
@@ -82,12 +79,19 @@ export const setRootFolder = createAsyncThunk<
     type: AlertEnum.Success,
   };
 
+  trackEvent(OPEN_EXISTING_PROJECT, {
+    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
+    numberOfResources: Object.values(resourceMap).length,
+  });
+
   return {
-    appConfig,
+    projectConfig,
     fileMap,
     resourceMap,
     helmChartMap,
     helmValuesMap,
+    isScanExcludesUpdated: 'applied',
+    isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
   };
 });

@@ -1,5 +1,7 @@
 import os from 'os';
 
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -31,7 +33,8 @@ const initialAppState: AppState = {
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
-      'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
+      'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs',
+      false
     ),
   },
   clusterDiff: {
@@ -45,6 +48,10 @@ const initialAppState: AppState = {
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
   registeredKindHandlers: [],
+  prevConfEditor: {
+    isOpen: false,
+  },
+  deviceID: electronStore.get('main.deviceID'),
 };
 
 const initialAppConfigState: AppConfig = {
@@ -59,12 +66,15 @@ const initialAppConfigState: AppConfig = {
     language: electronStore.get('appConfig.settings.language'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
+    createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
+    setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
   },
-  isClusterSelectorVisible: electronStore.get('appConfig.settings.isClusterSelectorVisible'),
-  loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastProjectOnStartup'),
+  isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
+  loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
-  isScanExcludesUpdated: 'outdated',
+  isScanExcludesUpdated: 'applied',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
+  isScanIncludesUpdated: 'applied',
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
@@ -81,6 +91,11 @@ const initialAppConfigState: AppConfig = {
   selectedProjectRootFolder: null,
   projectConfig: null,
   isProjectLoading: true,
+  projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
+  k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
+  favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
+  disableEventTracking: electronStore.get('appConfig.disableEventTracking') || false,
+  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting') || false,
 };
 
 const initialAlertState: AlertState = {};
@@ -93,6 +108,7 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
+  isReleaseNotesDrawerOpen: false,
   isSettingsOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
@@ -148,7 +164,18 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
-  paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  paneConfiguration: electronStore.get('ui.paneConfiguration') || {
+    leftWidth: 0.3333,
+    navWidth: 0.3333,
+    editWidth: 0.3333,
+    rightWidth: 0,
+    actionsPaneFooterExpandedHeight: 0,
+    recentProjectsPaneWidth: 300,
+  },
+  layoutSize: {
+    footer: 0,
+    header: 0,
+  },
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
