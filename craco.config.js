@@ -3,6 +3,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
 const lodash = require('lodash');
+const path = require('path');
 
 module.exports = {
   webpack: {
@@ -16,6 +17,7 @@ module.exports = {
       };
       webpackConfig.output = {
         filename: 'bundle.[name].js',
+        path: path.resolve(__dirname, 'build'),
       };
       // Temporary solution until react-scripts 5.0.1 is released
       webpackConfig.ignoreWarnings = [/Failed to parse source map/];
