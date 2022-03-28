@@ -26,6 +26,6 @@ Use this selector to open a new project or switch in between projects:
 
 ## **Manage Multiple Projects**
 
-![Browse your clusters objects](img/manage-multiple-projects.gif)
+![Browse your clusters objects](img/manage-multiple-projects-1.6.0.gif)
 
 Easily switch in between projects to more efficiently work with multiple projects at the same time.
