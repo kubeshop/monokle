@@ -2,20 +2,44 @@ const CracoAlias = require('craco-alias');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
+const lodash = require('lodash');
 
 module.exports = {
   webpack: {
-    plugins: {add: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})]},
+    plugins: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})],
     configure: webpackConfig => {
-      webpackConfig.node.__dirname = false;
+      webpackConfig.node = {__dirname: false};
       webpackConfig.target = 'electron-renderer';
+      webpackConfig.optimization = {
+        moduleIds: 'deterministic',
+        minimize: false,
+      };
+      webpackConfig.output = {
+        filename: 'bundle.[name].js',
+      };
+      // Temporary solution until react-scripts 5.0.1 is released
+      webpackConfig.ignoreWarnings = [/Failed to parse source map/];
       return webpackConfig;
     },
   },
   babel: {
     presets: [],
-    plugins: [process.env.NODE_ENV === 'development' ? ['babel-plugin-styled-components', { displayName: true, namespace: 'dev' }]: [{}]],
-},
+    plugins: [
+      process.env.NODE_ENV === 'development'
+        ? ['babel-plugin-styled-components', {displayName: true, namespace: 'dev'}]
+        : [{}],
+    ],
+  },
+  jest: {
+    configure: jestConfig =>
+      lodash.merge(jestConfig, {
+        setupFilesAfterEnv: ['<rootDir>/jest.env.js'],
+        transform: {
+          // https://github.com/gsoft-inc/craco/issues/353#issuecomment-1003301013
+          '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': './lib/jest-babel-transform.js',
+        },
+      }),
+  },
   plugins: [
     {
       plugin: CracoAlias,

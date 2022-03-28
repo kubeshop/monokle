@@ -63,10 +63,10 @@ jobs:
           echo "node: $(node --version)"
           npm install
 
-      - name: Verify Dependencies
-        run: |
-          ls -la
-          npm list --depth=1
+      # - name: Verify Dependencies
+      #   run: |
+      #     ls -la
+      #     npm list --depth=1
 
       - name: Generate and apply tag
         run: |
@@ -193,10 +193,10 @@ jobs:
           npm --version
           npm install
 
-      - name: Verify Dependencies
-        run: |
-          cmd /r dir
-          npm list --depth=1
+      # - name: Verify Dependencies
+      #   run: |
+      #     cmd /r dir
+      #     npm list --depth=1
 
       - name: Generate and apply tag
         run: |
@@ -304,10 +304,10 @@ jobs:
           echo "node: $(node --version)"
           npm install
 
-      - name: Verify Dependencies
-        run: |
-          ls -la
-          npm list --depth=1
+      # - name: Verify Dependencies
+      #   run: |
+      #     ls -la
+      #     npm list --depth=1
 
       - name: Install Tools
         run: |

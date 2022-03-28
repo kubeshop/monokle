@@ -6,10 +6,11 @@ import {v4 as uuidv4} from 'uuid';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/command';
 import {extractObjectsFromYaml} from '@redux/services/manifest-utils';
 import {interpolateTemplate} from '@redux/services/templates';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
+
+import {CommandOptions, runCommandInMainThread} from '@utils/command';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
 const fsReadFilePromise = promisify(fs.readFile);

@@ -15,7 +15,7 @@ import unhandled from 'electron-unhandled';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
-  '@constants': `${__dirname}/../src/constants`,
+  '@constants': `${__dirname}/../src/constants`, 
   '@models': `${__dirname}/../src/models`,
   '@redux': `${__dirname}/../src/redux`,
   '@utils': `${__dirname}/../src/utils`,

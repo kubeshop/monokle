@@ -26,7 +26,7 @@ function useEditorKeybindings(
         id: 'monokle-apply-selection',
         label: 'Apply Selection',
         // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_S],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyS],
         run: () => {
           applySelection();
         },
@@ -41,7 +41,7 @@ function useEditorKeybindings(
         id: 'monokle-diff-selected-resource',
         label: 'Diff Selected Resource',
         // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_D],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyD],
         run: () => {
           diffSelectedResource();
         },
@@ -65,7 +65,7 @@ function useEditorKeybindings(
       id: 'monokle-open-new-resource-wizard',
       label: 'Open New Resource Wizard',
       // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN],
       run: () => {
         if (fileMap[ROOT_FILE_ENTRY]) {
           dispatch(openNewResourceWizard());

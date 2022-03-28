@@ -11,9 +11,9 @@ import {
   DEFAULT_EDITOR_DEBOUNCE,
   DEFAULT_KUBECONFIG_DEBOUNCE,
   K8S_VERSIONS,
+  ROOT_FILE_ENTRY,
   TOOLTIP_DELAY,
   TOOLTIP_K8S_SELECTION,
-  ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {
   AddExclusionPatternTooltip,

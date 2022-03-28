@@ -109,7 +109,10 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   };
 }
 
-export function getDefaultNamespaceForApply(resources: K8sResource[], defaultNamespace = 'default'): {
+export function getDefaultNamespaceForApply(
+  resources: K8sResource[],
+  defaultNamespace = 'default'
+): {
   defaultNamespace: string;
   defaultOption?: string;
 } {
