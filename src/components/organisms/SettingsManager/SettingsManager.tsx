@@ -4,17 +4,10 @@ import {useDebounce} from 'react-use';
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {InfoCircleOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
-import {
-  AutoLoadLastProjectTooltip,
-  DisableErrorReportingTooltip,
-  DisableEventTrackingTooltip,
-  TelemetryDocumentationUrl,
-} from '@constants/tooltips';
+import {AutoLoadLastProjectTooltip} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -35,6 +28,8 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
+
+import {Telemetry} from '@organisms/SettingsManager/Telemetry';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -212,26 +207,12 @@ const SettingsManager: React.FC = () => {
               Show Cluster Selector
             </Checkbox>
           </S.Div>
-          <S.Div>
-            <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
-            <Tooltip title={TelemetryDocumentationUrl}>
-              <InfoCircleOutlined style={{display: 'inline-block'}} />
-            </Tooltip>
-            <S.Div style={{marginBottom: '8px'}}>
-              <Tooltip title={DisableEventTrackingTooltip}>
-                <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                  Disable Usage Data
-                </Checkbox>
-              </Tooltip>
-            </S.Div>
-            <S.Div>
-              <Tooltip title={DisableErrorReportingTooltip}>
-                <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-                  Disable Error Reports
-                </Checkbox>
-              </Tooltip>
-            </S.Div>
-          </S.Div>
+          <Telemetry
+            disableEventTracking={disableEventTracking}
+            disableErrorReporting={disableErrorReporting}
+            handleToggleEventTracking={handleToggleEventTracking}
+            handleToggleErrorReporting={handleToggleErrorReporting}
+          />
         </Panel>
         <Panel header="Default Project Settings" key="2">
           <Settings config={appConfig} onConfigChange={changeApplicationConfig} />

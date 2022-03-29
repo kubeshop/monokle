@@ -94,8 +94,8 @@ const initialAppConfigState: AppConfig = {
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
   k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
-  disableEventTracking: electronStore.get('appConfig.disableEventTracking') || false,
-  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting') || false,
+  disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
+  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
 };
 
 const initialAlertState: AlertState = {};

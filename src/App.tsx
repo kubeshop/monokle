@@ -60,6 +60,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
+const TelemetryModal = React.lazy(() => import('@organisms/TelemetryModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 
@@ -111,6 +112,8 @@ const App = () => {
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
+  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const size: Size = useWindowSize();
 
@@ -127,6 +130,11 @@ const App = () => {
       (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
       newVersion.code === NewVersionCode.Downloaded,
     [newVersion]
+  );
+
+  const isTelemetryModalVisible = useMemo(
+    () => disableEventTracking === undefined || disableErrorReporting === undefined,
+    [disableEventTracking, disableErrorReporting]
   );
 
   const onExecutedFrom = useCallback(
@@ -354,6 +362,7 @@ const App = () => {
           {isAboutModalVisible && <AboutModal />}
           {isStartupModalVisible && <StartupModal />}
           {isUpdateModalVisible && <UpdateModal />}
+          {isTelemetryModalVisible && <TelemetryModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"
