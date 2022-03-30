@@ -1,5 +1,3 @@
-import {useEffect, useState} from 'react';
-
 import {Col, Dropdown, Menu, Row} from 'antd';
 
 import {FileSearchOutlined, FireOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
@@ -9,7 +7,8 @@ import styled from 'styled-components';
 import {useAppDispatch} from '@redux/hooks';
 import {openReleaseNotesDrawer} from '@redux/reducers/ui';
 
-import {fetchAppVersion} from '@utils/appVersion';
+import {useAppVersion} from '@hooks/useAppVersion';
+
 import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
@@ -36,11 +35,7 @@ const MenuItem = styled(Menu.Item)`
 
 const HelpMenu = () => {
   const dispatch = useAppDispatch();
-
-  const [appVersion, setAppVersion] = useState<string>();
-  useEffect(() => {
-    fetchAppVersion().then(version => setAppVersion(version));
-  }, []);
+  const appVersion = useAppVersion();
 
   const onClickReleaseNotes = () => {
     dispatch(openReleaseNotesDrawer());

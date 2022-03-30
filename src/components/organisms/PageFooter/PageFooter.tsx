@@ -8,7 +8,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLayoutSize} from '@redux/reducers/ui';
 
-import {fetchAppVersion} from '@utils/appVersion';
+import {useAppVersion} from '@hooks/useAppVersion';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -25,7 +25,7 @@ const StyledFooter = styled.footer`
 `;
 
 const PageFooter = () => {
-  const [appVersion, setAppVersion] = useState('');
+  const appVersion = useAppVersion();
   const [footerText, setFooterText] = useState('');
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -45,10 +45,6 @@ const PageFooter = () => {
 
   // not counting the root
   const nrOfFiles = useMemo(() => Object.values(fileMap).filter(f => !f.children).length, [fileMap]);
-
-  useEffect(() => {
-    fetchAppVersion().then(version => setAppVersion(version));
-  }, []);
 
   useEffect(() => {
     setFooterText(

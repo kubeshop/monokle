@@ -1,69 +1,34 @@
 import * as React from 'react';
 
-import {Button, Modal} from 'antd';
+import {Button, Modal, Typography} from 'antd';
 
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 
-import {openGitHub} from '@utils/shell';
+import {useAppVersion} from '@hooks/useAppVersion';
 
-import MonokleStartupBackground from '@assets/MonokleStartupBackground.svg';
+import MonokleAbout from '@assets/MonokleAbout.svg';
 
 import Colors from '@styles/Colors';
+
+const {Text} = Typography;
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {
     font-size: 14px !important;
     color: ${Colors.grey700};
   }
-  .ant-modal-header {
-    background-color: ${Colors.grey1000};
-  }
   .ant-modal-body {
-    background-color: ${Colors.grey1000};
+    position: relative;
+    overflow: auto;
+    background-color: ${Colors.grey1};
   }
   .ant-modal-footer {
     padding-top: 20px;
-    border-top: none;
     background-color: ${Colors.grey1000};
   }
-
-  .ant-modal-content {
-    overflow: hidden;
-  }
-
-  h1 {
-    color: ${Colors.whitePure};
-    font-size: 56px;
-  }
-
-  p {
-    color: ${Colors.whitePure};
-    font-size: 20px;
-  }
-
-  li {
-    color: ${Colors.whitePure};
-    font-size: 20px;
-  }
-`;
-
-const StyledBackgroundImg = styled.img`
-  height: 100%;
-  width: 100%;
-  opacity: 0.1;
-`;
-
-const StyledGradientDiv = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 1;
-  width: 100%;
-  height: 110%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(196, 196, 196, 0) 100%);
 `;
 
 const StyledContentContainerDiv = styled.div`
@@ -77,17 +42,29 @@ const StyledContentContainerDiv = styled.div`
 `;
 
 const StyledContentDiv = styled.div`
-  padding: 72px 64px;
+  padding: 12px 24px;
+
+  img {
+    padding: 30px 0;
+  }
 `;
 
 const HeightFillDiv = styled.div`
   display: block;
-  height: 425px;
+  height: 440px;
+`;
+
+const StyledTextConteiner = styled.div`
+  overflow: hidden;
+  .ant-typography {
+    display: block;
+  }
 `;
 
 const StartupModal = () => {
   const dispatch = useAppDispatch();
   const startupModalVisible = useAppSelector(state => state.config.isStartupModalVisible);
+  const appVersion = useAppVersion();
 
   const handleClose = () => {
     dispatch(updateStartupModalVisible(false));
@@ -97,38 +74,42 @@ const StartupModal = () => {
     <StyledModal
       visible={startupModalVisible}
       centered
-      width={800}
+      width={400}
       onCancel={handleClose}
+      title="About Monokle"
       footer={
         <Button
           style={{zIndex: 100, marginBottom: 24, marginRight: 24, display: 'inline-block'}}
           type="primary"
           onClick={handleClose}
         >
-          Get Started!
+          Got it!
         </Button>
       }
     >
       <span id="WelcomeModal">
         <HeightFillDiv />
-        <StyledGradientDiv>
-          <StyledBackgroundImg src={MonokleStartupBackground} />
-        </StyledGradientDiv>
         <StyledContentContainerDiv>
           <StyledContentDiv>
-            <h1>Welcome 🎉</h1>
-            <p>Monokle is your K8s best friend!</p>
-            <ul>
-              <li>Read your manifest folders and files</li>
-              <li>See resources and understand links between them</li>
-              <li>Edit manifests without having to learn all yaml syntax</li>
-              <li>Preview and debug kustomizations and Helm charts</li>
-              <li>Diff and apply resource changes to your clusters</li>
-              <li>And much more!</li>
-            </ul>
-            <p>
-              Suggestions? Complaints? Head over to our <a onClick={openGitHub}>GitHub repo</a> and get involved!
-            </p>
+            <img src={MonokleAbout} />
+            <StyledTextConteiner>
+              <Text>Version: {appVersion}</Text>
+              <Text> Launched in: March 2022</Text>
+              <Text>
+                In this release, the focus was to:
+                <ul>
+                  <li>Increase the stability of Monokle</li>
+                  <li>Improve the UX/UI on Helm workflows</li>
+                  <li>Handle restricted cluster access</li>
+                </ul>
+                Other useful info:
+                <ul>
+                  <li>Electron version: 17.2.0</li>
+                  <li>Node.js version 16.14.0</li>
+                  <li>Compatible with Windows/macOS/Linux</li>
+                </ul>
+              </Text>
+            </StyledTextConteiner>
           </StyledContentDiv>
         </StyledContentContainerDiv>
       </span>
