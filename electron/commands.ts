@@ -143,6 +143,9 @@ export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent
 
   fixPath();
 
+  // TODO: Remove this after we get confirmation that the PATH var is fixed
+  console.log('PATH:', process.env.PATH);
+
   try {
     const child = spawn(options.cmd, options.args, {
       env: {
