@@ -106,7 +106,7 @@ const StartupModal = () => {
                 <ul>
                   <li>Electron version: 17.2.0</li>
                   <li>Node.js version 16.14.0</li>
-                  <li>Compatible with Windows/macOS/Linux</li>
+                  <li>React version: 17.0.2</li>
                 </ul>
               </Text>
             </StyledTextContainer>
