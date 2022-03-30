@@ -7,9 +7,9 @@ import {ReloadFolderTooltip} from '@constants/tooltips';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
 
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
 import {
+  openAboutModal,
   openCreateProjectModal,
   openFolderExplorer,
   openNewResourceWizard,
@@ -60,7 +60,7 @@ const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorO
       {
         label: 'About Monokle',
         click: () => {
-          dispatch(updateStartupModalVisible(true));
+          dispatch(openAboutModal());
         },
       },
       checkForUpdateMenu(state, dispatch),

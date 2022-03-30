@@ -229,6 +229,12 @@ export const uiSlice = createSlice({
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
     },
+    openAboutModal: (state: Draft<UiState>) => {
+      state.isAboutModalOpen = true;
+    },
+    closeAboutModal: (state: Draft<UiState>) => {
+      state.isAboutModalOpen = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -296,5 +302,7 @@ export const {
   zoomOut,
   openReleaseNotesDrawer,
   closeReleaseNotesDrawer,
+  openAboutModal,
+  closeAboutModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -25,3 +25,4 @@ export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as SettingsManager} from './SettingsManager';
 export {default as StartupModal} from './StartupModal';
 export {default as UpdateModal} from './UpdateModal';
+export {default as AboutModal} from './AboutModal';
