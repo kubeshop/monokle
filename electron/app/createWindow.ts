@@ -77,8 +77,8 @@ export const createWindow = (givenPath?: string) => {
   const splashscreenConfig: Splashscreen.Config = {
     windowOpts: mainBrowserWindowOptions,
     templateUrl: isDev
-      ? path.normalize(`${__dirname}/../../public/Splashscreen.html`)
-      : path.normalize(`${__dirname}/../Splashscreen.html`),
+      ? path.normalize(`${__dirname}/../../../public/Splashscreen.html`)
+      : path.normalize(`${__dirname}/../../Splashscreen.html`),
     delay: 0,
     splashScreenOpts: {
       width: 1200,
@@ -96,7 +96,7 @@ export const createWindow = (givenPath?: string) => {
     win.loadURL('http://localhost:3000/index.html');
   } else {
     // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`);
+    win.loadURL(`file://${__dirname}/../../index.html`);
   }
 
   // Hot Reloading
