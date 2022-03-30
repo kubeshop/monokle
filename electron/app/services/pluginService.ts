@@ -11,11 +11,11 @@ import {
   validateTemplatePluginModule,
 } from '@models/plugin';
 
-import downloadExtension from './extensions/downloadExtension';
-import downloadExtensionEntry from './extensions/downloadExtensionEntry';
-import {createFolder, doesPathExist} from './extensions/fileSystem';
-import loadMultipleExtensions from './extensions/loadMultipleExtensions';
-import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from './utils';
+import downloadExtension from '../extensions/downloadExtension';
+import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
+import {createFolder, doesPathExist} from '../extensions/fileSystem';
+import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
+import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from '../utils';
 
 const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 

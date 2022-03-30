@@ -26,8 +26,8 @@ import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
-import {MainDispatch, dispatchToFocusedWindow} from './ipcMainRedux';
-import {openApplication} from './main';
+import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
+import {openApplication} from './openApplication';
 
 const isMac = process.platform === 'darwin';
 

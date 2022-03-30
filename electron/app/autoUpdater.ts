@@ -1,5 +1,4 @@
 import {AppImageUpdater, MacUpdater, NsisUpdater} from 'electron-updater';
-
 import {GenericServerOptions} from 'electron-updater/node_modules/builder-util-runtime';
 
 const options: GenericServerOptions = {
