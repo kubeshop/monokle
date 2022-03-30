@@ -15,7 +15,7 @@ import unhandled from 'electron-unhandled';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
-  '@constants': `${__dirname}/../src/constants`, 
+  '@constants': `${__dirname}/../src/constants`,
   '@models': `${__dirname}/../src/models`,
   '@redux': `${__dirname}/../src/redux`,
   '@utils': `${__dirname}/../src/utils`,
@@ -25,6 +25,7 @@ moduleAlias.addAliases({
 
 import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
+import fixPath from "fix-path";
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
@@ -324,6 +325,8 @@ export const createWindow = (givenPath?: string) => {
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
   let unsavedResourceCount = 0;
+
+  fixPath();
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
