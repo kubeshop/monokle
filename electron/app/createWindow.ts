@@ -107,6 +107,7 @@ export const createWindow = (givenPath?: string) => {
         __dirname,
         '..',
         '..',
+        '..',
         'node_modules',
         '.bin',
         `electron${process.platform === 'win32' ? '.cmd' : ''}`
