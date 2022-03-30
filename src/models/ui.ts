@@ -61,6 +61,7 @@ export type UiState = {
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;
+  isAboutModalOpen: boolean;
   newResourceWizard: {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;

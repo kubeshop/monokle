@@ -110,6 +110,7 @@ const initialUiState: UiState = {
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
   isSettingsOpen: false,
+  isAboutModalOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
