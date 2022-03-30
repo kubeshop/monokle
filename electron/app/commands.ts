@@ -15,12 +15,11 @@ import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorer
 import {CommandOptions, CommandResult} from '@utils/command';
 import {ensureMainThread} from '@utils/thread';
 
-import autoUpdater from './auto-update';
+import autoUpdater from './autoUpdater';
 
 /**
- * prompts to select a file using the native dialogs
+ * Prompts to select a file using the native dialogs
  */
-
 export const selectFileDialog = (event: Electron.IpcMainInvokeEvent, options: FileExplorerOptions) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);
   let dialogOptions: Electron.OpenDialogSyncOptions = {};
@@ -48,9 +47,8 @@ export const selectFileDialog = (event: Electron.IpcMainInvokeEvent, options: Fi
 };
 
 /**
- * prompts to select a file using the native dialogs
+ * Prompts to select a file using the native dialogs
  */
-
 export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: FileOptions) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);
   let dialogOptions: Electron.SaveDialogSyncOptions = {};
@@ -77,7 +75,6 @@ export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: File
 /**
  * Checks for a new version of monokle
  */
-
 export const checkNewVersion = async (dispatch: (action: AnyAction) => void, initial?: boolean) => {
   try {
     dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
@@ -94,7 +91,6 @@ export const checkNewVersion = async (dispatch: (action: AnyAction) => void, ini
 /**
  * Interpolates the provided vanilla template in a sandboxed vm
  */
-
 export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Electron.IpcMainEvent) => {
   const vm = new VM({
     eval: false,
@@ -133,9 +129,8 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
 };
 
 /**
- * called by the renderer thread to run a command and capture its output
+ * Called by the renderer thread to run a command and capture its output
  */
-
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
   ensureMainThread();
 

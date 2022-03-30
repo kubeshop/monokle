@@ -185,8 +185,8 @@
       "icon": "build/icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
-      "entitlements": "./electron/src/entitlements.mac.inherit.plist",
-      "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
+      "entitlements": "./electron/entitlements.mac.inherit.plist",
+      "entitlementsInherit": "./electron/entitlements.mac.inherit.plist",
       "target": [
         {
           "target": "default",

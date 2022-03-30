@@ -25,8 +25,6 @@ const {NUCLEUS_SH_APP_ID} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
-const isMac = process.platform === 'darwin';
-
 export function isValidRepositoryUrl(repositoryUrl: string) {
   return GITHUB_REPOSITORY_REGEX.test(repositoryUrl);
 }
