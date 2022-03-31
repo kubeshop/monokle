@@ -14,7 +14,7 @@ import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
+import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
@@ -60,7 +60,6 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
-const TelemetryModal = React.lazy(() => import('@organisms/TelemetryModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 
@@ -132,7 +131,7 @@ const App = () => {
     [newVersion]
   );
 
-  const isTelemetryModalVisible = useMemo(
+  const shouldTriggerTelemetryNotification = useMemo(
     () => disableEventTracking === undefined || disableErrorReporting === undefined,
     [disableEventTracking, disableErrorReporting]
   );
@@ -162,6 +161,21 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadLastProjectOnStartup, projects]
   );
+
+  useEffect(() => {
+    if (!shouldTriggerTelemetryNotification) {
+      return;
+    }
+    dispatch(
+      setAlert({
+        title: 'Monokle telemetry',
+        message:
+          'We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. Data gathering is (and will always be!) anonymous. We want to make sure you are cool with that, though!',
+        type: AlertEnum.Info,
+        extraContentType: ExtraContentType.Telemetry,
+      })
+    );
+  }, [shouldTriggerTelemetryNotification, dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);
@@ -362,7 +376,6 @@ const App = () => {
           {isAboutModalVisible && <AboutModal />}
           {isStartupModalVisible && <StartupModal />}
           {isUpdateModalVisible && <UpdateModal />}
-          {isTelemetryModalVisible && <TelemetryModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"

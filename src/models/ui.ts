@@ -1,3 +1,5 @@
+import {SettingsPanel} from '@organisms/SettingsManager/types';
+
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -118,6 +120,7 @@ export type UiState = {
     browseTemplates: boolean;
     connectToCluster: boolean;
   };
+  activeSettingsPanel?: SettingsPanel;
 };
 
 export type PaneConfiguration = {

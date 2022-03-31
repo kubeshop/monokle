@@ -30,7 +30,7 @@ const MessageBox: React.FC = () => {
     // @ts-ignore
     notification[type]({
       message: alert.title,
-      description: <NotificationMarkdown message={alert.message} />,
+      description: <NotificationMarkdown message={alert.message} extraContentType={alert.extraContentType} />,
       duration: 2,
     });
 
