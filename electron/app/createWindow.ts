@@ -1,6 +1,5 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
-import fixPath from 'fix-path';
 import {indexOf} from 'lodash';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
@@ -23,6 +22,7 @@ import {setAppRehydrating} from '@redux/reducers/main';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
+import {fixPath} from '@utils/path';
 import {StartupFlags} from '@utils/startupFlag';
 
 import * as Splashscreen from '@trodi/electron-splashscreen';
@@ -180,6 +180,7 @@ export const createWindow = (givenPath?: string) => {
         pluginsDir,
       })
     );
+
     await checkNewVersion(dispatch, true);
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));
