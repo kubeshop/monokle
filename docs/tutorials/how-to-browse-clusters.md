@@ -29,7 +29,7 @@ Monokle will switch to the **Cluster Mode**, and the Navigator will reflect all 
 
 Select a resource to view its source code in the Editor. Editing resources in cluster mode allows quick changes to be made and deployed back to the cluster.
 
- ![Editor](img/editor-5-1.5.0.png)
+ ![Editor](img/editor-5-1.6.0.png)
 
 ## **3. Diff Changes Against Cluster**
 

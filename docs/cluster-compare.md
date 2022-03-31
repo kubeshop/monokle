@@ -17,6 +17,14 @@ To use Cluster Compare follow these steps:
 
 ![Cluster Compare](img/cluster-compare-button-1.6.0.png)
 
+The Cluster Compare modal opens and shows the local resources on the left and the cluster resources on the right. 
+
+Tick the **Select all** check box to deploy all local resources to the cluster or select individual resources via the check box to the left of the resource.
+
+![Cluster Compare Selector](img/cluster-compare-selection-1.6.0.png)
+
+Click the **Deploy selected local resources (#) to cluster** button to complete the deployment.
+
 Check out the below short video to see it in action:
 
 [![Monokle Cluster Compare](img/cluster-compare.png)](https://youtu.be/9ha3-aPgSt8)
