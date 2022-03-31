@@ -10,7 +10,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import {flatten} from 'lodash';
 import {stringify} from 'yaml';
 
-import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
+import {makeApplyKustomizationText, makeApplyResourceText, makeReplaceResourceText} from '@constants/makeApplyText';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
@@ -28,7 +28,7 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import Icon from '@components/atoms/Icon';
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useWindowSize} from '@utils/hooks';
 import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
@@ -38,6 +38,8 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './styled';
+
+export type ModalTypes = 'toCluster' | 'toLocal' | null;
 
 const DiffModal = () => {
   const dispatch = useAppDispatch();
@@ -63,7 +65,7 @@ const DiffModal = () => {
 
   const [defaultNamespace, setDefaultNamespace] = useState<string>('');
   const [hasDiffModalLoaded, setHasDiffModalLoaded] = useState(false);
-  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+  const [applyModalType, setApplyModalType] = useState<ModalTypes>(null);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
@@ -96,10 +98,14 @@ const DiffModal = () => {
       return '';
     }
 
+    if (applyModalType === 'toLocal') {
+      return makeReplaceResourceText(targetResource.name, kubeConfigContext);
+    }
+
     return isKustomizationResource(targetResource)
       ? makeApplyKustomizationText(targetResource.name, kubeConfigContext)
       : makeApplyResourceText(targetResource.name, kubeConfigContext);
-  }, [targetResource, kubeConfigContext]);
+  }, [targetResource, kubeConfigContext, applyModalType]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (targetResource?.id) {
@@ -111,12 +117,12 @@ const DiffModal = () => {
         });
       }
     }
-    setIsApplyModalVisible(false);
+    setApplyModalType(null);
   };
 
   const handleApply = () => {
     if (targetResource?.id) {
-      setIsApplyModalVisible(true);
+      setApplyModalType('toCluster');
     }
   };
 
@@ -135,7 +141,13 @@ const DiffModal = () => {
     if (!targetResource || !shouldDiffIgnorePaths || !cleanMatchingResourceText) {
       return;
     }
+    setApplyModalType('toLocal');
+  };
 
+  const onReplaceResource = () => {
+    if (!targetResource || !cleanMatchingResourceText) {
+      return;
+    }
     dispatch(
       updateResource({
         resourceId: targetResource.id,
@@ -143,6 +155,7 @@ const DiffModal = () => {
         preventSelectionAndHighlightsUpdate: true,
       })
     );
+    setApplyModalType(null);
   };
 
   const cleanMatchingResourceText = useMemo(() => {
@@ -400,13 +413,21 @@ const DiffModal = () => {
         </ResizableBox>
       </S.StyledModal>
 
-      {isApplyModalVisible && (
+      {applyModalType === 'toCluster' && (
         <ModalConfirmWithNamespaceSelect
-          isVisible={isApplyModalVisible}
+          isVisible={Boolean(applyModalType)}
           resources={targetResource ? [targetResource] : []}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyResource(namespace)}
-          onCancel={() => setIsApplyModalVisible(false)}
+          onCancel={() => setApplyModalType(null)}
+        />
+      )}
+      {applyModalType === 'toLocal' && (
+        <ModalConfirm
+          isVisible={Boolean(applyModalType)}
+          text={confirmModalTitle}
+          onOk={() => onReplaceResource()}
+          onCancel={() => setApplyModalType(null)}
         />
       )}
     </>
