@@ -9,15 +9,16 @@ import {openUrlInExternalBrowser} from '@utils/shell';
 type NotificationProps = {
   message: string;
   extraContentType?: ExtraContentType;
+  notificationId?: string;
 };
 
-const getExtraContent = (extraContentType: ExtraContentType) => {
+const getExtraContent = (extraContentType: ExtraContentType, notificationId?: string) => {
   if (extraContentType === ExtraContentType.Telemetry) {
-    return <TelemetryButtons />;
+    return <TelemetryButtons notificationId={notificationId} />;
   }
 };
 
-const NotificationMarkdown = ({message, extraContentType}: NotificationProps) => {
+const NotificationMarkdown = ({message, extraContentType, notificationId}: NotificationProps) => {
   return (
     <div>
       <ReactMarkdown
@@ -33,7 +34,7 @@ const NotificationMarkdown = ({message, extraContentType}: NotificationProps) =>
       >
         {message}
       </ReactMarkdown>
-      {extraContentType && getExtraContent(extraContentType)}
+      {extraContentType && getExtraContent(extraContentType, notificationId)}
     </div>
   );
 };

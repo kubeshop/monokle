@@ -170,9 +170,10 @@ const App = () => {
       setAlert({
         title: 'Monokle telemetry',
         message:
-          'We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. Data gathering is (and will always be!) anonymous. We want to make sure you are cool with that, though!',
+          'We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. Data gathering is ([and will always be!](https://github.com/kubeshop/monokle/blob/main/docs/telemetry.md)) anonymous. We want to make sure you are cool with that, though!',
         type: AlertEnum.Info,
         extraContentType: ExtraContentType.Telemetry,
+        duration: 5,
       })
     );
   }, [shouldTriggerTelemetryNotification, dispatch]);

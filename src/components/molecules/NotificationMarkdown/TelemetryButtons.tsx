@@ -1,4 +1,4 @@
-import React from 'react';
+import {notification} from 'antd';
 
 import {updateTelemetry} from '@redux/reducers/appConfig';
 import {setActiveSettingsPanel, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
@@ -8,7 +8,7 @@ import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 import * as S from './styled';
 
-export const TelemetryButtons = () => {
+export const TelemetryButtons = ({notificationId}: {notificationId?: string}) => {
   const disableTelemetryNotification = () => {
     store.dispatch(
       updateTelemetry({
@@ -16,6 +16,10 @@ export const TelemetryButtons = () => {
         disableErrorReporting: false,
       })
     );
+
+    if (notificationId) {
+      notification.close(notificationId);
+    }
   };
 
   const handleNotOk = () => {
@@ -28,6 +32,9 @@ export const TelemetryButtons = () => {
 
   const handleOk = () => {
     disableTelemetryNotification();
+    if (notificationId) {
+      return;
+    }
     store.dispatch(toggleNotifications());
   };
 

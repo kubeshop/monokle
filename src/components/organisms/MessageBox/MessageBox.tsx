@@ -29,9 +29,16 @@ const MessageBox: React.FC = () => {
 
     // @ts-ignore
     notification[type]({
+      key: alert.id,
       message: alert.title,
-      description: <NotificationMarkdown message={alert.message} extraContentType={alert.extraContentType} />,
-      duration: 2,
+      description: (
+        <NotificationMarkdown
+          message={alert.message}
+          extraContentType={alert.extraContentType}
+          notificationId={alert.id}
+        />
+      ),
+      duration: alert.duration || 2,
     });
 
     dispatch(clearAlert());
