@@ -22,7 +22,6 @@ import {setAppRehydrating} from '@redux/reducers/main';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
-import {fixPath} from '@utils/path';
 import {StartupFlags} from '@utils/startupFlag';
 
 import * as Splashscreen from '@trodi/electron-splashscreen';
@@ -89,8 +88,6 @@ export const createWindow = (givenPath?: string) => {
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
   let unsavedResourceCount = 0;
-
-  fixPath();
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -173,6 +170,7 @@ export const createWindow = (givenPath?: string) => {
         dataDir: userDataDir,
       })
     );
+
     dispatch(
       setExtensionsDirs({
         templatesDir,
