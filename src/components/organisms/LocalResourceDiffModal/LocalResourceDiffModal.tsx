@@ -39,7 +39,10 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './styled';
 
-export type ModalTypes = 'toCluster' | 'toLocal' | null;
+enum ModalTypes {
+  toCluster = 1,
+  toLocal,
+}
 
 const DiffModal = () => {
   const dispatch = useAppDispatch();
@@ -65,7 +68,7 @@ const DiffModal = () => {
 
   const [defaultNamespace, setDefaultNamespace] = useState<string>('');
   const [hasDiffModalLoaded, setHasDiffModalLoaded] = useState(false);
-  const [applyModalType, setApplyModalType] = useState<ModalTypes>(null);
+  const [applyModalType, setApplyModalType] = useState<ModalTypes | null>(null);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
@@ -98,7 +101,7 @@ const DiffModal = () => {
       return '';
     }
 
-    if (applyModalType === 'toLocal') {
+    if (applyModalType === ModalTypes.toLocal) {
       return makeReplaceResourceText(targetResource.name, kubeConfigContext);
     }
 
@@ -122,7 +125,7 @@ const DiffModal = () => {
 
   const handleApply = () => {
     if (targetResource?.id) {
-      setApplyModalType('toCluster');
+      setApplyModalType(ModalTypes.toCluster);
     }
   };
 
@@ -141,7 +144,7 @@ const DiffModal = () => {
     if (!targetResource || !shouldDiffIgnorePaths || !cleanMatchingResourceText) {
       return;
     }
-    setApplyModalType('toLocal');
+    setApplyModalType(ModalTypes.toLocal);
   };
 
   const onReplaceResource = () => {
@@ -413,7 +416,7 @@ const DiffModal = () => {
         </ResizableBox>
       </S.StyledModal>
 
-      {applyModalType === 'toCluster' && (
+      {applyModalType === ModalTypes.toCluster && (
         <ModalConfirmWithNamespaceSelect
           isVisible={Boolean(applyModalType)}
           resources={targetResource ? [targetResource] : []}
@@ -422,7 +425,7 @@ const DiffModal = () => {
           onCancel={() => setApplyModalType(null)}
         />
       )}
-      {applyModalType === 'toLocal' && (
+      {applyModalType === ModalTypes.toLocal && (
         <ModalConfirm
           isVisible={Boolean(applyModalType)}
           text={confirmModalTitle}

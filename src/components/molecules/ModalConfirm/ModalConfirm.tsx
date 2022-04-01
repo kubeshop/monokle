@@ -2,21 +2,7 @@ import React from 'react';
 
 import {Modal} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
-import Colors from '@styles/Colors';
-
-const TitleContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const TitleIcon = styled(ExclamationCircleOutlined)`
-  margin-right: 10px;
-  color: ${Colors.yellowWarning};
-`;
+import * as S from './styled';
 
 interface IProps {
   isVisible: boolean;
@@ -33,10 +19,10 @@ const ModalConfirm: React.FC<IProps> = props => {
       centered
       visible={isVisible}
       title={
-        <TitleContainer>
-          <TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
+        <S.TitleContainer>
+          <S.TitleIcon />
           Confirmation
-        </TitleContainer>
+        </S.TitleContainer>
       }
       onOk={onOk}
       onCancel={onCancel}
