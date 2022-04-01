@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useEffect, useState} from 'react';
 
 import {Button, Modal, Typography} from 'antd';
 
@@ -8,6 +8,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeAboutModal} from '@redux/reducers/ui';
 
 import {useAppVersion} from '@hooks/useAppVersion';
+
+import {getDependencyVersion} from '@utils/getDependencyVersion';
 
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
@@ -65,10 +67,23 @@ const StartupModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
+  const [dependenciesVersions, setDependenciesVersions] = useState<{name: string; version: string}[]>([]);
 
   const handleClose = () => {
     dispatch(closeAboutModal());
   };
+
+  useEffect(() => {
+    const getDependenciesVersions = async () => {
+      return getDependencyVersion(['react', 'electron']);
+    };
+
+    getDependenciesVersions()
+      .then(result => {
+        setDependenciesVersions(result);
+      })
+      .catch(err => console.error('Get Dependencies Failed', err));
+  }, [getDependencyVersion]);
 
   return (
     <StyledModal
@@ -104,9 +119,11 @@ const StartupModal = () => {
                 </ul>
                 Other useful info:
                 <ul>
-                  <li>Electron version: 17.2.0</li>
-                  <li>Node.js version 16.14.0</li>
-                  <li>React version: 17.0.2</li>
+                  {dependenciesVersions.map(({name, version}) => (
+                    <li key={name}>
+                      {name} version: {version}
+                    </li>
+                  ))}
                 </ul>
               </Text>
             </StyledTextContainer>
