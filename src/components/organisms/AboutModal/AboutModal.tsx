@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useMemo} from 'react';
 
 import {Button, Modal, Typography} from 'antd';
 
@@ -16,6 +16,7 @@ import MonokleAbout from '@assets/MonokleAbout.svg';
 import Colors from '@styles/Colors';
 
 const {Text} = Typography;
+const dependenciesList = ['react', 'electron'];
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {
@@ -67,23 +68,12 @@ const StartupModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
-  const [dependenciesVersions, setDependenciesVersions] = useState<{name: string; version: string}[]>([]);
 
   const handleClose = () => {
     dispatch(closeAboutModal());
   };
 
-  useEffect(() => {
-    const getDependenciesVersions = async () => {
-      return getDependencyVersion(['react', 'electron']);
-    };
-
-    getDependenciesVersions()
-      .then(result => {
-        setDependenciesVersions(result);
-      })
-      .catch(err => console.error('Get Dependencies Failed', err));
-  }, [getDependencyVersion]);
+  const dependenciesVersions = useMemo(() => getDependencyVersion(dependenciesList), [dependenciesList]);
 
   return (
     <StyledModal

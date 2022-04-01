@@ -1,9 +1,9 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
-const parsePackageFile = async () => {
+const parsePackageFile = () => {
   const packageJson = path.join(process.cwd(), './package.json');
-  const content = await fs.readFile(path.resolve(packageJson), 'utf-8', (err: Error, data: string) => {
+  const content = fs.readFileSync(path.resolve(packageJson), 'utf-8', (err: Error, data: string) => {
     if (err) {
       throw err;
     }
@@ -12,10 +12,8 @@ const parsePackageFile = async () => {
   return JSON.parse(content);
 };
 
-export const getDependencyVersion = async (
-  dependencyName: Array<string>
-): Promise<{name: string; version: string}[]> => {
-  const parsedContent = await parsePackageFile();
+export const getDependencyVersion = (dependencyName: Array<string>): {name: string; version: string}[] => {
+  const parsedContent = parsePackageFile();
   return dependencyName.map(name => ({
     name,
     version: (parsedContent.dependencies[name] as string) || parsedContent.devDependencies[name] || '',
