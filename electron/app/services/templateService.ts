@@ -25,8 +25,13 @@ const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
 const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';
 
 const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTemplate => {
-  const updatedTemplate = {
+  let icon = template.icon;
+  if (icon && !icon.includes('http')) {
+    icon = path.join(templateFolderPath, icon);
+  }
+  const updatedTemplate: AnyTemplate = {
     ...template,
+    icon,
     forms: template.forms.map(form => {
       return {
         ...form,
