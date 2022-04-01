@@ -23,7 +23,7 @@ Selecting the **Load** button will attempt to populate the Resource Navigator wi
 
 Monokle is now in **Cluster Mode** (as indicated by the header at the top):
 
-![Cluster Preview](img/cluster-preview2-1.5.0.png)
+![Cluster Preview](img/cluster-preview2-1.6.0.png)
 
 - The File Explorer has been disabled if a folder had been previously selected.
 - The Navigator contains all resources retrieved from the configured cluster:
