@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import {ipcRenderer} from 'electron';
 
 import asyncLib from 'async';
@@ -16,6 +17,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
 import electronStore from '@utils/electronStore';
+import {sleep} from '@utils/index';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createUnsavedResource} from './unsavedResource';
@@ -128,24 +130,33 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
-  const createdResources: K8sResource[] = [];
+
+  let objects: any[] = [];
+
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
-      const objects = extractObjectsFromYaml(resourceText);
-      objects.forEach(obj => {
-        const resource = createUnsavedResource(
-          {
-            name: obj.metadata.name,
-            namespace: obj.metadata.namespace,
-            kind: obj.kind,
-            apiVersion: obj.apiVersion,
-          },
-          dispatch,
-          obj
-        );
-        createdResources.push(resource);
-      });
+      objects = [...objects, ...extractObjectsFromYaml(resourceText)];
     });
+
+  const createdResources: K8sResource[] = [];
+
+  for (const obj of objects) {
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(500);
+    const resource = createUnsavedResource(
+      {
+        name: obj.metadata.name,
+        namespace: obj.metadata.namespace,
+        kind: obj.kind,
+        apiVersion: obj.apiVersion,
+      },
+      dispatch,
+      obj
+    );
+
+    createdResources.push(resource);
+  }
+
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };

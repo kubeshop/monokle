@@ -8,3 +8,6 @@ export const generateId = (prefix: string = 'id'): string => {
 export const uniqueArr = <T>(arr: Array<T>): Array<T> => {
   return Array.from(new Set(arr));
 };
+
+// eslint-disable-next-line no-promise-executor-return
+export const sleep = (ms: number) => new Promise(res => setTimeout(() => res(null), ms));
