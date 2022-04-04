@@ -11,20 +11,18 @@ import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
-import {ClusterAccess} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectClusterDiffMatch, setDiffResourceInClusterDiff, unselectClusterDiffMatch} from '@redux/reducers/main';
-import {currentClusterAccessSelector, currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
-import {hasAccessToResource} from '@utils/kubeclient';
 import {
   diffLocalToClusterResources,
   makeResourceNameKindNamespaceIdentifier,
@@ -86,7 +84,6 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
@@ -188,13 +185,6 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
   };
 
-  // TODO change-to-multiple-cluster-access
-  const resourceNamespace = (clusterAccess ?? [])?.find((access: ClusterAccess) => {
-    return access.namespace === matchMeta.resourceNamespace;
-  });
-  const canGet = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'get', resourceNamespace);
-  const canCreate = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'create', resourceNamespace);
-
   if (!clusterResource && !localResources) {
     return null;
   }
@@ -217,19 +207,19 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       </LabelContainer>
 
       <IconsContainer $clusterOnly={Boolean(clusterResource && !firstLocalResource)}>
-        {canCreate && firstLocalResource && (
+        {firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
             <ArrowRightOutlined style={{color: Colors.blue6}} onClick={onClickApply} />
           </Tooltip>
         )}
-        {canGet && clusterResource && firstLocalResource && (
+        {clusterResource && firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffCompareTooltip}>
             <StyledDiffSpan style={{color: Colors.blue6}} onClick={onClickDiff}>
               Diff
             </StyledDiffSpan>
           </Tooltip>
         )}
-        {canGet && clusterResource && !firstLocalResource?.filePath.startsWith(PREVIEW_PREFIX) && (
+        {clusterResource && !firstLocalResource?.filePath.startsWith(PREVIEW_PREFIX) && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffSaveTooltip}>
             <ArrowLeftOutlined style={{color: Colors.blue6}} onClick={onClickSave} />
           </Tooltip>
