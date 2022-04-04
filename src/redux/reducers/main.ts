@@ -20,10 +20,12 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
+import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {currentConfigSelector} from '@redux/selectors';
+import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
@@ -675,6 +677,13 @@ export const mainSlice = createSlice({
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
+
+    builder.addCase(setRootFolder.pending, state => {
+      const existingHelmCharts: HelmChart[] = JSON.parse(JSON.stringify(Object.values(state.helmChartMap)));
+      if (existingHelmCharts.length) {
+        setImmediate(() => existingHelmCharts.forEach(chart => HelmChartEventEmitter.emit('remove', chart.id)));
+      }
+    });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMap = action.payload.resourceMap;
