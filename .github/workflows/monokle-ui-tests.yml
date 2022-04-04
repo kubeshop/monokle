@@ -3,7 +3,7 @@ name: monokle-ui-tests
 on:
   push:
     branches:
-      - fix-nightly-test
+      - andreiv1992/fix/fixing-tests
       - main
 
   workflow_dispatch:
