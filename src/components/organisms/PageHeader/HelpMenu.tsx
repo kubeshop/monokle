@@ -1,7 +1,10 @@
+import {useMemo} from 'react';
+
 import {Col, Dropdown, Menu, Row} from 'antd';
 
 import {FileSearchOutlined, FireOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
+import semver from 'semver';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -37,6 +40,14 @@ const HelpMenu = () => {
   const dispatch = useAppDispatch();
   const appVersion = useAppVersion();
 
+  const parsedAppVersion = useMemo(() => {
+    const version = semver.parse(appVersion);
+    if (!version) {
+      return undefined;
+    }
+    return `${version.major}.${version.minor}`;
+  }, [appVersion]);
+
   const onClickReleaseNotes = () => {
     dispatch(openReleaseNotesDrawer());
   };
@@ -63,7 +74,7 @@ const HelpMenu = () => {
             </IconContainerSpan>
           </Col>
 
-          <Col span={19}>New in {appVersion || 'this version'}</Col>
+          <Col span={19}>New in {parsedAppVersion || 'this version'}</Col>
         </Row>
       </MenuItem>
 
