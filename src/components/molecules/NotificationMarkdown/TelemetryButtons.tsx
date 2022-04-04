@@ -9,6 +9,9 @@ import {SettingsPanel} from '@organisms/SettingsManager/types';
 import * as S from './styled';
 
 export const TelemetryButtons = ({notificationId}: {notificationId?: string}) => {
+  const disableEventTracking = store.getState().config.disableEventTracking;
+  const disableErrorReporting = store.getState().config.disableEventTracking;
+
   const disableTelemetryNotification = () => {
     store.dispatch(
       updateTelemetry({
@@ -37,6 +40,10 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     }
     store.dispatch(toggleNotifications());
   };
+
+  if (disableEventTracking !== undefined || disableErrorReporting !== undefined) {
+    return <span>Your settings have been saved.</span>;
+  }
 
   return (
     <div>
