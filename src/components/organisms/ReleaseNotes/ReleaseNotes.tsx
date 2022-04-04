@@ -28,6 +28,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
     fetchAppVersion().then(version => {
       const parsedVersion = semver.parse(version);
       if (!parsedVersion) {
+        onClose();
         return;
       }
       const releaseVersion = `${parsedVersion.major}.${parsedVersion.minor}`;
