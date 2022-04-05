@@ -67,3 +67,32 @@ export const Heading = styled.h2`
   font-size: 16px;
   margin-bottom: 7px;
 `;
+
+export const TelemetryTitle = styled(Span)`
+  display: inline-block;
+  margin-right: 8px;
+`;
+
+export const TelemetryInfo = styled.p`
+  padding: 0;
+  margin: 0;
+  margin-bottom: 8px;
+`;
+
+export const TelemetryDescription = styled.span`
+  color: ${Colors.grey500};
+  margin-right: 4px;
+`;
+
+export const TelemetryReadMoreLink = styled.span`
+  color: ${Colors.blue6};
+  cursor: pointer;
+
+  &:hover {
+    color: ${Colors.blue10};
+  }
+`;
+
+export const BoldSpan = styled.span`
+  font-weight: 600;
+`;
