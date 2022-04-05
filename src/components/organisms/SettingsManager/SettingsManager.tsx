@@ -36,6 +36,8 @@ import {
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
+import {SettingsPanel} from '@organisms/SettingsManager/types';
+
 import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -54,20 +56,23 @@ const SettingsManager: React.FC = () => {
   const mergedConfig: ProjectConfig = useAppSelector(currentConfigSelector);
   const appConfig = useAppSelector(state => state.config);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const activeSettingsPanel = useAppSelector(state => state.ui.activeSettingsPanel);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
-  const [activePanels, setActivePanels] = useState<number[]>([3]);
+  const [activePanels, setActivePanels] = useState<SettingsPanel[]>([
+    activeSettingsPanel || SettingsPanel.ActiveProjectSettings,
+  ]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, 3]));
+      setActivePanels(_.uniq([...activePanels, SettingsPanel.ActiveProjectSettings]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
@@ -166,7 +171,7 @@ const SettingsManager: React.FC = () => {
   return (
     <>
       <S.Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
-        <Panel header="Global Settings" key="1">
+        <Panel header="Global Settings" key={SettingsPanel.GlobalSettings}>
           <Form
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
@@ -233,11 +238,11 @@ const SettingsManager: React.FC = () => {
             </S.Div>
           </S.Div>
         </Panel>
-        <Panel header="Default Project Settings" key="2">
+        <Panel header="Default Project Settings" key={SettingsPanel.DefaultProjectSettings}>
           <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
         </Panel>
         {activeProject && (
-          <Panel header="Active Project Settings" key="3">
+          <Panel header="Active Project Settings" key={SettingsPanel.ActiveProjectSettings}>
             <Settings
               config={mergedConfig}
               onConfigChange={changeProjectConfig}

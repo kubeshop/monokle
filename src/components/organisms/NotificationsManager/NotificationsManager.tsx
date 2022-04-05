@@ -22,7 +22,7 @@ type NotificationProps = {
 
 const Notification: React.FC<NotificationProps> = props => {
   const {notification, badge} = props;
-  const {createdAt, title, message} = notification;
+  const {createdAt, title, message, extraContentType} = notification;
 
   const copyToClipboardMessage = `Title: ${title}. Description: ${message}.`;
 
@@ -50,7 +50,7 @@ const Notification: React.FC<NotificationProps> = props => {
         <S.MessageBodyContainer>
           <S.TitleSpan>{title}</S.TitleSpan>
           <S.MessageSpan>
-            <NotificationMarkdown message={message} />
+            <NotificationMarkdown message={message} extraContentType={extraContentType} />
           </S.MessageSpan>
         </S.MessageBodyContainer>
       </S.MessageContainer>

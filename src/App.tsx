@@ -14,7 +14,7 @@ import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
+import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
@@ -111,6 +111,8 @@ const App = () => {
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
+  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const size: Size = useWindowSize();
 
@@ -127,6 +129,11 @@ const App = () => {
       (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
       newVersion.code === NewVersionCode.Downloaded,
     [newVersion]
+  );
+
+  const shouldTriggerTelemetryNotification = useMemo(
+    () => disableEventTracking === undefined || disableErrorReporting === undefined,
+    [disableEventTracking, disableErrorReporting]
   );
 
   const onExecutedFrom = useCallback(
@@ -154,6 +161,22 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadLastProjectOnStartup, projects]
   );
+
+  useEffect(() => {
+    if (!shouldTriggerTelemetryNotification) {
+      return;
+    }
+    dispatch(
+      setAlert({
+        title: 'Monokle telemetry',
+        message:
+          'We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. Data gathering is ([and will always be!](https://github.com/kubeshop/monokle/blob/main/docs/telemetry.md)) anonymous. We want to make sure you are cool with that, though!',
+        type: AlertEnum.Info,
+        extraContentType: ExtraContentType.Telemetry,
+        duration: 5,
+      })
+    );
+  }, [shouldTriggerTelemetryNotification, dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);

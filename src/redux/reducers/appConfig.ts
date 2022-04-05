@@ -379,6 +379,15 @@ export const configSlice = createSlice({
       state.disableErrorReporting = !state.disableErrorReporting;
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
+    updateTelemetry: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{disableErrorReporting: boolean; disableEventTracking: boolean}>
+    ) => {
+      state.disableEventTracking = action.payload.disableEventTracking;
+      state.disableErrorReporting = action.payload.disableErrorReporting;
+      electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
+      electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -416,5 +425,6 @@ export const {
   toggleEventTracking,
   toggleErrorReporting,
   setAccessLoading,
+  updateTelemetry,
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -21,6 +21,8 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {SettingsPanel} from '@organisms/SettingsManager/types';
+
 import electronStore from '@utils/electronStore';
 
 export const uiSlice = createSlice({
@@ -70,6 +72,9 @@ export const uiSlice = createSlice({
     setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.rightMenu.isActive = action.payload;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
+    },
+    setActiveSettingsPanel: (state: Draft<UiState>, action: PayloadAction<SettingsPanel>) => {
+      state.activeSettingsPanel = action.payload;
     },
     setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<RightMenuSelectionType>) => {
       state.rightMenu.selection = action.payload;
@@ -302,6 +307,7 @@ export const {
   zoomOut,
   openReleaseNotesDrawer,
   closeReleaseNotesDrawer,
+  setActiveSettingsPanel,
   openAboutModal,
   closeAboutModal,
 } = uiSlice.actions;
