@@ -10,6 +10,8 @@ import {RootState} from '@models/rootstate';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {isResourcePassingFilter} from '@utils/resources';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
@@ -61,6 +63,12 @@ export const selectedResourceSelector = createSelector(
   (state: RootState) => state.main.resourceMap,
   (state: RootState) => state.main.selectedResourceId,
   (resourceMap, selectedResourceId) => (selectedResourceId ? resourceMap[selectedResourceId] : undefined)
+);
+
+export const filteredResourceSelector = createSelector(
+  (state: RootState) => state.main.resourceMap,
+  (state: RootState) => state.main.resourceFilter,
+  (resourceMap, filter) => Object.values(resourceMap).filter(resource => isResourcePassingFilter(resource, filter))
 );
 
 export const kustomizationsSelector = createSelector(allResourcesSelector, resources =>
