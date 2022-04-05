@@ -177,6 +177,10 @@ export function removeSchemaDefaults(schema: any, removeObjectDefaults: boolean,
 }
 
 function removeDefaults(schemaItem: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
+  if (!schemaItem) {
+    return;
+  }
+
   if (removeObjectDefaults && schemaItem.default && schemaItem.type === 'object') {
     delete schemaItem.default;
   }
