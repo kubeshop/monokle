@@ -13,6 +13,7 @@ import semver from 'semver';
 import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
+import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
@@ -169,8 +170,7 @@ const App = () => {
     dispatch(
       setAlert({
         title: 'Monokle telemetry',
-        message:
-          'We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. Data gathering is ([and will always be!](https://github.com/kubeshop/monokle/blob/main/docs/telemetry.md)) anonymous. We want to make sure you are cool with that, though!',
+        message: `We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. **Data gathering is *(and will always be!)* anonymous**. We want to make sure you are cool with that, though! [Read more about this in our documentation.](${TelemetryDocumentationUrl})`,
         type: AlertEnum.Info,
         extraContentType: ExtraContentType.Telemetry,
         duration: 5,

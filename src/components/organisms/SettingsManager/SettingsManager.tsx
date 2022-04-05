@@ -4,17 +4,10 @@ import {useDebounce} from 'react-use';
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {InfoCircleOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
-import {
-  AutoLoadLastProjectTooltip,
-  DisableErrorReportingTooltip,
-  DisableEventTrackingTooltip,
-  TelemetryDocumentationUrl,
-} from '@constants/tooltips';
+import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -42,7 +35,10 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {openUrlInExternalBrowser} from '@utils/shell';
 import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
+
+import Colors from '@styles/Colors';
 
 import {Settings} from './Settings';
 
@@ -218,23 +214,25 @@ const SettingsManager: React.FC = () => {
             </Checkbox>
           </S.Div>
           <S.Div>
-            <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
-            <Tooltip title={TelemetryDocumentationUrl}>
-              <InfoCircleOutlined style={{display: 'inline-block'}} />
-            </Tooltip>
+            <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
+            <S.TelemetryInfo>
+              <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
+              <S.TelemetryReadMoreLink
+                style={{color: Colors.blue6}}
+                onClick={() => openUrlInExternalBrowser(TelemetryDocumentationUrl)}
+              >
+                Read more about it in our documentation.
+              </S.TelemetryReadMoreLink>
+            </S.TelemetryInfo>
             <S.Div style={{marginBottom: '8px'}}>
-              <Tooltip title={DisableEventTrackingTooltip}>
-                <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                  Disable Usage Data
-                </Checkbox>
-              </Tooltip>
+              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
+              </Checkbox>
             </S.Div>
             <S.Div>
-              <Tooltip title={DisableErrorReportingTooltip}>
-                <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-                  Disable Error Reports
-                </Checkbox>
-              </Tooltip>
+              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+              </Checkbox>
             </S.Div>
           </S.Div>
         </Panel>
