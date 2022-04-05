@@ -12,6 +12,8 @@ import {filteredResourceSelector, isInPreviewModeSelector} from '@redux/selector
 
 import {Icon} from '@atoms';
 
+import {isDefined} from '@utils/filter';
+
 import * as S from './WarningAndErrorsDisplay.styled';
 
 type Warning = {
@@ -75,7 +77,7 @@ function WarningsAndErrorsDisplay() {
     );
   }, [filteredResources, isInPreviewMode]);
 
-  const warnings: any[] = useMemo(() => {
+  const warnings = useMemo(() => {
     const warningsCollection = resources
       .map(resource => {
         if (resource.refs) {
@@ -93,12 +95,13 @@ function WarningsAndErrorsDisplay() {
         }
         return null;
       })
-      .filter(warning => warning);
-    return sortWarnings(warningsCollection as Warning[]);
+      .filter(isDefined);
+
+    return sortWarnings(warningsCollection);
   }, [resources]);
 
-  const errors: any[] = useMemo(() => {
-    const errorsCollection = resources
+  const errors = useMemo(() => {
+    const errorsCollection: Warning[] = resources
       .map(resource => {
         if (resource.validation && !resource.validation.isValid) {
           return {
@@ -111,9 +114,9 @@ function WarningsAndErrorsDisplay() {
         }
         return null;
       })
-      .filter(error => error);
+      .filter(isDefined);
 
-    return sortWarnings(errorsCollection as Warning[]);
+    return sortWarnings(errorsCollection);
   }, [resources]);
 
   const warningsCount = useMemo(() => {
