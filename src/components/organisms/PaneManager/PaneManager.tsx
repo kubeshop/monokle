@@ -9,7 +9,7 @@ import RecentProjectsPane from '../RecentProjectsPane';
 import StartProjectPane from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import PaneManagerRightMenu from './PaneManagerRightMenu';
-import PaneManagerSplitView from './PaneMangerSplitView';
+import PaneManagerSplitView from './PaneManagerSplitView';
 
 import * as S from './styled';
 

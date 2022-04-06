@@ -8,9 +8,11 @@ import {ResourceRefType} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {filteredResourceSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
+
+import {isDefined} from '@utils/filter';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 
@@ -66,14 +68,17 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
 };
 
 function WarningsAndErrorsDisplay() {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const filteredResources = useAppSelector(filteredResourceSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
-  const warnings: any[] = useMemo(() => {
-    const warningsCollection = Object.values(resourceMap)
-      .filter(resource =>
-        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
-      )
+  const resources = useMemo(() => {
+    return filteredResources.filter(resource =>
+      isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
+    );
+  }, [filteredResources, isInPreviewMode]);
+
+  const warnings = useMemo(() => {
+    const warningsCollection = resources
       .map(resource => {
         if (resource.refs) {
           const unsatisfiedRefs = resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied);
@@ -90,15 +95,13 @@ function WarningsAndErrorsDisplay() {
         }
         return null;
       })
-      .filter(warning => warning);
-    return sortWarnings(warningsCollection as Warning[]);
-  }, [resourceMap, isInPreviewMode]);
+      .filter(isDefined);
 
-  const errors: any[] = useMemo(() => {
-    const errorsCollection = Object.values(resourceMap)
-      .filter(resource =>
-        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
-      )
+    return sortWarnings(warningsCollection);
+  }, [resources]);
+
+  const errors = useMemo(() => {
+    const errorsCollection: Warning[] = resources
       .map(resource => {
         if (resource.validation && !resource.validation.isValid) {
           return {
@@ -111,30 +114,22 @@ function WarningsAndErrorsDisplay() {
         }
         return null;
       })
-      .filter(error => error);
+      .filter(isDefined);
 
-    return sortWarnings(errorsCollection as Warning[]);
-  }, [resourceMap, isInPreviewMode]);
+    return sortWarnings(errorsCollection);
+  }, [resources]);
 
   const warningsCount = useMemo(() => {
-    return Object.values(resourceMap)
-      .filter(resource =>
-        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
-      )
-      .reduce<number>((acc, resource) => {
-        return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
-      }, 0);
-  }, [resourceMap, isInPreviewMode]);
+    return resources.reduce<number>((acc, resource) => {
+      return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
+    }, 0);
+  }, [resources]);
 
   const errorsCount = useMemo(() => {
-    return Object.values(resourceMap)
-      .filter(resource =>
-        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
-      )
-      .reduce<number>((acc, resource) => {
-        return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
-      }, 0);
-  }, [resourceMap, isInPreviewMode]);
+    return resources.reduce<number>((acc, resource) => {
+      return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
+    }, 0);
+  }, [resources]);
 
   return (
     <>

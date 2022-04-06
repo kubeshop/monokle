@@ -4,17 +4,10 @@ import {useDebounce} from 'react-use';
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {InfoCircleOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
-import {
-  AutoLoadLastProjectTooltip,
-  DisableErrorReportingTooltip,
-  DisableEventTrackingTooltip,
-  TelemetryDocumentationUrl,
-} from '@constants/tooltips';
+import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -36,11 +29,16 @@ import {
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
+import {SettingsPanel} from '@organisms/SettingsManager/types';
+
 import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {openUrlInExternalBrowser} from '@utils/shell';
 import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
+
+import Colors from '@styles/Colors';
 
 import {Settings} from './Settings';
 
@@ -54,20 +52,23 @@ const SettingsManager: React.FC = () => {
   const mergedConfig: ProjectConfig = useAppSelector(currentConfigSelector);
   const appConfig = useAppSelector(state => state.config);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const activeSettingsPanel = useAppSelector(state => state.ui.activeSettingsPanel);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
-  const [activePanels, setActivePanels] = useState<number[]>([3]);
+  const [activePanels, setActivePanels] = useState<SettingsPanel[]>([
+    activeSettingsPanel || SettingsPanel.ActiveProjectSettings,
+  ]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, 3]));
+      setActivePanels(_.uniq([...activePanels, SettingsPanel.ActiveProjectSettings]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
@@ -166,7 +167,7 @@ const SettingsManager: React.FC = () => {
   return (
     <>
       <S.Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
-        <Panel header="Global Settings" key="1">
+        <Panel header="Global Settings" key={SettingsPanel.GlobalSettings}>
           <Form
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
@@ -213,31 +214,33 @@ const SettingsManager: React.FC = () => {
             </Checkbox>
           </S.Div>
           <S.Div>
-            <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
-            <Tooltip title={TelemetryDocumentationUrl}>
-              <InfoCircleOutlined style={{display: 'inline-block'}} />
-            </Tooltip>
+            <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
+            <S.TelemetryInfo>
+              <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
+              <S.TelemetryReadMoreLink
+                style={{color: Colors.blue6}}
+                onClick={() => openUrlInExternalBrowser(TelemetryDocumentationUrl)}
+              >
+                Read more about it in our documentation.
+              </S.TelemetryReadMoreLink>
+            </S.TelemetryInfo>
             <S.Div style={{marginBottom: '8px'}}>
-              <Tooltip title={DisableEventTrackingTooltip}>
-                <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                  Disable Usage Data
-                </Checkbox>
-              </Tooltip>
+              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
+              </Checkbox>
             </S.Div>
             <S.Div>
-              <Tooltip title={DisableErrorReportingTooltip}>
-                <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-                  Disable Error Reports
-                </Checkbox>
-              </Tooltip>
+              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+              </Checkbox>
             </S.Div>
           </S.Div>
         </Panel>
-        <Panel header="Default Project Settings" key="2">
+        <Panel header="Default Project Settings" key={SettingsPanel.DefaultProjectSettings}>
           <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
         </Panel>
         {activeProject && (
-          <Panel header="Active Project Settings" key="3">
+          <Panel header="Active Project Settings" key={SettingsPanel.ActiveProjectSettings}>
             <Settings
               config={mergedConfig}
               onConfigChange={changeProjectConfig}

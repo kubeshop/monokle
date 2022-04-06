@@ -15,3 +15,4 @@ export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
 export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';
+export {default as ModalConfirm} from './ModalConfirm';

@@ -12,7 +12,6 @@ import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   setLeftMenuSelection,
-  toggleLeftMenu,
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
@@ -190,10 +189,6 @@ const HotKeysHandler = () => {
     },
     [isInPreviewMode]
   );
-
-  useHotkeys(hotkeys.TOGGLE_LEFT_PANE, () => {
-    dispatch(toggleLeftMenu());
-  });
 
   useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
     if (featureJson.ShowRightMenu) {

@@ -9,6 +9,10 @@ export enum AlertEnum {
   Error,
 }
 
+export enum ExtraContentType {
+  Telemetry = 1,
+}
+
 export type AlertState = {
   alert?: AlertType;
 };
@@ -21,4 +25,5 @@ export type AlertType = {
   hasSeen?: boolean;
   createdAt?: number;
   duration?: number | null;
+  extraContentType?: ExtraContentType;
 };

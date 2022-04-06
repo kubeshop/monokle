@@ -7,6 +7,8 @@ import Nucleus from 'nucleus-nodejs';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
+import {fixPath} from '@utils/path';
+
 import terminal from '@root/cli/terminal';
 
 import './ipc/ipcListeners';
@@ -31,6 +33,7 @@ unhandled({
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
+fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {
   yargs(hideBin(process.argv)).command(
