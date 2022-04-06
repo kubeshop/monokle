@@ -1,10 +1,10 @@
-import {ipcRenderer} from 'electron';
+import Nucleus from 'nucleus-nodejs';
 
 export const trackEvent = (eventName: string, payload?: any) => {
-  ipcRenderer.send('track-event', {eventName, payload});
+  Nucleus.track('track-event', {eventName, payload});
 };
 export const trackError = (error: any) => {
-  ipcRenderer.send('track-event', {error});
+  Nucleus.track('track-event', {error});
 };
 
 export const CREATE_EMPTY_PROJECT = 'CREATE_EMPTY_PROJECT';
