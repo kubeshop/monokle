@@ -57,7 +57,7 @@
     "craco-alias": "3.0.1",
     "craco-less": "2.0.0",
     "cross-env": "7.0.3",
-    "electron": "17.3.1",
+    "electron": "17.4.0",
     "electron-builder": "23.0.3",
     "electron-notarize": "1.2.1",
     "electron-reload": "2.0.0-alpha.1",
