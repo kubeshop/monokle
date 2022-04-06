@@ -6,7 +6,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import * as S from './styled';
 
-function SectionHeaderDefaultNameCounter({sectionInstance, sectionBlueprint}: SectionCustomComponentProps) {
+function SectionHeaderDefaultNameCounter({sectionInstance, sectionBlueprint, onClick}: SectionCustomComponentProps) {
   const {id, isSelected} = sectionInstance;
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
 
@@ -30,7 +30,7 @@ function SectionHeaderDefaultNameCounter({sectionInstance, sectionBlueprint}: Se
   }
 
   return (
-    <S.Counter selected={isSelected && isCollapsed}>
+    <S.Counter selected={isSelected && isCollapsed} onClick={onClick}>
       {resourceCount}
     </S.Counter>
   );

@@ -49,6 +49,7 @@ export const StyledMenuItem = styled(Menu.Item)`
 export const WarningCountContainer = styled.span<{$type: 'warning' | 'error'}>`
   ${({$type}) => `color: ${$type === 'warning' ? Colors.yellowWarning : Colors.redError};`}
   margin-left: 8px;
+  cursor: pointer;
 `;
 
 export const WarningKindLabel = styled.span`
