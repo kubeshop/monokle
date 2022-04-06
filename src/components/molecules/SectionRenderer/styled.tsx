@@ -142,6 +142,7 @@ export const Skeleton = styled(RawSkeleton)`
 export const Counter = styled.span<{selected: boolean}>`
   margin-left: 8px;
   font-size: 14px;
+  cursor: pointer;
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
 `;
 
