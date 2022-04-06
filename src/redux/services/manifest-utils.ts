@@ -1,6 +1,8 @@
 import log from 'loglevel';
 import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
 
+import {PossibleResource} from '@models/appstate';
+
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
@@ -170,16 +172,6 @@ export function traverseDocument(
       }
     },
   });
-}
-
-interface PossibleResource {
-  apiVersion: string;
-  kind: string;
-  metadata: {
-    name: string;
-    [x: string]: any;
-  };
-  [x: string]: any;
 }
 
 export function extractObjectsFromYaml(yamlText: string) {

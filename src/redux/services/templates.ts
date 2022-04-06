@@ -9,6 +9,7 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
+import {PossibleResource} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
@@ -130,7 +131,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     }
   );
 
-  let objects: any[] = [];
+  let objects: PossibleResource[] = [];
 
   resourceTextList
     .filter((text): text is string => typeof text === 'string')

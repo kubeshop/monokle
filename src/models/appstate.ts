@@ -158,6 +158,16 @@ interface AppState {
   deviceID: string;
 }
 
+export interface PossibleResource {
+  apiVersion: string;
+  kind: string;
+  metadata: {
+    name: string;
+    [x: string]: any;
+  };
+  [x: string]: any;
+}
+
 export type {
   AppState,
   ResourceMapType,
