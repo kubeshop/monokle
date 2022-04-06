@@ -1,5 +1,7 @@
 import {useEffect} from 'react';
 
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+
 import {FileMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
@@ -8,7 +10,7 @@ import {hasSupportedResourceContent} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
 function useResourceYamlSchema(
-  yaml: any,
+  yaml: typeof languages.yaml,
   userDataDir: string,
   k8sVersion: string,
   resource?: K8sResource,
