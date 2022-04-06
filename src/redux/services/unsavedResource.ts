@@ -6,7 +6,7 @@ import {UNSAVED_PREFIX} from '@constants/constants';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
-import {addResource, selectK8sResource} from '@redux/reducers/main';
+import {addMultipleResources, addResource, selectK8sResource} from '@redux/reducers/main';
 
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -65,4 +65,52 @@ export function createUnsavedResource(
   dispatch(selectK8sResource({resourceId: newResource.id}));
 
   return newResource;
+}
+
+export function createMultipleUnsavedResources(
+  inputs: {name: string; kind: string; apiVersion: string; namespace?: string; obj?: any}[],
+  dispatch: AppDispatch
+) {
+  const resourceMap: any = {};
+
+  inputs.forEach(input => {
+    const resourceId = uuidv4();
+    resourceMap[resourceId] = {};
+    resourceMap[resourceId].input = input;
+
+    if (input.obj) {
+      resourceMap[resourceId].content = {
+        ...input.obj,
+        apiVersion: input.apiVersion,
+        kind: input.kind,
+        metadata: {
+          ...(input.obj.metadata || {}),
+          name: input.name,
+          namespace: input.namespace,
+        },
+      };
+      resourceMap[resourceId].text = stringify(resourceMap[resourceId].content);
+    } else {
+      resourceMap[resourceId].text = createDefaultResourceText(input);
+      resourceMap[resourceId].content = parseYamlDocument(resourceMap[resourceId].text).toJS();
+    }
+  });
+
+  const newResources: K8sResource[] = Object.keys(resourceMap).map(resourceId => ({
+    name: resourceMap[resourceId].input.name,
+    filePath: `${UNSAVED_PREFIX}${resourceId}`,
+    id: resourceId,
+    isHighlighted: false,
+    isSelected: false,
+    kind: resourceMap[resourceId].input.kind,
+    version: resourceMap[resourceId].input.apiVersion,
+    namespace: resourceMap[resourceId].input.namespace,
+    text: resourceMap[resourceId].text,
+    content: resourceMap[resourceId].content,
+  }));
+
+  dispatch(addMultipleResources(newResources));
+  dispatch(selectK8sResource({resourceId: newResources[newResources.length - 1].id}));
+
+  return newResources;
 }

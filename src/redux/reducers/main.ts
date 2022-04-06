@@ -195,6 +195,36 @@ export const addResource = createAsyncThunk(
   }
 );
 
+export const addMultipleResources = createAsyncThunk(
+  'main/addMultipleResources',
+  async (resources: K8sResource[], thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = getK8sVersion(projectConfig);
+    const userDataDir = String(state.config.userDataDir);
+
+    const nextMainState = createNextState(state.main, mainState => {
+      resources.forEach(resource => {
+        mainState.resourceMap[resource.id] = resource;
+        const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+        processResources(
+          schemaVersion,
+          userDataDir,
+          getActiveResourceMap(mainState),
+          mainState.resourceRefsProcessingOptions,
+          {
+            resourceIds: [resource.id],
+            resourceKinds,
+          }
+        );
+      });
+    });
+
+    return nextMainState;
+  }
+);
+
 export const reprocessResource = createAsyncThunk(
   'main/reprocessResource',
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
@@ -958,6 +988,10 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(addResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(addMultipleResources.fulfilled, (state, action) => {
       return action.payload;
     });
 

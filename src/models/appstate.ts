@@ -158,6 +158,19 @@ interface AppState {
   deviceID: string;
 }
 
+export interface PossibleResource {
+  apiVersion: string;
+  kind: string;
+  metadata: {
+    name: string;
+    [x: string]: any;
+  };
+  [x: string]: any;
+}
+
+export const isPossibleResource = (obj: any) =>
+  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
+
 export type {
   AppState,
   ResourceMapType,
