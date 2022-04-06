@@ -583,6 +583,9 @@ export const mainSlice = createSlice({
         notification.hasSeen = true;
       });
     },
+    clearNotifications: (state: Draft<AppState>) => {
+      state.notifications = [];
+    },
     openPreviewConfigurationEditor: (
       state: Draft<AppState>,
       action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
@@ -1119,6 +1122,7 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  clearNotifications,
   openPreviewConfigurationEditor,
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,

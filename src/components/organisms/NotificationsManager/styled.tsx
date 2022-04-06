@@ -9,9 +9,35 @@ import {
 
 import styled from 'styled-components';
 
+import {AlertEnum} from '@models/alert';
+
 import Colors, {FontColors} from '@styles/Colors';
 
-export const StyledDiv = styled.div`
+type StyledDivProps = {
+  isNew: boolean;
+  type: AlertEnum;
+};
+
+export const StyledDiv = styled.div<StyledDivProps>`
+  padding: 5px;
+  transition: background-color 1000ms linear;
+
+  ${props =>
+    !props.isNew &&
+    props.type === AlertEnum.Success &&
+    `
+      background-color: ${Colors.okayBg}
+    `};
+
+  ${props =>
+    !props.isNew &&
+    props.type === AlertEnum.Error &&
+    `
+      background-color: ${Colors.errorBg}
+    `};
+`;
+
+const StyledContainer = styled.div`
   margin-bottom: 12px;
 `;
 
@@ -47,18 +73,18 @@ export const InfoCircleOutlined = styled(RawInfoCircleOutlined)`
   font-size: 16px;
 `;
 
-export const MessageBodyContainer = styled(StyledDiv)`
+export const MessageBodyContainer = styled(StyledContainer)`
   display: flex;
   flex-direction: column;
   width: 100%;
 `;
 
-export const MessageContainer = styled(StyledDiv)`
+export const MessageContainer = styled(StyledContainer)`
   display: flex;
   justify-content: space-between;
 `;
 
-export const NoNotificationsContainer = styled(StyledDiv)`
+export const NoNotificationsContainer = styled(StyledContainer)`
   display: flex;
 `;
 
