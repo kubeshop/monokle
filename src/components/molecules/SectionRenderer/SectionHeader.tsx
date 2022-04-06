@@ -1,9 +1,10 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {SectionBlueprint, SectionInstance} from '@models/navigator';
+import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models/navigator';
 
 import {useAppDispatch} from '@redux/hooks';
 
+import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
 
 import * as S from './styled';
@@ -39,6 +40,11 @@ function SectionHeader(props: SectionHeaderProps) {
     sectionBlueprint.customization
   );
 
+  const Counter: SectionCustomComponent = useMemo(
+    () => NameCounter.Component ?? SectionHeaderDefaultNameCounter,
+    [NameCounter]
+  );
+
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
       expandSection();
@@ -46,20 +52,6 @@ function SectionHeader(props: SectionHeaderProps) {
       collapseSection();
     }
   }, [isCollapsed, expandSection, collapseSection]);
-
-  const counter = useMemo(() => {
-    const counterDisplayMode = sectionBlueprint.customization?.counterDisplayMode;
-    if (!counterDisplayMode || counterDisplayMode === 'descendants') {
-      return sectionInstance?.visibleDescendantItemIds?.length || 0;
-    }
-    if (counterDisplayMode === 'items') {
-      return sectionInstance?.visibleItemIds.length;
-    }
-    if (counterDisplayMode === 'subsections') {
-      return sectionInstance?.visibleChildSectionIds?.length || 0;
-    }
-    return undefined;
-  }, [sectionInstance, sectionBlueprint]);
 
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
@@ -134,13 +126,7 @@ function SectionHeader(props: SectionHeaderProps) {
               {name}
             </S.Name>
 
-            {NameCounter.Component ? (
-              <NameCounter.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
-            ) : (
-              counter !== undefined && (
-                <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>
-              )
-            )}
+            <Counter sectionInstance={sectionInstance} sectionBlueprint={sectionBlueprint} onClick={toggleCollapse} />
 
             <S.BlankSpace level={level} onClick={toggleCollapse} />
 
