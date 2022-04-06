@@ -17,10 +17,9 @@ import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
 import electronStore from '@utils/electronStore';
-import {sleep} from '@utils/index';
 
 import {extractObjectsFromYaml} from './manifest-utils';
-import {createUnsavedResource} from './unsavedResource';
+import {createMultipleUnsavedResources} from './unsavedResource';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
@@ -139,24 +138,15 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       objects = [...objects, ...extractObjectsFromYaml(resourceText)];
     });
 
-  const createdResources: K8sResource[] = [];
+  const inputs = objects.map(obj => ({
+    name: obj.metadata.name,
+    namespace: obj.metadata.namespace,
+    kind: obj.kind,
+    apiVersion: obj.apiVersion,
+    obj,
+  }));
 
-  for (const obj of objects) {
-    // eslint-disable-next-line no-await-in-loop
-    await sleep(500);
-    const resource = createUnsavedResource(
-      {
-        name: obj.metadata.name,
-        namespace: obj.metadata.namespace,
-        kind: obj.kind,
-        apiVersion: obj.apiVersion,
-      },
-      dispatch,
-      obj
-    );
-
-    createdResources.push(resource);
-  }
+  const createdResources: K8sResource[] = createMultipleUnsavedResources(inputs, dispatch);
 
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };
