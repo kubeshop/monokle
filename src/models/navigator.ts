@@ -70,6 +70,9 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  nameCounter?: {
+    component: SectionCustomComponent;
+  };
   namePrefix?: {
     component: SectionCustomComponent;
   };
