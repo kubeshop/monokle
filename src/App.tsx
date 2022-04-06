@@ -133,7 +133,7 @@ const App = () => {
   );
 
   const shouldTriggerTelemetryNotification = useMemo(
-    () => disableEventTracking === undefined || disableErrorReporting === undefined,
+    () => disableEventTracking === undefined && disableErrorReporting === undefined,
     [disableEventTracking, disableErrorReporting]
   );
 
