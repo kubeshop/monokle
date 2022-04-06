@@ -168,6 +168,9 @@ export interface PossibleResource {
   [x: string]: any;
 }
 
+export const isPossibleResource = (obj: any) =>
+  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
+
 export type {
   AppState,
   ResourceMapType,

@@ -9,7 +9,7 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
-import {PossibleResource} from '@models/appstate';
+import {PossibleResource, isPossibleResource} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
@@ -139,13 +139,15 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       objects = [...objects, ...extractObjectsFromYaml(resourceText)];
     });
 
-  const inputs = objects.map(obj => ({
-    name: obj.metadata.name,
-    namespace: obj.metadata.namespace,
-    kind: obj.kind,
-    apiVersion: obj.apiVersion,
-    obj,
-  }));
+  const inputs = objects
+    .filter(obj => isPossibleResource(obj))
+    .map(obj => ({
+      name: obj.metadata.name,
+      namespace: obj.metadata.namespace,
+      kind: obj.kind,
+      apiVersion: obj.apiVersion,
+      obj,
+    }));
 
   const createdResources: K8sResource[] = createMultipleUnsavedResources(inputs, dispatch);
 
