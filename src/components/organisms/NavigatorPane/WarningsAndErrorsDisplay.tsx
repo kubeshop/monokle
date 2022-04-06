@@ -13,6 +13,7 @@ import {filteredResourceSelector, isInPreviewModeSelector} from '@redux/selector
 import {Icon} from '@atoms';
 
 import {isDefined} from '@utils/filter';
+import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 
@@ -119,17 +120,8 @@ function WarningsAndErrorsDisplay() {
     return sortWarnings(errorsCollection);
   }, [resources]);
 
-  const warningsCount = useMemo(() => {
-    return resources.reduce<number>((acc, resource) => {
-      return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
-    }, 0);
-  }, [resources]);
-
-  const errorsCount = useMemo(() => {
-    return resources.reduce<number>((acc, resource) => {
-      return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
-    }, 0);
-  }, [resources]);
+  const warningsCount = useMemo(() => countResourceWarnings(resources), [resources]);
+  const errorsCount = useMemo(() => countResourceErrors(resources), [resources]);
 
   return (
     <>

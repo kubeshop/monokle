@@ -35,7 +35,9 @@ function SectionHeader(props: SectionHeaderProps) {
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {NameDisplay, NamePrefix, NameSuffix, NameContext} = useSectionCustomization(sectionBlueprint.customization);
+  const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
+    sectionBlueprint.customization
+  );
 
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
@@ -131,10 +133,17 @@ function SectionHeader(props: SectionHeaderProps) {
             >
               {name}
             </S.Name>
-            {counter !== undefined && (
-              <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>
+
+            {NameCounter.Component ? (
+              <NameCounter.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
+            ) : (
+              counter !== undefined && (
+                <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>
+              )
             )}
+
             <S.BlankSpace level={level} onClick={toggleCollapse} />
+
             {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
               <NameSuffix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}

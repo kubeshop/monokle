@@ -23,5 +23,7 @@ export function useSectionCustomization(customization: SectionCustomization = {}
   );
   const NameContext = useMemo(() => ({Component: customization.nameContext?.component}), [customization.nameContext]);
 
-  return {NameDisplay, EmptyDisplay, NamePrefix, NameSuffix, NameContext};
+  const NameCounter = useMemo(() => ({Component: customization.nameCounter?.component}), [customization.nameCounter]);
+
+  return {NameDisplay, EmptyDisplay, NamePrefix, NameSuffix, NameContext, NameCounter};
 }
