@@ -74,12 +74,12 @@ export function createMultipleUnsavedResources(
   const resourceMap: any = {};
 
   inputs.forEach(input => {
-    const resourceID = uuidv4();
-    resourceMap[resourceID] = {};
-    resourceMap[resourceID].input = input;
+    const resourceId = uuidv4();
+    resourceMap[resourceId] = {};
+    resourceMap[resourceId].input = input;
 
     if (input.obj) {
-      resourceMap[resourceID].content = {
+      resourceMap[resourceId].content = {
         ...input.obj,
         apiVersion: input.apiVersion,
         kind: input.kind,
@@ -89,24 +89,24 @@ export function createMultipleUnsavedResources(
           namespace: input.namespace,
         },
       };
-      resourceMap[resourceID].text = stringify(resourceMap[resourceID].content);
+      resourceMap[resourceId].text = stringify(resourceMap[resourceId].content);
     } else {
-      resourceMap[resourceID].text = createDefaultResourceText(input);
-      resourceMap[resourceID].content = parseYamlDocument(resourceMap[resourceID].text).toJS();
+      resourceMap[resourceId].text = createDefaultResourceText(input);
+      resourceMap[resourceId].content = parseYamlDocument(resourceMap[resourceId].text).toJS();
     }
   });
 
-  const newResources: K8sResource[] = Object.keys(resourceMap).map(resourceID => ({
-    name: resourceMap[resourceID].input.name,
-    filePath: `${UNSAVED_PREFIX}${resourceID}`,
-    id: resourceID,
+  const newResources: K8sResource[] = Object.keys(resourceMap).map(resourceId => ({
+    name: resourceMap[resourceId].input.name,
+    filePath: `${UNSAVED_PREFIX}${resourceId}`,
+    id: resourceId,
     isHighlighted: false,
     isSelected: false,
-    kind: resourceMap[resourceID].input.kind,
-    version: resourceMap[resourceID].input.apiVersion,
-    namespace: resourceMap[resourceID].input.namespace,
-    text: resourceMap[resourceID].text,
-    content: resourceMap[resourceID].content,
+    kind: resourceMap[resourceId].input.kind,
+    version: resourceMap[resourceId].input.apiVersion,
+    namespace: resourceMap[resourceId].input.namespace,
+    text: resourceMap[resourceId].text,
+    content: resourceMap[resourceId].content,
   }));
 
   dispatch(addMultipleResources(newResources));
