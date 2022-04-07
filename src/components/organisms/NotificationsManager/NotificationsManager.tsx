@@ -88,7 +88,6 @@ const NotificationsManager: React.FC = () => {
       if (isNotificationsOpen) {
         // await for 1 sec before changing background color of notifications
         await sleep(1000);
-        console.log('seenNotifications', seenNotifications);
         dispatch(seenNotifications());
       }
     }
