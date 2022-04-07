@@ -4,6 +4,7 @@ import {SectionCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
 import * as S from '../../components/molecules/SectionRenderer/styled';
@@ -12,8 +13,7 @@ import * as WarningStyle from '../../components/organisms/NavigatorPane/WarningA
 function ResourceKindSectionCounter({sectionInstance, onClick}: SectionCustomComponentProps) {
   const {id, isSelected, itemIds} = sectionInstance;
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const resources = useMemo(() => itemIds.map(itemId => resourceMap[itemId]), [itemIds, resourceMap]);
+  const resources = useAppSelector(state => itemIds.map(itemId => state.main.resourceMap[itemId]).filter(isDefined));
 
   const resourceCount = resources.length;
   const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);

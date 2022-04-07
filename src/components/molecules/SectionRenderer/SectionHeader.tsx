@@ -126,7 +126,7 @@ function SectionHeader(props: SectionHeaderProps) {
               {name}
             </S.Name>
 
-            <Counter sectionInstance={sectionInstance} sectionBlueprint={sectionBlueprint} onClick={toggleCollapse} />
+            <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />
 
             <S.BlankSpace level={level} onClick={toggleCollapse} />
 
