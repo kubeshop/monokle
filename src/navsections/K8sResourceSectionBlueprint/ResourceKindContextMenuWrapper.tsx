@@ -14,7 +14,7 @@ import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileF
 import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
-import {removeResource} from '@redux/thunks/removeResource';
+import {removeResources} from '@redux/thunks/removeResources';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
@@ -39,7 +39,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        dispatch(removeResource(resource.id));
+        dispatch(removeResources([resource.id]));
         resolve({});
       });
     },

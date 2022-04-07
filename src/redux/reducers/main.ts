@@ -36,7 +36,7 @@ import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {removeResource} from '@redux/thunks/removeResource';
+import {removeResources} from '@redux/thunks/removeResources';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
@@ -971,7 +971,7 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(removeResource.fulfilled, (state, action) => {
+    builder.addCase(removeResources.fulfilled, (state, action) => {
       return action.payload;
     });
 

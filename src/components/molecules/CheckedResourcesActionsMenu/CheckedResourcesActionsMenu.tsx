@@ -19,7 +19,7 @@ import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
-import {removeResource} from '@redux/thunks/removeResource';
+import {removeResources} from '@redux/thunks/removeResources';
 
 import Colors from '@styles/Colors';
 
@@ -66,10 +66,12 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], disp
     onOk() {
       let alertMessage = '';
       return new Promise(resolve => {
+        const resourceIdsToRemove: string[] = [];
         checkedResources.forEach(resource => {
-          dispatch(removeResource(resource.id));
+          resourceIdsToRemove.push(resource.id);
           alertMessage += `${alertMessage && ' | '}${resource.name}\n`;
         });
+        dispatch(removeResources(resourceIdsToRemove));
         dispatch(uncheckAllResourceIds());
 
         dispatch(setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: alertMessage}));
@@ -91,14 +93,17 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const areOnlyUnsavedResourcesChecked = useMemo(
-    () => checkedResourceIds.every(resourceId => isUnsavedResource(resourceMap[resourceId])),
+    () =>
+      checkedResourceIds
+        .map(resourceId => resourceMap[resourceId])
+        .filter((resource): resource is K8sResource => resource !== undefined)
+        .every(isUnsavedResource),
     [checkedResourceIds, resourceMap]
   );
 
-  const checkedResources = useMemo(
-    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
-    [checkedResourceIds, resourceMap]
-  );
+  const checkedResources = useMemo(() => {
+    return checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined);
+  }, [checkedResourceIds, resourceMap]);
 
   const confirmModalTitle = useMemo(
     () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext),
