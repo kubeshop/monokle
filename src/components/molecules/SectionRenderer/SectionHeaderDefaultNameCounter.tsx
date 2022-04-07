@@ -4,10 +4,13 @@ import {SectionCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 
+import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
+
 import * as S from './styled';
 
-function SectionHeaderDefaultNameCounter({sectionInstance, sectionBlueprint, onClick}: SectionCustomComponentProps) {
+function SectionHeaderDefaultNameCounter({sectionInstance, onClick}: SectionCustomComponentProps) {
   const {id, isSelected} = sectionInstance;
+  const sectionBlueprint = sectionBlueprintMap.getById(id);
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
 
   const resourceCount = useMemo(() => {

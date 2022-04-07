@@ -49,7 +49,6 @@ export interface ItemCustomization {
 
 export type SectionCustomComponentProps = {
   sectionInstance: SectionInstance;
-  sectionBlueprint?: SectionBlueprint<any>;
   onClick?: () => void;
 };
 
