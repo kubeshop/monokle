@@ -109,7 +109,6 @@ jobs:
       - name: Install Tools
         run: |
           choco install curl
-          Remove-item alias:curl
 
       - name: Get Node Version
         run: |
