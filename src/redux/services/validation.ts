@@ -45,7 +45,12 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
   };
 }
 
-export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+export function validateResource(
+  resource: K8sResource,
+  schemaVersion: string,
+  userDataDir: string,
+  options?: {skipPolicies?: boolean}
+) {
   if (isKustomizationPatch(resource)) {
     return;
   }
@@ -128,14 +133,17 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
 
   // parse for policy errors
   const policyErrors = validatePolicies(resource.content);
-  const policyValidationErrors = policyErrors.map((err): ResourceValidationError => {
-    return {
-      message: `${uuid()} - ${err.id}: ${err.title}`,
-      description: err.msg,
-      property: 'property',
-    };
-  });
-  errors.push(...policyValidationErrors);
+  const skipPolicies = options?.skipPolicies ?? false;
+  if (!skipPolicies) {
+    const policyValidationErrors = policyErrors.map((err): ResourceValidationError => {
+      return {
+        message: `${uuid()} - ${err.id}: ${err.title}`,
+        description: err.msg,
+        property: 'property',
+      };
+    });
+    errors.push(...policyValidationErrors);
+  }
 
   errors.sort(compareErrorsByLineNumber);
 

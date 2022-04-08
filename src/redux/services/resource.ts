@@ -514,14 +514,21 @@ export function processResources(
   userHomeDir: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
-  options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
+  options?: {
+    resourceIds?: string[];
+    resourceKinds?: string[];
+    skipValidation?: boolean;
+  }
 ) {
   if (!options?.skipValidation) {
     if (options && options.resourceIds && options.resourceIds.length > 0) {
+      const [currentId, ...relatedIds] = options.resourceIds;
+      validateResource(resourceMap[currentId], schemaVersion, userHomeDir);
+
       Object.values(resourceMap)
-        .filter(r => options.resourceIds?.includes(r.id))
+        .filter(r => relatedIds?.includes(r.id))
         .forEach(resource => {
-          validateResource(resource, schemaVersion, userHomeDir);
+          validateResource(resource, schemaVersion, userHomeDir, {skipPolicies: true});
         });
     }
 
@@ -530,7 +537,7 @@ export function processResources(
         .filter(r => options.resourceKinds?.includes(r.kind))
         .forEach(resource => {
           if (!options.resourceIds || !options.resourceIds.includes(resource.id)) {
-            validateResource(resource, schemaVersion, userHomeDir);
+            validateResource(resource, schemaVersion, userHomeDir, {skipPolicies: true});
           }
         });
     }
