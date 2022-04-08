@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
+
 import {AppBorders} from '@styles/Borders';
 
 export const EditorPaneContainer = styled.div`
@@ -28,6 +30,7 @@ export const Pane = styled.div<{$height?: number}>`
     height: ${$height ? `${$height}px` : '100%'};
   `};
   width: 100%;
+  min-width: ${MIN_SPLIT_VIEW_PANE_WIDTH};
 `;
 
 export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
