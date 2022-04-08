@@ -1,10 +1,13 @@
 import Ajv, {ValidateFunction} from 'ajv';
+import {v4 as uuid} from 'uuid';
 import {Document, LineCounter, ParsedNode, isCollection, parseDocument} from 'yaml';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
+
+import {validatePolicies} from '@utils/policies';
 
 import {getResourceSchema} from './schema';
 
@@ -122,6 +125,17 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
         })
     );
   }
+
+  // parse for policy errors
+  const policyErrors = validatePolicies(resource.content);
+  const policyValidationErrors = policyErrors.map((err): ResourceValidationError => {
+    return {
+      message: `${uuid()} - ${err.id}: ${err.title}`,
+      description: err.msg,
+      property: 'property',
+    };
+  });
+  errors.push(...policyValidationErrors);
 
   errors.sort(compareErrorsByLineNumber);
 
