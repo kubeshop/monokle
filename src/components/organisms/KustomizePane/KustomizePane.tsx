@@ -10,7 +10,7 @@ import * as S from './styled';
 const KustomizePane: React.FC = () => {
   return (
     <S.KustomizePaneContainer id="KustomizePane">
-      <TitleBar title="Kustomize" />
+      <TitleBar title="Kustomize" closable />
 
       <S.List id="kustomize-sections-container">
         <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />

@@ -14,7 +14,7 @@ import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
 
 import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+import Colors, {BackgroundColors, FontColors, PanelColors} from '@styles/Colors';
 
 export const Row = styled(RawRow.default)`
   display: grid;
@@ -68,9 +68,9 @@ export const ExitButton = styled.span`
 export const Header = styled(RawHeader.default)`
   width: 100%;
   line-height: 30px;
-  background: ${BackgroundColors.darkThemeBackground};
+  background: ${PanelColors.headerBar};
   border-bottom: ${AppBorders.pageDivider};
-  min-height: 50px;
+  min-height: 48px;
   z-index: 1;
   height: 30px;
 `;

@@ -9,8 +9,7 @@ import * as S from './styled';
 const HelmPane: React.FC = () => {
   return (
     <S.HelmPaneContainer id="HelmPane">
-      <TitleBar title="Helm" />
-
+      <TitleBar title="Helm" closable />
       <S.List id="helm-sections-container">
         <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />
       </S.List>

@@ -23,8 +23,9 @@ import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
 
-import * as S from './Styled';
 import {TreeItemProps} from './types';
+
+import * as S from './styled';
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
   const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;

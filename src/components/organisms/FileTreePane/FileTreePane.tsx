@@ -35,7 +35,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {MonoPaneTitle} from '@atoms';
+import {TitleBar} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
 
@@ -43,9 +43,10 @@ import {uniqueArr} from '@utils/index';
 
 import AppContext from '@src/AppContext';
 
-import * as S from './Styled';
 import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
+
+import * as S from './styled';
 
 const createNode = (
   fileEntry: FileEntry,
@@ -456,42 +457,32 @@ const FileTreePane = () => {
 
   return (
     <S.FileTreeContainer id="FileExplorer">
-      <S.TitleBarContainer>
-        <MonoPaneTitle>
-          <S.TitleContainer>
-            <S.Title>
-              File Explorer{' '}
-              {isScanExcludesUpdated === 'outdated' && (
-                <Tooltip title={FileExplorerChanged}>
-                  <ExclamationCircleOutlined />
-                </Tooltip>
-              )}
-            </S.Title>
+      <TitleBar title="File Explorer" closable>
+        {isScanExcludesUpdated === 'outdated' && (
+          <Tooltip title={FileExplorerChanged}>
+            <ExclamationCircleOutlined />
+          </Tooltip>
+        )}
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+          <Button
+            size="small"
+            onClick={refreshFolder}
+            icon={<ReloadOutlined />}
+            type="link"
+            disabled={isButtonDisabled}
+          />
+        </Tooltip>
 
-            <S.RightButtons>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                <Button
-                  size="small"
-                  onClick={refreshFolder}
-                  icon={<ReloadOutlined />}
-                  type="link"
-                  disabled={isButtonDisabled}
-                />
-              </Tooltip>
-
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                <Button
-                  icon={<Icon name="collapse" />}
-                  onClick={onToggleTree}
-                  type="link"
-                  size="small"
-                  disabled={isButtonDisabled}
-                />
-              </Tooltip>
-            </S.RightButtons>
-          </S.TitleContainer>
-        </MonoPaneTitle>
-      </S.TitleBarContainer>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+          <Button
+            icon={<Icon name="collapse" />}
+            onClick={onToggleTree}
+            type="link"
+            size="small"
+            disabled={isButtonDisabled}
+          />
+        </Tooltip>
+      </TitleBar>
 
       {uiState.isFolderLoading ? (
         <S.Skeleton active />

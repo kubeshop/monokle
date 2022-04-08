@@ -76,7 +76,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   }, [rootFileEntry]);
 
   return (
-    <S.Container id="LeftToolbar">
+    <S.Container id="LeftToolbar" isLeftActive={leftActive}>
       <Tooltip
         mouseEnterDelay={TOOLTIP_DELAY}
         title={leftMenuSelection === 'file-explorer' && leftActive ? 'Hide File Explorer' : 'View File Explorer'}
