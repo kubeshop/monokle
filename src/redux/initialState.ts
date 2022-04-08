@@ -106,6 +106,23 @@ const initialLogsState: LogsState = {
 
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
+let paneConfiguration = electronStore.get('ui.paneConfiguration');
+
+if (
+  !paneConfiguration ||
+  (paneConfiguration &&
+    (paneConfiguration.leftWidth === 0 || paneConfiguration.navWidth === 0 || paneConfiguration.editWidth === 0))
+) {
+  paneConfiguration = {
+    leftWidth: 0.3333,
+    navWidth: 0.3333,
+    editWidth: 0.3333,
+    rightWidth: 0,
+    actionsPaneFooterExpandedHeight: 0,
+    recentProjectsPaneWidth: 300,
+  };
+}
+
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
@@ -165,14 +182,7 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
-  paneConfiguration: electronStore.get('ui.paneConfiguration') || {
-    leftWidth: 0.3333,
-    navWidth: 0.3333,
-    editWidth: 0.3333,
-    rightWidth: 0,
-    actionsPaneFooterExpandedHeight: 0,
-    recentProjectsPaneWidth: 300,
-  },
+  paneConfiguration,
   layoutSize: {
     footer: 0,
     header: 0,
