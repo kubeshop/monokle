@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.3](https://github.com/kubeshop/monokle/compare/v1.6.3-nightly-2022-04-08.0...v1.6.3) (2022-04-08)
+
+
+### Bug Fixes
+
+* initial state of ui pane configuration ([588152d](https://github.com/kubeshop/monokle/commit/588152dfc9cedfa039d6fa2f3d8444f226f4ddd9))
+* split view nav width dissapearing ([4eb02ee](https://github.com/kubeshop/monokle/commit/4eb02ee1c4699d8ab9f9cd65ff5c0eacf3d01d24))
+
 ### [1.6.2](https://github.com/kubeshop/monokle/compare/v1.6.1...v1.6.2) (2022-03-25)
 
 
