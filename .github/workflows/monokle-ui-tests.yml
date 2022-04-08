@@ -106,6 +106,11 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
+      - name: Install Tools
+        run: |
+          choco install curl
+          Remove-item alias:curl
+
       - name: Get Node Version
         run: |
           Set-PSDebug -Trace 1
@@ -174,6 +179,7 @@ jobs:
           path: test-output/**
 
       - name: Notify slack failure
+        shell: PowerShell
         env:
           TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
         if: failure()
