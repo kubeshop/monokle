@@ -9,10 +9,33 @@ import {
 
 import styled from 'styled-components';
 
+import {AlertEnum} from '@models/alert';
+
 import Colors, {FontColors} from '@styles/Colors';
 
-export const StyledDiv = styled.div`
-  margin-bottom: 12px;
+type StyledDivProps = {
+  isNew: boolean;
+  type: AlertEnum;
+};
+
+export const StyledDiv = styled.div<StyledDivProps>`
+  padding: 5px 15px;
+  margin-bottom: 4px;
+  transition: background-color 1000ms linear;
+
+  ${props =>
+    props.isNew &&
+    props.type === AlertEnum.Success &&
+    `
+      background-color: ${Colors.okayBg};
+    `};
+
+  ${props =>
+    props.isNew &&
+    props.type === AlertEnum.Error &&
+    `
+      background-color: ${Colors.errorBg}
+    `};
 `;
 
 export const StyledSpan = styled.span`
@@ -23,7 +46,7 @@ export const StyledSpan = styled.span`
 `;
 
 export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
-  color: ${Colors.greenOkay};
+  color: ${Colors.polarGreen};
   font-size: 16px;
 `;
 
@@ -47,19 +70,20 @@ export const InfoCircleOutlined = styled(RawInfoCircleOutlined)`
   font-size: 16px;
 `;
 
-export const MessageBodyContainer = styled(StyledDiv)`
+export const MessageBodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
 `;
 
-export const MessageContainer = styled(StyledDiv)`
+export const MessageContainer = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
-export const NoNotificationsContainer = styled(StyledDiv)`
+export const NoNotificationsContainer = styled.div`
   display: flex;
+  margin-bottom: 12px;
 `;
 
 export const DateSpan = styled(StyledSpan)`

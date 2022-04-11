@@ -4,7 +4,7 @@ import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
-import {AlertEnum} from '@models/alert';
+import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {seenNotifications} from '@redux/reducers/main';
@@ -13,16 +13,19 @@ import NotificationMarkdown from '@molecules/NotificationMarkdown';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
+import {sleep} from '@utils/sleep';
+
 import * as S from './styled';
 
 type NotificationProps = {
-  notification: any;
+  notification: AlertType;
   badge: JSX.Element;
 };
 
 const Notification: React.FC<NotificationProps> = props => {
   const {notification, badge} = props;
-  const {createdAt, title, message, extraContentType} = notification;
+
+  const {createdAt, title, message, extraContentType, hasSeen, type} = notification;
 
   const copyToClipboardMessage = `Title: ${title}. Description: ${message}.`;
 
@@ -37,7 +40,7 @@ const Notification: React.FC<NotificationProps> = props => {
   };
 
   return (
-    <S.StyledDiv key={notification.id}>
+    <S.StyledDiv key={notification.id} isNew={!hasSeen} type={type}>
       <S.DateSpan>
         {DateTime.fromMillis(Number(createdAt)).toRelativeCalendar()}&nbsp;
         {DateTime.fromMillis(Number(createdAt)).toFormat('T')}
@@ -81,9 +84,15 @@ const NotificationsManager: React.FC = () => {
   );
 
   useEffect(() => {
-    if (isNotificationsOpen) {
-      dispatch(seenNotifications());
+    async function markNotificationsSeen() {
+      if (isNotificationsOpen) {
+        // await for 1 sec before changing background color of notifications
+        await sleep(1000);
+        dispatch(seenNotifications());
+      }
     }
+
+    markNotificationsSeen();
   }, [isNotificationsOpen, dispatch]);
 
   return (

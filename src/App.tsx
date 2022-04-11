@@ -10,7 +10,6 @@ import 'antd/dist/antd.less';
 import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
-import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
@@ -23,7 +22,7 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
+import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -42,6 +41,7 @@ import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {StartupFlag} from '@utils/startupFlag';
 
+import * as S from './App.styled';
 import AppContext from './AppContext';
 
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
@@ -63,20 +63,6 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
-
-const AppContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-`;
-
-const MainContainer = styled.div`
-  height: 100%;
-  width: 100%;
-
-  display: grid;
-  grid-template-rows: max-content 1fr max-content;
-`;
 
 const App = () => {
   const dispatch = useDispatch();
@@ -323,17 +309,22 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
-      <AppContainer>
+      <S.AppContainer>
         <MessageBox />
-        <MainContainer>
+        <S.MainContainer>
           <PageHeader />
           <PaneManager />
           <PageFooter />
-        </MainContainer>
+        </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
 
-        <LazyDrawer onClose={notificationsDrawerOnClose} title="Notifications" visible={isNotificationsDrawerVisible}>
+        <LazyDrawer
+          onClose={notificationsDrawerOnClose}
+          title="Notifications"
+          visible={isNotificationsDrawerVisible}
+          extra={<S.Button onClick={() => dispatch(clearNotifications())}>Clear</S.Button>}
+        >
           <NotificationsManager />
         </LazyDrawer>
 
@@ -390,7 +381,7 @@ const App = () => {
             </Modal>
           )}
         </Suspense>
-      </AppContainer>
+      </S.AppContainer>
     </AppContext.Provider>
   );
 };
