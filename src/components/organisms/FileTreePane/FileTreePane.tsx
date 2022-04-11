@@ -12,7 +12,7 @@ import micromatch from 'micromatch';
 import path from 'path';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -473,7 +473,7 @@ const FileTreePane = () => {
           />
         </Tooltip>
 
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
           <Button
             icon={<Icon name="collapse" />}
             onClick={onToggleTree}
