@@ -19,22 +19,20 @@ type EvaluateOutput = Array<{
 
 export function validatePolicies(resourceContent: any): Misconfiguration[] {
   if (!CACHED_POLICY) {
-    console.error('policy not loaded yet');
+    console.error('policy should be loaded');
     return [];
   }
 
   const output: EvaluateOutput | null = CACHED_POLICY.evaluate(resourceContent);
-  // console.log('policy evaluated', JSON.stringify(output, null, 2));
 
   if (!output || output.length === 0) {
-    console.error('evaluation failed');
     return [];
   }
 
   return output[0].result;
 }
 
-async function lazyLoadPolicy() {
+export async function eagerLoadPolicy() {
   if (CACHED_POLICY) {
     return CACHED_POLICY;
   }
@@ -49,12 +47,5 @@ async function lazyLoadPolicy() {
     CACHED_POLICY = await loadPolicy(policyWasm);
   } catch (err) {
     console.error('policy load failed', err);
-    throw new Error('policy load failed');
   }
-
-  return CACHED_POLICY;
 }
-
-lazyLoadPolicy()
-  .then(policy => console.log('policy loaded'))
-  .catch(err => console.error('policed load failed')); // yikes

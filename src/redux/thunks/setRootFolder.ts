@@ -15,6 +15,7 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
+import {eagerLoadPolicy} from '@utils/policies';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 /**
@@ -66,6 +67,7 @@ export const setRootFolder = createAsyncThunk<
 
   rootEntry.children = files;
 
+  await eagerLoadPolicy();
   processKustomizations(resourceMap, fileMap);
   processResources(getK8sVersion(projectConfig), String(userDataDir), resourceMap, resourceRefsProcessingOptions);
 
