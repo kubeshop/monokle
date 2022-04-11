@@ -13,7 +13,8 @@ export type MonoSectionPaneProps = {};
 const MonoPaneTitle = styled((props: MonoSectionPaneProps) => <Text {...props} />)`
   &.ant-typography {
     white-space: nowrap;
-    display: block;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 0;
     padding: 8px 4px 8px 16px;
     text-transform: uppercase;

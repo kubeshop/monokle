@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import {MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
 import {AppBorders} from '@styles/Borders';
+import {PanelColors} from '@styles/Colors';
 
 export const EditorPaneContainer = styled.div`
   height: 100%;
@@ -23,6 +24,7 @@ export const LeftPaneContainer = styled.div`
   & .custom-modal-handle {
     right: -3px;
   }
+  background: ${PanelColors.toolBar};
 `;
 
 export const Pane = styled.div<{$height?: number}>`

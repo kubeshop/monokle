@@ -2,7 +2,7 @@ import {Badge as RawBadge} from 'antd';
 
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
+import {BackgroundColors, PanelColors} from '@styles/Colors';
 
 export const Badge = styled(RawBadge)`
   & .ant-badge-dot {
@@ -11,12 +11,13 @@ export const Badge = styled(RawBadge)`
   }
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{isLeftActive: boolean}>`
   height: 100%;
-  width: 100%;
+  width: 50px;
   display: flex;
-  padding-right: 4px;
   flex-direction: column;
+  align-items: center;
+  box-sizing: content-box;
   gap: 7px;
-  border-right: ${AppBorders.pageDivider};
+  background-color: ${props => (props.isLeftActive ? BackgroundColors.darkThemeBackground : PanelColors.toolBar)}};
 `;

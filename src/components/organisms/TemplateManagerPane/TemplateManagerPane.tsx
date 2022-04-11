@@ -95,7 +95,7 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane">
       <div ref={titleBarRef}>
-        <TitleBar title="Templates">
+        <TitleBar title="Templates" closable>
           <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
             <Button
               disabled={templates.length === 0}

@@ -1,40 +1,15 @@
 import React, {useMemo, useState} from 'react';
 import {shallowEqual} from 'react-redux';
 
-import {Button, ButtonProps} from 'antd';
+import {ButtonProps} from 'antd';
 
 import _ from 'lodash';
-import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
 
-const StyledButton = styled(Button)<{$hasGradientBackground: boolean}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  ${props => {
-    if (props.$hasGradientBackground) {
-      return `& .anticon {
-        color: ${Colors.blackPure} !important;
-      }`;
-    }
-  }}
-
-  & .anticon {
-    transition: all 0.2s ease-in;
-  }
-
-  ${props => `
-    &:hover {
-      & .anticon {
-        color: ${props.$hasGradientBackground ? Colors.grey5 : Colors.grey8} !important;
-      }
-    }
-  `}
-`;
+import * as S from './styled';
 
 interface IMenuButtonProps extends ButtonProps {
   shouldWatchSelectedPath?: boolean;
@@ -66,7 +41,7 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     return Object.values(sectionInstanceByName).some(sectionInstance => sectionInstance.isSelected);
   }, [sectionInstanceByName]);
 
-  const style: React.CSSProperties = {};
+  const style: React.CSSProperties = {width: '100%'};
 
   const hasGradientBackground = useMemo(() => {
     return Boolean(
@@ -84,8 +59,9 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
   }
 
   return (
-    <StyledButton
+    <S.StyledButton
       $hasGradientBackground={hasGradientBackground}
+      $showOpenArrow={!isSelected || !isActive}
       size="large"
       type="text"
       onClick={onClick}
