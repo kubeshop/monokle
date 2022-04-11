@@ -38,10 +38,6 @@ export const StyledDiv = styled.div<StyledDivProps>`
     `};
 `;
 
-const StyledContainer = styled.div`
-  margin-bottom: 12px;
-`;
-
 export const StyledSpan = styled.span`
   font-weight: 500;
   font-size: 12px;
