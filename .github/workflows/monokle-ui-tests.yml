@@ -5,6 +5,12 @@ on:
     branches:
       - andreiv1992/fix/fixing-tests
       - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - review_requested
+      - ready_for_review
 
   workflow_dispatch:
 
