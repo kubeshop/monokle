@@ -4,7 +4,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT} from '@constants/constants';
+import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {
   HighlightItems,
@@ -178,6 +178,9 @@ export const uiSlice = createSlice({
         );
       }
     },
+    setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
+      state.leftMenu.expandedFolders = action.payload;
+    },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
     },
@@ -248,7 +251,13 @@ export const uiSlice = createSlice({
       })
       .addCase(setRootFolder.fulfilled, (state, action) => {
         state.isFolderLoading = false;
-        state.shouldExpandAllNodes = true;
+
+        // Expand all folders on setting root folder
+        const nodes = Object.values(action.payload.fileMap);
+        const folders = nodes.filter(node => node.children?.length);
+        const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
+        state.leftMenu.expandedFolders = folderKeys;
+
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
           !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
@@ -310,5 +319,6 @@ export const {
   setActiveSettingsPanel,
   openAboutModal,
   closeAboutModal,
+  setExpandedFolders,
 } = uiSlice.actions;
 export default uiSlice.reducer;

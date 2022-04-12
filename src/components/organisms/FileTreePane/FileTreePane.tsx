@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Button, Modal, Tooltip} from 'antd';
@@ -26,7 +26,7 @@ import {
   openCreateFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
-  setShouldExpandAllNodes,
+  setExpandedFolders,
 } from '@redux/reducers/ui';
 import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
@@ -127,8 +127,6 @@ const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
 
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
     processingEntityID: undefined,
@@ -150,11 +148,12 @@ const FileTreePane = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
+  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const uiState = useAppSelector(state => state.ui);
   const configState = useAppSelector(state => state.config);
   const scanExcludes = useAppSelector(scanExcludesSelector);
   const fileIncludes = useAppSelector(fileIncludesSelector);
+  const isCollapsed = expandedFolders.length === 0;
   const {hideExcludedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
   const treeRef = useRef<any>();
@@ -190,20 +189,7 @@ const FileTreePane = () => {
       );
 
     setTree(treeData);
-
-    if (shouldExpandAllNodes) {
-      setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
-      dispatch(setShouldExpandAllNodes(false));
-    }
-  }, [
-    resourceMap,
-    fileMap,
-    shouldExpandAllNodes,
-    hideExcludedFilesInFileExplorer,
-    fileOrFolderContainedInFilter,
-    rootFolderName,
-    dispatch,
-  ]);
+  }, [resourceMap, fileMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter, rootFolderName, dispatch]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -233,7 +219,7 @@ const FileTreePane = () => {
     }
 
     setHighlightNode(node);
-    setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(keys)]));
+    dispatch(setExpandedFolders(uniqueArr([...expandedFolders, ...Array.from(keys)])));
   }
 
   useEffect(() => {
@@ -342,9 +328,8 @@ const FileTreePane = () => {
     }
   }, [isSelectingFile, dispatch]);
 
-  const onExpand = (expandedKeysValue: React.Key[]) => {
-    setExpandedKeys(expandedKeysValue);
-    setAutoExpandParent(false);
+  const onExpand = (newExpandedFolders: Key[]) => {
+    dispatch(setExpandedFolders(newExpandedFolders));
   };
 
   const onSelectRootFolderFromMainThread = useCallback(
@@ -394,7 +379,7 @@ const FileTreePane = () => {
   }, [tree]);
 
   const onToggleTree = () => {
-    setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
+    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
   };
 
   const onCreateFolder = (absolutePath: string) => {
@@ -505,7 +490,7 @@ const FileTreePane = () => {
             onSelect={onSelect}
             treeData={[tree]}
             ref={treeRef}
-            expandedKeys={expandedKeys}
+            expandedKeys={expandedFolders}
             onExpand={onExpand}
             titleRender={event => (
               <TreeItem
@@ -524,7 +509,7 @@ const FileTreePane = () => {
                 {...event}
               />
             )}
-            autoExpandParent={autoExpandParent}
+            autoExpandParent={false}
             selectedKeys={[selectedPath || '-']}
             filterTreeNode={node => {
               // @ts-ignore
