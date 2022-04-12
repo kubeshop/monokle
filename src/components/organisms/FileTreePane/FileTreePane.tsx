@@ -57,9 +57,12 @@ const createNode = (
   rootFolderName: string
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
+  const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+  const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
+  const name = isRoot ? rootFolderName : fileEntry.name;
 
   const node: TreeNode = {
-    key: fileEntry.filePath,
+    key,
     title: (
       <S.NodeContainer>
         <S.NodeTitleContainer>
@@ -73,7 +76,7 @@ const createNode = (
                 : 'not-supported-file-entry-name'
             }
           >
-            {fileEntry.name === ROOT_FILE_ENTRY ? rootFolderName : fileEntry.name}
+            {name}
           </span>
           {resources.length > 0 ? (
             <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
