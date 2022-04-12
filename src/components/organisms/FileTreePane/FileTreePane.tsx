@@ -198,14 +198,14 @@ const FileTreePane = () => {
 
   function highlightFilePath(filePath: string) {
     const paths = filePath.split(path.sep);
-    const keys: Array<React.Key> = [];
+    const keys: Array<React.Key> = [ROOT_FILE_ENTRY];
 
     for (let c = 1; c < paths.length; c += 1) {
       keys.push(paths.slice(0, c + 1).join(path.sep));
     }
 
     let node: TreeNode | undefined = tree || undefined;
-    for (let c = 0; c < keys.length && node; c += 1) {
+    for (let c = 1; c < keys.length && node; c += 1) {
       node = node.children.find((i: any) => i.key === keys[c]);
     }
 
