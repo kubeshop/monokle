@@ -199,9 +199,6 @@ export const uiSlice = createSlice({
         ...action.payload,
       };
     },
-    setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.shouldExpandAllNodes = action.payload;
-    },
     toggleExpandActionsPaneFooter: (state: Draft<UiState>) => {
       if (state.isActionsPaneFooterExpanded) {
         state.isActionsPaneFooterExpanded = false;
@@ -293,7 +290,6 @@ export const {
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,
-  setShouldExpandAllNodes,
   setPaneConfiguration,
   toggleStartProjectPane,
   setRightMenuIsActive,
