@@ -71,6 +71,16 @@ export const filteredResourceSelector = createSelector(
   (resourceMap, filter) => Object.values(resourceMap).filter(resource => isResourcePassingFilter(resource, filter))
 );
 
+export const filteredResourceMapSelector = createSelector(
+  (state: RootState) => state.main.resourceMap,
+  (state: RootState) => state.main.resourceFilter,
+  (resourceMap, filter) =>
+    _.keyBy(
+      Object.values(resourceMap).filter(resource => isResourcePassingFilter(resource, filter)),
+      'id'
+    )
+);
+
 export const kustomizationsSelector = createSelector(allResourcesSelector, resources =>
   resources.filter((r: K8sResource) => isKustomizationResource(r))
 );
