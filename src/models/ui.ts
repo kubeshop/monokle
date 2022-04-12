@@ -113,7 +113,6 @@ export type UiState = {
   isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
-  shouldExpandAllNodes: boolean;
   resetLayout: boolean;
   highlightedItems: {
     clusterPaneIcon: boolean;

@@ -188,7 +188,6 @@ const initialUiState: UiState = {
     footer: 0,
     header: 0,
   },
-  shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
   highlightedItems: {
