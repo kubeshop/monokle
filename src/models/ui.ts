@@ -95,6 +95,7 @@ export type UiState = {
   leftMenu: {
     selection: LeftMenuSelectionType;
     isActive: boolean;
+    expandedFolders: React.Key[];
   };
   quickSearchActionsPopup: {
     isOpen: boolean;
