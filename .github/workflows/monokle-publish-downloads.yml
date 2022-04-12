@@ -338,7 +338,6 @@ jobs:
           tag: 'downloads'
           commit: 'auto-updater'
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
