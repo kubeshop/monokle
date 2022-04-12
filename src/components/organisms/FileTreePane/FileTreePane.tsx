@@ -2,6 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import React, {Key, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
+import {useUpdateEffect} from 'react-use';
 
 import {Button, Modal, Tooltip} from 'antd';
 
@@ -10,7 +11,6 @@ import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
-import {useEffectOnceWhen} from 'rooks';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
@@ -423,7 +423,7 @@ const FileTreePane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightNode]);
 
-  useEffectOnceWhen(() => {
+  useUpdateEffect(() => {
     if (leftMenuSelection !== 'file-explorer') {
       return;
     }
@@ -436,7 +436,7 @@ const FileTreePane = () => {
     if (highlightNode) {
       treeRef?.current?.scrollTo({key: highlightNode.key});
     }
-  }, tree !== null);
+  }, [tree]);
 
   const onFilterByFileOrFolder = (relativePath: string | undefined) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
