@@ -10,6 +10,7 @@ import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
+import {useEffectOnceWhen} from 'rooks';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
@@ -422,7 +423,7 @@ const FileTreePane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightNode]);
 
-  useEffect(() => {
+  useEffectOnceWhen(() => {
     if (leftMenuSelection !== 'file-explorer') {
       return;
     }
@@ -435,9 +436,7 @@ const FileTreePane = () => {
     if (highlightNode) {
       treeRef?.current?.scrollTo({key: highlightNode.key});
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leftMenuSelection]);
+  }, tree !== null);
 
   const onFilterByFileOrFolder = (relativePath: string | undefined) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
