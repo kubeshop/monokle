@@ -1,9 +1,10 @@
-name: monokle-sign-notarize-publish-updater
+name: monokle-sign-notarize-publish-downloads
 
 on:
   push:
     branches:
       - auto-updater
+      - erdikose/chore/add-downloads
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
