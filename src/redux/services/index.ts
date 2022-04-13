@@ -26,3 +26,8 @@ export function loadResource(resourcePath: string) {
   const staticResourcePath = getStaticResourcePath(resourcePath);
   return fs.existsSync(staticResourcePath) ? fs.readFileSync(staticResourcePath, 'utf8') : undefined;
 }
+
+export function loadBinaryResource(resourcePath: string): ArrayBuffer | undefined {
+  const staticResourcePath = getStaticResourcePath(resourcePath);
+  return fs.existsSync(staticResourcePath) ? fs.readFileSync(staticResourcePath) : undefined;
+}

@@ -44,6 +44,9 @@ const initialAppState: AppState = {
     hideClusterOnlyResources: true,
     selectedMatches: [],
   },
+  policies: {
+    plugins: [],
+  },
   notifications: [],
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
