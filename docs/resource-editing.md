@@ -44,7 +44,7 @@ Select multiple resources by clicking the checkbox to the left of the resource n
 
 ![Working with Multiple Resources](img/select-multi-resource-1.6.0.png) 
 
-## **Add Resource**
+## **Add a Resource**
 
 While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
@@ -58,7 +58,7 @@ While creating a resource, it is possible to select an existing resource as a te
 
 ![Resource template](img/template.png)
 
-## **Edit Resources in Cluster**
+## **Edit Resources in a Cluster**
 
 You can easily view and edit resources from clusters. After making changes in a resource, you can quickly deploy them back to the cluster.
 
@@ -92,6 +92,10 @@ Click the ellipsis to the right of a resource name to see the options available:
 
 ![Resource Options](img/navigator-resource-options-1.6.0.png)
 
+Unknown Resources will display in the Navigator but only have the **Rename** and **Delete** options:
+
+![Unknown Resource Options](img/navigator-unknown-resource-options-1.6.0.png)
+
 ### **Rename a Resource**
 
 You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
@@ -110,3 +114,10 @@ You can use the Delete action in the cluster mode to delete the resource from th
 
 ![Delete Resource](img/delete.png)
 
+## **Secret Resources**
+
+Kubernetes secret resources are shown in the Navigator. A **Secret** is an object storing sensitive pieces of data such as usernames, passwords, tokens, and keys.
+
+Highlight the secret resource in the Navigator and the source will be displayed in the Editor pane. There, you can hover over the encoded secret value to see the decoded value (for **username** in the example below):
+
+![Secret Resource](img/secret-resource-hover-2-1.6.0.png)
