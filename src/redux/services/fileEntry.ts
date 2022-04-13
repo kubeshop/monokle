@@ -52,12 +52,19 @@ type PathRemovalSideEffect = {
  * Creates a FileEntry for the specified relative path
  */
 
-export function createFileEntry(fileEntryPath: string, fileMap: FileMapType) {
+interface CreateFileEntryArgs {
+  fileEntryPath: string;
+  fileMap: FileMapType;
+  helmChartId?: string;
+}
+
+export function createFileEntry({fileEntryPath, fileMap, helmChartId}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     isExcluded: false,
     isSupported: false,
+    helmChartId,
   };
 
   const timestamp = getFileTimestamp(getAbsoluteFilePath(fileEntryPath, fileMap));
@@ -181,7 +188,10 @@ export function readFiles(
     files.forEach(file => {
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
-      const fileEntry = createFileEntry(fileEntryPath, fileMap);
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
+      if (helmChart) {
+        helmChart.otherFilePaths.push(fileEntryPath);
+      }
 
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
@@ -516,7 +526,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
-  const fileEntry = createFileEntry(relativePath, state.fileMap);
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap});
 
   if (!fileIsIncluded(fileEntry, projectConfig)) {
     return fileEntry;
@@ -556,7 +566,10 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
-    const folderEntry = createFileEntry(absolutePath.substring(rootFolder.length), state.fileMap);
+    const folderEntry = createFileEntry({
+      fileEntryPath: absolutePath.substring(rootFolder.length),
+      fileMap: state.fileMap,
+    });
     folderEntry.children = readFiles(
       absolutePath,
       projectConfig,
