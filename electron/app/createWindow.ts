@@ -141,8 +141,6 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
-    Nucleus.appStarted();
-
     subscribeToStoreStateChanges(win.webContents, storeState => {
       createMenu(storeState, dispatch);
       let projectName = activeProjectSelector(storeState)?.name;
