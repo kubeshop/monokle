@@ -35,7 +35,7 @@ const store = configureStore({
     uiCoach: uiCoachSlice.reducer,
     extension: extensionSlice.reducer,
   },
-  middleware: getDefaultMiddleware => [...getDefaultMiddleware().concat(middlewares), sectionBlueprintMiddleware],
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares).concat(sectionBlueprintMiddleware),
 });
 
 export default store;
