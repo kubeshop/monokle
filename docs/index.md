@@ -12,9 +12,9 @@ Monokle helps you to:
 - Visualize and navigate resources in your clusters.
 - And much more!
 
-For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=SPmLfmDztTc).
+For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=aY6RK7LpxsE).
 
-<!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://youtu.be/SPmLfmDztTc)-->
+<!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://youtu.be/aY6RK7LpxsE)-->
 
 ## **Blog-posts**
 

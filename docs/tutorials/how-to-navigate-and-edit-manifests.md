@@ -31,7 +31,7 @@ In the file explorer, you can view manifests, including their resources, and the
 
 Scroll up & down to navigate and select the required manifests. 
 
-![Image 3](img/.gif)
+![Image 3](img/imaged-3-1.6.0.gif)
 
 Once you select a manifest, its related resources will be highlighted automatically in the navigator. 
 

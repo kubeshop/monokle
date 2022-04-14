@@ -18,12 +18,12 @@ Statistics tracked include:
 
 To opt out of the Monokle analytics collection:
 
-1. Left-click on the blue gear icon: `Open Settings`.
-2. Left-click on `Global Setttings`.
+1. Click on the blue gear icon at the top right of the Monokle screen: `Open Settings`.
+2. Click on `Global Setttings`.
 3. Go to `Telemetry` section and uncheck the boxes of the type of event(s) you'd like to opt-out.
 
 
 To check the current collection status:
-1. Left-click on the blue gear icon: `Open Settings`.
-2. Left-click on `Global Setttings`.
+1. Click on the blue gear icon: `Open Settings`.
+2. Click on `Global Setttings`.
 3. Go to `Telemetry` section and verify the state of the checkboxes.
