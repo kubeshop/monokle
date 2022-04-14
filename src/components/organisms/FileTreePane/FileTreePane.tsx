@@ -150,7 +150,7 @@ const FileTreePane = () => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
-  const uiState = useAppSelector(state => state.ui);
+  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const configState = useAppSelector(state => state.config);
   const scanExcludes = useAppSelector(scanExcludesSelector);
   const fileIncludes = useAppSelector(fileIncludesSelector);
@@ -177,6 +177,11 @@ const FileTreePane = () => {
   }, [fileMap, setFolder]);
 
   useEffect(() => {
+    if (isFolderLoading) {
+      setTree(null);
+      return;
+    }
+
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
     const treeData =
       rootEntry &&
@@ -190,7 +195,15 @@ const FileTreePane = () => {
       );
 
     setTree(treeData);
-  }, [resourceMap, fileMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter, rootFolderName, dispatch]);
+  }, [
+    isFolderLoading,
+    resourceMap,
+    fileMap,
+    hideExcludedFilesInFileExplorer,
+    fileOrFolderContainedInFilter,
+    rootFolderName,
+    dispatch,
+  ]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -471,7 +484,7 @@ const FileTreePane = () => {
         </Tooltip>
       </TitleBar>
 
-      {uiState.isFolderLoading ? (
+      {isFolderLoading ? (
         <S.Skeleton active />
       ) : tree ? (
         <S.TreeContainer>
