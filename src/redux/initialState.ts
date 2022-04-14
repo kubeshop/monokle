@@ -196,6 +196,9 @@ const initialUiState: UiState = {
     browseTemplates: false,
     connectToCluster: false,
   },
+  walkThrough: {
+    currentStep: 0,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {

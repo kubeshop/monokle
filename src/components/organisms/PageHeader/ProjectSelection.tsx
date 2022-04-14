@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import {useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Dropdown, Modal, Tooltip} from 'antd';
+import {Dropdown, Modal, Popover, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
@@ -28,6 +28,7 @@ import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui
 import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
+import {WalkThrough, WalkThroughTitle, wkContent} from '@components/molecules/WalkThrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -38,6 +39,7 @@ const ProjectSelection = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -264,11 +266,19 @@ const ProjectSelection = () => {
         onVisibleChange={onDropdownVisibleChange}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
-            <S.FolderOpenOutlined />
-            <S.ProjectName>{activeProject.name}</S.ProjectName>
-            <S.DownOutlined />
-          </S.Button>
+          <Popover
+            placement="leftTop"
+            content={<WalkThrough walkThrough={wkContent.stepTemplate} />}
+            title={<WalkThroughTitle title={wkContent.stepTemplate.title} />}
+            visible={walkThroughStep === wkContent.stepTemplate.currentStep}
+            overlayClassName="walkthrough"
+          >
+            <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
+              <S.FolderOpenOutlined />
+              <S.ProjectName>{activeProject.name}</S.ProjectName>
+              <S.DownOutlined />
+            </S.Button>
+          </Popover>
         </Tooltip>
       </Dropdown>
 

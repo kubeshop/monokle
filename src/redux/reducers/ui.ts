@@ -240,6 +240,12 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
+    cancelWalkThrough: (state: Draft<UiState>) => {
+      state.walkThrough.currentStep = 0;
+    },
+    handleWalkThroughStep: (state: Draft<UiState>, action: PayloadAction<number>) => {
+      state.walkThrough.currentStep += action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -316,5 +322,7 @@ export const {
   openAboutModal,
   closeAboutModal,
   setExpandedFolders,
+  cancelWalkThrough,
+  handleWalkThroughStep,
 } = uiSlice.actions;
 export default uiSlice.reducer;

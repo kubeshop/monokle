@@ -219,3 +219,38 @@ code {
 .ant-notification.ant-notification-topRight {
   z-index: 1051;
 }
+
+.walkthrough .ant-popover-inner {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  max-width: 420px;
+  background: linear-gradient(180deg, #393BCD 0%, #2090CF 100%);
+  padding: 28px 35px;
+}
+
+.walkthrough .ant-popover-title {
+  position: relative;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 24px;
+  border: none;
+}
+
+.walkthrough .ant-popover-arrow {
+  height: 20px;
+  width: 20px;
+}
+
+.walkthrough .ant-popover-arrow-content {
+  background: linear-gradient(180deg, #393BCD 0%, #2090CF 100%);
+  width: 20px;
+  height: 20px;
+}
+
+.walkthrough .ant-btn-icon-only {
+  border: none;
+  position: absolute;
+  top: -22px;
+  right: -22px;
+}

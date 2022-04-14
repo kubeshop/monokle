@@ -1,8 +1,12 @@
 import {useCallback, useMemo, useState} from 'react';
 
+import {Popover} from 'antd';
+
 import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models/navigator';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {WalkThrough, WalkThroughTitle, wkContent} from '@components/molecules/WalkThrough';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
@@ -35,7 +39,7 @@ function SectionHeader(props: SectionHeaderProps) {
   } = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
+  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
   const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
     sectionBlueprint.customization
   );
@@ -111,21 +115,45 @@ function SectionHeader(props: SectionHeaderProps) {
             {NamePrefix.Component && (
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
-            <S.Name
-              $isSelected={sectionInstance.isSelected && isCollapsed}
-              $isHighlighted={sectionInstance.isSelected && isCollapsed}
-              $isCheckable={Boolean(sectionInstance.checkable)}
-              $nameColor={sectionBlueprint.customization?.nameColor}
-              $nameSize={sectionBlueprint.customization?.nameSize}
-              $nameWeight={sectionBlueprint.customization?.nameWeight}
-              $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
-              $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
-              $level={level}
-              onClick={toggleCollapse}
-            >
-              {name}
-            </S.Name>
-
+            {name === 'K8s Resources' ? (
+              <Popover
+                placement="right"
+                content={<WalkThrough walkThrough={wkContent.stepResource} />}
+                title={<WalkThroughTitle title={wkContent.stepResource.title} />}
+                visible={walkThroughStep === wkContent.stepResource.currentStep}
+                overlayClassName="walkthrough"
+              >
+                <S.Name
+                  $isSelected={sectionInstance.isSelected && isCollapsed}
+                  $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                  $isCheckable={Boolean(sectionInstance.checkable)}
+                  $nameColor={sectionBlueprint.customization?.nameColor}
+                  $nameSize={sectionBlueprint.customization?.nameSize}
+                  $nameWeight={sectionBlueprint.customization?.nameWeight}
+                  $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+                  $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                  $level={level}
+                  onClick={toggleCollapse}
+                >
+                  {name}
+                </S.Name>
+              </Popover>
+            ) : (
+              <S.Name
+                $isSelected={sectionInstance.isSelected && isCollapsed}
+                $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                $isCheckable={Boolean(sectionInstance.checkable)}
+                $nameColor={sectionBlueprint.customization?.nameColor}
+                $nameSize={sectionBlueprint.customization?.nameSize}
+                $nameWeight={sectionBlueprint.customization?.nameWeight}
+                $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+                $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                $level={level}
+                onClick={toggleCollapse}
+              >
+                {name}
+              </S.Name>
+            )}
             <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />
 
             <S.BlankSpace level={level} onClick={toggleCollapse} />

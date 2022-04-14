@@ -23,7 +23,13 @@ import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
-import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {
+  closeFolderExplorer,
+  closeReleaseNotesDrawer,
+  handleWalkThroughStep,
+  toggleNotifications,
+  toggleSettings,
+} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -177,8 +183,10 @@ const App = () => {
       if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
+        dispatch(handleWalkThroughStep(1));
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {
