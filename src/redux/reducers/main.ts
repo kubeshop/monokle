@@ -20,10 +20,12 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
+import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {currentConfigSelector} from '@redux/selectors';
+import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
@@ -34,7 +36,7 @@ import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {removeResource} from '@redux/thunks/removeResource';
+import {removeResources} from '@redux/thunks/removeResources';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
@@ -187,6 +189,36 @@ export const addResource = createAsyncThunk(
           resourceKinds,
         }
       );
+    });
+
+    return nextMainState;
+  }
+);
+
+export const addMultipleResources = createAsyncThunk(
+  'main/addMultipleResources',
+  async (resources: K8sResource[], thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = getK8sVersion(projectConfig);
+    const userDataDir = String(state.config.userDataDir);
+
+    const nextMainState = createNextState(state.main, mainState => {
+      resources.forEach(resource => {
+        mainState.resourceMap[resource.id] = resource;
+        const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+        processResources(
+          schemaVersion,
+          userDataDir,
+          getActiveResourceMap(mainState),
+          mainState.resourceRefsProcessingOptions,
+          {
+            resourceIds: [resource.id],
+            resourceKinds,
+          }
+        );
+      });
     });
 
     return nextMainState;
@@ -551,6 +583,9 @@ export const mainSlice = createSlice({
         notification.hasSeen = true;
       });
     },
+    clearNotifications: (state: Draft<AppState>) => {
+      state.notifications = [];
+    },
     openPreviewConfigurationEditor: (
       state: Draft<AppState>,
       action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
@@ -675,6 +710,13 @@ export const mainSlice = createSlice({
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
       });
+
+    builder.addCase(setRootFolder.pending, state => {
+      const existingHelmCharts: HelmChart[] = JSON.parse(JSON.stringify(Object.values(state.helmChartMap)));
+      if (existingHelmCharts.length) {
+        setImmediate(() => existingHelmCharts.forEach(chart => HelmChartEventEmitter.emit('remove', chart.id)));
+      }
+    });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMap = action.payload.resourceMap;
@@ -932,7 +974,7 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(removeResource.fulfilled, (state, action) => {
+    builder.addCase(removeResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -949,6 +991,10 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(addResource.fulfilled, (state, action) => {
+      return action.payload;
+    });
+
+    builder.addCase(addMultipleResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -1076,6 +1122,7 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  clearNotifications,
   openPreviewConfigurationEditor,
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,

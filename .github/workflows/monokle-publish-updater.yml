@@ -216,6 +216,8 @@ jobs:
 
       - name: Package
         run: |
+          ($contents=jq --arg artifactName '${productName}-${os}-${arch}.${ext}'  '.build.artifactName = $artifactName' package.json) -and ($contents | set-content package.json -Encoding Ascii)
+          ($contents=jq --arg artifactName '${productName}-${os}-${arch}.${ext}'  '.build.appImage.artifactName = $artifactName' package.json) -and ($contents | set-content package.json -Encoding Ascii)
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}

@@ -4,7 +4,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT} from '@constants/constants';
+import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {
   HighlightItems,
@@ -20,6 +20,8 @@ import {
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 import electronStore from '@utils/electronStore';
 
@@ -70,6 +72,9 @@ export const uiSlice = createSlice({
     setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.rightMenu.isActive = action.payload;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
+    },
+    setActiveSettingsPanel: (state: Draft<UiState>, action: PayloadAction<SettingsPanel>) => {
+      state.activeSettingsPanel = action.payload;
     },
     setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<RightMenuSelectionType>) => {
       state.rightMenu.selection = action.payload;
@@ -173,6 +178,9 @@ export const uiSlice = createSlice({
         );
       }
     },
+    setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
+      state.leftMenu.expandedFolders = action.payload;
+    },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
     },
@@ -190,9 +198,6 @@ export const uiSlice = createSlice({
         ...state.monacoEditor,
         ...action.payload,
       };
-    },
-    setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.shouldExpandAllNodes = action.payload;
     },
     toggleExpandActionsPaneFooter: (state: Draft<UiState>) => {
       if (state.isActionsPaneFooterExpanded) {
@@ -243,7 +248,13 @@ export const uiSlice = createSlice({
       })
       .addCase(setRootFolder.fulfilled, (state, action) => {
         state.isFolderLoading = false;
-        state.shouldExpandAllNodes = true;
+
+        // Expand all folders on setting root folder
+        const nodes = Object.values(action.payload.fileMap);
+        const folders = nodes.filter(node => node.children?.length);
+        const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
+        state.leftMenu.expandedFolders = folderKeys;
+
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
           !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
@@ -279,7 +290,6 @@ export const {
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,
-  setShouldExpandAllNodes,
   setPaneConfiguration,
   toggleStartProjectPane,
   setRightMenuIsActive,
@@ -302,7 +312,9 @@ export const {
   zoomOut,
   openReleaseNotesDrawer,
   closeReleaseNotesDrawer,
+  setActiveSettingsPanel,
   openAboutModal,
   closeAboutModal,
+  setExpandedFolders,
 } = uiSlice.actions;
 export default uiSlice.reducer;

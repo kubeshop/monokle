@@ -23,8 +23,9 @@ import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
 
-import * as S from './Styled';
 import {TreeItemProps} from './types';
+
+import * as S from './styled';
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
   const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;
@@ -71,11 +72,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
-  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
-  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
-  const absolutePath = isRoot
-    ? fileMap[ROOT_FILE_ENTRY].filePath
-    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
+  const isRoot = treeKey === ROOT_FILE_ENTRY;
+  const root = fileMap[ROOT_FILE_ENTRY];
+  const node = fileMap[treeKey];
+  const relativePath = isRoot ? getBasename(path.normalize(node.filePath)) : node.filePath;
+  const absolutePath = isRoot ? node.filePath : path.join(root.filePath, node.filePath);
 
   const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
 

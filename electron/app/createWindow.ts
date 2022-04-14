@@ -1,6 +1,5 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
-import fixPath from 'fix-path';
 import {indexOf} from 'lodash';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
@@ -90,8 +89,6 @@ export const createWindow = (givenPath?: string) => {
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
   let unsavedResourceCount = 0;
 
-  fixPath();
-
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
   } else {
@@ -144,8 +141,6 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
-    Nucleus.appStarted();
-
     subscribeToStoreStateChanges(win.webContents, storeState => {
       createMenu(storeState, dispatch);
       let projectName = activeProjectSelector(storeState)?.name;
@@ -173,6 +168,7 @@ export const createWindow = (givenPath?: string) => {
         dataDir: userDataDir,
       })
     );
+
     dispatch(
       setExtensionsDirs({
         templatesDir,
@@ -180,6 +176,7 @@ export const createWindow = (givenPath?: string) => {
         pluginsDir,
       })
     );
+
     await checkNewVersion(dispatch, true);
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));

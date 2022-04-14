@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import {Button, Skeleton} from 'antd';
 
 import path from 'path';
+import semver from 'semver';
 
 import {loadResource} from '@redux/services';
 
@@ -25,9 +26,15 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
 
   useEffect(() => {
     fetchAppVersion().then(version => {
-      const rawVersionInfo = loadResource(path.join('releaseNotes', version, `${version}.json`));
-      const rawMarkdown = loadResource(path.join('releaseNotes', version, `${version}.md`));
-      const rawSvg = loadResource(path.join('releaseNotes', version, `${version}.svg`));
+      const parsedVersion = semver.parse(version);
+      if (!parsedVersion) {
+        onClose();
+        return;
+      }
+      const releaseVersion = `${parsedVersion.major}.${parsedVersion.minor}`;
+      const rawVersionInfo = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.json`));
+      const rawMarkdown = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.md`));
+      const rawSvg = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.svg`));
       if (!rawVersionInfo || !rawMarkdown || !rawSvg) {
         onClose();
         return;

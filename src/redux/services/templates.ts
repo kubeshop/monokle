@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import {ipcRenderer} from 'electron';
 
 import asyncLib from 'async';
@@ -8,6 +9,7 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
+import {PossibleResource, isPossibleResource} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
@@ -18,7 +20,7 @@ import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/
 import electronStore from '@utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
-import {createUnsavedResource} from './unsavedResource';
+import {createMultipleUnsavedResources} from './unsavedResource';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
@@ -128,24 +130,26 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
-  const createdResources: K8sResource[] = [];
+
+  let objects: PossibleResource[] = [];
+
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
-      const objects = extractObjectsFromYaml(resourceText);
-      objects.forEach(obj => {
-        const resource = createUnsavedResource(
-          {
-            name: obj.metadata.name,
-            namespace: obj.metadata.namespace,
-            kind: obj.kind,
-            apiVersion: obj.apiVersion,
-          },
-          dispatch,
-          obj
-        );
-        createdResources.push(resource);
-      });
+      objects = [...objects, ...extractObjectsFromYaml(resourceText)];
     });
+
+  const inputs = objects
+    .filter(obj => isPossibleResource(obj))
+    .map(obj => ({
+      name: obj.metadata.name,
+      namespace: obj.metadata.namespace,
+      kind: obj.kind,
+      apiVersion: obj.apiVersion,
+      obj,
+    }));
+
+  const createdResources: K8sResource[] = createMultipleUnsavedResources(inputs, dispatch);
+
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };

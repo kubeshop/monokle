@@ -94,8 +94,8 @@ const initialAppConfigState: AppConfig = {
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
   k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
-  disableEventTracking: electronStore.get('appConfig.disableEventTracking') || false,
-  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting') || false,
+  disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
+  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
 };
 
 const initialAlertState: AlertState = {};
@@ -105,6 +105,23 @@ const initialLogsState: LogsState = {
 };
 
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+
+let paneConfiguration = electronStore.get('ui.paneConfiguration');
+
+if (
+  !paneConfiguration ||
+  (paneConfiguration &&
+    (paneConfiguration.leftWidth === 0 || paneConfiguration.navWidth === 0 || paneConfiguration.editWidth === 0))
+) {
+  paneConfiguration = {
+    leftWidth: 0.3333,
+    navWidth: 0.3333,
+    editWidth: 0.3333,
+    rightWidth: 0,
+    actionsPaneFooterExpandedHeight: 0,
+    recentProjectsPaneWidth: 300,
+  };
+}
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
@@ -146,6 +163,7 @@ const initialUiState: UiState = {
     selection: uiLeftMenuSelection,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
+    expandedFolders: [],
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
@@ -165,19 +183,11 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
-  paneConfiguration: electronStore.get('ui.paneConfiguration') || {
-    leftWidth: 0.3333,
-    navWidth: 0.3333,
-    editWidth: 0.3333,
-    rightWidth: 0,
-    actionsPaneFooterExpandedHeight: 0,
-    recentProjectsPaneWidth: 300,
-  },
+  paneConfiguration,
   layoutSize: {
     footer: 0,
     header: 0,
   },
-  shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
   highlightedItems: {

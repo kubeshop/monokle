@@ -12,6 +12,8 @@ import {AnyTemplate} from '@models/template';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
 
+import {ImageIcon} from '@atoms';
+
 import PluginIcon from '@assets/PluginIcon.svg';
 
 import Colors from '@styles/Colors';
@@ -56,7 +58,7 @@ const PluginInformation: React.FC<IProps> = props => {
 
   return (
     <S.Container>
-      <S.Image src={plugin.icon ? plugin.icon : PluginIcon} alt="Plugin_Icon" />
+      <ImageIcon src={plugin.icon} fallback={PluginIcon} altText="Plugin_Icon" />
 
       <S.InfoContainer>
         <S.NameActionsContainer>

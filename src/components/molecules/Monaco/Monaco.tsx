@@ -7,9 +7,8 @@ import {useMeasure} from 'react-use';
 import fs from 'fs';
 import log from 'loglevel';
 import 'monaco-editor';
-// @ts-ignore
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
-import 'monaco-yaml/lib/esm/monaco.contribution';
+import 'monaco-yaml';
 import path from 'path';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -57,7 +56,6 @@ window.MonacoEnvironment = {
   },
 };
 
-// @ts-ignore
 const {yaml} = languages || {};
 
 function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {

@@ -1,7 +1,6 @@
 import {BrowserWindow, dialog} from 'electron';
 
 import {spawn} from 'child_process';
-import fixPath from 'fix-path';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
@@ -135,11 +134,6 @@ export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent
   ensureMainThread();
 
   const result: CommandResult = {exitCode: null, signal: null};
-
-  fixPath();
-
-  // TODO: Remove this after we get confirmation that the PATH var is fixed
-  console.log('PATH:', process.env.PATH);
 
   try {
     const child = spawn(options.cmd, options.args, {

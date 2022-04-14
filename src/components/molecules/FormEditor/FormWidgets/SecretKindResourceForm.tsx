@@ -75,6 +75,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
   const [stringDataKeyValuePairs, setStringDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>(
     []
   );
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const handleTypeChange = (value: any) => {
     if (formData.type !== value) {
@@ -131,34 +132,40 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
   useEffect(() => {
     const emptyObject: any = {};
 
-    const data = dataKeyValuePairs.reduce((object, value) => {
-      object[value.key] = value.value;
-      return object;
-    }, emptyObject);
-    if (!_.isEqual(formData.data, data)) {
-      onChange({
-        ...formData,
-        stringData: undefined,
-        data: data || undefined,
-      });
+    if (!isInitialLoad) {
+      const data = dataKeyValuePairs.reduce((object, value) => {
+        object[value.key] = value.value;
+        return object;
+      }, emptyObject);
+      if (!_.isEqual(formData.data, data)) {
+        onChange({
+          ...formData,
+          stringData: undefined,
+          data: data || undefined,
+        });
+      }
     }
+    setIsInitialLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataKeyValuePairs]);
 
   useEffect(() => {
     const emptyObject: any = {};
 
-    const stringData = stringDataKeyValuePairs.reduce((object, value) => {
-      object[value.key] = value.value;
-      return object;
-    }, emptyObject);
-    if (!_.isEqual(formData.stringData, stringData)) {
-      onChange({
-        ...formData,
-        data: undefined,
-        stringData: stringData || undefined,
-      });
+    if (!isInitialLoad) {
+      const stringData = stringDataKeyValuePairs.reduce((object, value) => {
+        object[value.key] = value.value;
+        return object;
+      }, emptyObject);
+      if (!_.isEqual(formData.stringData, stringData)) {
+        onChange({
+          ...formData,
+          data: undefined,
+          stringData: stringData || undefined,
+        });
+      }
     }
+    setIsInitialLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringDataKeyValuePairs]);
 

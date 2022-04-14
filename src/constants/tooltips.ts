@@ -2,7 +2,8 @@ const KEY_CTRL_CMD = process.platform === 'darwin' ? '⌘' : 'CTRL';
 
 export const BrowseFolderTooltip = `Browse for folder containing manifests, kustomizations or Helm charts (${KEY_CTRL_CMD}+O)`;
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
-export const ToggleTreeTooltip = 'Expand/Collapse all folders';
+export const ExpandTreeTooltip = 'Expand all folders';
+export const CollapseTreeTooltip = 'Collapse all folders';
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltips = {
   default: 'Show/hide Cluster Preview',
@@ -64,6 +65,4 @@ export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuratio
 export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
-export const DisableEventTrackingTooltip = 'Disables collection of usage metrics';
-export const DisableErrorReportingTooltip = 'Disables collection of error reports';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';

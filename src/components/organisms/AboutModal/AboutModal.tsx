@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useMemo} from 'react';
 
 import {Button, Modal, Typography} from 'antd';
 
@@ -9,11 +9,14 @@ import {closeAboutModal} from '@redux/reducers/ui';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
+import {getDependencyVersion} from '@utils/getDependencyVersion';
+
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
 import Colors from '@styles/Colors';
 
 const {Text} = Typography;
+const dependenciesList = ['react', 'electron'];
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {
@@ -70,6 +73,8 @@ const StartupModal = () => {
     dispatch(closeAboutModal());
   };
 
+  const dependenciesVersions = useMemo(() => getDependencyVersion(dependenciesList), [dependenciesList]);
+
   return (
     <StyledModal
       visible={aboutModalVisible}
@@ -104,9 +109,11 @@ const StartupModal = () => {
                 </ul>
                 Other useful info:
                 <ul>
-                  <li>Electron version: 17.2.0</li>
-                  <li>Node.js version 16.14.0</li>
-                  <li>Compatible with Windows/macOS/Linux</li>
+                  {dependenciesVersions.map(({name, version}) => (
+                    <li key={name}>
+                      {name} version: {version}
+                    </li>
+                  ))}
                 </ul>
               </Text>
             </StyledTextContainer>

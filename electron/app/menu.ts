@@ -22,6 +22,7 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {defineHotkey} from '@utils/defineHotkey';
 
 import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
@@ -96,6 +97,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     submenu: [
       {
         label: 'New Monokle Window',
+        accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW),
         click() {
           openApplication();
         },
@@ -296,7 +298,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
-        accelerator: hotkeys.TOGGLE_LEFT_PANE,
+        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE),
         click: () => {
           dispatch(toggleLeftMenu());
         },
@@ -313,14 +315,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Zoom in',
-        accelerator: hotkeys.ZOOM_IN,
+        accelerator: defineHotkey(hotkeys.ZOOM_IN),
         click: () => {
           dispatch(zoomIn());
         },
       },
       {
         label: 'Zoom out',
-        accelerator: hotkeys.ZOOM_OUT,
+        accelerator: defineHotkey(hotkeys.ZOOM_OUT),
         click: () => {
           dispatch(zoomOut());
         },

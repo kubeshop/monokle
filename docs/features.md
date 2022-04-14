@@ -36,7 +36,7 @@ When you select a resource, Monokle will show which file it was defined in. A ye
 
 ![Browse your clusters objects](img/cluster-objects-1.6.0.gif)
 
-Want to browse your cluster instead of a repo? Simply click the "Load" button to import all objects from
+To browse a cluster instead of a repo, simply click the "Load" button to import all objects from
 the cluster into Monokle - [read more](cluster-integration.md). If you need to make any immediate hot-fixes, simply modify
 the resource in the source editor and click the "Apply" button.
 

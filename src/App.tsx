@@ -10,11 +10,11 @@ import 'antd/dist/antd.less';
 import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
-import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
+import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {AlertEnum} from '@models/alert';
+import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
@@ -22,7 +22,7 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
+import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -41,6 +41,7 @@ import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {StartupFlag} from '@utils/startupFlag';
 
+import * as S from './App.styled';
 import AppContext from './AppContext';
 
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
@@ -62,20 +63,6 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
-
-const AppContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-`;
-
-const MainContainer = styled.div`
-  height: 100%;
-  width: 100%;
-
-  display: grid;
-  grid-template-rows: max-content 1fr max-content;
-`;
 
 const App = () => {
   const dispatch = useDispatch();
@@ -111,6 +98,8 @@ const App = () => {
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
+  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const size: Size = useWindowSize();
 
@@ -127,6 +116,11 @@ const App = () => {
       (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
       newVersion.code === NewVersionCode.Downloaded,
     [newVersion]
+  );
+
+  const shouldTriggerTelemetryNotification = useMemo(
+    () => disableEventTracking === undefined && disableErrorReporting === undefined,
+    [disableEventTracking, disableErrorReporting]
   );
 
   const onExecutedFrom = useCallback(
@@ -154,6 +148,21 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadLastProjectOnStartup, projects]
   );
+
+  useEffect(() => {
+    if (!shouldTriggerTelemetryNotification) {
+      return;
+    }
+    dispatch(
+      setAlert({
+        title: 'Monokle telemetry',
+        message: `We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. **Data gathering is *(and will always be!)* anonymous**. We want to make sure you are cool with that, though! [Read more about this in our documentation.](${TelemetryDocumentationUrl})`,
+        type: AlertEnum.Info,
+        extraContentType: ExtraContentType.Telemetry,
+        duration: 5,
+      })
+    );
+  }, [shouldTriggerTelemetryNotification, dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);
@@ -300,17 +309,22 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
-      <AppContainer>
+      <S.AppContainer>
         <MessageBox />
-        <MainContainer>
+        <S.MainContainer>
           <PageHeader />
           <PaneManager />
           <PageFooter />
-        </MainContainer>
+        </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
 
-        <LazyDrawer onClose={notificationsDrawerOnClose} title="Notifications" visible={isNotificationsDrawerVisible}>
+        <LazyDrawer
+          onClose={notificationsDrawerOnClose}
+          title="Notifications"
+          visible={isNotificationsDrawerVisible}
+          extra={<S.Button onClick={() => dispatch(clearNotifications())}>Clear</S.Button>}
+        >
           <NotificationsManager />
         </LazyDrawer>
 
@@ -367,7 +381,7 @@ const App = () => {
             </Modal>
           )}
         </Suspense>
-      </AppContainer>
+      </S.AppContainer>
     </AppContext.Provider>
   );
 };

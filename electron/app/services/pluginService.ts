@@ -23,6 +23,10 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
   const {repositoryOwner, repositoryName, repositoryBranch} = extractRepositoryOwnerAndNameFromUrl(
     packageJson.repository
   );
+  let icon = packageJson.monoklePlugin.icon;
+  if (icon && !icon.includes('http')) {
+    icon = path.join(folderPath, icon);
+  }
   const plugin: AnyPlugin = {
     id: packageJson.monoklePlugin.id,
     name: packageJson.name,
@@ -35,6 +39,7 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
       name: repositoryName,
       branch: repositoryBranch,
     },
+    icon,
     modules: packageJson.monoklePlugin.modules.map(module => {
       if (isTemplatePluginModule(module)) {
         return {

@@ -7,6 +7,8 @@ import Nucleus from 'nucleus-nodejs';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
+import {fixPath} from '@utils/path';
+
 import terminal from '@root/cli/terminal';
 
 import './ipc/ipcListeners';
@@ -17,6 +19,9 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+
+// This has to run before everything else related to Nucleus.
+Nucleus.appStarted();
 
 let {disableErrorReports} = initNucleus(isDev, app);
 unhandled({
@@ -31,6 +36,7 @@ unhandled({
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
+fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {
   yargs(hideBin(process.argv)).command(

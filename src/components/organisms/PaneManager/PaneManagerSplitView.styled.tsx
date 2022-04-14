@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
+import {MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
+
 import {AppBorders} from '@styles/Borders';
+import {PanelColors} from '@styles/Colors';
 
 export const EditorPaneContainer = styled.div`
   height: 100%;
@@ -21,6 +24,7 @@ export const LeftPaneContainer = styled.div`
   & .custom-modal-handle {
     right: -3px;
   }
+  background: ${PanelColors.toolBar};
 `;
 
 export const Pane = styled.div<{$height?: number}>`
@@ -28,6 +32,7 @@ export const Pane = styled.div<{$height?: number}>`
     height: ${$height ? `${$height}px` : '100%'};
   `};
   width: 100%;
+  min-width: ${MIN_SPLIT_VIEW_PANE_WIDTH};
 `;
 
 export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`

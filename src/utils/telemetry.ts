@@ -1,10 +1,22 @@
 import {ipcRenderer} from 'electron';
 
+import Nucleus from 'nucleus-nodejs';
+
+import {isRendererThread} from './thread';
+
 export const trackEvent = (eventName: string, payload?: any) => {
-  ipcRenderer.send('track-event', {eventName, payload});
+  if (isRendererThread()) {
+    ipcRenderer.send('track-event', {eventName, payload});
+  } else {
+    Nucleus.track(eventName, payload);
+  }
 };
 export const trackError = (error: any) => {
-  ipcRenderer.send('track-event', {error});
+  if (isRendererThread()) {
+    ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
+  } else {
+    Nucleus.track('Error', error);
+  }
 };
 
 export const CREATE_EMPTY_PROJECT = 'CREATE_EMPTY_PROJECT';

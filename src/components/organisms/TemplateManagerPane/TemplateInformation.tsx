@@ -11,7 +11,7 @@ import {AnyTemplate} from '@models/template';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {handleFavoriteTemplate} from '@redux/reducers/appConfig';
 
-import {Icon} from '@components/atoms';
+import {Icon, ImageIcon} from '@components/atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
 
@@ -35,7 +35,7 @@ const TemplateInformation: React.FC<IProps> = props => {
   };
   return (
     <S.Container $shouldHaveMarginBottom={actionType === 'button'}>
-      <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
+      <ImageIcon src={template.icon} fallback={TemplateIcon} altText="Template_Icon" />
 
       <S.InfoContainer>
         <S.NameContainer>

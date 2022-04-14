@@ -1,3 +1,5 @@
+import {SettingsPanel} from '@organisms/SettingsManager/types';
+
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -93,6 +95,7 @@ export type UiState = {
   leftMenu: {
     selection: LeftMenuSelectionType;
     isActive: boolean;
+    expandedFolders: React.Key[];
   };
   quickSearchActionsPopup: {
     isOpen: boolean;
@@ -110,7 +113,6 @@ export type UiState = {
   isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
-  shouldExpandAllNodes: boolean;
   resetLayout: boolean;
   highlightedItems: {
     clusterPaneIcon: boolean;
@@ -118,6 +120,7 @@ export type UiState = {
     browseTemplates: boolean;
     connectToCluster: boolean;
   };
+  activeSettingsPanel?: SettingsPanel;
 };
 
 export type PaneConfiguration = {

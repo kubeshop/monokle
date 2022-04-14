@@ -3,10 +3,9 @@ import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+import Colors, {FontColors} from '@styles/Colors';
 
 export const FileTreeContainer = styled.div`
-  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
 
@@ -139,20 +138,6 @@ export const NumberOfResources = styled.span`
   color: ${Colors.grey7};
 `;
 
-export const RightButtons = styled.div`
-  display: flex;
-  align-items: center;
-
-  button:not(:last-child),
-  .ant-tooltip-disabled-compatible-wrapper:not(:last-child) {
-    margin-right: 10px;
-  }
-
-  .ant-tooltip-disabled-compatible-wrapper {
-    margin-bottom: 1px;
-  }
-`;
-
 export const RootFolderText = styled.div`
   font-size: 12px;
   line-height: 22px;
@@ -193,11 +178,6 @@ export const Title = styled.span`
 
 export const TitleBarContainer = styled.div`
   border-bottom: ${AppBorders.sectionDivider};
-`;
-
-export const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
 `;
 
 export const TreeContainer = styled.div`

@@ -8,6 +8,8 @@ enum Colors {
   grey400 = '#DBE0DE',
   grey200 = '#F3F5F4',
   grey100 = '#F9FAFA',
+  grey11 = '#141718',
+  grey10 = '#242C2F',
   grey9 = '#DBDBDB', // gray, grey 9
   grey8 = '#ACACAC', // gray, gray 8
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
@@ -19,7 +21,9 @@ enum Colors {
 
   // Notifications
   greenOkay = '#09b89d',
+  polarGreen = '#6ABE39',
   greenOkayCompliment = '#B2DFD3',
+  okayBg = '#6ABE3933',
 
   yellowWarning = '#ffe17f',
   yellowWarningCompliment = '#FFF3CA',
@@ -29,6 +33,7 @@ enum Colors {
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
+  errorBg = '#E8474933',
 
   whitePure = '#ffffff',
   blackPure = '#000000',
@@ -52,6 +57,11 @@ enum Colors {
   highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
   diffBackground = '#2B2611',
   diffBackgroundHover = '#27220f',
+}
+
+export enum PanelColors {
+  toolBar = Colors.grey10,
+  headerBar = Colors.grey11,
 }
 
 export enum BackgroundColors {

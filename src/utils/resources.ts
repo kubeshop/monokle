@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource, ResourceRefType} from '@models/k8sresource';
 
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
@@ -133,4 +133,16 @@ export function getDefaultNamespaceForApply(
   }
 
   return {defaultNamespace: namespace};
+}
+
+export function countResourceWarnings(resources: K8sResource[]): number {
+  return resources.reduce<number>((acc, resource) => {
+    return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
+  }, 0);
+}
+
+export function countResourceErrors(resources: K8sResource[]): number {
+  return resources.reduce<number>((acc, resource) => {
+    return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
+  }, 0);
 }
