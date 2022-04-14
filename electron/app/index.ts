@@ -20,6 +20,9 @@ const isDev = process.env.NODE_ENV === 'development';
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 
+// This has to run before everything else related to Nucleus.
+Nucleus.appStarted();
+
 let {disableErrorReports} = initNucleus(isDev, app);
 unhandled({
   logger: error => {
