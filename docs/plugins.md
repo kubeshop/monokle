@@ -47,10 +47,19 @@ Here is how you can reference a template module:
 
 ## **How do I install a Plugin?**
 
-Open the Plugins manager from the top right icon.
+Open the Plugins manager from the top right icon:
 
-1. Click on the '+' button.
-2. A modal will show up asking for the Plugin URL.
+![Open Plugin Manager](img/open-plugin-manager-1.6.0.png)
+
+
+1. Click on the '+' button:
+
+![Add New Plugin](img/add-new-plugin-1.6.0.png)
+
+2. A modal will appear asking for the Plugin URL:
+
+![Add Plugin Modal](img/add-plugin-modal-1.6.0.png)
+
 
 - The URL must be a valid GitHub repository url in the format https://github.com/[user]/[repository].
 - The primary branch should be `main`. The plugin installer will search there for the `package.json` file.

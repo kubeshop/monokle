@@ -60,7 +60,7 @@ The Source Editor allows you to view and edit the source code easily.
 
 **Step 2:** Right click anywhere in the Source Editor to launch the menu to select the required editing option from the drop-down list.
 
-![Image 6](img/image-6-1.6 .0.png)
+![Image 6](img/image-6-1.6.0.png)
 
 You can also edit the source code using the Form Editor, which does not require any coding effort.
 
@@ -96,7 +96,7 @@ The Form Editor collects the required information and passes it to another entit
 
 **Step 3:** Tick the **Immutable** checkbox to ensure the data stored in the ConfigMap is not updated. 
 
-![Image 12](img/image-12.png)
+![Image 12](img/image-12-1.6.0.png)
 
 ## **Using the Object Metadata Editor**
 

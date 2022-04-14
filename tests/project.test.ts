@@ -75,6 +75,7 @@ test('should create new resource', async () => {
   const kind = 'ClusterRole';
   const fileName = 'test-cluster-role';
   await newResourceModal.createResource(fileName, kind);
+  await navigatorPane.clickLastFile();
 
   expect(await editorPane.formTab.textContent()).toEqual('Form');
 
@@ -90,6 +91,5 @@ test('should create new resource', async () => {
 
 test.afterAll(async () => {
   await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
-  await appWindow.context().close();
   await appWindow.close();
 });

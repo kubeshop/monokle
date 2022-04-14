@@ -53,9 +53,11 @@ const removeSomeFiles = 'f5518240cf7cac1f686c1bc9e4ca8099bfd7daa1';
 const removeMoreFiles = '28879f29f62c8357b5ca988e475db30e13c8300b';
 
 async function goToCommit(hash: string) {
+  console.log('*******************************************************');
   execSync(`git checkout ${hash}`, {
     cwd: `${projectPath}`,
   });
+  console.log('*******************************************************');
 
   await pause(5000);
 }
@@ -63,28 +65,28 @@ async function goToCommit(hash: string) {
 const testData = [
   {
     hash: startCommit,
-    fileExplorerCount: 53,
+    fileExplorerCount: 54,
     kustomizeCount: 13,
     helmCount: 9,
     navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
-    fileExplorerCount: 32,
+    fileExplorerCount: 33,
     kustomizeCount: 6,
     helmCount: 9,
     navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
-    fileExplorerCount: 15,
+    fileExplorerCount: 16,
     kustomizeCount: 3,
     helmCount: 9,
     navigatorCount: 34,
   },
   {
     hash: startCommit,
-    fileExplorerCount: 53,
+    fileExplorerCount: 54,
     kustomizeCount: 13,
     helmCount: 9,
     navigatorCount: 54,
@@ -122,7 +124,6 @@ test('all files should be loaded', async () => {
 
 test.afterAll(async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
-  await appWindow.context().close();
   await appWindow.close();
   fs.rmSync(projectPath, { recursive: true, force: true });
 });
