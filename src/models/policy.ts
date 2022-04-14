@@ -3,6 +3,12 @@ import * as Rt from 'runtypes';
 import {loadPolicy} from '@open-policy-agent/opa-wasm';
 
 //* * * * * * * * * * * * * * * * * * * * * * * *
+// Globals
+//* * * * * * * * * * * * * * * * * * * * * * * *
+export type ValidatorId = string;
+export const POLICY_VALIDATOR_MAP: Record<ValidatorId, PolicyValidator> = {};
+
+//* * * * * * * * * * * * * * * * * * * * * * * *
 // Plugin model
 //* * * * * * * * * * * * * * * * * * * * * * * *
 export type PolicyBase = Rt.Static<typeof PolicyBaseRuntype>;
@@ -47,7 +53,17 @@ export const BasicPolicyRuntype = PolicyBaseRuntype.extend({
 //* * * * * * * * * * * * * * * * * * * * * * * *
 export type PolicyValidator = Awaited<ReturnType<typeof loadPolicy>>;
 
-export type LoadedPolicy = {
+export type PolicyConfig = {
+  // Whether the policy is enabled.
+  enabled: boolean;
+};
+
+export type Policy = {
+  // The identifier of the validator, or `undefined` when not loaded.
+  // You can retrieve the validator as follows: `POLICY_VALIDATOR_MAP["validatorId"]`.
+  validatorId: ValidatorId | undefined;
+  // The metadata of the policy.
   metadata: BasicPolicy;
-  validator: PolicyValidator;
+  // The configuration of the policy.
+  config: PolicyConfig;
 };

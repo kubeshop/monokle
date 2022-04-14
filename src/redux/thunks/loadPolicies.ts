@@ -1,23 +1,16 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {v4 as uuid} from 'uuid';
+
 import {AlertEnum} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {BasicPolicy, LoadedPolicy, PolicyConfig} from '@models/policy';
-import {RootState} from '@models/rootstate';
+import {BasicPolicy, POLICY_VALIDATOR_MAP, Policy, PolicyConfig, ValidatorId} from '@models/policy';
 
 import {setAlert} from '@redux/reducers/alert';
 import {loadBinaryResource} from '@redux/services';
 
 import {loadPolicy} from '@open-policy-agent/opa-wasm';
 
-export const loadPolicies = createAsyncThunk<
-  LoadedPolicy[],
-  undefined,
-  {
-    dispatch: AppDispatch;
-    state: RootState;
-  }
->('main/loadPolicies', async (_, {dispatch}) => {
+export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', async (_, {dispatch}) => {
   try {
     const plugin = DEFAULT_TRIVY_PLUGIN;
     const wasm = loadBinaryResource('policies/bundle/policy.wasm');
@@ -26,9 +19,11 @@ export const loadPolicies = createAsyncThunk<
       throw new Error('policy not found');
     }
 
+    const validatorId: ValidatorId = uuid();
     const validator = await loadPolicy(wasm);
+    POLICY_VALIDATOR_MAP[validatorId] = validator;
 
-    return [{validator, metadata: plugin, config: DEFAULT_CONFIGURATION}];
+    return [{validatorId, metadata: plugin, config: DEFAULT_CONFIGURATION}];
   } catch (err) {
     dispatch(
       setAlert({
