@@ -3,8 +3,14 @@ name: monokle-ui-tests
 on:
   push:
     branches:
-      - fix-nightly-test
+      - andreiv1992/fix/fixing-tests
       - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - review_requested
+      - ready_for_review
 
   workflow_dispatch:
 
@@ -106,6 +112,10 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
+      - name: Install Tools
+        run: |
+          choco install curl
+
       - name: Get Node Version
         run: |
           Set-PSDebug -Trace 1
@@ -178,4 +188,4 @@ jobs:
           TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
         if: failure()
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Hi <!subteam^S02SXLUMUH0>, it seems that our ui tests failed on: https://github.com/kubeshop/monokle/actions/workflows/monokle-ui-tests.yml"}' $TEST_UI_AUTOMATION_WEBHOOK
+          curl -X POST -H "Content-type: application/json" --data "{'text':'Hi <!subteam^S02SXLUMUH0>, it seems that our ui tests failed on: https://github.com/kubeshop/monokle/actions/workflows/monokle-ui-tests.yml'}" $TEST_UI_AUTOMATION_WEBHOOK

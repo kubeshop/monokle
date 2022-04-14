@@ -38,7 +38,7 @@ test('Validate footer', async () => {
 });
 
 test('Validate logo', async () => {
-  const img = appWindow.locator("img[src*='MonokleKubeshopLogo'][src$='.svg']");
+  const img = appWindow.locator("#monokle-logo-header");
   expect(await img.count()).toBe(1);
 });
 
@@ -89,6 +89,5 @@ test('Validate notifications drawer', async () => {
 
 test.afterAll(async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
-  await appWindow.context().close();
   await appWindow.close();
 });
