@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV021
 
+import data.appshield.kubernetes.KSV021.deny
+
 import data.lib.kubernetes
 import data.lib.utils
 
@@ -51,17 +53,4 @@ getGroupIdContainers[container] {
 # equal to 10000 or if securityContext.runAsGroup is not set.
 failRunAsGroup {
 	count(getGroupIdContainers) > 0
-}
-
-deny[res] {
-	failRunAsGroup
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should set 'securityContext.runAsGroup' > 10000", [getGroupIdContainers[_], kubernetes.kind, kubernetes.name]))
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }

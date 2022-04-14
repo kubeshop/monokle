@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV015
 
+import data.appshield.kubernetes.KSV015.deny
+
 import data.lib.kubernetes
 import data.lib.utils
 
@@ -41,18 +43,4 @@ getNoRequestsCPUContainers[container] {
 # for ANY container
 failRequestsCPU {
 	count(getNoRequestsCPUContainers) > 0
-}
-
-deny[res] {
-	failRequestsCPU
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should set 'resources.requests.cpu'", [getNoRequestsCPUContainers[_], kubernetes.kind, kubernetes.name]))
-
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }

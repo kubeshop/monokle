@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV014
 
+import data.appshield.kubernetes.KSV014.deny
+
 import data.lib.kubernetes
 
 default failReadOnlyRootFilesystem = false
@@ -41,18 +43,4 @@ getNotReadOnlyRootFilesystemContainers[container] {
 # securityContext.readOnlyRootFilesystem set to false or not set at all.
 failReadOnlyRootFilesystem {
 	count(getNotReadOnlyRootFilesystemContainers) > 0
-}
-
-deny[res] {
-	failReadOnlyRootFilesystem
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should set 'securityContext.readOnlyRootFilesystem' to true", [getNotReadOnlyRootFilesystemContainers[_], kubernetes.kind, kubernetes.name]))
-
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }

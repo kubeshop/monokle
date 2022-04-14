@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV003
 
+import data.appshield.kubernetes.KSV003.deny
+
 import data.lib.kubernetes
 
 default checkCapsDropAll = false
@@ -39,18 +41,4 @@ getCapsNoDropAllContainers[container] {
 # or if capabilities drop is not specified at all.
 checkCapsDropAll {
 	count(getCapsNoDropAllContainers) > 0
-}
-
-deny[res] {
-	checkCapsDropAll
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should add 'ALL' to 'securityContext.capabilities.drop'", [getCapsNoDropAllContainers[_], kubernetes.kind, kubernetes.name]))
-
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }

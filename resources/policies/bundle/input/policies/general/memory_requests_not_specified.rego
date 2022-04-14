@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV016
 
+import data.appshield.kubernetes.KSV016.deny
+
 import data.lib.kubernetes
 import data.lib.utils
 
@@ -41,18 +43,4 @@ getNoRequestsMemoryContainers[container] {
 # for ANY container
 failRequestsMemory {
 	count(getNoRequestsMemoryContainers) > 0
-}
-
-deny[res] {
-	failRequestsMemory
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should set 'resources.requests.memory'", [getNoRequestsMemoryContainers[_], kubernetes.kind, kubernetes.name]))
-
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }

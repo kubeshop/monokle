@@ -1,5 +1,7 @@
 package appshield.kubernetes.KSV018
 
+import data.appshield.kubernetes.KSV018.deny
+
 import data.lib.kubernetes
 import data.lib.utils
 
@@ -41,17 +43,4 @@ getNoLimitsMemoryContainers[container] {
 # for ANY container
 failLimitsMemory {
 	count(getNoLimitsMemoryContainers) > 0
-}
-
-deny[res] {
-	failLimitsMemory
-
-	msg := kubernetes.format(sprintf("Container '%s' of %s '%s' should set 'resources.limits.memory'", [getNoLimitsMemoryContainers[_], kubernetes.kind, kubernetes.name]))
-	res := {
-		"msg": msg,
-		"id": __rego_metadata__.id,
-		"title": __rego_metadata__.title,
-		"severity": __rego_metadata__.severity,
-		"type": __rego_metadata__.type,
-	}
 }
