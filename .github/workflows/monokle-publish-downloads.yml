@@ -1,9 +1,10 @@
-name: monokle-sign-notarize-publish-updater
+name: monokle-sign-notarize-publish-downloads
 
 on:
   push:
     branches:
       - auto-updater
+      - erdikose/chore/add-downloads
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,7 +19,7 @@ jobs:
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: latest-version
+          tag_name: downloads
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -114,7 +115,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: 'latest-version'
+          tag: 'downloads'
           commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
@@ -152,7 +153,7 @@ jobs:
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: latest-version
+          tag_name: downloads
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -240,7 +241,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: 'latest-version'
+          tag: 'downloads'
           commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
@@ -260,7 +261,7 @@ jobs:
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: latest-version
+          tag_name: downloads
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -334,10 +335,9 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: 'latest-version'
+          tag: 'downloads'
           commit: 'auto-updater'
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
