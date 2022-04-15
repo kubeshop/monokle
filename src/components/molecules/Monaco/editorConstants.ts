@@ -2,7 +2,7 @@ import {monaco} from 'react-monaco-editor';
 
 import Colors from '@styles/Colors';
 
-export const MODEL_OWNER = 'yaml';
+export const MODEL_OWNER = 'monokle';
 
 export enum GlyphDecorationTypes {
   UnsatisfiedRef,

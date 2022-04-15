@@ -136,17 +136,51 @@ export async function applyForResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   model: monaco.editor.IModel | null
-) {
-  const refs = resource.refs;
+): Promise<{
+  newDecorations: monaco.editor.IModelDeltaDecoration[];
+  newDisposables: monaco.IDisposable[];
+  newMarkers: monaco.editor.IMarkerData[];
+}> {
+  const disposables: monaco.IDisposable[] = [];
+  const decorations: monaco.editor.IModelDeltaDecoration[] = [];
+  const markers: monaco.editor.IMarkerData[] = [];
+
+  if (model) {
+    await processSymbols(model, resource, filterResources, disposables, decorations);
+  }
+
+  const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
+  disposables.push(...refIntel.disposables);
+  decorations.push(...refIntel.decorations);
+
+  const policyIntel = applyPolicyIntel(resource);
+  decorations.push(...policyIntel.decorations);
+  markers.push(...policyIntel.markers);
+
+  return {
+    newDecorations: decorations,
+    newDisposables: disposables,
+    newMarkers: markers,
+  };
+}
+
+function applyRefIntel(
+  resource: K8sResource,
+  selectResource: (resourceId: string) => void,
+  selectFilePath: (filePath: string) => void,
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType
+): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
+  disposables: monaco.IDisposable[];
+} {
+  const refs = resource.refs ?? [];
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
 
-  if (model) {
-    await processSymbols(model, resource, filterResources, newDisposables, newDecorations);
-  }
-
-  if (!refs || refs.length === 0) {
-    return {newDecorations, newDisposables};
+  if (refs.length === 0) {
+    return {decorations: newDecorations, disposables: newDisposables};
   }
 
   const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
@@ -294,14 +328,11 @@ export async function applyForResource(
     }
   });
 
-  const {decorators: glyphDecorators, markers} = decoratePolicyIssues(resource);
-  newDecorations.push(...glyphDecorators);
-
-  return {newDecorations, newDisposables, newMarkers: markers};
+  return {decorations: newDecorations, disposables: newDisposables};
 }
 
-function decoratePolicyIssues(resource: K8sResource): {
-  decorators: monaco.editor.IModelDeltaDecoration[];
+function applyPolicyIntel(resource: K8sResource): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
   markers: monaco.editor.IMarkerData[];
 } {
   const issues = resource.issues?.errors ?? [];
@@ -360,7 +391,7 @@ function decoratePolicyIssues(resource: K8sResource): {
     })
     .filter(isDefined);
 
-  return {decorators: [...glyphs, ...inline], markers};
+  return {decorations: [...glyphs, ...inline], markers};
 }
 
 export default {

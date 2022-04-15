@@ -52,9 +52,7 @@ function useCodeIntel(
           disposablesRef.current = newDisposables;
 
           const model = editor.getModel();
-          if (model) {
-            setMarkers(model, newMarkers ?? []);
-          }
+          if (model) setMarkers(model, newMarkers);
         });
     }
   };
