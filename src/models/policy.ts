@@ -30,6 +30,9 @@ export const SarifRuleRuntype = Rt.Record({
   shortDescription: Rt.Record({
     text: Rt.String,
   }),
+  longDescription: Rt.Record({
+    text: Rt.String,
+  }),
   help: Rt.Record({
     text: Rt.String,
   }),
@@ -37,7 +40,6 @@ export const SarifRuleRuntype = Rt.Record({
   properties: Rt.Record({
     severity: Rt.String,
     entrypoint: Rt.String,
-    path: Rt.String,
   }),
 });
 
