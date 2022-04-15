@@ -68,6 +68,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV003/deny',
+        path: '$container.securityContext.capabilities.drop',
       },
     },
     {
@@ -86,6 +87,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV011/deny',
+        path: '$container.resources.limits.cpu',
       },
     },
     {
@@ -103,6 +105,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV013/deny',
+        path: '$container.image',
       },
     },
     {
@@ -120,6 +123,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV015/deny',
+        path: '$container.resources.requests.cpu',
       },
     },
     {
@@ -137,6 +141,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV016/deny',
+        path: '$container.resources.requests.memory',
       },
     },
     {
@@ -154,6 +159,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV018/deny',
+        path: '$container.resources.limits.memory',
       },
     },
     {
@@ -171,6 +177,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'medium',
         entrypoint: 'appshield/kubernetes/KSV021/deny',
+        path: '$container.securityContext.runAsGroup',
       },
     },
     {
@@ -188,6 +195,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV014/deny',
+        path: '$container.securityContext.readOnlyRootFilesystem',
       },
     },
     {
@@ -205,6 +213,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       properties: {
         severity: 'medium',
         entrypoint: 'appshield/kubernetes/KSV029/deny',
+        path: '$container.securityContext.runAsGroup',
       },
     },
   ],

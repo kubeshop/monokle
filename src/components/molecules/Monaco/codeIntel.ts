@@ -9,6 +9,8 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
+import {isDefined} from '@utils/filter';
+
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
@@ -291,7 +293,23 @@ export async function applyForResource(
     }
   });
 
+  const policyGlyphs = decoratePolicyIssues(resource);
+  newDecorations.push(...policyGlyphs);
+
   return {newDecorations, newDisposables};
+}
+
+function decoratePolicyIssues(resource: K8sResource): monaco.editor.IModelDeltaDecoration[] {
+  const issues = resource.issues?.errors ?? [];
+  const glyphs = issues.map(issue => {
+    const rule = issue.rule!;
+    const message = [
+      createMarkdownString(`__${issue.message}:__ ${rule.longDescription.text} ${rule.help.text}`),
+    ].filter(isDefined);
+
+    return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
+  });
+  return glyphs;
 }
 
 export default {

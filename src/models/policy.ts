@@ -40,6 +40,7 @@ export const SarifRuleRuntype = Rt.Record({
   properties: Rt.Record({
     severity: Rt.String,
     entrypoint: Rt.String,
+    path: Rt.Optional(Rt.String),
   }),
 });
 

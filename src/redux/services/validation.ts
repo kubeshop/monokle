@@ -1,5 +1,6 @@
 import Ajv, {ValidateFunction} from 'ajv';
-import {Document, LineCounter, ParsedNode, isCollection, parseDocument} from 'yaml';
+import {Document, LineCounter, ParsedNode, isCollection} from 'yaml';
+import {NodeBase} from 'yaml/dist/nodes/Node';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
 import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@models/policy';
@@ -68,14 +69,51 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
       ? `${rule.shortDescription.text} on container "${container}"`
       : rule.shortDescription.text;
 
+    const errorPos = container ? determineContainerErrorPos(resource, container) : {column: 1, length: 10, line: 1};
+
     return {
       message,
       description: `${rule.longDescription.text} ${rule.help.text}`,
       property: rule.id,
+      errorPos,
+      rule,
     };
   });
 
   return errors;
+}
+
+function determineContainerErrorPos(resource: K8sResource, container: string): RefPosition {
+  const supported = resource.kind === 'Deployment' || resource.kind === 'StatefulSet';
+  if (!supported) {
+    return {line: 1, column: 1, length: 10};
+  }
+
+  const prefix: Array<string | number> = ['spec', 'template', 'spec'];
+
+  const initContainers: {name: string}[] = resource.content.spec?.template?.spec?.initContainers ?? [];
+  const initContainerIndex = initContainers.findIndex(c => c.name === container);
+  if (initContainerIndex !== -1) {
+    prefix.push('initContainers', initContainerIndex);
+  }
+
+  const containers: {name: string}[] = resource.content.spec?.template?.spec?.containers ?? [];
+  const containerIndex = containers.findIndex(c => c.name === container);
+  if (containerIndex !== -1) {
+    prefix.push('containers', containerIndex);
+  }
+
+  const lineCounter = getLineCounter(resource);
+  const doc = getParsedDoc(resource);
+  const node = doc.getIn(prefix) as NodeBase | undefined;
+
+  if (!lineCounter || !node || !node.range) {
+    return {line: 1, column: 1, length: 1};
+  }
+  const start = lineCounter.linePos(node.range[0]);
+  const length = node.range[1] - node.range[0];
+
+  return {line: start.line, column: start.col, length};
 }
 
 export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {

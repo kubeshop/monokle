@@ -64,6 +64,16 @@ code {
   margin-left: 15px;
 }
 
+.monokleEditorPolicyIssueGlyphClass {
+  background-image: url('./assets/ErrorIcon.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  max-height: 10px;
+  max-width: 10px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
 .monokleEditorSatisfiedRefInlineClass {
   color: #1890ff !important;
   text-decoration: underline;
