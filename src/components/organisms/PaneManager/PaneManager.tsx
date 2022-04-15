@@ -5,7 +5,7 @@ import {activeProjectSelector} from '@redux/selectors';
 
 import featureJson from '@src/feature-flags.json';
 
-import {NewStartProjectPane} from '../NewStartProjectPane';
+import {NewRecentProjectsPane, NewStartProjectPane} from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import PaneManagerRightMenu from './PaneManagerRightMenu';
 import PaneManagerSplitView from './PaneManagerSplitView';
@@ -37,8 +37,8 @@ const PaneManager: React.FC = () => {
           <PaneManagerLeftMenu />
           <PaneManagerSplitView />
         </>
-      ) : projects.length === 0 ? (
-        <p>last project menu</p>
+      ) : projects.length > 0 ? (
+        <NewRecentProjectsPane />
       ) : (
         <NewStartProjectPane />
       )}
