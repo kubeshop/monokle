@@ -604,6 +604,12 @@ export const mainSlice = createSlice({
         previewConfigurationId: undefined,
       };
     },
+    clearSelected: (state: Draft<AppState>) => {
+      state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
+      state.selectedValuesFileId = undefined;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1126,5 +1132,6 @@ export const {
   openPreviewConfigurationEditor,
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,
+  clearSelected,
 } = mainSlice.actions;
 export default mainSlice.reducer;

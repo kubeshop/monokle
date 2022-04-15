@@ -6,6 +6,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {clearSelected, selectFile} from '@redux/reducers/main';
 
 export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'main/deletePreviewConfiguration',
@@ -16,6 +17,17 @@ export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispat
     if (!previewConfigurationMap) {
       return;
     }
+
+    if (state.main.selectedPreviewConfigurationId === previewConfigurationId) {
+      const previewConfiguration = previewConfigurationMap[previewConfigurationId];
+      const helmChartFilePath = previewConfiguration?.helmChartFilePath;
+      if (helmChartFilePath) {
+        thunkAPI.dispatch(selectFile({filePath: helmChartFilePath}));
+      } else {
+        thunkAPI.dispatch(clearSelected());
+      }
+    }
+
     const previewConfigurationMapCopy = cloneDeep(previewConfigurationMap);
     previewConfigurationMapCopy[previewConfigurationId] = null;
 
