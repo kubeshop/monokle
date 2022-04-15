@@ -1,22 +1,13 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
-import fs from 'fs';
 import {debounce} from 'lodash';
-import path from 'path';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
-import {InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
-import {getHelmValueRanges, getObjectKeys} from '@molecules/Monaco/helmCodeIntel';
-
-import {parseAllYamlDocuments} from '@utils/yaml';
-
 import codeIntel from './codeIntel';
-import {clearDecorations, createInlineDecoration, createLinkProvider, setDecorations, setMarkers} from './editorHelpers';
+import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
   editor: monaco.editor.IStandaloneCodeEditor | null;
@@ -69,7 +60,6 @@ function useCodeIntel(props: CodeIntelProps) {
     if (!editor) {
       return;
     }
-    const {helmNewDisposables, helmNewDecorations} = helmCodeIntel();
     if (selectedResource) {
       codeIntel
         .applyForResource(
@@ -83,56 +73,24 @@ function useCodeIntel(props: CodeIntelProps) {
           editor.getModel()
         )
         .then(({newDecorations, newDisposables, newMarkers}) => {
-          idsOfDecorationsRef.current = setDecorations(editor, [...newDecorations, ...helmNewDecorations]);
-          disposablesRef.current = [...newDisposables, ...helmNewDisposables];
+          idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+          disposablesRef.current = newDisposables;
 
           const model = editor.getModel();
           if (model) setMarkers(model, newMarkers);
         });
-    } else if (currentFile?.helmChartId) {
+    } else if (currentFile?.helmChartId && code) {
+      const {helmNewDisposables, helmNewDecorations} = codeIntel.applyForHelmFile({
+        code,
+        currentFile,
+        helmChartMap,
+        helmValuesMap,
+        selectFilePath,
+        fileMap,
+      });
       idsOfDecorationsRef.current = setDecorations(editor, helmNewDecorations);
       disposablesRef.current = helmNewDisposables;
     }
-  };
-
-  const helmCodeIntel = () => {
-    const helmNewDecorations: monaco.editor.IModelDeltaDecoration[] = [];
-    const helmNewDisposables: monaco.IDisposable[] = [];
-    const helmValueRanges = getHelmValueRanges(code);
-
-    if (!helmValueRanges.length || !helmValuesMap || !helmChartMap || !currentFile) {
-      return {helmNewDisposables, helmNewDecorations};
-    }
-
-    const validKeyPaths: string[] = [];
-    const fileHelmChart = helmChartMap[currentFile.helmChartId as string];
-    const valueFilePaths = fileHelmChart.valueFileIds.map(valueFileId => helmValuesMap[valueFileId].filePath);
-
-    valueFilePaths.forEach(valueFilePath => {
-      const valueFileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, valueFilePath), 'utf8');
-      const documents = parseAllYamlDocuments(valueFileContent);
-      documents.forEach(doc => {
-        validKeyPaths.push(...getObjectKeys(doc.toJS(), '.Values.'));
-      });
-    });
-
-    // log.info('helmValueRanges', helmValueRanges);
-    helmValueRanges.forEach(helmValueRange => {
-      const canFindKeyInValuesFile = validKeyPaths.includes(helmValueRange.value);
-      helmNewDecorations.push(
-        createInlineDecoration(
-          helmValueRange.range,
-          canFindKeyInValuesFile ? InlineDecorationTypes.SatisfiedRef : InlineDecorationTypes.UnsatisfiedRef
-        )
-      );
-
-      const linkDisposable = createLinkProvider(helmValueRange.range, 'aaa', () => {
-        selectFilePath(valueFilePaths[0]);
-      });
-      helmNewDisposables.push(linkDisposable);
-    });
-
-    return {helmNewDisposables, helmNewDecorations};
   };
 
   const debouncedUpdate = debounce(() => {

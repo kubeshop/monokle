@@ -1,13 +1,22 @@
 import {monaco} from 'react-monaco-editor';
 
-import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import fs from 'fs';
+import path from 'path';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
 import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
+import {getHelmValueRanges, getObjectKeys} from '@molecules/Monaco/helmCodeIntel';
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {isDefined} from '@utils/filter';
 
@@ -371,7 +380,66 @@ function applyPolicyIntel(resource: K8sResource): {
   return {decorations: [...glyphs], markers};
 }
 
+interface ApplyHelmFileArgs {
+  code: string;
+  currentFile: FileEntry;
+  helmChartMap?: HelmChartMapType;
+  helmValuesMap?: HelmValuesMapType;
+  selectFilePath: (filePath: string) => void;
+  fileMap: FileMapType;
+}
+
+const applyForHelmFile = ({
+  code,
+  currentFile,
+  helmChartMap,
+  helmValuesMap,
+  selectFilePath,
+  fileMap,
+}: ApplyHelmFileArgs) => {
+  const helmNewDecorations: monaco.editor.IModelDeltaDecoration[] = [];
+  const helmNewDisposables: monaco.IDisposable[] = [];
+  const helmValueRanges = getHelmValueRanges(code);
+
+  if (!helmValueRanges.length || !helmValuesMap || !helmChartMap || !currentFile) {
+    return {helmNewDisposables, helmNewDecorations};
+  }
+
+  const validKeyPaths: string[] = [];
+  const fileHelmChart = helmChartMap[currentFile.helmChartId as string];
+  const valueFilePaths = fileHelmChart.valueFileIds.map(valueFileId => helmValuesMap[valueFileId].filePath);
+
+  valueFilePaths.forEach(valueFilePath => {
+    const valueFileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, valueFilePath), 'utf8');
+    const documents = parseAllYamlDocuments(valueFileContent);
+    documents.forEach(doc => {
+      validKeyPaths.push(...getObjectKeys(doc.toJS(), '.Values.'));
+    });
+  });
+
+  helmValueRanges.forEach(helmValueRange => {
+    const canFindKeyInValuesFile = validKeyPaths.includes(helmValueRange.value);
+    helmNewDecorations.push(
+      createInlineDecoration(
+        helmValueRange.range,
+        canFindKeyInValuesFile ? InlineDecorationTypes.SatisfiedRef : InlineDecorationTypes.UnsatisfiedRef
+      )
+    );
+
+    const tooltip = canFindKeyInValuesFile
+      ? 'Go to helm values file'
+      : 'We cannot find the value in the helm values file';
+    const linkDisposable = createLinkProvider(helmValueRange.range, tooltip, () => {
+      selectFilePath(valueFilePaths[0]);
+    });
+    helmNewDisposables.push(linkDisposable);
+  });
+
+  return {helmNewDisposables, helmNewDecorations};
+};
+
 export default {
   applyForResource,
+  applyForHelmFile,
   applyAutocomplete,
 };
