@@ -87,6 +87,7 @@ export const updateFileEntry = createAsyncThunk(
               mainState.resourceRefsProcessingOptions,
               {
                 resourceKinds: extractedResources.map(r => r.kind),
+                policyPlugins: [],
               }
             );
           }

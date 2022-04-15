@@ -52,6 +52,9 @@ interface K8sResource {
   };
   /** result of schema validation */
   validation?: ResourceValidation;
+
+  /** result of policy validation */
+  issues?: ResourceValidation;
 }
 
 export enum ResourceRefType {

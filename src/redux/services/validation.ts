@@ -2,6 +2,7 @@ import Ajv, {ValidateFunction} from 'ajv';
 import {Document, LineCounter, ParsedNode, isCollection, parseDocument} from 'yaml';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
+import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@models/policy';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
@@ -40,6 +41,41 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
     column: linePos.col,
     length: valueNode.range[1] - valueNode.range[0],
   };
+}
+
+export function validatePolicies(resource: K8sResource, policies: Policy[]): ResourceValidationError[] {
+  const allErrors = policies
+    .filter(policy => policy.config.enabled && policy.validatorId)
+    .flatMap(policy => {
+      return policy.metadata.rules.flatMap(rule => {
+        const errors = validatePolicyRule(resource, policy, rule);
+        return errors;
+      });
+    });
+
+  return allErrors;
+}
+
+export function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRule): ResourceValidationError[] {
+  const validator = POLICY_VALIDATOR_MAP[policy.validatorId!];
+  const evaluation = validator.evaluate(resource.content, rule.properties.entrypoint);
+  const violations = evaluation[0]?.result ?? [];
+  const errors = violations.map((err: {msg?: string}): ResourceValidationError => {
+    // Needs a better generic solution
+    const regexMatch = err.msg?.match(/Container '([A-Za-z-]*)'/);
+    const container = regexMatch ? regexMatch[1] : undefined;
+    const message = container
+      ? `${rule.shortDescription.text} on container "${container}"`
+      : rule.shortDescription.text;
+
+    return {
+      message,
+      description: `${rule.longDescription.text} ${rule.help.text}`,
+      property: rule.id,
+    };
+  });
+
+  return errors;
 }
 
 export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {

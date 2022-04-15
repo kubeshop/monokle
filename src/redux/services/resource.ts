@@ -19,6 +19,7 @@ import {
 import {ClusterAccess} from '@models/appconfig';
 import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
+import {Policy} from '@models/policy';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
@@ -38,7 +39,7 @@ import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {processRefs} from './resourceRefs';
-import {validateResource} from './validation';
+import {validatePolicies, validateResource} from './validation';
 
 /**
  * Parse documents lazily...
@@ -453,6 +454,7 @@ export function reprocessResources(
   processingOptions: ResourceRefsProcessingOptions,
   options?: {
     resourceKinds?: string[];
+    policyPlugins: Policy[];
   }
 ) {
   if (resourceIds.length === 0) {
@@ -499,6 +501,7 @@ export function reprocessResources(
   processResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
+    policyPlugins: options?.policyPlugins,
   });
 
   // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
@@ -514,30 +517,52 @@ export function processResources(
   userHomeDir: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
-  options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
+  options?: {
+    resourceIds?: string[];
+    resourceKinds?: string[];
+    skipValidation?: boolean;
+    policyPlugins?: Policy[];
+  }
 ) {
-  if (!options?.skipValidation) {
-    if (options && options.resourceIds && options.resourceIds.length > 0) {
+  const resourceIds = options?.resourceIds ?? [];
+  const resourceKinds = options?.resourceKinds ?? [];
+  const skipValidation = options?.skipValidation ?? false;
+  const policies = options?.policyPlugins ?? [];
+
+  if (!skipValidation) {
+    if (resourceIds.length > 0) {
       Object.values(resourceMap)
-        .filter(r => options.resourceIds?.includes(r.id))
+        .filter(r => resourceIds.includes(r.id))
         .forEach(resource => {
           validateResource(resource, schemaVersion, userHomeDir);
         });
+
+      Object.values(resourceMap)
+        .filter(r => resourceIds.includes(r.id))
+        .forEach(resource => {
+          const errors = validatePolicies(resource, policies);
+          resource.issues = {errors, isValid: errors.length === 0};
+        });
     }
 
-    if (options && options.resourceKinds && options.resourceKinds.length > 0) {
+    if (resourceKinds.length > 0) {
       Object.values(resourceMap)
-        .filter(r => options.resourceKinds?.includes(r.kind))
+        .filter(r => resourceKinds.includes(r.kind))
         .forEach(resource => {
-          if (!options.resourceIds || !options.resourceIds.includes(resource.id)) {
+          if (!resourceIds.includes(resource.id)) {
             validateResource(resource, schemaVersion, userHomeDir);
           }
         });
     }
 
-    if (!options || (!options.resourceIds && !options.resourceKinds)) {
+    if (resourceIds.length === 0 && resourceKinds.length === 0) {
       Object.values(resourceMap).forEach(resource => {
         validateResource(resource, schemaVersion, userHomeDir);
+      });
+
+      Object.values(resourceMap).forEach(resource => {
+        const errors = validatePolicies(resource, policies);
+        resource.issues = {errors, isValid: errors.length === 0};
       });
     }
   }
