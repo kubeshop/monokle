@@ -8,9 +8,15 @@ import {BasicPolicy, POLICY_VALIDATOR_MAP, Policy, PolicyConfig, ValidatorId} fr
 import {setAlert} from '@redux/reducers/alert';
 import {loadBinaryResource} from '@redux/services';
 
+import featureJson from '@src/feature-flags.json';
+
 import {loadPolicy} from '@open-policy-agent/opa-wasm';
 
 export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', async (_, {dispatch}) => {
+  if (!featureJson.ResourceScanning) {
+    return [];
+  }
+
   try {
     const plugin = DEFAULT_TRIVY_PLUGIN;
     const wasm = loadBinaryResource('policies/bundle/policy.wasm');
