@@ -102,7 +102,7 @@ function WarningsAndErrorsDisplay() {
   }, [resources]);
 
   const errors = useMemo(() => {
-    const errorsCollection: Warning[] = resources
+    const schemaWarnings: Warning[] = resources
       .map(resource => {
         if (resource.validation && !resource.validation.isValid) {
           return {
@@ -117,7 +117,21 @@ function WarningsAndErrorsDisplay() {
       })
       .filter(isDefined);
 
-    return sortWarnings(errorsCollection);
+    const policyWarnings: Warning[] = resources
+      .map((resource): Warning | null => {
+        return resource.issues && !resource.issues.isValid
+          ? {
+              id: resource.id,
+              type: resource.kind,
+              name: resource.name,
+              count: resource.issues.errors.length,
+              namespace: resource.namespace,
+            }
+          : null;
+      })
+      .filter(isDefined);
+
+    return sortWarnings([...schemaWarnings, ...policyWarnings]);
   }, [resources]);
 
   const warningsCount = useMemo(() => countResourceWarnings(resources), [resources]);

@@ -4,14 +4,17 @@ import {K8sResource} from '@models/k8sresource';
 
 import Icon from '@atoms/Icon';
 
+import {countResourceErrors} from '@utils/resources';
+
 import Colors from '@styles/Colors';
 
 import ErrorsPopoverContent from './ErrorsPopoverContent';
 
 const ResourceRefsIconPopover = (props: {resource: K8sResource; isDisabled: boolean; isSelected: boolean}) => {
   const {resource, isDisabled, isSelected} = props;
+  const errorCount = countResourceErrors([resource]);
 
-  if (isDisabled || resource.validation?.isValid) {
+  if (isDisabled || errorCount === 0) {
     return null;
   }
 
