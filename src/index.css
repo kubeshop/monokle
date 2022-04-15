@@ -74,6 +74,11 @@ code {
   margin-left: 15px;
 }
 
+.monokleEditorPolicyIssueInlineClass {
+  color: #e65a6d !important;
+  text-decoration: underline;
+}
+
 .monokleEditorSatisfiedRefInlineClass {
   color: #1890ff !important;
   text-decoration: underline;

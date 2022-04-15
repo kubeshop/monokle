@@ -111,9 +111,10 @@ function determineContainerErrorPos(resource: K8sResource, container: string): R
     return {line: 1, column: 1, length: 1};
   }
   const start = lineCounter.linePos(node.range[0]);
+  const end = lineCounter.linePos(node.range[1]);
   const length = node.range[1] - node.range[0];
 
-  return {line: start.line, column: start.col, length};
+  return {line: start.line, column: start.col, length, endLine: end.line, endColumn: end.col};
 }
 
 export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {

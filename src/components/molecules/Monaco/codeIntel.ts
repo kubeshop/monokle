@@ -22,6 +22,7 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
+  createMarker,
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
@@ -293,14 +294,18 @@ export async function applyForResource(
     }
   });
 
-  const policyGlyphs = decoratePolicyIssues(resource);
-  newDecorations.push(...policyGlyphs);
+  const {decorators: glyphDecorators, markers} = decoratePolicyIssues(resource);
+  newDecorations.push(...glyphDecorators);
 
-  return {newDecorations, newDisposables};
+  return {newDecorations, newDisposables, newMarkers: markers};
 }
 
-function decoratePolicyIssues(resource: K8sResource): monaco.editor.IModelDeltaDecoration[] {
+function decoratePolicyIssues(resource: K8sResource): {
+  decorators: monaco.editor.IModelDeltaDecoration[];
+  markers: monaco.editor.IMarkerData[];
+} {
   const issues = resource.issues?.errors ?? [];
+
   const glyphs = issues.map(issue => {
     const rule = issue.rule!;
     const message = [
@@ -309,7 +314,53 @@ function decoratePolicyIssues(resource: K8sResource): monaco.editor.IModelDeltaD
 
     return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
   });
-  return glyphs;
+
+  const inline: monaco.editor.IModelDeltaDecoration[] = [];
+  // const inline = issues
+  //   .map(issue => {
+  //     if (
+  //       !issue.errorPos ||
+  //       issue.errorPos.line === 1 ||
+  //       issue.errorPos.endLine === undefined ||
+  //       issue.errorPos.endColumn === undefined
+  //     ) {
+  //       return undefined;
+  //     }
+
+  //     const range = new monaco.Range(
+  //       issue.errorPos.line,
+  //       issue.errorPos.column,
+  //       issue.errorPos.endLine,
+  //       issue.errorPos.endColumn
+  //     );
+
+  //     return createInlineDecoration(range, InlineDecorationTypes.PolicyIssue);
+  //   })
+  //   .filter(isDefined);
+
+  const markers = issues
+    .map(issue => {
+      if (
+        !issue.errorPos ||
+        issue.errorPos.line === 1 ||
+        issue.errorPos.endLine === undefined ||
+        issue.errorPos.endColumn === undefined
+      ) {
+        return undefined;
+      }
+
+      const range = new monaco.Range(
+        issue.errorPos.line,
+        issue.errorPos.column,
+        issue.errorPos.endLine,
+        issue.errorPos.endColumn
+      );
+
+      return createMarker(issue.message, range);
+    })
+    .filter(isDefined);
+
+  return {decorators: [...glyphs, ...inline], markers};
 }
 
 export default {

@@ -9,6 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 import {
   GlyphDecorationTypes,
   InlineDecorationTypes,
+  MODEL_OWNER,
   getGlyphDecorationOptions,
   getInlineDecorationOptions,
 } from './editorConstants';
@@ -23,6 +24,21 @@ export function setDecorations(
   idsOfOldDecorations: string[] = []
 ) {
   return editor.deltaDecorations(idsOfOldDecorations, newDecorations);
+}
+
+export function createMarker(message: string, range: monaco.Range): monaco.editor.IMarkerData {
+  return {
+    message,
+    startLineNumber: range.startLineNumber,
+    startColumn: range.startColumn,
+    endLineNumber: range.endLineNumber,
+    endColumn: range.endColumn,
+    severity: monaco.MarkerSeverity.Error,
+  };
+}
+
+export function setMarkers(model: monaco.editor.ITextModel, markers: monaco.editor.IMarkerData[]) {
+  return monaco.editor.setModelMarkers(model, MODEL_OWNER, markers);
 }
 
 export function createGlyphDecoration(

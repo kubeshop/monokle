@@ -94,6 +94,8 @@ interface RefPosition {
   line: number;
   column: number;
   length: number;
+  endLine?: number;
+  endColumn?: number;
 }
 
 export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};
