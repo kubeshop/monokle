@@ -56,7 +56,7 @@ export function validatePolicies(resource: K8sResource, policies: Policy[]): Res
   return allErrors;
 }
 
-export function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRule): ResourceValidationError[] {
+function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRule): ResourceValidationError[] {
   const validator = POLICY_VALIDATOR_MAP[policy.validatorId!];
   const evaluation = validator.evaluate(resource.content, rule.properties.entrypoint);
   const violations = evaluation[0]?.result ?? [];
@@ -95,7 +95,7 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
   }
 
   // parse for YAML errors that were allowed by non-strict parsing
-  const doc = parseDocument(resource.text);
+  const doc = getParsedDoc(resource, {forceParse: true});
   if (doc.errors.length > 0) {
     const lines = resource.text.split('\n');
     if (lines[0] === '---') {

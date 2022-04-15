@@ -58,15 +58,17 @@ type ParsedDocCacheEntry = {
 
 const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
 
-export function getParsedDoc(resource: K8sResource) {
-  if (!parsedDocCache.has(resource.id)) {
+export function getParsedDoc(resource: K8sResource, options?: {forceParse?: boolean}): Document.Parsed<ParsedNode> {
+  const forceParse = options?.forceParse ?? false;
+
+  if (forceParse || !parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
     const parsedDoc = parseYamlDocument(resource.text, lineCounter);
     parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
   const cacheEntry = parsedDocCache.get(resource.id);
-  return cacheEntry ? cacheEntry.parsedDoc : undefined;
+  return cacheEntry!.parsedDoc;
 }
 
 export function getLineCounter(resource: K8sResource) {
@@ -512,63 +514,70 @@ export function reprocessResources(
  * Establishes refs for all resources in specified resourceMap
  */
 
+type ValidationOptions = {
+  skipValidation?: boolean;
+  resourceIds?: string[];
+  resourceKinds?: string[];
+  policyPlugins?: Policy[];
+};
+
 export function processResources(
   schemaVersion: string,
   userHomeDir: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
-  options?: {
-    resourceIds?: string[];
-    resourceKinds?: string[];
-    skipValidation?: boolean;
-    policyPlugins?: Policy[];
-  }
+  options?: ValidationOptions
 ) {
-  const resourceIds = options?.resourceIds ?? [];
-  const resourceKinds = options?.resourceKinds ?? [];
-  const skipValidation = options?.skipValidation ?? false;
-  const policies = options?.policyPlugins ?? [];
+  const {current, other} = decideResourcesToValidate(resourceMap, options);
 
-  if (!skipValidation) {
-    if (resourceIds.length > 0) {
-      Object.values(resourceMap)
-        .filter(r => resourceIds.includes(r.id))
-        .forEach(resource => {
-          validateResource(resource, schemaVersion, userHomeDir);
-        });
-
-      Object.values(resourceMap)
-        .filter(r => resourceIds.includes(r.id))
-        .forEach(resource => {
-          const errors = validatePolicies(resource, policies);
-          resource.issues = {errors, isValid: errors.length === 0};
-        });
-    }
-
-    if (resourceKinds.length > 0) {
-      Object.values(resourceMap)
-        .filter(r => resourceKinds.includes(r.kind))
-        .forEach(resource => {
-          if (!resourceIds.includes(resource.id)) {
-            validateResource(resource, schemaVersion, userHomeDir);
-          }
-        });
-    }
-
-    if (resourceIds.length === 0 && resourceKinds.length === 0) {
-      Object.values(resourceMap).forEach(resource => {
-        validateResource(resource, schemaVersion, userHomeDir);
-      });
-
-      Object.values(resourceMap).forEach(resource => {
-        const errors = validatePolicies(resource, policies);
-        resource.issues = {errors, isValid: errors.length === 0};
-      });
-    }
+  if (current) {
+    validateResource(current, schemaVersion, userHomeDir);
+    const issues = validatePolicies(current, options?.policyPlugins ?? []);
+    current.issues = {errors: issues, isValid: issues.length === 0};
   }
+  other.forEach(resource => validateResource(resource, schemaVersion, userHomeDir));
+
+  if (!current) {
+    // skip validating policies of other resources when users are editing.
+    other.forEach(resource => {
+      const issues = validatePolicies(resource, options?.policyPlugins ?? []);
+      resource.issues = {errors: issues, isValid: issues.length === 0};
+    });
+  }
+
   const timestamp = Date.now();
   processRefs(resourceMap, processingOptions, options);
   log.info(`processing refs took ${Date.now() - timestamp}`, options);
+}
+
+function decideResourcesToValidate(
+  resourceMap: ResourceMapType,
+  options?: ValidationOptions
+): {current: K8sResource | undefined; other: K8sResource[]} {
+  const skipValidation = options?.skipValidation ?? false;
+
+  if (skipValidation) {
+    return {current: undefined, other: []};
+  }
+
+  const resourceIds = options?.resourceIds ?? [];
+  const resourceKinds = options?.resourceKinds ?? [];
+  const allResources = Object.values(resourceMap);
+
+  if (resourceIds.length === 0 && resourceKinds.length === 0) {
+    return {current: undefined, other: allResources};
+  }
+
+  const [currentId, ...relatedIds] = resourceIds;
+  const current = resourceMap[currentId];
+  const otherSet = new Set<K8sResource>();
+
+  relatedIds.forEach(id => {
+    otherSet.add(resourceMap[id]);
+  });
+  allResources.filter(r => resourceKinds.includes(r.kind)).forEach(r => otherSet.add(r));
+
+  return {current, other: Array.from(otherSet)};
 }
 
 /**
