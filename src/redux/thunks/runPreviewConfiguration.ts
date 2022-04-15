@@ -76,7 +76,7 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const orderedValuesFilePaths = sortBy(
     Object.values(previewConfiguration.valuesFileItemMap).filter(
-      (item): item is PreviewConfigValuesFileItem => item != null
+      (item): item is PreviewConfigValuesFileItem => item != null && item.isChecked
     ),
     ['order']
   ).map(i => i.filePath);
