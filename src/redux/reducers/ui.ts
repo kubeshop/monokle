@@ -241,7 +241,7 @@ export const uiSlice = createSlice({
       state.isAboutModalOpen = false;
     },
     cancelWalkThrough: (state: Draft<UiState>) => {
-      state.walkThrough.currentStep = 0;
+      state.walkThrough.currentStep = -1;
     },
     handleWalkThroughStep: (state: Draft<UiState>, action: PayloadAction<number>) => {
       state.walkThrough.currentStep += action.payload;

@@ -36,6 +36,7 @@ import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
+import {StepEnum} from '@components/molecules/WalkThrough/WalkThrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -183,16 +184,15 @@ const App = () => {
       if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
-        dispatch(handleWalkThroughStep(1));
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
-  }, [appVersion]);
+    dispatch(handleWalkThroughStep(StepEnum.Next));
+  }, [appVersion, dispatch]);
 
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {

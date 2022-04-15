@@ -197,7 +197,7 @@ const initialUiState: UiState = {
     connectToCluster: false,
   },
   walkThrough: {
-    currentStep: 0,
+    currentStep: -1,
   },
 };
 

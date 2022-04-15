@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 
-import {Button, Popover, Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import {SwapOutlined} from '@ant-design/icons';
 
@@ -15,7 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openClusterDiff} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {WalkThrough, WalkThroughTitle, wkContent} from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/WalkThrough';
 
 interface IProps {
   navigatorPaneWidth: number;
@@ -27,7 +27,6 @@ const ClusterCompareButton: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
   const onClickClusterComparison = () => {
@@ -46,13 +45,7 @@ const ClusterCompareButton: React.FC<IProps> = props => {
       }
       placement="bottom"
     >
-      <Popover
-        placement="leftTop"
-        content={<WalkThrough walkThrough={wkContent.stepCluster} />}
-        title={<WalkThroughTitle title={wkContent.stepCluster.title} />}
-        visible={walkThroughStep === wkContent.stepCluster.currentStep}
-        overlayClassName="walkthrough"
-      >
+      <WalkThrough placement="leftTop" step="cluster">
         <Button
           onClick={onClickClusterComparison}
           icon={<SwapOutlined />}
@@ -64,7 +57,7 @@ const ClusterCompareButton: React.FC<IProps> = props => {
         >
           {navigatorPaneWidth < 400 ? '' : 'Cluster Compare'}
         </Button>
-      </Popover>
+      </WalkThrough>
     </Tooltip>
   );
 };

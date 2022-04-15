@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
-import {Popover, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
@@ -12,7 +12,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
-import {WalkThrough, WalkThroughTitle, wkContent} from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/WalkThrough';
 
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
@@ -36,7 +36,6 @@ const PaneManagerLeftMenu: React.FC = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kustomizations = useAppSelector(kustomizationsSelector);
-  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -135,13 +134,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         title={leftMenuSelection === 'helm-pane' && leftActive ? 'Hide Helm Charts' : 'View Helm Charts'}
         placement="right"
       >
-        <Popover
-          placement="rightTop"
-          title={<WalkThroughTitle title={wkContent.stepKustomizeHelm.title} />}
-          content={<WalkThrough walkThrough={wkContent.stepKustomizeHelm} />}
-          visible={walkThroughStep === wkContent.stepKustomizeHelm.currentStep}
-          overlayClassName="walkthrough"
-        >
+        <WalkThrough placement="rightTop" step="kustomizeHelm">
           <MenuButton
             id="helm-pane"
             isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
@@ -163,7 +156,7 @@ const PaneManagerLeftMenu: React.FC = () => {
               />
             </S.Badge>
           </MenuButton>
-        </Popover>
+        </WalkThrough>
       </Tooltip>
 
       <Tooltip

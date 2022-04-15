@@ -4,7 +4,7 @@ import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'reac
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Button, Popover, Tabs, Tooltip} from 'antd';
+import {Button, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
@@ -65,7 +65,7 @@ import {
 
 import {Icon, TabHeader} from '@atoms';
 
-import {WalkThrough, WalkThroughTitle, wkContent} from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/WalkThrough';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -109,7 +109,6 @@ const ActionsPane: React.FC<IProps> = props => {
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
-  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
   const selectedPreviewConfiguration = useAppSelector(state => {
     if (!selectedPreviewConfigurationId) {
       return undefined;
@@ -541,15 +540,9 @@ const ActionsPane: React.FC<IProps> = props => {
             <TabPane
               key="source"
               tab={
-                <Popover
-                  placement="leftTop"
-                  overlayClassName="walkthrough"
-                  content={<WalkThrough walkThrough={wkContent.stepSyntax} />}
-                  title={<WalkThroughTitle title={wkContent.stepSyntax.title} />}
-                  visible={walkThroughStep === wkContent.stepSyntax.currentStep}
-                >
+                <WalkThrough placement="leftTop" step="syntax">
                   <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
-                </Popover>
+                </WalkThrough>
               }
             >
               {isFolderLoading || previewLoader.isLoading ? (
