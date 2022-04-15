@@ -1,26 +1,24 @@
 import {useMemo} from 'react';
 
-import {Popover} from 'antd';
+import {Popover, PopoverProps} from 'antd';
 
 import {CloseOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkThrough, handleWalkThroughStep} from '@redux/reducers/ui';
 
+import {StepEnum, WalkThroughContentProps, WalkThroughStep} from './types';
 import {walkThroughContent} from './walkThroughContent';
 
 import * as S from './styled';
 
-export enum StepEnum {
-  Previous = -1,
-  Next = 1,
-}
-
-type WalkThroughTitleProps = {
-  title: string;
+type WalkThroughProps = {
+  step: WalkThroughStep;
+  children: React.ReactNode;
+  placement?: PopoverProps['placement'];
 };
 
-const WalkThroughTitle = (props: WalkThroughTitleProps) => {
+const WalkThroughTitle = (props: {title: string}) => {
   const {title} = props;
   const dispatch = useAppDispatch();
 
@@ -34,14 +32,6 @@ const WalkThroughTitle = (props: WalkThroughTitleProps) => {
       <S.CloseButton onClick={handleClose} icon={<CloseOutlined />} />
     </>
   );
-};
-
-type WalkThroughContentProps = {
-  currentStep: number;
-  data: {
-    content: string;
-    step: string;
-  };
 };
 
 const WalkThroughContent = (props: WalkThroughContentProps) => {
@@ -69,12 +59,6 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
       </S.FlexContainer>
     </>
   );
-};
-
-type WalkThroughProps = {
-  step: 'template' | 'resource' | 'syntax' | 'cluster' | 'kustomizeHelm';
-  children: React.ReactNode;
-  placement?: any; // TODO: update it
 };
 
 const WalkThrough = (props: WalkThroughProps) => {

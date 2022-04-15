@@ -1,4 +1,6 @@
-export const walkThroughContent = [
+import {WalkThroughContentProps} from './types';
+
+export const walkThroughContent: WalkThroughContentProps['data'][] = [
   {
     step: 'template',
     title: 'From scratch or from a template',

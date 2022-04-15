@@ -36,7 +36,7 @@ import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
-import {StepEnum} from '@components/molecules/WalkThrough/WalkThrough';
+import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
