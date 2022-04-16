@@ -2,8 +2,6 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import StartBackgrojnd from '@assets/StartBackground.svg';
 
 import Colors from '@styles/Colors';
@@ -84,15 +82,6 @@ export const Container = styled.div`
   height: 100%;
   display: grid;
   grid-template-rows: max-content 1fr;
-`;
-
-export const ProjectsContainer = styled.div`
-  padding: 8px 12px;
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-
-  ${GlobalScrollbarStyle}
 `;
 
 export const ProjectLastOpened = styled.div`

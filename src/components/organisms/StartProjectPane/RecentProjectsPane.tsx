@@ -15,6 +15,8 @@ import {activeProjectSelector} from '@redux/selectors';
 
 import {TitleBar} from '@molecules';
 
+import {ProjectsContainer} from './NewRecentProjectsPane';
+
 import * as S from './styled';
 
 const RecentProjectsPane = () => {
@@ -72,7 +74,7 @@ const RecentProjectsPane = () => {
         <S.Container>
           <TitleBar title="Recent Projects" />
 
-          <S.ProjectsContainer>
+          <ProjectsContainer>
             {projects.map((project: Project) => {
               const isActivePropject = project.rootFolder === activeProject?.rootFolder;
               return (
@@ -93,7 +95,7 @@ const RecentProjectsPane = () => {
                 </S.ProjectItem>
               );
             })}
-          </S.ProjectsContainer>
+          </ProjectsContainer>
         </S.Container>
       </ResizableBox>
     </S.RecentProjectsPaneContainer>

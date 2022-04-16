@@ -1,7 +1,5 @@
 import {Button} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-
 import styled from 'styled-components';
 
 import CreateFromTemplate from '@assets/CreateFromTemplate.svg';
@@ -10,27 +8,10 @@ import SelectFolder from '@assets/SelectFolder.svg';
 
 import Colors from '@styles/Colors';
 
+import Guide from './Guide';
+
 const Container = styled.div`
   grid-column: 1 / -1;
-`;
-
-const GuideContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin: 10px 0;
-`;
-
-const GuideItem = styled.span`
-  margin: 0 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: ${Colors.blue7};
-  :hover {
-    text-decoration: underline;
-  }
 `;
 
 const InformationMessage = styled.div`
@@ -108,12 +89,7 @@ const StartProjectItemButton = styled(Button)`
 const NewStartProjectPane = () => {
   return (
     <Container>
-      <GuideContainer>
-        <ExclamationCircleOutlined />
-        <GuideItem>Read a quick start guide</GuideItem>
-        <GuideItem>Watch a 3 minute video tutorial</GuideItem>
-        <GuideItem>Documentation</GuideItem>
-      </GuideContainer>
+      <Guide />
       <InformationMessage>Choose your way to start your first project:</InformationMessage>
       <StartProjectContainer>
         <StartProjectItem>
