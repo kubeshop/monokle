@@ -2,7 +2,7 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors, {PanelColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
 export const StyledButton = styled(Button)<{$hasGradientBackground: boolean; $showOpenArrow: boolean}>`
   display: flex;
@@ -10,14 +10,14 @@ export const StyledButton = styled(Button)<{$hasGradientBackground: boolean; $sh
   justify-content: center;
   position: relative;
   border-radius: 0px;
+  transition: none;
 
   ${props => {
-    if (!props.$showOpenArrow) {
-      return ` background-color: ${PanelColors.toolBar} !important;
-            `;
-    }
     if (props.$showOpenArrow) {
       return `
+      &:hover, &:active, &:focus {
+        background-color: transparent;
+      }
       &:hover {
         &: after {
           position: absolute;
@@ -41,10 +41,6 @@ export const StyledButton = styled(Button)<{$hasGradientBackground: boolean; $sh
       }`;
     }
   }}
-
-  & .anticon {
-    transition: all 0.2s ease-in;
-  }
 
   ${props => `
     &:hover {
