@@ -16,6 +16,11 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
+      if (!kubeConfigPath.trim().length) {
+        setNamespaces([]);
+        return;
+      }
+
       let clusterNamespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
       clusterNamespaces.sort((a, b) => {
         if (a === 'default') {
