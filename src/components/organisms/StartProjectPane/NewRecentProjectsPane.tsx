@@ -19,7 +19,10 @@ import Guide from './Guide';
 import * as S from './styled';
 
 const Container = styled.div`
-  grid-column: 1 / -1;
+  width: 100vw;
+  height: calc(100vh - 47px);
+  display: grid;
+  grid-template-rows: 20px calc(100vh - 307px) 240px;
 `;
 
 export const ProjectsContainer = styled.div`
@@ -27,15 +30,15 @@ export const ProjectsContainer = styled.div`
   height: 100%;
   width: 30rem;
   overflow-y: auto;
-
   ${GlobalScrollbarStyle}
 `;
 
 export const Projects = styled.div`
-  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  height: 100%;
 `;
 
 const NewRecentProjectsPane = () => {
@@ -66,19 +69,19 @@ const NewRecentProjectsPane = () => {
     <Container>
       <Guide />
       <Projects>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '24px',
+            color: `${Colors.whitePure}`,
+            margin: '3rem 0 1rem 0',
+          }}
+        >
+          Recent Projects
+        </div>
         <ProjectsContainer>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: '24px',
-              color: `${Colors.whitePure}`,
-              margin: '0.5rem 0 1rem 0',
-            }}
-          >
-            Recent Projects
-          </div>
           {projects.map((project: Project) => {
             const isActivePropject = project.rootFolder === activeProject?.rootFolder;
             return (
@@ -101,6 +104,7 @@ const NewRecentProjectsPane = () => {
           })}
         </ProjectsContainer>
       </Projects>
+      <div style={{background: '#242C2F'}}>footer</div>
     </Container>
   );
 };

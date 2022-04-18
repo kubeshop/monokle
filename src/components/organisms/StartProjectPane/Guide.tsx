@@ -10,6 +10,7 @@ const GuideContainer = styled.div`
   align-items: center;
   width: 100%;
   margin: 10px 0;
+  height: 100%;
 `;
 
 const GuideItem = styled.span`

@@ -11,7 +11,10 @@ import Colors from '@styles/Colors';
 import Guide from './Guide';
 
 const Container = styled.div`
-  grid-column: 1 / -1;
+  width: 100vw;
+  height: calc(100vh - 47px);
+  display: grid;
+  grid-template-rows: 20px 240px calc(100vh - 307px);
 `;
 
 const InformationMessage = styled.div`
@@ -19,7 +22,7 @@ const InformationMessage = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin 7.5rem 0 6.5rem 0;
+  height: 100%;
   font-size: 16px;
   color: ${Colors.grey7};
   font-weight: 600;
