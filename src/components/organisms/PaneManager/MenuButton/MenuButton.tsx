@@ -41,7 +41,7 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     return Object.values(sectionInstanceByName).some(sectionInstance => sectionInstance.isSelected);
   }, [sectionInstanceByName]);
 
-  const style: React.CSSProperties = {width: '100%'};
+  const style: React.CSSProperties = {width: '100%', borderRadius: '0px'};
 
   const hasGradientBackground = useMemo(() => {
     return Boolean(

@@ -9,6 +9,7 @@ export const StyledButton = styled(Button)<{$hasGradientBackground: boolean; $sh
   align-items: center;
   justify-content: center;
   position: relative;
+  border-radius: 0px;
 
   ${props => {
     if (!props.$showOpenArrow) {
