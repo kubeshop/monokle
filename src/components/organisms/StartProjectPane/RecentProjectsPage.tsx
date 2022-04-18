@@ -1,7 +1,7 @@
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setOpenProject, toggleProjectPin} from '@redux/reducers/appConfig';
+import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
@@ -48,7 +48,7 @@ const NewRecentProjectsPane = () => {
       <S.Projects>
         <S.ProjectsTitle>Recent Projects</S.ProjectsTitle>
         <S.ProjectsContainer>
-          {projects.map((project: Project) => (
+          {sortProjects(projects, Boolean(activeProject)).map((project: Project) => (
             <RecentProject
               key={project.rootFolder}
               project={project}
