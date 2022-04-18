@@ -1,6 +1,4 @@
-import NewRecentProjectsPane from './NewRecentProjectsPane';
-import NewStartProjectPane from './NewStartProjectPane';
-import RecentProjectsPane from './RecentProjectsPane';
-import StartProjectPane from './StartProjectPane';
+import RecentProjectsPage from './RecentProjectsPage';
+import StartProjectPage from './StartProjectPage';
 
-export {StartProjectPane, RecentProjectsPane, NewStartProjectPane, NewRecentProjectsPane};
+export {StartProjectPage, RecentProjectsPage};
