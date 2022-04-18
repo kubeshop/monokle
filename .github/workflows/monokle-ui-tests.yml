@@ -91,13 +91,6 @@ jobs:
           name: playwright-output
           path: test-output/**
 
-      - name: Notify slack failure
-        env:
-          TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
-        if: failure()
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Hi <!subteam^S02SXLUMUH0>, it seems that our ui tests failed on: https://github.com/kubeshop/monokle/actions/workflows/monokle-ui-tests.yml"}' $TEST_UI_AUTOMATION_WEBHOOK
-
   ui-tests-windows:
     runs-on: windows-latest
 
@@ -182,10 +175,3 @@ jobs:
         with:
           name: playwright-output
           path: test-output/**
-
-      - name: Notify slack failure
-        env:
-          TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
-        if: failure()
-        run: |
-          curl -X POST -H "Content-type: application/json" --data "{'text':'Hi <!subteam^S02SXLUMUH0>, it seems that our ui tests failed on: https://github.com/kubeshop/monokle/actions/workflows/monokle-ui-tests.yml'}" $TEST_UI_AUTOMATION_WEBHOOK
