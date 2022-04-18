@@ -2,8 +2,6 @@ import {LegacyRef, useCallback, useMemo} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure, useWindowSize} from 'react-use';
 
-import {Tooltip} from 'antd';
-
 import {DateTime} from 'luxon';
 
 import {Project} from '@models/appconfig';
@@ -16,6 +14,7 @@ import {activeProjectSelector} from '@redux/selectors';
 import {TitleBar} from '@molecules';
 
 import {ProjectsContainer} from './NewRecentProjectsPane';
+import RecentProject from './RecentProject';
 
 import * as S from './styled';
 
@@ -76,23 +75,9 @@ const RecentProjectsPane = () => {
 
           <ProjectsContainer>
             {projects.map((project: Project) => {
-              const isActivePropject = project.rootFolder === activeProject?.rootFolder;
+              const isActiveProject = project.rootFolder === activeProject?.rootFolder;
               return (
-                <S.ProjectItem
-                  key={project.rootFolder}
-                  activeproject={isActivePropject}
-                  onClick={() => onProjectItemClick(isActivePropject, project)}
-                >
-                  <S.ProjectName>{project.name}</S.ProjectName>
-                  <Tooltip title={project.rootFolder} placement="bottom">
-                    <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
-                  </Tooltip>
-                  <S.ProjectLastOpened>
-                    {getRelativeDate(project.lastOpened)
-                      ? `last opened ${getRelativeDate(project.lastOpened)}`
-                      : 'Not opened yet'}
-                  </S.ProjectLastOpened>
-                </S.ProjectItem>
+                <RecentProject project={project} isActive={isActiveProject} onProjectItemClick={onProjectItemClick} />
               );
             })}
           </ProjectsContainer>

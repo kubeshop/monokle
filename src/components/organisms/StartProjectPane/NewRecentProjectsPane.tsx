@@ -1,6 +1,5 @@
-import {Button, Tooltip} from 'antd';
+import {Button} from 'antd';
 
-import {DateTime} from 'luxon';
 import styled from 'styled-components';
 
 import {Project} from '@models/appconfig';
@@ -19,8 +18,7 @@ import SelectFolder from '@assets/SelectFolder.svg';
 import Colors from '@styles/Colors';
 
 import Guide from './Guide';
-
-import * as S from './styled';
+import RecentProject from './RecentProject';
 
 const Container = styled.div`
   width: 100vw;
@@ -101,6 +99,7 @@ const ActionItemButton = styled(Button)`
   padding: 0;
   margin: 0;
   align-items: end;
+  font-size: 13px;
 `;
 
 const NewRecentProjectsPane = () => {
@@ -120,13 +119,6 @@ const NewRecentProjectsPane = () => {
     openProject(project);
   };
 
-  const getRelativeDate = (isoDate: string | undefined) => {
-    if (isoDate) {
-      return DateTime.fromISO(isoDate).toRelative();
-    }
-    return '';
-  };
-
   return (
     <Container>
       <Guide />
@@ -144,26 +136,14 @@ const NewRecentProjectsPane = () => {
           Recent Projects
         </div>
         <ProjectsContainer>
-          {projects.map((project: Project) => {
-            const isActivePropject = project.rootFolder === activeProject?.rootFolder;
-            return (
-              <S.ProjectItem
-                key={project.rootFolder}
-                activeproject={isActivePropject}
-                onClick={() => onProjectItemClick(isActivePropject, project)}
-              >
-                <S.ProjectName>{project.name}</S.ProjectName>
-                <Tooltip title={project.rootFolder} placement="bottom">
-                  <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
-                </Tooltip>
-                <S.ProjectLastOpened>
-                  {getRelativeDate(project.lastOpened)
-                    ? `last opened ${getRelativeDate(project.lastOpened)}`
-                    : 'Not opened yet'}
-                </S.ProjectLastOpened>
-              </S.ProjectItem>
-            );
-          })}
+          {projects.map((project: Project) => (
+            <RecentProject
+              key={project.rootFolder}
+              project={project}
+              isActive={project.rootFolder === activeProject?.rootFolder}
+              onProjectItemClick={onProjectItemClick}
+            />
+          ))}
         </ProjectsContainer>
       </Projects>
       <Actions>
