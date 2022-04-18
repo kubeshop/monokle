@@ -153,7 +153,7 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
 
     const nextMainState = createNextState(state.main, mainState => {
       electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
-      state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
+      mainState.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
 
       const projectConfig = currentConfigSelector(state);
       const schemaVersion = getK8sVersion(projectConfig);
