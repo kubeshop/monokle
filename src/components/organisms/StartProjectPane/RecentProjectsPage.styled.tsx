@@ -14,7 +14,6 @@ export const Container = styled.div`
 `;
 
 export const ProjectsContainer = styled.div`
-  padding: 8px 12px;
   height: 100%;
   width: 30rem;
   overflow-y: auto;

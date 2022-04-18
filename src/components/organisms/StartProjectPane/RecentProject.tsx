@@ -14,7 +14,7 @@ interface RecentProjectType {
   project: Project;
   isActive: boolean;
   onProjectItemClick?: Function;
-  onPinChanged?: Function;
+  onPinChange?: Function;
 }
 
 const getRelativeDate = (isoDate: string | undefined) => {
@@ -24,40 +24,40 @@ const getRelativeDate = (isoDate: string | undefined) => {
   return '';
 };
 
-const RecentProject: FC<RecentProjectType> = ({project, isActive, onProjectItemClick, onPinChanged}) => {
+const RecentProject: FC<RecentProjectType> = ({project, isActive, onProjectItemClick, onPinChange}) => {
   const handleOnProjectItemClick = () => {
     if (onProjectItemClick) {
       onProjectItemClick(isActive, project);
     }
   };
 
-  const handleOnPinChanged = (e: any) => {
+  const handleOnPinChange = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onPinChanged) {
-      onPinChanged(!project.isPinned);
+    if (onPinChange) {
+      onPinChange(!project.isPinned);
     }
   };
 
   return (
-    <S.ProjectItem key={project.rootFolder} activeproject={isActive} onClick={handleOnProjectItemClick}>
+    <S.Container key={project.rootFolder} activeproject={isActive} onClick={handleOnProjectItemClick}>
       {project.isPinned ? (
         <Tooltip placement="top" title="Unpin this project from the top">
-          <PushpinFilled onClick={handleOnPinChanged} />
+          <PushpinFilled onClick={handleOnPinChange} />
         </Tooltip>
       ) : (
         <Tooltip placement="top" title="Pin this project to the top">
-          <PushpinOutlined onClick={handleOnPinChanged} />
+          <PushpinOutlined onClick={handleOnPinChange} />
         </Tooltip>
       )}
-      <S.ProjectName>{project.name}</S.ProjectName>
+      <S.Name>{project.name}</S.Name>
       <Tooltip title={project.rootFolder} placement="bottom">
-        <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
+        <S.Path>{project.rootFolder}</S.Path>
       </Tooltip>
-      <S.ProjectLastOpened>
+      <S.LastOpened>
         {getRelativeDate(project.lastOpened) ? `last opened ${getRelativeDate(project.lastOpened)}` : 'Not opened yet'}
-      </S.ProjectLastOpened>
-    </S.ProjectItem>
+      </S.LastOpened>
+    </S.Container>
   );
 };
 

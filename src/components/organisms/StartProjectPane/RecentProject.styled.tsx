@@ -2,15 +2,12 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const ProjectItem = styled.div<{activeproject: boolean}>`
-  padding: 4px 8px 4px 8px;
-  margin-left: ${props => (props.activeproject ? '-12px' : 'unset')};
-  padding-left: ${props => (props.activeproject ? '12px' : 'unset')};
+export const Container = styled.div<{activeproject: boolean}>`
   border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
   color: ${props => (props.activeproject ? Colors.lightSeaGreen : Colors.whitePure)};
   cursor: pointer;
   position: relative;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
 
   :hover {
     background: ${Colors.grey2000};
@@ -23,7 +20,7 @@ export const ProjectItem = styled.div<{activeproject: boolean}>`
   }
 `;
 
-export const ProjectName = styled.div`
+export const Name = styled.div`
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
@@ -31,7 +28,7 @@ export const ProjectName = styled.div`
   width: 100%;
 `;
 
-export const ProjectPath = styled.div`
+export const Path = styled.div`
   color: ${Colors.grey7};
   font-size: 12px;
   white-space: nowrap;
@@ -40,7 +37,7 @@ export const ProjectPath = styled.div`
   width: 100%;
 `;
 
-export const ProjectLastOpened = styled.div`
+export const LastOpened = styled.div`
   color: ${Colors.grey5};
   font-size: 12px;
   white-space: nowrap;

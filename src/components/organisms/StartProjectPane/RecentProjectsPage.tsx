@@ -1,7 +1,7 @@
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setOpenProject} from '@redux/reducers/appConfig';
+import {setOpenProject, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
@@ -38,6 +38,10 @@ const NewRecentProjectsPane = () => {
     dispatch(openCreateProjectModal({fromTemplate}));
   };
 
+  const handleOnProjectPinChange = (project: Project) => {
+    dispatch(toggleProjectPin(project));
+  };
+
   return (
     <S.Container>
       <Guide />
@@ -50,6 +54,7 @@ const NewRecentProjectsPane = () => {
               project={project}
               isActive={project.rootFolder === activeProject?.rootFolder}
               onProjectItemClick={onProjectItemClick}
+              onPinChange={() => handleOnProjectPinChange(project)}
             />
           ))}
         </S.ProjectsContainer>

@@ -198,6 +198,16 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
+    toggleProjectPin: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      state.projects.forEach((project: Project) => {
+        if (project.rootFolder === action.payload.rootFolder) {
+          project.isPinned = !project.isPinned;
+        }
+      });
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      state.projects = _.sortBy(state.projects, (p: Project) => p.isPinned);
+      electronStore.set('appConfig.projects', state.projects);
+    },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
       const projectRootPath: string | null = action.payload;
 
@@ -426,5 +436,6 @@ export const {
   toggleErrorReporting,
   setAccessLoading,
   updateTelemetry,
+  toggleProjectPin,
 } = configSlice.actions;
 export default configSlice.reducer;
