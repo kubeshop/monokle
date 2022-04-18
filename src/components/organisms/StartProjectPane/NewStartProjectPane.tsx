@@ -14,7 +14,7 @@ const Container = styled.div`
   width: 100vw;
   height: calc(100vh - 47px);
   display: grid;
-  grid-template-rows: 20px 240px calc(100vh - 307px);
+  grid-template-rows: 1.25rem 15rem calc(100vh - 47px - 16.25rem);
 `;
 
 const InformationMessage = styled.div`
