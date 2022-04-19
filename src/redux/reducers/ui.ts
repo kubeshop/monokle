@@ -164,6 +164,13 @@ export const uiSlice = createSlice({
     toggleStartProjectPane: (state: Draft<UiState>) => {
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
+    toggleValidationDrawer: (state: Draft<UiState>, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload !== undefined) {
+        state.leftMenu.isValidationDrawerVisible = action.payload;
+      } else {
+        state.leftMenu.isValidationDrawerVisible = !state.leftMenu.isValidationDrawerVisible;
+      }
+    },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
       if (expandedSections.length > 0) {
@@ -298,6 +305,7 @@ export const {
   setMonacoEditor,
   setPaneConfiguration,
   toggleStartProjectPane,
+  toggleValidationDrawer,
   setRightMenuIsActive,
   setLeftMenuIsActive,
   openRenameEntityModal,

@@ -35,7 +35,13 @@ export const Pane = styled.div<{$height?: number}>`
   min-width: ${MIN_SPLIT_VIEW_PANE_WIDTH};
 `;
 
-export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
+export const SplitViewContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+`;
+
+export const SplitViewGrid = styled.div<{$gridTemplateColumns: string}>`
   width: 100%;
   height: 100%;
   display: grid;

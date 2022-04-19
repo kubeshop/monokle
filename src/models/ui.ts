@@ -49,12 +49,7 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType =
-  | 'file-explorer'
-  | 'helm-pane'
-  | 'kustomize-pane'
-  | 'templates-pane'
-  | 'validation-pane';
+export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -101,6 +96,7 @@ export type UiState = {
     selection: LeftMenuSelectionType;
     isActive: boolean;
     expandedFolders: React.Key[];
+    isValidationDrawerVisible: boolean;
   };
   quickSearchActionsPopup: {
     isOpen: boolean;
