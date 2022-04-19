@@ -15,8 +15,9 @@ export const Container = styled.div<{activeproject: boolean}>`
 
   .anticon-pushpin {
     position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
+    right: 0.3rem;
+    top: 0.3rem;
+    padding: 0.3rem;
   }
 `;
 

@@ -63,7 +63,7 @@ export const ActionItemContext = styled.div`
 `;
 
 export const Actions = styled.div`
-  background: ${Colors.grey10};
+  background: ${Colors.grey3000};
   display: flex;
   flex-direction: column;
   padding: 2rem 0 1rem 0;
