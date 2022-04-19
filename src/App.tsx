@@ -7,6 +7,7 @@ import {useDebounce} from 'react-use';
 import {Modal} from 'antd';
 import 'antd/dist/antd.less';
 
+import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
@@ -208,7 +209,17 @@ const App = () => {
         if (!newData || !oldData) {
           return;
         }
+        if (
+          lodash.isEqual(
+            lodash.sortBy(newData.map((d: any) => d.rootFolder)),
+            lodash.sortBy(oldData.map((d: any) => d.rootFolder))
+          )
+        ) {
+          return;
+        }
+
         const {shouldTriggerAcrossWindows, eventData} = globalElectronStoreChange.action(newData, oldData);
+
         if (!shouldTriggerAcrossWindows || !eventData) {
           return;
         }
