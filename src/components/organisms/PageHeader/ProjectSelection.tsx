@@ -28,7 +28,6 @@ import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui
 import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
-import WalkThrough from '@components/molecules/WalkThrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -265,13 +264,13 @@ const ProjectSelection = () => {
         onVisibleChange={onDropdownVisibleChange}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <WalkThrough placement="leftTop" step="template">
-            <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
-              <S.FolderOpenOutlined />
-              <S.ProjectName>{activeProject.name}</S.ProjectName>
-              <S.DownOutlined />
-            </S.Button>
-          </WalkThrough>
+          {/* <WalkThrough placement="leftTop" step="template"> */}
+          <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
+            <S.FolderOpenOutlined />
+            <S.ProjectName>{activeProject.name}</S.ProjectName>
+            <S.DownOutlined />
+          </S.Button>
+          {/* </WalkThrough> */}
         </Tooltip>
       </Dropdown>
 

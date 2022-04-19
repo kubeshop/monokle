@@ -210,10 +210,7 @@ const App = () => {
           return;
         }
         if (
-          lodash.isEqual(
-            lodash.sortBy(newData.map((d: any) => d.rootFolder)),
-            lodash.sortBy(oldData.map((d: any) => d.rootFolder))
-          )
+          lodash.isEqual(lodash.sortBy(newData.map((d: any) => d.name)), lodash.sortBy(oldData.map((d: any) => d.name)))
         ) {
           return;
         }
