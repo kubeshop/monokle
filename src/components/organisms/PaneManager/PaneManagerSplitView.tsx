@@ -21,6 +21,7 @@ const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
+const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -119,6 +120,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftMenuSelection === 'helm-pane' && <HelmPane />}
                 {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
                 {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
+                {leftMenuSelection === 'validation-pane' && <ValidationPane />}
               </Suspense>
             </S.Pane>
           </ResizableBox>

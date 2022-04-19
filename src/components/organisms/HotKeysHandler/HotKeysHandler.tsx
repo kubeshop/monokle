@@ -240,6 +240,10 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('helm-pane'));
   });
 
+  useHotkeys(hotkeys.OPEN_VALIDATION_TAB, () => {
+    dispatch(setLeftMenuSelection('validation-pane'));
+  });
+
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
     dispatch(resetResourceFilter());
   });

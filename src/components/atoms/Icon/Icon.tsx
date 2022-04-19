@@ -4,7 +4,7 @@ import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import Colors from '@styles/Colors';
 
-import {Collapse, Helm, IncomingRefs, Kubernetes, Kustomize, OutgoingRefs, Warning} from './Icons';
+import {Collapse, Helm, IncomingRefs, Kubernetes, Kustomize, OutgoingRefs, Validation, Warning} from './Icons';
 
 export type IconNames =
   | 'kubernetes'
@@ -14,7 +14,8 @@ export type IconNames =
   | 'incomingRefs'
   | 'outgoingRefs'
   | 'warning'
-  | 'error';
+  | 'error'
+  | 'validation';
 
 type IconProps = {
   name: IconNames;
@@ -34,6 +35,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   outgoingRefs: OutgoingRefs,
   warning: Warning,
   error: ExclamationCircleOutlined,
+  validation: Validation,
 };
 
 const Icon: React.FC<IconProps> = props => {

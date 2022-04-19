@@ -178,6 +178,27 @@ const PaneManagerLeftMenu: React.FC = () => {
           />
         </MenuButton>
       </PaneTooltip>
+
+      <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
+        title={leftMenuSelection === 'validation-pane' && leftActive ? 'Hide Validation' : 'View Validation'}
+        placement="right"
+      >
+        <MenuButton
+          id="validation-pane"
+          isSelected={Boolean(activeProject) && leftMenuSelection === 'validation-pane'}
+          isActive={Boolean(activeProject) && leftActive}
+          onClick={() => setLeftActiveMenu('validation-pane')}
+          sectionNames={['scanning']}
+          disabled={!activeProject}
+        >
+          <MenuIcon
+            iconName="validation"
+            active={Boolean(activeProject) && leftActive}
+            isSelected={Boolean(activeProject) && leftMenuSelection === 'validation-pane'}
+          />
+        </MenuButton>
+      </Tooltip>
     </S.Container>
   );
 };
