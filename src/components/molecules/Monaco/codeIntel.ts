@@ -346,29 +346,6 @@ function applyPolicyIntel(resource: K8sResource): {
     return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
   });
 
-  const inline: monaco.editor.IModelDeltaDecoration[] = [];
-  // const inline = issues
-  //   .map(issue => {
-  //     if (
-  //       !issue.errorPos ||
-  //       issue.errorPos.line === 1 ||
-  //       issue.errorPos.endLine === undefined ||
-  //       issue.errorPos.endColumn === undefined
-  //     ) {
-  //       return undefined;
-  //     }
-
-  //     const range = new monaco.Range(
-  //       issue.errorPos.line,
-  //       issue.errorPos.column,
-  //       issue.errorPos.endLine,
-  //       issue.errorPos.endColumn
-  //     );
-
-  //     return createInlineDecoration(range, InlineDecorationTypes.PolicyIssue);
-  //   })
-  //   .filter(isDefined);
-
   const markers = issues
     .map(issue => {
       if (
@@ -391,7 +368,7 @@ function applyPolicyIntel(resource: K8sResource): {
     })
     .filter(isDefined);
 
-  return {decorations: [...glyphs, ...inline], markers};
+  return {decorations: [...glyphs], markers};
 }
 
 export default {
