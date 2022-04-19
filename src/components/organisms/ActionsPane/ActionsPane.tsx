@@ -65,6 +65,8 @@ import {
 
 import {Icon, TabHeader} from '@atoms';
 
+import WalkThrough from '@components/molecules/WalkThrough';
+
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import featureFlags from '@src/feature-flags.json';
@@ -535,7 +537,14 @@ const ActionsPane: React.FC<IProps> = props => {
               ) : null
             }
           >
-            <TabPane key="source" tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}>
+            <TabPane
+              key="source"
+              tab={
+                <WalkThrough placement="leftTop" step="syntax">
+                  <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
+                </WalkThrough>
+              }
+            >
               {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'source' ? (

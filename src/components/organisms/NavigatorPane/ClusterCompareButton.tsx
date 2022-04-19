@@ -15,6 +15,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openClusterDiff} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
+import WalkThrough from '@components/molecules/WalkThrough';
+
 interface IProps {
   navigatorPaneWidth: number;
 }
@@ -25,7 +27,6 @@ const ClusterCompareButton: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
   const onClickClusterComparison = () => {
@@ -44,17 +45,19 @@ const ClusterCompareButton: React.FC<IProps> = props => {
       }
       placement="bottom"
     >
-      <Button
-        onClick={onClickClusterComparison}
-        icon={<SwapOutlined />}
-        type="primary"
-        ghost
-        size="small"
-        style={{marginLeft: 8}}
-        disabled={!isFolderOpen || isInClusterMode}
-      >
-        {navigatorPaneWidth < 400 ? '' : 'Cluster Compare'}
-      </Button>
+      <WalkThrough placement="leftTop" step="cluster">
+        <Button
+          onClick={onClickClusterComparison}
+          icon={<SwapOutlined />}
+          type="primary"
+          ghost
+          size="small"
+          style={{marginLeft: 8}}
+          disabled={!isFolderOpen || isInClusterMode}
+        >
+          {navigatorPaneWidth < 400 ? '' : 'Cluster Compare'}
+        </Button>
+      </WalkThrough>
     </Tooltip>
   );
 };

@@ -23,13 +23,20 @@ import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
-import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {
+  closeFolderExplorer,
+  closeReleaseNotesDrawer,
+  handleWalkThroughStep,
+  toggleNotifications,
+  toggleSettings,
+} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
+import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -184,7 +191,8 @@ const App = () => {
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
-  }, [appVersion]);
+    dispatch(handleWalkThroughStep(StepEnum.Next));
+  }, [appVersion, dispatch]);
 
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
