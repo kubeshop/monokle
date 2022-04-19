@@ -1,4 +1,5 @@
 import Ajv, {ValidateFunction} from 'ajv';
+import {get} from 'lodash';
 import {Document, LineCounter, Node, ParsedNode, isCollection, isNode} from 'yaml';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
@@ -88,23 +89,10 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
 type YamlPath = Array<string | number>;
 
 function determineContainerErrorPos(resource: K8sResource, container: string, pathHint?: string): RefPosition {
-  const supported = resource.kind === 'Deployment' || resource.kind === 'StatefulSet';
-  if (!supported) {
+  const prefix = determineContainerPrefix(resource, container);
+
+  if (!prefix.length) {
     return {line: 1, column: 1, length: 10};
-  }
-
-  const prefix: YamlPath = ['spec', 'template', 'spec'];
-
-  const initContainers: {name: string}[] = resource.content.spec?.template?.spec?.initContainers ?? [];
-  const initContainerIndex = initContainers.findIndex(c => c.name === container);
-  if (initContainerIndex !== -1) {
-    prefix.push('initContainers', initContainerIndex);
-  }
-
-  const containers: {name: string}[] = resource.content.spec?.template?.spec?.containers ?? [];
-  const containerIndex = containers.findIndex(c => c.name === container);
-  if (containerIndex !== -1) {
-    prefix.push('containers', containerIndex);
   }
 
   const lineCounter = getLineCounter(resource);
@@ -118,6 +106,44 @@ function determineContainerErrorPos(resource: K8sResource, container: string, pa
   const length = node.range[1] - node.range[0];
 
   return {line: start.line, column: start.col, length, endLine: end.line, endColumn: end.col};
+}
+
+const CONTROLLER_KINDS = ['Deployment', 'StatefulSet', 'Job', 'DaemonSet', 'ReplicaSet', 'ReplicationController'];
+
+function determineContainerPrefix(resource: K8sResource, container: string): YamlPath {
+  if (CONTROLLER_KINDS.includes(resource.kind)) {
+    const prefix: YamlPath = ['spec', 'template', 'spec'];
+    const containerIndex = determineContainerIndex(resource, container, prefix, ['initContainers', 'containers']);
+    return prefix.concat(containerIndex);
+  }
+  if (resource.kind === 'CronJob') {
+    const prefix: YamlPath = ['spec', 'jobTemplate', 'spec', 'template', 'spec'];
+    const containerIndex = determineContainerIndex(resource, container, prefix, ['containers']);
+    return prefix.concat(containerIndex);
+  }
+  if (resource.kind === 'Pod') {
+    const prefix: YamlPath = ['spec'];
+    const containerIndex = determineContainerIndex(resource, container, prefix, ['containers']);
+    return prefix.concat(containerIndex);
+  }
+  return [];
+}
+
+function determineContainerIndex(
+  resource: K8sResource,
+  container: string,
+  prefix: YamlPath,
+  properties: string[]
+): YamlPath {
+  for (let i = 0; i < properties.length; i += 1) {
+    const property = properties[i];
+    const containers: {name: string}[] = get(resource.content, prefix.concat(property), []);
+    const containerIndex = containers.findIndex(c => c.name === container);
+    if (containerIndex !== -1) {
+      return [property, containerIndex];
+    }
+  }
+  return [];
 }
 
 /**
