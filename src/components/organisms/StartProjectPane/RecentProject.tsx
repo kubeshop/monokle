@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 
 import Tooltip from 'antd/lib/tooltip';
 
@@ -25,6 +25,8 @@ const getRelativeDate = (isoDate: string | undefined) => {
 };
 
 const RecentProject: FC<RecentProjectType> = ({project, isActive, onProjectItemClick, onPinChange}) => {
+  const [isTooltipMessageVisible, setIsTooltipMessageVisible] = useState(false);
+
   const handleOnProjectItemClick = () => {
     if (onProjectItemClick) {
       onProjectItemClick(isActive, project);
@@ -34,22 +36,29 @@ const RecentProject: FC<RecentProjectType> = ({project, isActive, onProjectItemC
   const handleOnPinChange = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onPinChange) {
-      onPinChange(!project.isPinned);
-    }
+    setIsTooltipMessageVisible(false);
+
+    setTimeout(() => {
+      if (onPinChange) {
+        onPinChange(!project.isPinned);
+      }
+    }, 200);
   };
 
   return (
     <S.Container key={project.rootFolder} activeproject={isActive} onClick={handleOnProjectItemClick}>
-      {project.isPinned ? (
-        <Tooltip placement="top" title="Unpin this project from the top">
+      <Tooltip
+        visible={isTooltipMessageVisible}
+        onVisibleChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
+        title={project.isPinned ? 'Unpin this project from the top' : 'Pin this project to the top'}
+      >
+        {project.isPinned ? (
           <PushpinFilled onClick={handleOnPinChange} />
-        </Tooltip>
-      ) : (
-        <Tooltip placement="top" title="Pin this project to the top">
+        ) : (
           <PushpinOutlined onClick={handleOnPinChange} />
-        </Tooltip>
-      )}
+        )}
+      </Tooltip>
+
       <S.Name>{project.name}</S.Name>
       <Tooltip title={project.rootFolder} placement="bottom">
         <S.Path>{project.rootFolder}</S.Path>
