@@ -45,6 +45,7 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     width: '100%',
     borderRadius: '0px',
     background: !isSelected || !isActive ? 'transparent' : PanelColors.toolBar,
+    height: '45px',
   };
 
   const hasGradientBackground = useMemo(() => {
