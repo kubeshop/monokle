@@ -1,6 +1,5 @@
 import Ajv, {ValidateFunction} from 'ajv';
-import {Document, LineCounter, ParsedNode, isCollection} from 'yaml';
-import {NodeBase} from 'yaml/dist/nodes/Node';
+import {Document, LineCounter, Node, ParsedNode, isCollection, isNode} from 'yaml';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
 import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@models/policy';
@@ -69,7 +68,10 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
       ? `${rule.shortDescription.text} on container "${container}"`
       : rule.shortDescription.text;
 
-    const errorPos = container ? determineContainerErrorPos(resource, container) : {column: 1, length: 10, line: 1};
+    const pathHint = rule.properties.path;
+    const errorPos = container
+      ? determineContainerErrorPos(resource, container, pathHint)
+      : {column: 1, length: 10, line: 1};
 
     return {
       message,
@@ -83,13 +85,15 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
   return errors;
 }
 
-function determineContainerErrorPos(resource: K8sResource, container: string): RefPosition {
+type YamlPath = Array<string | number>;
+
+function determineContainerErrorPos(resource: K8sResource, container: string, pathHint?: string): RefPosition {
   const supported = resource.kind === 'Deployment' || resource.kind === 'StatefulSet';
   if (!supported) {
     return {line: 1, column: 1, length: 10};
   }
 
-  const prefix: Array<string | number> = ['spec', 'template', 'spec'];
+  const prefix: YamlPath = ['spec', 'template', 'spec'];
 
   const initContainers: {name: string}[] = resource.content.spec?.template?.spec?.initContainers ?? [];
   const initContainerIndex = initContainers.findIndex(c => c.name === container);
@@ -104,8 +108,7 @@ function determineContainerErrorPos(resource: K8sResource, container: string): R
   }
 
   const lineCounter = getLineCounter(resource);
-  const doc = getParsedDoc(resource);
-  const node = doc.getIn(prefix) as NodeBase | undefined;
+  const node = determineClosestErrorNode(resource, prefix, pathHint);
 
   if (!lineCounter || !node || !node.range) {
     return {line: 1, column: 1, length: 1};
@@ -115,6 +118,39 @@ function determineContainerErrorPos(resource: K8sResource, container: string): R
   const length = node.range[1] - node.range[0];
 
   return {line: start.line, column: start.col, length, endLine: end.line, endColumn: end.col};
+}
+
+/**
+ * Use a path hint to determine the node of the error or closest parent.
+ *
+ * Example:
+ * - Hint: $container.securityContext.readOnlyRootFilesystem and desired value is `true`.
+ * - When $container specifies `securityContext.readOnlyRootFilesystem` then it underlines the incorrect `false` value.
+ * - When $container specifies `securityContext` then it underlines whole context object.
+ * - When $container does not specify `securityContext` then it underlines whole container object.
+ */
+function determineClosestErrorNode(resource: K8sResource, prefix: YamlPath, pathHint?: string): Node | undefined {
+  const doc = getParsedDoc(resource);
+  const [head, ...tail] = pathHint?.split('.') ?? [];
+
+  if (!head || head !== '$container') {
+    const node = doc.getIn(prefix, true);
+    return isNode(node) ? node : undefined;
+  }
+
+  const path = prefix.concat(tail);
+  while (path.length > prefix.length) {
+    const node = doc.getIn(path, true);
+
+    if (isNode(node)) {
+      return node;
+    }
+
+    path.pop();
+  }
+
+  const node = doc.getIn(path, true);
+  return isNode(node) ? node : undefined;
 }
 
 export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {

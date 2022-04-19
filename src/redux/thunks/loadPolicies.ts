@@ -93,7 +93,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
     {
       id: 'KSV013',
       shortDescription: {
-        text: 'Image tag ":latest" used.',
+        text: 'Image tag ":latest" used',
       },
       longDescription: {
         text: "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
@@ -111,7 +111,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
     {
       id: 'KSV015',
       shortDescription: {
-        text: 'CPU requests not specified.',
+        text: 'CPU requests not specified',
       },
       longDescription: {
         text: 'When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.',
@@ -129,7 +129,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
     {
       id: 'KSV016',
       shortDescription: {
-        text: 'Memory requests not specified.',
+        text: 'Memory requests not specified',
       },
       longDescription: {
         text: 'When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.',
@@ -183,7 +183,7 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
     {
       id: 'KSV014',
       shortDescription: {
-        text: 'Root file system is not read-only.',
+        text: 'Root file system is not read-only',
       },
       longDescription: {
         text: 'An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.',
