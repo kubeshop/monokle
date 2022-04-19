@@ -12,6 +12,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
+import WalkThrough from '@components/molecules/WalkThrough';
+
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
@@ -132,27 +134,29 @@ const PaneManagerLeftMenu: React.FC = () => {
         title={leftMenuSelection === 'helm-pane' && leftActive ? 'Hide Helm Charts' : 'View Helm Charts'}
         placement="right"
       >
-        <MenuButton
-          id="helm-pane"
-          isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
-          isActive={Boolean(activeProject) && leftActive}
-          onClick={() => setLeftActiveMenu('helm-pane')}
-          sectionNames={[HELM_CHART_SECTION_NAME]}
-          disabled={!activeProject}
-        >
-          <S.Badge
-            count={!hasSeenHelmCharts && helmCharts.length ? helmCharts.length : 0}
-            color={Colors.blue6}
-            size="default"
-            dot
+        <WalkThrough placement="rightTop" step="kustomizeHelm">
+          <MenuButton
+            id="helm-pane"
+            isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+            isActive={Boolean(activeProject) && leftActive}
+            onClick={() => setLeftActiveMenu('helm-pane')}
+            sectionNames={[HELM_CHART_SECTION_NAME]}
+            disabled={!activeProject}
           >
-            <MenuIcon
-              iconName="helm"
-              active={Boolean(activeProject) && leftActive}
-              isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
-            />
-          </S.Badge>
-        </MenuButton>
+            <S.Badge
+              count={!hasSeenHelmCharts && helmCharts.length ? helmCharts.length : 0}
+              color={Colors.blue6}
+              size="default"
+              dot
+            >
+              <MenuIcon
+                iconName="helm"
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+              />
+            </S.Badge>
+          </MenuButton>
+        </WalkThrough>
       </Tooltip>
 
       <Tooltip

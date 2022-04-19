@@ -4,6 +4,8 @@ import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models
 
 import {useAppDispatch} from '@redux/hooks';
 
+import WalkThrough from '@components/molecules/WalkThrough';
+
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
 
@@ -35,7 +37,6 @@ function SectionHeader(props: SectionHeaderProps) {
   } = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
   const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
     sectionBlueprint.customization
   );
@@ -111,21 +112,39 @@ function SectionHeader(props: SectionHeaderProps) {
             {NamePrefix.Component && (
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
-            <S.Name
-              $isSelected={sectionInstance.isSelected && isCollapsed}
-              $isHighlighted={sectionInstance.isSelected && isCollapsed}
-              $isCheckable={Boolean(sectionInstance.checkable)}
-              $nameColor={sectionBlueprint.customization?.nameColor}
-              $nameSize={sectionBlueprint.customization?.nameSize}
-              $nameWeight={sectionBlueprint.customization?.nameWeight}
-              $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
-              $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
-              $level={level}
-              onClick={toggleCollapse}
-            >
-              {name}
-            </S.Name>
-
+            {name === 'K8s Resources' ? (
+              <WalkThrough placement="right" step="resource">
+                <S.Name
+                  $isSelected={sectionInstance.isSelected && isCollapsed}
+                  $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                  $isCheckable={Boolean(sectionInstance.checkable)}
+                  $nameColor={sectionBlueprint.customization?.nameColor}
+                  $nameSize={sectionBlueprint.customization?.nameSize}
+                  $nameWeight={sectionBlueprint.customization?.nameWeight}
+                  $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+                  $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                  $level={level}
+                  onClick={toggleCollapse}
+                >
+                  {name}
+                </S.Name>
+              </WalkThrough>
+            ) : (
+              <S.Name
+                $isSelected={sectionInstance.isSelected && isCollapsed}
+                $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                $isCheckable={Boolean(sectionInstance.checkable)}
+                $nameColor={sectionBlueprint.customization?.nameColor}
+                $nameSize={sectionBlueprint.customization?.nameSize}
+                $nameWeight={sectionBlueprint.customization?.nameWeight}
+                $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+                $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                $level={level}
+                onClick={toggleCollapse}
+              >
+                {name}
+              </S.Name>
+            )}
             <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />
 
             <S.BlankSpace level={level} onClick={toggleCollapse} />

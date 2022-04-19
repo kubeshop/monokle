@@ -121,6 +121,9 @@ export type UiState = {
     connectToCluster: boolean;
   };
   activeSettingsPanel?: SettingsPanel;
+  walkThrough: {
+    currentStep: number;
+  };
 };
 
 export type PaneConfiguration = {
