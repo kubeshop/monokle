@@ -65,7 +65,7 @@ code {
 }
 
 .monokleEditorPolicyIssueGlyphClass {
-  background-image: url('./assets/ErrorIcon.svg');
+  background-image: url('./assets/OpenPolicyAgentIcon.svg');
   background-repeat: no-repeat;
   background-size: contain;
   max-height: 10px;
