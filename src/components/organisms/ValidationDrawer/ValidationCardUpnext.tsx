@@ -1,6 +1,6 @@
 import * as S from './ValidationCardUpnext.styled';
 
-const LET_US_KNOW_URL = 'https://github.com/open-policy-agent/opa';
+const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
 
 export function ValidationCardUpnext() {
   return (
