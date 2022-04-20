@@ -75,6 +75,7 @@ export type Project = {
   k8sVersion?: string;
   created?: string;
   lastOpened?: string;
+  isPinned?: boolean;
 };
 
 export type PreviewConfigValuesFileItem = {

@@ -5,8 +5,7 @@ import {activeProjectSelector} from '@redux/selectors';
 
 import featureJson from '@src/feature-flags.json';
 
-import RecentProjectsPane from '../RecentProjectsPane';
-import StartProjectPane from '../StartProjectPane';
+import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import PaneManagerRightMenu from './PaneManagerRightMenu';
 import PaneManagerSplitView from './PaneManagerSplitView';
@@ -31,18 +30,17 @@ const PaneManager: React.FC = () => {
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
-      <PaneManagerLeftMenu />
-
       {isProjectLoading ? (
         <S.Skeleton />
       ) : activeProject && !isStartProjectPaneVisible ? (
-        <PaneManagerSplitView />
+        <>
+          <PaneManagerLeftMenu />
+          <PaneManagerSplitView />
+        </>
+      ) : projects.length > 0 ? (
+        <RecentProjectsPage />
       ) : (
-        <S.GettingStartedContainer>
-          <StartProjectPane />
-
-          {Boolean(projects.length) && <RecentProjectsPane />}
-        </S.GettingStartedContainer>
+        <StartProjectPage />
       )}
 
       {featureJson.ShowRightMenu && <PaneManagerRightMenu />}

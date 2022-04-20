@@ -1,1 +1,4 @@
-export {default} from './StartProjectPane';
+import RecentProjectsPage from './RecentProjectsPage';
+import StartProjectPage from './StartProjectPage';
+
+export {StartProjectPage, RecentProjectsPage};

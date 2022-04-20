@@ -1,3 +1,5 @@
+import {Button} from 'antd';
+
 import styled from 'styled-components';
 
 import StartBackgrojnd from '@assets/StartBackground.svg';
@@ -69,4 +71,32 @@ export const StartProjectPaneContainer = styled.div`
   border-left: 1px solid ${Colors.grey3};
   display: grid;
   grid-template-rows: max-content 1fr;
+`;
+
+export const BackToProjectButton = styled(Button)`
+  font-size: 12px;
+  color: ${Colors.lightSeaGreen};
+`;
+
+export const Container = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr;
+`;
+
+export const RecentProjectsPaneContainer = styled.div`
+  height: 100%;
+  border-left: 1px solid ${Colors.grey3};
+  position: relative;
+
+  & .custom-modal-handle {
+    position: absolute;
+    top: 50%;
+    left: -5px;
+    height: 100%;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    transform: translateY(-50%);
+  }
 `;

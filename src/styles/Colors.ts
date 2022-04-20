@@ -1,5 +1,7 @@
 enum Colors {
   // Greys
+  grey3000 = '#191F21',
+  grey2000 = '#081A20',
   grey1000 = '#141414',
   grey900 = '#3A4344',
   grey800 = '#7B8185',

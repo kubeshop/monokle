@@ -191,11 +191,21 @@ export const configSlice = createSlice({
         [project, ...state.projects],
         (p: Project) => p.lastOpened || new Date(-8640000000000000).toISOString()
       ).reverse();
+      state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
     deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
-      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    toggleProjectPin: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      state.projects.forEach((project: Project) => {
+        if (project.rootFolder === action.payload.rootFolder) {
+          project.isPinned = !project.isPinned;
+        }
+      });
+      state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
@@ -213,7 +223,7 @@ export const configSlice = createSlice({
         project.lastOpened = new Date().toISOString();
       }
 
-      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
     updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
@@ -426,5 +436,20 @@ export const {
   toggleErrorReporting,
   setAccessLoading,
   updateTelemetry,
+  toggleProjectPin,
 } = configSlice.actions;
 export default configSlice.reducer;
+
+export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boolean) => {
+  if (projects.length === 0) {
+    return [];
+  }
+
+  const sortedProjects = _.sortBy(projects, (p: Project) => p.lastOpened).reverse();
+  if (!isAnyProjectOpened) {
+    return _.sortBy(sortedProjects, (p: Project) => !p.isPinned);
+  }
+
+  const [lastOpened, ...rest] = sortedProjects;
+  return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
+};
