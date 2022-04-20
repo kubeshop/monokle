@@ -10,12 +10,12 @@ import {Project} from '@models/appconfig';
 
 import * as S from './RecentProject.styled';
 
-interface RecentProjectType {
+type RecentProjectProps = {
   project: Project;
   isActive: boolean;
-  onProjectItemClick?: Function;
-  onPinChange?: Function;
-}
+  onProjectItemClick?: (isActive: boolean, project: Project) => void;
+  onPinChange?: (isPinned: boolean) => void;
+};
 
 const getRelativeDate = (isoDate: string | undefined) => {
   if (isoDate) {
@@ -24,7 +24,7 @@ const getRelativeDate = (isoDate: string | undefined) => {
   return '';
 };
 
-const RecentProject: FC<RecentProjectType> = ({project, isActive, onProjectItemClick, onPinChange}) => {
+const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItemClick, onPinChange}) => {
   const [isTooltipMessageVisible, setIsTooltipMessageVisible] = useState(false);
 
   const handleOnProjectItemClick = () => {
