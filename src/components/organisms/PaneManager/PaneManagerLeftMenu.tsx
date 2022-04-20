@@ -16,6 +16,7 @@ import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
+import featureJson from '@src/feature-flags.json';
 import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
 import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
@@ -182,22 +183,24 @@ const PaneManagerLeftMenu: React.FC = () => {
         </MenuButton>
       </PaneTooltip>
 
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={leftDrawerVisible ? 'Hide Validation' : 'View Validation'}
-        placement="right"
-      >
-        <MenuButton
-          id="validation-drawer"
-          isSelected={leftDrawerVisible}
-          isActive={isActive}
-          onClick={() => dispatch(toggleValidationDrawer())}
-          sectionNames={['scanning']}
-          disabled={!activeProject}
+      {featureJson.ResourceScanning !== true ? null : (
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={leftDrawerVisible ? 'Hide Validation' : 'View Validation'}
+          placement="right"
         >
-          <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
-        </MenuButton>
-      </Tooltip>
+          <MenuButton
+            id="validation-drawer"
+            isSelected={leftDrawerVisible}
+            isActive={isActive}
+            onClick={() => dispatch(toggleValidationDrawer())}
+            sectionNames={['scanning']}
+            disabled={!activeProject}
+          >
+            <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
+          </MenuButton>
+        </Tooltip>
+      )}
     </S.Container>
   );
 };
