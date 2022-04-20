@@ -389,6 +389,11 @@ interface ApplyHelmFileArgs {
   fileMap: FileMapType;
 }
 
+interface HelmValueMatch {
+  path: string;
+  keyPath: string;
+}
+
 const applyForHelmFile = ({
   code,
   currentFile,
@@ -405,7 +410,7 @@ const applyForHelmFile = ({
     return {helmNewDisposables, helmNewDecorations};
   }
 
-  const validKeyPaths: string[] = [];
+  const validKeyPaths: HelmValueMatch[] = [];
   const fileHelmChart = helmChartMap[currentFile.helmChartId as string];
   const valueFilePaths = fileHelmChart.valueFileIds.map(valueFileId => helmValuesMap[valueFileId].filePath);
 
@@ -413,12 +418,18 @@ const applyForHelmFile = ({
     const valueFileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, valueFilePath), 'utf8');
     const documents = parseAllYamlDocuments(valueFileContent);
     documents.forEach(doc => {
-      validKeyPaths.push(...getObjectKeys(doc.toJS(), '.Values.'));
+      const fileKeyPaths = getObjectKeys(doc.toJS(), '.Values.').map(keyPath => ({
+        path: valueFilePath,
+        keyPath,
+      }));
+
+      validKeyPaths.push(...fileKeyPaths);
     });
   });
 
   helmValueRanges.forEach(helmValueRange => {
-    const canFindKeyInValuesFile = validKeyPaths.includes(helmValueRange.value);
+    const keyPathsInFile = validKeyPaths.filter(validKeyPath => helmValueRange.value === validKeyPath.keyPath);
+    const canFindKeyInValuesFile = Boolean(keyPathsInFile.length);
     helmNewDecorations.push(
       createInlineDecoration(
         helmValueRange.range,
@@ -426,12 +437,39 @@ const applyForHelmFile = ({
       )
     );
 
-    const tooltip = canFindKeyInValuesFile
-      ? 'Go to helm values file'
-      : 'We cannot find the value in the helm values file';
-    const linkDisposable = createLinkProvider(helmValueRange.range, tooltip, () => {
-      selectFilePath(valueFilePaths[0]);
-    });
+    if (canFindKeyInValuesFile) {
+      const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
+      keyPathsInFile.forEach(keyPathInFile => {
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+          `Go to: ${keyPathInFile.path}`,
+          'Select file',
+          () => {
+            // @ts-ignore
+            selectFilePath(keyPathInFile.path);
+          }
+        );
+        commandMarkdownLinkList.push(commandMarkdownLink);
+        helmNewDisposables.push(commandDisposable);
+      });
+
+      const text =
+        keyPathsInFile.length > 1
+          ? `Found this value in ${keyPathsInFile.length} helm value files`
+          : `Found this value in ${keyPathsInFile[0].path}`;
+      const hoverCommandMarkdownLinkList = [createMarkdownString(text), ...commandMarkdownLinkList];
+      if (hoverCommandMarkdownLinkList.length > 1) {
+        const hoverDisposable = createHoverProvider(helmValueRange.range, hoverCommandMarkdownLinkList);
+        helmNewDisposables.push(hoverDisposable);
+      }
+
+      return;
+    }
+
+    const linkDisposable = createLinkProvider(
+      helmValueRange.range,
+      'We cannot find the value in the helm values file',
+      () => {}
+    );
     helmNewDisposables.push(linkDisposable);
   });
 
