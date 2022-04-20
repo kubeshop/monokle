@@ -22,8 +22,8 @@ const NewRecentProjectsPane = () => {
     dispatch(setOpenProject(project.rootFolder));
   };
 
-  const onProjectItemClick = (isActivePropject: boolean, project: Project) => {
-    if (isActivePropject) {
+  const onProjectItemClick = (isActiveProject: boolean, project: Project) => {
+    if (isActiveProject) {
       dispatch(toggleStartProjectPane());
       return;
     }
