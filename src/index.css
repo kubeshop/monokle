@@ -64,6 +64,21 @@ code {
   margin-left: 15px;
 }
 
+.monokleEditorPolicyIssueGlyphClass {
+  background-image: url('./assets/OpenPolicyAgentIcon.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  max-height: 10px;
+  max-width: 10px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
+.monokleEditorPolicyIssueInlineClass {
+  color: #e65a6d !important;
+  text-decoration: underline;
+}
+
 .monokleEditorSatisfiedRefInlineClass {
   color: #1890ff !important;
   text-decoration: underline;

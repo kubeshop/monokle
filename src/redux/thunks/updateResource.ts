@@ -24,6 +24,7 @@ export const updateResource = createAsyncThunk(
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
+    const policyPlugins = state.main.policies.plugins;
 
     const {isInClusterMode, resourceId, content, preventSelectionAndHighlightsUpdate} = payload;
 
@@ -43,7 +44,8 @@ export const updateResource = createAsyncThunk(
             resourceIds,
             currentResourceMap,
             fileMap,
-            mainState.resourceRefsProcessingOptions
+            mainState.resourceRefsProcessingOptions,
+            {policyPlugins}
           );
           if (!preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;

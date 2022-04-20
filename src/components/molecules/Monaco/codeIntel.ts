@@ -9,6 +9,8 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
+import {isDefined} from '@utils/filter';
+
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
@@ -20,6 +22,7 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
+  createMarker,
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
@@ -133,17 +136,51 @@ export async function applyForResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   model: monaco.editor.IModel | null
-) {
-  const refs = resource.refs;
+): Promise<{
+  newDecorations: monaco.editor.IModelDeltaDecoration[];
+  newDisposables: monaco.IDisposable[];
+  newMarkers: monaco.editor.IMarkerData[];
+}> {
+  const disposables: monaco.IDisposable[] = [];
+  const decorations: monaco.editor.IModelDeltaDecoration[] = [];
+  const markers: monaco.editor.IMarkerData[] = [];
+
+  if (model) {
+    await processSymbols(model, resource, filterResources, disposables, decorations);
+  }
+
+  const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
+  disposables.push(...refIntel.disposables);
+  decorations.push(...refIntel.decorations);
+
+  const policyIntel = applyPolicyIntel(resource);
+  decorations.push(...policyIntel.decorations);
+  markers.push(...policyIntel.markers);
+
+  return {
+    newDecorations: decorations,
+    newDisposables: disposables,
+    newMarkers: markers,
+  };
+}
+
+function applyRefIntel(
+  resource: K8sResource,
+  selectResource: (resourceId: string) => void,
+  selectFilePath: (filePath: string) => void,
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType
+): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
+  disposables: monaco.IDisposable[];
+} {
+  const refs = resource.refs ?? [];
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
 
-  if (model) {
-    await processSymbols(model, resource, filterResources, newDisposables, newDecorations);
-  }
-
-  if (!refs || refs.length === 0) {
-    return {newDecorations, newDisposables};
+  if (refs.length === 0) {
+    return {decorations: newDecorations, disposables: newDisposables};
   }
 
   const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
@@ -291,7 +328,47 @@ export async function applyForResource(
     }
   });
 
-  return {newDecorations, newDisposables};
+  return {decorations: newDecorations, disposables: newDisposables};
+}
+
+function applyPolicyIntel(resource: K8sResource): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
+  markers: monaco.editor.IMarkerData[];
+} {
+  const issues = resource.issues?.errors ?? [];
+
+  const glyphs = issues.map(issue => {
+    const rule = issue.rule!;
+    const message = [
+      createMarkdownString(`__${issue.message}:__ ${rule.longDescription.text} ${rule.help.text}`),
+    ].filter(isDefined);
+
+    return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
+  });
+
+  const markers = issues
+    .map(issue => {
+      if (
+        !issue.errorPos ||
+        issue.errorPos.line === 1 ||
+        issue.errorPos.endLine === undefined ||
+        issue.errorPos.endColumn === undefined
+      ) {
+        return undefined;
+      }
+
+      const range = new monaco.Range(
+        issue.errorPos.line,
+        issue.errorPos.column,
+        issue.errorPos.endLine,
+        issue.errorPos.endColumn
+      );
+
+      return createMarker(issue.message, range);
+    })
+    .filter(isDefined);
+
+  return {decorations: [...glyphs], markers};
 }
 
 export default {

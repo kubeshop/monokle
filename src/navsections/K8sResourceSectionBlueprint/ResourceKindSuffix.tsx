@@ -25,7 +25,7 @@ const Suffix = (props: ItemCustomComponentProps) => {
           type="outgoing"
         />
       )}
-      {resource.validation?.errors && (
+      {(resource.validation?.errors || resource.issues?.errors) && (
         <ValidationErrorsPopover
           resource={resource}
           isSelected={itemInstance.isSelected}

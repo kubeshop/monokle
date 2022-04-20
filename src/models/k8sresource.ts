@@ -1,5 +1,7 @@
 import {Scalar} from 'yaml';
 
+import {SarifRule} from './policy';
+
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
 type ResourceValidationError = {
@@ -7,6 +9,7 @@ type ResourceValidationError = {
   message: string;
   errorPos?: RefPosition;
   description?: string;
+  rule?: SarifRule;
 };
 
 type ResourceValidation = {
@@ -52,6 +55,9 @@ interface K8sResource {
   };
   /** result of schema validation */
   validation?: ResourceValidation;
+
+  /** result of policy validation */
+  issues?: ResourceValidation;
 }
 
 export enum ResourceRefType {
@@ -88,6 +94,8 @@ interface RefPosition {
   line: number;
   column: number;
   length: number;
+  endLine?: number;
+  endColumn?: number;
 }
 
 export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};

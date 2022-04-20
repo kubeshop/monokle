@@ -31,6 +31,7 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {loadPolicies} from '@redux/thunks/loadPolicies';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
@@ -1014,6 +1015,12 @@ export const mainSlice = createSlice({
 
     builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
+    });
+
+    builder.addCase(loadPolicies.fulfilled, (state, action) => {
+      state.policies = {
+        plugins: action.payload,
+      };
     });
 
     builder.addMatcher(

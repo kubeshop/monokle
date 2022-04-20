@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {Divider, Typography} from 'antd';
 
@@ -54,6 +54,10 @@ const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
+  const errors = useMemo(() => {
+    return [...(resource.validation?.errors ?? []), ...(resource.issues?.errors ?? [])];
+  }, [resource]);
+
   const selectResource = (selectedId: string) => {
     if (resourceMap[selectedId]) {
       dispatch(selectK8sResource({resourceId: selectedId}));
@@ -95,9 +99,9 @@ const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
 
   return (
     <Container>
-      <PopoverTitle>Schema Validation Errors</PopoverTitle>
+      <PopoverTitle>Validation Errors</PopoverTitle>
       <StyledDivider />
-      {resource.validation?.errors.map(error => (
+      {errors.map(error => (
         <StyledRefDiv key={`${error.property}:${error.message}`}>
           <ValidationErrorLink validationError={error} onClick={() => onLinkClick(error)} />
           {error.description && <StyledDescription>{error.description}</StyledDescription>}

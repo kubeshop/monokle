@@ -143,6 +143,8 @@ export function countResourceWarnings(resources: K8sResource[]): number {
 
 export function countResourceErrors(resources: K8sResource[]): number {
   return resources.reduce<number>((acc, resource) => {
-    return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
+    const validationErrorCount = resource.validation ? resource.validation.errors.length : 0;
+    const policyErrorCount = resource.issues ? resource.issues.errors.length : 0;
+    return acc + validationErrorCount + policyErrorCount;
   }, 0);
 }

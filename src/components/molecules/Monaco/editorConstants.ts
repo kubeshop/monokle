@@ -1,15 +1,21 @@
 import {monaco} from 'react-monaco-editor';
 
+import Colors from '@styles/Colors';
+
+export const MODEL_OWNER = 'monokle';
+
 export enum GlyphDecorationTypes {
   UnsatisfiedRef,
   SatisfiedRef,
   IncomingRef,
   OutgoingRef,
+  PolicyIssue,
 }
 
 export enum InlineDecorationTypes {
   UnsatisfiedRef,
   SatisfiedRef,
+  PolicyIssue,
 }
 
 const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.IModelDecorationOptions> = {
@@ -29,21 +35,32 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
     glyphMarginClassName: 'monokleEditorOutgoingRefGlyphClass',
     glyphMarginHoverMessage: {value: 'Outgoing link'},
   },
+  [GlyphDecorationTypes.PolicyIssue]: {
+    glyphMarginClassName: 'monokleEditorPolicyIssueGlyphClass',
+    glyphMarginHoverMessage: {value: 'Policy issue'},
+  },
 };
 
-const inlineDecorationOptionsByType = {
-  [GlyphDecorationTypes.UnsatisfiedRef]: {
+const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor.IModelDecorationOptions> = {
+  [InlineDecorationTypes.UnsatisfiedRef]: {
     inlineClassName: 'monokleEditorUnsatisfiedRefInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Left,
       color: '#ad8b00',
     },
   },
-  [GlyphDecorationTypes.SatisfiedRef]: {
+  [InlineDecorationTypes.SatisfiedRef]: {
     inlineClassName: 'monokleEditorSatisfiedRefInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Right,
       color: '#3C8618',
+    },
+  },
+  [InlineDecorationTypes.PolicyIssue]: {
+    inlineClassName: 'monokleEditorPolicyIssueInlineClass',
+    overviewRuler: {
+      position: monaco.editor.OverviewRulerLane.Left,
+      color: Colors.redError,
     },
   },
 };

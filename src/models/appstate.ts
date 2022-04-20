@@ -3,6 +3,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
+import {Policy} from './policy';
 
 /**
  * Maps uuid:s to K8sResources
@@ -143,6 +144,9 @@ interface AppState {
     diffResourceId?: string;
     refreshDiffResource?: boolean;
     selectedMatches: string[];
+  };
+  policies: {
+    plugins: Policy[];
   };
   notifications: AlertType[];
   /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */

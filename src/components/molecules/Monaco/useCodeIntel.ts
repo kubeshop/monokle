@@ -7,7 +7,7 @@ import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import codeIntel from './codeIntel';
-import {clearDecorations, setDecorations} from './editorHelpers';
+import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 function useCodeIntel(
   editor: monaco.editor.IStandaloneCodeEditor | null,
@@ -45,11 +45,14 @@ function useCodeIntel(
           filterResources,
           resourceMap,
           fileMap,
-          editor?.getModel()
+          editor.getModel()
         )
-        .then(({newDecorations, newDisposables}) => {
+        .then(({newDecorations, newDisposables, newMarkers}) => {
           idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
           disposablesRef.current = newDisposables;
+
+          const model = editor.getModel();
+          if (model) setMarkers(model, newMarkers);
         });
     }
   };
