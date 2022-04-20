@@ -5,6 +5,7 @@ import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 import Colors from '@styles/Colors';
 
 import {Collapse, Helm, IncomingRefs, Kubernetes, Kustomize, OutgoingRefs, Validation, Warning} from './Icons';
+import OpenPolicyAgent from './Icons/OpenPolicyAgent';
 
 export type IconNames =
   | 'kubernetes'
@@ -15,7 +16,8 @@ export type IconNames =
   | 'outgoingRefs'
   | 'warning'
   | 'error'
-  | 'validation';
+  | 'validation'
+  | 'open-policy-agent';
 
 type IconProps = {
   name: IconNames;
@@ -36,6 +38,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   warning: Warning,
   error: ExclamationCircleOutlined,
   validation: Validation,
+  'open-policy-agent': OpenPolicyAgent,
 };
 
 const Icon: React.FC<IconProps> = props => {
