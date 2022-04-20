@@ -1,3 +1,7 @@
+import {useDispatch} from 'react-redux';
+
+import {toggleAllRules} from '@redux/reducers/main';
+
 import {Button} from '@src/App.styled';
 
 import * as S from './ValidationOpenPolicyAgent.styled';
@@ -13,6 +17,8 @@ type Props = {
 };
 
 export function ValidationOpenPolicyAgent({onBack}: Props) {
+  const dispatch = useDispatch();
+
   return (
     <>
       <ValidationOpenPolicyAgentHeading onBack={onBack} />
@@ -21,8 +27,8 @@ export function ValidationOpenPolicyAgent({onBack}: Props) {
         <S.Description>{data.description}</S.Description>
 
         <S.DescriptionActions>
-          <Button>Enable all</Button>
-          <Button>Disable all</Button>
+          <Button onClick={() => dispatch(toggleAllRules(true))}>Enable all</Button>
+          <Button onClick={() => dispatch(toggleAllRules(false))}>Disable all</Button>
         </S.DescriptionActions>
       </S.DescriptionContainer>
 

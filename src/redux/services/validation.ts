@@ -49,6 +49,8 @@ export function validatePolicies(resource: K8sResource, policies: Policy[]): Res
     .filter(policy => policy.config.enabled && policy.validatorId)
     .flatMap(policy => {
       return policy.metadata.rules.flatMap(rule => {
+        const isRuleEnabled = policy.config.enabledRules.includes(rule.id);
+        if (!isRuleEnabled) return [];
         const errors = validatePolicyRule(resource, policy, rule);
         return errors;
       });

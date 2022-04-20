@@ -611,6 +611,35 @@ export const mainSlice = createSlice({
       state.selectedPreviewConfigurationId = undefined;
       state.selectedValuesFileId = undefined;
     },
+    toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      const enable = action.payload;
+      const plugin = state.policies.plugins[0];
+      if (!plugin) return; // not yet loaded;
+
+      if (enable) {
+        const allRuleIds = plugin.metadata.rules.map(r => r.id);
+        plugin.config.enabledRules = allRuleIds;
+      } else {
+        plugin.config.enabledRules = [];
+      }
+    },
+    toggleRule: (state: Draft<AppState>, action: PayloadAction<{ruleId: string; enable?: boolean}>) => {
+      const plugin = state.policies.plugins[0];
+      if (!plugin) return; // not yet loaded;
+
+      const ruleId = action.payload.ruleId;
+      const shouldToggle = action.payload.enable === undefined;
+      const isEnabled = plugin.config.enabledRules.includes(ruleId);
+      const enable = shouldToggle ? !isEnabled : action.payload.enable;
+
+      if (enable) {
+        if (isEnabled) return;
+        plugin.config.enabledRules.push(ruleId);
+      } else {
+        if (!isEnabled) return;
+        plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1140,5 +1169,7 @@ export const {
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,
   clearSelected,
+  toggleAllRules,
+  toggleRule,
 } = mainSlice.actions;
 export default mainSlice.reducer;

@@ -5,7 +5,7 @@ import {Skeleton} from 'antd';
 import {useAppSelector} from '@redux/hooks';
 
 import * as S from './ValidationOpenPolicyAgentTable.styled';
-import {COLUMNS} from './ValidationOpenPolicyAgentTableConfig';
+import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
 
 export type Severity = 'high' | 'medium' | 'low';
 export type Rule = {
@@ -16,6 +16,7 @@ export type Rule = {
 };
 
 export function ValidationOpenPolicyAgentTable() {
+  const columns = useOpenPolicyAgentTable();
   const rules = useAppSelector(state => {
     const plugins = state.main.policies.plugins;
 
@@ -44,14 +45,7 @@ export function ValidationOpenPolicyAgentTable() {
 
   return (
     <>
-      <S.Table
-        columns={COLUMNS}
-        dataSource={filteredRules}
-        pagination={false}
-        components={{
-          body: {},
-        }}
-      />
+      <S.Table columns={columns} dataSource={filteredRules} pagination={false} rowKey="id" />
     </>
   );
 }
