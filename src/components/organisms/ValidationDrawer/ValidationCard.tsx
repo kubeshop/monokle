@@ -1,5 +1,3 @@
-import {Card} from 'antd';
-
 import {IconNames} from '@components/atoms/Icon';
 
 import * as S from './ValidationCard.styled';
@@ -14,7 +12,7 @@ type Props = {
 
 export function ValidationCard({id, icon, name, description, learnMoreUrl}: Props) {
   return (
-    <Card key={id} style={{backgroundColor: '#31393C', border: '2px solid #31393C', borderRadius: '2px'}}>
+    <S.Card key={id}>
       <S.Icon name={icon} />
       <S.Name>{name}</S.Name>
       <p>
@@ -22,6 +20,6 @@ export function ValidationCard({id, icon, name, description, learnMoreUrl}: Prop
       </p>
 
       <S.Button>Configure</S.Button>
-    </Card>
+    </S.Card>
   );
 }

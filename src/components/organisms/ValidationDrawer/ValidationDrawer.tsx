@@ -5,8 +5,6 @@ import {Col, Row} from 'antd';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleValidationDrawer} from '@redux/reducers/ui';
 
-import Drawer from '@components/atoms/Drawer';
-
 import ValidationFigure from '@assets/ValidationFigure.svg';
 
 import {ValidationCard} from './ValidationCard';
@@ -19,7 +17,7 @@ function ValidationPane({height}: {height: number}) {
   const isVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
 
   return (
-    <Drawer
+    <S.Drawer
       key="validation-pane"
       title={<DrawerHeading title="Validate your resources" />}
       size="large"
@@ -28,27 +26,7 @@ function ValidationPane({height}: {height: number}) {
       closable={false}
       onClose={() => dispatch(toggleValidationDrawer())}
       getContainer={false}
-      style={{
-        position: 'absolute',
-        height,
-        overflow: 'hidden',
-      }}
-      drawerStyle={{
-        backgroundColor: '#191F21',
-      }}
-      contentWrapperStyle={{
-        backgroundColor: 'red',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}
-      headerStyle={{
-        backgroundColor: '#191F21',
-        paddingLeft: '16px',
-        paddingTop: '8px',
-        paddingRight: '4px',
-        paddingBottom: '8px',
-      }}
+      height={height}
     >
       <S.ValidationImg src={ValidationFigure} />
       <S.ValidationTitle>Boost your validation powers!</S.ValidationTitle>
@@ -67,7 +45,7 @@ function ValidationPane({height}: {height: number}) {
           <ValidationCardUpnext />
         </Col>
       </Row>
-    </Drawer>
+    </S.Drawer>
   );
 }
 

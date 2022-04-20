@@ -1,10 +1,19 @@
-import {Button as AntdButton} from 'antd';
+import {Button as AntdButton, Card as AntdCard} from 'antd';
 
 import styled from 'styled-components';
 
 import {Icon as BaseIcon} from '@components/atoms';
 
 import Colors from '@styles/Colors';
+
+export const Card = styled(AntdCard)`
+  border: 2px solid #31393c;
+  border-radius: 2px;
+
+  .ant-card-body {
+    background-color: #31393c;
+  }
+`;
 
 export const Icon = styled(BaseIcon)`
   font-size: 32px;
