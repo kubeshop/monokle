@@ -1,20 +1,19 @@
-import React from 'react';
-
-import {Col, Row} from 'antd';
+import React, {useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleValidationDrawer} from '@redux/reducers/ui';
 
-import ValidationFigure from '@assets/ValidationFigure.svg';
-
-import {ValidationCard} from './ValidationCard';
-import {ValidationCardUpnext} from './ValidationCardUpnext';
+import {ValidationOpenPolicyAgent} from './OpenPolicyAgent/ValidationOpenPolicyAgent';
+import {ValidationOverView} from './Overview/ValidationOverview';
 import * as S from './ValidationDrawer.styled';
 import {DrawerHeading} from './ValidationDrawerHeading';
+
+export type Integration = 'open-policy-agent';
 
 function ValidationPane({height}: {height: number}) {
   const dispatch = useAppDispatch();
   const isVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
+  const [integration, setIntegration] = useState<Integration | undefined>(undefined);
 
   return (
     <S.Drawer
@@ -28,23 +27,11 @@ function ValidationPane({height}: {height: number}) {
       getContainer={false}
       height={height}
     >
-      <S.ValidationImg src={ValidationFigure} />
-      <S.ValidationTitle>Boost your validation powers!</S.ValidationTitle>
-
-      <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <ValidationCard
-            id="open-policy-agent"
-            icon="open-policy-agent"
-            name="Open Policy Agent"
-            description="Open Policy Agent Policy-based control for cloud native environments. Flexible, fine-grained control for administrators across the stack."
-            learnMoreUrl="https://github.com/open-policy-agent/opa"
-          />
-        </Col>
-        <Col span={12}>
-          <ValidationCardUpnext />
-        </Col>
-      </Row>
+      {integration === 'open-policy-agent' ? (
+        <ValidationOpenPolicyAgent onBack={() => setIntegration(undefined)} />
+      ) : (
+        <ValidationOverView onDiscover={setIntegration} />
+      )}
     </S.Drawer>
   );
 }

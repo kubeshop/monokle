@@ -8,9 +8,10 @@ type Props = {
   name: string;
   description: string;
   learnMoreUrl: string;
+  onDiscover: (id: string) => void;
 };
 
-export function ValidationCard({id, icon, name, description, learnMoreUrl}: Props) {
+export function ValidationCard({id, icon, name, description, learnMoreUrl, onDiscover}: Props) {
   return (
     <S.Card key={id}>
       <S.Icon name={icon} />
@@ -19,7 +20,7 @@ export function ValidationCard({id, icon, name, description, learnMoreUrl}: Prop
         <S.Description>{description}</S.Description> <S.Link href={learnMoreUrl}>Learn more</S.Link>
       </p>
 
-      <S.Button>Configure</S.Button>
+      <S.Button onClick={() => onDiscover(id)}>Configure</S.Button>
     </S.Card>
   );
 }
