@@ -1,10 +1,12 @@
-import React from 'react';
+import {Button} from '@src/App.styled';
 
-import {Button} from 'antd';
+import * as S from './ValidationOpenPolicyAgent.styled';
+import {ValidationOpenPolicyAgentHeading} from './ValidationOpenPolicyAgentHeading';
+import {ValidationOpenPolicyAgentTable} from './ValidationOpenPolicyAgentTable';
 
 const data = {
-  description: 'Scan your code for vulnerabilities. Enable or disable Trivy rules in this list.',
-};
+  description: 'Validate your resources with policies. Enable or disable OPA rules in this list.',
+} as const;
 
 type Props = {
   onBack: () => void;
@@ -13,16 +15,18 @@ type Props = {
 export function ValidationOpenPolicyAgent({onBack}: Props) {
   return (
     <>
-      <div>
-        <p>Open Policy Agent</p>
-        <Button onClick={onBack}>Back</Button>
-      </div>
+      <ValidationOpenPolicyAgentHeading onBack={onBack} />
 
-      <div>
-        <p>{data.description}</p>
-        <Button>Enable all</Button>
-        <Button>Disable all</Button>
-      </div>
+      <S.DescriptionContainer>
+        <S.Description>{data.description}</S.Description>
+
+        <S.DescriptionActions>
+          <Button>Enable all</Button>
+          <Button>Disable all</Button>
+        </S.DescriptionActions>
+      </S.DescriptionContainer>
+
+      <ValidationOpenPolicyAgentTable />
     </>
   );
 }

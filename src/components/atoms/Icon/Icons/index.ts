@@ -6,3 +6,7 @@ export {default as IncomingRefs} from './IncomingRefs';
 export {default as OutgoingRefs} from './OutgoingRefs';
 export {default as Warning} from './Warning';
 export {default as Validation} from './Validation';
+export {default as OpenPolicyAgent} from './OpenPolicyAgent';
+export {default as SeverityHigh} from './SeverityHigh';
+export {default as SeverityMedium} from './SeverityHigh';
+export {default as SeverityLow} from './SeverityLow';

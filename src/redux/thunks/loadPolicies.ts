@@ -42,7 +42,7 @@ export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', asyn
   }
 });
 
-const DEFAULT_CONFIGURATION: PolicyConfig = {enabled: true};
+const DEFAULT_CONFIGURATION: PolicyConfig = {enabled: true, enabledRules: []};
 
 const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
   name: 'Default Trivy policies',

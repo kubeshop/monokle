@@ -59,6 +59,8 @@ export type PolicyValidator = Awaited<ReturnType<typeof loadPolicy>>;
 export type PolicyConfig = {
   // Whether the policy is enabled.
   enabled: boolean;
+  // List of rule identifiers that are enabled.
+  enabledRules: string[];
 };
 
 export type Policy = {
