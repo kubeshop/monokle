@@ -1,7 +1,9 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {Switch} from 'antd';
+import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
@@ -28,7 +30,24 @@ export function useOpenPolicyAgentTable() {
       {
         key: 'description',
         title: 'Description',
-        dataIndex: 'description',
+        dataIndex: 'name',
+        render: (_value, record) => {
+          const {description, learnMoreUrl} = record;
+          return (
+            <Tooltip
+              title={
+                <p>
+                  {description}{' '}
+                  {!learnMoreUrl ? null : <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
+                </p>
+              }
+              placement="bottomLeft"
+              overlayStyle={{maxWidth: '500px'}}
+            >
+              {record.name}
+            </Tooltip>
+          );
+        },
       },
       {
         key: 'id',

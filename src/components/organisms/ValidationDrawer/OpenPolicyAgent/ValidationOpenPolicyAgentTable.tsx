@@ -10,7 +10,9 @@ import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
 export type Severity = 'high' | 'medium' | 'low';
 export type Rule = {
   id: string;
+  name: string;
   description: string;
+  learnMoreUrl?: string;
   severity: Severity;
   enabled: boolean;
 };
@@ -33,7 +35,9 @@ export function ValidationOpenPolicyAgentTable() {
 
       return {
         id: rule.id,
-        description: rule.longDescription.text,
+        name: rule.shortDescription.text,
+        description: `${rule.longDescription.text} ${rule.help.text}`,
+        learnMoreUrl: rule.helpUri,
         severity,
         enabled: defaultPlugin.config.enabledRules.includes(rule.id),
       };
