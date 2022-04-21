@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
-import {Checkbox, Input, Modal} from 'antd';
+import {Checkbox, Form, Input, Modal} from 'antd';
 
 import styled from 'styled-components';
 
@@ -23,7 +23,9 @@ const RenameResourceModel: React.FC = () => {
   const [newResourceName, setNewResourceName] = useState<string>();
   const [resource, setResource] = useState<K8sResource>();
   const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
+  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false);
 
+  const [form] = Form.useForm();
   const inputNameRef = useRef<any>();
 
   useEffect(() => {
@@ -63,20 +65,42 @@ const RenameResourceModel: React.FC = () => {
       title={`Rename resource - ${resource.name}`}
       visible={uiState.isOpen}
       onOk={handleOk}
+      okButtonProps={{disabled: isButtonDisabled}}
       onCancel={handleCancel}
     >
-      <span>New resource name:</span>
-      <Input ref={inputNameRef} defaultValue={newResourceName} onChange={e => setNewResourceName(e.target.value)} />
-      <CheckboxContainer>
-        <Checkbox
-          checked={shouldUpdateRefs}
-          onChange={e => {
-            setShouldUpdateRefs(e.target.checked);
-          }}
+      <Form
+        form={form}
+        layout="vertical"
+        onFieldsChange={() => setButtonDisabled(form.getFieldsError().some(field => field.errors.length > 0))}
+      >
+        <Form.Item
+          name="name"
+          label="New Resource Name"
+          rules={[
+            {required: true, message: 'This field is required'},
+            {pattern: /^[a-z0-9]$|^([a-z0-9\-.])*[a-z0-9]$/, message: 'Wrong pattern'},
+            {max: 63, type: 'string', message: 'Too long'},
+          ]}
         >
-          Automatically update references to this resource
-        </Checkbox>
-      </CheckboxContainer>
+          <Input
+            id="resource-name-input"
+            placeholder="Enter resource name"
+            ref={inputNameRef}
+            defaultValue={newResourceName}
+            onChange={e => setNewResourceName(e.target.value)}
+          />
+        </Form.Item>
+        <CheckboxContainer>
+          <Checkbox
+            checked={shouldUpdateRefs}
+            onChange={e => {
+              setShouldUpdateRefs(e.target.checked);
+            }}
+          >
+            Automatically update references to this resource
+          </Checkbox>
+        </CheckboxContainer>
+      </Form>
     </Modal>
   );
 };
