@@ -312,7 +312,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    dispatch(reprocessAllResources(null));
+    dispatch(reprocessAllResources());
   }, [k8sVersion, dispatch]);
 
   const previewConfigurationDrawerOnClose = () => {
