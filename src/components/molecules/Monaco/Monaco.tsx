@@ -271,7 +271,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (!settings.allowEditInClusterMode && previewType === 'cluster') {
+    if (isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode) {
       return true;
     }
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
