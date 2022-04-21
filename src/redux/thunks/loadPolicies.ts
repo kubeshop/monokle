@@ -8,6 +8,8 @@ import {BasicPolicy, POLICY_VALIDATOR_MAP, Policy, PolicyConfig, ValidatorId} fr
 import {setAlert} from '@redux/reducers/alert';
 import {loadBinaryResource} from '@redux/services';
 
+import electronStore from '@utils/electronStore';
+
 import featureJson from '@src/feature-flags.json';
 
 import {loadPolicy} from '@open-policy-agent/opa-wasm';
@@ -29,7 +31,11 @@ export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', asyn
     const validator = await loadPolicy(wasm);
     POLICY_VALIDATOR_MAP[validatorId] = validator;
 
-    return [{validatorId, metadata: plugin, config: DEFAULT_CONFIGURATION}];
+    const allStoredConfig: PolicyConfig[] = electronStore.get('pluginConfig.policies');
+    const storedConfig = allStoredConfig.find(c => c.id === plugin.id);
+    const config = storedConfig ?? {id: plugin.id, ...DEFAULT_CONFIGURATION};
+
+    return [{validatorId, metadata: plugin, config}];
   } catch (err) {
     dispatch(
       setAlert({
@@ -42,7 +48,7 @@ export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', asyn
   }
 });
 
-const DEFAULT_CONFIGURATION: PolicyConfig = {enabled: true, enabledRules: []};
+const DEFAULT_CONFIGURATION: Omit<PolicyConfig, 'id'> = {enabled: true, enabledRules: []};
 
 const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
   name: 'Default Trivy policies',

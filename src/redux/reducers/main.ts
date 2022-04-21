@@ -625,6 +625,10 @@ export const mainSlice = createSlice({
       } else {
         plugin.config.enabledRules = [];
       }
+
+      // persist latest configuration
+      const allConfig = state.policies.plugins.map(p => p.config);
+      electronStore.set('pluginConfig.policies', allConfig);
     },
     toggleRule: (state: Draft<AppState>, action: PayloadAction<{ruleId: string; enable?: boolean}>) => {
       const plugin = state.policies.plugins[0];
@@ -642,6 +646,10 @@ export const mainSlice = createSlice({
         if (!isEnabled) return;
         plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
       }
+
+      // persist latest configuration
+      const allConfig = state.policies.plugins.map(p => p.config);
+      electronStore.set('pluginConfig.policies', allConfig);
     },
   },
   extraReducers: builder => {
