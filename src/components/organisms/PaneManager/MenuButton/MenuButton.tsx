@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import Colors from '@styles/Colors';
+import Colors, {PanelColors} from '@styles/Colors';
 
 import * as S from './styled';
 
@@ -41,7 +41,12 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     return Object.values(sectionInstanceByName).some(sectionInstance => sectionInstance.isSelected);
   }, [sectionInstanceByName]);
 
-  const style: React.CSSProperties = {width: '100%'};
+  const style: React.CSSProperties = {
+    width: '100%',
+    borderRadius: '0px',
+    background: !isSelected || !isActive ? 'transparent' : PanelColors.toolBar,
+    height: '45px',
+  };
 
   const hasGradientBackground = useMemo(() => {
     return Boolean(

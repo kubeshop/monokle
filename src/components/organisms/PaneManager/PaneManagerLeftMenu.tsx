@@ -1,10 +1,8 @@
 import {useEffect, useMemo, useState} from 'react';
 
-import {Tooltip} from 'antd';
-
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {LeftMenuSelectionType} from '@models/ui';
 
@@ -25,6 +23,7 @@ import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSecti
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
 import * as S from './PaneManagerLeftMenu.styled';
+import PaneTooltip from './PaneTooltip';
 
 const PaneManagerLeftMenu: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -79,9 +78,9 @@ const PaneManagerLeftMenu: React.FC = () => {
 
   return (
     <S.Container id="LeftToolbar" isLeftActive={leftActive}>
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={leftMenuSelection === 'file-explorer' && leftActive ? 'Hide File Explorer' : 'View File Explorer'}
+      <PaneTooltip
+        show={!leftActive || !(leftMenuSelection === 'file-explorer')}
+        title="View File Explorer"
         placement="right"
       >
         <MenuButton
@@ -99,11 +98,11 @@ const PaneManagerLeftMenu: React.FC = () => {
             isSelected={Boolean(activeProject) && leftMenuSelection === 'file-explorer'}
           />
         </MenuButton>
-      </Tooltip>
+      </PaneTooltip>
 
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={leftMenuSelection === 'kustomize-pane' && leftActive ? 'Hide Kustomizations' : 'View Kustomizations'}
+      <PaneTooltip
+        show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
+        title="View Kustomizations"
         placement="right"
       >
         <MenuButton
@@ -127,11 +126,11 @@ const PaneManagerLeftMenu: React.FC = () => {
             />
           </S.Badge>
         </MenuButton>
-      </Tooltip>
+      </PaneTooltip>
 
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={leftMenuSelection === 'helm-pane' && leftActive ? 'Hide Helm Charts' : 'View Helm Charts'}
+      <PaneTooltip
+        show={!leftActive || !(leftMenuSelection === 'helm-pane')}
+        title="View Helm Charts"
         placement="right"
       >
         <WalkThrough placement="rightTop" step="kustomizeHelm">
@@ -157,11 +156,11 @@ const PaneManagerLeftMenu: React.FC = () => {
             </S.Badge>
           </MenuButton>
         </WalkThrough>
-      </Tooltip>
+      </PaneTooltip>
 
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={leftMenuSelection === 'templates-pane' && leftActive ? 'Hide Templates' : 'View Templates'}
+      <PaneTooltip
+        show={!leftActive || !(leftMenuSelection === 'templates-pane')}
+        title="View Templates"
         placement="right"
       >
         <MenuButton
@@ -178,7 +177,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
           />
         </MenuButton>
-      </Tooltip>
+      </PaneTooltip>
     </S.Container>
   );
 };

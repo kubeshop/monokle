@@ -100,7 +100,7 @@ export const ClusterOutlined = styled(RawClusterOutlined)`
 export const ClusterStatus = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey3};
+  border: 1px solid ${Colors.grey5};
   border-radius: 4px;
   padding: 0px 8px;
 `;
