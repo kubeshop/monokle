@@ -92,6 +92,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           shouldWatchSelectedPath
           onClick={() => setLeftActiveMenu('file-explorer')}
           disabled={!activeProject}
+          style={{borderRadius: 0}}
         >
           <MenuIcon
             style={{marginLeft: 4}}
@@ -114,6 +115,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           onClick={() => setLeftActiveMenu('kustomize-pane')}
           sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
           disabled={!activeProject}
+          style={{borderRadius: 0}}
         >
           <S.Badge
             count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
@@ -143,6 +145,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             onClick={() => setLeftActiveMenu('helm-pane')}
             sectionNames={[HELM_CHART_SECTION_NAME]}
             disabled={!activeProject}
+            style={{borderRadius: 0}}
           >
             <S.Badge
               count={!hasSeenHelmCharts && helmCharts.length ? helmCharts.length : 0}
@@ -170,6 +173,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           isActive={isActive}
           onClick={() => setLeftActiveMenu('templates-pane')}
           disabled={!activeProject}
+          style={{borderRadius: 0}}
         >
           <MenuIcon
             className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
@@ -188,12 +192,11 @@ const PaneManagerLeftMenu: React.FC = () => {
           placement="right"
         >
           <MenuButton
-            id="validation-drawer"
             isSelected={leftDrawerVisible}
             isActive={isActive}
             onClick={() => dispatch(toggleValidationDrawer())}
-            sectionNames={['scanning']}
             disabled={!activeProject}
+            style={{borderRadius: 0}}
           >
             <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
           </MenuButton>
