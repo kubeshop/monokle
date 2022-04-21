@@ -46,7 +46,13 @@ const PaneManagerLeftMenu: React.FC = () => {
   const rootFileEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
 
   const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
-    dispatch(toggleValidationDrawer(false));
+    if (leftDrawerVisible) {
+      dispatch(toggleValidationDrawer(false));
+      dispatch(setLeftMenuSelection(selectedMenu));
+      if (!leftActive) dispatch(toggleLeftMenu());
+      return;
+    }
+
     if (leftMenuSelection === selectedMenu) {
       if (isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());
