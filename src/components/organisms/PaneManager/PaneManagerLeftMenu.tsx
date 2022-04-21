@@ -16,7 +16,6 @@ import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
-import featureJson from '@src/feature-flags.json';
 import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
 import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
@@ -181,18 +180,16 @@ const PaneManagerLeftMenu: React.FC = () => {
         </MenuButton>
       </PaneTooltip>
 
-      {featureJson.ResourceScanning !== true ? null : (
-        <PaneTooltip show={!leftDrawerVisible} title="View Validation" placement="right">
-          <MenuButton
-            isSelected={leftDrawerVisible}
-            isActive={isActive}
-            onClick={() => dispatch(toggleValidationDrawer())}
-            disabled={!activeProject}
-          >
-            <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
-          </MenuButton>
-        </PaneTooltip>
-      )}
+      <PaneTooltip show={!leftDrawerVisible} title="View Validation" placement="right">
+        <MenuButton
+          isSelected={leftDrawerVisible}
+          isActive={isActive}
+          onClick={() => dispatch(toggleValidationDrawer())}
+          disabled={!activeProject}
+        >
+          <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
+        </MenuButton>
+      </PaneTooltip>
     </S.Container>
   );
 };
