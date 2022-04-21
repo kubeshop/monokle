@@ -1,5 +1,8 @@
-import React from 'react';
+import {shell} from 'electron';
 
+import React, {useCallback} from 'react';
+
+import {OPA_INTEGRATION} from '../integrations';
 import * as S from './ValidationOpenPolicyAgentHeading.styled';
 
 type Props = {
@@ -7,14 +10,17 @@ type Props = {
 };
 
 export function ValidationOpenPolicyAgentHeading({onBack}: Props) {
+  const {icon, name, learnMoreUrl} = OPA_INTEGRATION;
+  const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
+
   return (
     <S.Heading>
       <S.HeadingLeft>
-        <S.Icon name="open-policy-agent" />
+        <S.Icon name={icon} />
 
         <S.HeadingTextContainer>
-          <S.Name>Open Policy Agent</S.Name>
-          <S.Link>Learn more</S.Link>
+          <S.Name>{name}</S.Name>
+          <S.Link onClick={openLearnMore}>Learn more</S.Link>
         </S.HeadingTextContainer>
       </S.HeadingLeft>
 

@@ -7,13 +7,12 @@ import {ValidationOpenPolicyAgent} from './OpenPolicyAgent/ValidationOpenPolicyA
 import {ValidationOverView} from './Overview/ValidationOverview';
 import * as S from './ValidationDrawer.styled';
 import {DrawerHeading} from './ValidationDrawerHeading';
-
-export type Integration = 'open-policy-agent';
+import {ValidationIntegrationId} from './integrations';
 
 function ValidationPane({height}: {height: number}) {
   const dispatch = useAppDispatch();
   const isVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
-  const [integration, setIntegration] = useState<Integration | undefined>(undefined);
+  const [integration, setIntegration] = useState<ValidationIntegrationId | undefined>(undefined);
 
   return (
     <S.Drawer
