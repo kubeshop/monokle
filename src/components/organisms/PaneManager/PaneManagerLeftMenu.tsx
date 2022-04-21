@@ -7,7 +7,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, toggleLeftMenu, toggleStartProjectPane, toggleValidationDrawer} from '@redux/reducers/ui';
+import {setLeftMenuSelection, toggleLeftMenu, toggleValidationDrawer} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import WalkThrough from '@components/molecules/WalkThrough';
@@ -35,7 +35,6 @@ const PaneManagerLeftMenu: React.FC = () => {
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kustomizations = useAppSelector(kustomizationsSelector);
   const isActive = Boolean(activeProject) && (leftActive || leftDrawerVisible);
 
@@ -54,15 +53,8 @@ const PaneManagerLeftMenu: React.FC = () => {
     }
 
     if (leftMenuSelection === selectedMenu) {
-      if (isStartProjectPaneVisible) {
-        dispatch(toggleStartProjectPane());
-      } else {
-        dispatch(toggleLeftMenu());
-      }
+      dispatch(toggleLeftMenu());
     } else {
-      if (isStartProjectPaneVisible) {
-        dispatch(toggleStartProjectPane());
-      }
       trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedMenu});
       dispatch(setLeftMenuSelection(selectedMenu));
 
