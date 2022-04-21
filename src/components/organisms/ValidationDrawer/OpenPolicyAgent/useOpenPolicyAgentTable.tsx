@@ -4,7 +4,7 @@ import {useDispatch} from 'react-redux';
 import {Switch} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-import {toggleRule} from '@redux/reducers/main';
+import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
 import Icon, {IconNames} from '@components/atoms/Icon';
 
@@ -18,6 +18,7 @@ export function useOpenPolicyAgentTable() {
   const handleToggle = useCallback(
     (ruleId: string) => {
       dispatch(toggleRule({ruleId}));
+      dispatch(reprocessAllResources());
     },
     [dispatch]
   );

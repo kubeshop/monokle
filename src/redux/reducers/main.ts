@@ -260,9 +260,12 @@ export const reprocessAllResources = createAsyncThunk<AppState, void, ThunkApi>(
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
     const schemaVersion = getK8sVersion(projectConfig);
+    const policyPlugins = state.main.policies.plugins;
 
     const nextMainState = createNextState(state.main, mainState => {
-      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions);
+      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions, {
+        policyPlugins,
+      });
     });
 
     return nextMainState;
