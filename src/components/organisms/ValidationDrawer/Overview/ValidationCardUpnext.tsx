@@ -1,6 +1,6 @@
-import * as S from './ValidationCardUpnext.styled';
+import {LET_US_KNOW_URL} from '@constants/constants';
 
-const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
+import * as S from './ValidationCardUpnext.styled';
 
 export function ValidationCardUpnext() {
   return (
