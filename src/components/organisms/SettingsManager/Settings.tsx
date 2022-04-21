@@ -168,6 +168,13 @@ export const Settings = ({
     });
   };
 
+  const onChangeAllowEditInClusterMode = (e: any) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, allowEditInClusterMode: e.target.checked},
+    });
+  };
+
   const openFileSelect = () => {
     if (isEditingDisabled) {
       return;
@@ -433,6 +440,12 @@ export const Settings = ({
             </Checkbox>
           </Tooltip>
         </S.Div>
+      </S.Div>
+      <S.Div>
+        <S.Span>Cluster Mode</S.Span>
+        <Checkbox checked={localConfig?.settings?.allowEditInClusterMode} onChange={onChangeAllowEditInClusterMode}>
+          Allow editing resources
+        </Checkbox>
       </S.Div>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
