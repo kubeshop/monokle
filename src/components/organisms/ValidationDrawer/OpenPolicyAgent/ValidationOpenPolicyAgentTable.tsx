@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 
-import {Skeleton} from 'antd';
+import {Input, Skeleton} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -26,17 +26,23 @@ export function ValidationOpenPolicyAgentTable() {
     // Default plugin is not loaded yet.
     if (!defaultPlugin) return [];
 
-    return defaultPlugin.metadata.rules.map(rule => ({
-      id: rule.id,
-      description: rule.longDescription.text,
-      severity: rule.properties.severity,
-      enabled: defaultPlugin.config.enabledRules.includes(rule.id),
-    }));
-  });
-  const [filter] = useState<string>(''); // TODO add filter.
+    return defaultPlugin.metadata.rules.map(rule => {
+      const severity: Severity = ['high', 'medium', 'low'].includes(rule.properties.severity)
+        ? (rule.properties.severity as Severity)
+        : 'low';
 
-  const filteredRules = useMemo(() => {
-    return rules.filter(rule => (filter.length === 0 ? true : rule.description.includes(filter)));
+      return {
+        id: rule.id,
+        description: rule.longDescription.text,
+        severity,
+        enabled: defaultPlugin.config.enabledRules.includes(rule.id),
+      };
+    });
+  });
+  const [filter, setFilter] = useState<string>('');
+
+  const filteredRules: Rule[] = useMemo(() => {
+    return rules.filter(rule => (filter.length === 0 ? true : rule.description.toLowerCase().includes(filter)));
   }, [rules, filter]);
 
   if (rules.length === 0) {
@@ -45,7 +51,14 @@ export function ValidationOpenPolicyAgentTable() {
 
   return (
     <>
-      <S.Table columns={columns} dataSource={filteredRules} pagination={false} rowKey="id" />
+      <Input prefix={<S.SearchIcon />} value={filter} onChange={event => setFilter(event.target.value.toLowerCase())} />
+      <S.Table
+        columns={columns}
+        dataSource={filteredRules}
+        pagination={false}
+        rowKey="id"
+        locale={{emptyText: 'No rules found'}}
+      />
     </>
   );
 }
