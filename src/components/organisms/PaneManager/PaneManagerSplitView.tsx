@@ -163,10 +163,3 @@ const PaneManagerSplitView: React.FC = () => {
 };
 
 export default PaneManagerSplitView;
-
-export function getContainer(id: string) {
-  return () => {
-    if (!id || typeof document === 'undefined') return null;
-    return document.getElementById(id);
-  };
-}
