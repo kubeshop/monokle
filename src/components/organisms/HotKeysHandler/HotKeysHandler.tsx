@@ -15,6 +15,7 @@ import {
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
+  toggleValidationDrawer,
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
@@ -238,6 +239,10 @@ const HotKeysHandler = () => {
 
   useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
     dispatch(setLeftMenuSelection('helm-pane'));
+  });
+
+  useHotkeys(hotkeys.OPEN_VALIDATION_TAB, () => {
+    dispatch(toggleValidationDrawer());
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {

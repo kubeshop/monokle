@@ -19,7 +19,16 @@ interface IMenuButtonProps extends ButtonProps {
 }
 
 const MenuButton: React.FC<IMenuButtonProps> = props => {
-  const {children, sectionNames, shouldWatchSelectedPath, isSelected, isActive, onClick, ...buttonProps} = props;
+  const {
+    children,
+    sectionNames,
+    shouldWatchSelectedPath,
+    isSelected,
+    isActive,
+    onClick,
+    style: customStyle,
+    ...buttonProps
+  } = props;
 
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -46,6 +55,7 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     borderRadius: '0px',
     background: !isSelected || !isActive ? 'transparent' : PanelColors.toolBar,
     height: '45px',
+    ...customStyle
   };
 
   const hasGradientBackground = useMemo(() => {

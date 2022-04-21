@@ -51,6 +51,8 @@ enum Colors {
 
   red7 = '#E84748', // Dust Red
 
+  green7 = '#6ABE39', // Polar Green
+
   highlightGreen = '#33BCB7',
 
   selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',

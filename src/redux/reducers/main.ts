@@ -22,7 +22,7 @@ import {
 } from '@models/appstate';
 import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
+import {ThunkApi} from '@models/thunk';
 
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -147,10 +147,10 @@ export const performResourceContentUpdate = (
   }
 };
 
-export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
+export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk<AppState, boolean, ThunkApi>(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
-  async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (shouldIgnore, thunkAPI) => {
+    const state = thunkAPI.getState();
 
     const nextMainState = createNextState(state.main, mainState => {
       electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
@@ -168,10 +168,10 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   }
 );
 
-export const addResource = createAsyncThunk(
+export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
   'main/addResource',
-  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (resource, thunkAPI) => {
+    const state = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
@@ -196,10 +196,10 @@ export const addResource = createAsyncThunk(
   }
 );
 
-export const addMultipleResources = createAsyncThunk(
+export const addMultipleResources = createAsyncThunk<AppState, K8sResource[], ThunkApi>(
   'main/addMultipleResources',
-  async (resources: K8sResource[], thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (resources, thunkAPI) => {
+    const state = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
@@ -226,10 +226,10 @@ export const addMultipleResources = createAsyncThunk(
   }
 );
 
-export const reprocessResource = createAsyncThunk(
+export const reprocessResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
   'main/reprocessResource',
-  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (resource, thunkAPI) => {
+    const state = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
@@ -253,26 +253,29 @@ export const reprocessResource = createAsyncThunk(
   }
 );
 
-export const reprocessAllResources = createAsyncThunk(
+export const reprocessAllResources = createAsyncThunk<AppState, void, ThunkApi>(
   'main/reprocessAllResources',
-  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (_, thunkAPI) => {
+    const state = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
     const schemaVersion = getK8sVersion(projectConfig);
+    const policyPlugins = state.main.policies.plugins;
 
     const nextMainState = createNextState(state.main, mainState => {
-      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions);
+      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions, {
+        policyPlugins,
+      });
     });
 
     return nextMainState;
   }
 );
 
-export const multiplePathsRemoved = createAsyncThunk(
+export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkApi>(
   'main/multiplePathsRemoved',
-  async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
+  async (filePaths, thunkAPI) => {
+    const state = thunkAPI.getState();
 
     const nextMainState = createNextState(state.main, mainState => {
       filePaths.forEach((filePath: string) => {
@@ -610,6 +613,43 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedValuesFileId = undefined;
+    },
+    toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      const enable = action.payload;
+      const plugin = state.policies.plugins[0];
+      if (!plugin) return; // not yet loaded;
+
+      if (enable) {
+        const allRuleIds = plugin.metadata.rules.map(r => r.id);
+        plugin.config.enabledRules = allRuleIds;
+      } else {
+        plugin.config.enabledRules = [];
+      }
+
+      // persist latest configuration
+      const allConfig = state.policies.plugins.map(p => p.config);
+      electronStore.set('pluginConfig.policies', allConfig);
+    },
+    toggleRule: (state: Draft<AppState>, action: PayloadAction<{ruleId: string; enable?: boolean}>) => {
+      const plugin = state.policies.plugins[0];
+      if (!plugin) return; // not yet loaded;
+
+      const ruleId = action.payload.ruleId;
+      const shouldToggle = action.payload.enable === undefined;
+      const isEnabled = plugin.config.enabledRules.includes(ruleId);
+      const enable = shouldToggle ? !isEnabled : action.payload.enable;
+
+      if (enable) {
+        if (isEnabled) return;
+        plugin.config.enabledRules.push(ruleId);
+      } else {
+        if (!isEnabled) return;
+        plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
+      }
+
+      // persist latest configuration
+      const allConfig = state.policies.plugins.map(p => p.config);
+      electronStore.set('pluginConfig.policies', allConfig);
     },
   },
   extraReducers: builder => {
@@ -1140,5 +1180,7 @@ export const {
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,
   clearSelected,
+  toggleAllRules,
+  toggleRule,
 } = mainSlice.actions;
 export default mainSlice.reducer;

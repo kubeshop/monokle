@@ -216,6 +216,31 @@ const schema = {
       },
     },
   },
+  pluginConfig: {
+    type: 'object',
+    properties: {
+      policies: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+            enabled: {
+              type: 'boolean',
+            },
+            enabledRules: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -259,6 +284,9 @@ const defaults = {
   kubeConfig: {
     namespaces: [],
     contextsWithRemovedNamespace: [],
+  },
+  pluginConfig: {
+    policies: [],
   },
 };
 
