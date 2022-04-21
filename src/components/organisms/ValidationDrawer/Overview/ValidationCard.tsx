@@ -10,7 +10,7 @@ type Props = {
   onDiscover: (id: string) => void;
 };
 
-export function ValidationCard({integration, onDiscover}: Props) {
+export const ValidationCard: React.FC<Props> = ({integration, onDiscover}) => {
   const {id, icon, name, description, learnMoreUrl} = integration;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
@@ -25,4 +25,4 @@ export function ValidationCard({integration, onDiscover}: Props) {
       <S.Button onClick={() => onDiscover(id)}>Configure</S.Button>
     </S.Card>
   );
-}
+};

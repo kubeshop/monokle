@@ -17,7 +17,7 @@ export type Rule = {
   enabled: boolean;
 };
 
-export function ValidationOpenPolicyAgentTable() {
+export const ValidationOpenPolicyAgentTable: React.FC = () => {
   const columns = useOpenPolicyAgentTable();
   const rules = useAppSelector(state => {
     const plugins = state.main.policies.plugins;
@@ -65,4 +65,4 @@ export function ValidationOpenPolicyAgentTable() {
       />
     </>
   );
-}
+};

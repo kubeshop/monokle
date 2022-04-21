@@ -13,7 +13,7 @@ type Props = {
   onDiscover: (id: ValidationIntegrationId) => void;
 };
 
-export function ValidationOverView({onDiscover}: Props) {
+export const ValidationOverView: React.FC<Props> = ({onDiscover}) => {
   return (
     <>
       <S.ValidationImg src={ValidationFigure} />
@@ -29,4 +29,4 @@ export function ValidationOverView({onDiscover}: Props) {
       </Row>
     </>
   );
-}
+};

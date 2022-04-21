@@ -6,7 +6,7 @@ import {LET_US_KNOW_URL} from '@constants/constants';
 
 import * as S from './ValidationCardUpnext.styled';
 
-export function ValidationCardUpnext() {
+export const ValidationCardUpnext: React.FC = () => {
   const openLetUsKnow = useCallback(() => shell.openExternal(LET_US_KNOW_URL), []);
 
   return (
@@ -18,4 +18,4 @@ export function ValidationCardUpnext() {
       </span>
     </S.Card>
   );
-}
+};

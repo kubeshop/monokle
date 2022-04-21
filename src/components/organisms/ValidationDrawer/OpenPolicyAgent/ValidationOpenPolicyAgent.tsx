@@ -13,7 +13,7 @@ type Props = {
   onBack: () => void;
 };
 
-export function ValidationOpenPolicyAgent({onBack}: Props) {
+export const ValidationOpenPolicyAgent: React.FC<Props> = ({onBack}) => {
   const dispatch = useDispatch();
 
   const toggleRules = useCallback(
@@ -40,4 +40,4 @@ export function ValidationOpenPolicyAgent({onBack}: Props) {
       <ValidationOpenPolicyAgentTable />
     </>
   );
-}
+};

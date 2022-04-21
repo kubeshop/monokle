@@ -9,7 +9,7 @@ type Props = {
   onBack: () => void;
 };
 
-export function ValidationOpenPolicyAgentHeading({onBack}: Props) {
+export const ValidationOpenPolicyAgentHeading: React.FC<Props> = ({onBack}) => {
   const {icon, name, learnMoreUrl} = OPA_INTEGRATION;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
@@ -27,4 +27,4 @@ export function ValidationOpenPolicyAgentHeading({onBack}: Props) {
       <S.Button onClick={onBack}>Back</S.Button>
     </S.Heading>
   );
-}
+};

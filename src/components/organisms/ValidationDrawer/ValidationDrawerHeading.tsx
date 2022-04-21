@@ -5,7 +5,9 @@ import {toggleValidationDrawer} from '@redux/reducers/ui';
 
 import * as S from './ValidationDrawerHeading.styled';
 
-export function DrawerHeading({title, closable = true}: {title: string; closable?: boolean}) {
+type Props = {title: string; closable?: boolean};
+
+export const DrawerHeading: React.FC<Props> = ({title, closable = true}) => {
   const dispatch = useAppDispatch();
 
   return (
@@ -19,4 +21,4 @@ export function DrawerHeading({title, closable = true}: {title: string; closable
       )}
     </S.DrawerHeadingContainer>
   );
-}
+};

@@ -9,7 +9,11 @@ import * as S from './ValidationDrawer.styled';
 import {DrawerHeading} from './ValidationDrawerHeading';
 import {ValidationIntegrationId} from './integrations';
 
-function ValidationPane({height}: {height: number}) {
+type Props = {
+  height: number;
+};
+
+const ValidationPane: React.FC<Props> = ({height}) => {
   const dispatch = useAppDispatch();
   const isVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
   const [integration, setIntegration] = useState<ValidationIntegrationId | undefined>(undefined);
@@ -33,6 +37,6 @@ function ValidationPane({height}: {height: number}) {
       )}
     </S.Drawer>
   );
-}
+};
 
 export default ValidationPane;
