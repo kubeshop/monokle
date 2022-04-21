@@ -1,7 +1,5 @@
 import {IconNames} from '@components/atoms/Icon';
 
-import {Url} from '@utils/types';
-
 export type ValidationIntegrationId = 'open-policy-agent';
 
 export type ValidationIntegration = {
@@ -9,7 +7,7 @@ export type ValidationIntegration = {
   icon: IconNames;
   name: string;
   description: string;
-  learnMoreUrl: Url;
+  learnMoreUrl: string;
 };
 
 export const OPA_INTEGRATION: ValidationIntegration = {

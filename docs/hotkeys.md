@@ -1,6 +1,5 @@
 # Monokle Keyboard Shortcuts
 
-
 Monokle currently supports the following keyboard shortcuts:
 
 - Cluster Preview: Ctrl/Cmd I
@@ -20,6 +19,7 @@ Monokle currently supports the following keyboard shortcuts:
 - Open Cluster Tab: Ctrl/Cmd Shift C
 - Open Kustomization Tab: Ctrl/Cmd Shift K
 - Open Helm Tab: Ctrl/Cmd Shift H
+- Open Validation Tab: Ctrl/Cmd Shift V
 - Reset Resource Filters: Ctrl/Cmd ALT R
 - Open Quick Search: Ctrl/Cmd SHIFT P
 - Zoom In: Ctrl/Cmd =

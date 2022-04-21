@@ -22,6 +22,7 @@ import {
 } from '@models/appstate';
 import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
+import {ThunkApi} from '@models/thunk';
 
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -41,7 +42,6 @@ import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResou
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {ThunkApi} from '@redux/thunks/types';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateManyResources} from '@redux/thunks/updateManyResources';
 import {updateResource} from '@redux/thunks/updateResource';
