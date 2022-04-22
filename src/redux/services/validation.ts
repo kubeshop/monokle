@@ -101,7 +101,7 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
     const pathHint = rule.properties.path;
     const errorPos = container
       ? determineContainerErrorPos(resource, container, pathHint)
-      : {column: 1, length: 10, line: 1};
+      : determineErrorPos(resource, pathHint);
 
     return {
       message: rule.id,
@@ -117,6 +117,25 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
 
 type YamlPath = Array<string | number>;
 
+function determineErrorPos(resource: K8sResource, pathHint?: string): RefPosition {
+  if (!pathHint) {
+    return {line: 1, column: 1, length: 10};
+  }
+
+  const path = pathHint?.split('.') ?? [];
+  const lineCounter = getLineCounter(resource);
+  const node = determineClosestErrorNode(resource, path);
+
+  if (!lineCounter || !node || !node.range) {
+    return {line: 1, column: 1, length: 1};
+  }
+  const start = lineCounter.linePos(node.range[0]);
+  const end = lineCounter.linePos(node.range[1]);
+  const length = node.range[1] - node.range[0];
+
+  return {line: start.line, column: start.col, length, endLine: end.line, endColumn: end.col};
+}
+
 function determineContainerErrorPos(resource: K8sResource, container: string, pathHint?: string): RefPosition {
   const prefix = determineContainerPrefix(resource, container);
 
@@ -124,8 +143,14 @@ function determineContainerErrorPos(resource: K8sResource, container: string, pa
     return {line: 1, column: 1, length: 10};
   }
 
+  const [head, ...path] = pathHint?.split('.') ?? [];
+
+  if (head !== '$container') {
+    return {line: 1, column: 1, length: 10};
+  }
+
   const lineCounter = getLineCounter(resource);
-  const node = determineClosestErrorNode(resource, prefix, pathHint);
+  const node = determineClosestErrorNode(resource, path, prefix);
 
   if (!lineCounter || !node || !node.range) {
     return {line: 1, column: 1, length: 1};
@@ -184,27 +209,21 @@ function determineContainerIndex(
  * - When $container specifies `securityContext` then it underlines whole context object.
  * - When $container does not specify `securityContext` then it underlines whole container object.
  */
-function determineClosestErrorNode(resource: K8sResource, prefix: YamlPath, pathHint?: string): Node | undefined {
+function determineClosestErrorNode(resource: K8sResource, path: YamlPath, prefix: YamlPath = []): Node | undefined {
   const doc = getParsedDoc(resource);
-  const [head, ...tail] = pathHint?.split('.') ?? [];
 
-  if (!head || head !== '$container') {
-    const node = doc.getIn(prefix, true);
-    return isNode(node) ? node : undefined;
-  }
-
-  const path = prefix.concat(tail);
-  while (path.length > prefix.length) {
-    const node = doc.getIn(path, true);
+  const currentPath = prefix.concat(path);
+  while (currentPath.length > prefix.length) {
+    const node = doc.getIn(currentPath, true);
 
     if (isNode(node)) {
       return node;
     }
 
-    path.pop();
+    currentPath.pop();
   }
 
-  const node = doc.getIn(path, true);
+  const node = doc.getIn(currentPath, true);
   return isNode(node) ? node : undefined;
 }
 
