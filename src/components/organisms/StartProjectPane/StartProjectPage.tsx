@@ -29,7 +29,9 @@ const StartProjectPage = () => {
           <S.StartProjectItemDescription>
             Already have a local folder with ready-to-check Kubernetes resources? Bring it on!
           </S.StartProjectItemDescription>
-          <S.StartProjectItemButton onClick={handleOpenFolderExplorer}>Open</S.StartProjectItemButton>
+          <S.StartProjectItemButton id="select-existing-folder" onClick={handleOpenFolderExplorer}>
+            Open
+          </S.StartProjectItemButton>
         </S.StartProjectItem>
         <S.StartProjectItem>
           <S.StartProjectItemLogo src={CreateScratch} />
@@ -37,7 +39,9 @@ const StartProjectPage = () => {
           <S.StartProjectItemDescription>
             Create an empty project and new resources from scratch. We’ll help you along the way.
           </S.StartProjectItemDescription>
-          <S.StartProjectItemButton onClick={() => handleCreateProject(false)}>Create</S.StartProjectItemButton>
+          <S.StartProjectItemButton id="create-empty-project" onClick={() => handleCreateProject(false)}>
+            Create
+          </S.StartProjectItemButton>
         </S.StartProjectItem>
         <S.StartProjectItem>
           <S.StartProjectItemLogo src={CreateFromTemplate} />
@@ -45,7 +49,9 @@ const StartProjectPage = () => {
           <S.StartProjectItemDescription>
             Create basic jobs, pods, roles, services and other resources through ready-to-go templates.
           </S.StartProjectItemDescription>
-          <S.StartProjectItemButton onClick={() => handleCreateProject(true)}>Select Template</S.StartProjectItemButton>
+          <S.StartProjectItemButton id="start-from-template" onClick={() => handleCreateProject(true)}>
+            Select Template
+          </S.StartProjectItemButton>
         </S.StartProjectItem>
       </S.StartProjectContainer>
     </S.Container>

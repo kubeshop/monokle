@@ -29,7 +29,7 @@ const WalkThroughTitle = (props: {title: string}) => {
   return (
     <>
       <S.FlexContainer>{title}</S.FlexContainer>
-      <S.CloseButton onClick={handleClose} icon={<CloseOutlined />} />
+      <S.CloseButton id="close-walkthrough" onClick={handleClose} icon={<CloseOutlined />} />
     </>
   );
 };
