@@ -339,9 +339,7 @@ function applyPolicyIntel(resource: K8sResource): {
 
   const glyphs = issues.map(issue => {
     const rule = issue.rule!;
-    const message = [
-      createMarkdownString(`__${issue.message}:__ ${rule.longDescription.text} ${rule.help.text}`),
-    ].filter(isDefined);
+    const message = [createMarkdownString(`${rule.shortDescription.text} __(${issue.message})__`)].filter(isDefined);
 
     return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
   });
@@ -349,6 +347,7 @@ function applyPolicyIntel(resource: K8sResource): {
   const markers = issues
     .map(issue => {
       if (
+        !issue.rule ||
         !issue.errorPos ||
         issue.errorPos.line === 1 ||
         issue.errorPos.endLine === undefined ||
@@ -364,11 +363,13 @@ function applyPolicyIntel(resource: K8sResource): {
         issue.errorPos.endColumn
       );
 
-      return createMarker(issue.message, range);
+      const message = `${issue.rule.shortDescription.text}\n  ${issue.rule.longDescription.text}\n    ${issue.rule.help.text}`;
+
+      return createMarker(issue.rule.id, message, range);
     })
     .filter(isDefined);
 
-  return {decorations: [...glyphs], markers};
+  return {decorations: glyphs, markers};
 }
 
 export default {

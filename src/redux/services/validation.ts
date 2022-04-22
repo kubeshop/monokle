@@ -93,9 +93,10 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
     // Needs a better generic solution
     const regexMatch = err.msg?.match(/Container '([A-Za-z-]*)'/);
     const container = regexMatch ? regexMatch[1] : undefined;
-    const message = container
-      ? `${rule.shortDescription.text} on container "${container}"`
+    const description = container
+      ? `${rule.shortDescription.text} on container "${container}".`
       : rule.shortDescription.text;
+    const property = rule.properties.path?.replace(/\./g, '/') ?? resource.name;
 
     const pathHint = rule.properties.path;
     const errorPos = container
@@ -103,9 +104,9 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
       : {column: 1, length: 10, line: 1};
 
     return {
-      message,
-      description: `${rule.longDescription.text} ${rule.help.text}`,
-      property: rule.id,
+      message: rule.id,
+      description,
+      property,
       errorPos,
       rule,
     };

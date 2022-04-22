@@ -26,9 +26,10 @@ export function setDecorations(
   return editor.deltaDecorations(idsOfOldDecorations, newDecorations);
 }
 
-export function createMarker(message: string, range: monaco.Range): monaco.editor.IMarkerData {
+export function createMarker(ruleId: string, message: string, range: monaco.Range): monaco.editor.IMarkerData {
   return {
     message,
+    source: `(${ruleId})`,
     startLineNumber: range.startLineNumber,
     startColumn: range.startColumn,
     endLineNumber: range.endLineNumber,
