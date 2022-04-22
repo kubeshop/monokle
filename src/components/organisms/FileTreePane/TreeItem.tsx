@@ -74,9 +74,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const isRoot = treeKey === ROOT_FILE_ENTRY;
   const root = fileMap[ROOT_FILE_ENTRY];
-  const node = fileMap[treeKey];
-  const relativePath = isRoot ? getBasename(path.normalize(node.filePath)) : node.filePath;
-  const absolutePath = isRoot ? node.filePath : path.join(root.filePath, node.filePath);
+  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
+  const absolutePath = isRoot ? treeKey : path.join(root.filePath, treeKey);
 
   const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
 
