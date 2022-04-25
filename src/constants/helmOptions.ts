@@ -13,6 +13,7 @@ const helmCommonOptions = {
   '--key-file': 'string',
   '--keyring': 'string',
   '--name-template': 'string',
+  '--namespace': 'string',
   '--no-hooks': 'boolean',
   '--pass-credentials': 'boolean',
   '--password': 'string',
