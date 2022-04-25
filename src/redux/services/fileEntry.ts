@@ -190,7 +190,7 @@ export function readFiles(
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
       if (helmChart) {
-        helmChart.otherFilePaths.push(fileEntryPath);
+        helmChart.templateFilePaths.push(fileEntryPath);
       }
 
       if (fileIsExcluded(fileEntry, projectConfig)) {
