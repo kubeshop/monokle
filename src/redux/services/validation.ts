@@ -99,9 +99,7 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
     const property = rule.properties.path?.replace(/\./g, '/') ?? resource.name;
 
     const pathHint = rule.properties.path;
-    const errorPos = container
-      ? determineContainerErrorPos(resource, container, pathHint)
-      : determineErrorPos(resource, pathHint);
+    const errorPos = determineErrorPos(resource, pathHint, container);
 
     return {
       message: rule.id,
@@ -117,44 +115,38 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
 
 type YamlPath = Array<string | number>;
 
-function determineErrorPos(resource: K8sResource, pathHint?: string): RefPosition {
+function determineErrorPos(resource: K8sResource, pathHint?: string, container?: string): RefPosition {
   if (!pathHint) {
-    return {line: 1, column: 1, length: 10};
+    return createRefPositionFallback(resource);
   }
 
   const path = pathHint?.split('.') ?? [];
-  const lineCounter = getLineCounter(resource);
-  const node = determineClosestErrorNode(resource, path);
+  const isContainer = path[0] === '$container';
 
-  if (!lineCounter || !node || !node.range) {
-    return {line: 1, column: 1, length: 1};
+  if (isContainer && !container) {
+    return createRefPositionFallback(resource);
   }
-  const start = lineCounter.linePos(node.range[0]);
-  const end = lineCounter.linePos(node.range[1]);
-  const length = node.range[1] - node.range[0];
 
-  return {line: start.line, column: start.col, length, endLine: end.line, endColumn: end.col};
+  const prefix = isContainer && container ? determineContainerPrefix(resource, container) : [];
+  const node = determineClosestErrorNode(resource, path, prefix);
+  return createRefPosition(resource, node);
 }
 
-function determineContainerErrorPos(resource: K8sResource, container: string, pathHint?: string): RefPosition {
-  const prefix = determineContainerPrefix(resource, container);
+/**
+ * Ref position fallback is the resource kind to ensure VSC shows proper highlight.
+ */
+function createRefPositionFallback(resource: K8sResource): RefPosition {
+  const node = determineClosestErrorNode(resource, ['kind']);
+  return createRefPosition(resource, node);
+}
 
-  if (!prefix.length) {
-    return {line: 1, column: 1, length: 10};
-  }
-
-  const [head, ...path] = pathHint?.split('.') ?? [];
-
-  if (head !== '$container') {
-    return {line: 1, column: 1, length: 10};
-  }
-
+function createRefPosition(resource: K8sResource, node: Node | undefined): RefPosition {
   const lineCounter = getLineCounter(resource);
-  const node = determineClosestErrorNode(resource, path, prefix);
 
   if (!lineCounter || !node || !node.range) {
     return {line: 1, column: 1, length: 1};
   }
+
   const start = lineCounter.linePos(node.range[0]);
   const end = lineCounter.linePos(node.range[1]);
   const length = node.range[1] - node.range[0];
