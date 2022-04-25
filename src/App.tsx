@@ -35,6 +35,7 @@ import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelect
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
+import UpdateNotice from '@organisms/UpdateNotice';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 import {StepEnum} from '@components/molecules/WalkThrough/types';
@@ -68,7 +69,6 @@ const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveRe
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
-const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 
@@ -119,7 +119,7 @@ const App = () => {
     () => Boolean(targetResourceId) && !isInClusterMode,
     [isInClusterMode, targetResourceId]
   );
-  const isUpdateModalVisible = useMemo(
+  const isUpdateNoticeVisible = useMemo(
     () =>
       (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
       newVersion.code === NewVersionCode.Downloaded,
@@ -369,6 +369,8 @@ const App = () => {
           <ReleaseNotes onClose={onCloseReleaseNotesDrawer} singleColumn />
         </LazyDrawer>
 
+        {isUpdateNoticeVisible && <UpdateNotice />}
+
         <Suspense fallback={null}>
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterDiffModalVisible && <ClusterDiffModal />}
@@ -383,7 +385,6 @@ const App = () => {
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {isAboutModalVisible && <AboutModal />}
           {isStartupModalVisible && <StartupModal />}
-          {isUpdateModalVisible && <UpdateModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"
