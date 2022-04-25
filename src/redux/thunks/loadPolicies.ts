@@ -433,24 +433,6 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
       },
     },
     {
-      id: 'KSV026',
-      shortDescription: {
-        text: 'Unsafe sysctl options set',
-      },
-      longDescription: {
-        text: 'Sysctls can disable security mechanisms or affect all containers on a host, and should be disallowed except for an allowed "safe" subset. A sysctl is considered safe if it is namespaced in the container or the Pod, and it is isolated from other Pods or processes on the same Node.',
-      },
-      helpUri: 'https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline',
-      help: {
-        text: "Do not set 'spec.securityContext.sysctls' or set to values in an allowed subset",
-      },
-      properties: {
-        severity: 'medium',
-        entrypoint: 'appshield/kubernetes/KSV026/deny',
-        path: '$container.securityContext.sysctl',
-      },
-    },
-    {
       id: 'KSV027',
       shortDescription: {
         text: 'Non-default /proc masks set',
@@ -520,24 +502,6 @@ const DEFAULT_TRIVY_PLUGIN: BasicPolicy = {
         severity: 'low',
         entrypoint: 'appshield/kubernetes/KSV030/deny',
         path: '$container.securityContext.seccompProfile.type',
-      },
-    },
-    {
-      id: 'KSV102',
-      shortDescription: {
-        text: 'Tiller Is Deployed',
-      },
-      longDescription: {
-        text: 'Check if Helm Tiller component is deployed.',
-      },
-      helpUri: 'https://kubesec.io/basics/containers-securitycontext-runasuser/',
-      help: {
-        text: 'Migrate to Helm v3 which no longer has Tiller component.',
-      },
-      properties: {
-        severity: 'medium',
-        entrypoint: 'appshield/kubernetes/KSV102/deny',
-        path: '$container.image',
       },
     },
   ],
