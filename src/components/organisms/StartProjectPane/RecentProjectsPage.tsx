@@ -66,7 +66,7 @@ const NewRecentProjectsPane = () => {
             <S.ActionItemLogo src={SelectFolder} />
             <S.ActionItemContext>
               <S.ActionItemText>Select a folder with k8s resource</S.ActionItemText>
-              <S.ActionItemButton type="link" onClick={handleOpenFolderExplorer}>
+              <S.ActionItemButton id="select-existing-folder" type="link" onClick={handleOpenFolderExplorer}>
                 Open
               </S.ActionItemButton>
             </S.ActionItemContext>
@@ -75,7 +75,7 @@ const NewRecentProjectsPane = () => {
             <S.ActionItemLogo src={CreateScratch} />
             <S.ActionItemContext>
               <S.ActionItemText>Create a project from scratch</S.ActionItemText>
-              <S.ActionItemButton type="link" onClick={() => handleCreateProject(false)}>
+              <S.ActionItemButton id="create-empty-project" type="link" onClick={() => handleCreateProject(false)}>
                 Create
               </S.ActionItemButton>
             </S.ActionItemContext>
@@ -84,7 +84,7 @@ const NewRecentProjectsPane = () => {
             <S.ActionItemLogo src={CreateFromTemplate} />
             <S.ActionItemContext>
               <S.ActionItemText>Start from a template</S.ActionItemText>
-              <S.ActionItemButton type="link" onClick={() => handleCreateProject(true)}>
+              <S.ActionItemButton id="start-from-template" type="link" onClick={() => handleCreateProject(true)}>
                 Select template
               </S.ActionItemButton>
             </S.ActionItemContext>

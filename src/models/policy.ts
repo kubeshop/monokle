@@ -56,9 +56,20 @@ export const BasicPolicyRuntype = PolicyBaseRuntype.extend({
 //* * * * * * * * * * * * * * * * * * * * * * * *
 export type PolicyValidator = Awaited<ReturnType<typeof loadPolicy>>;
 
+/**
+ * The configuration of the policy plugin.
+ *
+ * @remarks
+ * This configuration is persisted in the electron store.
+ * You can find it under `pluginConfig.policies`.
+ */
 export type PolicyConfig = {
+  // The identifier of the policy.
+  id: string;
   // Whether the policy is enabled.
   enabled: boolean;
+  // List of rule identifiers that are enabled.
+  enabledRules: string[];
 };
 
 export type Policy = {

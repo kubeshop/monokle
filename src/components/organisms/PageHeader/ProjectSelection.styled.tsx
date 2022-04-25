@@ -81,7 +81,7 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey3};
+  border: 1px solid ${Colors.grey5};
   border-radius: 4px;
   margin-right: 10px;
   padding: 0px 10px;

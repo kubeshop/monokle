@@ -255,25 +255,25 @@ const ProjectSelection = () => {
 
   return (
     <S.ProjectContainer id="projects-dropdown-container">
-      <Dropdown
-        arrow
-        disabled={previewLoader.isLoading || isInPreviewMode}
-        overlay={projectMenu}
-        placement="bottomCenter"
-        trigger={['click']}
-        visible={isDropdownMenuVisible}
-        onVisibleChange={onDropdownVisibleChange}
-      >
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <WalkThrough placement="leftTop" step="template">
+      <WalkThrough placement="leftTop" step="template">
+        <Dropdown
+          arrow
+          disabled={previewLoader.isLoading || isInPreviewMode}
+          overlay={projectMenu}
+          placement="bottomCenter"
+          trigger={['click']}
+          visible={isDropdownMenuVisible}
+          onVisibleChange={onDropdownVisibleChange}
+        >
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
               <S.FolderOpenOutlined />
               <S.ProjectName>{activeProject.name}</S.ProjectName>
               <S.DownOutlined />
             </S.Button>
-          </WalkThrough>
-        </Tooltip>
-      </Dropdown>
+          </Tooltip>
+        </Dropdown>
+      </WalkThrough>
 
       {isStartProjectPaneVisible && activeProject && (
         <>

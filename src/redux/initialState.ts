@@ -168,6 +168,7 @@ const initialUiState: UiState = {
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     expandedFolders: [],
+    isValidationDrawerVisible: false,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

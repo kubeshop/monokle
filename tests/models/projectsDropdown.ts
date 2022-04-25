@@ -16,7 +16,7 @@ export class ProjectsDropdown {
     this._page = page;
 
     this._theLogo = page.locator('#monokle-logo-header');
-    this._projectsDropdown = page.locator('#projects-dropdown-container > button:first-child');
+    this._projectsDropdown = page.locator('#projects-dropdown-container button:first-child');
     this._openProjectFromFolder = page.locator('div.ant-dropdown ul.ant-dropdown-menu #open-new-project');
   }
 

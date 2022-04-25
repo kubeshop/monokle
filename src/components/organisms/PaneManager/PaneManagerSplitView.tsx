@@ -15,6 +15,7 @@ import {useMainPaneHeight} from '@utils/hooks';
 
 import featureJson from '@src/feature-flags.json';
 
+import ValidationPane from '../ValidationDrawer';
 import * as S from './PaneManagerSplitView.styled';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
@@ -100,57 +101,63 @@ const PaneManagerSplitView: React.FC = () => {
   }, [leftActive]);
 
   return (
-    <S.SplitViewContainer ref={splitViewContainerRef} $gridTemplateColumns={splitViewGridTemplateColumns}>
-      {leftActive && leftMenuSelection && (
-        <S.LeftPaneContainer ref={leftPaneRef}>
+    <S.SplitViewContainer>
+      <ValidationPane height={paneHeight} />
+
+      <S.SplitViewGrid ref={splitViewContainerRef as any} $gridTemplateColumns={splitViewGridTemplateColumns}>
+        {leftActive && leftMenuSelection && (
+          <S.LeftPaneContainer ref={leftPaneRef}>
+            <ResizableBox
+              height={paneHeight}
+              width={splitViewContainerWidth * leftWidth}
+              minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
+              maxConstraints={[leftPaneMaxWidth, paneHeight]}
+              axis="x"
+              resizeHandles={['e']}
+              handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+                <span className="custom-modal-handle" ref={ref} />
+              )}
+              onResizeStop={resizeLeftPane}
+            >
+              <S.Pane id="LeftPane">
+                <Suspense fallback={null}>
+                  {leftMenuSelection === 'file-explorer' && <FileTreePane />}
+                  {leftMenuSelection === 'helm-pane' && <HelmPane />}
+                  {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
+                  {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
+                </Suspense>
+              </S.Pane>
+            </ResizableBox>
+          </S.LeftPaneContainer>
+        )}
+
+        <S.Pane id="NavPane" $height={paneHeight} ref={navPaneRef}>
+          <NavigatorPane />
+        </S.Pane>
+
+        <S.EditorPaneContainer ref={editPaneRef}>
           <ResizableBox
             height={paneHeight}
-            width={splitViewContainerWidth * leftWidth}
+            width={splitViewContainerWidth * editWidth}
             minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
-            maxConstraints={[leftPaneMaxWidth, paneHeight]}
+            maxConstraints={[editPaneMaxWidth, paneHeight]}
             axis="x"
-            resizeHandles={['e']}
+            resizeHandles={['w']}
             handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
-            onResizeStop={resizeLeftPane}
+            onResizeStop={resizeEditPane}
           >
-            <S.Pane id="LeftPane">
-              <Suspense fallback={null}>
-                {leftMenuSelection === 'file-explorer' && <FileTreePane />}
-                {leftMenuSelection === 'helm-pane' && <HelmPane />}
-                {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
-                {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
-              </Suspense>
+            <S.Pane id="EditorPane" $height={paneHeight}>
+              <ActionsPane contentHeight={paneHeight} />
             </S.Pane>
           </ResizableBox>
-        </S.LeftPaneContainer>
-      )}
+        </S.EditorPaneContainer>
 
-      <S.Pane id="NavPane" $height={paneHeight} ref={navPaneRef}>
-        <NavigatorPane />
-      </S.Pane>
-
-      <S.EditorPaneContainer ref={editPaneRef}>
-        <ResizableBox
-          height={paneHeight}
-          width={splitViewContainerWidth * editWidth}
-          minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
-          maxConstraints={[editPaneMaxWidth, paneHeight]}
-          axis="x"
-          resizeHandles={['w']}
-          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
-          onResizeStop={resizeEditPane}
-        >
-          <S.Pane id="EditorPane" $height={paneHeight}>
-            <ActionsPane contentHeight={paneHeight} />
+        {featureJson.ShowGraphView && rightMenuSelection === 'graph' && rightActive && (
+          <S.Pane id="RightPane" $height={paneHeight}>
+            <GraphView editorHeight={paneHeight} />
           </S.Pane>
-        </ResizableBox>
-      </S.EditorPaneContainer>
-
-      {featureJson.ShowGraphView && rightMenuSelection === 'graph' && rightActive && (
-        <S.Pane id="RightPane" $height={paneHeight}>
-          <GraphView editorHeight={paneHeight} />
-        </S.Pane>
-      )}
+        )}
+      </S.SplitViewGrid>
     </S.SplitViewContainer>
   );
 };

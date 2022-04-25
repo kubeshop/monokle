@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import Colors from '@styles/Colors';
+import Colors, {PanelColors} from '@styles/Colors';
 
 import * as S from './styled';
 
@@ -19,7 +19,16 @@ interface IMenuButtonProps extends ButtonProps {
 }
 
 const MenuButton: React.FC<IMenuButtonProps> = props => {
-  const {children, sectionNames, shouldWatchSelectedPath, isSelected, isActive, onClick, ...buttonProps} = props;
+  const {
+    children,
+    sectionNames,
+    shouldWatchSelectedPath,
+    isSelected,
+    isActive,
+    onClick,
+    style: customStyle,
+    ...buttonProps
+  } = props;
 
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -41,7 +50,13 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     return Object.values(sectionInstanceByName).some(sectionInstance => sectionInstance.isSelected);
   }, [sectionInstanceByName]);
 
-  const style: React.CSSProperties = {width: '100%'};
+  const style: React.CSSProperties = {
+    width: '100%',
+    borderRadius: '0px',
+    background: !isSelected || !isActive ? 'transparent' : PanelColors.toolBar,
+    height: '45px',
+    ...customStyle
+  };
 
   const hasGradientBackground = useMemo(() => {
     return Boolean(

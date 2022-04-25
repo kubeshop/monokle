@@ -17,14 +17,14 @@ export const EditorPaneContainer = styled.div`
 `;
 
 export const LeftPaneContainer = styled.div`
-  height: 100%;
-  border-right: ${AppBorders.sectionDivider};
   position: relative;
+  height: 100%;
+  background: ${PanelColors.toolBar};
+  border-right: ${AppBorders.sectionDivider};
 
   & .custom-modal-handle {
     right: -3px;
   }
-  background: ${PanelColors.toolBar};
 `;
 
 export const Pane = styled.div<{$height?: number}>`
@@ -35,7 +35,13 @@ export const Pane = styled.div<{$height?: number}>`
   min-width: ${MIN_SPLIT_VIEW_PANE_WIDTH};
 `;
 
-export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
+export const SplitViewContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+`;
+
+export const SplitViewGrid = styled.div<{$gridTemplateColumns: string}>`
   width: 100%;
   height: 100%;
   display: grid;
