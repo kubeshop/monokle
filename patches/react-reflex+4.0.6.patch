@@ -1,0 +1,37 @@
+diff --git a/node_modules/react-reflex/dist/es/ReflexContainer.js b/node_modules/react-reflex/dist/es/ReflexContainer.js
+index 67ddf5d..8f943ff 100644
+--- a/node_modules/react-reflex/dist/es/ReflexContainer.js
++++ b/node_modules/react-reflex/dist/es/ReflexContainer.js
+@@ -92,6 +92,12 @@ export default class ReflexContainer extends React.Component {
+         return !ReflexSplitter.isA(child) && resizedRefs.includes(child.ref);
+       });
+       this.emitElementsEvent(elements, 'onStopResize');
++
++      if (this.props['onStopResize']) {
++        const all = this.children.filter(child => !ReflexSplitter.isA(child));
++        this.props['onStopResize'](all ?? []);
++      }
++
+       this.setState({
+         resizing: false
+       });
+diff --git a/node_modules/react-reflex/dist/index.d.ts b/node_modules/react-reflex/dist/index.d.ts
+index e9cf6d0..31a86bd 100644
+--- a/node_modules/react-reflex/dist/index.d.ts
++++ b/node_modules/react-reflex/dist/index.d.ts
+@@ -1,6 +1,7 @@
+ import * as React from "react";
+ 
+ export type StyleAndClass = {
++    id?: string;
+     className?: string;
+     style?: React.CSSProperties;
+ };
+@@ -9,6 +10,7 @@ export type ReflexContainerProps = {
+     orientation?: "horizontal" | "vertical";
+     maxRecDepth?: number;
+     windowResizeAware?: boolean;
++    onStopResize?: (elements: React.ComponentElement<ReflexElementProps, ReflexElement>[]) => void;
+ } & StyleAndClass;
+ 
+ export class ReflexContainer extends React.Component<ReflexContainerProps, any> { }
