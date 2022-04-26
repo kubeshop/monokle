@@ -21,10 +21,6 @@ import Colors from '@styles/Colors';
 const ALL_OPTIONS = '<all>';
 const ROOT_OPTIONS = '<root>';
 
-const BaseContainer = styled.div`
-  min-width: 250px;
-`;
-
 const FieldContainer = styled.div`
   margin-top: 5px;
   margin-bottom: 10px;
@@ -211,7 +207,7 @@ const ResourceFilter = () => {
   }, [filtersMap]);
 
   return (
-    <BaseContainer>
+    <div>
       <StyledTitleContainer>
         <StyledTitleLabel>Filter resources by:</StyledTitleLabel>
         <StyledTitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
@@ -310,7 +306,7 @@ const ResourceFilter = () => {
           {fileOrFolderContainedInOptions}
         </Select>
       </FieldContainer>
-    </BaseContainer>
+    </div>
   );
 };
 
