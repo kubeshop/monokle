@@ -64,48 +64,48 @@ const NavPane: React.FC = () => {
 
   return (
     <S.NavigatorPaneContainer>
-      <div className="nav-pane">
-        {checkedResourceIds.length && !isPreviewLoading ? (
+      {checkedResourceIds.length && !isPreviewLoading ? (
+        <S.SelectionBar>
           <CheckedResourcesActionsMenu />
-        ) : (
-          <S.TitleBar>
-            <MonoPaneTitle>
-              <div style={{display: 'flex', alignItems: 'center'}}>
-                Navigator <WarningsAndErrorsDisplay />
-              </div>
-            </MonoPaneTitle>
-            <S.TitleBarRightButtons>
-              <Tooltip title={NewResourceTooltip}>
-                <S.PlusButton
-                  id="create-resource-button"
-                  $disabled={!isFolderOpen || isInPreviewMode}
-                  $highlighted={highlightedItems.createResource}
-                  className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                  disabled={!isFolderOpen || isInPreviewMode}
-                  icon={<PlusOutlined />}
-                  size="small"
+        </S.SelectionBar>
+      ) : (
+        <S.TitleBar>
+          <MonoPaneTitle>
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              Navigator <WarningsAndErrorsDisplay />
+            </div>
+          </MonoPaneTitle>
+          <S.TitleBarRightButtons>
+            <Tooltip title={NewResourceTooltip}>
+              <S.PlusButton
+                id="create-resource-button"
+                $disabled={!isFolderOpen || isInPreviewMode}
+                $highlighted={highlightedItems.createResource}
+                className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                disabled={!isFolderOpen || isInPreviewMode}
+                icon={<PlusOutlined />}
+                size="small"
+                type="link"
+                onClick={onClickNewResource}
+              />
+            </Tooltip>
+
+            <Tooltip title={QuickFilterTooltip}>
+              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                <Button
+                  disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
                   type="link"
-                  onClick={onClickNewResource}
+                  size="small"
+                  icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                  onClick={resourceFilterButtonHandler}
                 />
-              </Tooltip>
+              </Badge>
+            </Tooltip>
 
-              <Tooltip title={QuickFilterTooltip}>
-                <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-                  <Button
-                    disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                    type="link"
-                    size="small"
-                    icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                    onClick={resourceFilterButtonHandler}
-                  />
-                </Badge>
-              </Tooltip>
-
-              <ClusterCompareButton />
-            </S.TitleBarRightButtons>
-          </S.TitleBar>
-        )}
-      </div>
+            <ClusterCompareButton />
+          </S.TitleBarRightButtons>
+        </S.TitleBar>
+      )}
 
       <ReflexContainer orientation="horizontal" style={{height: paneHeight - 40}}>
         {isResourceFiltersOpen && (

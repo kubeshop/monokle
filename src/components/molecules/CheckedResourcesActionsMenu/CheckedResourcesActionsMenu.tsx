@@ -36,6 +36,7 @@ const StyledMenu = styled(Menu)`
   line-height: 1.57;
   display: flex;
   align-items: center;
+  border-bottom: none;
 
   & .ant-menu-item {
     padding: 0 12px !important;

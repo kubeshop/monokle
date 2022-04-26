@@ -42,6 +42,11 @@ export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: bool
   }
 `;
 
+export const SelectionBar = styled.div`
+  width: 100%;
+  border-bottom: ${AppBorders.sectionDivider};
+`;
+
 export const TitleBar = styled.div`
   display: flex;
   justify-content: space-between;
