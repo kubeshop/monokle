@@ -127,6 +127,7 @@ function determineErrorPos(resource: K8sResource, pathHint?: string, container?:
     return createRefPositionFallback(resource);
   }
 
+  if (isContainer) path.shift(); // drop $container keyword
   const prefix = isContainer && container ? determineContainerPrefix(resource, container) : [];
   const node = determineClosestErrorNode(resource, path, prefix);
   return createRefPosition(resource, node);
