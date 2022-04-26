@@ -287,6 +287,11 @@ export const configSlice = createSlice({
         return;
       }
 
+      if (!action.payload.config) {
+        state.projectConfig = {};
+        return;
+      }
+
       if (!state.projectConfig) {
         state.projectConfig = {};
       }
