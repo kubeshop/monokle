@@ -60,7 +60,7 @@ const NewRecentProjectsPane = () => {
         </S.ProjectsContainer>
       </S.Projects>
       <S.Actions>
-        <S.ActionsTitle>Start a new one</S.ActionsTitle>
+        <S.ActionsTitle>Start a new project</S.ActionsTitle>
         <S.ActionItems>
           <S.ActionItem>
             <S.ActionItemLogo src={SelectFolder} />
