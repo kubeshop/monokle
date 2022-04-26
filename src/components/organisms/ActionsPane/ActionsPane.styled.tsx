@@ -4,11 +4,9 @@ import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-export const Tabs = styled(RawTabs)<{$height: number; $width: number}>`
-  ${({$height, $width}) => `
-    height: ${$height}px;
-    width: ${$width}px;
-  `};
+export const Tabs = styled(RawTabs)`
+  width: 100%;
+  height: 100%;
   overflow: visible;
 
   & .ant-tabs-nav {
@@ -28,9 +26,6 @@ export const Tabs = styled(RawTabs)<{$height: number; $width: number}>`
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;
-
-  display: grid;
-  grid-template-rows: 1fr max-content;
 `;
 
 export const ActionsPaneFooterContainer = styled.div`
@@ -57,8 +52,8 @@ export const ActionsPaneFooterContainer = styled.div`
 export const ActionsPaneMainContainer = styled.div`
   height: 100%;
   width: 100%;
-  display: grid;
-  grid-template-rows: max-content 1fr;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const DiffButton = styled(Button)`

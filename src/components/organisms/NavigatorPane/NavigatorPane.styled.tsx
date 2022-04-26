@@ -1,3 +1,6 @@
+import {ReflexElement} from 'react-reflex';
+import 'react-reflex/styles.css';
+
 import {Button} from 'antd';
 
 import styled from 'styled-components';
@@ -7,17 +10,10 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-export const FiltersContainer = styled.div`
+export const ReflexFilterElement = styled(ReflexElement)`
   position: relative;
   padding: 6px 0 3px 0;
   margin-bottom: 5px;
-
-  & .react-resizable {
-    padding: 8px 16px;
-    overflow-y: auto;
-
-    ${GlobalScrollbarStyle}
-  }
 
   & .custom-handle {
     position: absolute;
@@ -44,14 +40,10 @@ export const List = styled.ol`
   ${GlobalScrollbarStyle}
 `;
 
-export const NavigatorPaneContainer = styled.div<{$gridTemplateRows: string}>`
+export const NavigatorPaneContainer = styled.div`
   height: 100%;
-  display: grid;
-
-  ${({$gridTemplateRows}) => `
-    grid-template-rows: ${$gridTemplateRows};
-  `};
-  grid-row-gap: 5px;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`

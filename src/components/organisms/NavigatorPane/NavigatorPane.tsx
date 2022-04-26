@@ -1,12 +1,11 @@
-import {LegacyRef, useMemo} from 'react';
-import {ResizableBox} from 'react-resizable';
-import {useMeasure} from 'react-use';
+import {useMemo} from 'react';
+import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {GUT_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -41,11 +40,7 @@ const NavPane: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-
   const paneHeight = useMainPaneHeight();
-
-  const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
-  const [navigatorPaneRef, {width: navigatorPaneWidth}] = useMeasure<HTMLDivElement>();
 
   const appliedFilters = useMemo(
     () =>
@@ -56,16 +51,6 @@ const NavPane: React.FC = () => {
         .filter(filter => filter.filterValue && Object.values(filter.filterValue).length),
     [resourceFilters]
   );
-
-  const containerGridTemplateRows = useMemo(() => {
-    let gridTemplateRows = 'max-content 1fr';
-
-    if (isResourceFiltersOpen) {
-      gridTemplateRows = 'repeat(2, max-content) 1fr';
-    }
-
-    return gridTemplateRows;
-  }, [isResourceFiltersOpen]);
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
@@ -78,68 +63,66 @@ const NavPane: React.FC = () => {
   };
 
   return (
-    <S.NavigatorPaneContainer $gridTemplateRows={containerGridTemplateRows} ref={navigatorPaneRef}>
-      {checkedResourceIds.length && !isPreviewLoading ? (
-        <CheckedResourcesActionsMenu />
-      ) : (
-        <S.TitleBar>
-          <MonoPaneTitle>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay />
-            </div>
-          </MonoPaneTitle>
-          <S.TitleBarRightButtons>
-            <Tooltip title={NewResourceTooltip}>
-              <S.PlusButton
-                id="create-resource-button"
-                $disabled={!isFolderOpen || isInPreviewMode}
-                $highlighted={highlightedItems.createResource}
-                className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                disabled={!isFolderOpen || isInPreviewMode}
-                icon={<PlusOutlined />}
-                size="small"
-                type="link"
-                onClick={onClickNewResource}
-              />
-            </Tooltip>
-
-            <Tooltip title={QuickFilterTooltip}>
-              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-                <Button
-                  disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                  type="link"
+    <S.NavigatorPaneContainer>
+      <div className="nav-pane">
+        {checkedResourceIds.length && !isPreviewLoading ? (
+          <CheckedResourcesActionsMenu />
+        ) : (
+          <S.TitleBar>
+            <MonoPaneTitle>
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                Navigator <WarningsAndErrorsDisplay />
+              </div>
+            </MonoPaneTitle>
+            <S.TitleBarRightButtons>
+              <Tooltip title={NewResourceTooltip}>
+                <S.PlusButton
+                  id="create-resource-button"
+                  $disabled={!isFolderOpen || isInPreviewMode}
+                  $highlighted={highlightedItems.createResource}
+                  className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                  disabled={!isFolderOpen || isInPreviewMode}
+                  icon={<PlusOutlined />}
                   size="small"
-                  icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                  onClick={resourceFilterButtonHandler}
+                  type="link"
+                  onClick={onClickNewResource}
                 />
-              </Badge>
-            </Tooltip>
+              </Tooltip>
 
-            <ClusterCompareButton navigatorPaneWidth={navigatorPaneWidth} />
-          </S.TitleBarRightButtons>
-        </S.TitleBar>
-      )}
+              <Tooltip title={QuickFilterTooltip}>
+                <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                  <Button
+                    disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                    type="link"
+                    size="small"
+                    icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                    onClick={resourceFilterButtonHandler}
+                  />
+                </Badge>
+              </Tooltip>
 
-      {isResourceFiltersOpen && (
-        <S.FiltersContainer ref={filtersContainerRef}>
-          <ResizableBox
-            width={width}
-            height={height || 350}
-            axis="y"
-            resizeHandles={['s']}
-            minConstraints={[100, 200]}
-            maxConstraints={[width, paneHeight - 300]}
-            handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-handle" ref={ref} />}
-          >
+              <ClusterCompareButton />
+            </S.TitleBarRightButtons>
+          </S.TitleBar>
+        )}
+      </div>
+
+      <ReflexContainer orientation="horizontal" style={{height: paneHeight - 40}}>
+        {isResourceFiltersOpen && (
+          <S.ReflexFilterElement flex={0.22} minSize={100} maxSize={450}>
             <ResourceFilter />
-          </ResizableBox>
-        </S.FiltersContainer>
-      )}
+          </S.ReflexFilterElement>
+        )}
 
-      <S.List id="navigator-sections-container">
-        <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
-        <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
-      </S.List>
+        {isResourceFiltersOpen && <ReflexSplitter />}
+
+        <ReflexElement minSize={GUT_SPLIT_VIEW_PANE_WIDTH}>
+          <S.List id="navigator-sections-container">
+            <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
+            <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
+          </S.List>
+        </ReflexElement>
+      </ReflexContainer>
     </S.NavigatorPaneContainer>
   );
 };
