@@ -5,9 +5,9 @@ import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/ap
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
-import CreateFromTemplate from '@assets/CreateFromTemplate.svg';
-import CreateScratch from '@assets/CreateScratch.svg';
-import SelectFolder from '@assets/SelectFolder.svg';
+import SelectFolder from '@assets/FromFolder.svg';
+import CreateScratch from '@assets/FromScratch.svg';
+import CreateFromTemplate from '@assets/FromTemplate.svg';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';
@@ -60,7 +60,7 @@ const NewRecentProjectsPane = () => {
         </S.ProjectsContainer>
       </S.Projects>
       <S.Actions>
-        <S.ActionsTitle>Start a new one</S.ActionsTitle>
+        <S.ActionsTitle>Start a new project</S.ActionsTitle>
         <S.ActionItems>
           <S.ActionItem>
             <S.ActionItemLogo src={SelectFolder} />

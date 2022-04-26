@@ -8,5 +8,5 @@ export {default as Warning} from './Warning';
 export {default as Validation} from './Validation';
 export {default as OpenPolicyAgent} from './OpenPolicyAgent';
 export {default as SeverityHigh} from './SeverityHigh';
-export {default as SeverityMedium} from './SeverityHigh';
+export {default as SeverityMedium} from './SeverityMedium';
 export {default as SeverityLow} from './SeverityLow';

@@ -1,13 +1,22 @@
 import {monaco} from 'react-monaco-editor';
 
-import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import fs from 'fs';
+import path from 'path';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
 import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
+import {getHelmValueRanges, getObjectKeys} from '@molecules/Monaco/helmCodeIntel';
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {isDefined} from '@utils/filter';
 
@@ -339,9 +348,7 @@ function applyPolicyIntel(resource: K8sResource): {
 
   const glyphs = issues.map(issue => {
     const rule = issue.rule!;
-    const message = [
-      createMarkdownString(`__${issue.message}:__ ${rule.longDescription.text} ${rule.help.text}`),
-    ].filter(isDefined);
+    const message = [createMarkdownString(`${rule.shortDescription.text} __(${issue.message})__`)].filter(isDefined);
 
     return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
   });
@@ -349,6 +356,7 @@ function applyPolicyIntel(resource: K8sResource): {
   const markers = issues
     .map(issue => {
       if (
+        !issue.rule ||
         !issue.errorPos ||
         issue.errorPos.line === 1 ||
         issue.errorPos.endLine === undefined ||
@@ -364,14 +372,113 @@ function applyPolicyIntel(resource: K8sResource): {
         issue.errorPos.endColumn
       );
 
-      return createMarker(issue.message, range);
+      const message = `${issue.rule.shortDescription.text}\n  ${issue.rule.longDescription.text}\n    ${issue.rule.help.text}`;
+
+      return createMarker(issue.rule.id, message, range);
     })
     .filter(isDefined);
 
-  return {decorations: [...glyphs], markers};
+  return {decorations: glyphs, markers};
 }
+
+interface ApplyHelmFileArgs {
+  code: string;
+  currentFile: FileEntry;
+  helmChartMap?: HelmChartMapType;
+  helmValuesMap?: HelmValuesMapType;
+  selectFilePath: (filePath: string) => void;
+  fileMap: FileMapType;
+}
+
+interface HelmValueMatch {
+  path: string;
+  keyPath: string;
+}
+
+const applyForHelmFile = ({
+  code,
+  currentFile,
+  helmChartMap,
+  helmValuesMap,
+  selectFilePath,
+  fileMap,
+}: ApplyHelmFileArgs) => {
+  const helmNewDecorations: monaco.editor.IModelDeltaDecoration[] = [];
+  const helmNewDisposables: monaco.IDisposable[] = [];
+  const helmValueRanges = getHelmValueRanges(code);
+
+  if (!helmValueRanges.length || !helmValuesMap || !helmChartMap || !currentFile) {
+    return {helmNewDisposables, helmNewDecorations};
+  }
+
+  const validKeyPaths: HelmValueMatch[] = [];
+  const fileHelmChart = helmChartMap[currentFile.helmChartId as string];
+  const valueFilePaths = fileHelmChart.valueFileIds.map(valueFileId => helmValuesMap[valueFileId].filePath);
+
+  valueFilePaths.forEach(valueFilePath => {
+    const valueFileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, valueFilePath), 'utf8');
+    const documents = parseAllYamlDocuments(valueFileContent);
+    documents.forEach(doc => {
+      const fileKeyPaths = getObjectKeys(doc.toJS(), '.Values.').map(keyPath => ({
+        path: valueFilePath,
+        keyPath,
+      }));
+
+      validKeyPaths.push(...fileKeyPaths);
+    });
+  });
+
+  helmValueRanges.forEach(helmValueRange => {
+    const keyPathsInFile = validKeyPaths.filter(validKeyPath => helmValueRange.value === validKeyPath.keyPath);
+    const canFindKeyInValuesFile = Boolean(keyPathsInFile.length);
+    helmNewDecorations.push(
+      createInlineDecoration(
+        helmValueRange.range,
+        canFindKeyInValuesFile ? InlineDecorationTypes.SatisfiedRef : InlineDecorationTypes.UnsatisfiedRef
+      )
+    );
+
+    if (canFindKeyInValuesFile) {
+      const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
+      keyPathsInFile.forEach(keyPathInFile => {
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+          `Go to: ${keyPathInFile.path}`,
+          'Select file',
+          () => {
+            // @ts-ignore
+            selectFilePath(keyPathInFile.path);
+          }
+        );
+        commandMarkdownLinkList.push(commandMarkdownLink);
+        helmNewDisposables.push(commandDisposable);
+      });
+
+      const text =
+        keyPathsInFile.length > 1
+          ? `Found this value in ${keyPathsInFile.length} helm value files`
+          : `Found this value in ${keyPathsInFile[0].path}`;
+      const hoverCommandMarkdownLinkList = [createMarkdownString(text), ...commandMarkdownLinkList];
+      if (hoverCommandMarkdownLinkList.length > 1) {
+        const hoverDisposable = createHoverProvider(helmValueRange.range, hoverCommandMarkdownLinkList);
+        helmNewDisposables.push(hoverDisposable);
+      }
+
+      return;
+    }
+
+    const linkDisposable = createLinkProvider(
+      helmValueRange.range,
+      'We cannot find the value in the helm values file',
+      () => {}
+    );
+    helmNewDisposables.push(linkDisposable);
+  });
+
+  return {helmNewDisposables, helmNewDecorations};
+};
 
 export default {
   applyForResource,
+  applyForHelmFile,
   applyAutocomplete,
 };

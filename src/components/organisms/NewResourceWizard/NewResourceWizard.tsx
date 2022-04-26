@@ -377,7 +377,7 @@ const NewResourceWizard = () => {
           label="Resource Name"
           rules={[
             {required: true, message: 'This field is required'},
-            {pattern: /^[a-z0-9]$|^([a-z0-9\-.])*[a-z0-9]$/, message: 'Wrong pattern'},
+            {pattern: /^[a-z0-9]$|^([a-z0-9\-])*[a-z0-9]$/, message: 'Wrong pattern'},
             {max: 63, type: 'string', message: 'Too long'},
           ]}
           tooltip={{

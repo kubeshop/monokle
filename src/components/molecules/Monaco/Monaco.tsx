@@ -70,6 +70,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -135,18 +137,22 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     }
   };
 
-  useCodeIntel(
+  useCodeIntel({
     editor,
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
+    selectedResource:
+      selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
     resourceMap,
     fileMap,
     isEditorMounted,
     selectResource,
     selectFilePath,
-    isInPreviewMode ? undefined : createResource,
-    filterResources
-  );
+    createResource: isInPreviewMode ? undefined : createResource,
+    filterResources,
+    selectedPath,
+    helmValuesMap,
+    helmChartMap,
+  });
 
   const {registerStaticActions} = useEditorKeybindings(
     editor,
