@@ -1,10 +1,9 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Input, Select} from 'antd';
+import {Input, Select} from 'antd';
 
 import {mapValues} from 'lodash';
-import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
@@ -16,34 +15,10 @@ import {KeyValueInput} from '@components/atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import Colors from '@styles/Colors';
+import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
 const ROOT_OPTIONS = '<root>';
-
-const FieldContainer = styled.div`
-  margin-top: 5px;
-  margin-bottom: 10px;
-`;
-
-const FieldLabel = styled.p`
-  font-weight: 500;
-  margin-bottom: 5px;
-`;
-
-const StyledTitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const StyledTitleLabel = styled.span`
-  color: ${Colors.grey7};
-`;
-
-const StyledTitleButton = styled(Button)`
-  padding: 0;
-`;
 
 const {Option} = Select;
 
@@ -207,15 +182,16 @@ const ResourceFilter = () => {
   }, [filtersMap]);
 
   return (
-    <div>
-      <StyledTitleContainer>
-        <StyledTitleLabel>Filter resources by:</StyledTitleLabel>
-        <StyledTitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
+    <S.Container>
+      <S.Title>
+        <S.TitleLabel>Filter resources by:</S.TitleLabel>
+        <S.TitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
           Reset all
-        </StyledTitleButton>
-      </StyledTitleContainer>
-      <FieldContainer>
-        <FieldLabel>Name:</FieldLabel>
+        </S.TitleButton>
+      </S.Title>
+
+      <S.Field>
+        <S.FieldLabel>Name:</S.FieldLabel>
         <Input
           autoFocus
           disabled={areFiltersDisabled}
@@ -224,10 +200,10 @@ const ResourceFilter = () => {
           value={name}
           onChange={e => updateName(e.target.value)}
         />
-      </FieldContainer>
+      </S.Field>
 
-      <FieldContainer>
-        <FieldLabel>Kind:</FieldLabel>
+      <S.Field>
+        <S.FieldLabel>Kind:</S.FieldLabel>
         <Select
           showSearch
           disabled={areFiltersDisabled}
@@ -245,10 +221,10 @@ const ResourceFilter = () => {
             </Option>
           ))}
         </Select>
-      </FieldContainer>
+      </S.Field>
 
-      <FieldContainer>
-        <FieldLabel>Namespace:</FieldLabel>
+      <S.Field>
+        <S.FieldLabel>Namespace:</S.FieldLabel>
         <Select
           showSearch
           disabled={areFiltersDisabled}
@@ -269,9 +245,9 @@ const ResourceFilter = () => {
             );
           })}
         </Select>
-      </FieldContainer>
+      </S.Field>
 
-      <FieldContainer>
+      <S.Field>
         <KeyValueInput
           label="Labels:"
           schema={allLabelsSchema}
@@ -280,9 +256,9 @@ const ResourceFilter = () => {
           onChange={updateLabels}
           disabled={areFiltersDisabled}
         />
-      </FieldContainer>
+      </S.Field>
 
-      <FieldContainer>
+      <S.Field>
         <KeyValueInput
           disabled={areFiltersDisabled}
           label="Annotations:"
@@ -291,10 +267,10 @@ const ResourceFilter = () => {
           value={annotations}
           onChange={updateAnnotations}
         />
-      </FieldContainer>
+      </S.Field>
 
-      <FieldContainer>
-        <FieldLabel>Contained in file/folder:</FieldLabel>
+      <S.Field>
+        <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
         <Select
           defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
@@ -305,8 +281,8 @@ const ResourceFilter = () => {
         >
           {fileOrFolderContainedInOptions}
         </Select>
-      </FieldContainer>
-    </div>
+      </S.Field>
+    </S.Container>
   );
 };
 

@@ -1,6 +1,3 @@
-import {ReflexElement} from 'react-reflex';
-import 'react-reflex/styles.css';
-
 import {Button} from 'antd';
 
 import styled from 'styled-components';
@@ -9,22 +6,6 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
-
-export const ReflexFilterElement = styled(ReflexElement)`
-  position: relative;
-  padding: 6px 0 3px 0;
-  margin-bottom: 5px;
-
-  & .custom-handle {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-    height: 3px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    cursor: row-resize;
-  }
-`;
 
 export const FiltersNumber = styled.div`
   margin-left: 5px;

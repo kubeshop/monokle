@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
+import 'react-reflex/styles.css';
 
 import * as log from 'loglevel';
 
