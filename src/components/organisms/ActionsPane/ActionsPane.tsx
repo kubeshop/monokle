@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {ReflexContainer, ReflexElement} from 'react-reflex';
 import {useMeasure} from 'react-use';
 
 import {Button, Tabs, Tooltip} from 'antd';
@@ -67,6 +68,7 @@ import {Icon, TabHeader} from '@atoms';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
+import {useMainPaneHeight} from '@utils/hooks';
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -115,6 +117,7 @@ const ActionsPane: React.FC = () => {
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const paneHeight = useMainPaneHeight();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -388,172 +391,175 @@ const ActionsPane: React.FC = () => {
 
   return (
     <S.ActionsPaneMainContainer ref={actionsPaneRef}>
-      <div>
-        {selectedPreviewConfigurationId ? (
-          <TitleBar title="Helm Command">
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
-              <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
-                Preview
+      {selectedPreviewConfigurationId ? (
+        <TitleBar title="Helm Command">
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
+            <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
+              Preview
+            </Button>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
+            <S.DiffButton size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
+              Edit
+            </S.DiffButton>
+          </Tooltip>
+        </TitleBar>
+      ) : (
+        <TitleBar title="Editor">
+          <>
+            <S.LeftArrowButton
+              onClick={onClickLeftArrow}
+              disabled={!isLeftArrowEnabled}
+              type="link"
+              size="small"
+              icon={<ArrowLeftOutlined />}
+            />
+            <S.RightArrowButton
+              onClick={onClickRightArrow}
+              disabled={!isRightArrowEnabled}
+              type="link"
+              size="small"
+              icon={<ArrowRightOutlined />}
+            />
+
+            {isSelectedResourceUnsaved() && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
+                <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
+                  Save
+                </S.SaveButton>
+              </Tooltip>
+            )}
+
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
+              <Button
+                loading={Boolean(applyingResource)}
+                type="primary"
+                size="small"
+                ghost
+                onClick={applySelection}
+                disabled={isDeployButtonDisabled}
+                icon={<Icon name="kubernetes" />}
+              >
+                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
               </Button>
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
-              <S.DiffButton size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
-                Edit
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+              <S.DiffButton
+                size="small"
+                type="primary"
+                ghost
+                onClick={diffSelectedResource}
+                disabled={isDiffButtonDisabled}
+              >
+                Diff
               </S.DiffButton>
             </Tooltip>
-          </TitleBar>
-        ) : (
-          <TitleBar title="Editor">
-            <>
-              <S.LeftArrowButton
-                onClick={onClickLeftArrow}
-                disabled={!isLeftArrowEnabled}
-                type="link"
-                size="small"
-                icon={<ArrowLeftOutlined />}
-              />
-              <S.RightArrowButton
-                onClick={onClickRightArrow}
-                disabled={!isRightArrowEnabled}
-                type="link"
-                size="small"
-                icon={<ArrowRightOutlined />}
-              />
-
-              {isSelectedResourceUnsaved() && (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                  <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
-                    Save
-                  </S.SaveButton>
-                </Tooltip>
-              )}
-
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
-                <Button
-                  loading={Boolean(applyingResource)}
-                  type="primary"
-                  size="small"
-                  ghost
-                  onClick={applySelection}
-                  disabled={isDeployButtonDisabled}
-                  icon={<Icon name="kubernetes" />}
-                >
-                  {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-                </Button>
-              </Tooltip>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-                <S.DiffButton
-                  size="small"
-                  type="primary"
-                  ghost
-                  onClick={diffSelectedResource}
-                  disabled={isDiffButtonDisabled}
-                >
-                  Diff
-                </S.DiffButton>
-              </Tooltip>
-            </>
-          </TitleBar>
-        )}
-      </div>
-
-      {!selectedPreviewConfigurationId ? (
-        <S.Tabs
-          defaultActiveKey="source"
-          activeKey={activeTabKey}
-          onChange={k => setActiveTabKey(k)}
-          tabBarExtraContent={
-            selectedResource && resourceKindHandler?.helpLink ? (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
-                <S.ExtraRightButton
-                  onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
-                  type="link"
-                  ref={extraButton}
-                >
-                  {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
-                </S.ExtraRightButton>
-              </Tooltip>
-            ) : isKustomization ? (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
-                <S.ExtraRightButton
-                  onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
-                  type="link"
-                  ref={extraButton}
-                >
-                  {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
-                </S.ExtraRightButton>
-              </Tooltip>
-            ) : selectedPath && isHelmChartFile(selectedPath) ? (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
-                <S.ExtraRightButton
-                  onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
-                  type="link"
-                  ref={extraButton}
-                >
-                  {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
-                </S.ExtraRightButton>
-              </Tooltip>
-            ) : null
-          }
-        >
-          <TabPane
-            key="source"
-            tab={
-              <WalkThrough placement="leftTop" step="syntax">
-                <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
-              </WalkThrough>
-            }
-          >
-            {isFolderLoading || previewLoader.isLoading ? (
-              <S.Skeleton active />
-            ) : activeTabKey === 'source' ? (
-              !isClusterDiffVisible &&
-              (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
-              )
-            ) : null}
-          </TabPane>
-
-          {schemaForSelectedPath ||
-          (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-            <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
-              {isFolderLoading || previewLoader.isLoading ? (
-                <S.Skeleton active />
-              ) : activeTabKey === 'form' ? (
-                selectedPath && schemaForSelectedPath && !selectedResource ? (
-                  <FormEditor
-                    formSchema={extractFormSchema(schemaForSelectedPath)}
-                    formUiSchema={getUiSchemaForPath(selectedPath)}
-                  />
-                ) : isKustomization && selectedResource ? (
-                  <FormEditor
-                    formSchema={extractFormSchema(
-                      getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
-                    )}
-                  />
-                ) : resourceKindHandler?.formEditorOptions ? (
-                  <FormEditor
-                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                  />
-                ) : null
-              ) : null}
-            </TabPane>
-          ) : null}
-
-          {selectedResource && resourceKindHandler && !isKustomization && (
-            <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
-              {isFolderLoading || previewLoader.isLoading ? (
-                <S.Skeleton active />
-              ) : activeTabKey === 'metadataForm' ? (
-                <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
-              ) : null}
-            </TabPane>
-          )}
-        </S.Tabs>
-      ) : (
-        <PreviewConfigurationDetails />
+          </>
+        </TitleBar>
       )}
+
+      <ReflexContainer orientation="horizontal" style={{height: paneHeight - 40}}>
+        <ReflexElement flex={1.0}>
+          {!selectedPreviewConfigurationId ? (
+            <S.Tabs
+              defaultActiveKey="source"
+              activeKey={activeTabKey}
+              onChange={k => setActiveTabKey(k)}
+              tabBarExtraContent={
+                selectedResource && resourceKindHandler?.helpLink ? (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                    <S.ExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                      type="link"
+                      ref={extraButton}
+                    >
+                      {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
+                    </S.ExtraRightButton>
+                  </Tooltip>
+                ) : isKustomization ? (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
+                    <S.ExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
+                      type="link"
+                      ref={extraButton}
+                    >
+                      {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
+                    </S.ExtraRightButton>
+                  </Tooltip>
+                ) : selectedPath && isHelmChartFile(selectedPath) ? (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
+                    <S.ExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
+                      type="link"
+                      ref={extraButton}
+                    >
+                      {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
+                    </S.ExtraRightButton>
+                  </Tooltip>
+                ) : null
+              }
+            >
+              <TabPane
+                key="source"
+                tab={
+                  <WalkThrough placement="leftTop" step="syntax">
+                    <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
+                  </WalkThrough>
+                }
+              >
+                {isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : activeTabKey === 'source' ? (
+                  !isClusterDiffVisible &&
+                  (selectedResourceId || selectedPath || selectedValuesFileId) && (
+                    <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+                  )
+                ) : null}
+              </TabPane>
+
+              {schemaForSelectedPath ||
+              (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
+                <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
+                  {isFolderLoading || previewLoader.isLoading ? (
+                    <S.Skeleton active />
+                  ) : activeTabKey === 'form' ? (
+                    selectedPath && schemaForSelectedPath && !selectedResource ? (
+                      <FormEditor
+                        formSchema={extractFormSchema(schemaForSelectedPath)}
+                        formUiSchema={getUiSchemaForPath(selectedPath)}
+                      />
+                    ) : isKustomization && selectedResource ? (
+                      <FormEditor
+                        formSchema={extractFormSchema(
+                          getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                        )}
+                      />
+                    ) : resourceKindHandler?.formEditorOptions ? (
+                      <FormEditor
+                        formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                        formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                      />
+                    ) : null
+                  ) : null}
+                </TabPane>
+              ) : null}
+
+              {selectedResource && resourceKindHandler && !isKustomization && (
+                <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
+                  {isFolderLoading || previewLoader.isLoading ? (
+                    <S.Skeleton active />
+                  ) : activeTabKey === 'metadataForm' ? (
+                    <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
+                  ) : null}
+                </TabPane>
+              )}
+            </S.Tabs>
+          ) : (
+            <PreviewConfigurationDetails />
+          )}
+        </ReflexElement>
+      </ReflexContainer>
+
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
