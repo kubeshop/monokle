@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
@@ -123,6 +123,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const settings = useSelector(settingsSelector);
   const [schema, setSchema] = useState<any>({});
   const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
+  const previewType = useAppSelector(state => state.main.previewType);
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -188,6 +189,10 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
     }
   }, [formSchema, settings]);
 
+  const isReadOnlyMode = useMemo(() => {
+    return isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode;
+  }, [isInPreviewMode, previewType, settings.allowEditInClusterMode]);
+
   if (!selectedResource && !selectedPath) {
     return <div>Nothing selected..</div>;
   }
@@ -213,7 +218,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
         fields={getCustomFormFields()}
-        disabled={isInPreviewMode}
+        disabled={isReadOnlyMode}
       >
         <div />
       </Form>
