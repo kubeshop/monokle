@@ -1,11 +1,14 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {HelmPreviewConfiguration} from '@models/appconfig';
-import {HelmValuesMapType} from '@models/appstate';
+import {FileMapType, HelmValuesMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
+
+import {isDefined} from '@utils/filter';
 
 import Colors from '@styles/Colors';
 
@@ -14,6 +17,13 @@ import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
 import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
+
+type TemplatesScopeType = {
+  fileMap: FileMapType;
+  isFolderOpen: boolean;
+  selectedPath: string | undefined;
+  [currentHelmChart: string]: HelmChart | unknown;
+};
 
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
@@ -120,6 +130,75 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
+  const templateFilesSectionBlueprint: SectionBlueprint<FileEntry, TemplatesScopeType> = {
+    name: 'Templates',
+    id: `${helmChart.id}-templates`,
+    containerElementId: 'helm-section-container',
+    rootSectionId: HELM_CHART_SECTION_NAME,
+    getScope: state => {
+      return {
+        isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        fileMap: state.main.fileMap,
+        selectedPath: state.main.selectedPath,
+        [helmChart.id]: state.main.helmChartMap[helmChart.id],
+      };
+    },
+    builder: {
+      getRawItems: scope => {
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return [];
+        }
+        return currentHelmChart.templateFilePaths.map(filePath => scope.fileMap[filePath]).filter(isDefined);
+      },
+      isInitialized: scope => {
+        return scope.isFolderOpen;
+      },
+      isEmpty: (scope, rawItems) => {
+        return scope.isFolderOpen && rawItems.length === 0;
+      },
+    },
+    customization: {
+      counterDisplayMode: 'items',
+      indentation: 10,
+      nameWeight: 400,
+      nameSize: 14,
+      nameColor: Colors.grey9,
+      nameHorizontalPadding: 0,
+      namePrefix: {
+        component: CollapseSectionPrefix,
+      },
+    },
+    itemBlueprint: {
+      getName: rawItem => rawItem.name,
+      getInstanceId: rawItem => rawItem.filePath,
+      builder: {
+        isSelected: (rawItem, scope) => {
+          return rawItem.filePath === scope.selectedPath;
+        },
+        getMeta: () => {
+          return {
+            itemPrefixStyle: {
+              paddingLeft: 10,
+            },
+            itemPrefixIcon: 'file',
+          };
+        },
+      },
+      instanceHandler: {
+        onClick: (itemInstance, dispatch) => {
+          dispatch(selectFile({filePath: itemInstance.id}));
+        },
+      },
+      customization: {
+        prefix: {
+          component: ItemPrefix,
+        },
+        lastItemMarginBottom: 0,
+      },
+    },
+  };
+
   const valuesFilesSectionBlueprint: SectionBlueprint<HelmValuesFile, ValuesFilesScopeType> = {
     name: 'Values Files',
     id: `${helmChart.id}-values`,
@@ -207,7 +286,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     name: helmChart.name,
     containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
-    childSectionIds: [valuesFilesSectionBlueprint.id, previewConfigurationsSectionBlueprint.id],
+    childSectionIds: [
+      valuesFilesSectionBlueprint.id,
+      templateFilesSectionBlueprint.id,
+      previewConfigurationsSectionBlueprint.id,
+    ],
     getScope: state => {
       const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
       return {
@@ -272,5 +355,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
-  return {helmChartSectionBlueprint, valuesFilesSectionBlueprint, previewConfigurationsSectionBlueprint};
+  return {
+    helmChartSectionBlueprint,
+    valuesFilesSectionBlueprint,
+    previewConfigurationsSectionBlueprint,
+    templateFilesSectionBlueprint,
+  };
 }
