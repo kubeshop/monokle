@@ -93,19 +93,18 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
     // Needs a better generic solution
     const regexMatch = err.msg?.match(/Container '([A-Za-z-]*)'/);
     const container = regexMatch ? regexMatch[1] : undefined;
-    const message = container
-      ? `${rule.shortDescription.text} on container "${container}"`
+    const description = container
+      ? `${rule.shortDescription.text} on container "${container}".`
       : rule.shortDescription.text;
+    const property = rule.properties.path?.replace(/\./g, '/') ?? resource.name;
 
     const pathHint = rule.properties.path;
-    const errorPos = container
-      ? determineContainerErrorPos(resource, container, pathHint)
-      : {column: 1, length: 10, line: 1};
+    const errorPos = determineErrorPos(resource, pathHint, container);
 
     return {
-      message,
-      description: `${rule.longDescription.text} ${rule.help.text}`,
-      property: rule.id,
+      message: rule.id,
+      description,
+      property,
       errorPos,
       rule,
     };
@@ -116,19 +115,39 @@ function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRu
 
 type YamlPath = Array<string | number>;
 
-function determineContainerErrorPos(resource: K8sResource, container: string, pathHint?: string): RefPosition {
-  const prefix = determineContainerPrefix(resource, container);
-
-  if (!prefix.length) {
-    return {line: 1, column: 1, length: 10};
+function determineErrorPos(resource: K8sResource, pathHint?: string, container?: string): RefPosition {
+  if (!pathHint) {
+    return createRefPositionFallback(resource);
   }
 
+  const path = pathHint?.split('.') ?? [];
+  const isContainer = path[0] === '$container';
+
+  if (isContainer && !container) {
+    return createRefPositionFallback(resource);
+  }
+
+  if (isContainer) path.shift(); // drop $container keyword
+  const prefix = isContainer && container ? determineContainerPrefix(resource, container) : [];
+  const node = determineClosestErrorNode(resource, path, prefix);
+  return createRefPosition(resource, node);
+}
+
+/**
+ * Ref position fallback is the resource kind to ensure VSC shows proper highlight.
+ */
+function createRefPositionFallback(resource: K8sResource): RefPosition {
+  const node = determineClosestErrorNode(resource, ['kind']);
+  return createRefPosition(resource, node);
+}
+
+function createRefPosition(resource: K8sResource, node: Node | undefined): RefPosition {
   const lineCounter = getLineCounter(resource);
-  const node = determineClosestErrorNode(resource, prefix, pathHint);
 
   if (!lineCounter || !node || !node.range) {
     return {line: 1, column: 1, length: 1};
   }
+
   const start = lineCounter.linePos(node.range[0]);
   const end = lineCounter.linePos(node.range[1]);
   const length = node.range[1] - node.range[0];
@@ -183,27 +202,21 @@ function determineContainerIndex(
  * - When $container specifies `securityContext` then it underlines whole context object.
  * - When $container does not specify `securityContext` then it underlines whole container object.
  */
-function determineClosestErrorNode(resource: K8sResource, prefix: YamlPath, pathHint?: string): Node | undefined {
+function determineClosestErrorNode(resource: K8sResource, path: YamlPath, prefix: YamlPath = []): Node | undefined {
   const doc = getParsedDoc(resource);
-  const [head, ...tail] = pathHint?.split('.') ?? [];
 
-  if (!head || head !== '$container') {
-    const node = doc.getIn(prefix, true);
-    return isNode(node) ? node : undefined;
-  }
-
-  const path = prefix.concat(tail);
-  while (path.length > prefix.length) {
-    const node = doc.getIn(path, true);
+  const currentPath = prefix.concat(path);
+  while (currentPath.length > prefix.length) {
+    const node = doc.getIn(currentPath, true);
 
     if (isNode(node)) {
       return node;
     }
 
-    path.pop();
+    currentPath.pop();
   }
 
-  const node = doc.getIn(path, true);
+  const node = doc.getIn(currentPath, true);
   return isNode(node) ? node : undefined;
 }
 
