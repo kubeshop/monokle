@@ -1,9 +1,9 @@
 import {useAppDispatch} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
-import CreateFromTemplate from '@assets/CreateFromTemplate.svg';
-import CreateScratch from '@assets/CreateScratch.svg';
-import SelectFolder from '@assets/SelectFolder.svg';
+import SelectFolder from '@assets/FromFolder.svg';
+import CreateScratch from '@assets/FromScratch.svg';
+import CreateFromTemplate from '@assets/FromTemplate.svg';
 
 import Guide from './Guide';
 import * as S from './StartProjectPage.styled';

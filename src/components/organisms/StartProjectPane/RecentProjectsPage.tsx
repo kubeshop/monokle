@@ -5,9 +5,9 @@ import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/ap
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
-import CreateFromTemplate from '@assets/CreateFromTemplate.svg';
-import CreateScratch from '@assets/CreateScratch.svg';
-import SelectFolder from '@assets/SelectFolder.svg';
+import SelectFolder from '@assets/FromFolder.svg';
+import CreateScratch from '@assets/FromScratch.svg';
+import CreateFromTemplate from '@assets/FromTemplate.svg';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';
