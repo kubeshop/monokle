@@ -79,6 +79,9 @@ const schema = {
           setDefaultPrimitiveValues: {
             type: 'boolean',
           },
+          allowEditInClusterMode: {
+            type: 'boolean',
+          },
         },
       },
       recentFolders: {
@@ -257,6 +260,7 @@ const defaults = {
       helmPreviewMode: 'template',
       createDefaultObjects: false,
       setDefaultPrimitiveValues: true,
+      allowEditInClusterMode: true,
     },
     recentFolders: [],
     newVersion: 0,

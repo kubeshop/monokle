@@ -71,6 +71,7 @@ const initialAppConfigState: AppConfig = {
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
     createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
+    allowEditInClusterMode: electronStore.get('appConfig.settings.allowEditInClusterMode', true),
   },
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),

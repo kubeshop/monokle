@@ -27,7 +27,7 @@ import {NewResourceWizardInput} from '@models/ui';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
@@ -79,6 +79,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const settings = useSelector(settingsSelector);
 
   const resourcesFromSelectedPath = useMemo(() => {
     if (!selectedPath) {
@@ -274,18 +275,18 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
 
-  // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
+  // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
+    if (isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode) {
+      return true;
+    }
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
       return previewType !== 'kustomization' || !isKustomizationPatch(selectedResource);
     }
     if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
       return true;
     }
-    if (!selectedPath && !selectedResourceId) {
-      return true;
-    }
-    return false;
+    return !selectedPath && !selectedResourceId;
   }, [
     isInPreviewMode,
     selectedResourceId,
@@ -295,6 +296,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     previewValuesFileId,
     selectedPath,
     previewType,
+    settings.allowEditInClusterMode,
   ]);
 
   const options = useMemo(() => {

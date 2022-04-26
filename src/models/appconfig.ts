@@ -27,6 +27,7 @@ export type Settings = {
   enableHelmWithKustomize?: boolean;
   createDefaultObjects?: boolean;
   setDefaultPrimitiveValues?: boolean;
+  allowEditInClusterMode?: boolean;
 };
 
 export enum NewVersionCode {
