@@ -6,6 +6,7 @@ interface HelmChart {
   filePath: string;
   name: string;
   valueFileIds: string[]; // ids of contained Helm value files
+  templateFilePaths: string[]; // other files contained in the helm chart
 }
 
 /**

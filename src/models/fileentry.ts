@@ -15,6 +15,8 @@ interface FileEntry {
   children?: string[];
   /** the timestamp of the last write - for discarding change notifications */
   timestamp?: number;
+  /** the id of the helm chart this file might belong to */
+  helmChartId?: string;
 }
 
 export type {FileEntry};
