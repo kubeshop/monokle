@@ -50,6 +50,16 @@ export function isHelmValuesFile(filePath: string): boolean {
 }
 
 /**
+ * Checks if the specified path is a helm chart template
+ */
+export function isHelmTemplateFile(filePath: string): boolean {
+  return (
+    filePath.includes('templates') &&
+    ['*.yaml', '*.yml'].some(ext => micromatch.isMatch(path.basename(filePath).toLowerCase(), ext))
+  );
+}
+
+/**
  * Checks if the specified path is a helm chart file
  */
 
@@ -73,7 +83,7 @@ export function createHelmValuesFile(fileEntry: FileEntry, helmChart: HelmChart,
   const helmValues: HelmValuesFile = {
     id: uuidv4(),
     filePath: fileEntry.filePath,
-    name: fileEntry.filePath.substring(path.dirname(helmChart.filePath).length + 1),
+    name: path.basename(fileEntry.filePath),
     isSelected: false,
     helmChartId: helmChart.id,
   };
@@ -115,7 +125,6 @@ export function processHelmChartFolder(
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id});
-      helmChart.templateFilePaths.push(fileEntryPath);
 
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
@@ -140,6 +149,8 @@ export function processHelmChartFolder(
         createHelmValuesFile(fileEntry, helmChart, helmValuesMap);
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
+      } else if (isHelmTemplateFile(fileEntry.filePath)) {
+        helmChart.templateFilePaths.push(fileEntryPath);
       }
 
       result.push(fileEntry.name);

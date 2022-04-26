@@ -21,6 +21,7 @@ import {
   getHelmValuesFile,
   isHelmChartFile,
   isHelmChartFolder,
+  isHelmTemplateFile,
   isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
@@ -189,10 +190,9 @@ export function readFiles(
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
-      if (helmChart) {
+      if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         helmChart.templateFilePaths.push(fileEntryPath);
       }
-
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
