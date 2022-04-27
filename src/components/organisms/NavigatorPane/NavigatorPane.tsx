@@ -5,7 +5,7 @@ import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {GUT_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -110,14 +110,14 @@ const NavPane: React.FC<Props> = ({height}) => {
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         {isResourceFiltersOpen && (
-          <ReflexElement flex={0.22} minSize={100}>
+          <ReflexElement flex={0.4} minSize={100}>
             <ResourceFilter />
           </ReflexElement>
         )}
 
         {isResourceFiltersOpen && <ReflexSplitter />}
 
-        <ReflexElement minSize={GUT_SPLIT_VIEW_PANE_WIDTH}>
+        <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
           <S.List id="navigator-sections-container">
             <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
             <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />

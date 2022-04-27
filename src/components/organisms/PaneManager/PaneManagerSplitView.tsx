@@ -1,7 +1,7 @@
 import React, {Suspense, useCallback} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
-import {GUT_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
@@ -71,7 +71,7 @@ const PaneManagerSplitView: React.FC = () => {
 
         <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
-        <ReflexElement id="editPane" minSize={GUT_SPLIT_VIEW_PANE_WIDTH}>
+        <ReflexElement id="editPane" minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
           <ActionsPane height={height} />
         </ReflexElement>
       </ReflexContainer>
