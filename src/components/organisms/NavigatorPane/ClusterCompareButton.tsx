@@ -28,18 +28,18 @@ const ClusterCompareButton: React.FC = ({children}) => {
   };
 
   return (
-    <Tooltip
-      mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
-      title={
-        !isFolderOpen
-          ? ClusterDiffDisabledTooltip
-          : isInClusterMode
-          ? ClusterDiffDisabledInClusterPreviewTooltip
-          : ClusterDiffTooltip
-      }
-      placement="bottom"
-    >
-      <WalkThrough placement="leftTop" step="cluster">
+    <WalkThrough placement="leftTop" step="cluster">
+      <Tooltip
+        mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
+        title={
+          !isFolderOpen
+            ? ClusterDiffDisabledTooltip
+            : isInClusterMode
+            ? ClusterDiffDisabledInClusterPreviewTooltip
+            : ClusterDiffTooltip
+        }
+        placement="bottom"
+      >
         <Button
           onClick={onClickClusterComparison}
           icon={<SwapOutlined />}
@@ -51,8 +51,8 @@ const ClusterCompareButton: React.FC = ({children}) => {
         >
           {children}
         </Button>
-      </WalkThrough>
-    </Tooltip>
+      </Tooltip>
+    </WalkThrough>
   );
 };
 
