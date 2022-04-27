@@ -181,14 +181,16 @@ const PaneManagerLeftMenu: React.FC = () => {
       </PaneTooltip>
 
       <PaneTooltip show={!leftDrawerVisible} title="View Validation" placement="right">
-        <MenuButton
-          isSelected={leftDrawerVisible}
-          isActive={isActive}
-          onClick={() => dispatch(toggleValidationDrawer())}
-          disabled={!activeProject}
-        >
-          <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
-        </MenuButton>
+        <WalkThrough placement="rightTop" step="validation">
+          <MenuButton
+            isSelected={leftDrawerVisible}
+            isActive={isActive}
+            onClick={() => dispatch(toggleValidationDrawer())}
+            disabled={!activeProject}
+          >
+            <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
+          </MenuButton>
+        </WalkThrough>
       </PaneTooltip>
     </S.Container>
   );

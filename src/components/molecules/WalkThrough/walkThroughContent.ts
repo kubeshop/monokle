@@ -31,4 +31,9 @@ export const walkThroughContent: WalkThroughContentProps['data'][] = [
     content:
       'Check out and debug your Kustomize and Helm outputs. Change kustomizations and see effects on the generated resources.',
   },
+  {
+    step: 'validation',
+    title: 'Validate policies',
+    content: 'Enable policies to ensure your resources are configured securely.',
+  },
 ];
