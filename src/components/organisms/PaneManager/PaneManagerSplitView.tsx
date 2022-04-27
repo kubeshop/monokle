@@ -8,7 +8,7 @@ import {setPaneConfiguration} from '@redux/reducers/ui';
 
 import {ActionsPane, NavigatorPane} from '@organisms';
 
-import {useMainPaneHeight} from '@utils/hooks';
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import ValidationPane from '../ValidationDrawer';
 import * as S from './PaneManagerSplitView.styled';
@@ -21,10 +21,10 @@ const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerP
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
   const layout = useAppSelector(store => store.ui.paneConfiguration);
-  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-
-  const paneHeight = useMainPaneHeight();
+  const leftActiveMenu = useAppSelector(state =>
+    state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
+  );
+  const {height, width} = useMainPaneDimensions();
 
   const handleResize = useCallback(
     elements => {
@@ -41,24 +41,24 @@ const PaneManagerSplitView: React.FC = () => {
   );
 
   return (
-    <S.SplitViewContainer>
-      <ValidationPane height={paneHeight} />
+    <S.SplitViewContainer style={{width}}>
+      <ValidationPane height={height} />
 
-      <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware>
-        {leftActive && leftMenuSelection && (
+      <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
+        {leftActiveMenu && (
           <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
             <S.LeftPane>
               <Suspense fallback={<div />}>
-                {leftMenuSelection === 'file-explorer' && <FileTreePane />}
-                {leftMenuSelection === 'helm-pane' && <HelmPane />}
-                {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
-                {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
+                {leftActiveMenu === 'file-explorer' && <FileTreePane />}
+                {leftActiveMenu === 'helm-pane' && <HelmPane />}
+                {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
+                {leftActiveMenu === 'templates-pane' && <TemplateManagerPane contentHeight={height} />}
               </Suspense>
             </S.LeftPane>
           </ReflexElement>
         )}
 
-        {leftActive && leftMenuSelection && <ReflexSplitter propagate />}
+        {leftActiveMenu && <ReflexSplitter propagate />}
 
         <ReflexElement
           id="navPane"
@@ -66,13 +66,13 @@ const PaneManagerSplitView: React.FC = () => {
           maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 75}
           flex={layout.navPane}
         >
-          <NavigatorPane />
+          <NavigatorPane height={height} />
         </ReflexElement>
 
-        <ReflexSplitter propagate={leftActive && leftMenuSelection !== undefined} />
+        <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
         <ReflexElement id="editPane" minSize={GUT_SPLIT_VIEW_PANE_WIDTH}>
-          <ActionsPane />
+          <ActionsPane height={height} />
         </ReflexElement>
       </ReflexContainer>
     </S.SplitViewContainer>

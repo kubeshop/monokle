@@ -1,5 +1,3 @@
-import {ReflexElement} from 'react-reflex';
-
 import styled from 'styled-components';
 
 import {PanelColors} from '@styles/Colors';
@@ -10,7 +8,7 @@ export const SplitViewContainer = styled.div`
   height: 100%;
 `;
 
-export const LeftPane = styled(ReflexElement)`
+export const LeftPane = styled.div`
   position: relative;
   height: 100%;
   background: ${PanelColors.toolBar};

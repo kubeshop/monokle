@@ -18,8 +18,6 @@ import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
-import {useMainPaneHeight} from '@utils/hooks';
-
 import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
@@ -29,7 +27,11 @@ import ClusterCompareButton from './ClusterCompareButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
-const NavPane: React.FC = () => {
+type Props = {
+  height: number;
+};
+
+const NavPane: React.FC<Props> = ({height}) => {
   const dispatch = useAppDispatch();
   const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
@@ -40,7 +42,6 @@ const NavPane: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-  const paneHeight = useMainPaneHeight();
 
   const appliedFilters = useMemo(
     () =>
@@ -107,7 +108,7 @@ const NavPane: React.FC = () => {
         </S.TitleBar>
       )}
 
-      <ReflexContainer orientation="horizontal" style={{height: paneHeight - 40}}>
+      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         {isResourceFiltersOpen && (
           <ReflexElement flex={0.22} minSize={100}>
             <ResourceFilter />

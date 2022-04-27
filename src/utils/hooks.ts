@@ -15,13 +15,15 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
   return [htmlElRef, focus];
 }
 
-export function useMainPaneHeight(): number {
+export function useMainPaneDimensions(): {height: number; width: number} {
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
-  const [mainPaneHeight, setMainPaneHeight] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [width, setWidth] = useState<number>(0);
 
   useEffect(() => {
     const handleResize = () => {
-      setMainPaneHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
+      setHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
+      setWidth(window.innerWidth - 50);
     };
 
     window.addEventListener('resize', handleResize);
@@ -30,7 +32,7 @@ export function useMainPaneHeight(): number {
     return () => window.removeEventListener('resize', handleResize);
   }, [layoutSize]);
 
-  return mainPaneHeight;
+  return {height, width};
 }
 
 export function useWindowSize(): Size {
