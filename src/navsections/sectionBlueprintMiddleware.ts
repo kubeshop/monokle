@@ -10,6 +10,7 @@ import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance}
 import {RootState} from '@models/rootstate';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
+import {setPaneConfiguration, toggleLeftMenu, toggleResourceFilters} from '@redux/reducers/ui';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 
@@ -369,7 +370,10 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
   if (
     action?.type === updateNavigatorInstanceState.type ||
     action?.type === expandSectionIds.type ||
-    action?.type === collapseSectionIds.type
+    action?.type === collapseSectionIds.type ||
+    action?.type === toggleLeftMenu.type ||
+    action?.type === setPaneConfiguration.type ||
+    action?.type === toggleResourceFilters.type
   ) {
     return;
   }
