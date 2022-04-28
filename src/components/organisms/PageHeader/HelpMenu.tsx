@@ -2,13 +2,21 @@ import {useMemo} from 'react';
 
 import {Col, Dropdown, Menu, Row} from 'antd';
 
-import {FileSearchOutlined, FireOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {
+  FileSearchOutlined,
+  FireOutlined,
+  GithubOutlined,
+  MessageOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
 
 import semver from 'semver';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openReleaseNotesDrawer} from '@redux/reducers/ui';
+import {handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
+
+import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
@@ -111,6 +119,18 @@ const HelpMenu = () => {
           </Col>
 
           <Col span={19}>Discord</Col>
+        </Row>
+      </MenuItem>
+
+      <MenuItem onClick={() => dispatch(handleWalkThroughStep(StepEnum.Next))} key="replay">
+        <Row align="middle">
+          <Col span={5}>
+            <IconContainerSpan>
+              <MessageOutlined style={{transform: 'rotate(180deg)'}} />
+            </IconContainerSpan>
+          </Col>
+
+          <Col span={19}>Re-play Quick Guide</Col>
         </Row>
       </MenuItem>
     </Menu>
