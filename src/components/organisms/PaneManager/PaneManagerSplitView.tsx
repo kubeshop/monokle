@@ -71,7 +71,7 @@ const PaneManagerSplitView: React.FC = () => {
 
         <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
-        <ReflexElement id="editPane" minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
+        <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
           <ActionsPane height={height} />
         </ReflexElement>
       </ReflexContainer>

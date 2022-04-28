@@ -16,7 +16,7 @@ code {
 }
 
 .reflex-container.vertical > .reflex-splitter {
-  width: 1px;
+  width: 2px;
   background-color: #262626;
   border: 0px;
 }
@@ -35,7 +35,7 @@ code {
 }
 
 .reflex-container.horizontal > .reflex-splitter {
-  height: 1px;
+  height: 2px;
   background-color: #262626;
   border: 0px;
 }
