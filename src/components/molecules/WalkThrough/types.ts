@@ -1,4 +1,4 @@
-export type WalkThroughStep = 'template' | 'resource' | 'syntax' | 'cluster' | 'kustomizeHelm';
+export type WalkThroughStep = 'template' | 'resource' | 'syntax' | 'cluster' | 'kustomizeHelm' | 'validation';
 export type WalkThroughContentProps = {
   data: {
     step: WalkThroughStep;

@@ -7,29 +7,6 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-export const FiltersContainer = styled.div`
-  position: relative;
-  padding: 6px 0 3px 0;
-  margin-bottom: 5px;
-
-  & .react-resizable {
-    padding: 8px 16px;
-    overflow-y: auto;
-
-    ${GlobalScrollbarStyle}
-  }
-
-  & .custom-handle {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-    height: 3px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    cursor: row-resize;
-  }
-`;
-
 export const FiltersNumber = styled.div`
   margin-left: 5px;
 `;
@@ -44,14 +21,10 @@ export const List = styled.ol`
   ${GlobalScrollbarStyle}
 `;
 
-export const NavigatorPaneContainer = styled.div<{$gridTemplateRows: string}>`
+export const NavigatorPaneContainer = styled.div`
   height: 100%;
-  display: grid;
-
-  ${({$gridTemplateRows}) => `
-    grid-template-rows: ${$gridTemplateRows};
-  `};
-  grid-row-gap: 5px;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`
@@ -67,6 +40,11 @@ export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: bool
       left: ${$highlighted ? '-1px' : 'inherit'}
     `};
   }
+`;
+
+export const SelectionBar = styled.div`
+  width: 100%;
+  border-bottom: ${AppBorders.sectionDivider};
 `;
 
 export const TitleBar = styled.div`

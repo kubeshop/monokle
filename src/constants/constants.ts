@@ -1,3 +1,5 @@
+import {PaneConfiguration} from '@models/ui';
+
 export const PREVIEW_PREFIX = 'preview://';
 export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
@@ -21,7 +23,8 @@ export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
 export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
-export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
+export const MIN_SPLIT_VIEW_PANE_WIDTH = 300;
+export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
 export const DEFAULT_PLUGINS = [
   {
@@ -32,6 +35,14 @@ export const DEFAULT_PLUGINS = [
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
+
+export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
+  leftPane: 0.25,
+  navPane: 0.25,
+  rightPane: 0,
+  actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+  recentProjectsPaneWidth: 450,
+};
 
 export const PREDEFINED_K8S_VERSION = '1.23.3';
 

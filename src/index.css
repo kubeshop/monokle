@@ -15,9 +15,42 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.custom-modal-handle:active {
-  border-right: 2px solid rgba(23, 125, 220, 0.5);
-  border-left: 2px solid rgba(23, 125, 220, 0.5);
+.reflex-container.vertical > .reflex-splitter {
+  width: 2px;
+  background-color: #262626;
+  border: 0px;
+}
+
+.reflex-container.vertical > .reflex-splitter:hover {
+  background-color: #dbdbdb;
+  transition: all 0.5s ease;
+  border: 0px;
+}
+
+.reflex-container.vertical > .reflex-splitter.active {
+  background-color: rgba(23, 125, 220, 0.5);
+  border-right: 1px solid rgba(23, 125, 220, 0.5);
+  border-left: 1px solid rgba(23, 125, 220, 0.5);
+  transition: all 0.25s ease;
+}
+
+.reflex-container.horizontal > .reflex-splitter {
+  height: 2px;
+  background-color: #262626;
+  border: 0px;
+}
+
+.reflex-container.horizontal > .reflex-splitter:hover {
+  background-color: #dbdbdb;
+  transition: all 0.5s ease;
+  border: 0px;
+}
+
+.reflex-container.horizontal > .reflex-splitter.active {
+  background-color: rgba(23, 125, 220, 0.5);
+  border-bottom: 1px solid rgba(23, 125, 220, 0.5);
+  border-top: 1px solid rgba(23, 125, 220, 0.5);
+  transition: all 0.25s ease;
 }
 
 .monokleEditorUnsatisfiedRefGlyphClass {
@@ -240,7 +273,7 @@ code {
   z-index: 1;
   box-sizing: border-box;
   max-width: 420px;
-  background: linear-gradient(180deg, #393BCD 0%, #2090CF 100%);
+  background: linear-gradient(180deg, #393bcd 0%, #2090cf 100%);
   padding: 28px 35px;
 }
 
@@ -258,7 +291,7 @@ code {
 }
 
 .walkthrough .ant-popover-arrow-content {
-  background: linear-gradient(180deg, #393BCD 0%, #2090CF 100%);
+  background: linear-gradient(180deg, #393bcd 0%, #2090cf 100%);
   width: 20px;
   height: 20px;
 }

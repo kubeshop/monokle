@@ -128,10 +128,9 @@ export type UiState = {
 };
 
 export type PaneConfiguration = {
-  leftWidth: number;
-  navWidth: number;
-  editWidth: number;
-  rightWidth: number;
+  leftPane: number;
+  navPane: number;
+  rightPane: number;
   actionsPaneFooterExpandedHeight: number;
   recentProjectsPaneWidth: number;
 };

@@ -4,7 +4,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {
   HighlightItems,
@@ -218,16 +218,8 @@ export const uiSlice = createSlice({
       electronStore.set('ui.leftMenu.isActive', true);
       state.rightMenu.isActive = false;
       electronStore.set('ui.rightMenu.isActive', false);
-      const defaultPaneConfiguration = {
-        leftWidth: 0.3333,
-        navWidth: 0.3333,
-        editWidth: 0.3333,
-        rightWidth: 0,
-        actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
-        recentProjectsPaneWidth: 450,
-      };
-      state.paneConfiguration = defaultPaneConfiguration;
-      electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
+      state.paneConfiguration = DEFAULT_PANE_CONFIGURATION;
+      electronStore.set('ui.paneConfiguration', DEFAULT_PANE_CONFIGURATION);
     },
     highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
       state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
