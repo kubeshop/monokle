@@ -95,17 +95,21 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane">
       <div ref={titleBarRef}>
-        <TitleBar title="Templates" closable>
-          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
-            <Button
-              disabled={templates.length === 0}
-              onClick={onClickReload}
-              type="link"
-              size="small"
-              icon={<ReloadOutlined />}
-            />
-          </Tooltip>
-        </TitleBar>
+        <TitleBar
+          title="Templates"
+          closable
+          leftButtons={
+            <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+              <Button
+                disabled={templates.length === 0}
+                onClick={onClickReload}
+                type="link"
+                size="small"
+                icon={<ReloadOutlined />}
+              />
+            </Tooltip>
+          }
+        />
       </div>
 
       <S.Container $height={contentHeight ? contentHeight - titleBarHeight : 0}>
