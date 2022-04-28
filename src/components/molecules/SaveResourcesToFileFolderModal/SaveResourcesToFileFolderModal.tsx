@@ -54,11 +54,10 @@ const generateFullFileName = (
   existingFileNames: string[],
   includeKind?: boolean
 ): string => {
-  const {kind, name} = resource;
-  let fullFileName = getFullFileName(
-    `${name}${includeKind ? `-${kind}` : ''}${suffix ? ` (${suffix})` : ''}`,
-    fileIncludes
-  );
+  const name = resource.name;
+  const nameKind = includeKind ? `-${resource.kind.toLowerCase()}` : '';
+  const nameSuffix = suffix ? ` (${suffix})` : '';
+  const fullFileName = getFullFileName(`${name}${nameKind}${nameSuffix}`, fileIncludes);
   let foundFile: fs.Dirent | FileEntry | undefined;
   let foundExistingFileName = false;
 
