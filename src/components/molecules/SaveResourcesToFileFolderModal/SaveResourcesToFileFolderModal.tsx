@@ -28,6 +28,7 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {isDefined} from '@utils/filter';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
@@ -280,6 +281,10 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       }
 
       let existingFileNames: string[] = [];
+      const resources = resourcesIds.map(id => resourceMap[id]).filter(isDefined);
+      const hasNameClash = resources.some(resource =>
+        resources.filter(r => r.id !== resource.id).some(r => r.name === resource.name)
+      );
 
       resourcesIds.forEach(resourceId => {
         const resource = resourceMap[resourceId];
@@ -290,7 +295,8 @@ const SaveResourceToFileFolderModal: React.FC = () => {
           selectedFolder,
           fileMap,
           0,
-          existingFileNames
+          existingFileNames,
+          hasNameClash
         );
 
         if (!existingFileNames.includes(fullFileName)) {
