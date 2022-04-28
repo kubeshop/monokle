@@ -64,19 +64,25 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
 sectionBlueprintMap.register(RootHelmChartsSectionBlueprint);
 
 HelmChartEventEmitter.on('create', helmChart => {
-  const {valuesFilesSectionBlueprint, helmChartSectionBlueprint, previewConfigurationsSectionBlueprint} =
-    makeHelmChartSectionBlueprint(helmChart);
+  const {
+    valuesFilesSectionBlueprint,
+    helmChartSectionBlueprint,
+    previewConfigurationsSectionBlueprint,
+    templateFilesSectionBlueprint,
+  } = makeHelmChartSectionBlueprint(helmChart);
   if (RootHelmChartsSectionBlueprint.childSectionIds) {
     RootHelmChartsSectionBlueprint.childSectionIds?.push(helmChartSectionBlueprint.id);
   } else {
     RootHelmChartsSectionBlueprint.childSectionIds = [helmChartSectionBlueprint.id];
   }
+  sectionBlueprintMap.register(templateFilesSectionBlueprint);
   sectionBlueprintMap.register(previewConfigurationsSectionBlueprint);
   sectionBlueprintMap.register(valuesFilesSectionBlueprint);
   sectionBlueprintMap.register(helmChartSectionBlueprint);
 });
 
 HelmChartEventEmitter.on('remove', helmChartId => {
+  sectionBlueprintMap.remove(`${helmChartId}-templates`, [RootHelmChartsSectionBlueprint.id, helmChartId]);
   sectionBlueprintMap.remove(`${helmChartId}-configurations`, [RootHelmChartsSectionBlueprint.id, helmChartId]);
   sectionBlueprintMap.remove(`${helmChartId}-values`, [RootHelmChartsSectionBlueprint.id, helmChartId]);
   sectionBlueprintMap.remove(helmChartId, [RootHelmChartsSectionBlueprint.id]);
