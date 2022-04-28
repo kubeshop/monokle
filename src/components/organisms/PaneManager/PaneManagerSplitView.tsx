@@ -58,6 +58,8 @@ const PaneManagerSplitView: React.FC = () => {
           </ReflexElement>
         )}
 
+        {/* react-reflex does not work as intended when you
+            use fragments so keep this separate. */}
         {leftActiveMenu && <ReflexSplitter propagate />}
 
         <ReflexElement
@@ -69,6 +71,8 @@ const PaneManagerSplitView: React.FC = () => {
           <NavigatorPane height={height} />
         </ReflexElement>
 
+        {/* react-reflex does not work as intended when you use propagate 
+            without multiple splitters so set is dynamically. */}
         <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
