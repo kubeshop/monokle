@@ -1,17 +1,19 @@
-import {expect, test} from '@playwright/test';
+import {execSync} from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
 import {Page} from 'playwright';
 import {ElectronApplication} from 'playwright-core';
-import {execSync} from 'child_process';
-import * as path from 'path';
-import * as fs from 'fs';
+
+import {expect, test} from '@playwright/test';
+
 import {ElectronAppInfo, startApp} from './electronHelpers';
-import {getRecordingPath, pause} from './utils';
-import {MainWindow} from './models/mainWindow';
 import {FileExplorerPane} from './models/fileExplorerPane';
-import {KustomizePane} from './models/kustomizePane';
 import {HelmPane} from './models/helmPane';
-import {StartProjectPane} from './models/startProjectPane';
+import {KustomizePane} from './models/kustomizePane';
+import {MainWindow} from './models/mainWindow';
 import {NavigatorPane} from './models/navigatorPane';
+import {StartProjectPane} from './models/startProjectPane';
+import {getRecordingPath, pause} from './utils';
 
 let appWindow: Page;
 let appInfo: ElectronAppInfo;
@@ -67,33 +69,33 @@ const testData = [
     hash: startCommit,
     fileExplorerCount: 54,
     kustomizeCount: 13,
-    helmCount: 9,
+    helmCount: 12,
     navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
     fileExplorerCount: 33,
     kustomizeCount: 6,
-    helmCount: 9,
+    helmCount: 12,
     navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
     fileExplorerCount: 16,
     kustomizeCount: 3,
-    helmCount: 9,
+    helmCount: 12,
     navigatorCount: 34,
   },
   {
     hash: startCommit,
     fileExplorerCount: 54,
     kustomizeCount: 13,
-    helmCount: 9,
+    helmCount: 12,
     navigatorCount: 54,
   },
 ];
 
-test('all files should be loaded', async () => {
+test.only('all files should be loaded', async () => {
   await mainWindow.clickLogo();
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
   await pause(10000);
@@ -125,5 +127,5 @@ test('all files should be loaded', async () => {
 test.afterAll(async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
   await appWindow.close();
-  fs.rmSync(projectPath, { recursive: true, force: true });
+  fs.rmSync(projectPath, {recursive: true, force: true});
 });
