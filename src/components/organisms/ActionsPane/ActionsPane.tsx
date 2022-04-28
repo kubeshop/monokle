@@ -8,14 +8,7 @@ import {Button, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
-import {
-  ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
-  ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
-  HELM_CHART_ENTRY_FILE,
-  HELM_CHART_HELP_URL,
-  KUSTOMIZE_HELP_URL,
-  TOOLTIP_DELAY,
-} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE, HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
   ApplyFileTooltip,
