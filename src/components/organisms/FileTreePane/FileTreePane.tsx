@@ -457,32 +457,37 @@ const FileTreePane = () => {
 
   return (
     <S.FileTreeContainer id="FileExplorer">
-      <TitleBar title="File Explorer" closable>
-        {isScanExcludesUpdated === 'outdated' && (
-          <Tooltip title={FileExplorerChanged}>
-            <ExclamationCircleOutlined />
-          </Tooltip>
-        )}
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-          <Button
-            size="small"
-            onClick={refreshFolder}
-            icon={<ReloadOutlined />}
-            type="link"
-            disabled={isButtonDisabled}
-          />
-        </Tooltip>
-
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
-          <Button
-            icon={<Icon name="collapse" />}
-            onClick={onToggleTree}
-            type="link"
-            size="small"
-            disabled={isButtonDisabled}
-          />
-        </Tooltip>
-      </TitleBar>
+      <TitleBar
+        title="File Explorer"
+        closable
+        leftButtons={
+          <>
+            {isScanExcludesUpdated === 'outdated' && (
+              <Tooltip title={FileExplorerChanged}>
+                <ExclamationCircleOutlined />
+              </Tooltip>
+            )}
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+              <Button
+                size="small"
+                onClick={refreshFolder}
+                icon={<ReloadOutlined />}
+                type="link"
+                disabled={isButtonDisabled}
+              />
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
+              <Button
+                icon={<Icon name="collapse" />}
+                onClick={onToggleTree}
+                type="link"
+                size="small"
+                disabled={isButtonDisabled}
+              />
+            </Tooltip>
+          </>
+        }
+      />
 
       {isFolderLoading ? (
         <S.Skeleton active />

@@ -11,17 +11,21 @@ import * as S from './styled';
 
 interface IProps {
   title: string;
+  leftButtons?: React.ReactNode;
   closable?: boolean;
 }
 
 const TitleBar: React.FC<IProps> = props => {
-  const {title, children, closable = false} = props;
+  const {title, leftButtons, children, closable = false} = props;
   const dispatch = useAppDispatch();
 
   return (
     <S.TitleBarContainer>
       <MonoPaneTitle>
-        <S.Container>{title}</S.Container>
+        <S.Container>
+          {title}
+          {leftButtons && <div style={{marginLeft: '10px'}}>{leftButtons}</div>}
+        </S.Container>
         {children && <S.RightButtons>{children}</S.RightButtons>}
         {closable && (
           <Button id="pane-close" onClick={() => dispatch(toggleLeftMenu())} type="link" size="small">
