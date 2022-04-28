@@ -20,6 +20,7 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
@@ -813,14 +814,19 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
-          const newFileEntry = {
+          const newFileEntry: FileEntry = {
             ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap}),
             isSupported: true,
+            timestamp: resourcePayload.fileTimestamp,
           };
-          newFileEntry.timestamp = resourcePayload.fileTimestamp;
+          state.fileMap[relativeFilePath] = newFileEntry;
+
+          // add to parent's children
           const childFileName = path.basename(relativeFilePath);
           const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
-          if (parentPath === path.sep) {
+          const isRoot = parentPath === path.sep;
+
+          if (isRoot) {
             const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
             if (rootFileEntry.children) {
               rootFileEntry.children.push(childFileName);

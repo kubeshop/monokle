@@ -105,3 +105,8 @@ export interface CreateFolderCallback {
 export function createFolder(rootDir: string, folderName: string, callback: (args: CreateFolderCallback) => any) {
   return fs.mkdir(`${rootDir}${path.sep}${folderName}`, err => callback({rootDir, folderName, err}));
 }
+
+export function hasValidExtension(file: string | undefined, extensions: string[]): boolean {
+  if (!file) return false;
+  return extensions.some(extension => file.endsWith(extension));
+}

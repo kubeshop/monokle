@@ -1,7 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
-import micromatch from 'micromatch';
 import util from 'util';
 
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
@@ -11,7 +10,7 @@ import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import {getFileTimestamp} from '@utils/files';
+import {getFileTimestamp, hasValidExtension} from '@utils/files';
 import {ADD_NEW_RESOURCE, trackEvent} from '@utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';
@@ -54,7 +53,7 @@ const performSaveUnsavedResource = async (
   } else {
     const fileName = absolutePath.split('\\').pop();
 
-    if (fileName && !micromatch.isMatch(fileName, fileIncludes)) {
+    if (!hasValidExtension(fileName, ['.yaml', '.yml'])) {
       throw new Error('The selected file does not have .yaml extension.');
     }
 
@@ -115,7 +114,7 @@ export const saveUnsavedResources = createAsyncThunk<
       });
     } catch (e) {
       if (e instanceof Error) {
-        createRejectionWithAlert(thunkAPI, ERROR_TITLE, e.message);
+        return createRejectionWithAlert(thunkAPI, ERROR_TITLE, e.message);
       }
     }
   }
