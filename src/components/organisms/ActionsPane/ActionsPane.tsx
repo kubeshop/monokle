@@ -11,6 +11,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, Conta
 import {
   ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
   ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+  HELM_CHART_ENTRY_FILE,
   HELM_CHART_HELP_URL,
   KUSTOMIZE_HELP_URL,
   TOOLTIP_DELAY,
@@ -44,7 +45,7 @@ import {
   kubeConfigPathSelector,
 } from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
@@ -395,6 +396,8 @@ const ActionsPane: React.FC<IProps> = props => {
   const isDeployButtonDisabled = useMemo(() => {
     return (
       (!selectedResourceId && !selectedPath) ||
+      (selectedPath && selectedPath.endsWith(HELM_CHART_ENTRY_FILE)) ||
+      (selectedPath && isHelmTemplateFile(selectedPath)) ||
       (selectedResource &&
         !isKustomizationResource(selectedResource) &&
         (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
