@@ -239,16 +239,23 @@ export const configSlice = createSlice({
         state.projectConfig.kubeConfig = {};
       }
 
+      const kubeConfig = state.projectConfig?.kubeConfig;
       const serializedIncomingConfig = flatten<any, any>(action.payload);
       const serializedState = flatten<any, any>(state.projectConfig.kubeConfig);
       const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
       keys.forEach(key => {
-        const kubeConfig = state.projectConfig?.kubeConfig;
         if (kubeConfig) {
           _.set(kubeConfig, key, serializedIncomingConfig[key]);
         }
       });
+
+      const currentLength = kubeConfig?.contexts?.length;
+      const newLength = action.payload?.contexts?.length;
+      // means we are updating/removing at least one of the contexts
+      if (currentLength && newLength && currentLength > newLength) {
+        kubeConfig?.contexts?.splice(newLength - 1, currentLength - newLength);
+      }
 
       if (keys.length > 0) {
         writeProjectConfigFile(state);
@@ -284,6 +291,11 @@ export const configSlice = createSlice({
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      if (!action.payload.config) {
+        state.projectConfig = {};
         return;
       }
 

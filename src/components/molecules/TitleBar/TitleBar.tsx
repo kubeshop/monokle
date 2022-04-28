@@ -21,10 +21,8 @@ const TitleBar: React.FC<IProps> = props => {
   return (
     <S.TitleBarContainer>
       <MonoPaneTitle>
-        <S.Container>
-          {title}
-          {children && <S.RightButtons>{children}</S.RightButtons>}
-        </S.Container>
+        <S.Container>{title}</S.Container>
+        {children && <S.RightButtons>{children}</S.RightButtons>}
         {closable && (
           <Button id="pane-close" onClick={() => dispatch(toggleLeftMenu())} type="link" size="small">
             <S.ArrowIcon />
