@@ -63,7 +63,7 @@ const PaneManagerSplitView: React.FC = () => {
         <ReflexElement
           id="navPane"
           minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
-          maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 75}
+          maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
           flex={layout.navPane}
         >
           <NavigatorPane height={height} />
