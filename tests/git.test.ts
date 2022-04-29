@@ -96,6 +96,8 @@ const testData = [
 ];
 
 test.only('all files should be loaded', async () => {
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'before-git-test.png')});
+
   await mainWindow.clickLogo();
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
   await pause(10000);
