@@ -13,6 +13,7 @@ export class StartProjectPane {
 
   private readonly _createEmptyProjectLink: Locator;
   private readonly _emptyProjectName: Locator;
+  private readonly _projectLocation: Locator;
 
   private readonly _emptyProjectSave: Locator;
 
@@ -24,6 +25,7 @@ export class StartProjectPane {
 
     this._createEmptyProjectLink = page.locator('#create-empty-project');
     this._emptyProjectName = page.locator('.ant-modal #name');
+    this._projectLocation = page.locator('.ant-modal #rootFolder');
 
     this._emptyProjectSave = page.locator('#empty-project-save');
   }
@@ -48,4 +50,19 @@ export class StartProjectPane {
     }, { chanel });
   }
 
+  get createEmptyProjectLink(): Locator {
+    return this._createEmptyProjectLink;
+  }
+
+  get emptyProjectName(): Locator {
+    return this._emptyProjectName;
+  }
+
+  get emptyProjectSave(): Locator {
+    return this._emptyProjectSave;
+  }
+
+  get projectLocation(): Locator {
+    return this._projectLocation;
+  }
 }

@@ -46,8 +46,8 @@ const NewRecentProjectsPane = () => {
     <S.Container>
       <Guide />
       <S.Projects>
-        <S.ProjectsTitle>Recent Projects</S.ProjectsTitle>
-        <S.ProjectsContainer>
+        <S.ProjectsTitle id="recent-project-title">Recent Projects</S.ProjectsTitle>
+        <S.ProjectsContainer id="recent-projects-container">
           {sortProjects(projects, Boolean(activeProject)).map((project: Project) => (
             <RecentProject
               key={project.rootFolder}

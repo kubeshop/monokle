@@ -34,4 +34,8 @@ export class ProjectsDropdown {
     return name;
   }
 
+  async click() {
+    await this._projectsDropdown.click();
+  }
+
 }

@@ -23,6 +23,7 @@ import {UiState} from '@models/ui';
 
 import {currentKubeContext} from '@redux/selectors';
 import {
+  CONFIG_PATH,
   keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
@@ -257,7 +258,7 @@ export const configSlice = createSlice({
         kubeConfig?.contexts?.splice(newLength - 1, currentLength - newLength);
       }
 
-      if (keys.length > 0) {
+      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
         writeProjectConfigFile(state);
       }
     },
@@ -330,7 +331,7 @@ export const configSlice = createSlice({
         }
       });
 
-      if (keys.length > 0) {
+      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
         writeProjectConfigFile(state);
       }
     },
