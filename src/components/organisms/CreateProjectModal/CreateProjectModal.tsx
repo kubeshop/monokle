@@ -187,16 +187,16 @@ const CreateProjectModal: React.FC = () => {
       onCancel={closeModal}
       style={{opacity: isModalHid ? 0 : 1}}
       transitionName=""
-      footer={[
-        <Button key="cancel" onClick={closeModal}>
-          Cancel
-        </Button>,
-        uiState.fromTemplate && formStep === FormSteps.STEP_TWO && (
-          <Button key="back" onClick={() => setFormStep(FormSteps.STEP_ONE)}>
-            Back
-          </Button>
-        ),
+      footer={
         <>
+          <Button key="cancel" onClick={closeModal}>
+            Cancel
+          </Button>
+          {uiState.fromTemplate && formStep === FormSteps.STEP_TWO && (
+            <Button key="back" onClick={() => setFormStep(FormSteps.STEP_ONE)}>
+              Back
+            </Button>
+          )}
           {formStep !== FormSteps.STEP_TWO && (
             <Button
               id="empty-project-save"
@@ -208,8 +208,8 @@ const CreateProjectModal: React.FC = () => {
               {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
             </Button>
           )}
-        </>,
-      ]}
+        </>
+      }
     >
       {formStep === FormSteps.STEP_ONE ? (
         <Form
