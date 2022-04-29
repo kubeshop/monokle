@@ -1,6 +1,6 @@
 import {notification} from 'antd';
 
-import {updateTelemetry} from '@redux/reducers/appConfig';
+import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/reducers/appConfig';
 import {setActiveSettingsPanel, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import store from '@redux/store';
 
@@ -31,6 +31,8 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
     store.dispatch(toggleSettings());
     store.dispatch(toggleNotifications());
+    store.dispatch(toggleEventTracking(false));
+    store.dispatch(toggleErrorReporting(false));
   };
 
   const handleOk = () => {
