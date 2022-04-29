@@ -287,7 +287,7 @@ export async function getTargetClusterNamespaces(
 ): Promise<string[]> {
   const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
   const clusterAccessNamespaces = clusterAccess?.map(ca => ca.namespace) || [];
-  if (!hasFullAccess) {
+  if (!hasFullAccess && clusterAccess?.length) {
     return clusterAccessNamespaces;
   }
 
