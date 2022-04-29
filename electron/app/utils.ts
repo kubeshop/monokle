@@ -7,6 +7,7 @@ import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
 import log from 'loglevel';
+import fetch from 'node-fetch';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
@@ -21,7 +22,7 @@ import {loadResource} from '@redux/services';
 import electronStore from '@utils/electronStore';
 import {APP_INSTALLED} from '@utils/telemetry';
 
-const {NUCLEUS_SH_APP_ID} = process.env;
+const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -100,12 +101,27 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
-export const setDeviceID = (deviceID: string) => {
+export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
   const ID: string = electronStore.get('main.deviceID');
+
+  const requestArgs = {
+    method: 'post',
+    body: JSON.stringify({
+      machineId: ID,
+    }),
+    headers: {'Content-Type': 'application/json'},
+  };
+
+  if (!disableTracking) {
+    fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
+  }
 
   if (!ID) {
     if (NUCLEUS_SH_APP_ID) {
       Nucleus.track(APP_INSTALLED);
+    }
+    if (MONOKLE_INSTALLS_URL) {
+      fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
     }
     electronStore.set('main.deviceID', deviceID);
   }
