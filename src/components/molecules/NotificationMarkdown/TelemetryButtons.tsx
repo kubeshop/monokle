@@ -31,8 +31,8 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
     store.dispatch(toggleSettings());
     store.dispatch(toggleNotifications());
-    store.dispatch(toggleEventTracking());
-    store.dispatch(toggleErrorReporting());
+    store.dispatch(toggleEventTracking(false));
+    store.dispatch(toggleErrorReporting(false));
   };
 
   const handleOk = () => {

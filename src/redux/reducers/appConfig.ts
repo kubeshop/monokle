@@ -393,12 +393,20 @@ export const configSlice = createSlice({
       else state.favoriteTemplates = state.favoriteTemplates.filter(template => template !== action.payload);
       electronStore.set('appConfig.favoriteTemplates', state.favoriteTemplates);
     },
-    toggleEventTracking: (state: Draft<AppConfig>) => {
-      state.disableEventTracking = !state.disableEventTracking;
+    toggleEventTracking: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload !== undefined) {
+        state.disableEventTracking = action.payload;
+      } else {
+        state.disableEventTracking = !state.disableEventTracking;
+      }
       electronStore.set('appConfig.disableEventTracking', state.disableEventTracking);
     },
-    toggleErrorReporting: (state: Draft<AppConfig>) => {
-      state.disableErrorReporting = !state.disableErrorReporting;
+    toggleErrorReporting: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload !== undefined) {
+        state.disableErrorReporting = action.payload;
+      } else {
+        state.disableErrorReporting = !state.disableErrorReporting;
+      }
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
     updateTelemetry: (
