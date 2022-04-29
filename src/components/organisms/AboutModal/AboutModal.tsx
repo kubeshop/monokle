@@ -64,7 +64,7 @@ const StyledTextContainer = styled.div`
   }
 `;
 
-const StartupModal = () => {
+const AboutModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
@@ -124,4 +124,4 @@ const StartupModal = () => {
   );
 };
 
-export default StartupModal;
+export default AboutModal;

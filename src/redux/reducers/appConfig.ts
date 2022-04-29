@@ -100,12 +100,6 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      if (!action.payload) {
-        electronStore.set('appConfig.startupModalVisible', false);
-      }
-      state.isStartupModalVisible = action.payload;
-    },
     updateScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       electronStore.set('appConfig.scanExcludes', action.payload);
       state.scanExcludes = action.payload;
@@ -437,7 +431,6 @@ export const {
   updateFileIncludes,
   updateLoadLastProjectOnStartup,
   updateScanExcludes,
-  updateStartupModalVisible,
   updateTextSize,
   updateTheme,
   setKubeConfig,

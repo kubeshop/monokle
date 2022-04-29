@@ -122,8 +122,6 @@ interface AppConfig {
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
   folderReadsMaxDepth: number;
-  /** if the startup modal is visible */
-  isStartupModalVisible: boolean;
   loadLastProjectOnStartup: boolean;
   isClusterSelectorVisible: boolean;
   settings: Settings;

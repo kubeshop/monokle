@@ -17,7 +17,7 @@ interface StartAppResponse {
   appInfo: ElectronAppInfo;
 }
 
-const modalsToWait = ['WelcomeModal'];
+const modalsToWait: string[] = [];
 
 /**
  * Find the latest build and start monokle app for testing
