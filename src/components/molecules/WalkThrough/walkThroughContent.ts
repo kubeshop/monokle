@@ -3,9 +3,9 @@ import {WalkThroughContentProps} from './types';
 export const walkThroughContent: WalkThroughContentProps['data'][] = [
   {
     step: 'template',
-    title: 'From scratch or from a template',
+    title: 'Find your projects here',
     content:
-      'Create your project by loading a folder with K8s resources, from scratch or using a template. See and manage your YAML files from the left column.',
+      'Create your projects by loading a folder with K8s resources, from scratch or using a template. See and manage your YAML files from the File Explorer.',
   },
   {
     step: 'resource',

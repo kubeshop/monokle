@@ -47,15 +47,15 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
     <>
       <S.Description>{data.content}</S.Description>
       <S.FlexContainer>
-        <div>
+        <S.Container>
           {currentStep + 1} of {totalSteps}
-        </div>
-        <div>
+        </S.Container>
+        <S.Container>
           {currentStep !== 0 && <S.StyledButton onClick={() => handleStep(StepEnum.Previous)}>Previous</S.StyledButton>}
           <S.StyledButton type="primary" onClick={() => handleStep(StepEnum.Next)}>
-            {totalSteps === currentStep ? 'Got it!' : 'Next'}
+            {totalSteps - 1 === currentStep ? 'Got it!' : 'Next'}
           </S.StyledButton>
-        </div>
+        </S.Container>
       </S.FlexContainer>
     </>
   );

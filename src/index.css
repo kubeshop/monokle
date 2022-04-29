@@ -291,7 +291,7 @@ code {
 }
 
 .walkthrough .ant-popover-arrow-content {
-  background: linear-gradient(180deg, #393bcd 0%, #2090cf 100%);
+  background: #3840CD;
   width: 20px;
   height: 20px;
 }

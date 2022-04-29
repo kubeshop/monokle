@@ -14,7 +14,7 @@ import semver from 'semver';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
+import {cancelWalkThrough, handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
 
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
@@ -122,7 +122,10 @@ const HelpMenu = () => {
         </Row>
       </MenuItem>
 
-      <MenuItem onClick={() => dispatch(handleWalkThroughStep(StepEnum.Next))} key="replay">
+      <MenuItem onClick={() => {
+        dispatch(cancelWalkThrough());
+        dispatch(handleWalkThroughStep(StepEnum.Next));
+        }} key="replay">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>
