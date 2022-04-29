@@ -16,6 +16,7 @@ import styled from 'styled-components';
 import {useAppDispatch} from '@redux/hooks';
 import {handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
 
+import {Icon} from '@components/atoms';
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
@@ -24,7 +25,7 @@ import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from 
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
 
-import {FontColors} from '@styles/Colors';
+import Colors, {FontColors} from '@styles/Colors';
 
 const IconContainerSpan = styled.span`
   width: 18px;
@@ -41,7 +42,7 @@ const StyledQuestionCircleOutlined = styled(QuestionCircleOutlined)`
 `;
 
 const MenuItem = styled(Menu.Item)`
-  padding-right: 20px;
+  padding-right: 12px;
 `;
 
 const HelpMenu = () => {
@@ -61,7 +62,7 @@ const HelpMenu = () => {
   };
 
   const menu = (
-    <Menu inlineIndent={25}>
+    <Menu inlineIndent={25} style={{width: '200px'}}>
       <MenuItem onClick={openDocumentation} key="documentation">
         <Row align="middle">
           <Col span={5}>
@@ -90,7 +91,7 @@ const HelpMenu = () => {
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>
-              <FileSearchOutlined />
+              <Icon name="shortcuts" color={Colors.blue6} />
             </IconContainerSpan>
           </Col>
 

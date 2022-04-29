@@ -14,6 +14,7 @@ import {
   SeverityHigh,
   SeverityLow,
   SeverityMedium,
+  Shortcuts,
   Validation,
   Warning,
 } from './Icons';
@@ -32,7 +33,8 @@ export type IconNames =
   | 'open-policy-agent'
   | 'severity-high'
   | 'severity-medium'
-  | 'severity-low';
+  | 'severity-low'
+  | 'shortcuts';
 
 type IconProps = {
   name: IconNames;
@@ -57,6 +59,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'severity-high': SeverityHigh,
   'severity-medium': SeverityMedium,
   'severity-low': SeverityLow,
+  shortcuts: Shortcuts,
 };
 
 const Icon: React.FC<IconProps> = props => {
