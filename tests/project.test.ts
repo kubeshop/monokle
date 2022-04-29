@@ -1,6 +1,9 @@
 import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {ElectronApplication} from 'playwright-core';
+import {v4 as uuidV4} from 'uuid';
+import {readdirSync} from 'fs';
+
 import {ElectronAppInfo, startApp} from './electronHelpers';
 import {getRecordingPath, pause} from './utils';
 import {StartProjectPane} from './models/startProjectPane';
@@ -85,8 +88,48 @@ test('should create new resource', async () => {
   await pause(1000);
 
   expect((await fileExplorerPane.projectName.textContent())?.includes(projectName)).toBe(true);
-  expect(await fileExplorerPane.fileCount.textContent()).toEqual('1 files');
+  expect(await fileExplorerPane.fileCount.textContent()).toEqual('2 files');
   expect((await fileExplorerPane.tree.textContent())?.includes(fileName)).toBe(true);
+});
+
+test('should autocomplete path & create .monokle file', async () => {
+  const projectName = `project-${uuidV4()}`;
+  await startPane.createEmptyProjectLink.click();
+  await startPane.emptyProjectName.fill(projectName);
+
+  const projectPath = await startPane.projectLocation.inputValue();
+  expect(projectPath?.includes(projectName)).toEqual(true);
+
+  await startPane.emptyProjectSave.click();
+  // pause for 2 sec to wait for project load
+  await pause(2000);
+
+  const projectContents = readdirSync(projectPath as string);
+  projectContents.includes('.monokle');
+
+  await projectsDropdown.click();
+  const pathColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectPath}"]`);
+  expect(await pathColumn.textContent()).toEqual(projectPath);
+
+  const nameColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectName}"]`);
+  expect(await nameColumn.textContent()).toEqual(projectName);
+});
+
+test('should delete project', async () => {
+  const projectName = await startPane.createEmptyProject();
+  await pause(2000);
+
+  await projectsDropdown.click();
+  const nameColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectName}"]`);
+  await nameColumn.hover();
+  await appWindow.locator('.ant-table-cell-row-hover span.anticon-delete').click();
+  await appWindow.locator('.ant-modal-confirm-confirm button.ant-btn-primary').click();
+  await pause(2000);
+
+  expect(await appWindow.locator('#recent-project-title').isVisible()).toEqual(true);
+  expect(
+    (await appWindow.locator('#recent-projects-container').textContent())?.includes(projectName)
+  ).toEqual(false);
 });
 
 test.afterAll(async () => {
