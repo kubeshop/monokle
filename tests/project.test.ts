@@ -53,21 +53,21 @@ test.afterEach(async () => {
   await pause(1000);
 });
 
-test.skip('should create empty project from welcome screen', async () => {
+test('should create empty project from welcome screen', async () => {
   const name = await startPane.createEmptyProject();
 
   const currentProject = await mainWindow.projectsDropdown.textContent();
   expect(name).toEqual(currentProject);
 });
 
-test.skip('should create empty project from projects dropdown', async () => {
+test('should create empty project from projects dropdown', async () => {
   const name = await projectsDropdown.createNewProject(electronApp);
 
   const currentProject = await mainWindow.projectsDropdown.textContent();
   expect(name).toEqual(currentProject);
 });
 
-test.skip('should create new resource', async () => {
+test('should create new resource', async () => {
   const projectName = await startPane.createEmptyProject();
 
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'after-project-creation.png')});
@@ -92,7 +92,7 @@ test.skip('should create new resource', async () => {
   expect((await fileExplorerPane.tree.textContent())?.includes(fileName)).toBe(true);
 });
 
-test.skip('should autocomplete path & create .monokle file', async () => {
+test('should autocomplete path & create .monokle file', async () => {
   const projectName = `project-${uuidV4()}`;
   await startPane.createEmptyProjectLink.click();
   await startPane.emptyProjectName.fill(projectName);
