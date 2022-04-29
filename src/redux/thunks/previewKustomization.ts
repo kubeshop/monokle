@@ -3,7 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ERROR_MSG_FALLBACK, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
@@ -14,7 +14,7 @@ import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandResult, runCommandInMainThread} from '@utils/command';
+import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/command';
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
 
 /**
@@ -44,8 +44,9 @@ export const previewKustomization = createAsyncThunk<
 
     trackEvent(DO_KUSTOMIZE_PREVIEW);
 
-    if (result.error) {
-      return createRejectionWithAlert(thunkAPI, 'Kustomize Error', result.error);
+    if (hasCommandFailed(result)) {
+      const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+      return createRejectionWithAlert(thunkAPI, 'Kustomize Error', msg);
     }
 
     if (result.stdout) {

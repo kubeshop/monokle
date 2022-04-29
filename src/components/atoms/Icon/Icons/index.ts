@@ -10,3 +10,4 @@ export {default as OpenPolicyAgent} from './OpenPolicyAgent';
 export {default as SeverityHigh} from './SeverityHigh';
 export {default as SeverityMedium} from './SeverityMedium';
 export {default as SeverityLow} from './SeverityLow';
+export {default as Shortcuts} from './Shortcuts';

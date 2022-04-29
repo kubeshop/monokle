@@ -30,3 +30,7 @@ export function runCommandInMainThread(options: CommandOptions): Promise<Command
     ipcRenderer.send('run-command', options);
   });
 }
+
+export function hasCommandFailed({exitCode, error, stderr}: CommandResult): boolean {
+  return exitCode !== 0 || error !== undefined || stderr !== undefined;
+}
