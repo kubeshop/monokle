@@ -113,7 +113,7 @@ function SectionHeader(props: SectionHeaderProps) {
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
             {name === 'K8s Resources' ? (
-              <WalkThrough placement="right" step="resource">
+              <WalkThrough placement="rightTop" step="resource">
                 <S.Name
                   $isSelected={sectionInstance.isSelected && isCollapsed}
                   $isHighlighted={sectionInstance.isSelected && isCollapsed}

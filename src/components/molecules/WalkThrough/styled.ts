@@ -41,5 +41,7 @@ export const CloseButton = styled(Button)`
 `;
 
 export const Description = styled.p`
-  margin: 15px 0 30px;
+  margin: 0 0 30px;
 `;
+
+export const Container = styled.div``;

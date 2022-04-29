@@ -191,8 +191,8 @@ const App = () => {
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
-    electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
     dispatch(handleWalkThroughStep(StepEnum.Next));
+    electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
   }, [appVersion, dispatch]);
 
   // called from main thread because thunks cannot be dispatched by main
