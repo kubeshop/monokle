@@ -191,7 +191,9 @@ const App = () => {
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
-    dispatch(handleWalkThroughStep(StepEnum.Next));
+    if (!electronStore.get('appConfig.lastSeenReleaseNotesVersion')) {
+      dispatch(handleWalkThroughStep(StepEnum.Next));
+    }
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
   }, [appVersion, dispatch]);
 
