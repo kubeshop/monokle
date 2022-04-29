@@ -2,6 +2,8 @@ import styled from 'styled-components';
 
 import BaseDrawer, {DrawerProps as BaseDrawerProps} from '@components/atoms/Drawer';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 type DrawerProps = BaseDrawerProps & {
   height: number;
 };
@@ -21,5 +23,9 @@ export const Drawer = styled((props: DrawerProps) => <BaseDrawer {...props} />)`
     padding-top: 8px;
     padding-right: 4px;
     padding-bottom: 8px;
+  }
+
+  .ant-drawer-body {
+    ${GlobalScrollbarStyle}
   }
 `;
