@@ -83,6 +83,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
 
       - name: Package
         id: package
@@ -216,6 +217,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
 
       - name: Package
         id: package
@@ -328,6 +330,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
 
       - name: Package
         id: package

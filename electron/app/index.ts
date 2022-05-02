@@ -23,7 +23,7 @@ const userDataDir = app.getPath('userData');
 // This has to run before everything else related to Nucleus.
 Nucleus.appStarted();
 
-let {disableErrorReports} = initNucleus(isDev, app);
+let {disableErrorReports, disableTracking} = initNucleus(isDev, app);
 unhandled({
   logger: error => {
     if (!disableErrorReports) {
@@ -35,7 +35,7 @@ unhandled({
 
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
-setDeviceID(machineIdSync());
+setDeviceID(machineIdSync(), disableTracking);
 fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {
