@@ -195,7 +195,12 @@ const initialUiState: UiState = {
     connectToCluster: false,
   },
   walkThrough: {
-    currentStep: -1,
+    novice: {
+      currentStep: -1,
+    },
+    release: {
+      currentStep: -1,
+    },
   },
 };
 

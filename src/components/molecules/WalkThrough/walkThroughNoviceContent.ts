@@ -1,6 +1,6 @@
 import {WalkThroughContentProps} from './types';
 
-export const walkThroughContent: WalkThroughContentProps['data'][] = [
+export const walkThroughNoviceContent: WalkThroughContentProps['data'][] = [
   {
     step: 'template',
     title: 'Find your projects here',
@@ -30,10 +30,5 @@ export const walkThroughContent: WalkThroughContentProps['data'][] = [
     title: 'Validate Kustomize and Helm output',
     content:
       'Check out and debug your Kustomize and Helm outputs. Change kustomizations and see effects on the generated resources.',
-  },
-  {
-    step: 'validation',
-    title: 'Validate policies',
-    content: 'Enable policies to ensure your resources are configured securely.',
   },
 ];

@@ -23,6 +23,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
+import {WalkThroughCollection} from '@components/molecules/WalkThrough/types';
+
 import electronStore from '@utils/electronStore';
 
 export const uiSlice = createSlice({
@@ -239,11 +241,16 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkThrough: (state: Draft<UiState>) => {
-      state.walkThrough.currentStep = -1;
+    cancelWalkThrough: (state: Draft<UiState>, action: PayloadAction<WalkThroughCollection>) => {
+      const collection = action.payload;
+      state.walkThrough[collection].currentStep = -1;
     },
-    handleWalkThroughStep: (state: Draft<UiState>, action: PayloadAction<number>) => {
-      state.walkThrough.currentStep += action.payload;
+    handleWalkThroughStep: (
+      state: Draft<UiState>,
+      action: PayloadAction<{step: number; collection: WalkThroughCollection}>
+    ) => {
+      const {step, collection} = action.payload;
+      state.walkThrough[collection].currentStep += step;
     },
   },
   extraReducers: builder => {

@@ -255,7 +255,7 @@ const ProjectSelection = () => {
 
   return (
     <S.ProjectContainer id="projects-dropdown-container">
-      <WalkThrough placement="leftTop" step="template">
+      <WalkThrough placement="leftTop" step="template" collection="novice">
         <Dropdown
           arrow
           disabled={previewLoader.isLoading || isInPreviewMode}

@@ -7,23 +7,30 @@ import {CloseOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkThrough, handleWalkThroughStep} from '@redux/reducers/ui';
 
-import {StepEnum, WalkThroughContentProps, WalkThroughStep} from './types';
-import {walkThroughContent} from './walkThroughContent';
+import {newReleaseFeatureContent} from './newReleaseFeaturesContent';
+import {StepEnum, WalkThroughCollection, WalkThroughContentProps, WalkThroughStep} from './types';
+import {walkThroughNoviceContent} from './walkThroughNoviceContent';
 
 import * as S from './styled';
 
-type WalkThroughProps = {
-  step: WalkThroughStep;
+type WalkThroughProps<C extends WalkThroughCollection> = {
+  step: WalkThroughStep<C>;
   children: React.ReactNode;
   placement?: PopoverProps['placement'];
+  collection: C;
 };
 
-const WalkThroughTitle = (props: {title: string}) => {
-  const {title} = props;
+const walkThroughCollection = {
+  novice: walkThroughNoviceContent,
+  release: newReleaseFeatureContent,
+};
+
+const WalkThroughTitle = (props: {title: string; collection: WalkThroughCollection}) => {
+  const {title, collection} = props;
   const dispatch = useAppDispatch();
 
   const handleClose = () => {
-    dispatch(cancelWalkThrough());
+    dispatch(cancelWalkThrough(collection));
   };
 
   return (
@@ -35,14 +42,14 @@ const WalkThroughTitle = (props: {title: string}) => {
 };
 
 const WalkThroughContent = (props: WalkThroughContentProps) => {
-  const {data, currentStep} = props;
+  const {data, currentStep, collection} = props;
   const dispatch = useAppDispatch();
 
   const handleStep = (step: number) => {
-    dispatch(handleWalkThroughStep(step));
+    dispatch(handleWalkThroughStep({step, collection}));
   };
 
-  const totalSteps = useMemo(() => walkThroughContent.length, []);
+  const totalSteps = useMemo(() => walkThroughCollection[collection].length, []);
   return (
     <>
       <S.Description>{data.content}</S.Description>
@@ -61,16 +68,16 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
   );
 };
 
-const WalkThrough = (props: WalkThroughProps) => {
-  const {placement, children, step} = props;
-  const walkThroughStep = useAppSelector(state => state.ui.walkThrough.currentStep);
-  const data = walkThroughContent[walkThroughStep] || {};
+const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
+  const {placement, step, collection, children} = props;
+  const walkThroughStep = useAppSelector(state => state.ui.walkThrough[collection].currentStep);
+  const data = walkThroughCollection[collection][walkThroughStep] || {};
 
   return (
     <Popover
       placement={placement}
-      content={<WalkThroughContent data={data} currentStep={walkThroughStep} />}
-      title={<WalkThroughTitle title={data.title} />}
+      content={<WalkThroughContent data={data} currentStep={walkThroughStep} collection={collection} />}
+      title={<WalkThroughTitle title={data.title} collection={collection} />}
       visible={data.step === step}
       overlayClassName="walkthrough"
     >

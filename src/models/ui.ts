@@ -123,7 +123,12 @@ export type UiState = {
   };
   activeSettingsPanel?: SettingsPanel;
   walkThrough: {
-    currentStep: number;
+    novice: {
+      currentStep: number;
+    };
+    release: {
+      currentStep: number;
+    };
   };
 };
 

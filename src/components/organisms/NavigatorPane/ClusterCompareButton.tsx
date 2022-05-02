@@ -28,7 +28,7 @@ const ClusterCompareButton: React.FC = ({children}) => {
   };
 
   return (
-    <WalkThrough placement="leftTop" step="cluster">
+    <WalkThrough placement="leftTop" step="cluster" collection="novice">
       <Tooltip
         mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
         title={
