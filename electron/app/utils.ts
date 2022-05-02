@@ -107,12 +107,13 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
   const requestArgs = {
     method: 'post',
     body: JSON.stringify({
-      machineId: ID,
+      machineId: deviceID,
     }),
     headers: {'Content-Type': 'application/json'},
   };
 
   if (!disableTracking) {
+    console.log('New Session.');
     fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
   }
 
@@ -121,6 +122,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
       Nucleus.track(APP_INSTALLED);
     }
     if (MONOKLE_INSTALLS_URL) {
+      console.log('New Installation.');
       fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
     }
     electronStore.set('main.deviceID', deviceID);
