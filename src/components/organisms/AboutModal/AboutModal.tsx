@@ -99,13 +99,14 @@ const AboutModal = () => {
             <img src={MonokleAbout} />
             <StyledTextContainer>
               <Text>Version: {appVersion}</Text>
-              <Text> Launched in: March 2022</Text>
+              <Text>Launched in: May 2022</Text>
               <Text>
+                {/* TODO: get the below text from the releaseNotes folder */}
                 In this release, the focus was to:
                 <ul>
-                  <li>Increase the stability of Monokle</li>
-                  <li>Improve the UX/UI on Helm workflows</li>
-                  <li>Handle restricted cluster access</li>
+                  <li>Policy Validation by integrating OPA</li>
+                  <li>Improve Helm functionality</li>
+                  <li>Walkthrough tutorial</li>
                 </ul>
                 Other useful info:
                 <ul>
