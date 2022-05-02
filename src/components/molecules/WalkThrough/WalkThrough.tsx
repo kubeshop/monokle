@@ -13,11 +13,11 @@ import {walkThroughNoviceContent} from './walkThroughNoviceContent';
 
 import * as S from './styled';
 
-type WalkThroughProps = {
-  step: WalkThroughStep;
+type WalkThroughProps<C extends WalkThroughCollection> = {
+  step: WalkThroughStep<C>;
   children: React.ReactNode;
   placement?: PopoverProps['placement'];
-  collection: WalkThroughCollection;
+  collection: C;
 };
 
 const walkThroughCollection = {
@@ -68,8 +68,8 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
   );
 };
 
-const WalkThrough = (props: WalkThroughProps) => {
-  const {placement, children, step, collection} = props;
+const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
+  const {placement, step, collection, children} = props;
   const walkThroughStep = useAppSelector(state => state.ui.walkThrough[collection].currentStep);
   const data = walkThroughCollection[collection][walkThroughStep] || {};
 
