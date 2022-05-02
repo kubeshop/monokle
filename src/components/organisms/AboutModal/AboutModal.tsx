@@ -1,5 +1,3 @@
-import {useMemo} from 'react';
-
 import {Button, Modal, Typography} from 'antd';
 
 import styled from 'styled-components';
@@ -9,14 +7,17 @@ import {closeAboutModal} from '@redux/reducers/ui';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
-import {getDependencyVersion} from '@utils/getDependencyVersion';
-
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
 import Colors from '@styles/Colors';
 
+import packageJson from '@root/package.json';
+
 const {Text} = Typography;
-const dependenciesList = ['react', 'electron'];
+
+const INCLUDED_DEPENDENCIES = ['react', 'electron'];
+const allDeps = {...packageJson.devDependencies, ...packageJson.dependencies};
+const filteredDependencies = Object.entries(allDeps).filter(([name]) => INCLUDED_DEPENDENCIES.includes(name));
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {
@@ -73,8 +74,6 @@ const AboutModal = () => {
     dispatch(closeAboutModal());
   };
 
-  const dependenciesVersions = useMemo(() => getDependencyVersion(dependenciesList), [dependenciesList]);
-
   return (
     <StyledModal
       visible={aboutModalVisible}
@@ -110,7 +109,7 @@ const AboutModal = () => {
                 </ul>
                 Other useful info:
                 <ul>
-                  {dependenciesVersions.map(({name, version}) => (
+                  {filteredDependencies.map(([name, version]) => (
                     <li key={name}>
                       {name} version: {version}
                     </li>
