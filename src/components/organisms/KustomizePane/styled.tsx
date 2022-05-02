@@ -8,12 +8,12 @@ export const KustomizePaneContainer = styled.div`
   grid-template-rows: max-content 1fr;
 `;
 
-export const Container = styled.div`
-  height: 100%;
-  overflow-y: auto;
-  ${GlobalScrollbarStyle}
-`;
-
 export const List = styled.ol`
+  height: 100%;
   list-style-type: none;
+  padding: 0;
+  padding-bottom: 20px;
+  overflow-y: auto;
+  margin: 0;
+  ${GlobalScrollbarStyle}
 `;
