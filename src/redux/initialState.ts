@@ -58,7 +58,6 @@ const initialAppState: AppState = {
 };
 
 const initialAppConfigState: AppConfig = {
-  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible', true),
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,

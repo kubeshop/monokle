@@ -28,9 +28,6 @@ const schema = {
       lastSeenReleaseNotesVersion: {
         type: 'string',
       },
-      startupModalVisible: {
-        type: 'boolean',
-      },
       isClusterSelectorVisible: {
         type: 'boolean',
       },
@@ -248,7 +245,6 @@ const schema = {
 
 const defaults = {
   appConfig: {
-    startupModalVisible: true,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],

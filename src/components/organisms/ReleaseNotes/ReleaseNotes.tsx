@@ -53,7 +53,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
   }
 
   return (
-    <>
+    <span id="NewRelease">
       <S.Container $singleColumn={singleColumn}>
         <S.Content>
           <S.Title>{title}</S.Title>
@@ -88,7 +88,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           </S.ConfirmButton>
         </S.Actions>
       )}
-    </>
+    </span>
   );
 };
 

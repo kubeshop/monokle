@@ -67,7 +67,6 @@ const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
@@ -97,7 +96,6 @@ const App = () => {
   );
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
-  const isStartupModalVisible = useAppSelector(state => state.config.isStartupModalVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
@@ -386,7 +384,6 @@ const App = () => {
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {isAboutModalVisible && <AboutModal />}
-          {isStartupModalVisible && <StartupModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"
