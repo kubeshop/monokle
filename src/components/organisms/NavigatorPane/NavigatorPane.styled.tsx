@@ -2,6 +2,8 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import {AppBorders} from '@styles/Borders';
@@ -43,12 +45,14 @@ export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: bool
 `;
 
 export const SelectionBar = styled.div`
+  height: ${DEFAULT_PANE_TITLE_HEIGHT}px;
   width: 100%;
   border-bottom: ${AppBorders.sectionDivider};
 `;
 
 export const TitleBar = styled.div`
   display: flex;
+  height: ${DEFAULT_PANE_TITLE_HEIGHT}px;
   justify-content: space-between;
   border-bottom: ${AppBorders.sectionDivider};
   width: 100%;

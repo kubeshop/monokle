@@ -12,10 +12,12 @@ const KustomizePane: React.FC = () => {
     <S.KustomizePaneContainer id="KustomizePane">
       <TitleBar title="Kustomize" closable />
 
-      <S.List id="kustomize-sections-container">
-        <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
-        <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
-      </S.List>
+      <S.Container>
+        <S.List id="kustomize-sections-container">
+          <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
+          <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
+        </S.List>
+      </S.Container>
     </S.KustomizePaneContainer>
   );
 };

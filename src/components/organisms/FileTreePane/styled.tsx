@@ -142,6 +142,7 @@ export const RootFolderText = styled.div`
   font-size: 12px;
   line-height: 22px;
   color: ${Colors.grey7};
+  margin-top: 10px;
   margin-left: 14px;
 `;
 
@@ -182,7 +183,6 @@ export const TitleBarContainer = styled.div`
 
 export const TreeContainer = styled.div`
   margin-left: 2px;
-  margin-top: 10px;
 `;
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`

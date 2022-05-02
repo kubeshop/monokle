@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+
 import {AppBorders} from '@styles/Borders';
 import Colors from '@styles/Colors';
 
@@ -16,6 +18,7 @@ export const RightButtons = styled.div`
 `;
 
 export const TitleBarContainer = styled.div`
+  height: ${DEFAULT_PANE_TITLE_HEIGHT}px;
   width: 100%;
   border-bottom: ${AppBorders.sectionDivider};
   position: relative;

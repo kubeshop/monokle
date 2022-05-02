@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Key, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useUpdateEffect} from 'react-use';
 
@@ -12,7 +12,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
@@ -41,8 +41,6 @@ import {TitleBar} from '@molecules';
 import Icon from '@components/atoms/Icon';
 
 import {uniqueArr} from '@utils/index';
-
-import AppContext from '@src/AppContext';
 
 import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
@@ -124,10 +122,11 @@ const createNode = (
   return node;
 };
 
-const FileTreePane = () => {
-  const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
+type Props = {
+  height: number;
+};
 
+const FileTreePane: React.FC<Props> = ({height}) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
     processingEntityID: undefined,
@@ -493,17 +492,12 @@ const FileTreePane = () => {
         <S.Skeleton active />
       ) : tree ? (
         <S.TreeContainer>
-          <S.RootFolderText>
+          <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
             <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
             <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
           </S.RootFolderText>
           <S.TreeDirectoryTree
-            // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
-            height={
-              windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
-                ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
-                : 0
-            }
+            height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onSelect}
             treeData={[tree]}
             ref={treeRef}

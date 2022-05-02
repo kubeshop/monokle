@@ -24,7 +24,7 @@ const TitleBar: React.FC<IProps> = props => {
       <MonoPaneTitle>
         <S.Container>
           {title}
-          {leftButtons && <div style={{marginLeft: '10px'}}>{leftButtons}</div>}
+          {leftButtons && <div style={{marginLeft: '10px', height: '24px'}}>{leftButtons}</div>}
         </S.Container>
         {children && <S.RightButtons>{children}</S.RightButtons>}
         {closable && (
