@@ -41,7 +41,7 @@ const PaneManagerSplitView: React.FC = () => {
   );
 
   return (
-    <S.SplitViewContainer style={{width}}>
+    <S.SplitViewContainer style={{width, height}}>
       <ValidationPane height={height} />
 
       <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
@@ -49,10 +49,10 @@ const PaneManagerSplitView: React.FC = () => {
           <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
             <S.LeftPane>
               <Suspense fallback={<div />}>
-                {leftActiveMenu === 'file-explorer' && <FileTreePane />}
+                {leftActiveMenu === 'file-explorer' && <FileTreePane height={height} />}
                 {leftActiveMenu === 'helm-pane' && <HelmPane />}
                 {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-                {leftActiveMenu === 'templates-pane' && <TemplateManagerPane contentHeight={height} />}
+                {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
               </Suspense>
             </S.LeftPane>
           </ReflexElement>

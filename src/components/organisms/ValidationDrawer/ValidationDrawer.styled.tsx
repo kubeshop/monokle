@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+
 import BaseDrawer, {DrawerProps as BaseDrawerProps} from '@components/atoms/Drawer';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
@@ -23,6 +25,7 @@ export const Drawer = styled((props: DrawerProps) => <BaseDrawer {...props} />)`
     padding-top: 8px;
     padding-right: 4px;
     padding-bottom: 8px;
+    height: ${DEFAULT_PANE_TITLE_HEIGHT}px;
   }
 
   .ant-drawer-body {
