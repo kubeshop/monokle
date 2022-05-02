@@ -36,21 +36,21 @@ Let's have a look at how you would configure and remediate violations.
 
 When you look at the left sidebar, you will notice that a new icon is available for resource validation. Clicking on the icon will open a drawer:
 
-![Open validation drawer](img/missing.png)
+![Open validation drawer](img/validation-overview-1.7.0.png)
 
 This is the new home for all modules related to validation. Continue by clicking on the Open Policy Agent integration and you will see a set of rules:
 
-![Open OPA drawer](img/missing.png)
+![Open OPA drawer](img/opa-table-1.7.0.png)
 
 Here you can familiarize yourself with the rules that are available. We recommend enabling all of them and afterwards disabling those that generate too much noice for your use cases.
 
 Great! Policy validation is now enabled. Policy errors have the same behavior as syntax errors. This means that you will see a red error icon appear whenever a violation is detected.
 
-![Policy error navigator](img/missing.png)
+![Policy error navigator](img/opa-error-navigator-1.7.0.png)
 
 After opening the resource in your editor, you will notice that the error is also marked in gutter and highlighted. Hovering over the error will show you help on how to remediate the violation. Use this information to directly edit your resource and the errors will disappear in real-time.
 
-![Policy error editor](img/missing.png)
+![Policy error editor](img/opa-error-editor-1.7.0.png)
 
 ### Policy rules
 
