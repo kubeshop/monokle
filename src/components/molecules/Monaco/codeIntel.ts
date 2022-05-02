@@ -16,9 +16,8 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getHelmValueRanges, getObjectKeys} from '@molecules/Monaco/helmCodeIntel';
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
-import {parseAllYamlDocuments} from '@utils/yaml';
-
 import {isDefined} from '@utils/filter';
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
@@ -453,12 +452,19 @@ const applyForHelmFile = ({
         helmNewDisposables.push(commandDisposable);
       });
 
-      const text =
-        keyPathsInFile.length > 1
-          ? `Found this value in ${keyPathsInFile.length} helm value files`
-          : `Found this value in ${keyPathsInFile[0].path}`;
+      const hasMultipleLinks = keyPathsInFile.length > 1;
+      const text = hasMultipleLinks
+        ? `Found this value in ${keyPathsInFile.length} helm value files`
+        : `Found this value in ${keyPathsInFile[0].path}`;
+      if (!hasMultipleLinks) {
+        const linkDisposable = createLinkProvider(helmValueRange.range, 'Open file', () => {
+          selectFilePath(keyPathsInFile[0].path);
+        });
+        helmNewDisposables.push(linkDisposable);
+      }
+
       const hoverCommandMarkdownLinkList = [createMarkdownString(text), ...commandMarkdownLinkList];
-      if (hoverCommandMarkdownLinkList.length > 1) {
+      if (commandMarkdownLinkList.length) {
         const hoverDisposable = createHoverProvider(helmValueRange.range, hoverCommandMarkdownLinkList);
         helmNewDisposables.push(hoverDisposable);
       }
