@@ -122,10 +122,13 @@ const HelpMenu = () => {
         </Row>
       </MenuItem>
 
-      <MenuItem onClick={() => {
-        dispatch(cancelWalkThrough());
-        dispatch(handleWalkThroughStep(StepEnum.Next));
-        }} key="replay">
+      <MenuItem
+        onClick={() => {
+          dispatch(cancelWalkThrough('novice'));
+          dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+        }}
+        key="replay"
+      >
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>

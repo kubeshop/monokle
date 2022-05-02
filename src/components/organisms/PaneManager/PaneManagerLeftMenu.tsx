@@ -134,7 +134,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         title="View Helm Charts"
         placement="right"
       >
-        <WalkThrough placement="rightTop" step="kustomizeHelm">
+        <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
           <MenuButton
             id="helm-pane"
             isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'helm-pane'}
@@ -181,7 +181,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       </PaneTooltip>
 
       <PaneTooltip show={!leftDrawerVisible} title="View Validation" placement="right">
-        <WalkThrough placement="rightTop" step="validation">
+        <WalkThrough placement="rightTop" step="validation" collection="release">
           <MenuButton
             isSelected={leftDrawerVisible}
             isActive={isActive}

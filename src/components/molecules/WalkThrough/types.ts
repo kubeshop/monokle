@@ -1,3 +1,4 @@
+export type WalkThroughCollection = 'novice' | 'release';
 export type WalkThroughStep = 'template' | 'resource' | 'syntax' | 'cluster' | 'kustomizeHelm' | 'validation';
 export type WalkThroughContentProps = {
   data: {
@@ -5,6 +6,7 @@ export type WalkThroughContentProps = {
     title: string;
     content: string;
   };
+  collection: WalkThroughCollection;
   currentStep: number;
 };
 

@@ -497,7 +497,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
               <TabPane
                 key="source"
                 tab={
-                  <WalkThrough placement="leftTop" step="syntax">
+                  <WalkThrough placement="leftTop" step="syntax" collection="novice">
                     <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
                   </WalkThrough>
                 }
