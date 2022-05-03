@@ -15,6 +15,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.reflex-container > .reflex-element::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reflex-container > .reflex-element::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+.reflex-container > .reflex-element::-webkit-scrollbar-thumb {
+  background: #303030;
+}
+
 .reflex-container.vertical > .reflex-splitter {
   width: 2px;
   background-color: #262626;
