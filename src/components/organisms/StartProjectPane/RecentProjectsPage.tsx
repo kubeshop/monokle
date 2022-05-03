@@ -42,6 +42,7 @@ const NewRecentProjectsPane = () => {
     dispatch(toggleProjectPin(project));
   };
 
+  console.log('render recents');
   return (
     <S.Container>
       <Guide />

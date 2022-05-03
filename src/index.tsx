@@ -1,13 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {ErrorBoundary} from 'react-error-boundary';
 import {Provider} from 'react-redux';
 import 'react-reflex/styles.css';
+
+import 'antd/dist/antd.less';
 
 import * as log from 'loglevel';
 
 import '@redux/ipcRendererRedux';
-import store from '@redux/store';
+import {setLoadingProject} from '@redux/reducers/appConfig';
+import store, {resetStore} from '@redux/store';
 import '@redux/storeListeners';
+
+import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import App from './App';
 import './index.css';
@@ -20,7 +26,19 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ErrorBoundary
+      FallbackComponent={ErrorPage}
+      onReset={() => {
+        store.dispatch(resetStore());
+
+        // Immediately on startup an effect is performed.
+        // Skip all and go to new/recent projects to have best chance of a recovery.
+        // See src/App.tsx:131 onExecutedFrom
+        store.dispatch(setLoadingProject(false));
+      }}
+    >
+      <App />
+    </ErrorBoundary>
   </Provider>,
   document.getElementById('root')
 );

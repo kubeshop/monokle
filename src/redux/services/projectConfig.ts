@@ -1,6 +1,5 @@
-import flatten from 'flat';
 import {readFileSync, writeFileSync} from 'fs';
-import _ from 'lodash';
+import _, {isArray, mergeWith} from 'lodash';
 import log from 'loglevel';
 import {sep} from 'path';
 import {AnyAction} from 'redux';
@@ -161,29 +160,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
     throw Error('Base config must be set');
   }
-
-  if (!config) {
-    return baseConfig;
-  }
-
-  const serializedBaseConfig: SerializableObject = flatten<any, any>(baseConfig);
-  const serializedConfig: SerializableObject = flatten<any, any>(config);
-
-  // override base properties
-  Object.keys(serializedBaseConfig).forEach((key: string) => {
-    if (!_.isUndefined(serializedConfig[key])) {
-      serializedBaseConfig[key] = serializedConfig[key];
-    }
-  });
-
-  // add missing base properties
-  Object.keys(serializedConfig).forEach((key: string) => {
-    if (_.isUndefined(serializedBaseConfig[key])) {
-      serializedBaseConfig[key] = serializedConfig[key];
-    }
-  });
-
-  return flatten.unflatten(serializedBaseConfig);
+  return mergeWith(baseConfig, config, (_a, b) => (isArray(b) ? b : undefined));
 };
 
 export const keysToUpdateStateBulk = (

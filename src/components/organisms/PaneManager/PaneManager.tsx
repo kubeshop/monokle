@@ -28,6 +28,21 @@ const PaneManager: React.FC = () => {
     return gridTemplateColumns;
   }, []);
 
+  console.log(
+    'render',
+    JSON.stringify(
+      {
+        isProjectLoading,
+        showProject: Boolean(activeProject) && !isStartProjectPaneVisible,
+        activeProject,
+        isStartProjectPaneVisible,
+        projectCount: projects.length,
+      },
+      null,
+      2
+    )
+  );
+
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
