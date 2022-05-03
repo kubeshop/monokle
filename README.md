@@ -55,10 +55,41 @@ Read about the [latest 1.6.0 release](https://kubeshop.io/blog/monokle-1-6-0-rel
 
 ## Download & Install
 
-| <p align="center">Windows                                                                  | <p align="center">macOS                                                                    | <p align="center">Linux                                                                                                  |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| <p align="center"><img src="docs/img/windows.svg" height="50" width="50" /></p>            | <p align="center"><img src="docs/img/macos.svg" height="50" width="50" /></p>              | <p align="center"><img src="docs/img/linux.svg" height="50" width="50" /></p>                                            |
-| <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.exe` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.dmg` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.appImage`/`.deb` file for your platform |
+<table>
+  <tr>
+    <td>Windows</td>
+    <td>macOS</td>
+    <td>Linux</td>
+  </tr>
+  <tr>
+    <td>
+      <p align="center">
+        <img src="docs/img/windows.svg" height="50" width="50" /></p>
+      </p>
+    </td>
+    <td>
+      <p align="center">
+        <img src="docs/img/macos.svg" height="50" width="50" />
+      </p>
+    </td>
+    <td>
+      <p align="center">
+        <img src="docs/img/linux.svg" height="50" width="50" />
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-win-x64.exe">Download .exe</a>
+    </td>
+    <td>
+      <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-mac-universal.dmg">Download .dmg</a>
+    </td>
+    <td>
+      <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-linux-x86_64.AppImage">Download .appImage</a>
+    </td>
+  </tr>
+</table>
 
 ## Roadmap
 
