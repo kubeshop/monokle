@@ -51,7 +51,7 @@
 
 Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) document or the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview.
 
-Read about the [latest 1.6.0 release](https://kubeshop.io/blog/monokle-1-6-0-release).
+Read about the [latest 1.7.0 release](https://kubeshop.io/blog/monokle-1-7-0-release).
 
 ## Download & Install
 
