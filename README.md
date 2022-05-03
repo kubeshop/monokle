@@ -42,6 +42,7 @@
 ## Core Features
 
 - ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
+- ✅ Validate resources using OPA policy rules
 - 🖊️ Easily edit resources without having to learn or look up yaml syntax
 - 🔨 Refactor resources with maintained integrity of names and references
 - 📷 Preview and debug resources generated with kustomize or helm
