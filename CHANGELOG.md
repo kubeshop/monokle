@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/kubeshop/monokle/compare/v1.7.1-nightly-2022-05-04.0...v1.7.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* fix filter scroll style ([f463e75](https://github.com/kubeshop/monokle/commit/f463e75f77ad2b481e3aafd2b6d90a1cc11f2cd4))
+
 ## [1.7.0](https://github.com/kubeshop/monokle/compare/v1.6.4-nightly-2022-05-03.0...v1.7.0) (2022-05-03)
 
 ### [1.6.3](https://github.com/kubeshop/monokle/compare/v1.6.3-nightly-2022-04-08.0...v1.6.3) (2022-04-08)
