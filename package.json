@@ -57,7 +57,6 @@
     "craco-alias": "3.0.1",
     "craco-less": "2.0.0",
     "cross-env": "7.0.3",
-    "patch-package": "6.4.7",
     "electron": "18.1.0",
     "electron-builder": "23.0.4",
     "electron-notarize": "1.2.1",
@@ -74,6 +73,7 @@
     "husky": "7.0.4",
     "lint-staged": "12.3.7",
     "monaco-editor-webpack-plugin": "4.2.0",
+    "patch-package": "6.4.7",
     "playwright": "1.20.1",
     "prettier": "2.6.1",
     "react-scripts": "5.0.0",
@@ -90,6 +90,7 @@
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
+    "@amplitude/node": "^1.10.0",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",

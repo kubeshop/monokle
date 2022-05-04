@@ -75,12 +75,14 @@ jobs:
         run: |
           contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg AMPLITUDE_API_KEY $AMPLITUDE_API_KEY '.AMPLITUDE_API_KEY = $AMPLITUDE_API_KEY' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
+          AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
 
       - name: Package
         id: build

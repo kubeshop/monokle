@@ -2,6 +2,7 @@ import {app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
+import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
@@ -36,6 +37,7 @@ import {CommandOptions} from '@utils/command';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
 
+import {getAmplitudeClient} from '../amplitude';
 import autoUpdater from '../autoUpdater';
 import {checkNewVersion, interpolateTemplate, runCommand, saveFileDialog, selectFileDialog} from '../commands';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
@@ -56,9 +58,18 @@ const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
+const machineId = machineIdSync();
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
+  const amplitudeClient = getAmplitudeClient();
+  if (amplitudeClient) {
+    amplitudeClient.logEvent({
+      event_type: eventName,
+      user_id: machineId,
+      event_properties: payload,
+    });
+  }
 });
 
 ipcMain.on('get-user-home-dir', (event: any) => {

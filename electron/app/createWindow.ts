@@ -26,6 +26,7 @@ import {StartupFlags} from '@utils/startupFlag';
 
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
+import {disableAmplitude, enableAmplitude} from './amplitude';
 import autoUpdater from './autoUpdater';
 import {checkNewVersion} from './commands';
 import initKubeconfig from './initKubeconfig';
@@ -151,8 +152,10 @@ export const createWindow = (givenPath?: string) => {
       // disableErrorReports = storeState.config.disableErrorReporting;
       if (storeState.config.disableEventTracking) {
         Nucleus.disableTracking();
+        disableAmplitude();
       } else {
         Nucleus.enableTracking();
+        enableAmplitude();
       }
     });
 
