@@ -22,6 +22,8 @@ import {loadResource} from '@redux/services';
 import electronStore from '@utils/electronStore';
 import {APP_INSTALLED} from '@utils/telemetry';
 
+import {getAmplitudeClient} from './amplitude';
+
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -104,6 +106,8 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
 export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
   const ID: string = electronStore.get('main.deviceID');
 
+  const amplitudeClient = getAmplitudeClient();
+
   const requestArgs = {
     method: 'post',
     body: JSON.stringify({
@@ -115,6 +119,10 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
   if (!disableTracking) {
     console.log('New Session.');
     fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
+    amplitudeClient?.logEvent({
+      event_type: 'APP_SESSION',
+      user_id: deviceID,
+    });
   }
 
   if (!ID) {
@@ -124,6 +132,10 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
     if (MONOKLE_INSTALLS_URL) {
       console.log('New Installation.');
       fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
+      amplitudeClient?.logEvent({
+        event_type: APP_INSTALLED,
+        user_id: deviceID,
+      });
     }
     electronStore.set('main.deviceID', deviceID);
   }
