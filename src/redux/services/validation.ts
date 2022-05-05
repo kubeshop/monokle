@@ -45,9 +45,6 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
 }
 
 export function validatePolicies(resource: K8sResource, policies: Policy[]): ResourceValidationError[] {
-  if (resource.filePath.startsWith('preview://')) {
-    return [];
-  }
   if (isManagedByKustomize(resource)) {
     return [];
   }
@@ -72,10 +69,6 @@ function isManagedByKustomize(resource: K8sResource): boolean {
   }
 
   if (resource.name.startsWith('Patch: ')) {
-    return true;
-  }
-
-  if (resource.refs?.some(hasKustomizationReference)) {
     return true;
   }
 
