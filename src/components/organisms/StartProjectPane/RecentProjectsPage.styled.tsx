@@ -8,7 +8,7 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div`
   display: grid;
-  grid-template-rows: 1.25rem 1fr 15rem;
+  grid-template-rows: 1.25rem calc(100vh - 70px - 16.25rem) 15rem;
 `;
 
 export const ProjectsContainer = styled.div`

@@ -6,7 +6,7 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div`
   display: grid;
-  grid-template-rows: 1.25rem 15rem 1fr;
+  grid-template-rows: 1.25rem 15rem calc(100vh - 70px - 16.25rem);
 `;
 
 export const InformationMessage = styled.div`
