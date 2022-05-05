@@ -24,7 +24,7 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {defineHotkey} from '@utils/defineHotkey';
 
-import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
+import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts, openLogs} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
@@ -360,6 +360,10 @@ const helpMenu = (
     {
       label: 'Keyboard Shortcuts',
       click: openKeyboardShortcuts,
+    },
+    {
+      label: 'Logs',
+      click: openLogs,
     },
     {type: 'separator'},
     {
