@@ -65,7 +65,7 @@ const NewRecentProjectsPane = () => {
           <S.ActionItem>
             <S.ActionItemLogo src={SelectFolder} />
             <S.ActionItemContext>
-              <S.ActionItemText>Select a folder with k8s resource</S.ActionItemText>
+              <S.ActionItemText>Select a folder with k8s resources</S.ActionItemText>
               <S.ActionItemButton id="select-existing-folder" type="link" onClick={handleOpenFolderExplorer}>
                 Open
               </S.ActionItemButton>
