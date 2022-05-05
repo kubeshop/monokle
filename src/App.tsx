@@ -70,6 +70,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
+const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -96,6 +97,7 @@ const App = () => {
   );
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
+  const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
@@ -386,6 +388,7 @@ const App = () => {
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {isAboutModalVisible && <AboutModal />}
+          {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {showReleaseNotes && (
             <Modal
               width="900px"
