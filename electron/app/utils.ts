@@ -231,6 +231,9 @@ export const initNucleus = (isDev: boolean, app: any) => {
       debug: false,
     });
 
+    // This has to run after Nucleus.init but before tracking any events.
+    Nucleus.appStarted();
+
     Nucleus.setUserId(machineIdSync());
 
     Nucleus.setProps(
