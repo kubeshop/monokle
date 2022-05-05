@@ -19,6 +19,10 @@ const PaneManager: React.FC = () => {
   const projects = useAppSelector(state => state.config.projects);
 
   const gridColumns = useMemo(() => {
+    if (!activeProject || isStartProjectPaneVisible) {
+      return '1fr';
+    }
+
     let gridTemplateColumns = 'max-content 1fr';
 
     if (featureJson.ShowRightMenu) {
@@ -26,7 +30,7 @@ const PaneManager: React.FC = () => {
     }
 
     return gridTemplateColumns;
-  }, []);
+  }, [activeProject, isStartProjectPaneVisible]);
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>

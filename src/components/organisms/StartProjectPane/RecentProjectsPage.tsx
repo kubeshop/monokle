@@ -45,6 +45,7 @@ const NewRecentProjectsPane = () => {
   return (
     <S.Container>
       <Guide />
+
       <S.Projects>
         <S.ProjectsTitle id="recent-project-title">Recent Projects</S.ProjectsTitle>
         <S.ProjectsContainer id="recent-projects-container">
@@ -59,6 +60,7 @@ const NewRecentProjectsPane = () => {
           ))}
         </S.ProjectsContainer>
       </S.Projects>
+
       <S.Actions>
         <S.ActionsTitle>Start a new project</S.ActionsTitle>
         <S.ActionItems>
