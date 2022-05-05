@@ -61,7 +61,7 @@ export const ActionsTitle = styled.div`
 
 export const Container = styled.div`
   display: grid;
-  grid-template-rows: 1.25rem 1fr 15rem;
+  grid-template-rows: max-content 1fr 15rem;
   grid-row-gap: 10px;
 `;
 
