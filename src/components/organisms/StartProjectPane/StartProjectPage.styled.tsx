@@ -8,7 +8,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 `;
 
 export const InformationMessage = styled.div`
