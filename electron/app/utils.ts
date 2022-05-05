@@ -103,7 +103,7 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
-export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
+export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersion: string) => {
   const ID: string = electronStore.get('main.deviceID');
 
   const amplitudeClient = getAmplitudeClient();
@@ -127,7 +127,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
 
   if (!ID) {
     if (NUCLEUS_SH_APP_ID) {
-      Nucleus.track(APP_INSTALLED);
+      Nucleus.track(APP_INSTALLED, {appVersion});
     }
     if (MONOKLE_INSTALLS_URL) {
       console.log('New Installation.');
@@ -135,6 +135,9 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean) => {
       amplitudeClient?.logEvent({
         event_type: APP_INSTALLED,
         user_id: deviceID,
+        event_properties: {
+          appVersion,
+        },
       });
     }
     electronStore.set('main.deviceID', deviceID);
