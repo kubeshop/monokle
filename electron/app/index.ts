@@ -33,7 +33,7 @@ unhandled({
 
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
-setDeviceID(machineIdSync(), disableTracking);
+setDeviceID(machineIdSync(), disableTracking, app.getVersion());
 fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {
