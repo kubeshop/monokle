@@ -34,6 +34,7 @@ export const previewKustomization = createAsyncThunk<
   const k8sVersion = getK8sVersion(projectConfig);
   const userDataDir = thunkAPI.getState().config.userDataDir;
   const resource = state.resourceMap[resourceId];
+  const policyPlugins = state.policies.plugins;
 
   if (resource && resource.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
@@ -56,7 +57,10 @@ export const previewKustomization = createAsyncThunk<
         result.stdout,
         resource.id,
         'Kustomize Preview',
-        state.resourceRefsProcessingOptions
+        state.resourceRefsProcessingOptions,
+        undefined,
+        undefined,
+        {policyPlugins}
       );
     }
   }

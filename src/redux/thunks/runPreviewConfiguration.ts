@@ -39,6 +39,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   const currentContext =
     thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
     thunkAPI.getState().config.kubeConfig.currentContext;
+  const policyPlugins = mainState.policies.plugins;
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
@@ -127,7 +128,10 @@ export const runPreviewConfiguration = createAsyncThunk<
       result.stdout,
       previewConfiguration.id,
       'Helm Preview',
-      mainState.resourceRefsProcessingOptions
+      mainState.resourceRefsProcessingOptions,
+      undefined,
+      undefined,
+      {policyPlugins}
     );
   }
 
