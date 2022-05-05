@@ -7,10 +7,8 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
-  width: 100vw;
-  height: calc(100vh - 47px);
   display: grid;
-  grid-template-rows: 1.25rem calc(100vh - 47px - 16.25rem) 15rem;
+  grid-template-rows: 1.25rem 1fr 15rem;
 `;
 
 export const ProjectsContainer = styled.div`

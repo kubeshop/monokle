@@ -5,18 +5,14 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
-  width: 100vw;
-  height: calc(100vh - 47px);
   display: grid;
-  grid-template-rows: 1.25rem 15rem calc(100vh - 47px - 16.25rem);
+  grid-template-rows: 1.25rem 15rem 1fr;
 `;
 
 export const InformationMessage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
   font-size: 16px;
   color: ${Colors.grey7};
   font-weight: 600;
@@ -25,8 +21,6 @@ export const InformationMessage = styled.div`
 export const StartProjectContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  alig-items: center;
-  width: 100%;
   padding: 0 6rem;
 `;
 
