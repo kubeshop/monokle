@@ -98,7 +98,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     submenu: [
       {
         label: 'New Monokle Window',
-        accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW),
+        accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW.key),
         click() {
           openApplication();
         },
@@ -229,7 +229,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Apply',
-        accelerator: hotkeys.APPLY_SELECTION,
+        accelerator: hotkeys.APPLY_SELECTION.key,
         enabled: Boolean(state.main.selectedResourceId),
         click: () => {
           dispatch(setMonacoEditor({apply: true}));
@@ -237,7 +237,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {
         label: 'Diff',
-        accelerator: hotkeys.DIFF_RESOURCE,
+        accelerator: hotkeys.DIFF_RESOURCE.key,
         enabled: Boolean(state.main.selectedResourceId),
         click: () => {
           if (!state.main.selectedResourceId) {
@@ -268,7 +268,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {
         label: 'Previous Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
+        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK.key,
         enabled: Boolean(isPreviousResourceEnabled),
         click: () => {
           selectFromHistory(
@@ -283,7 +283,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {
         label: 'Next Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
+        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD.key,
         enabled: Boolean(isNextResourceEnabled),
         click: () => {
           selectFromHistory(
@@ -299,7 +299,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
-        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE),
+        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
           dispatch(toggleLeftMenu());
         },
@@ -316,14 +316,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Zoom in',
-        accelerator: defineHotkey(hotkeys.ZOOM_IN),
+        accelerator: defineHotkey(hotkeys.ZOOM_IN.key),
         click: () => {
           dispatch(zoomIn());
         },
       },
       {
         label: 'Zoom out',
-        accelerator: defineHotkey(hotkeys.ZOOM_OUT),
+        accelerator: defineHotkey(hotkeys.ZOOM_OUT.key),
         click: () => {
           dispatch(zoomOut());
         },
@@ -359,7 +359,7 @@ const helpMenu = (
       click: openDocumentation,
     },
     {
-      accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS),
+      accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS.key),
       label: 'Keyboard Shortcuts',
       click: () => dispatch(openKeyboardShortcutsModal()),
     },
