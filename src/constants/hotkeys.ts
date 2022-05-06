@@ -23,6 +23,7 @@ const hotkeys = {
   OPEN_QUICK_SEARCH: 'ctrl+p, ctrl+shift+p, command+p, command+shift+p',
   OPEN_GETTING_STARTED_PAGE: 'ctrl+shift+t, command+shift+t',
   OPEN_NEW_WINDOW: 'ctrl+shift+n, command+shift+n',
+  OPEN_SHORTCUTS: 'ctrl+/, command+/',
 };
 
 export default hotkeys;

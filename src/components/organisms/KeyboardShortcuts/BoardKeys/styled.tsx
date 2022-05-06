@@ -4,6 +4,15 @@ import Colors from '@styles/Colors';
 
 export const StyledShortCut = styled.div`
   display: flex;
+  flex-direction: column;
+`;
+
+export const StyledShortCell = styled.div`
+  display: flex;
+
+  :not(:first-child) {
+    margin-top: 10px;
+  }
 `;
 
 export const StyledKey = styled.div`

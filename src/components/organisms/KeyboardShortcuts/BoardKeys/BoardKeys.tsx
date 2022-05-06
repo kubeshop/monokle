@@ -9,15 +9,15 @@ const BoardKeys = ({bindings}: BoardKeysProps) => {
 
   return (
     <S.StyledShortCut>
-      {commands.map((command: string) =>
-        command
-          .split('+')
-          .map((keyboardKey: string) => (
+      {commands.map((command: string) => (
+        <S.StyledShortCell>
+          {command.split('+').map((keyboardKey: string) => (
             <S.StyledKey key={`${command}_${keyboardKey}`}>
               {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || '+'}
             </S.StyledKey>
-          ))
-      )}
+          ))}
+        </S.StyledShortCell>
+      ))}
     </S.StyledShortCut>
   );
 };

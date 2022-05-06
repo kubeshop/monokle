@@ -359,6 +359,7 @@ const helpMenu = (
       click: openDocumentation,
     },
     {
+      accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS),
       label: 'Keyboard Shortcuts',
       click: () => dispatch(openKeyboardShortcutsModal()),
     },
