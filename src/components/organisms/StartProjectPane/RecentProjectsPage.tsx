@@ -45,32 +45,39 @@ const NewRecentProjectsPane = () => {
   return (
     <S.Container>
       <Guide />
+
       <S.Projects>
         <S.ProjectsTitle id="recent-project-title">Recent Projects</S.ProjectsTitle>
-        <S.ProjectsContainer id="recent-projects-container">
-          {sortProjects(projects, Boolean(activeProject)).map((project: Project) => (
-            <RecentProject
-              key={project.rootFolder}
-              project={project}
-              isActive={project.rootFolder === activeProject?.rootFolder}
-              onProjectItemClick={onProjectItemClick}
-              onPinChange={() => handleOnProjectPinChange(project)}
-            />
-          ))}
-        </S.ProjectsContainer>
+
+        <S.ProjectsContainerWrapper>
+          <S.ProjectsContainer id="recent-projects-container">
+            {sortProjects(projects, Boolean(activeProject)).map((project: Project) => (
+              <RecentProject
+                key={project.rootFolder}
+                project={project}
+                isActive={project.rootFolder === activeProject?.rootFolder}
+                onProjectItemClick={onProjectItemClick}
+                onPinChange={() => handleOnProjectPinChange(project)}
+              />
+            ))}
+          </S.ProjectsContainer>
+        </S.ProjectsContainerWrapper>
       </S.Projects>
+
       <S.Actions>
         <S.ActionsTitle>Start a new project</S.ActionsTitle>
+
         <S.ActionItems>
           <S.ActionItem>
             <S.ActionItemLogo src={SelectFolder} />
             <S.ActionItemContext>
-              <S.ActionItemText>Select a folder with k8s resource</S.ActionItemText>
+              <S.ActionItemText>Select a folder with k8s resources</S.ActionItemText>
               <S.ActionItemButton id="select-existing-folder" type="link" onClick={handleOpenFolderExplorer}>
                 Open
               </S.ActionItemButton>
             </S.ActionItemContext>
           </S.ActionItem>
+
           <S.ActionItem>
             <S.ActionItemLogo src={CreateScratch} />
             <S.ActionItemContext>
@@ -80,6 +87,7 @@ const NewRecentProjectsPane = () => {
               </S.ActionItemButton>
             </S.ActionItemContext>
           </S.ActionItem>
+
           <S.ActionItem>
             <S.ActionItemLogo src={CreateFromTemplate} />
             <S.ActionItemContext>

@@ -12,14 +12,15 @@ Monokle helps you to:
 - Visualize and navigate resources in your clusters.
 - And much more!
 
-For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=aY6RK7LpxsE).
+For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=ossBDhP_K-4).
 
-<!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://youtu.be/aY6RK7LpxsE)-->
+<!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://www.youtube.com/watch?v=ossBDhP_K-4)-->
 
 ## **Blog-posts**
 
 Check out the following blog-posts with Monokle-related content:
 
+- 1.7.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-7-0-release) - May 2, 2022
 - 1.6.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-6-0-release) - Mar 21, 2022
 - 1.5.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79) - Feb 7, 2022
 - 1.4.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5) - Dec 15, 2021

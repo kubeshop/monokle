@@ -21,7 +21,9 @@ const StartProjectPage = () => {
   return (
     <S.Container>
       <Guide />
+
       <S.InformationMessage>Choose your way to start your first project:</S.InformationMessage>
+
       <S.StartProjectContainer>
         <S.StartProjectItem>
           <S.StartProjectItemLogo src={SelectFolder} />
@@ -33,6 +35,7 @@ const StartProjectPage = () => {
             Open
           </S.StartProjectItemButton>
         </S.StartProjectItem>
+
         <S.StartProjectItem>
           <S.StartProjectItemLogo src={CreateScratch} />
           <S.StartProjectItemTitle>Create a project from scratch</S.StartProjectItemTitle>
@@ -43,6 +46,7 @@ const StartProjectPage = () => {
             Create
           </S.StartProjectItemButton>
         </S.StartProjectItem>
+
         <S.StartProjectItem>
           <S.StartProjectItemLogo src={CreateFromTemplate} />
           <S.StartProjectItemTitle>Start from a template</S.StartProjectItemTitle>

@@ -7,6 +7,7 @@ import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/const
 import {AlertEnum} from '@models/alert';
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+import {Policy} from '@models/policy';
 
 import {extractK8sResources, processResources} from '@redux/services/resource';
 
@@ -44,7 +45,8 @@ export function createPreviewResult(
   title: string,
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions,
   previewKubeConfigPath?: string,
-  previewKubeConfigContext?: string
+  previewKubeConfigContext?: string,
+  processOptions?: {policyPlugins?: Policy[]}
 ) {
   const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
   const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
@@ -52,7 +54,8 @@ export function createPreviewResult(
     return rm;
   }, {});
 
-  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions);
+  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions, processOptions);
+
   return {
     previewResourceId,
     previewResources: resourceMap,
