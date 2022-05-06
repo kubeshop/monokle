@@ -25,3 +25,4 @@ export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as SettingsManager} from './SettingsManager';
 export {default as UpdateModal} from './UpdateNotice';
 export {default as AboutModal} from './AboutModal';
+export {default as KeyboardShortcuts} from './KeyboardShortcuts';
