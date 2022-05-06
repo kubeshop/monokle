@@ -1,4 +1,4 @@
-import {Button, Typography} from 'antd';
+import {Button, Modal, Typography} from 'antd';
 
 import hotkeys from '@constants/hotkeys';
 
@@ -8,6 +8,8 @@ import {closeKeyboardShortcutsModal} from '@redux/reducers/ui';
 import {defineHotkey} from '@utils/defineHotkey';
 
 import Keyboard from '@assets/Keyboard.svg';
+
+import BoardKeys from './BoardKeys';
 
 import * as S from './styled';
 
@@ -43,28 +45,6 @@ const shortcutsTools = [
   {name: 'Reset Resource Filters', value: defineHotkey(hotkeys.RESET_RESOURCE_FILTERS)},
 ];
 
-type BoardKeysProps = {
-  bindings: string;
-};
-
-const BoardKeys = ({bindings}: BoardKeysProps) => {
-  const commands: string[] = bindings.split(',').filter((item: string) => item);
-
-  return (
-    <S.StyledShortCut>
-      {commands.map((command: string) =>
-        command
-          .split('+')
-          .map((keyboardKey: string) => (
-            <S.StyledKey key={`${command}_${keyboardKey}`}>
-              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || '+'}
-            </S.StyledKey>
-          ))
-      )}
-    </S.StyledShortCut>
-  );
-};
-
 const KeyboardShortcuts = () => {
   const dispatch = useAppDispatch();
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
@@ -74,7 +54,7 @@ const KeyboardShortcuts = () => {
   };
 
   return (
-    <S.StyledModal
+    <Modal
       visible={isKeyboardShortcutsVisible}
       centered
       width={900}
@@ -107,14 +87,14 @@ const KeyboardShortcuts = () => {
               </thead>
               <tbody>
                 {shortcutsNavigation.map(shortcut => (
-                  <S.ShortCutContainer key={shortcut.name}>
+                  <tr key={shortcut.name}>
                     <td>
                       <Text>{shortcut.name}</Text>
                     </td>
                     <td>
                       <BoardKeys bindings={shortcut.value} />
                     </td>
-                  </S.ShortCutContainer>
+                  </tr>
                 ))}
               </tbody>
             </S.StyledTextBlock>
@@ -130,21 +110,21 @@ const KeyboardShortcuts = () => {
               </thead>
               <tbody>
                 {shortcutsTools.map(shortcut => (
-                  <S.ShortCutContainer key={shortcut.name}>
+                  <tr key={shortcut.name}>
                     <td>
                       <Text>{shortcut.name}</Text>
                     </td>
                     <td>
                       <BoardKeys bindings={shortcut.value} />
                     </td>
-                  </S.ShortCutContainer>
+                  </tr>
                 ))}
               </tbody>
             </S.StyledTextBlock>
           </S.StyledContainer>
         </S.ContentContainerDiv>
       </div>
-    </S.StyledModal>
+    </Modal>
   );
 };
 
