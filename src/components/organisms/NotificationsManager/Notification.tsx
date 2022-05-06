@@ -1,8 +1,5 @@
-import {useMemo} from 'react';
-
 import {Tooltip} from 'antd';
 
-import _ from 'lodash';
 import {DateTime} from 'luxon';
 
 import {AlertType} from '@models/alert';
@@ -27,14 +24,6 @@ const Notification: React.FC<NotificationProps> = props => {
 
   const {isCopied, setCopyToClipboardState} = useCopyToClipboard(copyToClipboardMessage);
 
-  const truncatedMessage = useMemo(() => {
-    if (message.length <= 200) {
-      return message;
-    }
-
-    return _.truncate(message, {length: 200});
-  }, [message]);
-
   const onCopyToClipboard = () => {
     if (isCopied) {
       return;
@@ -57,11 +46,7 @@ const Notification: React.FC<NotificationProps> = props => {
         <S.MessageBodyContainer>
           <S.TitleSpan>{title}</S.TitleSpan>
           <S.MessageSpan>
-            <NotificationMarkdown
-              extraContentType={extraContentType}
-              message={truncatedMessage}
-              showSeeMore={message.length > 200}
-            />
+            <NotificationMarkdown extraContentType={extraContentType} message={message} />
           </S.MessageSpan>
         </S.MessageBodyContainer>
       </S.MessageContainer>

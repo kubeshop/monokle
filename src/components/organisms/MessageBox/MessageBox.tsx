@@ -2,8 +2,6 @@ import {useEffect} from 'react';
 
 import {notification} from 'antd';
 
-import _ from 'lodash';
-
 import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -35,7 +33,7 @@ const MessageBox: React.FC = () => {
       message: alert.title,
       description: (
         <NotificationMarkdown
-          message={_.truncate(alert.message, {length: 200})}
+          message={alert.message}
           extraContentType={alert.extraContentType}
           notificationId={alert.id}
         />

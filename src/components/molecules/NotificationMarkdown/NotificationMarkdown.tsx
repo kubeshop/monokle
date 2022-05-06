@@ -1,10 +1,15 @@
+import {useMemo} from 'react';
 import ReactMarkdown from 'react-markdown';
+
+import _ from 'lodash';
 
 import {ExtraContentType} from '@models/alert';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
+
+import * as S from './styled';
 
 type NotificationProps = {
   message: string;
@@ -18,24 +23,35 @@ const getExtraContent = (extraContentType: ExtraContentType, notificationId?: st
   }
 };
 
-const NotificationMarkdown = ({message, extraContentType, notificationId}: NotificationProps) => {
+const NotificationMarkdown: React.FC<NotificationProps> = props => {
+  const {extraContentType, message, notificationId} = props;
+
+  const truncatedMessage = useMemo(() => {
+    if (message.length <= 200) {
+      return message;
+    }
+
+    return _.truncate(message, {length: 200});
+  }, [message]);
+
   return (
-    <div>
+    <S.NotificationMarkdownContainer>
       <ReactMarkdown
         components={{
-          a({href, children, ...props}) {
+          a({href, children, ...restProps}) {
             return (
-              <a onClick={() => openUrlInExternalBrowser(href)} {...props}>
+              <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
                 {children}
               </a>
             );
           },
         }}
       >
-        {message}
+        {truncatedMessage}
       </ReactMarkdown>
+      {message.length > 200 && <S.SeeAllButton type="link">See more</S.SeeAllButton>}
       {extraContentType && getExtraContent(extraContentType, notificationId)}
-    </div>
+    </S.NotificationMarkdownContainer>
   );
 };
 

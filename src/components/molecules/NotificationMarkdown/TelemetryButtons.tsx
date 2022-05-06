@@ -44,7 +44,7 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
   };
 
   if (disableEventTracking !== undefined || disableErrorReporting !== undefined) {
-    return <span>Your settings have been saved.</span>;
+    return <div>Your settings have been saved.</div>;
   }
 
   return (
