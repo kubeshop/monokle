@@ -67,6 +67,7 @@ const initialAppConfigState: AppConfig = {
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
+    hideUnsupportedFilesInFileExplorer: electronStore.get('appConfig.settings.hideUnsupportedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
     createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),

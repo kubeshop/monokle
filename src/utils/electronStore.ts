@@ -67,6 +67,9 @@ const schema = {
           hideExcludedFilesInFileExplorer: {
             type: 'boolean',
           },
+          hideUnsupportedFilesInFileExplorer: {
+            type: 'boolean',
+          },
           enableHelmWithKustomize: {
             type: 'boolean',
           },
