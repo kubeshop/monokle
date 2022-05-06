@@ -1,14 +1,14 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
-import * as ElectronLog from 'electron-log';
 import ElectronStore from 'electron-store';
 
 import * as path from 'path';
 
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';
+import {logToFile} from "@utils/logToFile";
 
-Object.assign(console, ElectronLog.functions);
+Object.assign(console, logToFile.functions);
 
 const isDev = process.env.NODE_ENV === 'development';
 
