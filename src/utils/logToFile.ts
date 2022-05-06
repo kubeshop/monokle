@@ -4,11 +4,11 @@ const logFileFormat = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] [{level}] 
 electronLog.transports.console.format = logFileFormat;
 electronLog.transports.file.format = logFileFormat;
 
-// 5MB .log file size
-electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+// 2MB .log file size
+electronLog.transports.file.maxSize = 2 * 1024 * 1024;
 
 // one file in stand of main.log & renderer.log
-electronLog.transports.file.fileName = 'logs.log';
+// electronLog.transports.file.fileName = 'logs.log';
 
 // remove file logs for DEV
 if (process.env.NODE_ENV === 'development') {
