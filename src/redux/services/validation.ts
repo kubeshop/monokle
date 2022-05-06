@@ -2,7 +2,7 @@ import Ajv, {ValidateFunction} from 'ajv';
 import {get} from 'lodash';
 import {Document, LineCounter, Node, ParsedNode, isCollection, isNode} from 'yaml';
 
-import {K8sResource, RefPosition, ResourceRef, ResourceValidationError} from '@models/k8sresource';
+import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
 import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@models/policy';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
@@ -45,9 +45,6 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
 }
 
 export function validatePolicies(resource: K8sResource, policies: Policy[]): ResourceValidationError[] {
-  if (resource.filePath.startsWith('preview://')) {
-    return [];
-  }
   if (isManagedByKustomize(resource)) {
     return [];
   }
@@ -75,15 +72,8 @@ function isManagedByKustomize(resource: K8sResource): boolean {
     return true;
   }
 
-  if (resource.refs?.some(hasKustomizationReference)) {
-    return true;
-  }
-
   return false;
 }
-
-const hasKustomizationReference = (ref: ResourceRef) =>
-  (ref.target?.type === 'resource' && ref.target.resourceKind === 'Kustomization') ?? false;
 
 function validatePolicyRule(resource: K8sResource, policy: Policy, rule: SarifRule): ResourceValidationError[] {
   const validator = POLICY_VALIDATOR_MAP[policy.validatorId!];
@@ -184,7 +174,7 @@ function determineContainerIndex(
 ): YamlPath {
   for (let i = 0; i < properties.length; i += 1) {
     const property = properties[i];
-    const containers: {name: string}[] = get(resource.content, prefix.concat(property), []);
+    const containers = get<{name: string}[]>(resource.content, prefix.concat(property), []) ?? [];
     const containerIndex = containers.findIndex(c => c.name === container);
     if (containerIndex !== -1) {
       return [property, containerIndex];
