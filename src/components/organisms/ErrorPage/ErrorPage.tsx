@@ -1,11 +1,13 @@
 import {shell} from 'electron';
 
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {FallbackProps} from 'react-error-boundary';
 
 import {ExportOutlined} from '@ant-design/icons';
 
 import newGithubIssueUrl from 'new-github-issue-url';
+
+import {logToFile} from '@utils/logToFile';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import BigSvg from '@assets/ValidationFigure.svg';
@@ -45,6 +47,10 @@ export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) 
       },
     ];
   }, [resetErrorBoundary, createGitHubIssue]);
+
+  useEffect(() => {
+    logToFile.error(error);
+  }, [error]);
 
   return (
     <S.Container>
