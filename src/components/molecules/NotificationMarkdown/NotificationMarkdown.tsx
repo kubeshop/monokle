@@ -1,11 +1,14 @@
 import {useMemo} from 'react';
 import ReactMarkdown from 'react-markdown';
+import {Provider} from 'react-redux';
 
 import {Modal} from 'antd';
 
 import _ from 'lodash';
 
 import {AlertType, ExtraContentType} from '@models/alert';
+
+import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
@@ -42,7 +45,11 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     // @ts-ignore
     Modal[type]({
       content: <S.NotificationModalContent>{message}</S.NotificationModalContent>,
-      title: <NotificationModalTitle message={message} title={title} />,
+      title: (
+        <Provider store={store}>
+          <NotificationModalTitle message={message} title={title} />
+        </Provider>
+      ),
       width: 600,
     });
   };
@@ -62,6 +69,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
       >
         {truncatedMessage}
       </ReactMarkdown>
+
       {message.length > 200 && (
         <S.SeeAllButton type="link" onClick={handleSeeMore}>
           See more
