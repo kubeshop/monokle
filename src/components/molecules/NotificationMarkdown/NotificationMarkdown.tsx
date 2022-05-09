@@ -51,6 +51,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
         </Provider>
       ),
       width: 600,
+      okText: 'Done',
     });
   };
 
