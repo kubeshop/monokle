@@ -14,14 +14,19 @@ import semver from 'semver';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {cancelWalkThrough, handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
+import {
+  cancelWalkThrough,
+  handleWalkThroughStep,
+  openKeyboardShortcutsModal,
+  openReleaseNotesDrawer,
+} from '@redux/reducers/ui';
 
 import {Icon} from '@components/atoms';
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
-import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
+import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
 
@@ -59,6 +64,10 @@ const HelpMenu = () => {
 
   const onClickReleaseNotes = () => {
     dispatch(openReleaseNotesDrawer());
+  };
+
+  const openKeyboardShortcuts = () => {
+    dispatch(openKeyboardShortcutsModal());
   };
 
   const menu = (

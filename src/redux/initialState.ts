@@ -125,6 +125,7 @@ const initialUiState: UiState = {
   isReleaseNotesDrawerOpen: false,
   isSettingsOpen: false,
   isAboutModalOpen: false,
+  isKeyboardShortcutsModalOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,

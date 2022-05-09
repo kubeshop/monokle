@@ -29,11 +29,6 @@ export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
-export function openKeyboardShortcuts() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'shortcuts'});
-  shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
-}
-
 export function openLogs() {
   trackEvent(WINDOW_HELP_LINK, {linkID: 'logs'});
   shell.showItemInFolder(app.getPath('logs'));
