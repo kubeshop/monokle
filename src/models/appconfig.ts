@@ -129,11 +129,11 @@ interface AppConfig {
     code: NewVersionCode;
     data: any;
   };
-  kubeConfig: KubeConfig;
+  kubeConfig: KubeConfig; // this.contexts is undefined and used in `populateProjectConfig`.
   osPlatform: NodeJS.Platform;
   projects: Project[];
   selectedProjectRootFolder: string | null;
-  projectConfig?: ProjectConfig | null;
+  projectConfig?: ProjectConfig | null; // this.kubeConfig.contexts is defined and causes crash during merge.
   userHomeDir?: string;
   userDataDir?: string;
   userTempDir?: string;

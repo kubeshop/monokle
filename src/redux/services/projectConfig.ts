@@ -89,7 +89,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
     isPathValid: state.kubeConfig.isPathValid,
-    contexts: state.kubeConfig.contexts,
+    contexts: state.kubeConfig.contexts, // this is undefined. Expected?
     currentContext: state.kubeConfig.currentContext,
   };
   applicationConfig.k8sVersion = state.k8sVersion;
