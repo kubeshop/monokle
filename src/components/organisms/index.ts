@@ -1,3 +1,4 @@
+export {default as AboutModal} from './AboutModal';
 export {default as ActionsPane} from './ActionsPane';
 export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
@@ -19,9 +20,8 @@ export {default as PaneManager} from './PaneManager';
 export {default as PluginManager} from './PluginManager';
 export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
-export {default as TemplateManagerPane} from './TemplateManagerPane';
-export {default as TemplateModal} from './TemplateModal';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as SettingsManager} from './SettingsManager';
+export {default as TemplateManagerPane} from './TemplateManagerPane';
+export {default as TemplateModal} from './TemplateModal';
 export {default as UpdateModal} from './UpdateNotice';
-export {default as AboutModal} from './AboutModal';

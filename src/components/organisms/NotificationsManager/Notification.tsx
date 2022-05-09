@@ -1,8 +1,10 @@
+import {useMemo} from 'react';
+
 import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
-import {AlertType} from '@models/alert';
+import {AlertEnum, AlertType} from '@models/alert';
 
 import NotificationMarkdown from '@molecules/NotificationMarkdown';
 
@@ -18,11 +20,23 @@ type NotificationProps = {
 const Notification: React.FC<NotificationProps> = props => {
   const {notification, badge} = props;
 
-  const {createdAt, title, message, extraContentType, hasSeen, type} = notification;
+  const {createdAt, title, message, hasSeen, type} = notification;
 
   const copyToClipboardMessage = `Title: ${title}. Description: ${message}.`;
 
   const {isCopied, setCopyToClipboardState} = useCopyToClipboard(copyToClipboardMessage);
+
+  const notificationType = useMemo(
+    () =>
+      type === AlertEnum.Error
+        ? 'error'
+        : type === AlertEnum.Warning
+        ? 'warning'
+        : type === AlertEnum.Success
+        ? 'success'
+        : 'info',
+    [type]
+  );
 
   const onCopyToClipboard = () => {
     if (isCopied) {
@@ -46,7 +60,7 @@ const Notification: React.FC<NotificationProps> = props => {
         <S.MessageBodyContainer>
           <S.TitleSpan>{title}</S.TitleSpan>
           <S.MessageSpan>
-            <NotificationMarkdown extraContentType={extraContentType} message={message} />
+            <NotificationMarkdown notification={notification} type={notificationType} />
           </S.MessageSpan>
         </S.MessageBodyContainer>
       </S.MessageContainer>

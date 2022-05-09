@@ -1,9 +1,11 @@
 import {useMemo} from 'react';
 import ReactMarkdown from 'react-markdown';
 
+import {Modal} from 'antd';
+
 import _ from 'lodash';
 
-import {ExtraContentType} from '@models/alert';
+import {AlertType, ExtraContentType} from '@models/alert';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
@@ -12,9 +14,8 @@ import {openUrlInExternalBrowser} from '@utils/shell';
 import * as S from './styled';
 
 type NotificationProps = {
-  message: string;
-  extraContentType?: ExtraContentType;
-  notificationId?: string;
+  notification: AlertType;
+  type: string;
 };
 
 const getExtraContent = (extraContentType: ExtraContentType, notificationId?: string) => {
@@ -24,7 +25,8 @@ const getExtraContent = (extraContentType: ExtraContentType, notificationId?: st
 };
 
 const NotificationMarkdown: React.FC<NotificationProps> = props => {
-  const {extraContentType, message, notificationId} = props;
+  const {notification, type} = props;
+  const {extraContentType, id, message, title} = notification;
 
   const truncatedMessage = useMemo(() => {
     if (message.length <= 200) {
@@ -33,6 +35,15 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
 
     return _.truncate(message, {length: 200});
   }, [message]);
+
+  const handleSeeMore = () => {
+    // @ts-ignore
+    Modal[type]({
+      content: <S.NotificationModalContent>{message}</S.NotificationModalContent>,
+      title,
+      width: 600,
+    });
+  };
 
   return (
     <S.NotificationMarkdownContainer>
@@ -49,8 +60,12 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
       >
         {truncatedMessage}
       </ReactMarkdown>
-      {message.length > 200 && <S.SeeAllButton type="link">See more</S.SeeAllButton>}
-      {extraContentType && getExtraContent(extraContentType, notificationId)}
+      {message.length > 200 && (
+        <S.SeeAllButton type="link" onClick={handleSeeMore}>
+          See more
+        </S.SeeAllButton>
+      )}
+      {extraContentType && getExtraContent(extraContentType, id)}
     </S.NotificationMarkdownContainer>
   );
 };

@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {notification} from 'antd';
 
@@ -13,36 +13,35 @@ const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();
   const alert = useAppSelector(state => state.alert.alert);
 
-  useEffect(() => {
-    if (!alert) {
-      return;
-    }
-
-    let type: any =
-      alert.type === AlertEnum.Error
+  const notificationType = useMemo(
+    () =>
+      !alert
+        ? ''
+        : alert.type === AlertEnum.Error
         ? 'error'
         : alert.type === AlertEnum.Warning
         ? 'warning'
         : alert.type === AlertEnum.Success
         ? 'success'
-        : 'info';
+        : 'info',
+    [alert]
+  );
+
+  useEffect(() => {
+    if (!alert) {
+      return;
+    }
 
     // @ts-ignore
-    notification[type]({
+    notification[notificationType]({
       key: alert.id,
       message: alert.title,
-      description: (
-        <NotificationMarkdown
-          message={alert.message}
-          extraContentType={alert.extraContentType}
-          notificationId={alert.id}
-        />
-      ),
+      description: <NotificationMarkdown notification={alert} type={notificationType} />,
       duration: alert.duration || 2,
     });
 
     dispatch(clearAlert());
-  }, [alert, dispatch]);
+  }, [alert, dispatch, notificationType]);
 
   return null;
 };
