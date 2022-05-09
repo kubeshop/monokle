@@ -9,8 +9,6 @@ import {useAppVersion} from '@hooks/useAppVersion';
 
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
-import Colors from '@styles/Colors';
-
 import packageJson from '@root/package.json';
 
 const {Text} = Typography;
@@ -18,22 +16,6 @@ const {Text} = Typography;
 const INCLUDED_DEPENDENCIES = ['react', 'electron'];
 const allDeps = {...packageJson.devDependencies, ...packageJson.dependencies};
 const filteredDependencies = Object.entries(allDeps).filter(([name]) => INCLUDED_DEPENDENCIES.includes(name));
-
-const StyledModal = styled(Modal)`
-  .ant-modal-close-icon {
-    font-size: 14px !important;
-    color: ${Colors.grey700};
-  }
-  .ant-modal-body {
-    position: relative;
-    overflow: auto;
-    background-color: ${Colors.grey1};
-  }
-  .ant-modal-footer {
-    padding-top: 20px;
-    background-color: ${Colors.grey1000};
-  }
-`;
 
 const StyledContentContainerDiv = styled.div`
   position: absolute;
@@ -75,7 +57,7 @@ const AboutModal = () => {
   };
 
   return (
-    <StyledModal
+    <Modal
       visible={aboutModalVisible}
       centered
       width={400}
@@ -120,7 +102,7 @@ const AboutModal = () => {
           </StyledContentDiv>
         </StyledContentContainerDiv>
       </span>
-    </StyledModal>
+    </Modal>
   );
 };
 

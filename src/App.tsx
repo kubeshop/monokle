@@ -59,6 +59,7 @@ const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'))
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
@@ -96,6 +97,7 @@ const App = () => {
   );
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
+  const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
@@ -380,13 +382,13 @@ const App = () => {
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
+          {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
           {isQuickSearchActionsVisible && <QuickSearchActions />}
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
-
           {showReleaseNotes && (
             <Modal
               width="900px"

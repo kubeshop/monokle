@@ -7,6 +7,7 @@ export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as FileTreePane} from './FileTreePane';
 export {default as HelmPane} from './HelmPane';
 export {default as HotKeysHandler} from './HotKeysHandler';
+export {default as KeyboardShortcuts} from './KeyboardShortcuts';
 export {default as KustomizePane} from './KustomizePane';
 export {default as LazyDrawer} from './LazyDrawer';
 export {default as LocalResourceDiffModal} from './LocalResourceDiffModal';
