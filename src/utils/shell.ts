@@ -1,4 +1,4 @@
-import {shell} from 'electron';
+import {app, shell} from 'electron';
 
 import * as os from 'os';
 
@@ -27,6 +27,11 @@ export function openUrlInExternalBrowser(url?: string) {
 export function openDocumentation() {
   trackEvent(WINDOW_HELP_LINK, {linkID: 'documentation'});
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
+}
+
+export function openLogs() {
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'logs'});
+  shell.showItemInFolder(app.getPath('logs'));
 }
 
 export function openUniqueObjectNameTopic() {
