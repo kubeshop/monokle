@@ -11,6 +11,8 @@ import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
+import NotificationModalTitle from './NotificationModalTitle';
+
 import * as S from './styled';
 
 type NotificationProps = {
@@ -40,7 +42,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     // @ts-ignore
     Modal[type]({
       content: <S.NotificationModalContent>{message}</S.NotificationModalContent>,
-      title,
+      title: <NotificationModalTitle message={message} title={title} />,
       width: 600,
     });
   };
