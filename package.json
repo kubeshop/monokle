@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -90,6 +90,7 @@
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
+    "@amplitude/node": "^1.10.0",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
@@ -106,7 +107,7 @@
     "chokidar": "3.5.3",
     "dagre": "0.8.5",
     "electron-devtools-installer": "3.2.0",
-    "electron-log": "4.4.6",
+    "electron-log": "^4.4.6",
     "electron-store": "8.0.1",
     "electron-unhandled": "4.0.1",
     "electron-updater": "4.6.5",

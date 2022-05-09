@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/kubeshop/monokle/compare/v1.7.2-nightly-2022-05-05.0...v1.7.2) (2022-05-05)
+
+
+### Bug Fixes
+
+* enabled OPA validation for preview resources and resources referred to by kustomizations ([344f0ae](https://github.com/kubeshop/monokle/commit/344f0ae64d6beafff6debfbb8aedc9b54bb42911))
+* nucleus telemetry ([53829b1](https://github.com/kubeshop/monokle/commit/53829b1da35d4e34073814374e713a8f32cf75d8))
+* recent projects overflow ([5e1371a](https://github.com/kubeshop/monokle/commit/5e1371a0ce9177dbb395a190695e471846de6d4a))
+* reprocess resources on preview ([7fa16ab](https://github.com/kubeshop/monokle/commit/7fa16ab61bcd5447c9487a54040e0f1a3dbd4282))
+* text typo ([ee6c638](https://github.com/kubeshop/monokle/commit/ee6c638b8793d4117d22366ace2ee29fb0290a70))
+
+### [1.7.1](https://github.com/kubeshop/monokle/compare/v1.7.1-nightly-2022-05-04.0...v1.7.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* fix filter scroll style ([f463e75](https://github.com/kubeshop/monokle/commit/f463e75f77ad2b481e3aafd2b6d90a1cc11f2cd4))
+
 ## [1.7.0](https://github.com/kubeshop/monokle/compare/v1.6.4-nightly-2022-05-03.0...v1.7.0) (2022-05-03)
 
 ### [1.6.3](https://github.com/kubeshop/monokle/compare/v1.6.3-nightly-2022-04-08.0...v1.6.3) (2022-04-08)

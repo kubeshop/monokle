@@ -35,6 +35,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   const kubeconfig = projectConfig.kubeConfig?.path;
   const currentContext = projectConfig.kubeConfig?.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
+  const policyPlugins = state.policies.plugins;
 
   if (kubeconfig && valuesFile && valuesFile.filePath && currentContext) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
@@ -84,7 +85,10 @@ export const previewHelmValuesFile = createAsyncThunk<
           result.stdout,
           valuesFile.id,
           'Helm Preview',
-          state.resourceRefsProcessingOptions
+          state.resourceRefsProcessingOptions,
+          undefined,
+          undefined,
+          {policyPlugins}
         );
       }
 

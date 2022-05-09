@@ -61,12 +61,12 @@ const HotKeysHandler = () => {
     }
   );
 
-  useHotkeys(hotkeys.SELECT_FOLDER, () => {
+  useHotkeys(hotkeys.SELECT_FOLDER.key, () => {
     openFileExplorer();
   });
 
   useHotkeys(
-    hotkeys.REFRESH_FOLDER,
+    hotkeys.REFRESH_FOLDER.key,
     () => {
       if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
         dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
@@ -75,7 +75,7 @@ const HotKeysHandler = () => {
     [mainState]
   );
 
-  useHotkeys(hotkeys.TOGGLE_SETTINGS, () => {
+  useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
     dispatch(toggleSettings());
   });
 
@@ -152,7 +152,7 @@ const HotKeysHandler = () => {
   }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext]);
 
   useHotkeys(
-    hotkeys.APPLY_SELECTION,
+    hotkeys.APPLY_SELECTION.key,
     () => {
       applySelection();
     },
@@ -166,7 +166,7 @@ const HotKeysHandler = () => {
   }, [mainState.selectedResourceId, dispatch]);
 
   useHotkeys(
-    hotkeys.DIFF_RESOURCE,
+    hotkeys.DIFF_RESOURCE.key,
     () => {
       diffSelectedResource();
     },
@@ -174,7 +174,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.PREVIEW_CLUSTER,
+    hotkeys.PREVIEW_CLUSTER.key,
     () => {
       startPreview(kubeConfigPath, 'cluster', dispatch);
     },
@@ -182,7 +182,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.EXIT_PREVIEW_MODE,
+    hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
       if (isInPreviewMode) {
         stopPreview(dispatch);
@@ -191,13 +191,13 @@ const HotKeysHandler = () => {
     [isInPreviewMode]
   );
 
-  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
+  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
     if (featureJson.ShowRightMenu) {
       dispatch(toggleRightMenu());
     }
   });
 
-  useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK, () => {
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
     selectFromHistory(
       'left',
       mainState.currentSelectionHistoryIndex,
@@ -208,7 +208,7 @@ const HotKeysHandler = () => {
     );
   });
 
-  useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD, () => {
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD.key, () => {
     selectFromHistory(
       'right',
       mainState.currentSelectionHistoryIndex,
@@ -220,7 +220,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(
-    hotkeys.OPEN_NEW_RESOURCE_WIZARD,
+    hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
       if (!uiState.newResourceWizard.isOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
         dispatch(openNewResourceWizard());
@@ -229,28 +229,28 @@ const HotKeysHandler = () => {
     [mainState.fileMap[ROOT_FILE_ENTRY]]
   );
 
-  useHotkeys(hotkeys.OPEN_EXPLORER_TAB, () => {
+  useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
     dispatch(setLeftMenuSelection('file-explorer'));
   });
 
-  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB, () => {
+  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
     dispatch(setLeftMenuSelection('kustomize-pane'));
   });
 
-  useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
+  useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
     dispatch(setLeftMenuSelection('helm-pane'));
   });
 
-  useHotkeys(hotkeys.OPEN_VALIDATION_TAB, () => {
+  useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
     dispatch(toggleValidationDrawer());
   });
 
-  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
+  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
     dispatch(resetResourceFilter());
   });
 
   useHotkeys(
-    hotkeys.OPEN_QUICK_SEARCH,
+    hotkeys.OPEN_QUICK_SEARCH.key,
     () => {
       if (!uiState.quickSearchActionsPopup.isOpen) {
         dispatch(openQuickSearchActionsPopup());
@@ -260,7 +260,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.OPEN_GETTING_STARTED_PAGE,
+    hotkeys.OPEN_GETTING_STARTED_PAGE.key,
     () => {
       if (!uiState.isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());

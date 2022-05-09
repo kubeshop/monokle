@@ -232,6 +232,12 @@ export const uiSlice = createSlice({
     openReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = true;
     },
+    openKeyboardShortcutsModal: (state: Draft<UiState>) => {
+      state.isKeyboardShortcutsModalOpen = true;
+    },
+    closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
+      state.isKeyboardShortcutsModalOpen = false;
+    },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
     },
@@ -296,6 +302,8 @@ export const {
   openNewResourceWizard,
   closeNewResourceWizard,
   openRenameResourceModal,
+  openKeyboardShortcutsModal,
+  closeKeyboardShortcutsModal,
   closeRenameResourceModal,
   collapseNavSections,
   expandNavSections,

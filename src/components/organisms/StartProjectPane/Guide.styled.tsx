@@ -9,9 +9,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   gap: 1.2rem;
-  width: 100%;
-  margin: 10px 0;
-  height: 100%;
+  margin-top: 10px;
 `;
 
 export const Item = styled(ButtonRaw)`

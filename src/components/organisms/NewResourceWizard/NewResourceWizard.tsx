@@ -338,7 +338,7 @@ const NewResourceWizard = () => {
   const handleSavingDestinationChange = (value: any) => setSavingDestination(value);
 
   useHotkeys(
-    hotkeys.CREATE_NEW_RESOURCE,
+    hotkeys.CREATE_NEW_RESOURCE.key,
     () => {
       if (newResourceWizardState.isOpen) {
         form.submit();

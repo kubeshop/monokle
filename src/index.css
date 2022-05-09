@@ -15,6 +15,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.reflex-container > .reflex-element::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reflex-container > .reflex-element::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+.reflex-container > .reflex-element::-webkit-scrollbar-thumb {
+  background: #303030;
+}
+
 .reflex-container.vertical > .reflex-splitter {
   width: 2px;
   background-color: #262626;
@@ -301,4 +313,34 @@ code {
   position: absolute;
   top: -22px;
   right: -22px;
+}
+
+.ant-modal-close-icon {
+  font-size: 14px !important;
+  color: #93989C;
+}
+.ant-modal-body {
+  position: relative;
+  overflow: auto;
+  background-color: #141414;
+}
+.ant-modal-footer {
+  padding-top: 20px;
+  background-color: #141414;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #303030;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #242424;
 }
