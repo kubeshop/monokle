@@ -6,6 +6,9 @@ import {debounce} from 'lodash';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
+import {useAppDispatch} from '@redux/hooks';
+import {setMonacoEditor} from '@redux/reducers/ui';
+
 import codeIntel from './codeIntel';
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
@@ -46,6 +49,7 @@ function useCodeIntel(props: CodeIntelProps) {
   const disposablesRef = useRef<monaco.IDisposable[]>([]);
   const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const currentFile = Object.values(fileMap).find(file => selectedPath === file.filePath);
+  const dispatch = useAppDispatch();
 
   const clearCodeIntel = () => {
     if (editor) {
@@ -87,6 +91,13 @@ function useCodeIntel(props: CodeIntelProps) {
         helmValuesMap,
         selectFilePath,
         fileMap,
+        setEditorSelection: ({selection}) => {
+          dispatch(
+            setMonacoEditor({
+              selection,
+            })
+          );
+        },
       });
       idsOfDecorationsRef.current = setDecorations(editor, helmNewDecorations);
       disposablesRef.current = helmNewDisposables;
