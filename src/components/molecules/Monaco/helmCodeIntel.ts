@@ -22,7 +22,7 @@ export const getHelmValueRanges = (code: string | undefined): RangeAndValue[] =>
     return ranges;
   }
 
-  const valuesMatches = code?.matchAll(/\s.Values.+?(?=\s.)/g);
+  const valuesMatches = code?.matchAll(/\s.Values.+?(?=\s.|}})/g);
   if (!valuesMatches) {
     return ranges;
   }
