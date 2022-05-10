@@ -53,24 +53,24 @@ import {StartupFlag} from '@utils/startupFlag';
 import * as S from './App.styled';
 import AppContext from './AppContext';
 
+const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
 const PluginManager = React.lazy(() => import('@components/organisms/PluginManager'));
+const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
-const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
-const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
-const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -376,19 +376,19 @@ const App = () => {
         {isUpdateNoticeVisible && <UpdateNotice />}
 
         <Suspense fallback={null}>
+          {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
+          {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
           {isQuickSearchActionsVisible && <QuickSearchActions />}
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
-          {isAboutModalVisible && <AboutModal />}
-          {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {showReleaseNotes && (
             <Modal
               width="900px"
