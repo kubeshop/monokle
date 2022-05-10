@@ -11,6 +11,7 @@ export const UpdateNoticeContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: 0;
+  z-index: 100;
   background: linear-gradient(90deg, #15395b 0%, #2c2c2c 100%);
   border-radius: 4px;
   color: white;
