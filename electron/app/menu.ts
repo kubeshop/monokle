@@ -12,6 +12,7 @@ import {
   openAboutModal,
   openCreateProjectModal,
   openFolderExplorer,
+  openKeyboardShortcutsModal,
   openNewResourceWizard,
   resetLayout,
   setMonacoEditor,
@@ -19,12 +20,11 @@ import {
   toggleStartProjectPane,
   zoomIn,
   zoomOut,
-  openKeyboardShortcutsModal,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {defineHotkey} from '@utils/defineHotkey';
 
+import {defineHotkey} from '@utils/defineHotkey';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
