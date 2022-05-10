@@ -1,5 +1,9 @@
 import {K8sResource} from '@models/k8sresource';
 
+export type FakeStore = {
+  main: FakeMainState;
+};
+
 export type FakeMainState = {
   diff: Diff;
   deviceId: string;

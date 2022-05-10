@@ -1,9 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 import {useWindowSize} from 'react-use';
 
 import {Button, Checkbox, Col, Divider, Dropdown, Input, Menu, Modal, Row, Space, Tag, Tooltip} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {ClearOutlined, DownOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -17,7 +18,7 @@ import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import {DiffData, FakeMainState, ResourceSetData} from './DiffState';
+import {DiffData, FakeStore, ResourceSet, ResourceSetData} from './DiffState';
 
 type Props = {
   visible: boolean;
@@ -46,7 +47,7 @@ export function DiffModal({visible, onClose}: Props) {
   //   return state.main.deviceId;
   // });
   const sizeProps = useModalSize();
-  const current = useSelector((state: {main: FakeMainState}) => {
+  const current = useSelector((state: FakeStore) => {
     return state.main.diff.current;
   });
 
@@ -63,16 +64,16 @@ export function DiffModal({visible, onClose}: Props) {
       <p>deviceId: {deviceId}</p>
       <Button onClick={() => dispatch(deviceIdUpdated())}>update deviceId</Button> */}
 
-      <DiffActionBar disabled={false} />
+      <DiffActionBar />
 
       <div style={{height: 'calc(100% - 66px)', position: 'relative'}}>
         <Row>
           <Col span={11}>
-            <DiffSetSelector />
+            <ResourceSetSelector side="left" />
           </Col>
           <Col span={2} />
           <Col span={11}>
-            <DiffSetSelector />
+            <ResourceSetSelector side="right" />
           </Col>
         </Row>
 
@@ -195,6 +196,10 @@ function DiffComparisonList({data}: {data: DiffData}) {
     return result;
   }, [data.comparisons]);
 
+  const handleSelect = useCallback((id: string, checked: boolean) => {
+    console.log('dispatch ComparisonSelected', {id, value: checked});
+  }, []);
+
   return (
     <div>
       {rows.map(row => {
@@ -224,7 +229,7 @@ function DiffComparisonList({data}: {data: DiffData}) {
           <ComparisonRow key={id}>
             <Col span={11}>
               <ResourceDiv>
-                <Checkbox style={{marginRight: 16}} />
+                <Checkbox style={{marginRight: 16}} onChange={e => handleSelect(id, e.target.checked)} />
                 <ResourceNamespace>{namespace}</ResourceNamespace>
                 <ResourceName $isActive={leftActive}>{name}</ResourceName>
               </ResourceDiv>
@@ -431,10 +436,42 @@ const DiffSetSelectorDiv = styled.div`
   margin-bottom: 16px;
 `;
 
-function DiffSetSelector() {
+const resourceSetLabelMap: Record<ResourceSet['type'], string> = {
+  local: 'Local',
+  cluster: 'Cluster',
+  helm: 'Helm Preview',
+  kustomize: 'Kustomize',
+};
+
+function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
+  const resourceSet = useSelector((state: FakeStore) => {
+    const view = state.main.diff.current.view;
+    return side === 'left' ? view.leftSet : view.rightSet;
+  });
+
+  const handleSelect = useCallback(
+    (value: string) => {
+      console.log('dispatch ResourceSetSelected', {side, value});
+    },
+    [side]
+  );
+
+  const handleRefresh = useCallback(() => {
+    console.log('dispatch ResourceSetRefreshed', {side});
+  }, [side]);
+
+  const handleClear = useCallback(() => {
+    console.log('dispatch ResourceSetCleared', {side});
+  }, [side]);
+
   const menu = (
     <Menu>
-      <Menu.Item>Placeholder</Menu.Item>
+      <Menu.Item key="local" onClick={() => handleSelect('local')}>
+        Local
+      </Menu.Item>
+      <Menu.Item key="cluster" onClick={() => handleSelect('cluster')}>
+        Cluster
+      </Menu.Item>
     </Menu>
   );
 
@@ -442,18 +479,18 @@ function DiffSetSelector() {
     <DiffSetSelectorDiv>
       <Dropdown overlay={menu}>
         <Button style={{width: 180, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-          Choose...
+          {resourceSet ? resourceSetLabelMap[resourceSet.type] : 'Choose...'}
           <DownOutlined />
         </Button>
       </Dropdown>
 
       <div>
-        <Tooltip title="TODO_PLACEHOLDER" placement="bottom">
-          <Button type="link" size="middle" icon={<ReloadOutlined />} />
+        <Tooltip title="Reload resources" placement="bottom">
+          <Button type="link" size="middle" icon={<ReloadOutlined />} onClick={handleRefresh} />
         </Tooltip>
 
-        <Tooltip title="TODO_PLACEHOLDER" placement="bottom">
-          <Button type="link" size="middle" icon={<ClearOutlined />} />
+        <Tooltip title="Clear resources" placement="bottom">
+          <Button type="link" size="middle" icon={<ClearOutlined />} onClick={handleClear} />
         </Tooltip>
       </div>
     </DiffSetSelectorDiv>
@@ -479,21 +516,45 @@ const ActionBarRightDiv = styled.div`
   align-items: center;
 `;
 
-const ActionBarCheckbox = styled(Checkbox)`
-  /* color: #5a5a5a; */
-`;
+function DiffActionBar() {
+  const disabled = false;
+  const namespaces = ['default', 'demo'];
 
-function DiffActionBar({disabled}: {disabled: boolean}) {
+  const handleSelectAll = useCallback((event: CheckboxChangeEvent) => {
+    const value = event.target.checked;
+    console.log('dispatch ComparisonAllSelected', {value});
+  }, []);
+
+  const handleSelectNamespace = useCallback((namespace: string) => {
+    console.log('dispatch FilterUpdated', {namespace});
+  }, []);
+
+  const handleSaveView = useCallback(() => {
+    console.log('dispatch ViewSaved');
+  }, []);
+
+  const handleLoadView = useCallback(() => {
+    console.log('dispatch ViewLoaded');
+  }, []);
+
   const menu = (
     <Menu>
-      <Menu.Item>Placeholder</Menu.Item>
+      {namespaces.map(namespace => {
+        return (
+          <Menu.Item key={namespace} onClick={() => handleSelectNamespace(namespace)}>
+            {namespace}
+          </Menu.Item>
+        );
+      })}
     </Menu>
   );
 
   return (
     <ActionBarDiv>
       <div>
-        <ActionBarCheckbox disabled={disabled}>Select all</ActionBarCheckbox>
+        <Checkbox disabled={disabled} onChange={handleSelectAll}>
+          Select all
+        </Checkbox>
       </div>
 
       <ActionBarRightDiv>
@@ -511,9 +572,13 @@ function DiffActionBar({disabled}: {disabled: boolean}) {
 
           <Divider type="vertical" style={{height: 28}} />
 
-          <Button disabled={disabled}>Save Diff</Button>
+          <Button disabled={disabled} onClick={handleSaveView}>
+            Save Diff
+          </Button>
 
-          <Button disabled={disabled}>Load Diff</Button>
+          <Button disabled={disabled} onClick={handleLoadView}>
+            Load Diff
+          </Button>
         </Space>
       </ActionBarRightDiv>
     </ActionBarDiv>
@@ -534,7 +599,9 @@ function DiffModalFooter({onClose}: {onClose: () => void}) {
     <StyledButtonsContainer>
       <div />
 
-      <Button onClick={onClose}>Close</Button>
+      <Button type="link" onClick={onClose}>
+        Close
+      </Button>
     </StyledButtonsContainer>
   );
 }
