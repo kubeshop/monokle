@@ -4,6 +4,7 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
+import {listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
@@ -49,7 +50,11 @@ const rootReducer: typeof appReducer = (state, action) => {
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares).concat(sectionBlueprintMiddleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware()
+      .prepend(listenerMiddleware.middleware)
+      .concat(middlewares)
+      .concat(sectionBlueprintMiddleware),
 });
 
 export default store;
