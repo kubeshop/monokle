@@ -57,6 +57,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
     kustomizeCommand: state.projectConfig?.settings?.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig?.settings?.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.projectConfig?.settings?.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
     createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
     setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
@@ -82,6 +83,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.settings.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
     createDefaultObjects: state.settings.createDefaultObjects,
     setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
@@ -116,6 +118,9 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
             : undefined,
           hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
             ? settings.hideExcludedFilesInFileExplorer
+            : undefined,
+          hideUnsupportedFilesInFileExplorer: _.isBoolean(settings.hideUnsupportedFilesInFileExplorer)
+            ? settings.hideUnsupportedFilesInFileExplorer
             : undefined,
           enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
             ? settings.enableHelmWithKustomize

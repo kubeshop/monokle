@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -129,10 +130,17 @@ export const Settings = ({
     }
   };
 
-  const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
+  const onChangeHideExcludedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
     setLocalConfig({
       ...localConfig,
       settings: {...localConfig?.settings, hideExcludedFilesInFileExplorer: e.target.checked},
+    });
+  };
+
+  const onChangeHideUnsupportedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, hideUnsupportedFilesInFileExplorer: e.target.checked},
     });
   };
 
@@ -379,6 +387,16 @@ export const Settings = ({
           Hide excluded files
         </Checkbox>
       </S.Div>
+
+      <S.Div>
+        <Checkbox
+          checked={Boolean(localConfig?.settings?.hideUnsupportedFilesInFileExplorer)}
+          onChange={onChangeHideUnsupportedFilesInFileExplorer}
+        >
+          Hide unsupported files
+        </Checkbox>
+      </S.Div>
+
       <S.Div>
         <S.Span>Helm Preview Mode</S.Span>
         <Tooltip title={HelmPreviewModeTooltip}>
@@ -447,29 +465,6 @@ export const Settings = ({
           Allow editing resources
         </Checkbox>
       </S.Div>
-      {/* <StyledDiv>
-        <StyledSpan>Theme</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
-          <Radio.Button value={Themes.Dark}>Dark</Radio.Button>
-          <Radio.Button value={Themes.Light}>Light</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Text Size</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.textSize}>
-          <Radio.Button value={TextSizes.Large}>Large</Radio.Button>
-          <Radio.Button value={TextSizes.Medium}>Medium</Radio.Button>
-          <Radio.Button value={TextSizes.Small}>Small</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Language</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.language}>
-          <Space direction="vertical">
-            <Radio value={Languages.English}>English</Radio>
-          </Space>
-        </Radio.Group>
-      </StyledDiv> */}
     </>
   );
 };

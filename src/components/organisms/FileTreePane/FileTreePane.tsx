@@ -52,6 +52,7 @@ const createNode = (
   fileMap: FileMapType,
   resourceMap: ResourceMapType,
   hideExcludedFilesInFileExplorer: boolean,
+  hideUnsupportedFilesInFileExplorer: boolean,
   fileOrFolderContainedInFilter: string | undefined,
   rootFolderName: string
 ): TreeNode => {
@@ -102,6 +103,7 @@ const createNode = (
             fileMap,
             resourceMap,
             hideExcludedFilesInFileExplorer,
+            hideUnsupportedFilesInFileExplorer,
             fileOrFolderContainedInFilter,
             rootFolderName
           )
@@ -112,6 +114,13 @@ const createNode = (
           }
 
           return !childEntry.isExcluded;
+        })
+        .filter(childEntry => {
+          if (!hideUnsupportedFilesInFileExplorer || childEntry.isFolder) {
+            return childEntry;
+          }
+
+          return childEntry.isSupported;
         });
     }
     node.isFolder = true;
@@ -138,27 +147,28 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const dispatch = useAppDispatch();
+  const configState = useAppSelector(state => state.config);
+  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
-  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
-  const configState = useAppSelector(state => state.config);
-  const scanExcludes = useAppSelector(scanExcludesSelector);
+
+  const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
   const fileIncludes = useAppSelector(fileIncludesSelector);
-  const isCollapsed = expandedFolders.length === 0;
-  const {hideExcludedFilesInFileExplorer} = useAppSelector(settingsSelector);
+  const scanExcludes = useAppSelector(scanExcludesSelector);
 
   const treeRef = useRef<any>();
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
+  const isCollapsed = expandedFolders.length === 0;
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -189,6 +199,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
         fileMap,
         resourceMap,
         Boolean(hideExcludedFilesInFileExplorer),
+        Boolean(hideUnsupportedFilesInFileExplorer),
         fileOrFolderContainedInFilter,
         rootFolderName
       );
@@ -199,6 +210,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     resourceMap,
     fileMap,
     hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer,
     fileOrFolderContainedInFilter,
     rootFolderName,
     dispatch,
