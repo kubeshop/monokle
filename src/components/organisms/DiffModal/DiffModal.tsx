@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import React, {useCallback, useMemo} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useWindowSize} from 'react-use';
 
 import {Button, Checkbox, Col, Divider, Dropdown, Input, Menu, Modal, Row, Space, Tag, Tooltip} from 'antd';
@@ -11,6 +11,14 @@ import {ClearOutlined, DownOutlined, ReloadOutlined} from '@ant-design/icons';
 import {groupBy} from 'lodash';
 import styled from 'styled-components';
 
+import {
+  CompareState,
+  resourceSetCleared,
+  resourceSetRefreshed,
+  resourceSetSelected,
+  selectCompareStatus,
+} from '@redux/reducers/compare';
+
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import DiffDoubleFigure from '@assets/DiffDoubleFigure.svg';
@@ -18,7 +26,7 @@ import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import {DiffData, FakeStore, ResourceSet, ResourceSetData} from './DiffState';
+import {DiffData, ResourceSet, ResourceSetData} from './DiffState';
 
 type Props = {
   visible: boolean;
@@ -41,14 +49,15 @@ const FloatingFigure = styled.div`
   pointer-events: none;
 `;
 
-export function DiffModal({visible, onClose}: Props) {
-  // const dispatch = useDispatch();
-  // const deviceId = useSelector<{main: FakeMainState}, string>(state => {
-  //   return state.main.deviceId;
-  // });
+export type PartialStore = {
+  compare: CompareState;
+};
+
+export default function DiffModal({visible, onClose}: Props) {
   const sizeProps = useModalSize();
-  const current = useSelector((state: FakeStore) => {
-    return state.main.diff.current;
+  const status = useSelector((state: PartialStore) => selectCompareStatus(state.compare));
+  const current = useSelector((state: PartialStore) => {
+    return state.compare.current;
   });
 
   return (
@@ -60,10 +69,6 @@ export function DiffModal({visible, onClose}: Props) {
       footer={<DiffModalFooter onClose={onClose} />}
       {...sizeProps}
     >
-      {/* <p>Some there </p>
-      <p>deviceId: {deviceId}</p>
-      <Button onClick={() => dispatch(deviceIdUpdated())}>update deviceId</Button> */}
-
       <DiffActionBar />
 
       <div style={{height: 'calc(100% - 66px)', position: 'relative'}}>
@@ -77,7 +82,7 @@ export function DiffModal({visible, onClose}: Props) {
           </Col>
         </Row>
 
-        {!current.left && !current.right ? (
+        {status === 'selecting' ? (
           <Row style={{height: 'calc(100% - 72px)'}}>
             <DiffFigure
               src={DiffDoubleFigure}
@@ -85,7 +90,7 @@ export function DiffModal({visible, onClose}: Props) {
               description="Choose a local resource, Kustomize / Helm preview or a cluster in any of the sides to start your diff."
             />
           </Row>
-        ) : current.left !== undefined && current.right === undefined ? (
+        ) : current.left && !current.right ? (
           <>
             <ListRow style={{height: 'calc(100% - 72px)'}}>
               <Col span={11}>
@@ -109,17 +114,16 @@ export function DiffModal({visible, onClose}: Props) {
               <p>Stuff will come here</p>
             </Col>
           </Row>
-        ) : current.diff ? (
+        ) : status === 'comparing' ? (
           <Row>
             <Col span={24}>
-              <DiffComparisonList data={current.diff} />
+              <p>comparing..</p>
             </Col>
           </Row>
         ) : (
           <Row>
             <Col span={24}>
-              <p>Something unexpected went wrong.</p>
-              <p>-- button to reset view --</p>
+              <DiffComparisonList data={current.diff!} />
             </Col>
           </Row>
         )}
@@ -444,25 +448,27 @@ const resourceSetLabelMap: Record<ResourceSet['type'], string> = {
 };
 
 function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
-  const resourceSet = useSelector((state: FakeStore) => {
-    const view = state.main.diff.current.view;
+  const dispatch = useDispatch();
+  const resourceSet = useSelector((state: PartialStore) => {
+    const view = state.compare.current.view;
     return side === 'left' ? view.leftSet : view.rightSet;
   });
 
   const handleSelect = useCallback(
-    (value: string) => {
-      console.log('dispatch ResourceSetSelected', {side, value});
+    (type: string) => {
+      const value: ResourceSet = type === 'local' ? {type: 'local'} : {type: 'cluster', context: 'somecontext'};
+      dispatch(resourceSetSelected({side, value}));
     },
-    [side]
+    [dispatch, side]
   );
 
   const handleRefresh = useCallback(() => {
-    console.log('dispatch ResourceSetRefreshed', {side});
-  }, [side]);
+    dispatch(resourceSetRefreshed({side}));
+  }, [dispatch, side]);
 
   const handleClear = useCallback(() => {
-    console.log('dispatch ResourceSetCleared', {side});
-  }, [side]);
+    dispatch(resourceSetCleared({side}));
+  }, [dispatch, side]);
 
   const menu = (
     <Menu>

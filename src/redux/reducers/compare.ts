@@ -9,10 +9,13 @@ import {startAppListening} from '@redux/listeners/base';
 
 import {basicDeploymentFixture} from '@components/organisms/DiffModal/__test__/fixtures/basicDeployment';
 
+import faker from '@faker-js/faker';
+
 /* * * * * * * * * * * * * *
  * State definition
  * * * * * * * * * * * * * */
 export type CompareState = {
+  isOpen: boolean;
   views: SavedDiffView[];
   current: {
     view: DiffView | SavedDiffView;
@@ -107,6 +110,7 @@ export type ResourceComparison =
  * Initial state
  * * * * * * * * * * * * * */
 const initialState: CompareState = {
+  isOpen: false,
   views: [],
   current: {
     view: {
@@ -121,10 +125,17 @@ const initialState: CompareState = {
 /* * * * * * * * * * * * * *
  * Slice definition
  * * * * * * * * * * * * * */
-const slice = createSlice({
+export const compareSlice = createSlice({
   name: 'compare',
   initialState,
   reducers: {
+    compareToggled: (state, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload === undefined) {
+        state.isOpen = !state.isOpen;
+      } else {
+        state.isOpen = action.payload;
+      }
+    },
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
     },
@@ -153,20 +164,24 @@ const slice = createSlice({
         };
       } else {
         state.current.view.rightSet = value;
-        state.current.left = {
+        state.current.right = {
           loading: true,
           error: false,
           resources: [],
         };
       }
     },
-    resourceSetCleared: (state, action: PayloadAction<{side: CompareSide}>) => {
-      if (action.payload.side === 'left') {
+    resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
+      const side = action.payload.side;
+      if (['left', 'both'].includes(side)) {
         state.current.view.leftSet = undefined;
         state.current.left = undefined;
-      } else {
+        state.current.diff = undefined;
+      }
+      if (['right', 'both'].includes(side)) {
         state.current.view.rightSet = undefined;
         state.current.right = undefined;
+        state.current.diff = undefined;
       }
     },
     resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
@@ -184,6 +199,15 @@ const slice = createSlice({
         loading: false,
         resources,
       };
+
+      const leftReady = state.current.left && !state.current.left.loading && !state.current.left.error;
+      const rightReady = state.current.right && !state.current.right.loading && !state.current.right.error;
+      if (leftReady && rightReady) {
+        state.current.diff = {
+          loading: true,
+          comparisons: [],
+        };
+      }
     },
     resourceSetFetchFailed: (state, action: PayloadAction<{side: CompareSide; reason: string}>) => {
       const {side, reason} = action.payload;
@@ -195,14 +219,21 @@ const slice = createSlice({
         resources: [],
       };
     },
+    resourceSetCompared: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+      state.current.diff = {
+        loading: false,
+        comparisons: action.payload.comparisons,
+      };
+    },
   },
 });
 
 /* * * * * * * * * * * * * *
  * Export
  * * * * * * * * * * * * * */
-export default slice.reducer;
+export default compareSlice.reducer;
 export const {
+  compareToggled,
   filterUpdated,
   operationUpdated,
   resourceSetCleared,
@@ -210,17 +241,37 @@ export const {
   resourceSetSelected,
   resourceSetFetchFailed,
   resourceSetFetched,
-} = slice.actions;
+  resourceSetCompared,
+} = compareSlice.actions;
+
+/* * * * * * * * * * * * * *
+ * Selectors
+ * * * * * * * * * * * * * */
+export type CompareStatus = 'selecting' | 'comparing' | 'compared';
+export const selectCompareStatus = (state: CompareState): CompareStatus => {
+  const c = state.current;
+
+  const empty = !c.left && !c.right;
+  const leftSuccess = c.left && !c.left.loading && !c.left.error;
+  const rightSuccess = c.right && !c.right.loading && !c.right.error;
+  if (empty || !leftSuccess || !rightSuccess) {
+    return 'selecting';
+  }
+
+  const diffSuccess = c.diff && !c.diff.loading;
+  return diffSuccess ? 'compared' : 'comparing';
+};
 
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 startAppListening({
   matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed),
-  effect: (action, {dispatch}) => {
+  effect: async (action, {dispatch, delay}) => {
     const side = (action as any).payload.side;
     try {
       console.log('fetching resources...', {trigger: action.type, side});
+      await delay(2000);
 
       const resources = times(20, () => basicDeploymentFixture());
 
@@ -229,5 +280,36 @@ startAppListening({
       const reason = err instanceof Error ? err.message : 'unknown failure';
       dispatch(resourceSetFetchFailed({side, reason}));
     }
+  },
+});
+
+startAppListening({
+  actionCreator: resourceSetFetched,
+  effect: async (action, {dispatch, delay, getState}) => {
+    const status = selectCompareStatus(getState().compare);
+    if (status !== 'comparing') return;
+
+    await delay(400);
+
+    const comparisons: ResourceComparison[] = [
+      {
+        id: faker.datatype.uuid(),
+        isMatch: true,
+        left: basicDeploymentFixture(),
+        right: basicDeploymentFixture(), // not actually a match but it suffices..
+        isDifferent: true,
+      },
+      {
+        id: faker.datatype.uuid(),
+        isMatch: true,
+        left: basicDeploymentFixture(),
+        right: basicDeploymentFixture(), // not actually a match but it suffices..
+        isDifferent: false,
+      },
+      {id: faker.datatype.uuid(), isMatch: false, left: basicDeploymentFixture(), right: undefined},
+      {id: faker.datatype.uuid(), isMatch: false, left: undefined, right: basicDeploymentFixture()},
+    ];
+
+    dispatch(resourceSetCompared({comparisons}));
   },
 });

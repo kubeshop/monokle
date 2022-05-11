@@ -1,7 +1,7 @@
 import {K8sResource} from '@models/k8sresource';
 
 export type FakeStore = {
-  main: FakeMainState;
+  compare: FakeMainState;
 };
 
 export type FakeMainState = {

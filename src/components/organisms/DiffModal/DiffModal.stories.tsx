@@ -7,7 +7,7 @@ import {times} from 'lodash';
 
 import faker from '@faker-js/faker';
 
-import {DiffModal} from './DiffModal';
+import DiffModal from './DiffModal';
 import {FakeMainState} from './DiffState';
 import {basicDeploymentFixture} from './__test__/fixtures/basicDeployment';
 import {diffStateFixture} from './__test__/fixtures/difState';
