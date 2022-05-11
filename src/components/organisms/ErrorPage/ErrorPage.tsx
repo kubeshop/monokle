@@ -1,11 +1,10 @@
 import {shell} from 'electron';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {FallbackProps} from 'react-error-boundary';
 
 import {Button, Space} from 'antd';
 
-import {AnimatePresence} from 'framer-motion';
 import newGithubIssueUrl from 'new-github-issue-url';
 
 import {logToFile} from '@utils/logToFile';
@@ -13,6 +12,7 @@ import {logToFile} from '@utils/logToFile';
 import crashFigure from '@assets/figures/crash.svg';
 
 import * as S from './ErrorPage.styled';
+import {ErrorStack} from './ErrorStack';
 
 export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => {
   const createGitHubIssue = useCallback(() => {
@@ -50,37 +50,3 @@ export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) 
     </S.ErrorContainer>
   );
 };
-
-function ErrorStack({error}: {error: Error}) {
-  const [showError, setShowError] = useState<boolean>(false);
-
-  return (
-    <S.ErrorStack>
-      <S.ErrorButton type="link" onClick={() => setShowError(!showError)}>
-        <Space>
-          Show error stack <S.DownOutlined size={4} />
-        </Space>
-      </S.ErrorButton>
-      <AnimatePresence initial={false}>
-        {showError && (
-          <S.ErrorStackContent
-            key="content"
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
-            variants={{
-              open: {opacity: 1, height: 200},
-              collapsed: {opacity: 0, height: 0},
-            }}
-            transition={{duration: 0.6}}
-          >
-            <code>{error.message}</code>
-            <pre>
-              <code>{error.stack}</code>
-            </pre>
-          </S.ErrorStackContent>
-        )}
-      </AnimatePresence>
-    </S.ErrorStack>
-  );
-}
