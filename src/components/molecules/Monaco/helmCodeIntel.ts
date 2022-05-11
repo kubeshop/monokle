@@ -8,10 +8,10 @@ interface RangeAndValue {
 export const getObjectKeys = (obj: any, prefix = ''): string[] =>
   Object.keys(obj).reduce((res: any, el) => {
     if (Array.isArray(obj[el])) {
-      return res;
+      return [...res, prefix + el];
     }
     if (typeof obj[el] === 'object' && obj[el] !== null) {
-      return [...res, ...getObjectKeys(obj[el], `${prefix + el}.`)];
+      return [...res, prefix + el, ...getObjectKeys(obj[el], `${prefix + el}.`)];
     }
     return [...res, prefix + el];
   }, []);
