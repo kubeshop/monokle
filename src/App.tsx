@@ -71,7 +71,7 @@ const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@organisms/DiffModal'));
+const CompareModal = React.lazy(() => import('@components/organisms/CompareModal'));
 
 const App = () => {
   const dispatch = useDispatch();

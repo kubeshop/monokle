@@ -7,7 +7,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {startAppListening} from '@redux/listeners/base';
 
-import {basicDeploymentFixture} from '@components/organisms/DiffModal/__test__/fixtures/basicDeployment';
+import {basicDeploymentFixture} from '@components/organisms/CompareModal/__test__/fixtures/basicDeployment';
 
 import faker from '@faker-js/faker';
 
