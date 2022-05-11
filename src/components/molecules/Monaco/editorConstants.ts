@@ -10,6 +10,7 @@ export enum GlyphDecorationTypes {
   IncomingRef,
   OutgoingRef,
   PolicyIssue,
+  ErrorRef,
 }
 
 export enum InlineDecorationTypes {
@@ -38,6 +39,10 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
   [GlyphDecorationTypes.PolicyIssue]: {
     glyphMarginClassName: 'monokleEditorPolicyIssueGlyphClass',
     glyphMarginHoverMessage: {value: 'Policy issue'},
+  },
+  [GlyphDecorationTypes.ErrorRef]: {
+    glyphMarginClassName: 'monokleEditorErrorRefGlyphClass',
+    glyphMarginHoverMessage: {value: 'Error ref'},
   },
 };
 

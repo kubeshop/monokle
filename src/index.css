@@ -65,13 +65,22 @@ code {
   transition: all 0.25s ease;
 }
 
+.monokleEditorErrorRefGlyphClass {
+  background: #e84749;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
+  margin-left: 15px;
+}
+
 .monokleEditorUnsatisfiedRefGlyphClass {
   background: #f3ea62;
   height: 10px !important;
   width: 10px !important;
   border-radius: 7px;
   margin-top: 4px;
-  margin-left: 13px;
+  margin-left: 15px;
 }
 
 .monokleEditorUnsatisfiedRefInlineClass {
@@ -114,7 +123,7 @@ code {
   width: 10px !important;
   border-radius: 7px;
   margin-top: 4px;
-  margin-left: 13px;
+  margin-left: 15px;
 }
 
 .monokleEditorPolicyIssueInlineClass {
