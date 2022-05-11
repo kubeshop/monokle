@@ -7,6 +7,7 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 import {listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
+import {compareSlice} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
@@ -36,6 +37,7 @@ const appReducer = combineReducers({
   navigator: navigatorSlice.reducer,
   uiCoach: uiCoachSlice.reducer,
   extension: extensionSlice.reducer,
+  compare: compareSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

@@ -21,6 +21,7 @@ import {Size} from '@models/window';
 import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
+import {compareToggled} from '@redux/reducers/compare';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {
@@ -70,6 +71,7 @@ const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
+const CompareModal = React.lazy(() => import('@organisms/DiffModal'));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -94,6 +96,7 @@ const App = () => {
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
+  const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
@@ -318,13 +321,17 @@ const App = () => {
     dispatch(reprocessAllResources());
   }, [k8sVersion, dispatch]);
 
-  const previewConfigurationDrawerOnClose = () => {
+  const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
-  };
+  }, [dispatch]);
 
-  const onCloseReleaseNotesDrawer = () => {
+  const onCloseReleaseNotesDrawer = useCallback(() => {
     dispatch(closeReleaseNotesDrawer());
-  };
+  }, [dispatch]);
+
+  const onCloseCompareModal = useCallback(() => {
+    dispatch(compareToggled(false));
+  }, [dispatch]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
@@ -379,6 +386,7 @@ const App = () => {
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
+          {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}

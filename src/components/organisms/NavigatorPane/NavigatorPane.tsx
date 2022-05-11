@@ -23,7 +23,7 @@ import Colors from '@styles/Colors';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import ClusterCompareButton from './ClusterCompareButton';
+import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
@@ -103,7 +103,8 @@ const NavPane: React.FC<Props> = ({height}) => {
               </Badge>
             </Tooltip>
 
-            <ClusterCompareButton />
+            <CompareButton />
+            {/* <ClusterCompareButton /> */}
           </S.TitleBarRightButtons>
         </S.TitleBar>
       )}
