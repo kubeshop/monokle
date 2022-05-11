@@ -5,7 +5,7 @@ import {configureStore, createSlice} from '@reduxjs/toolkit';
 
 import {v4 as uuid} from 'uuid';
 
-import {FakeMainState} from '../../DiffState';
+import {FakeMainState} from '../../CompareState';
 
 type Props = {
   mainState: Partial<FakeMainState>;

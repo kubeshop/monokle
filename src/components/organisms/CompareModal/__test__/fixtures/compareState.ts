@@ -1,9 +1,9 @@
 import {isArray, mergeWith} from 'lodash';
 import {PartialDeep} from 'type-fest';
 
-import {FakeMainState} from '../../DiffState';
+import {FakeMainState} from '../../CompareState';
 
-export function diffStateFixture(args?: PartialDeep<FakeMainState>): Partial<FakeMainState> {
+export function compareStateFixture(args?: PartialDeep<FakeMainState>): Partial<FakeMainState> {
   const defaults = {
     diff: {
       views: [],

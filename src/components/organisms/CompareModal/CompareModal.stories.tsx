@@ -7,10 +7,10 @@ import {times} from 'lodash';
 
 import faker from '@faker-js/faker';
 
-import DiffModal from './DiffModal';
-import {FakeMainState} from './DiffState';
+import DiffModal from './CompareModal';
+import {FakeMainState} from './CompareState';
 import {basicDeploymentFixture} from './__test__/fixtures/basicDeployment';
-import {diffStateFixture} from './__test__/fixtures/difState';
+import {compareStateFixture} from './__test__/fixtures/compareState';
 import {Mockstore} from './__test__/utils/mockStore';
 
 export function Default({scenario}: {scenario: string}) {
@@ -32,8 +32,8 @@ export function Default({scenario}: {scenario: string}) {
 }
 
 const SCENARIOS: Record<string, Partial<FakeMainState>> = {
-  empty: diffStateFixture(),
-  left: diffStateFixture({
+  empty: compareStateFixture(),
+  left: compareStateFixture({
     diff: {
       current: {
         view: {
@@ -49,7 +49,7 @@ const SCENARIOS: Record<string, Partial<FakeMainState>> = {
       },
     },
   }),
-  comparison: diffStateFixture({
+  comparison: compareStateFixture({
     diff: {
       current: {
         view: {

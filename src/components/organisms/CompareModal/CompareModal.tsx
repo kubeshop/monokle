@@ -26,7 +26,7 @@ import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import {DiffData, ResourceSet, ResourceSetData} from './DiffState';
+import {DiffData, ResourceSet, ResourceSetData} from './CompareState';
 
 type Props = {
   visible: boolean;
