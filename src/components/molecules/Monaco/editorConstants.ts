@@ -46,7 +46,7 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
     inlineClassName: 'monokleEditorUnsatisfiedRefInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Left,
-      color: '#ad8b00',
+      color: Colors.yellow7,
     },
   },
   [InlineDecorationTypes.SatisfiedRef]: {
@@ -60,7 +60,7 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
     inlineClassName: 'monokleEditorPolicyIssueInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Left,
-      color: Colors.redError,
+      color: Colors.red7,
     },
   },
 };
