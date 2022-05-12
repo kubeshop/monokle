@@ -12,6 +12,7 @@ export const DownOutlined = styled(DownOutlinedBase)`
 `;
 
 export const ErrorStack = styled.div`
+  width: 700px;
   margin-bottom: 6px;
 `;
 
@@ -22,6 +23,6 @@ export const ErrorButton = styled(Button)`
 
 export const ErrorStackContent = styled(motion.section)`
   height: 100%;
-  overflow-y: auto;
+  overflow: auto;
   ${GlobalScrollbarStyle}
 `;
