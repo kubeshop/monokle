@@ -32,7 +32,7 @@ export function ErrorStack({error}: Props) {
             transition={{duration: 0.6}}
           >
             <code>{error.message}</code>
-            <pre>
+            <pre style={{marginBottom: 0}}>
               <code>{error.stack}</code>
             </pre>
           </S.ErrorStackContent>
