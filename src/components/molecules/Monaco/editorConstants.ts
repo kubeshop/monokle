@@ -42,7 +42,6 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
   },
   [GlyphDecorationTypes.ErrorRef]: {
     glyphMarginClassName: 'monokleEditorErrorRefGlyphClass',
-    glyphMarginHoverMessage: {value: 'Error ref'},
   },
 };
 
