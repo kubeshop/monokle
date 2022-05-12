@@ -9,8 +9,7 @@ import 'antd/dist/antd.less';
 import * as log from 'loglevel';
 
 import '@redux/ipcRendererRedux';
-import {setLoadingProject} from '@redux/reducers/appConfig';
-import store, {resetStore} from '@redux/store';
+import store from '@redux/store';
 import '@redux/storeListeners';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
@@ -26,17 +25,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 
 ReactDOM.render(
   <Provider store={store}>
-    <ErrorBoundary
-      FallbackComponent={ErrorPage}
-      onReset={() => {
-        store.dispatch(resetStore());
-
-        // Immediately on startup an effect is performed.
-        // Skip all and go to new/recent projects to have best chance of a recovery.
-        // See src/App.tsx:131 onExecutedFrom
-        store.dispatch(setLoadingProject(false));
-      }}
-    >
+    <ErrorBoundary FallbackComponent={ErrorPage}>
       <App />
     </ErrorBoundary>
   </Provider>,

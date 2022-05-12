@@ -3,17 +3,13 @@ import {useMemo} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {activeProjectSelector} from '@redux/selectors';
 
-import {FeatureFlag, useFeatureFlags} from '@utils/features';
-
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
-import PaneManagerRightMenu from './PaneManagerRightMenu';
 import PaneManagerSplitView from './PaneManagerSplitView';
 
 import * as S from './styled';
 
 const PaneManager: React.FC = () => {
-  const {ShowRightMenu} = useFeatureFlags();
   const activeProject = useAppSelector(activeProjectSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -24,14 +20,8 @@ const PaneManager: React.FC = () => {
       return '1fr';
     }
 
-    let gridTemplateColumns = 'max-content 1fr';
-
-    if (ShowRightMenu) {
-      gridTemplateColumns += ' max-content';
-    }
-
-    return gridTemplateColumns;
-  }, [activeProject, isStartProjectPaneVisible, ShowRightMenu]);
+    return 'max-content 1fr';
+  }, [activeProject, isStartProjectPaneVisible]);
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
@@ -47,10 +37,6 @@ const PaneManager: React.FC = () => {
       ) : (
         <StartProjectPage />
       )}
-
-      <FeatureFlag name="ActionsPaneFooter">
-        <PaneManagerRightMenu />
-      </FeatureFlag>
     </S.PaneManagerContainer>
   );
 };

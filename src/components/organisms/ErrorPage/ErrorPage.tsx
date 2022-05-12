@@ -1,4 +1,4 @@
-import {shell} from 'electron';
+import {ipcRenderer, shell} from 'electron';
 
 import {useCallback, useEffect} from 'react';
 import {FallbackProps} from 'react-error-boundary';
@@ -14,7 +14,7 @@ import crashFigure from '@assets/figures/crash.svg';
 import * as S from './ErrorPage.styled';
 import {ErrorStack} from './ErrorStack';
 
-export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => {
+export const ErrorPage: React.FC<FallbackProps> = ({error}) => {
   const createGitHubIssue = useCallback(() => {
     const url = newGithubIssueUrl({
       user: 'kubeshop',
@@ -31,6 +31,10 @@ export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) 
     logToFile.error(error);
   }, [error]);
 
+  const onRestart = useCallback(() => {
+    ipcRenderer.send('force-reload');
+  }, []);
+
   return (
     <S.ErrorContainer>
       <S.Figure src={crashFigure} />
@@ -43,7 +47,7 @@ export const ErrorPage: React.FC<FallbackProps> = ({error, resetErrorBoundary}) 
         <Button type="default" onClick={createGitHubIssue}>
           Help us by creating an automatic GitHub issue
         </Button>
-        <Button type="primary" onClick={resetErrorBoundary}>
+        <Button type="primary" onClick={onRestart}>
           Back to Monokle
         </Button>
       </Space>
