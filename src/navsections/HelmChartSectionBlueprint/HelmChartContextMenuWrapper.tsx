@@ -20,7 +20,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const onClickShowFile = () => {
     dispatch(setLeftMenuSelection('file-explorer'));
     dispatch(setSelectingFile(true));
-    dispatch(selectFile({filePath: itemInstance.id}));
+    dispatch(selectFile({filePath: itemInstance.meta.filePath || itemInstance.id}));
   };
 
   const menu = (

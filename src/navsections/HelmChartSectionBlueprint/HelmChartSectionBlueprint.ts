@@ -348,6 +348,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       customization: {
         prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
       },
     },
     customization: {
