@@ -2,8 +2,6 @@ import React from 'react';
 
 import {Menu} from 'antd';
 
-import styled from 'styled-components';
-
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,12 +15,7 @@ import ContextMenu from '@components/molecules/ContextMenu';
 
 import Colors from '@styles/Colors';
 
-const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-`;
+import {StyledActionsMenuIconContainer} from '@src/navsections/HelmChartSectionBlueprint/HelmChartContextMenu.styled';
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
