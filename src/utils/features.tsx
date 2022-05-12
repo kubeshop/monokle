@@ -21,7 +21,8 @@ type Props = {
 };
 
 export const FeatureFlag: React.FC<Props> = ({name, children, fallback = null}) => {
-  return name ? <>{children}</> : <>{fallback}</>;
+  const isEnabled = FEATURES[name];
+  return isEnabled ? <>{children}</> : <>{fallback}</>;
 };
 
 export function useFeatureFlags(): typeof FEATURES {
