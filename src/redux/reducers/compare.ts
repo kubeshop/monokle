@@ -273,7 +273,12 @@ startAppListening({
       console.log('fetching resources...', {trigger: action.type, side});
       await delay(2000);
 
-      const resources = times(20, () => basicDeploymentFixture());
+      if (Math.random() > 0.75) {
+        dispatch(resourceSetFetchFailed({side, reason: 'forced error'}));
+        return;
+      }
+
+      const resources = times(40, () => basicDeploymentFixture());
 
       dispatch(resourceSetFetched({side, resources}));
     } catch (err) {

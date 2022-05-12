@@ -4,44 +4,18 @@ import {useWindowSize} from 'react-use';
 
 import {Col, Modal, Row} from 'antd';
 
-import styled from 'styled-components';
-
 import {CompareState, selectCompareStatus} from '@redux/reducers/compare';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
-import DiffDoubleFigure from '@assets/DiffDoubleFigure.svg';
-import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
-
-import Colors from '@styles/Colors';
-
 import {DiffActionBar} from './CompareActionBar';
-import {DiffFigure} from './CompareFigure';
 import {DiffModalFooter} from './CompareModalFooter';
+import {CompareModalSelecting} from './CompareModalSelecting';
 import {DiffComparisonList} from './ComparisonList';
-import {DiffSetList} from './ResourceList';
 import {ResourceSetSelector} from './ResourceSetSelector';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
 };
-
-const ListRow = styled(Row)`
-  margin-right: -23px;
-  overflow: auto;
-  ${GlobalScrollbarStyle}
-`;
-
-const FloatingFigure = styled.div`
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 45%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-`;
 
 export type PartialStore = {
   compare: CompareState;
@@ -77,37 +51,7 @@ export default function DiffModal({visible, onClose}: Props) {
         </Row>
 
         {status === 'selecting' ? (
-          <Row style={{height: 'calc(100% - 72px)'}}>
-            <DiffFigure
-              src={DiffDoubleFigure}
-              title="Compare (almost) anything!"
-              description="Choose a local resource, Kustomize / Helm preview or a cluster in any of the sides to start your diff."
-            />
-          </Row>
-        ) : current.left && !current.right ? (
-          <>
-            <ListRow style={{height: 'calc(100% - 72px)'}}>
-              <Col span={11}>
-                <DiffSetList data={current.left} showCheckbox />
-              </Col>
-            </ListRow>
-
-            <FloatingFigure>
-              <DiffFigure src={DiffSingleFigure} description="Now, something here" color={Colors.grey8} />
-            </FloatingFigure>
-          </>
-        ) : current.right && !current.left ? (
-          <Row>
-            <Col span={11}>
-              <DiffFigure src={DiffSingleFigure} description="Now, something here" color={Colors.grey8} />
-            </Col>
-
-            <Col span={2} />
-
-            <Col span={11}>
-              <p>Stuff will come here</p>
-            </Col>
-          </Row>
+          <CompareModalSelecting />
         ) : status === 'comparing' ? (
           <Row>
             <Col span={24}>

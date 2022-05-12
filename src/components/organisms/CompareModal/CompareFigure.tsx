@@ -1,3 +1,5 @@
+import {ReactNode} from 'react';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -11,33 +13,24 @@ const FigureDiv = styled.div`
   justify-content: 'center';
 `;
 
-const FigureTitle = styled.h1`
+export const FigureTitle = styled.h1`
+  color: ${props => props.color ?? Colors.whitePure};
   font-size: medium;
   font-weight: bold;
 `;
 
-const FigureDescription = styled.p`
+export const FigureDescription = styled.p`
+  color: ${props => props.color ?? Colors.whitePure};
   font-size: small;
   font-weight: normal;
 `;
 
-export function DiffFigure({
-  src,
-  title,
-  description,
-  color = Colors.whitePure,
-}: {
-  src: string;
-  title?: string;
-  description?: string;
-  color?: Colors;
-}) {
+export function DiffFigure({src, children}: {src: string; children?: ReactNode}) {
   return (
     <FigureDiv
       style={{
         display: 'flex',
         flexDirection: 'column',
-        pointerEvents: 'none',
         width: '100%',
         height: '100%',
         alignItems: 'center',
@@ -45,11 +38,7 @@ export function DiffFigure({
       }}
     >
       <img src={src} />
-
-      <div style={{width: 350, paddingTop: 24, textAlign: 'center'}}>
-        {title ? <FigureTitle style={{color}}>{title}</FigureTitle> : null}
-        {description ? <FigureDescription style={{color}}>{description} </FigureDescription> : null}
-      </div>
+      <div style={{width: 350, paddingTop: 24, textAlign: 'center'}}>{children}</div>
     </FigureDiv>
   );
 }

@@ -8,7 +8,6 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import {Header} from '../PageHeader/styled';
 import {DiffData} from './CompareState';
 
 type HeaderItem = {
@@ -31,6 +30,13 @@ const HeaderRow = styled(Row)`
   height: 28px;
   margin-left: 8px;
   font-size: 16px;
+`;
+
+const Header = styled.h1`
+  padding: 0;
+  margin-bottom: 0px;
+  font-size: 18px;
+  line-height: 22px;
 `;
 
 const ComparisonRow = styled(Row)`
