@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.3](https://github.com/kubeshop/monokle/compare/v1.7.3-nightly-2022-05-12.0...v1.7.3) (2022-05-12)
+
+
+### Features
+
+* fix allow editing in cluster mode ([e0a89cf](https://github.com/kubeshop/monokle/commit/e0a89cf92ba2e38a7682eac746255fee1246701f))
+
+
+### Bug Fixes
+
+* force reload on error page ([bade869](https://github.com/kubeshop/monokle/commit/bade86916d1c3cfd11ce9ac8afeada5d09b7054b))
+* hotfix feature flags ([bcc450c](https://github.com/kubeshop/monokle/commit/bcc450c5d133da263c1ffb105397d3d10b137258))
+
 ### [1.7.2](https://github.com/kubeshop/monokle/compare/v1.7.2-nightly-2022-05-05.0...v1.7.2) (2022-05-05)
 
 
