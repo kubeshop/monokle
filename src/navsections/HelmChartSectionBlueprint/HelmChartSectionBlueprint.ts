@@ -13,6 +13,8 @@ import {isDefined} from '@utils/filter';
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
+import HelmChartContextMenu from './HelmChartContextMenu';
+import HelmChartContextMenuWrapper from './HelmChartContextMenuWrapper';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
@@ -195,6 +197,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           component: ItemPrefix,
         },
         lastItemMarginBottom: 0,
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
       },
     },
   };

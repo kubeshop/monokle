@@ -58,7 +58,6 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
       component: RootHelmChartsSectionEmptyDisplay,
     },
     nameSize: 16,
-    // contextMenuWrapper: {component: KustomizationContextMenuWrapper, options: {isVisibleOnHover: false}},
   },
 };
 
