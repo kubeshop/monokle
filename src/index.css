@@ -65,6 +65,10 @@ code {
   transition: all 0.25s ease;
 }
 
+div.hover-row {
+  padding: 5px;
+}
+
 .monokleEditorErrorRefGlyphClass {
   background: #e84749;
   height: 10px !important;
