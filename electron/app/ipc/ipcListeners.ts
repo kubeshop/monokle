@@ -39,7 +39,14 @@ import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
 
 import {getAmplitudeClient} from '../amplitude';
 import autoUpdater from '../autoUpdater';
-import {checkNewVersion, interpolateTemplate, runCommand, saveFileDialog, selectFileDialog} from '../commands';
+import {
+  checkNewVersion,
+  forceLoad as forceReload,
+  interpolateTemplate,
+  runCommand,
+  saveFileDialog,
+  selectFileDialog,
+} from '../commands';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -238,6 +245,10 @@ ipcMain.on('quit-and-install', () => {
   trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+});
+
+ipcMain.on('force-reload', async (event: any) => {
+  forceReload(event);
 });
 
 ipcMain.on('confirm-action', (event: any, args) => {
