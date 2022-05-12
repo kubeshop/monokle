@@ -4,8 +4,6 @@ import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
 
@@ -19,8 +17,6 @@ export const List = styled.ol`
   padding: 0;
   margin: 0;
   overflow-y: auto;
-
-  ${GlobalScrollbarStyle}
 `;
 
 export const NavigatorPaneContainer = styled.div`
