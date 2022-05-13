@@ -1,4 +1,4 @@
-import {Middleware, configureStore} from '@reduxjs/toolkit';
+import {Middleware, combineReducers, configureStore, createAction} from '@reduxjs/toolkit';
 
 import {createLogger} from 'redux-logger';
 
@@ -24,17 +24,31 @@ if (process.env.NODE_ENV === `development`) {
   middlewares.push(reduxLoggerMiddleware);
 }
 
+export const resetStore = createAction('app/reset');
+
+const appReducer = combineReducers({
+  config: configSlice.reducer,
+  main: mainSlice.reducer,
+  alert: alertSlice.reducer,
+  logs: logsSlice.reducer,
+  ui: uiSlice.reducer,
+  navigator: navigatorSlice.reducer,
+  uiCoach: uiCoachSlice.reducer,
+  extension: extensionSlice.reducer,
+});
+
+const rootReducer: typeof appReducer = (state, action) => {
+  if (resetStore.match(action)) {
+    // Invoking reducers with `undefined` sets initial state.
+    // see https://stackoverflow.com/questions/35622588/how-to-reset-the-state-of-a-redux-store/35641992#35641992
+    return appReducer(undefined, action);
+  }
+
+  return appReducer(state, action);
+};
+
 const store = configureStore({
-  reducer: {
-    config: configSlice.reducer,
-    main: mainSlice.reducer,
-    alert: alertSlice.reducer,
-    logs: logsSlice.reducer,
-    ui: uiSlice.reducer,
-    navigator: navigatorSlice.reducer,
-    uiCoach: uiCoachSlice.reducer,
-    extension: extensionSlice.reducer,
-  },
+  reducer: rootReducer,
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares).concat(sectionBlueprintMiddleware),
 });
 

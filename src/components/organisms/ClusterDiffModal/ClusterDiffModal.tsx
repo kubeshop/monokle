@@ -44,7 +44,9 @@ const SkeletonContainer = styled.div`
 const StyledModal = styled(Modal)<{previewing: boolean}>`
   & .ant-modal-body {
     padding: 8px;
+    overflow-x: hidden;
   }
+
   ${props =>
     props.previewing &&
     `

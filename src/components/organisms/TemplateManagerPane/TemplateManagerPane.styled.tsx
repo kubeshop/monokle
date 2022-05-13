@@ -2,8 +2,6 @@ import {Input, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 export const Container = styled.div``;
@@ -37,7 +35,6 @@ export const TemplatesContainer = styled.div<{$height?: number}>`
   grid-row-gap: 25px;
   overflow-y: auto;
   padding: 0px 16px 10px 16px;
-  ${GlobalScrollbarStyle};
 `;
 
 export const Skeleton = styled(RawSkeleton)`

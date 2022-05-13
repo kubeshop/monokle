@@ -5,7 +5,6 @@ import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
-import 'antd/dist/antd.less';
 
 import lodash from 'lodash';
 import log from 'loglevel';

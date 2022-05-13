@@ -15,18 +15,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.reflex-container > .reflex-element::-webkit-scrollbar {
-  width: 8px;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-track {
-  background: #141414;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-thumb {
-  background: #303030;
-}
-
 .reflex-container.vertical > .reflex-splitter {
   width: 2px;
   background-color: #262626;
@@ -253,18 +241,6 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   width: 0 !important;
   height: 0 !important;
   background-color: transparent !important;
-}
-
-.ant-table-body::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.ant-table-body::-webkit-scrollbar-track {
-  background: #141414 !important;
-}
-
-.ant-table-body::-webkit-scrollbar-thumb {
-  background: #303030 !important;
 }
 
 .ant-table-body .ant-table-row .ant-table-cell {

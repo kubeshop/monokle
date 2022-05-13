@@ -20,7 +20,6 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -39,8 +38,6 @@ const FormContainer = styled.div`
   margin: 0px;
   overflow-y: auto;
   overflow-x: hidden;
-
-  ${GlobalScrollbarStyle}
 
   .ant-input[disabled] {
     color: grey;

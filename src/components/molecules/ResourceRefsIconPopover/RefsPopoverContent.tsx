@@ -14,7 +14,6 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
@@ -28,7 +27,6 @@ const Container = styled.div`
   width: 100%;
   max-height: 350px;
   overflow-y: auto;
-  ${GlobalScrollbarStyle}
 `;
 
 const PopoverTitle = styled(Text)`

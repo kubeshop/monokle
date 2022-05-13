@@ -7,25 +7,26 @@ import {RightMenuSelectionType} from '@models/ui';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setRightMenuSelection, toggleRightMenu} from '@redux/reducers/ui';
 
-import featureJson from '@src/feature-flags.json';
+import {useFeatureFlags} from '@utils/features';
 
 import MenuIcon from './MenuIcon';
 import * as S from './PaneManagerRightMenu.styled';
 
 const PaneManagerRightMenu: React.FC = () => {
+  const {ShowRightMenu, ShowGraphView} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
 
   const setRightActiveMenu = (selectedMenu: RightMenuSelectionType) => {
-    if (featureJson.ShowRightMenu) {
-      if (rightMenuSelection === selectedMenu) {
+    if (!ShowRightMenu) return;
+
+    if (rightMenuSelection === selectedMenu) {
+      dispatch(toggleRightMenu());
+    } else {
+      dispatch(setRightMenuSelection(selectedMenu));
+      if (!rightActive) {
         dispatch(toggleRightMenu());
-      } else {
-        dispatch(setRightMenuSelection(selectedMenu));
-        if (!rightActive) {
-          dispatch(toggleRightMenu());
-        }
       }
     }
   };
@@ -37,7 +38,7 @@ const PaneManagerRightMenu: React.FC = () => {
         type="text"
         onClick={() => setRightActiveMenu('graph')}
         icon={<MenuIcon icon={ApartmentOutlined} active={rightActive} isSelected={rightMenuSelection === 'graph'} />}
-        style={{display: featureJson.ShowGraphView ? 'inline' : 'none'}}
+        style={{display: ShowGraphView ? 'inline' : 'none'}}
       />
 
       <Button

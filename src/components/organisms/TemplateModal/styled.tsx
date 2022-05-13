@@ -4,8 +4,6 @@ import {FormOutlined as RawFormOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import TemplateIconSvg from '@assets/TemplateIcon.svg';
 
 import Colors from '@styles/Colors';
@@ -22,7 +20,6 @@ export const FormContainer = styled.div`
   max-height: 500px;
   overflow-y: auto;
   overflow-x: hidden;
-  ${GlobalScrollbarStyle};
 `;
 
 export const FormOutlined = styled(RawFormOutlined)`
@@ -68,7 +65,6 @@ export const StepsContainer = styled.div`
   max-height: 500px;
   overflow-y: auto;
   overflow-x: hidden;
-  ${GlobalScrollbarStyle};
 `;
 
 export const StyledTextArea = styled(Input.TextArea)`
