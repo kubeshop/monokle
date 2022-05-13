@@ -1,18 +1,17 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
-import log from 'loglevel';
 
 import {debounce} from 'lodash';
+import log from 'loglevel';
 
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
-import codeIntel, {codeIntels, ShouldApplyCodeIntelParams} from './codeIntel';
-import {
-  clearDecorations,
-  setDecorations,
-  setMarkers
-} from './editorHelpers';
+import {useAppDispatch} from '@redux/hooks';
+import {setMonacoEditor} from '@redux/reducers/ui';
+
+import codeIntel, {ShouldApplyCodeIntelParams, codeIntels} from './codeIntel';
+import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
   editor: monaco.editor.IStandaloneCodeEditor | null;
@@ -51,6 +50,7 @@ function useCodeIntel(props: CodeIntelProps) {
   const disposablesRef = useRef<monaco.IDisposable[]>([]);
   const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const currentFile = Object.values(fileMap).find(file => selectedPath === file.filePath);
+  const dispatch = useAppDispatch();
 
   const clearCodeIntel = () => {
     if (editor) {
@@ -71,35 +71,37 @@ function useCodeIntel(props: CodeIntelProps) {
       currentFile,
       selectedResource,
     };
-    const codeIntelForFile = codeIntels.find((ci) => ci.shouldApply(shouldApplyParams));
+    const codeIntelForFile = codeIntels.find(ci => ci.shouldApply(shouldApplyParams));
     log.info('codeIntelForFile', codeIntelForFile?.name);
     if (!codeIntelForFile) {
       return;
     }
 
-    codeIntelForFile.codeIntel({
-      currentFile,
-      helmChartMap,
-      helmValuesMap,
-      selectFilePath,
-    }).then((data) => {
-      if (!data) {
-        return;
-      }
-      log.info('data', data);
-      const { newDecorations, newDisposables, newMarkers } = data;
-      if (newDecorations) {
-        idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
-      }
-      if (newDisposables) {
-        disposablesRef.current = newDisposables;
-      }
+    codeIntelForFile
+      .codeIntel({
+        currentFile,
+        helmChartMap,
+        helmValuesMap,
+        selectFilePath,
+      })
+      .then(data => {
+        if (!data) {
+          return;
+        }
+        log.info('data', data);
+        const {newDecorations, newDisposables, newMarkers} = data;
+        if (newDecorations) {
+          idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+        }
+        if (newDisposables) {
+          disposablesRef.current = newDisposables;
+        }
 
-      const model = editor.getModel();
-      if (model && newMarkers) {
-        setMarkers(model, newMarkers);
-      }
-    });
+        const model = editor.getModel();
+        if (model && newMarkers) {
+          setMarkers(model, newMarkers);
+        }
+      });
 
     if (selectedResource) {
       codeIntel
@@ -128,6 +130,13 @@ function useCodeIntel(props: CodeIntelProps) {
         helmValuesMap,
         selectFilePath,
         fileMap,
+        setEditorSelection: ({selection}) => {
+          dispatch(
+            setMonacoEditor({
+              selection,
+            })
+          );
+        },
       });
       idsOfDecorationsRef.current = setDecorations(editor, helmNewDecorations);
       disposablesRef.current = helmNewDisposables;

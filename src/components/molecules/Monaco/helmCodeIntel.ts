@@ -8,10 +8,10 @@ export interface RangeAndValue {
 export const getObjectKeys = (obj: any, prefix = ''): string[] =>
   Object.keys(obj).reduce((res: any, el) => {
     if (Array.isArray(obj[el])) {
-      return res;
+      return [...res, prefix + el];
     }
     if (typeof obj[el] === 'object' && obj[el] !== null) {
-      return [...res, ...getObjectKeys(obj[el], `${prefix + el}.`)];
+      return [...res, prefix + el, ...getObjectKeys(obj[el], `${prefix + el}.`)];
     }
     return [...res, prefix + el];
   }, []);
@@ -22,7 +22,7 @@ export const getHelmValueRanges = (code: string | undefined): RangeAndValue[] =>
     return ranges;
   }
 
-  const valuesMatches = code?.matchAll(/{{\s.Value.+?(?=}})/g);
+  const valuesMatches = code?.matchAll(/\s.Values.+?(?=\s.|}})/g);
   if (!valuesMatches) {
     return ranges;
   }
@@ -45,13 +45,13 @@ export const getHelmValueRanges = (code: string | undefined): RangeAndValue[] =>
 
     const range = new monaco.Range(
       lineNumber + 1,
-      start[0].length + 1,
+      start[0].length + 2,
       lineNumber + 1,
-      start[0].length + matchedValue.length + 3
+      start[0].length + matchedValue.length + 1
     );
     ranges.push({
       range,
-      value: matchedValue.substring(3, matchedValue.length - 1),
+      value: matchedValue.substring(1, matchedValue.length),
     });
   }
 

@@ -1,17 +1,20 @@
 import {monaco} from 'react-monaco-editor';
 
 import fs from 'fs';
-import path from 'path';
+import {get} from 'lodash';
 import log from 'loglevel';
+import path from 'path';
+import {LineCounter, Scalar} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
+import {MonacoSelectionFile, MonacoUiState} from '@models/ui';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
+import {NodeWrapper, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {getHelmValueRanges, getObjectKeys} from '@molecules/Monaco/helmCodeIntel';
@@ -394,12 +397,54 @@ interface ApplyHelmFileArgs {
   helmValuesMap?: HelmValuesMapType;
   selectFilePath: (filePath: string) => void;
   fileMap: FileMapType;
+  setEditorSelection: (selection: Partial<MonacoUiState>) => void;
 }
 
 interface HelmValueMatch {
   path: string;
   keyPath: string;
+  value: any;
+  linePosition: RefPosition;
 }
+
+const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
+  const keyParts = keyPath.split('.');
+  const keyStart = keyParts.shift();
+  const pair = contents.items.find((item: any) => {
+    return item.key.value === keyStart;
+  });
+  if (!pair) {
+    return;
+  }
+
+  if (!keyParts.length) {
+    return pair.value;
+  }
+
+  return getYamlScalar(pair.value, keyParts.join('.'));
+};
+
+interface GoToValuesFileParams {
+  helmMatch: HelmValueMatch;
+  selectFilePath: (filePath: string) => void;
+  setEditorSelection: (selection: Partial<MonacoUiState>) => void;
+}
+
+const goToValuesFile = ({helmMatch, selectFilePath, setEditorSelection}: GoToValuesFileParams) => {
+  selectFilePath(helmMatch.path);
+
+  const selection: MonacoSelectionFile = {
+    type: 'file',
+    filePath: helmMatch.path,
+    range: {
+      startLineNumber: helmMatch.linePosition.line,
+      endLineNumber: helmMatch.linePosition.line,
+      startColumn: helmMatch.linePosition.column,
+      endColumn: helmMatch.linePosition.column + helmMatch.linePosition.length,
+    },
+  };
+  setEditorSelection({selection});
+};
 
 const applyForHelmFile = ({
   code,
@@ -408,6 +453,7 @@ const applyForHelmFile = ({
   helmValuesMap,
   selectFilePath,
   fileMap,
+  setEditorSelection,
 }: ApplyHelmFileArgs) => {
   const helmNewDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const helmNewDisposables: monaco.IDisposable[] = [];
@@ -428,14 +474,24 @@ const applyForHelmFile = ({
 
   valueFilePaths.forEach(valueFilePath => {
     const valueFileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, valueFilePath), 'utf8');
-    const documents = parseAllYamlDocuments(valueFileContent);
-    documents.forEach(doc => {
-      const fileKeyPaths = getObjectKeys(doc.toJS(), '.Values.').map(keyPath => ({
-        path: valueFilePath,
-        keyPath,
-      }));
+    const lineCounter = new LineCounter();
+    const documents = parseAllYamlDocuments(valueFileContent, lineCounter);
+    documents.forEach((doc: any) => {
+      const helmObject = doc.toJS();
+      getObjectKeys(helmObject).forEach(keyPath => {
+        const scalar = getYamlScalar(doc.contents, keyPath);
+        if (!scalar) {
+          return;
+        }
 
-      validKeyPaths.push(...fileKeyPaths);
+        const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+        validKeyPaths.push({
+          value: get(helmObject, keyPath),
+          path: valueFilePath,
+          keyPath: `.Values.${keyPath}`,
+          linePosition: nodeWrapper.getNodePosition(),
+        });
+      });
     });
   });
 
@@ -453,12 +509,16 @@ const applyForHelmFile = ({
       const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
       keyPathsInFile.forEach(keyPathInFile => {
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-          `Go to: ${keyPathInFile.path}`,
+          `${keyPathInFile.path}`,
           'Select file',
           () => {
-            // @ts-ignore
-            selectFilePath(keyPathInFile.path);
-          }
+            goToValuesFile({
+              selectFilePath,
+              helmMatch: keyPathInFile,
+              setEditorSelection,
+            });
+          },
+          `Value: ${keyPathInFile.value}\n\nGo to `
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
         helmNewDisposables.push(commandDisposable);
@@ -470,7 +530,11 @@ const applyForHelmFile = ({
         : `Found this value in ${keyPathsInFile[0].path}`;
       if (!hasMultipleLinks) {
         const linkDisposable = createLinkProvider(helmValueRange.range, 'Open file', () => {
-          selectFilePath(keyPathsInFile[0].path);
+          goToValuesFile({
+            selectFilePath,
+            helmMatch: keyPathsInFile[0],
+            setEditorSelection,
+          });
         });
         helmNewDisposables.push(linkDisposable);
       }
@@ -517,7 +581,7 @@ interface CodeIntelApply {
 
 const resourceCodeIntel: CodeIntelApply = {
   name: 'resource',
-  shouldApply: (params) => {
+  shouldApply: params => {
     return Boolean(params.selectedResource);
   },
   codeIntel: async () => {
@@ -532,8 +596,7 @@ function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMap
     return;
   }
 
-  return Object.values(helmValuesMap || {})
-    .find((valueFile) => valueFile.filePath === filePath);
+  return Object.values(helmValuesMap || {}).find(valueFile => valueFile.filePath === filePath);
 }
 
 interface HelmMatches {
@@ -546,10 +609,10 @@ interface HelmMatches {
 
 const helmValueCodeIntel: CodeIntelApply = {
   name: 'helmValueFile',
-  shouldApply: (params) => {
+  shouldApply: params => {
     return Boolean(getHelmValueFile(params.currentFile, params.helmValuesMap));
   },
-  codeIntel: async (params) => {
+  codeIntel: async params => {
     const helmValueFile = getHelmValueFile(params.currentFile, params.helmValuesMap);
     if (!helmValueFile || !params.helmChartMap) {
       return;
@@ -561,18 +624,18 @@ const helmValueCodeIntel: CodeIntelApply = {
     }
 
     const placesUsed: HelmMatches[] = [];
-    helmValueFile.values.forEach((helmValue) => {
+    helmValueFile.values.forEach(helmValue => {
       const placeUsed: HelmMatches = {
         locationInValueFile: new monaco.Range(
           helmValue.linePosition.line,
           helmValue.linePosition.column,
           helmValue.linePosition.line,
-          helmValue.linePosition.column + helmValue.linePosition.length,
+          helmValue.linePosition.column + helmValue.linePosition.length
         ),
         uses: [],
       };
-      helmChart.templateFilePaths.forEach((templateFilePath) => {
-        templateFilePath.values.forEach((value) => {
+      helmChart.templateFilePaths.forEach(templateFilePath => {
+        templateFilePath.values.forEach(value => {
           if (helmValue.keyPath !== value.value) {
             return;
           }
@@ -582,7 +645,7 @@ const helmValueCodeIntel: CodeIntelApply = {
               value.range.startLineNumber,
               value.range.endLineNumber,
               value.range.endColumn,
-              value.range.endLineNumber,
+              value.range.endLineNumber
             ),
           });
         });
@@ -595,14 +658,12 @@ const helmValueCodeIntel: CodeIntelApply = {
     const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
     const newDisposables: monaco.IDisposable[] = [];
 
-    placesUsed.forEach((placeUsed) => {
+    placesUsed.forEach(placeUsed => {
       const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
 
-      newDecorations.push(
-        createInlineDecoration(placeUsed.locationInValueFile, InlineDecorationTypes.SatisfiedRef)
-      );
+      newDecorations.push(createInlineDecoration(placeUsed.locationInValueFile, InlineDecorationTypes.SatisfiedRef));
 
-      placeUsed.uses.forEach((use) => {
+      placeUsed.uses.forEach(use => {
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
           `Go to: ${use.filePath}`,
           'Select file',
@@ -615,7 +676,7 @@ const helmValueCodeIntel: CodeIntelApply = {
         newDisposables.push(commandDisposable);
       });
 
-      const fileName = `file${(placeUsed.uses.length === 1 ? '' : 's')}`;
+      const fileName = `file${placeUsed.uses.length === 1 ? '' : 's'}`;
       const hoverCommandMarkdownLinkList = [
         createMarkdownString(`Found this value in ${placeUsed.uses.length} ${fileName}`),
         ...commandMarkdownLinkList,
@@ -637,7 +698,7 @@ const helmValueCodeIntel: CodeIntelApply = {
 
 const helmFileCodeIntel: CodeIntelApply = {
   name: 'helmFile',
-  shouldApply: (params) => {
+  shouldApply: params => {
     return Boolean(params?.currentFile?.helmChartId);
   },
   codeIntel: async () => {
@@ -645,11 +706,7 @@ const helmFileCodeIntel: CodeIntelApply = {
   },
 };
 
-export const codeIntels: CodeIntelApply[] = [
-  resourceCodeIntel,
-  helmValueCodeIntel,
-  helmFileCodeIntel,
-];
+export const codeIntels: CodeIntelApply[] = [resourceCodeIntel, helmValueCodeIntel, helmFileCodeIntel];
 
 export default {
   applyForResource,
