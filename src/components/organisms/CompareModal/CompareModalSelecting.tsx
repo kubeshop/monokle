@@ -7,8 +7,8 @@ import styled from 'styled-components';
 
 import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
-import DiffDoubleFigure from '@assets/DiffDoubleFigure.svg';
-import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
+import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
+import CompareSingleFigure from '@assets/figures/compareSingle.svg';
 import ErrorFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
@@ -85,7 +85,7 @@ export function CompareModalSelecting() {
 
         <FloatingFigure side="right" noEvents={!right?.error}>
           {!right ? (
-            <DiffFigure src={DiffSingleFigure}>
+            <DiffFigure src={CompareSingleFigure}>
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
             </DiffFigure>
           ) : right.error ? (
@@ -111,7 +111,7 @@ export function CompareModalSelecting() {
 
         <FloatingFigure side="left" noEvents={!left?.error}>
           {!left ? (
-            <DiffFigure src={DiffSingleFigure}>
+            <DiffFigure src={CompareSingleFigure}>
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
             </DiffFigure>
           ) : left.error ? (
@@ -126,7 +126,7 @@ export function CompareModalSelecting() {
 
   return (
     <Row style={{height: 'calc(100% - 72px)'}}>
-      <DiffFigure src={DiffDoubleFigure}>
+      <DiffFigure src={CompareDoubleFigure}>
         <FigureTitle>Compare (almost) anything!</FigureTitle>
         <FigureDescription>
           Choose a local resource, Kustomize / Helm preview or a cluster in any of the sides to start your diff.
