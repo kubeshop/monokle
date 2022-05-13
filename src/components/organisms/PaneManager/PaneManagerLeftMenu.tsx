@@ -12,6 +12,7 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
+import {useFeatureFlags} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
@@ -36,6 +37,8 @@ const PaneManagerLeftMenu: React.FC = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
   const isActive = Boolean(activeProject) && (leftActive || leftDrawerVisible);
+
+  const {DockerImagesPane} = useFeatureFlags();
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -159,24 +162,26 @@ const PaneManagerLeftMenu: React.FC = () => {
         </WalkThrough>
       </PaneTooltip>
 
-      <PaneTooltip
-        show={!leftActive || !(leftMenuSelection === 'docker-images-pane')}
-        title="View Docker Images"
-        placement="right"
-      >
-        <MenuButton
-          isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'docker-images-pane'}
-          isActive={isActive}
-          onClick={() => setLeftActiveMenu('docker-images-pane')}
-          disabled={!activeProject}
+      {DockerImagesPane && (
+        <PaneTooltip
+          show={!leftActive || !(leftMenuSelection === 'docker-images-pane')}
+          title="View Docker Images"
+          placement="right"
         >
-          <MenuIcon
-            iconName="docker-images"
-            active={isActive}
+          <MenuButton
             isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'docker-images-pane'}
-          />
-        </MenuButton>
-      </PaneTooltip>
+            isActive={isActive}
+            onClick={() => setLeftActiveMenu('docker-images-pane')}
+            disabled={!activeProject}
+          >
+            <MenuIcon
+              iconName="docker-images"
+              active={isActive}
+              isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'docker-images-pane'}
+            />
+          </MenuButton>
+        </PaneTooltip>
+      )}
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'templates-pane')}
