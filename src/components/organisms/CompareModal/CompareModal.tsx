@@ -4,12 +4,13 @@ import {useWindowSize} from 'react-use';
 
 import {Col, Modal, Row} from 'antd';
 
-import {CompareState, selectCompareStatus} from '@redux/reducers/compare';
+import {CompareState, selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compare';
 
-import {DiffActionBar} from './CompareActionBar';
+import {CompareActionBar} from './CompareActionBar';
+import {CompareModalComparing} from './CompareModalComparing';
 import {DiffModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
-import {DiffComparisonList} from './ComparisonList';
+import {DiffActionBar} from './DiffActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
 
 type Props = {
@@ -24,9 +25,7 @@ export type PartialStore = {
 export default function DiffModal({visible, onClose}: Props) {
   const sizeProps = useModalSize();
   const status = useSelector((state: PartialStore) => selectCompareStatus(state.compare));
-  const current = useSelector((state: PartialStore) => {
-    return state.compare.current;
-  });
+  const diffComparison = useSelector((state: PartialStore) => selectDiffedComparison(state.compare));
 
   return (
     <Modal
@@ -37,7 +36,7 @@ export default function DiffModal({visible, onClose}: Props) {
       footer={<DiffModalFooter onClose={onClose} />}
       {...sizeProps}
     >
-      <DiffActionBar />
+      {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
 
       <div style={{height: 'calc(100% - 66px)', position: 'relative'}}>
         <Row>
@@ -50,21 +49,7 @@ export default function DiffModal({visible, onClose}: Props) {
           </Col>
         </Row>
 
-        {status === 'selecting' ? (
-          <CompareModalSelecting />
-        ) : status === 'comparing' ? (
-          <Row>
-            <Col span={24}>
-              <p>comparing..</p>
-            </Col>
-          </Row>
-        ) : (
-          <Row>
-            <Col span={24}>
-              <DiffComparisonList data={current.diff!} />
-            </Col>
-          </Row>
-        )}
+        {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </div>
     </Modal>
   );
