@@ -4,9 +4,9 @@ import ElectronStore from 'electron-store';
 
 import * as path from 'path';
 
+import {logToFile} from '@utils/logToFile';
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';
-import {logToFile} from "@utils/logToFile";
 
 Object.assign(console, logToFile.functions);
 
