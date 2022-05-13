@@ -1,11 +1,15 @@
 import {useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {Button, Checkbox, Divider, Dropdown, Input, Menu, Space} from 'antd';
-import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DownOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+import {comparisonAllToggled, selectCompareStatus, selectIsAllComparisonSelected} from '@redux/reducers/compare';
+
+import {PartialStore} from './CompareModal';
 
 const ActionBarDiv = styled.div`
   display: flex;
@@ -24,13 +28,15 @@ const ActionBarRightDiv = styled.div`
 `;
 
 export function CompareActionBar() {
-  const disabled = false;
+  const dispatch = useDispatch();
+  const status = useSelector((state: PartialStore) => selectCompareStatus(state.compare));
+  const isAllSelected = useSelector((state: PartialStore) => selectIsAllComparisonSelected(state.compare));
+  const disabled = status === 'selecting';
   const namespaces = ['default', 'demo'];
 
-  const handleSelectAll = useCallback((event: CheckboxChangeEvent) => {
-    const value = event.target.checked;
-    console.log('dispatch ComparisonAllSelected', {value});
-  }, []);
+  const handleSelectAll = useCallback(() => {
+    dispatch(comparisonAllToggled());
+  }, [dispatch]);
 
   const handleSelectNamespace = useCallback((namespace: string) => {
     console.log('dispatch FilterUpdated', {namespace});
@@ -59,7 +65,7 @@ export function CompareActionBar() {
   return (
     <ActionBarDiv>
       <div>
-        <Checkbox disabled={disabled} onChange={handleSelectAll}>
+        <Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
           Select all
         </Checkbox>
       </div>
