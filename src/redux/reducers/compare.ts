@@ -165,8 +165,10 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
+
         state.current.diff = undefined;
         state.current.viewDiff = undefined;
+        state.current.selection = [];
       } else {
         state.current.view.rightSet = value;
         state.current.right = {
@@ -174,8 +176,10 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
+
         state.current.diff = undefined;
         state.current.viewDiff = undefined;
+        state.current.selection = [];
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
@@ -183,14 +187,18 @@ export const compareSlice = createSlice({
       if (['left', 'both'].includes(side)) {
         state.current.view.leftSet = undefined;
         state.current.left = undefined;
+
         state.current.diff = undefined;
         state.current.viewDiff = undefined;
+        state.current.selection = [];
       }
       if (['right', 'both'].includes(side)) {
         state.current.view.rightSet = undefined;
         state.current.right = undefined;
+
         state.current.diff = undefined;
         state.current.viewDiff = undefined;
+        state.current.selection = [];
       }
     },
     resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
@@ -200,9 +208,31 @@ export const compareSlice = createSlice({
         error: false,
         resources: [],
       };
+
+      state.current.diff = undefined;
+      state.current.viewDiff = undefined;
+      state.current.selection = [];
     },
     diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
       state.current.viewDiff = action.payload.id;
+    },
+    comparisonToggled: (state, action: PayloadAction<{id: string}>) => {
+      const {id} = action.payload;
+
+      const index = state.current.selection.findIndex(comparison => comparison === id);
+      if (index === -1) {
+        state.current.selection.push(id);
+      } else {
+        state.current.selection.splice(index, 1);
+      }
+    },
+    comparisonAllToggled: state => {
+      const isAllSelected = selectIsAllComparisonSelected(state);
+      if (isAllSelected) {
+        state.current.selection = [];
+      } else {
+        state.current.selection = state.current.diff?.comparisons.map(c => c.id) ?? [];
+      }
     },
     resourceSetFetched: (state, action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>) => {
       const {side, resources} = action.payload;
@@ -255,6 +285,8 @@ export const {
   resourceSetFetched,
   resourceSetCompared,
   diffViewOpened,
+  comparisonAllToggled,
+  comparisonToggled,
 } = compareSlice.actions;
 
 /* * * * * * * * * * * * * *
@@ -280,6 +312,14 @@ export const selectDiffedComparison = (state: CompareState): MatchingResourceCom
   const comparison = state.current.diff?.comparisons.find(c => c.id === id);
   if (!comparison || !comparison.isMatch) return undefined;
   return comparison;
+};
+
+export const selectIsComparisonSelected = (state: CompareState, id: string): boolean => {
+  return state.current.selection.some(comparisonId => comparisonId === id);
+};
+
+export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
+  return !state.current.diff?.loading && state.current.selection.length === state.current.diff?.comparisons.length;
 };
 
 /* * * * * * * * * * * * * *

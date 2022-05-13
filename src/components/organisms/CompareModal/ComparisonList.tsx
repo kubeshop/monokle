@@ -1,25 +1,26 @@
 /* eslint-disable no-restricted-syntax */
 import {useCallback, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {Button, Checkbox, Col, Row, Tag} from 'antd';
 
 import {groupBy} from 'lodash';
 import styled from 'styled-components';
 
-import {diffViewOpened} from '@redux/reducers/compare';
+import {comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+import {PartialStore} from './CompareModal';
 import {DiffData} from './CompareState';
 
-type HeaderItem = {
+type HeaderData = {
   type: 'header';
   kind: string;
   count: number;
 };
 
-type ComparisonItem = {
+type ComparisonData = {
   type: 'comparison';
   id: string;
   namespace: string;
@@ -35,7 +36,7 @@ const HeaderRow = styled(Row)`
   font-size: 16px;
 `;
 
-const Header = styled.h1`
+const Title = styled.h1`
   padding: 0;
   margin-bottom: 0px;
   font-size: 18px;
@@ -86,14 +87,12 @@ const ResourceNamespace = styled(Tag)`
 `;
 
 export function DiffComparisonList({data}: {data: DiffData}) {
-  const dispatch = useDispatch();
-
   const rows = useMemo(() => {
     const groups = groupBy(data.comparisons, r => {
       if (r.isMatch) return r.left.kind;
       return r.left ? r.left.kind : r.right.kind;
     });
-    const result: Array<HeaderItem | ComparisonItem> = [];
+    const result: Array<HeaderData | ComparisonData> = [];
 
     for (const [kind, comparisons] of Object.entries(groups)) {
       result.push({type: 'header', kind, count: comparisons.length});
@@ -126,68 +125,73 @@ export function DiffComparisonList({data}: {data: DiffData}) {
     return result;
   }, [data.comparisons]);
 
-  const handleSelect = useCallback((id: string, checked: boolean) => {
-    console.log('dispatch ComparisonSelected', {id, value: checked});
-  }, []);
-
-  const handleViewDiff = useCallback(
-    id => {
-      dispatch(diffViewOpened({id}));
-    },
-    [dispatch]
-  );
-
   return (
     <div>
       {rows.map(row => {
-        if (row.type === 'header') {
-          const {kind, count: resourceCount} = row;
-          return (
-            <HeaderRow key={kind}>
-              <Col span={11}>
-                <Header>
-                  {kind} <ResourceCount>{resourceCount}</ResourceCount>
-                </Header>
-              </Col>
-
-              <Col span={2} />
-
-              <Col span={11}>
-                <Header>
-                  {kind} <ResourceCount>{resourceCount}</ResourceCount>
-                </Header>
-              </Col>
-            </HeaderRow>
-          );
-        }
-
-        const {id, namespace, name, leftActive, rightActive, canDiff} = row;
-        return (
-          <ComparisonRow key={id}>
-            <Col span={11}>
-              <ResourceDiv>
-                <Checkbox style={{marginRight: 16}} onChange={e => handleSelect(id, e.target.checked)} />
-                <ResourceNamespace>{namespace}</ResourceNamespace>
-                <ResourceName $isActive={leftActive}>{name}</ResourceName>
-              </ResourceDiv>
-            </Col>
-            <Col span={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-              {canDiff ? (
-                <Button type="primary" shape="round" size="small" onClick={() => handleViewDiff(id)}>
-                  <DiffLabel>diff</DiffLabel>
-                </Button>
-              ) : null}
-            </Col>
-
-            <Col span={11}>
-              <ResourceDiv>
-                <ResourceNamespace>{namespace}</ResourceNamespace>
-                <ResourceName $isActive={rightActive}>{name}</ResourceName>
-              </ResourceDiv>
-            </Col>
-          </ComparisonRow>
+        return row.type === 'header' ? (
+          <HeaderItem key={row.kind} data={row} />
+        ) : (
+          <ComparisonItem key={row.id} data={row} />
         );
       })}
     </div>
+  );
+}
+
+function HeaderItem({data}: {data: HeaderData}) {
+  const {kind, count} = data;
+  return (
+    <HeaderRow key={kind}>
+      <Col span={11}>
+        <Title>
+          {kind} <ResourceCount>{count}</ResourceCount>
+        </Title>
+      </Col>
+
+      <Col span={2} />
+
+      <Col span={11}>
+        <Title>
+          {kind} <ResourceCount>{count}</ResourceCount>
+        </Title>
+      </Col>
+    </HeaderRow>
+  );
+}
+
+function ComparisonItem({data}: {data: ComparisonData}) {
+  const {id, namespace, name, leftActive, rightActive, canDiff} = data;
+  const dispatch = useDispatch();
+  const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
+  const selected = useSelector((state: PartialStore) => selectIsComparisonSelected(state.compare, id));
+
+  const handleViewDiff = useCallback(() => {
+    dispatch(diffViewOpened({id}));
+  }, [dispatch, id]);
+
+  return (
+    <ComparisonRow key={id}>
+      <Col span={11}>
+        <ResourceDiv>
+          <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
+          <ResourceNamespace>{namespace}</ResourceNamespace>
+          <ResourceName $isActive={leftActive}>{name}</ResourceName>
+        </ResourceDiv>
+      </Col>
+      <Col span={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        {canDiff ? (
+          <Button type="primary" shape="round" size="small" onClick={handleViewDiff}>
+            <DiffLabel>diff</DiffLabel>
+          </Button>
+        ) : null}
+      </Col>
+
+      <Col span={11}>
+        <ResourceDiv>
+          <ResourceNamespace>{namespace}</ResourceNamespace>
+          <ResourceName $isActive={rightActive}>{name}</ResourceName>
+        </ResourceDiv>
+      </Col>
+    </ComparisonRow>
   );
 }
