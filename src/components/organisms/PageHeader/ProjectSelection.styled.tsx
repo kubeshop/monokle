@@ -10,8 +10,6 @@ import {
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 export const BackToProjectButton = styled(RawButton)`
@@ -127,5 +125,4 @@ export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;
-  ${GlobalScrollbarStyle}
 `;

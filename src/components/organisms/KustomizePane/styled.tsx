@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 export const KustomizePaneContainer = styled.div`
   height: 100%;
   display: grid;
@@ -15,5 +13,4 @@ export const List = styled.ol`
   padding-bottom: 20px;
   overflow-y: auto;
   margin: 0;
-  ${GlobalScrollbarStyle}
 `;

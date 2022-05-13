@@ -4,8 +4,6 @@ import {WarningOutlined as RawWarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 export const Div = styled.div`
@@ -33,8 +31,7 @@ export const Select = styled(RawSelect)`
 
 export const Collapse = styled(RawCollapse)`
   max-height: 100%;
-  overflow-y: scroll;
-  ${GlobalScrollbarStyle};
+  overflow-y: auto;
 `;
 
 export const OptionContainer = styled.div`
