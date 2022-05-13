@@ -2,6 +2,7 @@ import {monaco} from 'react-monaco-editor';
 
 import fs from 'fs';
 import path from 'path';
+import log from 'loglevel';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -33,6 +34,12 @@ import {
   createMarker,
   getSymbolsBeforePosition,
 } from './editorHelpers';
+
+export interface CodeIntelResponse {
+  newDecorations: monaco.editor.IModelDeltaDecoration[];
+  newDisposables: monaco.IDisposable[];
+  newMarkers?: monaco.editor.IMarkerData[];
+}
 
 export type SymbolsToResourceKindMatcher = {
   resourceKind: string;
@@ -406,6 +413,11 @@ const applyForHelmFile = ({
   const helmNewDisposables: monaco.IDisposable[] = [];
   const helmValueRanges = getHelmValueRanges(code);
 
+  log.info('helmChartMap', helmChartMap);
+  log.info('currentFile', currentFile);
+  log.info('helmValuesMap', helmValuesMap);
+  log.info('helmValueRanges', helmValueRanges);
+
   if (!helmValueRanges.length || !helmValuesMap || !helmChartMap || !currentFile) {
     return {helmNewDisposables, helmNewDecorations};
   }
@@ -482,6 +494,162 @@ const applyForHelmFile = ({
 
   return {helmNewDisposables, helmNewDecorations};
 };
+
+export interface ShouldApplyCodeIntelParams {
+  selectedResource?: K8sResource;
+  currentFile?: FileEntry;
+  helmValuesMap?: HelmValuesMapType;
+}
+
+interface CodeIntelParams {
+  selectedResource?: K8sResource;
+  currentFile?: FileEntry;
+  helmValuesMap?: HelmValuesMapType;
+  helmChartMap?: HelmChartMapType;
+  selectFilePath?: (filePath: string) => void;
+}
+
+interface CodeIntelApply {
+  shouldApply: (params: ShouldApplyCodeIntelParams) => boolean;
+  codeIntel: (params: CodeIntelParams) => Promise<CodeIntelResponse | undefined>;
+  name: string;
+}
+
+const resourceCodeIntel: CodeIntelApply = {
+  name: 'resource',
+  shouldApply: (params) => {
+    return Boolean(params.selectedResource);
+  },
+  codeIntel: async () => {
+    return {} as any;
+  },
+};
+
+function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMapType) {
+  const helmChartId = currentFile?.helmChartId;
+  const filePath = currentFile?.filePath;
+  if (!helmChartId || !filePath) {
+    return;
+  }
+
+  return Object.values(helmValuesMap || {})
+    .find((valueFile) => valueFile.filePath === filePath);
+}
+
+interface HelmMatches {
+  locationInValueFile: monaco.Range;
+  uses: {
+    filePath: string;
+    range: monaco.Range;
+  }[];
+}
+
+const helmValueCodeIntel: CodeIntelApply = {
+  name: 'helmValueFile',
+  shouldApply: (params) => {
+    return Boolean(getHelmValueFile(params.currentFile, params.helmValuesMap));
+  },
+  codeIntel: async (params) => {
+    const helmValueFile = getHelmValueFile(params.currentFile, params.helmValuesMap);
+    if (!helmValueFile || !params.helmChartMap) {
+      return;
+    }
+
+    const helmChart = params.helmChartMap[helmValueFile.helmChartId];
+    if (!helmChart) {
+      return;
+    }
+
+    const placesUsed: HelmMatches[] = [];
+    helmValueFile.values.forEach((helmValue) => {
+      const placeUsed: HelmMatches = {
+        locationInValueFile: new monaco.Range(
+          helmValue.linePosition.line,
+          helmValue.linePosition.column,
+          helmValue.linePosition.line,
+          helmValue.linePosition.column + helmValue.linePosition.length,
+        ),
+        uses: [],
+      };
+      helmChart.templateFilePaths.forEach((templateFilePath) => {
+        templateFilePath.values.forEach((value) => {
+          if (helmValue.keyPath !== value.value) {
+            return;
+          }
+          placeUsed.uses.push({
+            filePath: templateFilePath.filePath,
+            range: new monaco.Range(
+              value.range.startLineNumber,
+              value.range.endLineNumber,
+              value.range.endColumn,
+              value.range.endLineNumber,
+            ),
+          });
+        });
+      });
+      if (placeUsed && placeUsed.uses.length) {
+        placesUsed.push(placeUsed);
+      }
+    });
+
+    const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
+    const newDisposables: monaco.IDisposable[] = [];
+
+    placesUsed.forEach((placeUsed) => {
+      const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
+
+      newDecorations.push(
+        createInlineDecoration(placeUsed.locationInValueFile, InlineDecorationTypes.SatisfiedRef)
+      );
+
+      placeUsed.uses.forEach((use) => {
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+          `Go to: ${use.filePath}`,
+          'Select file',
+          () => {
+            // @ts-ignore
+            params.selectFilePath(use.filePath);
+          }
+        );
+        commandMarkdownLinkList.push(commandMarkdownLink);
+        newDisposables.push(commandDisposable);
+      });
+
+      const fileName = `file${(placeUsed.uses.length === 1 ? '' : 's')}`;
+      const hoverCommandMarkdownLinkList = [
+        createMarkdownString(`Found this value in ${placeUsed.uses.length} ${fileName}`),
+        ...commandMarkdownLinkList,
+      ];
+      if (commandMarkdownLinkList.length) {
+        const hoverDisposable = createHoverProvider(placeUsed.locationInValueFile, hoverCommandMarkdownLinkList);
+        newDisposables.push(hoverDisposable);
+      }
+    });
+
+    log.info('placesUsed', placesUsed);
+
+    return {
+      newDecorations,
+      newDisposables,
+    };
+  },
+};
+
+const helmFileCodeIntel: CodeIntelApply = {
+  name: 'helmFile',
+  shouldApply: (params) => {
+    return Boolean(params?.currentFile?.helmChartId);
+  },
+  codeIntel: async () => {
+    return {} as any;
+  },
+};
+
+export const codeIntels: CodeIntelApply[] = [
+  resourceCodeIntel,
+  helmValueCodeIntel,
+  helmFileCodeIntel,
+];
 
 export default {
   applyForResource,

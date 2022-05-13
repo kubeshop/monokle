@@ -1,6 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
-interface RangeAndValue {
+export interface RangeAndValue {
   range: monaco.Range;
   value: string;
 }

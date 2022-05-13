@@ -23,7 +23,7 @@ import {
   isHelmChartFolder,
   isHelmTemplateFile,
   isHelmValuesFile,
-  processHelmChartFolder,
+  processHelmChartFolder, createHelmFile,
 } from '@redux/services/helm';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -191,7 +191,7 @@ export function readFiles(
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
-        helmChart.templateFilePaths.push(fileEntryPath);
+        createHelmFile(fileEntry, helmChart, fileMap);
       }
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
@@ -207,11 +207,22 @@ export function readFiles(
             fileMap,
             helmChartMap,
             helmValuesMap,
-            depth + 1
+            depth + 1,
+            helmChart,
           );
         }
-      } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
-        createHelmValuesFile(fileEntry, helmChart, helmValuesMap);
+      } else if (helmChart) {
+        if (isHelmValuesFile(fileEntry.name)) {
+          createHelmValuesFile({
+            fileEntry,
+            helmChart,
+            helmValuesMap,
+            fileMap,
+          });
+        } else {
+          // other kind of helm value
+          log.info(`helm file: ${filePath}`);
+        }
       } else if (fileIsIncluded(fileEntry, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
@@ -475,11 +486,21 @@ function findParentFolderEntry(absolutePath: string, fileMap: FileMapType) {
  * Adds a new HelmValuesFile for the specified fileEntry
  */
 
-function addHelmValuesFile(fileEntry: FileEntry, helmChartMap: HelmChartMapType, helmValuesMap: HelmValuesMapType) {
+function addHelmValuesFile(
+  fileEntry: FileEntry,
+  helmChartMap: HelmChartMapType,
+  helmValuesMap: HelmValuesMapType,
+  fileMap: FileMapType,
+) {
   const charts = findContainingHelmCharts(helmChartMap, fileEntry);
 
   if (charts.length > 0) {
-    createHelmValuesFile(fileEntry, charts[0], helmValuesMap);
+    createHelmValuesFile({
+      fileEntry,
+      helmChart: charts[0],
+      helmValuesMap,
+      fileMap,
+    });
     log.info(`Added values file at ${fileEntry.filePath} to helm chart ${charts[0].name}`);
   } else {
     log.warn(`Could not find Helm Chart for values file ${fileEntry.filePath}, ignoring..`);
@@ -510,7 +531,12 @@ function addHelmChartFile(
 
         const valuesFileEntry = fileMap[valuesFilePath];
         if (valuesFileEntry) {
-          createHelmValuesFile(valuesFileEntry, helmChart, helmValuesMap);
+          createHelmValuesFile({
+            fileEntry: valuesFileEntry,
+            helmChart,
+            helmValuesMap,
+            fileMap,
+          });
         }
       }
     });
@@ -534,7 +560,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
 
   // Add a Helm values file
   if (isHelmValuesFile(fileEntry.filePath)) {
-    addHelmValuesFile(fileEntry, state.helmChartMap, state.helmValuesMap);
+    addHelmValuesFile(fileEntry, state.helmChartMap, state.helmValuesMap, state.fileMap);
   }
   // if this file is the Helm Chart entry file, create a new helm chart and add existing values files
   else if (isHelmChartFile(absolutePath)) {
