@@ -6,6 +6,7 @@ const FEATURES = createFeatureFlags(featureJson, {
   ShowGraphView: false,
   ShowRightMenu: false,
   ActionsPaneFooter: false,
+  CompareEverything: false,
 });
 
 function createFeatureFlags<TFeature extends string>(
@@ -17,7 +18,7 @@ function createFeatureFlags<TFeature extends string>(
 
 type Props = {
   name: keyof typeof FEATURES;
-  fallback?: React.ComponentType | null;
+  fallback?: React.ReactNode | null;
 };
 
 export const FeatureFlag: React.FC<Props> = ({name, children, fallback = null}) => {
