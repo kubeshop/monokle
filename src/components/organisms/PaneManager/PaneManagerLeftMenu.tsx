@@ -159,6 +159,17 @@ const PaneManagerLeftMenu: React.FC = () => {
         </WalkThrough>
       </PaneTooltip>
 
+      <PaneTooltip show={!leftDrawerVisible} title="View Docker Images" placement="right">
+        <MenuButton
+          isSelected={leftDrawerVisible}
+          isActive={isActive}
+          // onClick={() => dispatch(toggleValidationDrawer())}
+          disabled={!activeProject}
+        >
+          <MenuIcon iconName="docker-images" active={isActive} isSelected={leftDrawerVisible} />
+        </MenuButton>
+      </PaneTooltip>
+
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'templates-pane')}
         title="View Templates"
