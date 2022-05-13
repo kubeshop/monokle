@@ -46,9 +46,7 @@ export function CompareModalSelecting() {
   const leftSuccess = left && !left.loading && !left.error;
   const rightSuccess = right && !right.loading && !right.error;
 
-  const handleRetry = useCallback((side: CompareSide) => {
-    dispatch(resourceSetRefreshed({side}));
-  }, []);
+  const handleRetry = useCallback((side: CompareSide) => dispatch(resourceSetRefreshed({side})), [dispatch]);
 
   const ErrorFigureLeft = () => (
     <DiffFigure src={ErrorFigure}>
@@ -110,13 +108,7 @@ export function CompareModalSelecting() {
           <Col span={13} />
 
           <Col span={11}>
-            {right.loading ? (
-              <div>loading...</div>
-            ) : right.error ? (
-              <ErrorFigureRight />
-            ) : (
-              <DiffSetList data={right} showCheckbox />
-            )}
+            {right.loading ? <div>loading...</div> : right.error ? <ErrorFigureRight /> : <DiffSetList data={right} />}
           </Col>
         </ListRow>
 

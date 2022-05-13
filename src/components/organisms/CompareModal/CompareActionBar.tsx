@@ -11,7 +11,7 @@ const ActionBarDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px;
+  padding: 9px 12px;
   margin-bottom: 6px;
   border-radius: 2px;
   background-color: #31393c80;
@@ -23,7 +23,7 @@ const ActionBarRightDiv = styled.div`
   align-items: center;
 `;
 
-export function DiffActionBar() {
+export function CompareActionBar() {
   const disabled = false;
   const namespaces = ['default', 'demo'];
 

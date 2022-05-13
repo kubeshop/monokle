@@ -1,10 +1,13 @@
 /* eslint-disable no-restricted-syntax */
 import {useCallback, useMemo} from 'react';
+import {useDispatch} from 'react-redux';
 
 import {Button, Checkbox, Col, Row, Tag} from 'antd';
 
 import {groupBy} from 'lodash';
 import styled from 'styled-components';
+
+import {diffViewOpened} from '@redux/reducers/compare';
 
 import Colors, {FontColors} from '@styles/Colors';
 
@@ -83,6 +86,8 @@ const ResourceNamespace = styled(Tag)`
 `;
 
 export function DiffComparisonList({data}: {data: DiffData}) {
+  const dispatch = useDispatch();
+
   const rows = useMemo(() => {
     const groups = groupBy(data.comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -125,6 +130,13 @@ export function DiffComparisonList({data}: {data: DiffData}) {
     console.log('dispatch ComparisonSelected', {id, value: checked});
   }, []);
 
+  const handleViewDiff = useCallback(
+    id => {
+      dispatch(diffViewOpened({id}));
+    },
+    [dispatch]
+  );
+
   return (
     <div>
       {rows.map(row => {
@@ -161,7 +173,7 @@ export function DiffComparisonList({data}: {data: DiffData}) {
             </Col>
             <Col span={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               {canDiff ? (
-                <Button type="primary" shape="round" size="small">
+                <Button type="primary" shape="round" size="small" onClick={() => handleViewDiff(id)}>
                   <DiffLabel>diff</DiffLabel>
                 </Button>
               ) : null}

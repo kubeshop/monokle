@@ -2,6 +2,8 @@ import {v4} from 'uuid';
 
 import {K8sResource} from '@models/k8sresource';
 
+import {jsonToYaml} from '@utils/yaml';
+
 import {faker} from '@faker-js/faker';
 
 type Args = {
@@ -78,7 +80,7 @@ function createK8sResource(raw: KubernetesObject, options: CreateK8sResourceOpti
     kind: raw.kind,
     name: raw.metadata.name,
     content: raw,
-    text: JSON.stringify(raw), // fixme
+    text: jsonToYaml(raw),
     isHighlighted: options.isHighlighted ?? false,
     isSelected: options.isSelected ?? false,
     filePath: `unsaved://${id}`, // fixme

@@ -23,6 +23,7 @@ export type CompareState = {
     right?: ResourceSetData;
     diff?: DiffData;
     selection: string[];
+    viewDiff?: string; // comparisonId
   };
 };
 
@@ -97,14 +98,16 @@ export type ResourceComparison =
       left: undefined;
       right: K8sResource;
     }
-  | {
-      // appears in intersection | union
-      id: string;
-      isMatch: true;
-      isDifferent: boolean;
-      left: K8sResource;
-      right: K8sResource;
-    };
+  | MatchingResourceComparison;
+
+type MatchingResourceComparison = {
+  // appears in intersection | union
+  id: string;
+  isMatch: true;
+  isDifferent: boolean;
+  left: K8sResource;
+  right: K8sResource;
+};
 
 /* * * * * * * * * * * * * *
  * Initial state
@@ -162,6 +165,8 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
+        state.current.diff = undefined;
+        state.current.viewDiff = undefined;
       } else {
         state.current.view.rightSet = value;
         state.current.right = {
@@ -169,6 +174,8 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
+        state.current.diff = undefined;
+        state.current.viewDiff = undefined;
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
@@ -177,11 +184,13 @@ export const compareSlice = createSlice({
         state.current.view.leftSet = undefined;
         state.current.left = undefined;
         state.current.diff = undefined;
+        state.current.viewDiff = undefined;
       }
       if (['right', 'both'].includes(side)) {
         state.current.view.rightSet = undefined;
         state.current.right = undefined;
         state.current.diff = undefined;
+        state.current.viewDiff = undefined;
       }
     },
     resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
@@ -191,6 +200,9 @@ export const compareSlice = createSlice({
         error: false,
         resources: [],
       };
+    },
+    diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
+      state.current.viewDiff = action.payload.id;
     },
     resourceSetFetched: (state, action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>) => {
       const {side, resources} = action.payload;
@@ -242,12 +254,13 @@ export const {
   resourceSetFetchFailed,
   resourceSetFetched,
   resourceSetCompared,
+  diffViewOpened,
 } = compareSlice.actions;
 
 /* * * * * * * * * * * * * *
  * Selectors
  * * * * * * * * * * * * * */
-export type CompareStatus = 'selecting' | 'comparing' | 'compared';
+export type CompareStatus = 'selecting' | 'comparing';
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
 
@@ -258,8 +271,15 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
     return 'selecting';
   }
 
-  const diffSuccess = c.diff && !c.diff.loading;
-  return diffSuccess ? 'compared' : 'comparing';
+  return 'comparing';
+};
+
+export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
+  const id = state.current.viewDiff;
+  if (!id) return undefined;
+  const comparison = state.current.diff?.comparisons.find(c => c.id === id);
+  if (!comparison || !comparison.isMatch) return undefined;
+  return comparison;
 };
 
 /* * * * * * * * * * * * * *
@@ -275,7 +295,7 @@ startAppListening({
 
     try {
       console.log('fetching resources for left...', {trigger: action.type, side});
-      await delay(2500);
+      await delay(150);
 
       if (Math.random() > 0.75) {
         dispatch(resourceSetFetchFailed({side: 'left', reason: 'forced error'}));
@@ -303,7 +323,7 @@ startAppListening({
 
     try {
       console.log('fetching resources for right...', {trigger: action.type, side});
-      await delay(2500);
+      await delay(150);
 
       if (Math.random() > 0.75) {
         dispatch(resourceSetFetchFailed({side: 'right', reason: 'forced error'}));
