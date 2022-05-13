@@ -2,8 +2,6 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 export const Tabs = styled(RawTabs)`
   width: 100%;
   height: 100%;
@@ -35,8 +33,6 @@ export const ActionsPaneFooterContainer = styled.div`
 
   & .react-resizable {
     overflow-y: auto;
-
-    ${GlobalScrollbarStyle}
   }
 
   & .custom-handle {

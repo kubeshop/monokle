@@ -13,8 +13,6 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 const {Text} = Typography;
@@ -26,7 +24,6 @@ const Container = styled.div`
   width: 100%;
   max-height: 350px;
   overflow-y: auto;
-  ${GlobalScrollbarStyle}
 `;
 
 const PopoverTitle = styled(Text)`

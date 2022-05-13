@@ -15,18 +15,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.reflex-container > .reflex-element::-webkit-scrollbar {
-  width: 8px;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-track {
-  background: #141414;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-thumb {
-  background: #303030;
-}
-
 .reflex-container.vertical > .reflex-splitter {
   width: 2px;
   background-color: #262626;
@@ -229,18 +217,6 @@ code {
   background-color: transparent !important;
 }
 
-.ant-table-body::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.ant-table-body::-webkit-scrollbar-track {
-  background: #141414 !important;
-}
-
-.ant-table-body::-webkit-scrollbar-thumb {
-  background: #303030 !important;
-}
-
 .ant-table-body .ant-table-row .ant-table-cell {
   background-color: transparent !important;
   border-bottom: none !important;
@@ -303,7 +279,7 @@ code {
 }
 
 .walkthrough .ant-popover-arrow-content {
-  background: #3840CD;
+  background: #3840cd;
   width: 20px;
   height: 20px;
 }
@@ -317,7 +293,7 @@ code {
 
 .ant-modal-close-icon {
   font-size: 14px !important;
-  color: #93989C;
+  color: #93989c;
 }
 .ant-modal-body {
   position: relative;
