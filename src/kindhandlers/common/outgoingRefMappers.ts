@@ -166,6 +166,15 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     type: 'name',
     ...PersistentVolumeClaimTarget,
   },
+  {
+    type: 'image',
+    source: {
+      pathParts: ['image'],
+    },
+    target: {
+      kind: 'monokle://image', // this is not used (maybe needs a refactor later on to make the target optional)
+    },
+  },
 ];
 
 export function createSelectorOutgoingRefMappers(targetResourceKind: string, selectorPathParts?: string[]): RefMapper {
