@@ -4,6 +4,7 @@ export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CreateFolderModal} from './CreateFolderModal';
 export {default as CreateProjectModal} from './CreateProjectModal';
+export {default as DockerImagesPane} from './DockerImagesPane';
 export {default as FileTreePane} from './FileTreePane';
 export {default as HelmPane} from './HelmPane';
 export {default as HotKeysHandler} from './HotKeysHandler';
