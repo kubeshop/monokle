@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import {selectDiffedComparison} from '@redux/reducers/compare';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import {PartialStore} from './CompareModal';
 import {DiffComparisonList} from './ComparisonList';
@@ -66,5 +65,4 @@ export function CompareModalComparing() {
 
 const ListRow = styled(Row)`
   overflow: auto;
-  ${GlobalScrollbarStyle}
 `;

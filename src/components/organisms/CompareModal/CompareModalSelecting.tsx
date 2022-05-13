@@ -7,8 +7,6 @@ import styled from 'styled-components';
 
 import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import DiffDoubleFigure from '@assets/DiffDoubleFigure.svg';
 import DiffSingleFigure from '@assets/DiffSingleFigure.svg';
 import ErrorFigure from '@assets/figures/crash.svg';
@@ -22,7 +20,6 @@ import {DiffSetList} from './ResourceList';
 const ListRow = styled(Row)`
   margin-right: -23px;
   overflow: auto;
-  ${GlobalScrollbarStyle}
 `;
 
 const FloatingFigure = styled.div<{side: 'left' | 'right'; noEvents?: boolean}>`
