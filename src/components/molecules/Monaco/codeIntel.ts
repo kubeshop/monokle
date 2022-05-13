@@ -1,8 +1,9 @@
 import {monaco} from 'react-monaco-editor';
 
 import fs from 'fs';
+import {get} from 'lodash';
 import path from 'path';
-import {LineCounter} from 'yaml';
+import {LineCounter, Scalar} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -399,9 +400,7 @@ interface HelmValueMatch {
   linePosition: RefPosition;
 }
 
-const get = (t: object, objPath: string) => objPath.split('.').reduce((r, k) => (r as any)?.[k], t);
-
-const getRange = (contents: any, keyPath: string): any => {
+const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
   const keyParts = keyPath.split('.');
   const keyStart = keyParts.shift();
   const pair = contents.items.find((item: any) => {
@@ -415,7 +414,7 @@ const getRange = (contents: any, keyPath: string): any => {
     return pair.value;
   }
 
-  return getRange(pair.value, keyParts.join('.'));
+  return getYamlScalar(pair.value, keyParts.join('.'));
 };
 
 interface GoToValuesFileParams {
@@ -467,17 +466,20 @@ const applyForHelmFile = ({
     const documents = parseAllYamlDocuments(valueFileContent, lineCounter);
     documents.forEach((doc: any) => {
       const helmObject = doc.toJS();
-      const fileKeyPaths = getObjectKeys(helmObject).map(keyPath => {
-        const nodeWrapper = new NodeWrapper(getRange(doc.contents, keyPath), lineCounter);
-        return {
+      getObjectKeys(helmObject).forEach(keyPath => {
+        const scalar = getYamlScalar(doc.contents, keyPath);
+        if (!scalar) {
+          return;
+        }
+
+        const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+        validKeyPaths.push({
           value: get(helmObject, keyPath),
           path: valueFilePath,
           keyPath: `.Values.${keyPath}`,
           linePosition: nodeWrapper.getNodePosition(),
-        };
+        });
       });
-
-      validKeyPaths.push(...fileKeyPaths);
     });
   });
 
