@@ -1,4 +1,4 @@
-import {PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {PayloadAction, TaskAbortError, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import {times} from 'lodash';
 import log from 'loglevel';
@@ -266,24 +266,57 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
  * Listeners
  * * * * * * * * * * * * * */
 startAppListening({
-  matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed),
-  effect: async (action, {dispatch, delay}) => {
+  matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
+  effect: async (action, {dispatch, delay, cancelActiveListeners}) => {
     const side = (action as any).payload.side;
+    if (side === 'right') return;
+    cancelActiveListeners();
+    if (resourceSetCleared.match(action)) return;
+
     try {
-      console.log('fetching resources...', {trigger: action.type, side});
-      await delay(2000);
+      console.log('fetching resources for left...', {trigger: action.type, side});
+      await delay(2500);
 
       if (Math.random() > 0.75) {
-        dispatch(resourceSetFetchFailed({side, reason: 'forced error'}));
+        dispatch(resourceSetFetchFailed({side: 'left', reason: 'forced error'}));
         return;
       }
 
       const resources = times(40, () => basicDeploymentFixture());
 
-      dispatch(resourceSetFetched({side, resources}));
+      dispatch(resourceSetFetched({side: 'left', resources}));
     } catch (err) {
+      if (err instanceof TaskAbortError) return;
       const reason = err instanceof Error ? err.message : 'unknown failure';
-      dispatch(resourceSetFetchFailed({side, reason}));
+      dispatch(resourceSetFetchFailed({side: 'left', reason}));
+    }
+  },
+});
+
+startAppListening({
+  matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
+  effect: async (action, {dispatch, delay, cancelActiveListeners}) => {
+    const side = (action as any).payload.side;
+    if (side === 'left') return;
+    cancelActiveListeners();
+    if (resourceSetCleared.match(action)) return;
+
+    try {
+      console.log('fetching resources for right...', {trigger: action.type, side});
+      await delay(2500);
+
+      if (Math.random() > 0.75) {
+        dispatch(resourceSetFetchFailed({side: 'right', reason: 'forced error'}));
+        return;
+      }
+
+      const resources = times(40, () => basicDeploymentFixture());
+
+      dispatch(resourceSetFetched({side: 'right', resources}));
+    } catch (err) {
+      if (err instanceof TaskAbortError) return;
+      const reason = err instanceof Error ? err.message : 'unknown failure';
+      dispatch(resourceSetFetchFailed({side: 'right', reason}));
     }
   },
 });
