@@ -1,11 +1,16 @@
 import {PayloadAction, TaskAbortError, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
-import {times} from 'lodash';
 import log from 'loglevel';
 
+import {CLUSTER_DIFF_PREFIX} from '@constants/constants';
+
+import {AppState} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {startAppListening} from '@redux/listeners/base';
+import {compareResources} from '@redux/services/compare/compareResources';
+import {fetchResourcesFromCluster} from '@redux/services/compare/fetchResourcesFromCluster';
+import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {basicDeploymentFixture} from '@components/organisms/CompareModal/__test__/fixtures/basicDeployment';
 
@@ -322,27 +327,42 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   return !state.current.diff?.loading && state.current.selection.length === state.current.diff?.comparisons.length;
 };
 
+export const selectLocalResources = (state: AppState): K8sResource[] => {
+  return Object.values(state.resourceMap).filter(
+    resource =>
+      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+      !resource.name.startsWith('Patch:') &&
+      !isKustomizationResource(resource)
+  );
+};
+
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 startAppListening({
   matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
-  effect: async (action, {dispatch, delay, cancelActiveListeners}) => {
+  effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
     const side = (action as any).payload.side;
     if (side === 'right') return;
     cancelActiveListeners();
     if (resourceSetCleared.match(action)) return;
 
     try {
-      console.log('fetching resources for left...', {trigger: action.type, side});
-      await delay(150);
+      const state = getState();
+      const resourceSet = state.compare.current.view.leftSet;
+      if (!resourceSet) return;
 
-      if (Math.random() > 0.75) {
-        dispatch(resourceSetFetchFailed({side: 'left', reason: 'forced error'}));
-        return;
+      let resources: K8sResource[];
+      switch (resourceSet.type) {
+        case 'local':
+          resources = selectLocalResources(state.main);
+          break;
+        case 'cluster':
+          resources = await fetchResourcesFromCluster(state);
+          break;
+        default:
+          throw new Error('Not yet implemented');
       }
-
-      const resources = times(40, () => basicDeploymentFixture());
 
       dispatch(resourceSetFetched({side: 'left', resources}));
     } catch (err) {
@@ -355,22 +375,28 @@ startAppListening({
 
 startAppListening({
   matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
-  effect: async (action, {dispatch, delay, cancelActiveListeners}) => {
+  effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
     const side = (action as any).payload.side;
     if (side === 'left') return;
     cancelActiveListeners();
     if (resourceSetCleared.match(action)) return;
 
     try {
-      console.log('fetching resources for right...', {trigger: action.type, side});
-      await delay(150);
+      const state = getState();
+      const resourceSet = state.compare.current.view.rightSet;
+      if (!resourceSet) return;
 
-      if (Math.random() > 0.75) {
-        dispatch(resourceSetFetchFailed({side: 'right', reason: 'forced error'}));
-        return;
+      let resources: K8sResource[];
+      switch (resourceSet.type) {
+        case 'local':
+          resources = selectLocalResources(state.main);
+          break;
+        case 'cluster':
+          resources = await fetchResourcesFromCluster(state);
+          break;
+        default:
+          throw new Error('Not yet implemented');
       }
-
-      const resources = times(40, () => basicDeploymentFixture());
 
       dispatch(resourceSetFetched({side: 'right', resources}));
     } catch (err) {
@@ -383,11 +409,14 @@ startAppListening({
 
 startAppListening({
   actionCreator: resourceSetFetched,
-  effect: async (action, {dispatch, delay, getState}) => {
+  effect: async (_action, {dispatch, getState}) => {
     const status = selectCompareStatus(getState().compare);
-    if (status !== 'comparing') return;
+    const left = getState().compare.current.left;
+    const right = getState().compare.current.right;
 
-    await delay(400);
+    if (status !== 'comparing' || !left || !right) {
+      return;
+    }
 
     const comparisons: ResourceComparison[] = [
       {
@@ -406,6 +435,7 @@ startAppListening({
       },
       {id: faker.datatype.uuid(), isMatch: false, left: basicDeploymentFixture(), right: undefined},
       {id: faker.datatype.uuid(), isMatch: false, left: undefined, right: basicDeploymentFixture()},
+      ...compareResources(left.resources, right.resources, {operation: 'union'}),
     ];
 
     dispatch(resourceSetCompared({comparisons}));

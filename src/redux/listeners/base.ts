@@ -1,13 +1,8 @@
-import {AnyAction, Dispatch, ThunkDispatch, TypedStartListening, createListenerMiddleware} from '@reduxjs/toolkit';
+import {TypedStartListening, createListenerMiddleware} from '@reduxjs/toolkit';
 
-import type {CompareState} from '@redux/reducers/compare';
-
-type PartialState = {
-  compare: CompareState;
-};
-
-type PartialDispatch = Dispatch<AnyAction> & ThunkDispatch<PartialState, null, AnyAction>;
+import {AppDispatch} from '@models/appdispatch';
+import {RootState} from '@models/rootstate';
 
 export const listenerMiddleware = createListenerMiddleware();
-export type AppStartListening = TypedStartListening<PartialState, PartialDispatch>;
+export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export const startAppListening = listenerMiddleware.startListening as AppStartListening;
