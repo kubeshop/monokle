@@ -2,19 +2,11 @@ import {PayloadAction, TaskAbortError, createSlice, isAnyOf} from '@reduxjs/tool
 
 import log from 'loglevel';
 
-import {CLUSTER_DIFF_PREFIX} from '@constants/constants';
-
-import {AppState} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {startAppListening} from '@redux/listeners/base';
 import {compareResources} from '@redux/services/compare/compareResources';
-import {fetchResourcesFromCluster} from '@redux/services/compare/fetchResourcesFromCluster';
-import {isKustomizationResource} from '@redux/services/kustomize';
-
-import {basicDeploymentFixture} from '@components/organisms/CompareModal/__test__/fixtures/basicDeployment';
-
-import faker from '@faker-js/faker';
+import {fetchResources} from '@redux/services/compare/fetchResources';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -327,15 +319,6 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   return !state.current.diff?.loading && state.current.selection.length === state.current.diff?.comparisons.length;
 };
 
-export const selectLocalResources = (state: AppState): K8sResource[] => {
-  return Object.values(state.resourceMap).filter(
-    resource =>
-      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-      !resource.name.startsWith('Patch:') &&
-      !isKustomizationResource(resource)
-  );
-};
-
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
@@ -349,21 +332,10 @@ startAppListening({
 
     try {
       const state = getState();
-      const resourceSet = state.compare.current.view.leftSet;
-      if (!resourceSet) return;
+      const options = state.compare.current.view.leftSet;
+      if (!options) return;
 
-      let resources: K8sResource[];
-      switch (resourceSet.type) {
-        case 'local':
-          resources = selectLocalResources(state.main);
-          break;
-        case 'cluster':
-          resources = await fetchResourcesFromCluster(state);
-          break;
-        default:
-          throw new Error('Not yet implemented');
-      }
-
+      const resources = await fetchResources(state, options);
       dispatch(resourceSetFetched({side: 'left', resources}));
     } catch (err) {
       if (err instanceof TaskAbortError) return;
@@ -383,21 +355,10 @@ startAppListening({
 
     try {
       const state = getState();
-      const resourceSet = state.compare.current.view.rightSet;
-      if (!resourceSet) return;
+      const options = state.compare.current.view.rightSet;
+      if (!options) return;
 
-      let resources: K8sResource[];
-      switch (resourceSet.type) {
-        case 'local':
-          resources = selectLocalResources(state.main);
-          break;
-        case 'cluster':
-          resources = await fetchResourcesFromCluster(state);
-          break;
-        default:
-          throw new Error('Not yet implemented');
-      }
-
+      const resources = await fetchResources(state, options);
       dispatch(resourceSetFetched({side: 'right', resources}));
     } catch (err) {
       if (err instanceof TaskAbortError) return;
@@ -418,26 +379,7 @@ startAppListening({
       return;
     }
 
-    const comparisons: ResourceComparison[] = [
-      {
-        id: faker.datatype.uuid(),
-        isMatch: true,
-        left: basicDeploymentFixture(),
-        right: basicDeploymentFixture(), // not actually a match but it suffices..
-        isDifferent: true,
-      },
-      {
-        id: faker.datatype.uuid(),
-        isMatch: true,
-        left: basicDeploymentFixture(),
-        right: basicDeploymentFixture(), // not actually a match but it suffices..
-        isDifferent: false,
-      },
-      {id: faker.datatype.uuid(), isMatch: false, left: basicDeploymentFixture(), right: undefined},
-      {id: faker.datatype.uuid(), isMatch: false, left: undefined, right: basicDeploymentFixture()},
-      ...compareResources(left.resources, right.resources, {operation: 'union'}),
-    ];
-
+    const comparisons = compareResources(left.resources, right.resources, {operation: 'union'});
     dispatch(resourceSetCompared({comparisons}));
   },
 });
