@@ -31,11 +31,13 @@ enum Colors {
   yellowWarningCompliment = '#FFF3CA',
   yellow6 = '#D8BD14',
   yellow7 = '#E8D639',
+  yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
-  errorBg = '#E8474933',
+  red7 = '#E84749', // Dust Red
+  errorBg = '#E84749',
 
   whitePure = '#ffffff',
   blackPure = '#000000',
@@ -48,8 +50,6 @@ enum Colors {
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
   blue10 = '#B7E3FA',
-
-  red7 = '#E84748', // Dust Red
 
   green7 = '#6ABE39', // Polar Green
 

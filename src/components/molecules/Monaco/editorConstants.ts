@@ -10,6 +10,7 @@ export enum GlyphDecorationTypes {
   IncomingRef,
   OutgoingRef,
   PolicyIssue,
+  ErrorRef,
 }
 
 export enum InlineDecorationTypes {
@@ -39,6 +40,9 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
     glyphMarginClassName: 'monokleEditorPolicyIssueGlyphClass',
     glyphMarginHoverMessage: {value: 'Policy issue'},
   },
+  [GlyphDecorationTypes.ErrorRef]: {
+    glyphMarginClassName: 'monokleEditorErrorRefGlyphClass',
+  },
 };
 
 const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor.IModelDecorationOptions> = {
@@ -46,7 +50,7 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
     inlineClassName: 'monokleEditorUnsatisfiedRefInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Left,
-      color: '#ad8b00',
+      color: Colors.yellow7,
     },
   },
   [InlineDecorationTypes.SatisfiedRef]: {
@@ -60,7 +64,7 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
     inlineClassName: 'monokleEditorPolicyIssueInlineClass',
     overviewRuler: {
       position: monaco.editor.OverviewRulerLane.Left,
-      color: Colors.redError,
+      color: Colors.red7,
     },
   },
 };
