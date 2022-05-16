@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
@@ -27,13 +25,22 @@ const getRawItems = (resourceMap: ResourceMapType) => {
     if (k8sResource.refs?.length) {
       k8sResource.refs.forEach(ref => {
         if (ref.type === 'outgoing' && ref.target?.type === 'image') {
-          images.push({name: ref.name, tag: ref.target?.tag || 'latest'});
+          const refName = ref.name;
+          const refTag = ref.target?.tag || 'latest';
+
+          const foundImage = images.find(image => image.name === refName && image.tag === refTag);
+
+          if (!foundImage) {
+            images.push({name: refName, tag: refTag || 'latest', resourcesIds: [k8sResource.id]});
+          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
+            foundImage.resourcesIds.push(k8sResource.id);
+          }
         }
       });
     }
   });
 
-  return _.uniqWith(images, _.isEqual);
+  return images;
 };
 
 const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesScopeType> = {
@@ -57,6 +64,7 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     emptyDisplay: {component: DockerImagesSectionEmptyDisplay},
     beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
     counterDisplayMode: 'items',
+    showHeader: false,
   },
   itemBlueprint: {
     getName: rawItem => `${rawItem.name}:${rawItem.tag}`,
@@ -66,12 +74,17 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         scope.selectedDockerImage
           ? rawItem.name === scope.selectedDockerImage.name && rawItem.tag === scope.selectedDockerImage.tag
           : false,
+      getMeta: rawItem => ({resourcesIds: rawItem.resourcesIds}),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        const [name, tag] = itemInstance.id.split(':');
+        const {
+          id,
+          meta: {resourcesIds},
+        } = itemInstance;
+        const [name, tag] = id.split(':');
 
-        dispatch(selectDockerImage({name, tag}));
+        dispatch(selectDockerImage({name, tag, resourcesIds}));
       },
     },
   },
