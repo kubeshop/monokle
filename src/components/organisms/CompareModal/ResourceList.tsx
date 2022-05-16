@@ -22,7 +22,12 @@ type ResourceItem = {
   name: string;
 };
 
-export function DiffSetList({data, showCheckbox = false}: {data: ResourceSetData; showCheckbox?: boolean}) {
+type Props = {
+  data: ResourceSetData;
+  showCheckbox?: boolean;
+};
+
+export const DiffSetList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.resources, r => r.kind);
     const result: Array<HeaderItem | ResourceItem> = [];
@@ -63,4 +68,4 @@ export function DiffSetList({data, showCheckbox = false}: {data: ResourceSetData
       })}
     </S.SetListDiv>
   );
-}
+};

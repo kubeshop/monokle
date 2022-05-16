@@ -18,7 +18,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function DiffModal({visible, onClose}: Props) {
+export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
@@ -49,7 +49,7 @@ export default function DiffModal({visible, onClose}: Props) {
       </div>
     </Modal>
   );
-}
+};
 
 /* * * * * * * * * * * * * *
  * Modal size hook
@@ -75,3 +75,5 @@ function useModalSize(): ModalSizeProps {
     },
   };
 }
+
+export default DiffModal;

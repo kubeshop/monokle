@@ -1,9 +1,8 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Col, Row} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
 import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
@@ -17,8 +16,8 @@ import {FigureDescription, FigureTitle} from './CompareFigure.styled';
 import * as S from './CompareModalSelecting.styled';
 import {DiffSetList} from './ResourceList';
 
-export function CompareModalSelecting() {
-  const dispatch = useDispatch();
+export const CompareModalSelecting: React.FC = () => {
+  const dispatch = useAppDispatch();
   const {left, right} = useAppSelector(state => state.compare.current);
   const leftSuccess = left && !left.loading && !left.error;
   const rightSuccess = right && !right.loading && !right.error;
@@ -114,4 +113,4 @@ export function CompareModalSelecting() {
       </DiffFigure>
     </Row>
   );
-}
+};

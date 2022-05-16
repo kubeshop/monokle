@@ -1,18 +1,17 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 import {Button, Space, Switch} from 'antd';
 
 import log from 'loglevel';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {diffViewOpened, selectDiffedComparison} from '@redux/reducers/compare';
 
-import {PartialStore} from './CompareModal';
 import * as S from './DiffActionBar.styled';
 
-export function DiffActionBar() {
-  const dispatch = useDispatch();
-  const diffComparison = useSelector((state: PartialStore) => selectDiffedComparison(state.compare));
+export const DiffActionBar: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
 
   const handleBack = useCallback(() => {
     dispatch(diffViewOpened({id: undefined}));
@@ -40,4 +39,4 @@ export function DiffActionBar() {
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
   );
-}
+};

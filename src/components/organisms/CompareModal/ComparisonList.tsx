@@ -1,12 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import {useCallback, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Button, Checkbox, Col} from 'antd';
 
 import {groupBy} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {DiffData, comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
@@ -27,7 +26,11 @@ type ComparisonData = {
   canDiff: boolean;
 };
 
-export function DiffComparisonList({data}: {data: DiffData}) {
+type Props = {
+  data: DiffData;
+};
+
+export const DiffComparisonList: React.FC<Props> = ({data}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -77,7 +80,7 @@ export function DiffComparisonList({data}: {data: DiffData}) {
       })}
     </div>
   );
-}
+};
 
 function HeaderItem({data}: {data: HeaderData}) {
   const {kind, count} = data;
@@ -102,7 +105,7 @@ function HeaderItem({data}: {data: HeaderData}) {
 
 function ComparisonItem({data}: {data: ComparisonData}) {
   const {id, namespace, name, leftActive, rightActive, canDiff} = data;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
   const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));
 

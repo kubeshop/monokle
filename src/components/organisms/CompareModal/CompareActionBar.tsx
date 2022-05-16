@@ -1,5 +1,4 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Button, Checkbox, Divider, Dropdown, Input, Menu, Space} from 'antd';
 
@@ -7,13 +6,13 @@ import {DownOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {comparisonAllToggled, selectCompareStatus, selectIsAllComparisonSelected} from '@redux/reducers/compare';
 
 import * as S from './CompareActionBar.styled';
 
-export function CompareActionBar() {
-  const dispatch = useDispatch();
+export const CompareActionBar: React.FC = () => {
+  const dispatch = useAppDispatch();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
@@ -81,4 +80,4 @@ export function CompareActionBar() {
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
   );
-}
+};
