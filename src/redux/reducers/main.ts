@@ -656,6 +656,10 @@ export const mainSlice = createSlice({
     selectDockerImage: (state: Draft<AppState>, action: PayloadAction<DockerImage>) => {
       state.selectedDockerImage = action.payload;
 
+      if (state.selectedResourceId) {
+        state.selectedResourceId = undefined;
+      }
+
       clearResourceSelections(state.resourceMap);
       action.payload.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
     },

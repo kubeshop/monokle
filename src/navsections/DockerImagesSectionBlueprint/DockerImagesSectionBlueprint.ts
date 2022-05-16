@@ -14,6 +14,7 @@ export type DockerImagesScopeType = {
   isFolderOpen: boolean;
   isFolderLoading: boolean;
   selectedDockerImage?: DockerImage | null;
+  selectedK8sResourceId: string | undefined;
 };
 
 export const DOCKER_IMAGES_SECTION_NAME = 'Docker Images' as const;
@@ -53,6 +54,7 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
     selectedDockerImage: state.main.selectedDockerImage,
+    selectedK8sResourceId: state.main.selectedResourceId,
   }),
   builder: {
     getRawItems: scope => getRawItems(scope.resourceMap),
@@ -74,6 +76,16 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         scope.selectedDockerImage
           ? rawItem.name === scope.selectedDockerImage.name && rawItem.tag === scope.selectedDockerImage.tag
           : false,
+      isHighlighted: (rawItem, scope) => {
+        const {resourcesIds} = rawItem;
+        const {selectedK8sResourceId} = scope;
+
+        if (selectedK8sResourceId && resourcesIds.includes(selectedK8sResourceId)) {
+          return true;
+        }
+
+        return false;
+      },
       getMeta: rawItem => ({resourcesIds: rawItem.resourcesIds}),
     },
     instanceHandler: {
