@@ -22,6 +22,7 @@ import {
 } from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
+import {DockerImage} from '@models/image';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
@@ -652,6 +653,9 @@ export const mainSlice = createSlice({
       const allConfig = state.policies.plugins.map(p => p.config);
       electronStore.set('pluginConfig.policies', allConfig);
     },
+    selectDockerImage: (state: Draft<AppState>, action: PayloadAction<DockerImage>) => {
+      state.selectedDockerImage = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1150,46 +1154,47 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
 }
 
 export const {
-  setAppRehydrating,
-  selectK8sResource,
-  selectFile,
-  setSelectingFile,
-  setApplyingResource,
-  selectHelmValuesFile,
+  addKindHandler,
+  addMultipleKindHandlers,
+  checkMultipleResourceIds,
+  checkResourceId,
+  clearNotifications,
   clearPreview,
   clearPreviewAndSelectionHistory,
+  clearSelected,
+  closePreviewConfigurationEditor,
+  closeResourceDiffModal,
+  editorHasReloadedSelectedPath,
+  extendResourceFilter,
+  openPreviewConfigurationEditor,
+  openResourceDiffModal,
+  reloadClusterDiff,
+  resetResourceFilter,
+  seenNotifications,
+  selectDockerImage,
+  selectFile,
+  selectHelmValuesFile,
+  selectK8sResource,
+  selectMultipleClusterDiffMatches,
+  selectPreviewConfiguration,
+  setAppRehydrating,
+  setApplyingResource,
+  selectClusterDiffMatch,
+  setClusterDiffRefreshDiffResource,
+  setDiffResourceInClusterDiff,
+  setFiltersToBeChanged,
+  setSelectingFile,
+  setSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
-  updateResourceFilter,
-  extendResourceFilter,
-  setDiffResourceInClusterDiff,
-  setClusterDiffRefreshDiffResource,
-  selectClusterDiffMatch,
-  selectMultipleClusterDiffMatches,
-  unselectClusterDiffMatch,
-  unselectAllClusterDiffMatches,
-  reloadClusterDiff,
-  toggleClusterOnlyResourcesInClusterDiff,
-  setSelectionHistory,
-  editorHasReloadedSelectedPath,
-  checkResourceId,
-  uncheckAllResourceIds,
-  uncheckResourceId,
-  resetResourceFilter,
-  checkMultipleResourceIds,
-  uncheckMultipleResourceIds,
-  closeResourceDiffModal,
-  openResourceDiffModal,
-  setFiltersToBeChanged,
-  addMultipleKindHandlers,
-  addKindHandler,
-  seenNotifications,
-  clearNotifications,
-  openPreviewConfigurationEditor,
-  closePreviewConfigurationEditor,
-  selectPreviewConfiguration,
-  clearSelected,
   toggleAllRules,
+  toggleClusterOnlyResourcesInClusterDiff,
   toggleRule,
+  uncheckAllResourceIds,
+  uncheckMultipleResourceIds,
+  uncheckResourceId,
+  unselectAllClusterDiffMatches,
+  unselectClusterDiffMatch,
+  updateResourceFilter,
 } = mainSlice.actions;
 export default mainSlice.reducer;

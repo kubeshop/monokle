@@ -118,8 +118,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   background-image: url('./assets/OutgoingImageRefIcon.svg');
   background-repeat: no-repeat;
   background-size: cover;
-  max-height: 13px;
-  max-width: 13px;
+  max-height: 12px;
+  max-width: 12px;
   margin-top: 5px;
   margin-left: 15px;
 }

@@ -2,6 +2,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
+import {DockerImage} from './image';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -160,6 +161,7 @@ interface AppState {
     previewConfigurationId?: string;
   };
   deviceID: string;
+  selectedDockerImage?: DockerImage;
 }
 
 export interface PossibleResource {
