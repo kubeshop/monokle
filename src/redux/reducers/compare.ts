@@ -13,12 +13,12 @@ import {fetchResources} from '@redux/services/compare/fetchResources';
  * * * * * * * * * * * * * */
 export type CompareState = {
   isOpen: boolean;
-  views: SavedDiffView[];
+  views: SavedComparisonView[];
   current: {
-    view: DiffView | SavedDiffView;
+    view: ComparisonView | SavedComparisonView;
     left?: ResourceSetData;
     right?: ResourceSetData;
-    diff?: DiffData;
+    comparison?: ComparisonData;
     selection: string[];
     viewDiff?: string; // comparisonId
   };
@@ -26,7 +26,7 @@ export type CompareState = {
 
 export type CompareSide = 'left' | 'right';
 
-export type DiffData = {
+export type ComparisonData = {
   loading: boolean;
   comparisons: ResourceComparison[];
 };
@@ -43,14 +43,14 @@ export type CompareFilter = {
   namespace?: string;
 };
 
-export type DiffView = {
+export type ComparisonView = {
   leftSet: ResourceSet | undefined;
   rightSet: ResourceSet | undefined;
   operation: CompareOperation;
   filter?: CompareFilter;
 };
 
-export type SavedDiffView = DiffView & {
+export type SavedComparisonView = ComparisonView & {
   name: string;
   viewedAt: Date;
 };
@@ -163,7 +163,7 @@ export const compareSlice = createSlice({
           resources: [],
         };
 
-        state.current.diff = undefined;
+        state.current.comparison = undefined;
         state.current.viewDiff = undefined;
         state.current.selection = [];
       } else {
@@ -174,7 +174,7 @@ export const compareSlice = createSlice({
           resources: [],
         };
 
-        state.current.diff = undefined;
+        state.current.comparison = undefined;
         state.current.viewDiff = undefined;
         state.current.selection = [];
       }
@@ -185,7 +185,7 @@ export const compareSlice = createSlice({
         state.current.view.leftSet = undefined;
         state.current.left = undefined;
 
-        state.current.diff = undefined;
+        state.current.comparison = undefined;
         state.current.viewDiff = undefined;
         state.current.selection = [];
       }
@@ -193,7 +193,7 @@ export const compareSlice = createSlice({
         state.current.view.rightSet = undefined;
         state.current.right = undefined;
 
-        state.current.diff = undefined;
+        state.current.comparison = undefined;
         state.current.viewDiff = undefined;
         state.current.selection = [];
       }
@@ -206,7 +206,7 @@ export const compareSlice = createSlice({
         resources: [],
       };
 
-      state.current.diff = undefined;
+      state.current.comparison = undefined;
       state.current.viewDiff = undefined;
       state.current.selection = [];
     },
@@ -228,7 +228,7 @@ export const compareSlice = createSlice({
       if (isAllSelected) {
         state.current.selection = [];
       } else {
-        state.current.selection = state.current.diff?.comparisons.map(c => c.id) ?? [];
+        state.current.selection = state.current.comparison?.comparisons.map(c => c.id) ?? [];
       }
     },
     resourceSetFetched: (state, action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>) => {
@@ -242,7 +242,7 @@ export const compareSlice = createSlice({
       const leftReady = state.current.left && !state.current.left.loading && !state.current.left.error;
       const rightReady = state.current.right && !state.current.right.loading && !state.current.right.error;
       if (leftReady && rightReady) {
-        state.current.diff = {
+        state.current.comparison = {
           loading: true,
           comparisons: [],
         };
@@ -259,7 +259,7 @@ export const compareSlice = createSlice({
       };
     },
     resourceSetCompared: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
-      state.current.diff = {
+      state.current.comparison = {
         loading: false,
         comparisons: action.payload.comparisons,
       };
@@ -306,7 +306,7 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
 export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
   const id = state.current.viewDiff;
   if (!id) return undefined;
-  const comparison = state.current.diff?.comparisons.find(c => c.id === id);
+  const comparison = state.current.comparison?.comparisons.find(c => c.id === id);
   if (!comparison || !comparison.isMatch) return undefined;
   return comparison;
 };
@@ -316,7 +316,10 @@ export const selectIsComparisonSelected = (state: CompareState, id: string): boo
 };
 
 export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
-  return !state.current.diff?.loading && state.current.selection.length === state.current.diff?.comparisons.length;
+  return (
+    !state.current.comparison?.loading &&
+    state.current.selection.length === state.current.comparison?.comparisons.length
+  );
 };
 
 /* * * * * * * * * * * * * *

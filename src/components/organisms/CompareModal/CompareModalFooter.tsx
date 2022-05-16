@@ -12,7 +12,7 @@ const FooterDiv = styled.div`
   align-items: center;
 `;
 
-export const DiffModalFooter: React.FC<Props> = ({onClose}) => {
+export const CompareModalFooter: React.FC<Props> = ({onClose}) => {
   return (
     <FooterDiv>
       <div />

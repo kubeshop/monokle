@@ -9,13 +9,13 @@ import {selectDiffedComparison} from '@redux/reducers/compare';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import {DiffComparisonList} from './ComparisonList';
+import {ComparisonList} from './ComparisonList';
 
 export const CompareModalComparing: React.FC = () => {
-  const {diff} = useAppSelector(state => state.compare.current);
+  const {comparison} = useAppSelector(state => state.compare.current);
   const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
 
-  if (!diff || diff.loading) {
+  if (!comparison || comparison.loading) {
     return (
       <Row>
         <Col span={24}>
@@ -56,7 +56,7 @@ export const CompareModalComparing: React.FC = () => {
   return (
     <Row>
       <Col span={24}>
-        <DiffComparisonList data={diff} />
+        <ComparisonList data={comparison} />
       </Col>
     </Row>
   );

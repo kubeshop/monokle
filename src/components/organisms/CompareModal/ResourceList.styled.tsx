@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-export const SetListDiv = styled.div`
+export const ResourceListDiv = styled.div`
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

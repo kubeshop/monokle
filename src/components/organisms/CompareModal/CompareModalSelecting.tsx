@@ -11,10 +11,10 @@ import ErrorFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
 
-import {DiffFigure} from './CompareFigure';
+import {CompareFigure} from './CompareFigure';
 import {FigureDescription, FigureTitle} from './CompareFigure.styled';
 import * as S from './CompareModalSelecting.styled';
-import {DiffSetList} from './ResourceList';
+import {ResourceList} from './ResourceList';
 
 export const CompareModalSelecting: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -25,21 +25,21 @@ export const CompareModalSelecting: React.FC = () => {
   const handleRetry = useCallback((side: CompareSide) => dispatch(resourceSetRefreshed({side})), [dispatch]);
 
   const ErrorFigureLeft = () => (
-    <DiffFigure src={ErrorFigure}>
+    <CompareFigure src={ErrorFigure}>
       <FigureTitle color={Colors.red7}>Cannot retrieve resources</FigureTitle>
       <FigureDescription color={Colors.grey8}>
         <S.RetrySpan onClick={() => handleRetry('left')}>Try again</S.RetrySpan> or select different resources
       </FigureDescription>
-    </DiffFigure>
+    </CompareFigure>
   );
 
   const ErrorFigureRight = () => (
-    <DiffFigure src={ErrorFigure}>
+    <CompareFigure src={ErrorFigure}>
       <FigureTitle color={Colors.red7}>Cannot retrieve resources</FigureTitle>
       <FigureDescription color={Colors.grey8}>
         <S.RetrySpan onClick={() => handleRetry('right')}>Try again</S.RetrySpan> or select different resources
       </FigureDescription>
-    </DiffFigure>
+    </CompareFigure>
   );
 
   if (leftSuccess && rightSuccess) {
@@ -57,16 +57,16 @@ export const CompareModalSelecting: React.FC = () => {
             ) : left.error ? (
               <ErrorFigureLeft />
             ) : (
-              <DiffSetList data={left} showCheckbox />
+              <ResourceList data={left} showCheckbox />
             )}
           </Col>
         </S.ListRow>
 
         <S.FloatingFigure side="right" noEvents={!right?.error}>
           {!right ? (
-            <DiffFigure src={CompareSingleFigure}>
+            <CompareFigure src={CompareSingleFigure}>
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
-            </DiffFigure>
+            </CompareFigure>
           ) : right.error ? (
             <ErrorFigureRight />
           ) : (
@@ -84,15 +84,15 @@ export const CompareModalSelecting: React.FC = () => {
           <Col span={13} />
 
           <Col span={11}>
-            {right.loading ? <div>loading...</div> : right.error ? <ErrorFigureRight /> : <DiffSetList data={right} />}
+            {right.loading ? <div>loading...</div> : right.error ? <ErrorFigureRight /> : <ResourceList data={right} />}
           </Col>
         </S.ListRow>
 
         <S.FloatingFigure side="left" noEvents={!left?.error}>
           {!left ? (
-            <DiffFigure src={CompareSingleFigure}>
+            <CompareFigure src={CompareSingleFigure}>
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
-            </DiffFigure>
+            </CompareFigure>
           ) : left.error ? (
             <ErrorFigureLeft />
           ) : (
@@ -105,12 +105,12 @@ export const CompareModalSelecting: React.FC = () => {
 
   return (
     <Row style={{height: 'calc(100% - 72px)'}}>
-      <DiffFigure src={CompareDoubleFigure}>
+      <CompareFigure src={CompareDoubleFigure}>
         <FigureTitle>Compare (almost) anything!</FigureTitle>
         <FigureDescription>
           Choose a local resource, Kustomize / Helm preview or a cluster in any of the sides to start your diff.
         </FigureDescription>
-      </DiffFigure>
+      </CompareFigure>
     </Row>
   );
 };
