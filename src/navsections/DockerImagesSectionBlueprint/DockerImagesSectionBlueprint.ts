@@ -13,7 +13,7 @@ export type DockerImagesScopeType = {
   resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
-  selectedDockerImage: DockerImage | undefined;
+  selectedDockerImage?: DockerImage | null;
 };
 
 export const DOCKER_IMAGES_SECTION_NAME = 'Docker Images' as const;

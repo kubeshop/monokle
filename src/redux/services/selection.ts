@@ -39,7 +39,7 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     });
 }
 
-function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
+export function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
   const currentResource = resourceMap[resourceId];
   if (currentResource) {
     currentResource.isHighlighted = true;
@@ -71,6 +71,10 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
       getLinkedResources(resource).forEach(resourceId => {
         highlightResource(state.resourceMap, resourceId);
       });
+    }
+
+    if (state.selectedDockerImage) {
+      state.selectedDockerImage = null;
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {

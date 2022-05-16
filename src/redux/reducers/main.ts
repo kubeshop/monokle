@@ -63,7 +63,7 @@ import {
   recalculateResourceRanges,
   saveResource,
 } from '../services/resource';
-import {updateSelectionAndHighlights} from '../services/selection';
+import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
@@ -655,6 +655,9 @@ export const mainSlice = createSlice({
     },
     selectDockerImage: (state: Draft<AppState>, action: PayloadAction<DockerImage>) => {
       state.selectedDockerImage = action.payload;
+
+      clearResourceSelections(state.resourceMap);
+      action.payload.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
     },
   },
   extraReducers: builder => {

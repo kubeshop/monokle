@@ -161,7 +161,7 @@ interface AppState {
     previewConfigurationId?: string;
   };
   deviceID: string;
-  selectedDockerImage?: DockerImage;
+  selectedDockerImage?: DockerImage | null;
 }
 
 export interface PossibleResource {
