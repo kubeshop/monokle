@@ -2,7 +2,6 @@ import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
-import log from 'loglevel';
 
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
@@ -10,7 +9,10 @@ import {K8sResource, ResourceRef} from '@models/k8sresource';
 import {useAppDispatch} from '@redux/hooks';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
-import codeIntel, {ShouldApplyCodeIntelParams, codeIntels} from './codeIntel';
+import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
+import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
+import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
+
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
@@ -72,74 +74,46 @@ function useCodeIntel(props: CodeIntelProps) {
       selectedResource,
     };
     const codeIntelForFile = codeIntels.find(ci => ci.shouldApply(shouldApplyParams));
-    log.info('codeIntelForFile', codeIntelForFile?.name);
-    if (!codeIntelForFile) {
-      return;
-    }
-
-    codeIntelForFile
-      .codeIntel({
-        currentFile,
-        helmChartMap,
-        helmValuesMap,
-        selectFilePath,
-      })
-      .then(data => {
-        if (!data) {
-          return;
-        }
-        log.info('data', data);
-        const {newDecorations, newDisposables, newMarkers} = data;
-        if (newDecorations) {
-          idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
-        }
-        if (newDisposables) {
-          disposablesRef.current = newDisposables;
-        }
-
-        const model = editor.getModel();
-        if (model && newMarkers) {
-          setMarkers(model, newMarkers);
-        }
-      });
-
-    if (selectedResource) {
-      codeIntel
-        .applyForResource(
-          selectedResource,
-          selectResource,
+    if (codeIntelForFile) {
+      codeIntelForFile
+        .codeIntel({
+          fileMap,
+          currentFile,
+          helmChartMap,
+          helmValuesMap,
           selectFilePath,
+          code,
+          setEditorSelection: ({selection}) => {
+            dispatch(
+              setMonacoEditor({
+                selection,
+              })
+            );
+          },
+          resource: selectedResource as K8sResource,
+          selectResource,
           createResource,
           filterResources,
           resourceMap,
-          fileMap,
-          editor.getModel()
-        )
-        .then(({newDecorations, newDisposables, newMarkers}) => {
-          idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
-          disposablesRef.current = newDisposables;
+          model: editor.getModel(),
+        })
+        .then(data => {
+          if (!data) {
+            return;
+          }
+          const {newDecorations, newDisposables, newMarkers} = data;
+          if (newDecorations) {
+            idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+          }
+          if (newDisposables) {
+            disposablesRef.current = newDisposables;
+          }
 
           const model = editor.getModel();
-          if (model) setMarkers(model, newMarkers);
+          if (model && newMarkers) {
+            setMarkers(model, newMarkers);
+          }
         });
-    } else if (currentFile?.helmChartId && code) {
-      const {helmNewDisposables, helmNewDecorations} = codeIntel.applyForHelmFile({
-        code,
-        currentFile,
-        helmChartMap,
-        helmValuesMap,
-        selectFilePath,
-        fileMap,
-        setEditorSelection: ({selection}) => {
-          dispatch(
-            setMonacoEditor({
-              selection,
-            })
-          );
-        },
-      });
-      idsOfDecorationsRef.current = setDecorations(editor, helmNewDecorations);
-      disposablesRef.current = helmNewDisposables;
     }
   };
 
@@ -163,7 +137,7 @@ function useCodeIntel(props: CodeIntelProps) {
       completionDisposableRef.current.dispose();
     }
     if (editor) {
-      completionDisposableRef.current = codeIntel.applyAutocomplete(resourceMap);
+      completionDisposableRef.current = applyAutocomplete(resourceMap);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource, resourceMap, editor]);

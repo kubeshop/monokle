@@ -4,7 +4,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {LineCounter, parse} from 'yaml';
+import {LineCounter, Scalar, parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
@@ -21,9 +21,9 @@ import {
   getAbsoluteFilePath,
   readFiles,
 } from '@redux/services/fileEntry';
+import {NodeWrapper} from '@redux/services/resource';
 
 import {getFileStats} from '@utils/files';
-import {NodeWrapper} from '@redux/services/resource';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 export const HelmChartEventEmitter = new EventEmitter();
@@ -91,7 +91,7 @@ interface CreateHelmValuesFileParams {
 
 const get = (t: object, objPath: string) => objPath.split('.').reduce((r, k) => (r as any)?.[k], t);
 
-const getRange = (contents: any, keyPath: string): any => {
+const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
   const keyParts = keyPath.split('.');
   const keyStart = keyParts.shift();
   const pair = contents.items.find((item: any) => {
@@ -105,15 +105,10 @@ const getRange = (contents: any, keyPath: string): any => {
     return pair.value;
   }
 
-  return getRange(pair.value, keyParts.join('.'));
+  return getYamlScalar(pair.value, keyParts.join('.'));
 };
 
-export function createHelmValuesFile({
-  fileEntry,
-  helmChart,
-  helmValuesMap,
-  fileMap,
-}: CreateHelmValuesFileParams) {
+export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileMap}: CreateHelmValuesFileParams) {
   const filePath = getAbsoluteFilePath(fileEntry.filePath, fileMap);
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const lineCounter = new LineCounter();
@@ -122,16 +117,18 @@ export function createHelmValuesFile({
   const values: HelmValueMatch[] = [];
   documents.forEach((doc: any) => {
     const helmObject = doc.toJS();
-    const fileKeyPaths = getObjectKeys(helmObject).map(keyPath => {
-      const nodeWrapper = new NodeWrapper(getRange(doc.contents, keyPath), lineCounter);
-      return {
+    getObjectKeys(helmObject).forEach(keyPath => {
+      const scalar = getYamlScalar(doc.contents, keyPath);
+      if (!scalar) {
+        return;
+      }
+      const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+      values.push({
         value: get(helmObject, keyPath),
         keyPath: `.Values.${keyPath}`,
         linePosition: nodeWrapper.getNodePosition(),
-      };
+      });
     });
-
-    values.push(...fileKeyPaths);
   });
 
   const helmValues: HelmValuesFile = {

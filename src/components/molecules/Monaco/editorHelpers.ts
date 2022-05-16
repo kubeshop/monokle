@@ -78,7 +78,7 @@ export function createCommandMarkdownLink(
   return {
     commandMarkdownLink: {
       isTrusted: true,
-      value: `${beforeText}[${text}](command:${commandId} '${altText}')`,
+      value: `${beforeText || ''}[${text}](command:${commandId} '${altText}')`,
     },
     commandDisposable,
   };

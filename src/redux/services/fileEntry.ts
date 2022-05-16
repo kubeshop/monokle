@@ -14,6 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {
   HelmChartEventEmitter,
   createHelmChart,
+  createHelmFile,
   createHelmValuesFile,
   findContainingHelmCharts,
   getHelmChartFromFileEntry,
@@ -23,7 +24,7 @@ import {
   isHelmChartFolder,
   isHelmTemplateFile,
   isHelmValuesFile,
-  processHelmChartFolder, createHelmFile,
+  processHelmChartFolder,
 } from '@redux/services/helm';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -208,21 +209,16 @@ export function readFiles(
             helmChartMap,
             helmValuesMap,
             depth + 1,
-            helmChart,
+            helmChart
           );
         }
-      } else if (helmChart) {
-        if (isHelmValuesFile(fileEntry.name)) {
-          createHelmValuesFile({
-            fileEntry,
-            helmChart,
-            helmValuesMap,
-            fileMap,
-          });
-        } else {
-          // other kind of helm value
-          log.info(`helm file: ${filePath}`);
-        }
+      } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
+        createHelmValuesFile({
+          fileEntry,
+          helmChart,
+          helmValuesMap,
+          fileMap,
+        });
       } else if (fileIsIncluded(fileEntry, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
@@ -490,7 +486,7 @@ function addHelmValuesFile(
   fileEntry: FileEntry,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  fileMap: FileMapType,
+  fileMap: FileMapType
 ) {
   const charts = findContainingHelmCharts(helmChartMap, fileEntry);
 
