@@ -25,4 +25,4 @@ Monokle currently supports the following keyboard shortcuts:
 - Zoom In: Ctrl/Cmd =
 - Zoom Out: Ctrl/Cmd -
 - Open Shortcuts: Ctrl/Cmd /
-- Reload Preview: Ctrl/Cmd Shift R
+- Reload Preview: Ctrl/Cmd R

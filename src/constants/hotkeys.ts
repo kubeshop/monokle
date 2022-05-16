@@ -134,7 +134,7 @@ export const hotkeys: Record<string, HotkeyConf> = {
   },
   RELOAD_PREVIEW: {
     name: 'Reload Preview',
-    key: 'ctrl+shift+r, command+shift+r',
+    key: 'ctrl+r, command+r',
     category: 'tool',
   },
 };
