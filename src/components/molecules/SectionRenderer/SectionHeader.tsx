@@ -35,7 +35,12 @@ function SectionHeader(props: SectionHeaderProps) {
     expandSection,
     collapseSection,
   } = props;
+
+  const {customization = {}} = sectionBlueprint;
+  const {showHeader = true} = customization;
+
   const dispatch = useAppDispatch();
+
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
     sectionBlueprint.customization
@@ -66,6 +71,10 @@ function SectionHeader(props: SectionHeaderProps) {
       dispatch(sectionInstance.checkable.uncheckItemsAction);
     }
   }, [sectionInstance, dispatch]);
+
+  if (!showHeader) {
+    return null;
+  }
 
   return (
     <S.SectionContainer
@@ -130,20 +139,22 @@ function SectionHeader(props: SectionHeaderProps) {
                 </S.Name>
               </WalkThrough>
             ) : (
-              <S.Name
-                $isSelected={sectionInstance.isSelected && isCollapsed}
-                $isHighlighted={sectionInstance.isSelected && isCollapsed}
-                $isCheckable={Boolean(sectionInstance.checkable)}
-                $nameColor={sectionBlueprint.customization?.nameColor}
-                $nameSize={sectionBlueprint.customization?.nameSize}
-                $nameWeight={sectionBlueprint.customization?.nameWeight}
-                $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
-                $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
-                $level={level}
-                onClick={toggleCollapse}
-              >
-                {name}
-              </S.Name>
+              name && (
+                <S.Name
+                  $isSelected={sectionInstance.isSelected && isCollapsed}
+                  $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                  $isCheckable={Boolean(sectionInstance.checkable)}
+                  $nameColor={sectionBlueprint.customization?.nameColor}
+                  $nameSize={sectionBlueprint.customization?.nameSize}
+                  $nameWeight={sectionBlueprint.customization?.nameWeight}
+                  $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+                  $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                  $level={level}
+                  onClick={toggleCollapse}
+                >
+                  {name}
+                </S.Name>
+              )
             )}
             <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />
 
@@ -155,6 +166,7 @@ function SectionHeader(props: SectionHeaderProps) {
           </>
         )}
       </S.NameContainer>
+
       <S.NameDisplayContainer>
         {!NameDisplay.Component && NameContext.Component && (
           <NameContext.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />

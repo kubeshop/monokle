@@ -90,6 +90,7 @@ export interface SectionCustomization {
   beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;
   sectionMarginBottom?: number;
+  showHeader?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
