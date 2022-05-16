@@ -710,7 +710,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         }
 
         log.warn(
-          `Ignoring doaaacument ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
           documents[docIndex],
           splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
         );

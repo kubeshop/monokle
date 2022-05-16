@@ -115,7 +115,7 @@ export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileM
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
 
   const values: HelmValueMatch[] = [];
-  documents.forEach((doc: any) => {
+  documents.forEach(doc => {
     const helmObject = doc.toJS();
     getObjectKeys(helmObject).forEach(keyPath => {
       const scalar = getYamlScalar(doc.contents, keyPath);
@@ -279,6 +279,12 @@ export function findContainingHelmCharts(helmChartMap: HelmChartMapType, fileEnt
   return charts;
 }
 
+/**
+ * get all keys paths for an object not just bottom leafs
+ * for object { a: 1, b: { c: 2 } } it would return ['a', 'b', 'b.c']
+ * @param obj
+ * @param prefix
+ */
 export const getObjectKeys = (obj: any, prefix = ''): string[] =>
   Object.keys(obj).reduce((res: any, el) => {
     if (Array.isArray(obj[el])) {
