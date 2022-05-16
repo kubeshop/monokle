@@ -53,18 +53,45 @@ code {
   transition: all 0.25s ease;
 }
 
+div.hover-row {
+  padding: 5px;
+}
+
+div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass {
+  margin-left: 22px;
+  background: #e84749;
+}
+
+div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after {
+  content: '';
+  position: absolute;
+  left: -15px;
+  background-color: #f3ea62;
+  height: 10px;
+  width: 10px;
+  border-radius: 7px;
+}
+
+.monokleEditorErrorRefGlyphClass {
+  background: #e84749;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
+  margin-left: 15px;
+}
+
 .monokleEditorUnsatisfiedRefGlyphClass {
-  background-image: url('./assets/MonokleWarning.svg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  max-height: 12px;
-  max-width: 14px;
-  margin-top: 2.5px;
-  margin-left: 12.5px;
+  background: #f3ea62;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
+  margin-left: 15px;
 }
 
 .monokleEditorUnsatisfiedRefInlineClass {
-  color: #ad8b00 !important;
+  color: #f3ea62 !important;
   text-decoration: underline;
 }
 
@@ -98,17 +125,16 @@ code {
 }
 
 .monokleEditorPolicyIssueGlyphClass {
-  background-image: url('./assets/ErrorIcon.svg');
-  background-repeat: no-repeat;
-  background-size: contain;
-  max-height: 10px;
-  max-width: 10px;
-  margin-top: 5px;
+  background-color: #e84749;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
   margin-left: 15px;
 }
 
 .monokleEditorPolicyIssueInlineClass {
-  color: #e65a6d !important;
+  color: #e84749 !important;
   text-decoration: underline;
 }
 
