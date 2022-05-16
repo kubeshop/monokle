@@ -36,8 +36,12 @@ const applyRefIntel = (
     return {decorations: newDecorations, disposables: newDisposables};
   }
 
-  const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
-    [];
+  const listOfMatchedRefsByEqualPos: {
+    refType: ResourceRefType;
+    position: RefPosition;
+    matchedRefs: ResourceRef[];
+    targetType: string;
+  }[] = [];
 
   // find refs that can be decorated
   refs.forEach(ref => {
@@ -50,6 +54,7 @@ const applyRefIntel = (
           refType: ref.type,
           position: refPos,
           matchedRefs: [ref],
+          targetType: ref.target?.type || '',
         });
       } else {
         listOfMatchedRefsByEqualPos[refsByEqualPosIndex].matchedRefs.push(ref);
@@ -58,7 +63,7 @@ const applyRefIntel = (
   });
 
   // decorate matched refs
-  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType}) => {
+  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType, targetType}) => {
     const inlineRange = new monaco.Range(
       position.line,
       position.column,
@@ -126,7 +131,9 @@ const applyRefIntel = (
 
     const hoverTitle =
       refType === ResourceRefType.Outgoing
-        ? 'Outgoing Links'
+        ? targetType === 'image'
+          ? 'Outgoing Image Link'
+          : 'Outgoing Links'
         : refType === ResourceRefType.Incoming
         ? 'Incoming Links'
         : 'Unsatisfied link';
@@ -153,7 +160,9 @@ const applyRefIntel = (
       hasUnsatisfiedRef
         ? GlyphDecorationTypes.UnsatisfiedRef
         : refType === ResourceRefType.Outgoing
-        ? GlyphDecorationTypes.OutgoingRef
+        ? targetType === 'image'
+          ? GlyphDecorationTypes.OutgoingImageRef
+          : GlyphDecorationTypes.OutgoingRef
         : GlyphDecorationTypes.IncomingRef,
       hoverCommandMarkdownLinkList
     );

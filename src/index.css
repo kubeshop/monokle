@@ -114,6 +114,16 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   margin-left: 15px;
 }
 
+.monokleEditorOutgoingImageRefGlyphClass {
+  background-image: url('./assets/OutgoingImageRefIcon.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-height: 13px;
+  max-width: 13px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
 .monokleEditorIncomingRefGlyphClass {
   background-image: url('./assets/IncomingRefsIcon.svg');
   background-repeat: no-repeat;

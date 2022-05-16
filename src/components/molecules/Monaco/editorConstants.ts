@@ -11,6 +11,7 @@ export enum GlyphDecorationTypes {
   OutgoingRef,
   PolicyIssue,
   ErrorRef,
+  OutgoingImageRef,
 }
 
 export enum InlineDecorationTypes {
@@ -42,6 +43,10 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
   },
   [GlyphDecorationTypes.ErrorRef]: {
     glyphMarginClassName: 'monokleEditorErrorRefGlyphClass',
+  },
+  [GlyphDecorationTypes.OutgoingImageRef]: {
+    glyphMarginClassName: 'monokleEditorOutgoingImageRefGlyphClass',
+    glyphMarginHoverMessage: {value: 'Image link'},
   },
 };
 
