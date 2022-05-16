@@ -1,5 +1,6 @@
 import {PayloadAction, TaskAbortError, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
+import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
@@ -154,6 +155,7 @@ export const compareSlice = createSlice({
     },
     resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: ResourceSet}>) => {
       const {side, value} = action.payload;
+      resetComparison(state);
 
       if (side === 'left') {
         state.current.view.leftSet = value;
@@ -162,10 +164,6 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
-
-        state.current.comparison = undefined;
-        state.current.viewDiff = undefined;
-        state.current.selection = [];
       } else {
         state.current.view.rightSet = value;
         state.current.right = {
@@ -173,42 +171,30 @@ export const compareSlice = createSlice({
           error: false,
           resources: [],
         };
-
-        state.current.comparison = undefined;
-        state.current.viewDiff = undefined;
-        state.current.selection = [];
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
       const side = action.payload.side;
+      resetComparison(state);
+
       if (['left', 'both'].includes(side)) {
         state.current.view.leftSet = undefined;
         state.current.left = undefined;
-
-        state.current.comparison = undefined;
-        state.current.viewDiff = undefined;
-        state.current.selection = [];
       }
       if (['right', 'both'].includes(side)) {
         state.current.view.rightSet = undefined;
         state.current.right = undefined;
-
-        state.current.comparison = undefined;
-        state.current.viewDiff = undefined;
-        state.current.selection = [];
       }
     },
     resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
       const {side} = action.payload;
+      resetComparison(state);
+
       state.current[side] = {
         loading: true,
         error: false,
         resources: [],
       };
-
-      state.current.comparison = undefined;
-      state.current.viewDiff = undefined;
-      state.current.selection = [];
     },
     diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
       state.current.viewDiff = action.payload.id;
@@ -266,6 +252,12 @@ export const compareSlice = createSlice({
     },
   },
 });
+
+function resetComparison(state: WritableDraft<CompareState>) {
+  state.current.comparison = undefined;
+  state.current.viewDiff = undefined;
+  state.current.selection = [];
+}
 
 /* * * * * * * * * * * * * *
  * Export
