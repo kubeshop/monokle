@@ -1,4 +1,4 @@
-import {Row, Tag} from 'antd';
+import {Col, Row, Tag} from 'antd';
 
 import styled from 'styled-components';
 
@@ -21,6 +21,12 @@ export const ComparisonRow = styled(Row)`
   height: 28px;
   margin-left: 8px;
   font-size: 16px;
+`;
+
+export const ComparisonActionsCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const DiffLabel = styled.span`

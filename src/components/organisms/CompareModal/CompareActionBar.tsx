@@ -57,7 +57,6 @@ export const CompareActionBar: React.FC = () => {
       <S.ActionBarRightDiv>
         <Space>
           <Input disabled={disabled} value="search" />
-          {/* <Dropdown overlay={menu}> */}
           <Dropdown disabled={disabled} overlay={menu}>
             <Button>
               <Space>

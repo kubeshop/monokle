@@ -84,13 +84,13 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
           <S.ResourceName $isActive={leftActive}>{name}</S.ResourceName>
         </S.ResourceDiv>
       </Col>
-      <Col span={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+      <S.ComparisonActionsCol span={2}>
         {canDiff ? (
           <Button type="primary" shape="round" size="small" onClick={handleViewDiff}>
             <S.DiffLabel>diff</S.DiffLabel>
           </Button>
         ) : null}
-      </Col>
+      </S.ComparisonActionsCol>
 
       <Col span={11}>
         <S.ResourceDiv>
