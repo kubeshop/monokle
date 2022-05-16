@@ -5,7 +5,7 @@ import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {startAppListening} from '@redux/listeners/base';
+import {AppListenerFn} from '@redux/listeners/base';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 
@@ -317,64 +317,51 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
-startAppListening({
-  matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
-  effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
-    const side = (action as any).payload.side;
-    if (side === 'right') return;
-    cancelActiveListeners();
-    if (resourceSetCleared.match(action)) return;
+export const resourceFetchListener =
+  (side: CompareSide): AppListenerFn =>
+  listen => {
+    listen({
+      predicate: action => {
+        const resourceSetUpdated = isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared);
+        if (!resourceSetUpdated(action)) return false;
+        const actionSide = (action as any).payload.side;
+        return actionSide === side;
+      },
+      effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
+        try {
+          cancelActiveListeners();
+          if (resourceSetCleared.match(action)) return;
 
-    try {
-      const state = getState();
-      const options = state.compare.current.view.leftSet;
-      if (!options) return;
+          const state = getState();
+          const options = state.compare.current.view.rightSet;
+          if (!options) return;
 
-      const resources = await fetchResources(state, options);
-      dispatch(resourceSetFetched({side: 'left', resources}));
-    } catch (err) {
-      if (err instanceof TaskAbortError) return;
-      const reason = err instanceof Error ? err.message : 'unknown failure';
-      dispatch(resourceSetFetchFailed({side: 'left', reason}));
-    }
-  },
-});
+          const resources = await fetchResources(state, options);
 
-startAppListening({
-  matcher: isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared),
-  effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
-    const side = (action as any).payload.side;
-    if (side === 'left') return;
-    cancelActiveListeners();
-    if (resourceSetCleared.match(action)) return;
+          dispatch(resourceSetFetched({side, resources}));
+        } catch (err) {
+          if (err instanceof TaskAbortError) return;
+          const reason = err instanceof Error ? err.message : 'unknown failure';
+          dispatch(resourceSetFetchFailed({side, reason}));
+        }
+      },
+    });
+  };
 
-    try {
-      const state = getState();
-      const options = state.compare.current.view.rightSet;
-      if (!options) return;
+export const compareListener: AppListenerFn = listen => {
+  listen({
+    actionCreator: resourceSetFetched,
+    effect: async (_action, {dispatch, getState}) => {
+      const status = selectCompareStatus(getState().compare);
+      const left = getState().compare.current.left;
+      const right = getState().compare.current.right;
 
-      const resources = await fetchResources(state, options);
-      dispatch(resourceSetFetched({side: 'right', resources}));
-    } catch (err) {
-      if (err instanceof TaskAbortError) return;
-      const reason = err instanceof Error ? err.message : 'unknown failure';
-      dispatch(resourceSetFetchFailed({side: 'right', reason}));
-    }
-  },
-});
+      if (status !== 'comparing' || !left || !right) {
+        return;
+      }
 
-startAppListening({
-  actionCreator: resourceSetFetched,
-  effect: async (_action, {dispatch, getState}) => {
-    const status = selectCompareStatus(getState().compare);
-    const left = getState().compare.current.left;
-    const right = getState().compare.current.right;
-
-    if (status !== 'comparing' || !left || !right) {
-      return;
-    }
-
-    const comparisons = compareResources(left.resources, right.resources, {operation: 'union'});
-    dispatch(resourceSetCompared({comparisons}));
-  },
-});
+      const comparisons = compareResources(left.resources, right.resources, {operation: 'union'});
+      dispatch(resourceSetCompared({comparisons}));
+    },
+  });
+};

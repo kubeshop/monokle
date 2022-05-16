@@ -4,10 +4,10 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
-import {listenerMiddleware} from './listeners/base';
+import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
-import {compareSlice} from './reducers/compare';
+import {compareListener, compareSlice, resourceFetchListener} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
@@ -27,6 +27,8 @@ if (process.env.NODE_ENV === `development`) {
 }
 
 export const resetStore = createAction('app/reset');
+
+combineListeners([resourceFetchListener('left'), resourceFetchListener('right'), compareListener]);
 
 const appReducer = combineReducers({
   config: configSlice.reducer,
