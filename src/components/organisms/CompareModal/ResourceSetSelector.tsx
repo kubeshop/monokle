@@ -1,25 +1,14 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 import {Button, Dropdown, Menu, Tooltip} from 'antd';
 
 import {ClearOutlined, DownOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import styled from 'styled-components';
+import {useAppSelector} from '@redux/hooks';
+import {ResourceSet, resourceSetCleared, resourceSetRefreshed, resourceSetSelected} from '@redux/reducers/compare';
 
-import {resourceSetCleared, resourceSetRefreshed, resourceSetSelected} from '@redux/reducers/compare';
-
-import {PartialStore} from './CompareModal';
-import {ResourceSet} from './CompareState';
-
-const DiffSetSelectorDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 9px 12px;
-  border-radius: 2;
-  background-color: #31393c;
-  margin-bottom: 16px;
-`;
+import * as S from './ResourceSetSelector.styled';
 
 const resourceSetLabelMap: Record<ResourceSet['type'], string> = {
   local: 'Local',
@@ -30,7 +19,7 @@ const resourceSetLabelMap: Record<ResourceSet['type'], string> = {
 
 export function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
   const dispatch = useDispatch();
-  const resourceSet = useSelector((state: PartialStore) => {
+  const resourceSet = useAppSelector(state => {
     const view = state.compare.current.view;
     return side === 'left' ? view.leftSet : view.rightSet;
   });
@@ -63,7 +52,7 @@ export function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
   );
 
   return (
-    <DiffSetSelectorDiv>
+    <S.DiffSetSelectorDiv>
       <Dropdown overlay={menu}>
         <Button style={{width: 180, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
           {resourceSet ? resourceSetLabelMap[resourceSet.type] : 'Choose...'}
@@ -80,6 +69,6 @@ export function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
           <Button type="link" size="middle" icon={<ClearOutlined />} onClick={handleClear} />
         </Tooltip>
       </div>
-    </DiffSetSelectorDiv>
+    </S.DiffSetSelectorDiv>
   );
 }

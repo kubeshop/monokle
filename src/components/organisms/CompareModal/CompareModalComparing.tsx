@@ -1,20 +1,19 @@
 import {MonacoDiffEditor} from 'react-monaco-editor';
-import {useSelector} from 'react-redux';
 
 import {Col, Row} from 'antd';
 
 import styled from 'styled-components';
 
+import {useAppSelector} from '@redux/hooks';
 import {selectDiffedComparison} from '@redux/reducers/compare';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import {PartialStore} from './CompareModal';
 import {DiffComparisonList} from './ComparisonList';
 
 export function CompareModalComparing() {
-  const {diff} = useSelector((state: PartialStore) => state.compare.current);
-  const diffComparison = useSelector((state: PartialStore) => selectDiffedComparison(state.compare));
+  const {diff} = useAppSelector(state => state.compare.current);
+  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
 
   if (!diff || diff.loading) {
     return (
@@ -28,7 +27,7 @@ export function CompareModalComparing() {
 
   if (diffComparison) {
     return (
-      <ListRow style={{height: 'calc(100% - 100px)'}}>
+      <DiffRow>
         <Col span={24}>
           <MonacoDiffEditor
             language="yaml"
@@ -50,7 +49,7 @@ export function CompareModalComparing() {
             }}
           />
         </Col>
-      </ListRow>
+      </DiffRow>
     );
   }
 
@@ -63,6 +62,7 @@ export function CompareModalComparing() {
   );
 }
 
-const ListRow = styled(Row)`
+const DiffRow = styled(Row)`
+  height: calc(100% - 100px);
   overflow: auto;
 `;

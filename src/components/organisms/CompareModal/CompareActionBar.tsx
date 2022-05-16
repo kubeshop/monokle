@@ -1,36 +1,21 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 import {Button, Checkbox, Divider, Dropdown, Input, Menu, Space} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
-import styled from 'styled-components';
+import log from 'loglevel';
 
+import {useAppSelector} from '@redux/hooks';
 import {comparisonAllToggled, selectCompareStatus, selectIsAllComparisonSelected} from '@redux/reducers/compare';
 
-import {PartialStore} from './CompareModal';
-
-const ActionBarDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 12px;
-  margin-bottom: 6px;
-  border-radius: 2px;
-  background-color: #31393c80;
-  color: #5a5a5a;
-`;
-
-const ActionBarRightDiv = styled.div`
-  display: flex;
-  align-items: center;
-`;
+import * as S from './CompareActionBar.styled';
 
 export function CompareActionBar() {
   const dispatch = useDispatch();
-  const status = useSelector((state: PartialStore) => selectCompareStatus(state.compare));
-  const isAllSelected = useSelector((state: PartialStore) => selectIsAllComparisonSelected(state.compare));
+  const status = useAppSelector(state => selectCompareStatus(state.compare));
+  const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
   const namespaces = ['default', 'demo'];
 
@@ -39,15 +24,15 @@ export function CompareActionBar() {
   }, [dispatch]);
 
   const handleSelectNamespace = useCallback((namespace: string) => {
-    console.log('dispatch FilterUpdated', {namespace});
+    log.debug('dispatch FilterUpdated', {namespace});
   }, []);
 
   const handleSaveView = useCallback(() => {
-    console.log('dispatch ViewSaved');
+    log.debug('dispatch ViewSaved');
   }, []);
 
   const handleLoadView = useCallback(() => {
-    console.log('dispatch ViewLoaded');
+    log.debug('dispatch ViewLoaded');
   }, []);
 
   const menu = (
@@ -63,14 +48,14 @@ export function CompareActionBar() {
   );
 
   return (
-    <ActionBarDiv>
+    <S.ActionBarDiv>
       <div>
         <Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
           Select all
         </Checkbox>
       </div>
 
-      <ActionBarRightDiv>
+      <S.ActionBarRightDiv>
         <Space>
           <Input disabled={disabled} value="search" />
           {/* <Dropdown overlay={menu}> */}
@@ -93,7 +78,7 @@ export function CompareActionBar() {
             Load Diff
           </Button>
         </Space>
-      </ActionBarRightDiv>
-    </ActionBarDiv>
+      </S.ActionBarRightDiv>
+    </S.ActionBarDiv>
   );
 }
