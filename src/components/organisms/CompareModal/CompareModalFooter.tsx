@@ -2,20 +2,20 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-const StyledButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 export function DiffModalFooter({onClose}: {onClose: () => void}) {
   return (
-    <StyledButtonsContainer>
+    <FooterDiv>
       <div />
 
       <Button type="link" onClick={onClose}>
         Close
       </Button>
-    </StyledButtonsContainer>
+    </FooterDiv>
   );
 }
+
+const FooterDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;

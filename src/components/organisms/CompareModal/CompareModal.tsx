@@ -1,10 +1,10 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
 import {useWindowSize} from 'react-use';
 
 import {Col, Modal, Row} from 'antd';
 
-import {CompareState, selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compare';
+import {useAppSelector} from '@redux/hooks';
+import {selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compare';
 
 import {CompareActionBar} from './CompareActionBar';
 import {CompareModalComparing} from './CompareModalComparing';
@@ -18,14 +18,10 @@ type Props = {
   onClose: () => void;
 };
 
-export type PartialStore = {
-  compare: CompareState;
-};
-
 export default function DiffModal({visible, onClose}: Props) {
   const sizeProps = useModalSize();
-  const status = useSelector((state: PartialStore) => selectCompareStatus(state.compare));
-  const diffComparison = useSelector((state: PartialStore) => selectDiffedComparison(state.compare));
+  const status = useAppSelector(state => selectCompareStatus(state.compare));
+  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
 
   return (
     <Modal

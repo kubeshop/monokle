@@ -18,6 +18,7 @@ enum Colors {
   grey6 = '#5A5A5A', // gray, gray 6
   grey5 = '#5A5A5A', // gray, gray 5
   grey5b = '#434343', // gray, gray 5 as in Figma - FIXME!
+  greyXY = '#31393c80', // Missing color - FIXME!
   grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1

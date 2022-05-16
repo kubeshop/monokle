@@ -1,18 +1,15 @@
 /* eslint-disable no-restricted-syntax */
 import {useCallback, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 
-import {Button, Checkbox, Col, Row, Tag} from 'antd';
+import {Button, Checkbox, Col} from 'antd';
 
 import {groupBy} from 'lodash';
-import styled from 'styled-components';
 
-import {comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
+import {useAppSelector} from '@redux/hooks';
+import {DiffData, comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
 
-import Colors, {FontColors} from '@styles/Colors';
-
-import {PartialStore} from './CompareModal';
-import {DiffData} from './CompareState';
+import * as S from './ComparisonList.styled';
 
 type HeaderData = {
   type: 'header';
@@ -29,62 +26,6 @@ type ComparisonData = {
   rightActive: boolean;
   canDiff: boolean;
 };
-
-const HeaderRow = styled(Row)`
-  height: 28px;
-  margin-left: 8px;
-  font-size: 16px;
-`;
-
-const Title = styled.h1`
-  padding: 0;
-  margin-bottom: 0px;
-  font-size: 18px;
-  line-height: 22px;
-`;
-
-const ComparisonRow = styled(Row)`
-  height: 28px;
-  margin-left: 8px;
-  font-size: 16px;
-`;
-
-const DiffLabel = styled.span`
-  color: #1f1f1f;
-`;
-
-const ResourceName = styled.span<{$isActive?: boolean}>`
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 25px;
-  color: ${({$isActive = true}) => ($isActive ? Colors.whitePure : Colors.grey5b)};
-`;
-
-const ResourceCount = styled.span`
-  margin-left: 6px;
-  font-size: 14px;
-  color: ${FontColors.grey};
-`;
-
-const ResourceDiv = styled.div`
-  height: 28px;
-  display: flex;
-  align-items: center;
-  margin-left: 8px;
-`;
-
-const ResourceNamespace = styled(Tag)`
-  height: 22px;
-  margin: 1px 8px 1px 0px;
-  width: 72px;
-  text-align: center;
-  color: ${Colors.whitePure};
-  font-size: 12px;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
 
 export function DiffComparisonList({data}: {data: DiffData}) {
   const rows = useMemo(() => {
@@ -141,21 +82,21 @@ export function DiffComparisonList({data}: {data: DiffData}) {
 function HeaderItem({data}: {data: HeaderData}) {
   const {kind, count} = data;
   return (
-    <HeaderRow key={kind}>
+    <S.HeaderRow key={kind}>
       <Col span={11}>
-        <Title>
-          {kind} <ResourceCount>{count}</ResourceCount>
-        </Title>
+        <S.Title>
+          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+        </S.Title>
       </Col>
 
       <Col span={2} />
 
       <Col span={11}>
-        <Title>
-          {kind} <ResourceCount>{count}</ResourceCount>
-        </Title>
+        <S.Title>
+          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+        </S.Title>
       </Col>
-    </HeaderRow>
+    </S.HeaderRow>
   );
 }
 
@@ -163,35 +104,35 @@ function ComparisonItem({data}: {data: ComparisonData}) {
   const {id, namespace, name, leftActive, rightActive, canDiff} = data;
   const dispatch = useDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
-  const selected = useSelector((state: PartialStore) => selectIsComparisonSelected(state.compare, id));
+  const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));
 
   const handleViewDiff = useCallback(() => {
     dispatch(diffViewOpened({id}));
   }, [dispatch, id]);
 
   return (
-    <ComparisonRow key={id}>
+    <S.ComparisonRow key={id}>
       <Col span={11}>
-        <ResourceDiv>
+        <S.ResourceDiv>
           <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
-          <ResourceNamespace>{namespace}</ResourceNamespace>
-          <ResourceName $isActive={leftActive}>{name}</ResourceName>
-        </ResourceDiv>
+          <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+          <S.ResourceName $isActive={leftActive}>{name}</S.ResourceName>
+        </S.ResourceDiv>
       </Col>
       <Col span={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
         {canDiff ? (
           <Button type="primary" shape="round" size="small" onClick={handleViewDiff}>
-            <DiffLabel>diff</DiffLabel>
+            <S.DiffLabel>diff</S.DiffLabel>
           </Button>
         ) : null}
       </Col>
 
       <Col span={11}>
-        <ResourceDiv>
-          <ResourceNamespace>{namespace}</ResourceNamespace>
-          <ResourceName $isActive={rightActive}>{name}</ResourceName>
-        </ResourceDiv>
+        <S.ResourceDiv>
+          <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+          <S.ResourceName $isActive={rightActive}>{name}</S.ResourceName>
+        </S.ResourceDiv>
       </Col>
-    </ComparisonRow>
+    </S.ComparisonRow>
   );
 }
