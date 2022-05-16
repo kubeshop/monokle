@@ -4,7 +4,7 @@ type Props = {
   src: string;
 };
 
-export const DiffFigure: React.FC<Props> = ({src, children}) => {
+export const CompareFigure: React.FC<Props> = ({src, children}) => {
   return (
     <S.FigureDiv>
       <img src={src} />

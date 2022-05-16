@@ -6,37 +6,21 @@ import {Button, Checkbox, Col} from 'antd';
 import {groupBy} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {DiffData, comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
+import {ComparisonData, comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
 
-type HeaderData = {
-  type: 'header';
-  kind: string;
-  count: number;
-};
-
-type ComparisonData = {
-  type: 'comparison';
-  id: string;
-  namespace: string;
-  name: string;
-  leftActive: boolean;
-  rightActive: boolean;
-  canDiff: boolean;
-};
-
 type Props = {
-  data: DiffData;
+  data: ComparisonData;
 };
 
-export const DiffComparisonList: React.FC<Props> = ({data}) => {
+export const ComparisonList: React.FC<Props> = ({data}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.comparisons, r => {
       if (r.isMatch) return r.left.kind;
       return r.left ? r.left.kind : r.right.kind;
     });
-    const result: Array<HeaderData | ComparisonData> = [];
+    const result: Array<HeaderItemProps | ComparisonItemProps> = [];
 
     for (const [kind, comparisons] of Object.entries(groups)) {
       result.push({type: 'header', kind, count: comparisons.length});
@@ -73,17 +57,22 @@ export const DiffComparisonList: React.FC<Props> = ({data}) => {
     <div>
       {rows.map(row => {
         return row.type === 'header' ? (
-          <HeaderItem key={row.kind} data={row} />
+          <HeaderItem key={row.kind} {...row} />
         ) : (
-          <ComparisonItem key={row.id} data={row} />
+          <ComparisonItem key={row.id} {...row} />
         );
       })}
     </div>
   );
 };
 
-function HeaderItem({data}: {data: HeaderData}) {
-  const {kind, count} = data;
+type HeaderItemProps = {
+  type: 'header';
+  kind: string;
+  count: number;
+};
+
+function HeaderItem({kind, count}: HeaderItemProps) {
   return (
     <S.HeaderRow key={kind}>
       <Col span={11}>
@@ -103,8 +92,17 @@ function HeaderItem({data}: {data: HeaderData}) {
   );
 }
 
-function ComparisonItem({data}: {data: ComparisonData}) {
-  const {id, namespace, name, leftActive, rightActive, canDiff} = data;
+type ComparisonItemProps = {
+  type: 'comparison';
+  id: string;
+  namespace: string;
+  name: string;
+  leftActive: boolean;
+  rightActive: boolean;
+  canDiff: boolean;
+};
+
+function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}: ComparisonItemProps) {
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
   const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));

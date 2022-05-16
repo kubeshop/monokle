@@ -27,7 +27,7 @@ type Props = {
   showCheckbox?: boolean;
 };
 
-export const DiffSetList: React.FC<Props> = ({data, showCheckbox = false}) => {
+export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.resources, r => r.kind);
     const result: Array<HeaderItem | ResourceItem> = [];
@@ -44,7 +44,7 @@ export const DiffSetList: React.FC<Props> = ({data, showCheckbox = false}) => {
   }, [data.resources]);
 
   return (
-    <S.SetListDiv>
+    <S.ResourceListDiv>
       {rows.map(row => {
         if (row.type === 'header') {
           const {kind, count: resourceCount} = row;
@@ -66,6 +66,6 @@ export const DiffSetList: React.FC<Props> = ({data, showCheckbox = false}) => {
           </S.ResourceDiv>
         );
       })}
-    </S.SetListDiv>
+    </S.ResourceListDiv>
   );
 };

@@ -8,7 +8,7 @@ import {selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compa
 
 import {CompareActionBar} from './CompareActionBar';
 import {CompareModalComparing} from './CompareModalComparing';
-import {DiffModalFooter} from './CompareModalFooter';
+import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
 import {DiffActionBar} from './DiffActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
@@ -29,7 +29,7 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       visible={visible}
       onCancel={onClose}
       onOk={onClose}
-      footer={<DiffModalFooter onClose={onClose} />}
+      footer={<CompareModalFooter onClose={onClose} />}
       {...sizeProps}
     >
       {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}

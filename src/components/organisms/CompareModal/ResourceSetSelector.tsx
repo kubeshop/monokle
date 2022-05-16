@@ -55,7 +55,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
   );
 
   return (
-    <S.DiffSetSelectorDiv>
+    <S.ResourceSetSelectorDiv>
       <Dropdown overlay={menu}>
         <Button style={{width: 180, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
           {resourceSet ? resourceSetLabelMap[resourceSet.type] : 'Choose...'}
@@ -72,6 +72,6 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
           <Button type="link" size="middle" icon={<ClearOutlined />} onClick={handleClear} />
         </Tooltip>
       </div>
-    </S.DiffSetSelectorDiv>
+    </S.ResourceSetSelectorDiv>
   );
 };
