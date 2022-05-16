@@ -2,7 +2,17 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-export function DiffModalFooter({onClose}: {onClose: () => void}) {
+type Props = {
+  onClose: () => void;
+};
+
+const FooterDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const DiffModalFooter: React.FC<Props> = ({onClose}) => {
   return (
     <FooterDiv>
       <div />
@@ -12,10 +22,4 @@ export function DiffModalFooter({onClose}: {onClose: () => void}) {
       </Button>
     </FooterDiv>
   );
-}
-
-const FooterDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+};

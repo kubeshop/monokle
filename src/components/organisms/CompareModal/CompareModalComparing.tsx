@@ -11,7 +11,7 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {DiffComparisonList} from './ComparisonList';
 
-export function CompareModalComparing() {
+export const CompareModalComparing: React.FC = () => {
   const {diff} = useAppSelector(state => state.compare.current);
   const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
 
@@ -60,7 +60,7 @@ export function CompareModalComparing() {
       </Col>
     </Row>
   );
-}
+};
 
 const DiffRow = styled(Row)`
   height: calc(100% - 100px);

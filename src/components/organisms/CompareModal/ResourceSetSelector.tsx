@@ -1,11 +1,10 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Button, Dropdown, Menu, Tooltip} from 'antd';
 
 import {ClearOutlined, DownOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {ResourceSet, resourceSetCleared, resourceSetRefreshed, resourceSetSelected} from '@redux/reducers/compare';
 
 import * as S from './ResourceSetSelector.styled';
@@ -17,8 +16,12 @@ const resourceSetLabelMap: Record<ResourceSet['type'], string> = {
   kustomize: 'Kustomize',
 };
 
-export function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
-  const dispatch = useDispatch();
+type Props = {
+  side: 'left' | 'right';
+};
+
+export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
+  const dispatch = useAppDispatch();
   const resourceSet = useAppSelector(state => {
     const view = state.compare.current.view;
     return side === 'left' ? view.leftSet : view.rightSet;
@@ -71,4 +74,4 @@ export function ResourceSetSelector({side}: {side: 'left' | 'right'}) {
       </div>
     </S.DiffSetSelectorDiv>
   );
-}
+};
