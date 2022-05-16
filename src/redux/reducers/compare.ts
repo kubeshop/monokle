@@ -1,6 +1,7 @@
-import {PayloadAction, TaskAbortError, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {PayloadAction, TaskAbortError, createSelector, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import {WritableDraft} from 'immer/dist/internal';
+import {groupBy} from 'lodash';
 import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
@@ -8,6 +9,8 @@ import {K8sResource} from '@models/k8sresource';
 import {AppListenerFn} from '@redux/listeners/base';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
+
+import {ComparisonListItem} from '@components/organisms/CompareModal/ComparisonList';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -313,6 +316,48 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
     state.current.selection.length === state.current.comparison?.comparisons.length
   );
 };
+
+export const selectComparisonListItems = createSelector(
+  (state: CompareState) => state.current.comparison?.comparisons,
+  comparisons => {
+    const result: ComparisonListItem[] = [];
+
+    const groups = groupBy(comparisons, r => {
+      if (r.isMatch) return r.left.kind;
+      return r.left ? r.left.kind : r.right.kind;
+    });
+
+    Object.entries(groups).forEach(([kind, comps]) => {
+      result.push({type: 'header', kind, count: comps.length});
+
+      comps.forEach(comparison => {
+        if (comparison.isMatch) {
+          result.push({
+            type: 'comparison',
+            id: comparison.id,
+            name: comparison.left.name,
+            namespace: comparison.left.namespace ?? 'default',
+            leftActive: true,
+            rightActive: true,
+            canDiff: comparison.isDifferent,
+          });
+        } else {
+          result.push({
+            type: 'comparison',
+            id: comparison.id,
+            name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
+            namespace: comparison.left?.namespace ?? comparison.right?.namespace ?? 'default',
+            leftActive: Boolean(comparison.left),
+            rightActive: Boolean(comparison.right),
+            canDiff: false,
+          });
+        }
+      });
+    });
+
+    return result;
+  }
+);
 
 /* * * * * * * * * * * * * *
  * Listeners

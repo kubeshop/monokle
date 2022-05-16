@@ -56,7 +56,7 @@ export const CompareModalComparing: React.FC = () => {
   return (
     <Row>
       <Col span={24}>
-        <ComparisonList data={comparison} />
+        <ComparisonList />
       </Col>
     </Row>
   );

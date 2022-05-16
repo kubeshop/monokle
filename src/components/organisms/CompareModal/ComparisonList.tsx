@@ -1,65 +1,29 @@
-/* eslint-disable no-restricted-syntax */
-import {useCallback, useMemo} from 'react';
+import {useCallback} from 'react';
 
 import {Button, Checkbox, Col} from 'antd';
 
-import {groupBy} from 'lodash';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {ComparisonData, comparisonToggled, diffViewOpened, selectIsComparisonSelected} from '@redux/reducers/compare';
+import {
+  comparisonToggled,
+  diffViewOpened,
+  selectComparisonListItems,
+  selectIsComparisonSelected,
+} from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
 
-type Props = {
-  data: ComparisonData;
-};
+export type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
 
-export const ComparisonList: React.FC<Props> = ({data}) => {
-  const rows = useMemo(() => {
-    const groups = groupBy(data.comparisons, r => {
-      if (r.isMatch) return r.left.kind;
-      return r.left ? r.left.kind : r.right.kind;
-    });
-    const result: Array<HeaderItemProps | ComparisonItemProps> = [];
-
-    for (const [kind, comparisons] of Object.entries(groups)) {
-      result.push({type: 'header', kind, count: comparisons.length});
-
-      for (const comparison of comparisons) {
-        if (comparison.isMatch) {
-          result.push({
-            type: 'comparison',
-            id: comparison.id,
-            name: comparison.left.name,
-            namespace: comparison.left.namespace ?? 'default',
-            leftActive: true,
-            rightActive: true,
-            canDiff: comparison.isDifferent,
-          });
-        } else {
-          result.push({
-            type: 'comparison',
-            id: comparison.id,
-            name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
-            namespace: comparison.left?.namespace ?? comparison.right?.namespace ?? 'default',
-            leftActive: Boolean(comparison.left),
-            rightActive: Boolean(comparison.right),
-            canDiff: false,
-          });
-        }
-      }
-    }
-
-    return result;
-  }, [data.comparisons]);
+export const ComparisonList: React.FC = () => {
+  const items = useAppSelector(state => selectComparisonListItems(state.compare));
 
   return (
     <div>
-      {rows.map(row => {
-        return row.type === 'header' ? (
-          <HeaderItem key={row.kind} {...row} />
+      {items.map(item => {
+        return item.type === 'header' ? (
+          <HeaderItem key={item.kind} {...item} />
         ) : (
-          <ComparisonItem key={row.id} {...row} />
+          <ComparisonItem key={item.id} {...item} />
         );
       })}
     </div>
