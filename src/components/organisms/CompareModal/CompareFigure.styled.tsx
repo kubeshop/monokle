@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const FigureDiv = styled.div`
-  display: 'flex';
-  flex-direction: 'column';
-  width: '100%';
-  height: '100%';
-  align-items: 'center';
-  justify-content: 'center';
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const ContentDiv = styled.div`

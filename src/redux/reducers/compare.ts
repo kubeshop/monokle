@@ -369,7 +369,7 @@ export const resourceFetchListener =
       predicate: action => {
         const resourceSetUpdated = isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared);
         if (!resourceSetUpdated(action)) return false;
-        const actionSide = (action as any).payload.side;
+        const actionSide = action.payload.side;
         return actionSide === side;
       },
       effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
@@ -378,7 +378,7 @@ export const resourceFetchListener =
           if (resourceSetCleared.match(action)) return;
 
           const state = getState();
-          const options = state.compare.current.view.rightSet;
+          const options = side === 'left' ? state.compare.current.view.leftSet : state.compare.current.view.rightSet;
           if (!options) return;
 
           const resources = await fetchResources(state, options);
