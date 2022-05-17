@@ -23,6 +23,14 @@ export function compareResources(
   switch (operation) {
     case 'union':
       return compareResourcesAsUnion(leftMap, rightMap);
+    case 'intersection':
+      return compareResourcesAsIntersection(leftMap, rightMap);
+    case 'symmetricDifference':
+      return compareResourcesAsSymmetricDifference(leftMap, rightMap);
+    case 'leftJoin':
+      return compareResourcesAsLeftJoin(leftMap, rightMap);
+    case 'rightJoin':
+      return compareResourcesAsRightJoin(leftMap, rightMap);
     default:
       throw new Error(`${operation} is not yet implemented`);
   }
@@ -61,6 +69,124 @@ function compareResourcesAsUnion(
     if (matchingLeftResource) {
       // eslint-disable-next-line no-continue
       continue; // already had these in previous loop.
+    } else {
+      result.push({
+        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        isMatch: false,
+        left: undefined,
+        right: rightResource,
+      });
+    }
+  }
+
+  return result;
+}
+
+function compareResourcesAsIntersection(
+  leftMap: Map<string, K8sResource>,
+  rightMap: Map<string, K8sResource>
+): ResourceComparison[] {
+  const result: ResourceComparison[] = [];
+
+  for (const [id, leftResource] of leftMap.entries()) {
+    const matchingRightResource = rightMap.get(id);
+
+    if (matchingRightResource) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        isMatch: true,
+        isDifferent: leftResource.text === matchingRightResource.text,
+        left: leftResource,
+        right: matchingRightResource,
+      });
+    }
+  }
+
+  return result;
+}
+
+function compareResourcesAsSymmetricDifference(
+  leftMap: Map<string, K8sResource>,
+  rightMap: Map<string, K8sResource>
+): ResourceComparison[] {
+  const result: ResourceComparison[] = [];
+
+  for (const [id, leftResource] of leftMap.entries()) {
+    const matchingRightResource = rightMap.get(id);
+
+    if (!matchingRightResource) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        isMatch: false,
+        left: leftResource,
+        right: undefined,
+      });
+    }
+  }
+
+  for (const [id, rightResource] of rightMap.entries()) {
+    const matchingLeftResource = leftMap.get(id);
+
+    if (!matchingLeftResource) {
+      result.push({
+        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        isMatch: false,
+        left: undefined,
+        right: rightResource,
+      });
+    }
+  }
+
+  return result;
+}
+
+function compareResourcesAsLeftJoin(
+  leftMap: Map<string, K8sResource>,
+  rightMap: Map<string, K8sResource>
+): ResourceComparison[] {
+  const result: ResourceComparison[] = [];
+
+  for (const [id, leftResource] of leftMap.entries()) {
+    const matchingRightResource = rightMap.get(id);
+
+    if (matchingRightResource) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        isMatch: true,
+        isDifferent: leftResource.text === matchingRightResource.text,
+        left: leftResource,
+        right: matchingRightResource,
+      });
+    } else {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        isMatch: false,
+        left: leftResource,
+        right: undefined,
+      });
+    }
+  }
+
+  return result;
+}
+
+function compareResourcesAsRightJoin(
+  leftMap: Map<string, K8sResource>,
+  rightMap: Map<string, K8sResource>
+): ResourceComparison[] {
+  const result: ResourceComparison[] = [];
+
+  for (const [id, rightResource] of rightMap.entries()) {
+    const matchingLeftResource = leftMap.get(id);
+
+    if (matchingLeftResource) {
+      result.push({
+        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        isMatch: true,
+        isDifferent: matchingLeftResource.text === rightResource.text,
+        left: matchingLeftResource,
+        right: rightResource,
+      });
     } else {
       result.push({
         id: createStableComparisonIdentifier(matchingLeftResource, rightResource),

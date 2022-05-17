@@ -45,16 +45,16 @@ export type ResourceSetData = {
   resources: K8sResource[];
 };
 
-export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' | 'leftDifference' | 'rightDifference';
+export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' | 'leftJoin' | 'rightJoin';
 
 export type CompareFilter = {
   namespace?: string;
 };
 
 export type ComparisonView = {
-  leftSet: PartialResourceSet | undefined;
-  rightSet: PartialResourceSet | undefined;
-  operation: CompareOperation;
+  leftSet?: PartialResourceSet;
+  rightSet?: PartialResourceSet;
+  operation?: CompareOperation;
   filter?: CompareFilter;
 };
 
@@ -147,6 +147,7 @@ export const compareSlice = createSlice({
     },
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
+      resetComparison(state);
     },
     filterUpdated: (state, action: PayloadAction<{filter: Partial<CompareFilter>}>) => {
       const currentFilter = state.current.view.filter;
@@ -166,8 +167,10 @@ export const compareSlice = createSlice({
       resetComparison(state);
       if (side === 'left') {
         state.current.view.leftSet = value;
+        state.current.left = undefined;
       } else {
         state.current.view.rightSet = value;
+        state.current.right = undefined;
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
@@ -468,17 +471,18 @@ export const resourceFetchListener =
 
 export const compareListener: AppListenerFn = listen => {
   listen({
-    actionCreator: resourceSetFetched,
+    matcher: isAnyOf(resourceSetFetched, operationUpdated),
     effect: async (_action, {dispatch, getState}) => {
       const status = selectCompareStatus(getState().compare);
-      const left = getState().compare.current.left;
-      const right = getState().compare.current.right;
+      const current = getState().compare.current;
+      const {left, right, view} = current;
 
       if (status !== 'comparing' || !left || !right) {
         return;
       }
 
-      const comparisons = compareResources(left.resources, right.resources, {operation: 'union'});
+      const options = {operation: view.operation ?? 'union'};
+      const comparisons = compareResources(left.resources, right.resources, options);
       dispatch(resourceSetCompared({comparisons}));
     },
   });
