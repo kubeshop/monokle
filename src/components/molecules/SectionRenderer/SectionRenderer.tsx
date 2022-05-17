@@ -208,11 +208,11 @@ function SectionRenderer(props: SectionRendererProps) {
         collapseSection={collapseSection}
         indentation={sectionIndentation || 0}
       />
-      {sectionInstance &&
-        sectionInstance.isVisible &&
-        !isCollapsed &&
-        itemBlueprint &&
-        sectionInstance.groups.length === 0 &&
+      {sectionInstance?.isVisible &&
+      !isCollapsed &&
+      itemBlueprint &&
+      sectionInstance.groups.length === 0 &&
+      sectionInstance.visibleItemIds.length ? (
         sectionInstance.visibleItemIds.map(itemId => (
           <ItemRenderer
             key={itemId}
@@ -225,7 +225,13 @@ function SectionRenderer(props: SectionRendererProps) {
             options={itemRendererOptions}
             indentation={sectionIndentation || 0}
           />
-        ))}
+        ))
+      ) : (
+        <S.EmptyGroupText>
+          {sectionBlueprint.customization?.emptyVisibleItemsText || 'No items found.'}
+        </S.EmptyGroupText>
+      )}
+
       {sectionInstance?.isVisible &&
         !isCollapsed &&
         itemBlueprint &&
@@ -262,6 +268,7 @@ function SectionRenderer(props: SectionRendererProps) {
             </React.Fragment>
           );
         })}
+
       {childSections &&
         childSections.map(child => (
           <SectionRenderer
@@ -272,6 +279,7 @@ function SectionRenderer(props: SectionRendererProps) {
             parentIndentation={sectionIndentation}
           />
         ))}
+
       {sectionBlueprint.customization?.sectionMarginBottom !== undefined && (
         <div style={{marginBottom: sectionBlueprint.customization.sectionMarginBottom}} />
       )}

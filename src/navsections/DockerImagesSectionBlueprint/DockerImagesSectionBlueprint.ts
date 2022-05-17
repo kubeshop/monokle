@@ -14,6 +14,7 @@ export type DockerImagesScopeType = {
   resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
+  imagesSearchedValue: string | undefined;
   selectedDockerImage?: DockerImage | null;
   selectedK8sResourceId: string | undefined;
 };
@@ -45,6 +46,20 @@ const getRawItems = (resourceMap: ResourceMapType) => {
   return images;
 };
 
+const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
+  let shouldBeFiltered = true;
+  const splittedSearchedValue = searchedValue.split(' ');
+
+  for (let i = 0; i < splittedSearchedValue.length; i += 1) {
+    if (!name.split(':').find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))) {
+      shouldBeFiltered = false;
+      break;
+    }
+  }
+
+  return shouldBeFiltered;
+};
+
 const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesScopeType> = {
   name: 'Docker Images',
   id: DOCKER_IMAGES_SECTION_NAME,
@@ -54,6 +69,7 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     resourceMap: state.main.resourceMap,
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
+    imagesSearchedValue: state.main.imagesSearchedValue,
     selectedDockerImage: state.main.selectedDockerImage,
     selectedK8sResourceId: state.main.selectedResourceId,
   }),
@@ -62,6 +78,7 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     isLoading: scope => scope.isFolderLoading,
     isInitialized: scope => scope.isFolderOpen,
     isEmpty: (scope, rawItems) => scope.isFolderOpen && rawItems.length === 0,
+    isVisible: () => true,
   },
   customization: {
     emptyDisplay: {component: DockerImagesSectionEmptyDisplay},
@@ -87,6 +104,16 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         }
 
         return false;
+      },
+      isVisible: (rawItem, scope) => {
+        const {imagesSearchedValue} = scope;
+        const {name, tag} = rawItem;
+
+        if (imagesSearchedValue) {
+          return filterImagesBySearchedValue(imagesSearchedValue, `${name}:${tag}`);
+        }
+
+        return true;
       },
       getMeta: rawItem => ({resourcesIds: rawItem.resourcesIds}),
     },
