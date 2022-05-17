@@ -4,8 +4,10 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
+import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
+import {compareListener, compareSlice, resourceFetchListener} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
@@ -26,6 +28,8 @@ if (process.env.NODE_ENV === `development`) {
 
 export const resetStore = createAction('app/reset');
 
+combineListeners([resourceFetchListener('left'), resourceFetchListener('right'), compareListener]);
+
 const appReducer = combineReducers({
   config: configSlice.reducer,
   main: mainSlice.reducer,
@@ -35,6 +39,7 @@ const appReducer = combineReducers({
   navigator: navigatorSlice.reducer,
   uiCoach: uiCoachSlice.reducer,
   extension: extensionSlice.reducer,
+  compare: compareSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
@@ -49,7 +54,11 @@ const rootReducer: typeof appReducer = (state, action) => {
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares).concat(sectionBlueprintMiddleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware()
+      .prepend(listenerMiddleware.middleware)
+      .concat(middlewares)
+      .concat(sectionBlueprintMiddleware),
 });
 
 export default store;
