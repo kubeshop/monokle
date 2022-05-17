@@ -106,7 +106,7 @@ function HelmChartSelect({side}: Props) {
     [dispatch, side]
   );
   return (
-    <Select onChange={handleSelect} placeholder="Choose Chart…" value={currentHelmChart?.id} style={{width: 180}}>
+    <Select onChange={handleSelect} placeholder="Choose Chart…" value={currentHelmChart?.id} style={{width: 160}}>
       {allHelmCharts.map(chart => {
         return (
           <Select.Option key={chart.id} value={chart.id}>
@@ -134,11 +134,11 @@ function HelmValuesSelect({side}: Props) {
   );
 
   if (!currentHelmChart) {
-    return <Select disabled placeholder="Select values…" />;
+    return <Select disabled placeholder="Select values…" style={{width: 160}} />;
   }
 
   return (
-    <Select placeholder="Select values…" onSelect={handleSelect} value={currentHelmValues?.id} style={{width: 180}}>
+    <Select placeholder="Select values…" onSelect={handleSelect} value={currentHelmValues?.id} style={{width: 160}}>
       {availableHelmValues.map(values => {
         return (
           <Select.Option key={values.id} value={values.id}>

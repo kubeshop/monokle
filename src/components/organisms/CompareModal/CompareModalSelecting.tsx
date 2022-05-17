@@ -32,7 +32,7 @@ export const CompareModalSelecting: React.FC = () => {
   if (left && !rightSuccess) {
     return (
       <>
-        <S.ListRow style={{height: 'calc(100% - 72px)'}}>
+        <S.ListRow>
           <Col span={11}>
             {left.loading ? (
               <div>loading...</div>
@@ -62,7 +62,7 @@ export const CompareModalSelecting: React.FC = () => {
   if (right && !leftSuccess) {
     return (
       <>
-        <S.ListRow style={{height: 'calc(100% - 72px)'}}>
+        <S.ListRow>
           <Col span={13} />
 
           <Col span={11}>
@@ -92,7 +92,7 @@ export const CompareModalSelecting: React.FC = () => {
   }
 
   return (
-    <Row style={{height: 'calc(100% - 72px)'}}>
+    <Row style={{height: '100%'}}>
       <CompareFigure src={CompareDoubleFigure}>
         <FigureTitle>Compare (almost) anything!</FigureTitle>
         <FigureDescription>
