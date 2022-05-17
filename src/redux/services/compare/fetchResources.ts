@@ -14,8 +14,9 @@ import {
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import {HelmResourceSet, ResourceSet} from '@redux/reducers/compare';
+import {HelmResourceSet, KustomizeResourceSet, ResourceSet} from '@redux/reducers/compare';
 import {currentConfigSelector, currentKubeContext} from '@redux/selectors';
+import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
 import {createKubeClient} from '@utils/kubeclient';
@@ -34,6 +35,8 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
       return fetchResourcesFromCluster(state);
     case 'helm':
       return previewHelmResources(state, options);
+    case 'kustomize':
+      return previewKustomizeResources(state, options);
     default:
       throw new Error('Not yet implemented');
   }
@@ -118,6 +121,27 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
     return resources;
   } catch (err) {
     log.debug('preview Helm resources failed', err);
+    throw err;
+  }
+}
+
+async function previewKustomizeResources(state: RootState, options: KustomizeResourceSet): Promise<K8sResource[]> {
+  try {
+    const projectConfig = currentConfigSelector(state);
+    const kustomization = state.main.resourceMap[options.kustomizationId];
+    const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
+    const folder = path.join(rootFolder, path.dirname(kustomization.filePath));
+    const result = await runKustomize(folder, projectConfig);
+
+    if (!result.stdout) {
+      const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+      throw new Error(msg);
+    }
+
+    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + kustomization.id);
+    return resources;
+  } catch (err) {
+    log.debug('preview Kustomize resources failed', err);
     throw err;
   }
 }

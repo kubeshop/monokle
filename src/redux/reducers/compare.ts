@@ -8,6 +8,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {AppListenerFn} from '@redux/listeners/base';
+import {kustomizationsSelector} from '@redux/selectors';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 
@@ -72,7 +73,7 @@ export type LocalResourceSet = {
 
 export type KustomizeResourceSet = {
   type: 'kustomize';
-  kustomizationPath: string; // so resource.filePath (because internal id changes and this persists)
+  kustomizationId: string; // so resource.filePath (because internal id changes and this persists)
   defaultNamespace?: string;
 };
 
@@ -163,21 +164,10 @@ export const compareSlice = createSlice({
     resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
       const {side, value} = action.payload;
       resetComparison(state);
-
       if (side === 'left') {
         state.current.view.leftSet = value;
-        state.current.left = {
-          loading: true,
-          error: false,
-          resources: [],
-        };
       } else {
         state.current.view.rightSet = value;
-        state.current.right = {
-          loading: true,
-          error: false,
-          resources: [],
-        };
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
@@ -196,12 +186,7 @@ export const compareSlice = createSlice({
     resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
       const {side} = action.payload;
       resetComparison(state);
-
-      state.current[side] = {
-        loading: true,
-        error: false,
-        resources: [],
-      };
+      state.current[side] = undefined;
     },
     diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
       state.current.viewDiff = action.payload.id;
@@ -223,6 +208,15 @@ export const compareSlice = createSlice({
       } else {
         state.current.selection = state.current.comparison?.comparisons.map(c => c.id) ?? [];
       }
+    },
+    resourceSetFetchPending: (state, action: PayloadAction<{side: CompareSide}>) => {
+      const {side} = action.payload;
+
+      state.current[side] = {
+        loading: true,
+        error: false,
+        resources: [],
+      };
     },
     resourceSetFetched: (state, action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>) => {
       const {side, resources} = action.payload;
@@ -277,6 +271,7 @@ export const {
   resourceSetCleared,
   resourceSetRefreshed,
   resourceSetSelected,
+  resourceSetFetchPending,
   resourceSetFetchFailed,
   resourceSetFetched,
   resourceSetCompared,
@@ -324,6 +319,17 @@ export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
     allHelmCharts,
     availableHelmValues,
   };
+};
+
+export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'kustomize') return undefined;
+  const {kustomizationId} = resourceSet;
+
+  const currentKustomization = kustomizationId ? state.main.resourceMap[kustomizationId] : undefined;
+  const allKustomizations = kustomizationsSelector(state);
+
+  return {allKustomizations, currentKustomization};
 };
 
 export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
@@ -390,14 +396,14 @@ export const selectComparisonListItems = createSelector(
 /* * * * * * * * * * * * * *
  * Utilities
  * * * * * * * * * * * * * */
-function isCompleteResourceSet(options: PartialResourceSet | undefined): options is ResourceSet {
+export function isCompleteResourceSet(options: PartialResourceSet | undefined): options is ResourceSet {
   switch (options?.type) {
     case 'local':
       return true;
     case 'cluster':
       return isDefined(options.context);
     case 'kustomize':
-      return isDefined(options.kustomizationPath);
+      return isDefined(options.kustomizationId);
     case 'helm':
       return isDefined(options.chartId) && isDefined(options.valuesId);
     default:
@@ -428,6 +434,7 @@ export const resourceFetchListener =
         try {
           cancelActiveListeners();
           if (resourceSetCleared.match(action)) return;
+          dispatch(resourceSetFetchPending({side}));
 
           const state = getState();
           const options = side === 'left' ? state.compare.current.view.leftSet : state.compare.current.view.rightSet;

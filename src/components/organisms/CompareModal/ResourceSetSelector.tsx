@@ -1,9 +1,10 @@
 import {useCallback} from 'react';
 
-import {Button, Select, Tooltip} from 'antd';
+import {Button, Select, Space, Tooltip} from 'antd';
 
 import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import styled from 'styled-components';
 import invariant from 'tiny-invariant';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -14,6 +15,7 @@ import {
   resourceSetRefreshed,
   resourceSetSelected,
   selectHelmResourceSet,
+  selectKustomizeResourceSet,
   selectResourceSet,
 } from '@redux/reducers/compare';
 
@@ -37,13 +39,22 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
 
   return (
     <S.ResourceSetSelectorDiv>
-      <div>
+      <MySpacer>
         <ResourceSetTypeSelect side={side} />
-        {resourceSet?.type === 'helm' && <HelmChartSelect side={side} />}
-        {resourceSet?.type === 'helm' && <HelmValuesSelect side={side} />}
-      </div>
+        {resourceSet?.type === 'helm' && (
+          <Space wrap>
+            <HelmChartSelect side={side} />
+            <HelmValuesSelect side={side} />
+          </Space>
+        )}
+        {resourceSet?.type === 'kustomize' && (
+          <div style={{maxWidth: 320, minWidth: 0, width: '100%'}}>
+            <KustomizeSelect side={side} />
+          </div>
+        )}
+      </MySpacer>
 
-      <div>
+      <div style={{flexGrow: 0, flexShrink: 0}}>
         <Tooltip title="Reload resources" placement="bottom">
           <Button type="link" size="middle" icon={<ReloadOutlined />} onClick={handleRefresh} />
         </Tooltip>
@@ -76,6 +87,7 @@ function ResourceSetTypeSelect({side}: Props) {
       <Select.Option value="local">Local</Select.Option>
       <Select.Option value="cluster">Cluster</Select.Option>
       <Select.Option value="helm">Helm Preview</Select.Option>
+      <Select.Option value="kustomize">Kustomize Preview</Select.Option>
     </Select>
   );
 }
@@ -137,3 +149,49 @@ function HelmValuesSelect({side}: Props) {
     </Select>
   );
 }
+
+function KustomizeSelect({side}: Props) {
+  const dispatch = useAppDispatch();
+  const resourceSet = useAppSelector(state => selectKustomizeResourceSet(state, side));
+  invariant(resourceSet, 'invalid_state');
+  const {currentKustomization, allKustomizations} = resourceSet;
+
+  const handleSelect = useCallback(
+    (kustomizationId: string) => {
+      const value: PartialResourceSet = {type: 'kustomize', kustomizationId};
+      dispatch(resourceSetSelected({side, value}));
+    },
+    [dispatch, side]
+  );
+  return (
+    <Select
+      onChange={id => handleSelect(id as string)}
+      placeholder="Choose Kustomization…"
+      value={currentKustomization?.id}
+      style={{width: '100%'}}
+    >
+      {allKustomizations.map(kustomization => {
+        return (
+          <Select.Option key={kustomization.id} value={kustomization.id}>
+            {kustomization.name}
+          </Select.Option>
+        );
+      })}
+    </Select>
+  );
+}
+
+const MySpacer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-grow: 1;
+  min-width: auto;
+  overflow: hidden;
+  align-items: center;
+
+  .ant-select-selection-item {
+    text-overflow: ellipsis;
+  }
+`;
