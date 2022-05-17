@@ -5,12 +5,15 @@ import {groupBy} from 'lodash';
 import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 
 import {ComparisonListItem} from '@components/organisms/CompareModal/ComparisonList';
+
+import {isDefined} from '@utils/filter';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -48,8 +51,8 @@ export type CompareFilter = {
 };
 
 export type ComparisonView = {
-  leftSet: ResourceSet | undefined;
-  rightSet: ResourceSet | undefined;
+  leftSet: PartialResourceSet | undefined;
+  rightSet: PartialResourceSet | undefined;
   operation: CompareOperation;
   filter?: CompareFilter;
 };
@@ -59,6 +62,7 @@ export type SavedComparisonView = ComparisonView & {
   viewedAt: Date;
 };
 
+export type PartialResourceSet = Pick<ResourceSet, 'type'> & Partial<ResourceSet>;
 export type ResourceSet = LocalResourceSet | KustomizeResourceSet | HelmResourceSet | ClusterResourceSet;
 
 export type LocalResourceSet = {
@@ -74,8 +78,8 @@ export type KustomizeResourceSet = {
 
 export type HelmResourceSet = {
   type: 'helm';
-  chartPath: string; // e.g. "postgresql"
-  values: string;
+  chartId: string;
+  valuesId: string;
   defaultNamespace?: string;
 };
 
@@ -156,7 +160,7 @@ export const compareSlice = createSlice({
         };
       }
     },
-    resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: ResourceSet}>) => {
+    resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
       const {side, value} = action.payload;
       resetComparison(state);
 
@@ -298,6 +302,30 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
   return 'comparing';
 };
 
+export const selectResourceSet = (state: CompareState, side: CompareSide): PartialResourceSet | undefined => {
+  return side === 'left' ? state.current.view.leftSet : state.current.view.rightSet;
+};
+
+export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'helm') return undefined;
+  const {chartId, valuesId} = resourceSet;
+
+  const currentHelmChart = chartId ? state.main.helmChartMap[chartId] : undefined;
+  const currentHelmValues = valuesId ? state.main.helmValuesMap[valuesId] : undefined;
+  const allHelmCharts = Object.values(state.main.helmChartMap);
+  const availableHelmValues = currentHelmChart
+    ? Object.values(state.main.helmValuesMap).filter(values => currentHelmChart.valueFileIds.includes(values.id))
+    : [];
+
+  return {
+    currentHelmChart,
+    currentHelmValues,
+    allHelmCharts,
+    availableHelmValues,
+  };
+};
+
 export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
   const id = state.current.viewDiff;
   if (!id) return undefined;
@@ -360,17 +388,41 @@ export const selectComparisonListItems = createSelector(
 );
 
 /* * * * * * * * * * * * * *
+ * Utilities
+ * * * * * * * * * * * * * */
+function isCompleteResourceSet(options: PartialResourceSet | undefined): options is ResourceSet {
+  switch (options?.type) {
+    case 'local':
+      return true;
+    case 'cluster':
+      return isDefined(options.context);
+    case 'kustomize':
+      return isDefined(options.kustomizationPath);
+    case 'helm':
+      return isDefined(options.chartId) && isDefined(options.valuesId);
+    default:
+      return false;
+  }
+}
+
+/* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 export const resourceFetchListener =
   (side: CompareSide): AppListenerFn =>
   listen => {
     listen({
-      predicate: action => {
+      predicate: (action, state) => {
         const resourceSetUpdated = isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared);
         if (!resourceSetUpdated(action)) return false;
+
         const actionSide = action.payload.side;
-        return actionSide === side;
+        if (actionSide !== side) return false;
+
+        const resourceSet = selectResourceSet(state.compare, side);
+        if (!isCompleteResourceSet(resourceSet)) return false;
+
+        return true;
       },
       effect: async (action, {dispatch, getState, cancelActiveListeners}) => {
         try {
@@ -379,7 +431,7 @@ export const resourceFetchListener =
 
           const state = getState();
           const options = side === 'left' ? state.compare.current.view.leftSet : state.compare.current.view.rightSet;
-          if (!options) return;
+          if (!isCompleteResourceSet(options)) return;
 
           const resources = await fetchResources(state, options);
 
