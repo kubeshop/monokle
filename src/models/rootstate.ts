@@ -1,3 +1,5 @@
+import {CompareState} from '@redux/reducers/compare';
+
 import {AlertState} from './alert';
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
@@ -14,6 +16,7 @@ import {UiCoachState} from './uiCoach';
 export type RootState = {
   config: AppConfig;
   main: AppState;
+  compare: CompareState;
   alert: AlertState;
   logs: LogsState;
   ui: UiState;
