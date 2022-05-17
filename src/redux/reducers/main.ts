@@ -26,6 +26,7 @@ import {DockerImage} from '@models/image';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
+import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -1209,3 +1210,17 @@ export const {
   updateResourceFilter,
 } = mainSlice.actions;
 export default mainSlice.reducer;
+
+/* * * * * * * * * * * * * *
+ * Listeners
+ * * * * * * * * * * * * * */
+export const resourceMapChangedListener: AppListenerFn = listen => {
+  listen({
+    predicate: (action, currentState, previousState) => {
+      return currentState.main.resourceMap !== previousState.main.resourceMap;
+    },
+    effect: async (_action, {dispatch}) => {
+      console.log('Will update images');
+    },
+  });
+};

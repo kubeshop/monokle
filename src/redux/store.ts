@@ -10,7 +10,7 @@ import {configSlice} from './reducers/appConfig';
 import {compareListener, compareSlice, resourceFetchListener} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
-import {mainSlice} from './reducers/main';
+import {mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
@@ -28,7 +28,12 @@ if (process.env.NODE_ENV === `development`) {
 
 export const resetStore = createAction('app/reset');
 
-combineListeners([resourceFetchListener('left'), resourceFetchListener('right'), compareListener]);
+combineListeners([
+  resourceFetchListener('left'),
+  resourceFetchListener('right'),
+  compareListener,
+  resourceMapChangedListener,
+]);
 
 const appReducer = combineReducers({
   config: configSlice.reducer,
