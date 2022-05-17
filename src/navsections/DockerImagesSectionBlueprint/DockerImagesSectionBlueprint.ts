@@ -8,6 +8,7 @@ import {selectDockerImage} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import DockerImagesSectionEmptyDisplay from './DockerImagesSectionEmptyDisplay';
+import DockerImagesSectionNameDisplay from './DockerImagesSectionNameDisplay';
 
 export type DockerImagesScopeType = {
   resourceMap: ResourceMapType;
@@ -64,9 +65,10 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
   },
   customization: {
     emptyDisplay: {component: DockerImagesSectionEmptyDisplay},
+    nameDisplay: {component: DockerImagesSectionNameDisplay},
     beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
     counterDisplayMode: 'items',
-    showHeader: false,
+    disableHoverStyle: true,
   },
   itemBlueprint: {
     getName: rawItem => `${rawItem.name}:${rawItem.tag}`,
