@@ -663,6 +663,9 @@ export const mainSlice = createSlice({
       clearResourceSelections(state.resourceMap);
       action.payload.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
     },
+    setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.imagesSearchedValue = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1190,6 +1193,7 @@ export const {
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
   setFiltersToBeChanged,
+  setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
   startPreviewLoader,

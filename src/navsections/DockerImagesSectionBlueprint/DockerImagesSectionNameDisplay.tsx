@@ -1,4 +1,10 @@
+import {useState} from 'react';
+import {useDebounce} from 'react-use';
+
 import {SectionInstance} from '@models/navigator';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setImagesSearchedValue} from '@redux/reducers/main';
 
 import * as S from './DockerImagesSectionNameDisplay.styled';
 
@@ -11,6 +17,23 @@ const DockerImagesSectionNameDisplay: React.FC<IProps> = props => {
     sectionInstance: {itemIds},
   } = props;
 
+  const dispatch = useAppDispatch();
+  const searchedValue = useAppSelector(state => state.main.imagesSearchedValue);
+
+  const [value, setValue] = useState(searchedValue);
+
+  useDebounce(
+    () => {
+      if (value) {
+        dispatch(setImagesSearchedValue(value));
+      } else {
+        dispatch(setImagesSearchedValue(''));
+      }
+    },
+    200,
+    [value]
+  );
+
   return (
     <S.NameDisplayContainer>
       <div>
@@ -18,11 +41,7 @@ const DockerImagesSectionNameDisplay: React.FC<IProps> = props => {
         <S.HelperLabel>Find out where they are used and get + info</S.HelperLabel>
       </div>
 
-      <S.SearchInput
-        placeholder="Search project images"
-        // value={searchedValue}
-        // onChange={e => setSearchedValue(e.target.value)}
-      />
+      <S.SearchInput placeholder="Search project images" value={value} onChange={e => setValue(e.target.value)} />
     </S.NameDisplayContainer>
   );
 };
