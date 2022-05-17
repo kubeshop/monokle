@@ -23,6 +23,7 @@ export {default as PluginManager} from './PluginManager';
 export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
 export {default as RenameResourceModal} from './RenameResourceModal';
+export {default as ReplaceImageModal} from './ReplaceImageModal';
 export {default as SettingsManager} from './SettingsManager';
 export {default as TemplateManagerPane} from './TemplateManagerPane';
 export {default as TemplateModal} from './TemplateModal';

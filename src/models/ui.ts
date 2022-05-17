@@ -86,6 +86,9 @@ export type UiState = {
     isOpen: boolean;
     resourceId: string;
   };
+  replaceImageModal?: {
+    isOpen: boolean;
+  };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
     resourcesIds: string[];
