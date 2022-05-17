@@ -7,6 +7,7 @@ import {SectionBlueprint} from '@models/navigator';
 import {selectDockerImage} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import DockerImagesQuickAction from './DockerImagesQuickAction';
 import DockerImagesSectionEmptyDisplay from './DockerImagesSectionEmptyDisplay';
 import DockerImagesSectionNameDisplay from './DockerImagesSectionNameDisplay';
 
@@ -126,6 +127,12 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         const [name, tag] = id.split(':');
 
         dispatch(selectDockerImage({name, tag, resourcesIds}));
+      },
+    },
+    customization: {
+      quickAction: {
+        component: DockerImagesQuickAction,
+        options: {isVisibleOnHover: true},
       },
     },
   },
