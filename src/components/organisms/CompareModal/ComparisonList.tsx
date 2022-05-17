@@ -11,8 +11,7 @@ import {
 } from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
-
-export type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
+import {ComparisonItemProps, HeaderItemProps} from './types';
 
 export const ComparisonList: React.FC = () => {
   const items = useAppSelector(state => selectComparisonListItems(state.compare));
@@ -28,12 +27,6 @@ export const ComparisonList: React.FC = () => {
       })}
     </div>
   );
-};
-
-type HeaderItemProps = {
-  type: 'header';
-  kind: string;
-  count: number;
 };
 
 function HeaderItem({kind, count}: HeaderItemProps) {
@@ -55,16 +48,6 @@ function HeaderItem({kind, count}: HeaderItemProps) {
     </S.HeaderRow>
   );
 }
-
-type ComparisonItemProps = {
-  type: 'comparison';
-  id: string;
-  namespace: string;
-  name: string;
-  leftActive: boolean;
-  rightActive: boolean;
-  canDiff: boolean;
-};
 
 function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}: ComparisonItemProps) {
   const dispatch = useAppDispatch();

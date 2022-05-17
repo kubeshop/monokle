@@ -1,5 +1,5 @@
 import React from 'react';
-import {useWindowSize} from 'react-use';
+import {useMeasure, useWindowSize} from 'react-use';
 
 import {Col, Modal, Row} from 'antd';
 
@@ -22,6 +22,7 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
+  const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
     <Modal
@@ -34,17 +35,24 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
     >
       {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
 
-      <div style={{height: 'calc(100% - 66px)', position: 'relative'}}>
-        <Row>
-          <Col span={11}>
-            <ResourceSetSelector side="left" />
-          </Col>
-          <Col span={2} />
-          <Col span={11}>
-            <ResourceSetSelector side="right" />
-          </Col>
-        </Row>
+      <Row ref={containerRef}>
+        <Col span={11}>
+          <ResourceSetSelector side="left" />
+        </Col>
+        <Col span={2} />
+        <Col span={11}>
+          <ResourceSetSelector side="right" />
+        </Col>
+      </Row>
 
+      <div
+        style={{
+          height: `calc(100% - ${height}px - 66px)`,
+          position: 'relative',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </div>
     </Modal>
