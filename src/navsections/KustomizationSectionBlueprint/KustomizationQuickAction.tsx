@@ -1,5 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 
+import hotkeys from '@constants/hotkeys';
 import {
   ExitKustomizationPreviewTooltip,
   KustomizationPreviewTooltip,
@@ -13,6 +15,8 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import QuickActionPreview from '@components/molecules/QuickActionPreview';
+
+import {defineHotkey} from '@utils/defineHotkey';
 
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
@@ -43,6 +47,10 @@ const QuickAction = (props: ItemCustomComponentProps) => {
 
     restartPreview(itemInstance.id, 'kustomization', dispatch);
   }, [itemInstance, selectedResourceId, dispatch]);
+
+  useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
+    reloadPreview();
+  });
 
   return (
     <QuickActionPreview
