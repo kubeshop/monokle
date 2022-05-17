@@ -471,11 +471,11 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.namespace
           : state.resourceFilter.namespace,
-        kind: filter.kind
-          ? filter.kind === state.resourceFilter.kind
+        kinds: filter.kinds
+          ? filter.kinds === state.resourceFilter.kinds
             ? undefined
-            : filter.kind
-          : state.resourceFilter.kind,
+            : filter.kinds
+          : state.resourceFilter.kinds,
         fileOrFolderContainedIn: filter.fileOrFolderContainedIn
           ? filter.fileOrFolderContainedIn === state.resourceFilter.fileOrFolderContainedIn
             ? undefined

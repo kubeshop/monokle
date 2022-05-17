@@ -82,7 +82,7 @@ function addKindFilterLink(
       `${kind}`,
       'Add/remove kind to/from current filter',
       () => {
-        filterResources({kind, labels: {}, annotations: {}});
+        filterResources({kinds: [kind], labels: {}, annotations: {}});
       }
     );
     newDisposables.push(commandDisposable);
