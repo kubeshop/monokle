@@ -11,7 +11,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 
-import {ComparisonListItem} from '@components/organisms/CompareModal/ComparisonList';
+import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {isDefined} from '@utils/filter';
 
