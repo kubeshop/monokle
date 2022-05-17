@@ -4,11 +4,14 @@ import Nucleus from 'nucleus-nodejs';
 
 import {isRendererThread} from './thread';
 
-export const trackEvent = (eventName: string, payload?: any) => {
+export const trackEvent = <TEvent extends Event>(
+  eventName: TEvent,
+  ...payload: EventMap[TEvent] extends undefined ? [undefined?] : [EventMap[TEvent]]
+) => {
   if (isRendererThread()) {
     ipcRenderer.send('track-event', {eventName, payload});
   } else {
-    Nucleus.track(eventName, payload);
+    Nucleus.track(eventName, payload as any);
   }
 };
 export const trackError = (error: any) => {
@@ -17,6 +20,32 @@ export const trackError = (error: any) => {
   } else {
     Nucleus.track('Error', error);
   }
+};
+
+export type Event = keyof EventMap;
+export type EventMap = {
+  CREATE_EMPTY_PROJECT: undefined;
+  SELECT_LEFT_TOOL_PANEL: {panelID: string};
+  START_FROM_A_TEMPLATE: {templateID: string};
+  WINDOW_HELP_LINK: {linkID: string};
+  USE_TEMPLATE: {templateID: string};
+  DO_HELM_PREVIEW: undefined;
+  CLUSTER_VIEW: {numberOfResourcesInCluster: number};
+  DO_KUSTOMIZE_PREVIEW: undefined;
+  OPEN_EXISTING_PROJECT: {numberOfFiles: number; numberOfResources: number};
+  ADD_NEW_RESOURCE: {resourceKind: string};
+  APP_INSTALLED: {appVersion: string};
+  CHANGES_BY_FORM_EDITOR: {resourceKind?: string};
+  CHANGES_BY_SETTINGS_PANEL: {type: string; settingKey: string};
+  APPLY: {kind: string} & Record<string, any>;
+  DIFF: undefined;
+  CLUSTER_COMPARE: {numberOfResourcesBeingCompared: number} | {fail: string};
+  FOLLOW_LINK: {type: string};
+  QUICK_SEARCH: undefined;
+  UPDATE_APPLICATION: undefined;
+  APPLY_FILE: undefined;
+  APPLY_HELM_CHART: undefined;
+  RUN_PREVIEW_CONFIGURATION: undefined;
 };
 
 export const CREATE_EMPTY_PROJECT = 'CREATE_EMPTY_PROJECT';
