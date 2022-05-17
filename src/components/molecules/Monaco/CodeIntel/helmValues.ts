@@ -76,7 +76,7 @@ export const helmValueCodeIntel: CodeIntelApply = {
 
       placeUsed.uses.forEach(use => {
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-          `Go to ${use.filePath}`,
+          `${use.filePath}`,
           'Select file',
           () => {
             goToFileAndHighlightCode({
@@ -90,7 +90,8 @@ export const helmValueCodeIntel: CodeIntelApply = {
               },
               filePath: use.filePath,
             });
-          }
+          },
+          'Go to '
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
         newDisposables.push(commandDisposable);
