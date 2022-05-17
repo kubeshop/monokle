@@ -14,6 +14,7 @@ import {
   resourceSetCleared,
   resourceSetRefreshed,
   resourceSetSelected,
+  selectClusterResourceSet,
   selectHelmResourceSet,
   selectKustomizeResourceSet,
   selectResourceSet,
@@ -52,6 +53,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
             <KustomizeSelect side={side} />
           </div>
         )}
+        {resourceSet?.type === 'cluster' && <ClusterContextSelect side={side} />}
       </MySpacer>
 
       <div style={{flexGrow: 0, flexShrink: 0}}>
@@ -73,11 +75,7 @@ function ResourceSetTypeSelect({side}: Props) {
 
   const handleSelectType = useCallback(
     (type: ResourceSet['type']) => {
-      if (type === 'cluster') {
-        dispatch(resourceSetSelected({side, value: {type: 'cluster', context: 'some-context'}}));
-      } else {
-        dispatch(resourceSetSelected({side, value: {type}}));
-      }
+      dispatch(resourceSetSelected({side, value: {type}}));
     },
     [dispatch, side]
   );
@@ -88,6 +86,32 @@ function ResourceSetTypeSelect({side}: Props) {
       <Select.Option value="cluster">Cluster</Select.Option>
       <Select.Option value="helm">Helm Preview</Select.Option>
       <Select.Option value="kustomize">Kustomize Preview</Select.Option>
+    </Select>
+  );
+}
+
+function ClusterContextSelect({side}: Props) {
+  const dispatch = useAppDispatch();
+  const resourceSet = useAppSelector(state => selectClusterResourceSet(state, side));
+  invariant(resourceSet, 'invalid_state');
+  const {currentContext, allContexts} = resourceSet;
+
+  const handleSelect = useCallback(
+    (context: string) => {
+      const value: PartialResourceSet = {type: 'cluster', context};
+      dispatch(resourceSetSelected({side, value}));
+    },
+    [dispatch, side]
+  );
+  return (
+    <Select onChange={handleSelect} placeholder="Choose context…" value={currentContext?.name} style={{width: 160}}>
+      {allContexts.map(context => {
+        return (
+          <Select.Option key={context.name} value={context.name}>
+            {context.name}
+          </Select.Option>
+        );
+      })}
     </Select>
   );
 }

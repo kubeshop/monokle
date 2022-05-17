@@ -301,6 +301,20 @@ export const selectResourceSet = (state: CompareState, side: CompareSide): Parti
   return side === 'left' ? state.current.view.leftSet : state.current.view.rightSet;
 };
 
+export const selectClusterResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'cluster') return undefined;
+  const {context} = resourceSet;
+
+  const allContexts = state.config.kubeConfig.contexts ?? [];
+  const currentContext = allContexts.find(c => c.name === context);
+
+  return {
+    currentContext,
+    allContexts,
+  };
+};
+
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
   const resourceSet = selectResourceSet(state.compare, side);
   if (resourceSet?.type !== 'helm') return undefined;

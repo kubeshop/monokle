@@ -14,8 +14,8 @@ import {
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import {HelmResourceSet, KustomizeResourceSet, ResourceSet} from '@redux/reducers/compare';
-import {currentConfigSelector, currentKubeContext} from '@redux/selectors';
+import {ClusterResourceSet, HelmResourceSet, KustomizeResourceSet, ResourceSet} from '@redux/reducers/compare';
+import {currentConfigSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
@@ -32,7 +32,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
     case 'local':
       return fetchLocalResources(state);
     case 'cluster':
-      return fetchResourcesFromCluster(state);
+      return fetchResourcesFromCluster(state, options);
     case 'helm':
       return previewHelmResources(state, options);
     case 'kustomize':
@@ -51,9 +51,9 @@ function fetchLocalResources(state: RootState): K8sResource[] {
   );
 }
 
-async function fetchResourcesFromCluster(state: RootState): Promise<K8sResource[]> {
+async function fetchResourcesFromCluster(state: RootState, options: ClusterResourceSet): Promise<K8sResource[]> {
   try {
-    const currentContext = currentKubeContext(state.config);
+    const currentContext = options.context;
     const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
     const kc = createKubeClient(state.config);
 
