@@ -7,7 +7,7 @@ import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
 import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
 import CompareSingleFigure from '@assets/figures/compareSingle.svg';
-import ErrorFigure from '@assets/figures/crash.svg';
+import CrashFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
 
@@ -24,24 +24,6 @@ export const CompareModalSelecting: React.FC = () => {
 
   const handleRetry = useCallback((side: CompareSide) => dispatch(resourceSetRefreshed({side})), [dispatch]);
 
-  const ErrorFigureLeft = () => (
-    <CompareFigure src={ErrorFigure}>
-      <FigureTitle color={Colors.red7}>Cannot retrieve resources</FigureTitle>
-      <FigureDescription color={Colors.grey8}>
-        <S.RetrySpan onClick={() => handleRetry('left')}>Try again</S.RetrySpan> or select different resources
-      </FigureDescription>
-    </CompareFigure>
-  );
-
-  const ErrorFigureRight = () => (
-    <CompareFigure src={ErrorFigure}>
-      <FigureTitle color={Colors.red7}>Cannot retrieve resources</FigureTitle>
-      <FigureDescription color={Colors.grey8}>
-        <S.RetrySpan onClick={() => handleRetry('right')}>Try again</S.RetrySpan> or select different resources
-      </FigureDescription>
-    </CompareFigure>
-  );
-
   if (leftSuccess && rightSuccess) {
     // Invalid state - it should be comparing.
     return <div />;
@@ -55,7 +37,7 @@ export const CompareModalSelecting: React.FC = () => {
             {left.loading ? (
               <div>loading...</div>
             ) : left.error ? (
-              <ErrorFigureLeft />
+              <ErrorFigure onRetry={() => handleRetry('left')} />
             ) : (
               <ResourceList data={left} showCheckbox />
             )}
@@ -68,7 +50,7 @@ export const CompareModalSelecting: React.FC = () => {
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
             </CompareFigure>
           ) : right.error ? (
-            <ErrorFigureRight />
+            <ErrorFigure onRetry={() => handleRetry('right')} />
           ) : (
             <p>loading..</p>
           )}
@@ -84,7 +66,13 @@ export const CompareModalSelecting: React.FC = () => {
           <Col span={13} />
 
           <Col span={11}>
-            {right.loading ? <div>loading...</div> : right.error ? <ErrorFigureRight /> : <ResourceList data={right} />}
+            {right.loading ? (
+              <div>loading...</div>
+            ) : right.error ? (
+              <ErrorFigure onRetry={() => handleRetry('right')} />
+            ) : (
+              <ResourceList data={right} />
+            )}
           </Col>
         </S.ListRow>
 
@@ -94,7 +82,7 @@ export const CompareModalSelecting: React.FC = () => {
               <FigureDescription color={Colors.grey8}>Now, something here</FigureDescription>
             </CompareFigure>
           ) : left.error ? (
-            <ErrorFigureLeft />
+            <ErrorFigure onRetry={() => handleRetry('left')} />
           ) : (
             <p>loading..</p>
           )}
@@ -114,3 +102,18 @@ export const CompareModalSelecting: React.FC = () => {
     </Row>
   );
 };
+
+type ErrorFigureProps = {
+  onRetry: () => void;
+};
+
+function ErrorFigure({onRetry}: ErrorFigureProps) {
+  return (
+    <CompareFigure src={CrashFigure}>
+      <FigureTitle color={Colors.red7}>Cannot retrieve resources</FigureTitle>
+      <FigureDescription color={Colors.grey8}>
+        <S.RetrySpan onClick={onRetry}>Try again</S.RetrySpan> or select different resources
+      </FigureDescription>
+    </CompareFigure>
+  );
+}
