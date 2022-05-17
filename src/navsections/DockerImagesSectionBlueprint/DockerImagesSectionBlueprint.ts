@@ -15,37 +15,13 @@ export type DockerImagesScopeType = {
   resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
+  imagesMap: DockerImage[];
   imagesSearchedValue: string | undefined;
   selectedDockerImage?: DockerImage | null;
   selectedK8sResourceId: string | undefined;
 };
 
 export const DOCKER_IMAGES_SECTION_NAME = 'Docker Images' as const;
-
-const getRawItems = (resourceMap: ResourceMapType) => {
-  let images: DockerImage[] = [];
-
-  Object.values(resourceMap).forEach(k8sResource => {
-    if (k8sResource.refs?.length) {
-      k8sResource.refs.forEach(ref => {
-        if (ref.type === 'outgoing' && ref.target?.type === 'image') {
-          const refName = ref.name;
-          const refTag = ref.target?.tag || 'latest';
-
-          const foundImage = images.find(image => image.name === refName && image.tag === refTag);
-
-          if (!foundImage) {
-            images.push({name: refName, tag: refTag || 'latest', resourcesIds: [k8sResource.id]});
-          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
-            foundImage.resourcesIds.push(k8sResource.id);
-          }
-        }
-      });
-    }
-  });
-
-  return images;
-};
 
 const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
   let shouldBeFiltered = true;
@@ -70,12 +46,13 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     resourceMap: state.main.resourceMap,
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
+    imagesMap: state.main.imagesMap,
     imagesSearchedValue: state.main.imagesSearchedValue,
     selectedDockerImage: state.main.selectedDockerImage,
     selectedK8sResourceId: state.main.selectedResourceId,
   }),
   builder: {
-    getRawItems: scope => getRawItems(scope.resourceMap),
+    getRawItems: scope => scope.imagesMap,
     isLoading: scope => scope.isFolderLoading,
     isInitialized: scope => scope.isFolderOpen,
     isEmpty: (scope, rawItems) => scope.isFolderOpen && rawItems.length === 0,

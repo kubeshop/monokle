@@ -1,4 +1,6 @@
 // eslint-disable-next-line
+import {shallowEqual} from 'react-redux';
+
 import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
@@ -113,6 +115,31 @@ export type StartPreviewLoaderPayload = {
   targetId: string;
   previewType: PreviewType;
 };
+
+function getDockerImages(resourceMap: ResourceMapType) {
+  let images: DockerImage[] = [];
+
+  Object.values(resourceMap).forEach(k8sResource => {
+    if (k8sResource.refs?.length) {
+      k8sResource.refs.forEach(ref => {
+        if (ref.type === 'outgoing' && ref.target?.type === 'image') {
+          const refName = ref.name;
+          const refTag = ref.target?.tag || 'latest';
+
+          const foundImage = images.find(image => image.name === refName && image.tag === refTag);
+
+          if (!foundImage) {
+            images.push({name: refName, tag: refTag || 'latest', resourcesIds: [k8sResource.id]});
+          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
+            foundImage.resourcesIds.push(k8sResource.id);
+          }
+        }
+      });
+    }
+  });
+
+  return images;
+}
 
 function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
@@ -667,6 +694,9 @@ export const mainSlice = createSlice({
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
+    setImagesMap: (state: Draft<AppState>, action: PayloadAction<DockerImage[]>) => {
+      state.imagesMap = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1194,6 +1224,7 @@ export const {
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
   setFiltersToBeChanged,
+  setImagesMap,
   setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
@@ -1217,10 +1248,16 @@ export default mainSlice.reducer;
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return currentState.main.resourceMap !== previousState.main.resourceMap;
+      return !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
     },
-    effect: async (_action, {dispatch}) => {
-      console.log('Will update images');
+    effect: async (_action, {dispatch, getState}) => {
+      const resourceMap = getState().main.resourceMap;
+      const imagesMap = getState().main.imagesMap;
+      const images = getDockerImages(resourceMap);
+
+      if (!shallowEqual(images, imagesMap)) {
+        dispatch(setImagesMap(images));
+      }
     },
   });
 };

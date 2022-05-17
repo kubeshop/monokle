@@ -163,6 +163,7 @@ interface AppState {
   deviceID: string;
   selectedDockerImage?: DockerImage | null;
   imagesSearchedValue?: string;
+  imagesMap: DockerImage[];
 }
 
 export interface PossibleResource {
