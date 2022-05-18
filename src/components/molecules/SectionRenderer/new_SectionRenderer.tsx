@@ -1,11 +1,9 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {useVirtual} from 'react-virtual';
 
-import {SectionBlueprint, SectionInstance} from '@models/navigator';
+import {NavigatorRow, SectionBlueprint} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
-
-import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import {ItemRendererOptions} from './ItemRenderer';
 
@@ -18,56 +16,17 @@ type SectionRendererProps = {
   height: number;
 };
 
-function flattenSectionsAndItems(instance: SectionInstance, sectionInstanceMap: Record<string, SectionInstance>) {
-  const flatItemIds: {id: string; type: 'section' | 'item'}[] = [];
-  if (!instance.isVisible) {
-    return flatItemIds;
-  }
-  flatItemIds.push(
-    {id: instance.id, type: 'section'},
-    ...instance.visibleItemIds.map(id => ({id, type: 'item' as const}))
-  );
-
-  const blueprint = sectionBlueprintMap.getById(instance.id);
-
-  if (!blueprint?.childSectionIds) {
-    return flatItemIds;
-  }
-
-  for (let i = 0; i < blueprint.childSectionIds.length; i += 1) {
-    const childBlueprintId = blueprint.childSectionIds[i];
-    if (!childBlueprintId) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    const childInstance = sectionInstanceMap[childBlueprintId];
-    if (childInstance) {
-      flatItemIds.push(...flattenSectionsAndItems(childInstance, sectionInstanceMap));
-    }
-  }
-
-  return flatItemIds;
-}
-
 function SectionRenderer(props: SectionRendererProps) {
   const {sectionBlueprint, height} = props;
 
   const {id: sectionId} = sectionBlueprint;
 
-  const sectionInstance: SectionInstance | undefined = useAppSelector(
-    state => state.navigator.sectionInstanceMap[sectionId]
-  );
-
-  const sectionInstanceMap = useAppSelector(state => state.navigator.sectionInstanceMap);
+  const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
 
   const parentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-  const rows = useMemo(() => {
-    return sectionInstance ? flattenSectionsAndItems(sectionInstance, sectionInstanceMap) : [];
-  }, [sectionInstance, sectionInstanceMap]);
-
   const rowVirtualizer = useVirtual({
-    size: rows.length,
+    size: rows?.length || 0,
     parentRef,
     estimateSize: React.useCallback(i => (rows[i].type === 'section' ? 50 : 25), [rows]),
     overscan: 5,

@@ -6,7 +6,7 @@ import log from 'loglevel';
 import {Middleware} from 'redux';
 
 import {AppDispatch} from '@models/appdispatch';
-import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {ItemInstance, NavigatorInstanceState, NavigatorRow, SectionBlueprint, SectionInstance} from '@models/navigator';
 import {RootState} from '@models/rootstate';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
@@ -25,6 +25,7 @@ const pickPartialRecord = (record: Record<string, any>, keys: string[]) => {
     }, {});
 };
 
+// TODO: do we really need this?
 const hasNavigatorInstanceStateChanged = (
   navigatorState: NavigatorInstanceState,
   newNavigatorInstanceState: NavigatorInstanceState
@@ -183,6 +184,38 @@ function computeSectionVisibility(
     sectionInstance.visibleDescendantItemIds,
   ];
 }
+
+function makeNavigatorRows(
+  instance: SectionInstance,
+  sectionInstanceMap: Record<string, SectionInstance>
+): NavigatorRow[] {
+  const rows: NavigatorRow[] = [];
+  if (!instance.isVisible) {
+    return rows;
+  }
+  rows.push({id: instance.id, type: 'section'}, ...instance.visibleItemIds.map(id => ({id, type: 'item' as const})));
+
+  const blueprint = sectionBlueprintMap.getById(instance.id);
+
+  if (!blueprint?.childSectionIds) {
+    return rows;
+  }
+
+  for (let i = 0; i < blueprint.childSectionIds.length; i += 1) {
+    const childBlueprintId = blueprint.childSectionIds[i];
+    if (!childBlueprintId) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    const childInstance = sectionInstanceMap[childBlueprintId];
+    if (childInstance) {
+      rows.push(...makeNavigatorRows(childInstance, sectionInstanceMap));
+    }
+  }
+
+  return rows;
+}
+
 /**
  * Build the section and item instances based on the registered section blueprints
  */
@@ -357,11 +390,14 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
   const newNavigatorInstanceState: NavigatorInstanceState = {
     sectionInstanceMap,
     itemInstanceMap,
+    rowsByRootSectionId: Object.fromEntries(
+      sectionInstanceRoots.map(rootInstance => [rootInstance.id, makeNavigatorRows(rootInstance, sectionInstanceMap)])
+    ),
   };
 
-  if (hasNavigatorInstanceStateChanged(state.navigator, newNavigatorInstanceState)) {
-    dispatch(updateNavigatorInstanceState(newNavigatorInstanceState));
-  }
+  // if (hasNavigatorInstanceStateChanged(state.navigator, newNavigatorInstanceState)) {
+  dispatch(updateNavigatorInstanceState(newNavigatorInstanceState));
+  // }
 };
 
 export const sectionBlueprintMiddleware: Middleware = store => next => action => {

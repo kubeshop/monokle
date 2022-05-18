@@ -211,6 +211,7 @@ const initialNavigatorState: NavigatorState = {
   itemInstanceMap: {},
   collapsedSectionIds: [],
   registeredSectionBlueprintIds: [],
+  rowsByRootSectionId: {},
 };
 
 const initialUiCoachState: UiCoachState = {
