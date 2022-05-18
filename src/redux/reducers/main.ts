@@ -652,8 +652,10 @@ export const mainSlice = createSlice({
       if (enable) {
         const allRuleIds = plugin.metadata.rules.map(r => r.id);
         plugin.config.enabledRules = allRuleIds;
+        trackEvent('OPA_ENABLED', {all: true});
       } else {
         plugin.config.enabledRules = [];
+        trackEvent('OPA_DISABLED', {all: true});
       }
 
       // persist latest configuration
@@ -672,9 +674,11 @@ export const mainSlice = createSlice({
       if (enable) {
         if (isEnabled) return;
         plugin.config.enabledRules.push(ruleId);
+        trackEvent('OPA_ENABLED', {all: false});
       } else {
         if (!isEnabled) return;
         plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
+        trackEvent('OPA_DISABLED', {all: false});
       }
 
       // persist latest configuration

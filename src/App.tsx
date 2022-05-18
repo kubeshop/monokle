@@ -340,7 +340,7 @@ const App = () => {
   }, [dispatch]);
 
   const onCloseCompareModal = useCallback(() => {
-    dispatch(compareToggled(false));
+    dispatch(compareToggled({value: false}));
   }, [dispatch]);
 
   return (

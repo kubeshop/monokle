@@ -7,7 +7,7 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
-import {compareListener, compareSlice, resourceFetchListener} from './reducers/compare';
+import {compareListener, compareSlice, filterListener, resourceFetchListener} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice, resourceMapChangedListener} from './reducers/main';
@@ -28,12 +28,7 @@ if (process.env.NODE_ENV === `development`) {
 
 export const resetStore = createAction('app/reset');
 
-combineListeners([
-  resourceFetchListener('left'),
-  resourceFetchListener('right'),
-  compareListener,
-  resourceMapChangedListener,
-]);
+combineListeners([resourceFetchListener('left'), resourceFetchListener('right'), compareListener, filterListener]);
 
 const appReducer = combineReducers({
   config: configSlice.reducer,
