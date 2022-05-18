@@ -15,15 +15,15 @@ import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {MonoPaneTitle} from '@components/atoms';
-import {ResourceFilter, SectionRenderer} from '@components/molecules';
+import {ResourceFilter} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
+import SectionRenderer from '@components/molecules/SectionRenderer/new_SectionRenderer';
 
 import {FeatureFlag} from '@utils/features';
 
 import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
 import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
@@ -123,10 +123,15 @@ const NavPane: React.FC<Props> = ({height}) => {
         {isResourceFiltersOpen && <ReflexSplitter />}
 
         <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
-          <S.List id="navigator-sections-container">
-            <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
-            <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
-          </S.List>
+          {/* <S.List id="navigator-sections-container"> */}
+          <SectionRenderer
+            height={height - 40}
+            sectionBlueprint={K8sResourceSectionBlueprint}
+            level={0}
+            isLastSection={false}
+          />
+          {/* <SectionRenderer  sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} /> */}
+          {/* </S.List> */}
         </ReflexElement>
       </ReflexContainer>
     </S.NavigatorPaneContainer>

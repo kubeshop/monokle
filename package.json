@@ -140,6 +140,7 @@
     "react-reflex": "4.0.6",
     "react-resizable": "3.0.4",
     "react-use": "17.3.2",
+    "react-virtual": "^2.10.4",
     "redux": "4.2.0",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.1",
