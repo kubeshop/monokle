@@ -5,7 +5,8 @@ import {NavigatorRow, SectionBlueprint} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {ItemRendererOptions} from './ItemRenderer';
+import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
+import SectionHeader from './SectionHeader';
 
 type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
@@ -55,9 +56,27 @@ function SectionRenderer(props: SectionRendererProps) {
                 transform: `translateY(${virtualRow.start}px)`,
               }}
             >
-              <div style={{height: row.type === 'section' ? 50 : 25, textOverflow: 'ellipsis'}} key={row.id}>
-                {row.id}
-              </div>
+              {row.type === 'section' ? (
+                <SectionHeader
+                  sectionId={row.id}
+                  isCollapsed={false}
+                  isLastSection={false}
+                  level={row.level}
+                  indentation={0}
+                  expandSection={() => {}}
+                  collapseSection={() => {}}
+                />
+              ) : (
+                <ItemRenderer
+                  itemId={row.id}
+                  sectionId={row.sectionId}
+                  level={row.level}
+                  isLastItem={false}
+                  isSectionCheckable={false}
+                  sectionContainerElementId=""
+                  indentation={0}
+                />
+              )}
             </div>
           );
         })}

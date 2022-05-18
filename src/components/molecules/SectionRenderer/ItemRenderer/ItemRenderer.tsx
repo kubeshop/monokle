@@ -1,10 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
+import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+
+import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -17,9 +19,9 @@ export type ItemRendererOptions = {
   disableContextMenu?: boolean;
 };
 
-export type ItemRendererProps<ItemType, ScopeType> = {
+export type ItemRendererProps = {
   itemId: string;
-  blueprint: ItemBlueprint<ItemType, ScopeType>;
+  sectionId: string;
   level: number;
   isLastItem: boolean;
   isSectionCheckable: boolean;
@@ -33,10 +35,14 @@ const WrapperPlacehoder: React.FC<ItemCustomComponentProps> = props => {
   return <div>{children}</div>;
 };
 
-function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, indentation, options} =
+function ItemRenderer(props: ItemRendererProps) {
+  const {itemId, sectionId, level, isLastItem, isSectionCheckable, sectionContainerElementId, indentation, options} =
     props;
-  const {instanceHandler} = blueprint;
+  // const {instanceHandler} = blueprint;
+
+  const sectionBlueprint = useMemo(() => sectionBlueprintMap.getById(sectionId), [sectionId]);
+  const {itemBlueprint} = sectionBlueprint || {};
+  const {instanceHandler} = itemBlueprint || {};
 
   const dispatch = useAppDispatch();
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
@@ -45,7 +51,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay} = useItemCustomization(
-    blueprint.customization
+    itemBlueprint?.customization
   );
 
   const previouslyCheckedResourcesLength = useRef(checkedResourceIds.length);
@@ -91,7 +97,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             onMouseLeave={() => setIsHovered(false)}
             isSelected={itemInstance.isSelected}
             isHighlighted={itemInstance.isHighlighted}
-            disableHoverStyle={Boolean(blueprint.customization?.disableHoverStyle)}
+            disableHoverStyle={Boolean(itemBlueprint?.customization?.disableHoverStyle)}
             isHovered={isHovered}
             level={level}
             isLastItem={isLastItem}
@@ -99,10 +105,10 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             $indentation={indentation}
             $isSectionCheckable={isSectionCheckable}
             $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
-            $lastItemMarginBottom={blueprint.customization?.lastItemMarginBottom}
+            $lastItemMarginBottom={itemBlueprint?.customization?.lastItemMarginBottom}
           >
             {itemInstance.isCheckable &&
-              (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
+              (itemBlueprint?.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
                 <span>
                   <S.Checkbox
                     checked={itemInstance.isChecked}

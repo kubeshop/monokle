@@ -198,9 +198,7 @@ function SectionRenderer(props: SectionRendererProps) {
   return (
     <>
       <SectionHeader
-        name={sectionInstance.name}
-        sectionInstance={sectionInstance}
-        sectionBlueprint={sectionBlueprint}
+        sectionId={sectionId}
         isCollapsed={isCollapsed}
         isLastSection={isLastSection}
         level={level}
@@ -217,7 +215,7 @@ function SectionRenderer(props: SectionRendererProps) {
           <ItemRenderer
             key={itemId}
             itemId={itemId}
-            blueprint={itemBlueprint}
+            sectionId={sectionId}
             level={level + 1}
             isLastItem={isLastVisibleItemId(itemId)}
             isSectionCheckable={Boolean(sectionInstance.checkable)}
@@ -245,7 +243,7 @@ function SectionRenderer(props: SectionRendererProps) {
                   <ItemRenderer
                     key={itemId}
                     itemId={itemId}
-                    blueprint={itemBlueprint}
+                    sectionId={sectionId}
                     level={level + 2}
                     isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
                     isSectionCheckable={Boolean(sectionInstance.checkable)}

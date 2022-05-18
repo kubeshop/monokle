@@ -1,10 +1,12 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models/navigator';
+import {SectionCustomComponent} from '@models/navigator';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import WalkThrough from '@components/molecules/WalkThrough';
+
+import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
@@ -12,9 +14,9 @@ import {useSectionCustomization} from './useSectionCustomization';
 import * as S from './styled';
 
 interface SectionHeaderProps {
-  name: string;
-  sectionInstance: SectionInstance;
-  sectionBlueprint: SectionBlueprint<any>;
+  sectionId: string;
+  // sectionInstance: SectionInstance;
+  // sectionBlueprint: SectionBlueprint<any>;
   isCollapsed: boolean;
   isLastSection: boolean;
   level: number;
@@ -24,21 +26,15 @@ interface SectionHeaderProps {
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {
-    name,
-    sectionInstance,
-    sectionBlueprint,
-    isCollapsed,
-    isLastSection,
-    level,
-    indentation,
-    expandSection,
-    collapseSection,
-  } = props;
+  const {sectionId, isCollapsed, isLastSection, level, indentation, expandSection, collapseSection} = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const sectionBlueprint = useMemo(() => sectionBlueprintMap.getById(sectionId), [sectionId]);
+  const sectionInstance = useAppSelector(state => state.navigator.sectionInstanceMap[sectionId]);
+
   const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
-    sectionBlueprint.customization
+    sectionBlueprint?.customization
   );
 
   const Counter: SectionCustomComponent = useMemo(
@@ -66,6 +62,10 @@ function SectionHeader(props: SectionHeaderProps) {
       dispatch(sectionInstance.checkable.uncheckItemsAction);
     }
   }, [sectionInstance, dispatch]);
+
+  if (!sectionBlueprint) {
+    return null;
+  }
 
   return (
     <S.SectionContainer
@@ -112,7 +112,7 @@ function SectionHeader(props: SectionHeaderProps) {
             {NamePrefix.Component && (
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
-            {name === 'K8s Resources' ? (
+            {sectionInstance.name === 'K8s Resources' ? (
               <WalkThrough placement="rightTop" step="resource" collection="novice">
                 <S.Name
                   $isSelected={sectionInstance.isSelected && isCollapsed}
@@ -126,7 +126,7 @@ function SectionHeader(props: SectionHeaderProps) {
                   $level={level}
                   onClick={toggleCollapse}
                 >
-                  {name}
+                  {sectionInstance.name}
                 </S.Name>
               </WalkThrough>
             ) : (
@@ -142,7 +142,7 @@ function SectionHeader(props: SectionHeaderProps) {
                 $level={level}
                 onClick={toggleCollapse}
               >
-                {name}
+                {sectionInstance.name}
               </S.Name>
             )}
             <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />

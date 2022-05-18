@@ -191,10 +191,20 @@ export interface SectionInstance {
   meta?: any;
 }
 
-export type NavigatorRow = {
-  type: 'section' | 'item';
+type NavigatorSectionRow = {
+  type: 'section';
   id: string;
+  level: number;
 };
+
+type NavigatorItemRow = {
+  type: 'item';
+  id: string;
+  sectionId: string;
+  level: number;
+};
+
+export type NavigatorRow = NavigatorSectionRow | NavigatorItemRow;
 
 export interface NavigatorInstanceState {
   sectionInstanceMap: Record<string, SectionInstance>;

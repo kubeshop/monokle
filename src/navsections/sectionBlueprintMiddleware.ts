@@ -187,13 +187,17 @@ function computeSectionVisibility(
 
 function makeNavigatorRows(
   instance: SectionInstance,
-  sectionInstanceMap: Record<string, SectionInstance>
+  sectionInstanceMap: Record<string, SectionInstance>,
+  level = 0
 ): NavigatorRow[] {
   const rows: NavigatorRow[] = [];
   if (!instance.isVisible) {
     return rows;
   }
-  rows.push({id: instance.id, type: 'section'}, ...instance.visibleItemIds.map(id => ({id, type: 'item' as const})));
+  rows.push(
+    {id: instance.id, type: 'section', level},
+    ...instance.visibleItemIds.map(id => ({id, type: 'item' as const, level, sectionId: instance.id}))
+  );
 
   const blueprint = sectionBlueprintMap.getById(instance.id);
 
@@ -209,7 +213,7 @@ function makeNavigatorRows(
     }
     const childInstance = sectionInstanceMap[childBlueprintId];
     if (childInstance) {
-      rows.push(...makeNavigatorRows(childInstance, sectionInstanceMap));
+      rows.push(...makeNavigatorRows(childInstance, sectionInstanceMap, level + 1));
     }
   }
 
