@@ -47,7 +47,29 @@ const ReplaceImageModal: React.FC = () => {
       onOk={handleOk}
     >
       <Form form={form} layout="vertical">
-        <Form.Item name="tag" label="New Image Tag" rules={[{required: true, message: 'This field is required'}]}>
+        <Form.Item
+          name="tag"
+          label="New Image Tag"
+          rules={[
+            ({getFieldValue}) => ({
+              required: true,
+              validator: () =>
+                new Promise((resolve: (value?: any) => void, reject) => {
+                  const newTag = getFieldValue('tag');
+
+                  if (!newTag) {
+                    reject(new Error('This field is required'));
+                  }
+
+                  if (newTag === image.tag) {
+                    reject(new Error('Tag must be different'));
+                  }
+
+                  resolve();
+                }),
+            }),
+          ]}
+        >
           <Input id="image-tag-input" placeholder="Enter image tag" />
         </Form.Item>
       </Form>
