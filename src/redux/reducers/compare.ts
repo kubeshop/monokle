@@ -11,6 +11,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {kustomizationsSelector} from '@redux/selectors';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
+import {createResourceFilters, filterComparisons} from '@redux/services/compare/filterComparisons';
 
 import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
@@ -30,6 +31,9 @@ export type CompareState = {
     selection: string[];
     viewDiff?: string; // comparisonId
     search?: string;
+    filtering?: {
+      comparisons: ResourceComparison[];
+    };
   };
 };
 
@@ -258,6 +262,11 @@ export const compareSlice = createSlice({
         comparisons: action.payload.comparisons,
       };
     },
+    resourceSetFiltered: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+      state.current.filtering = {
+        comparisons: action.payload.comparisons,
+      };
+    },
   },
 });
 
@@ -265,6 +274,8 @@ function resetComparison(state: WritableDraft<CompareState>) {
   state.current.comparison = undefined;
   state.current.viewDiff = undefined;
   state.current.selection = [];
+
+  state.current.filtering = undefined;
 }
 
 /* * * * * * * * * * * * * *
@@ -283,6 +294,7 @@ export const {
   resourceSetFetchFailed,
   resourceSetFetched,
   resourceSetCompared,
+  resourceSetFiltered,
   diffViewOpened,
   comparisonAllToggled,
   comparisonToggled,
@@ -374,7 +386,7 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
 };
 
 export const selectComparisonListItems = createSelector(
-  (state: CompareState) => state.current.comparison?.comparisons,
+  (state: CompareState) => state.current.filtering?.comparisons,
   comparisons => {
     const result: ComparisonListItem[] = [];
 
@@ -489,6 +501,23 @@ export const compareListener: AppListenerFn = listen => {
       const options = {operation: view.operation ?? 'union'};
       const comparisons = compareResources(left.resources, right.resources, options);
       dispatch(resourceSetCompared({comparisons}));
+    },
+  });
+};
+
+export const filterListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(resourceSetCompared, filterUpdated, searchUpdated),
+    effect: async (_, {dispatch, getState, cancelActiveListeners, delay}) => {
+      cancelActiveListeners();
+      await delay(3);
+
+      const {search, comparison} = getState().compare.current;
+      const comparisons = comparison?.comparisons ?? [];
+      const filters = createResourceFilters({search});
+      const filteredComparisons = filterComparisons(comparisons, filters);
+      const action = resourceSetFiltered({comparisons: filteredComparisons});
+      dispatch(action);
     },
   });
 };
