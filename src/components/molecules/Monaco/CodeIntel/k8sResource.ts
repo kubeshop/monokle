@@ -45,6 +45,7 @@ function applyRefIntel(
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  selectImage: (imageId: string) => void,
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ): {
@@ -197,7 +198,11 @@ function applyRefIntel(
       if (createResource || !isUnsatisfiedRef(matchRef.type)) {
         const linkDisposable = createLinkProvider(
           inlineRange,
-          isUnsatisfiedRef(matchRef.type) ? 'Create resource' : 'Open resource',
+          isUnsatisfiedRef(matchRef.type)
+            ? 'Create resource'
+            : matchRef.target?.type === 'image'
+            ? 'Select image'
+            : 'Open resource',
           () => {
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
               createResource(matchRef, resource.namespace, getResourceFolder(resource));
@@ -205,6 +210,8 @@ function applyRefIntel(
               selectResource(matchRef.target.resourceId);
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
+            } else if (matchRef.target?.type === 'image') {
+              selectImage(`${matchRef.name}:${matchRef.target?.tag}`);
             }
           }
         );
@@ -268,6 +275,7 @@ export const resourceCodeIntel: CodeIntelApply = {
     selectFilePath,
     createResource,
     filterResources,
+    selectImage,
     resourceMap,
     fileMap,
     model,
@@ -280,7 +288,15 @@ export const resourceCodeIntel: CodeIntelApply = {
       await processSymbols(model, resource, filterResources, disposables, decorations);
     }
 
-    const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
+    const refIntel = applyRefIntel(
+      resource,
+      selectResource,
+      selectFilePath,
+      createResource,
+      selectImage,
+      resourceMap,
+      fileMap
+    );
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);
 

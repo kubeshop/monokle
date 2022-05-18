@@ -26,6 +26,7 @@ interface CodeIntelProps {
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
+  selectImage: (imageId: string) => void;
   selectedPath?: string;
   helmChartMap?: HelmChartMapType;
   helmValuesMap?: HelmValuesMapType;
@@ -43,6 +44,7 @@ function useCodeIntel(props: CodeIntelProps) {
     selectFilePath,
     createResource,
     filterResources,
+    selectImage,
     selectedPath,
     helmChartMap,
     helmValuesMap,
@@ -94,6 +96,7 @@ function useCodeIntel(props: CodeIntelProps) {
           selectResource,
           createResource,
           filterResources,
+          selectImage,
           resourceMap,
           model: editor.getModel(),
         })
