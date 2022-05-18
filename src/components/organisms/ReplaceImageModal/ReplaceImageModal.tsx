@@ -40,7 +40,12 @@ const ReplaceImageModal: React.FC = () => {
   };
 
   return (
-    <Modal title={`Replace ${image.name} tag`} visible={uiState.isOpen} onCancel={handleCancel} onOk={handleOk}>
+    <Modal
+      title={`Replace ${image.name}:${image.tag}`}
+      visible={uiState.isOpen}
+      onCancel={handleCancel}
+      onOk={handleOk}
+    >
       <Form form={form} layout="vertical">
         <Form.Item name="tag" label="New Image Tag" rules={[{required: true, message: 'This field is required'}]}>
           <Input id="image-tag-input" placeholder="Enter image tag" />

@@ -4,15 +4,15 @@ import log from 'loglevel';
 
 import {RootState} from '@models/rootstate';
 
-import {UpdateManyResourcesPayload, getActiveResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
+import {UpdateMultipleResourcesPayload, getActiveResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 
-export const updateManyResources = createAsyncThunk(
-  'main/updateManyResources',
-  async (payload: UpdateManyResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+export const updateMultipleResources = createAsyncThunk(
+  'main/updateMultipleResources',
+  async (payload: UpdateMultipleResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);

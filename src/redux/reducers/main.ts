@@ -48,7 +48,7 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
-import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
@@ -88,7 +88,7 @@ export type UpdateResourcePayload = {
   isInClusterMode?: boolean;
 };
 
-export type UpdateManyResourcesPayload = {
+export type UpdateMultipleResourcesPayload = {
   resourceId: string;
   content: string;
 }[];
@@ -1079,7 +1079,7 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(updateManyResources.fulfilled, (state, action) => {
+    builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -1248,7 +1248,10 @@ export default mainSlice.reducer;
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return (
+        !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap) &&
+        action.type !== 'main/selectK8sResource'
+      );
     },
     effect: async (_action, {dispatch, getState}) => {
       const resourceMap = getState().main.resourceMap;
