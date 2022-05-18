@@ -9,6 +9,7 @@ import {
   CompareOperation,
   comparisonAllToggled,
   operationUpdated,
+  searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
 } from '@redux/reducers/compare';
@@ -20,10 +21,18 @@ export const CompareActionBar: React.FC = () => {
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
+  const search = useAppSelector(state => state.compare.current.search);
 
   const handleSelectAll = useCallback(() => {
     dispatch(comparisonAllToggled());
   }, [dispatch]);
+
+  const handleSearch = useCallback(
+    (newSearch: string) => {
+      dispatch(searchUpdated({search: newSearch}));
+    },
+    [dispatch]
+  );
 
   const handleSaveView = useCallback(() => {
     log.debug('dispatch ViewSaved');
@@ -43,7 +52,13 @@ export const CompareActionBar: React.FC = () => {
 
       <S.ActionBarRightDiv>
         <Space>
-          <Input disabled={disabled} value="search" />
+          <Input
+            disabled={disabled}
+            prefix={<S.SearchIcon />}
+            placeholder="Search"
+            value={search}
+            onChange={e => handleSearch(e.target.value)}
+          />
 
           <OperationSelect />
 

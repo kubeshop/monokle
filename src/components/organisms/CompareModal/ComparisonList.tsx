@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {Button, Checkbox, Col} from 'antd';
 
@@ -15,10 +15,25 @@ import {ComparisonItemProps, HeaderItemProps} from './types';
 
 export const ComparisonList: React.FC = () => {
   const items = useAppSelector(state => selectComparisonListItems(state.compare));
+  const search = useAppSelector(state => state.compare.current.search);
+
+  const searchedItems = useMemo(() => {
+    if (!search) return items;
+    return items
+      .filter(item => {
+        if (item.type === 'header') return true;
+        return item.name.toLowerCase().includes(search);
+      })
+      .filter((item, index, partiallySearchedItems) => {
+        if (item.type === 'comparison') return true;
+        const nextItem = partiallySearchedItems[index + 1];
+        return nextItem && nextItem.type === 'comparison';
+      });
+  }, [items, search]);
 
   return (
     <div>
-      {items.map(item => {
+      {searchedItems.map(item => {
         return item.type === 'header' ? (
           <HeaderItem key={item.kind} {...item} />
         ) : (

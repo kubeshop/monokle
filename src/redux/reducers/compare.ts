@@ -29,6 +29,7 @@ export type CompareState = {
     comparison?: ComparisonData;
     selection: string[];
     viewDiff?: string; // comparisonId
+    search?: string;
   };
 };
 
@@ -148,6 +149,9 @@ export const compareSlice = createSlice({
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
       resetComparison(state);
+    },
+    searchUpdated: (state, action: PayloadAction<{search: string}>) => {
+      state.current.search = action.payload.search;
     },
     filterUpdated: (state, action: PayloadAction<{filter: Partial<CompareFilter>}>) => {
       const currentFilter = state.current.view.filter;
@@ -269,6 +273,7 @@ function resetComparison(state: WritableDraft<CompareState>) {
 export default compareSlice.reducer;
 export const {
   compareToggled,
+  searchUpdated,
   filterUpdated,
   operationUpdated,
   resourceSetCleared,
