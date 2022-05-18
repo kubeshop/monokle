@@ -143,11 +143,16 @@ export const compareSlice = createSlice({
   name: 'compare',
   initialState,
   reducers: {
-    compareToggled: (state, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload === undefined) {
+    compareToggled: (state, action: PayloadAction<{value: boolean | undefined; initialView?: ComparisonView}>) => {
+      const {value, initialView} = action.payload;
+      if (value === undefined) {
         state.isOpen = !state.isOpen;
       } else {
-        state.isOpen = action.payload;
+        state.isOpen = value;
+      }
+
+      if (initialView) {
+        state.current.view = initialView;
       }
     },
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
@@ -453,10 +458,15 @@ export const resourceFetchListener =
   listen => {
     listen({
       predicate: (action, state) => {
-        const resourceSetUpdated = isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared);
+        const resourceSetUpdated = isAnyOf(
+          compareToggled,
+          resourceSetSelected,
+          resourceSetRefreshed,
+          resourceSetCleared
+        );
         if (!resourceSetUpdated(action)) return false;
 
-        const actionSide = action.payload.side;
+        const actionSide = compareToggled.match(action) ? side : action.payload.side;
         if (actionSide !== side) return false;
 
         const resourceSet = selectResourceSet(state.compare, side);
