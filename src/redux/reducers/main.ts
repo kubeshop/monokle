@@ -126,10 +126,10 @@ function getDockerImages(resourceMap: ResourceMapType) {
           const refName = ref.name;
           const refTag = ref.target?.tag || 'latest';
 
-          const foundImage = images.find(image => image.name === refName && image.tag === refTag);
+          const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
 
           if (!foundImage) {
-            images.push({name: refName, tag: refTag || 'latest', resourcesIds: [k8sResource.id]});
+            images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
           } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
             foundImage.resourcesIds.push(k8sResource.id);
           }

@@ -3,6 +3,7 @@
  */
 
 interface DockerImage {
+  id: string;
   name: string;
   tag: string;
   resourcesIds: string[];

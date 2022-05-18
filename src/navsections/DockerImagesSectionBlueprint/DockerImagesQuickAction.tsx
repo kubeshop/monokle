@@ -11,7 +11,7 @@ const DockerImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
   const dispatch = useAppDispatch();
 
   const onReplaceHandler = () => {
-    dispatch(openReplaceImageModal());
+    dispatch(openReplaceImageModal(itemInstance.id));
   };
 
   return (

@@ -127,11 +127,13 @@ export const uiSlice = createSlice({
     closeReplaceImageModal: (state: Draft<UiState>) => {
       state.replaceImageModal = {
         isOpen: false,
+        imageId: '',
       };
     },
-    openReplaceImageModal: (state: Draft<UiState>) => {
+    openReplaceImageModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.replaceImageModal = {
         isOpen: true,
+        imageId: action.payload,
       };
     },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
