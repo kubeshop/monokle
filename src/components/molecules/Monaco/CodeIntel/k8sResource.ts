@@ -26,6 +26,20 @@ function areRefPosEqual(a: RefPosition, b: RefPosition) {
   return a.line === b.line && a.column === b.column && a.length === b.length;
 }
 
+const applyErrorIntel = (
+  resource: K8sResource
+): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
+} => {
+  const validations = resource.validation?.errors ?? [];
+
+  const glyphs = validations.map(validation =>
+    createGlyphDecoration(validation.errorPos?.line ?? 1, GlyphDecorationTypes.ErrorRef)
+  );
+
+  return {decorations: glyphs};
+};
+
 function applyRefIntel(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
@@ -260,6 +274,9 @@ export const resourceCodeIntel: CodeIntelApply = {
     const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);
+
+    const errorIntel = applyErrorIntel(resource);
+    decorations.push(...errorIntel.decorations);
 
     const policyIntel = applyPolicyIntel(resource);
     decorations.push(...policyIntel.decorations);
