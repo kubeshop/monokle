@@ -24,7 +24,7 @@ test('array-optional-resource-refs', () => {
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: true});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(3);
+  expect(deployment.refs?.length).toBe(4);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 });
