@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import {shallowEqual} from 'react-redux';
 
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import path from 'path';
@@ -1248,10 +1248,9 @@ export default mainSlice.reducer;
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return (
-        !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap) &&
-        action.type !== 'main/selectK8sResource'
-      );
+      const ignoringActions = isAnyOf(selectK8sResource, selectDockerImage);
+
+      return !ignoringActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
     },
     effect: async (_action, {dispatch, getState}) => {
       const resourceMap = getState().main.resourceMap;
