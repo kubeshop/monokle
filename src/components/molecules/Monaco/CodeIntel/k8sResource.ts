@@ -40,8 +40,6 @@ const applyErrorIntel = (
   return {decorations: glyphs};
 };
 
-export default applyErrorIntel;
-
 function applyRefIntel(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
