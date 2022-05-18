@@ -58,7 +58,7 @@ type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
 type ResourceFilterType = {
   name?: string;
-  kind?: string;
+  kinds?: string[];
   namespace?: string;
   labels: Record<string, string | null>;
   annotations: Record<string, string | null>;

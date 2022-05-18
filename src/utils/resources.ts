@@ -27,7 +27,7 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   ) {
     return false;
   }
-  if (filters.kind && resource.kind !== filters.kind) {
+  if (filters.kinds?.length && !filters.kinds?.includes(resource.kind)) {
     return false;
   }
   if (filters.namespace) {
