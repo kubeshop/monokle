@@ -2,8 +2,6 @@ import {ipcRenderer} from 'electron';
 
 import Nucleus from 'nucleus-nodejs';
 
-import {ValidationIntegrationId} from '@components/organisms/ValidationDrawer/integrations';
-
 import {isRendererThread} from './thread';
 
 export const trackEvent = <TEvent extends Event>(
@@ -48,7 +46,7 @@ export type EventMap = {
   APPLY_FILE: undefined;
   APPLY_HELM_CHART: undefined;
   RUN_PREVIEW_CONFIGURATION: undefined;
-  VALIDATION_PANE_OPENED: {id: ValidationIntegrationId};
+  VALIDATION_PANE_OPENED: {id: string};
   OPA_ENABLED: {all: boolean};
   OPA_DISABLED: {all: boolean};
 };
