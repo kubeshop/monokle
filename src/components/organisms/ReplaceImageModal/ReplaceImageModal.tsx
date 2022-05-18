@@ -4,12 +4,14 @@ import {Form, Input, Modal} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeReplaceImageModal} from '@redux/reducers/ui';
+import {replaceImageTag} from '@redux/thunks/replaceImageTag';
 
 const ReplaceImageModal: React.FC = () => {
   const [form] = Form.useForm();
 
   const dispatch = useAppDispatch();
   const imagesMap = useAppSelector(state => state.main.imagesMap);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
   const uiState = useAppSelector(state => state.ui.replaceImageModal);
 
   const image = useMemo(() => {
@@ -30,7 +32,10 @@ const ReplaceImageModal: React.FC = () => {
 
   const handleOk = () => {
     form.validateFields().then(values => {
-      console.log(values);
+      const {tag} = values;
+
+      replaceImageTag(image, tag, resourceMap, dispatch);
+      dispatch(closeReplaceImageModal());
     });
   };
 
