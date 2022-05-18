@@ -135,7 +135,7 @@
     "react-flow-renderer": "9.7.4",
     "react-hotkeys-hook": "3.4.4",
     "react-markdown": "8.0.3",
-    "react-monaco-editor": "0.46.0",
+    "react-monaco-editor": "0.48.0",
     "react-redux": "7.2.8",
     "react-reflex": "4.0.6",
     "react-resizable": "3.0.4",
