@@ -211,7 +211,8 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "certificateSubjectName": "The name of the subject of the signing certificate, which is often labeled with the field name issued to"
     },
     "nsis": {
       "oneClick": false,

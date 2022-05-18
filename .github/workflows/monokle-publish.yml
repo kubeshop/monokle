@@ -174,12 +174,23 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      - name: Azure CLI Login
+        uses: Azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: Azure/get-keyvault-secrets@v1
+        with:
+          keyvault: 'monokle-signing'
+          secrets: 'mySecret' # Certificate key should be here - it will get Base64 certificate
+        id: myGetSecretAction
+
       - name: Get MSFT Cert
         id: write_file
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'kubeshop_msft.p12'
-          encodedString: ${{ secrets.CERT_MSFT_KUBESHOP_P12_B64 }}
+          encodedString: ${{ teps.myGetSecretAction.outputs.mySecret }} # mySecret key will be changed
 
       # Install Dependencies
       - name: Install Dependencies
@@ -215,7 +226,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }} # This will be changed
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
 
