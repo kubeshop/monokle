@@ -17,7 +17,7 @@ test('array-optional-resource-refs', () => {
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(4);
+  expect(deployment.refs?.length).toBe(5);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(2);
 
@@ -40,7 +40,7 @@ test('namespaced-resource-refs', () => {
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: true});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(2);
+  expect(deployment.refs?.length).toBe(3);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 
