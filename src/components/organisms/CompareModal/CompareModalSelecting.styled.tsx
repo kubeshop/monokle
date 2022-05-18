@@ -10,7 +10,7 @@ export const ListRow = styled(Row)`
 export const FloatingFigure = styled.div<{side: 'left' | 'right'; noEvents?: boolean}>`
   position: absolute;
   ${({side}) => (side === 'left' ? 'left: 0;' : 'right: 0;')}
-  top: 72px;
+  top: 0px;
   width: 45%;
   height: calc(100% - 72px);
   overflow: hidden;

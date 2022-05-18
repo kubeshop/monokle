@@ -24,3 +24,5 @@ Monokle currently supports the following keyboard shortcuts:
 - Open Quick Search: Ctrl/Cmd SHIFT P
 - Zoom In: Ctrl/Cmd =
 - Zoom Out: Ctrl/Cmd -
+- Open Shortcuts: Ctrl/Cmd /
+- Reload Preview: Ctrl/Cmd R

@@ -4,10 +4,11 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {areRefPosEqual, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
+import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {GlyphDecorationTypes, InlineDecorationTypes} from '../editorConstants';
+import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
+import {GlyphDecorationTypes, InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {
   createCommandMarkdownLink,
   createGlyphDecoration,
@@ -15,9 +16,17 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
-} from '../editorHelpers';
+  createMarker,
+} from '@molecules/Monaco/editorHelpers';
+import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
-const applyRefIntel = (
+import {isDefined} from '@utils/filter';
+
+function areRefPosEqual(a: RefPosition, b: RefPosition) {
+  return a.line === b.line && a.column === b.column && a.length === b.length;
+}
+
+function applyRefIntel(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
@@ -27,7 +36,7 @@ const applyRefIntel = (
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   disposables: monaco.IDisposable[];
-} => {
+} {
   const refs = resource.refs ?? [];
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
@@ -191,6 +200,84 @@ const applyRefIntel = (
   });
 
   return {decorations: newDecorations, disposables: newDisposables};
-};
+}
 
-export default applyRefIntel;
+function applyPolicyIntel(resource: K8sResource): {
+  decorations: monaco.editor.IModelDeltaDecoration[];
+  markers: monaco.editor.IMarkerData[];
+} {
+  const issues = resource.issues?.errors ?? [];
+
+  const glyphs = issues.map(issue => {
+    const rule = issue.rule!;
+    const message = [createMarkdownString(`${rule.shortDescription.text} __(${issue.message})__`)].filter(isDefined);
+
+    return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
+  });
+
+  const markers = issues
+    .map(issue => {
+      if (
+        !issue.rule ||
+        !issue.errorPos ||
+        issue.errorPos.line === 1 ||
+        issue.errorPos.endLine === undefined ||
+        issue.errorPos.endColumn === undefined
+      ) {
+        return undefined;
+      }
+
+      const range = new monaco.Range(
+        issue.errorPos.line,
+        issue.errorPos.column,
+        issue.errorPos.endLine,
+        issue.errorPos.endColumn
+      );
+
+      const message = `${issue.rule.shortDescription.text}\n  ${issue.rule.longDescription.text}\n    ${issue.rule.help.text}`;
+
+      return createMarker(issue.rule.id, message, range);
+    })
+    .filter(isDefined);
+
+  return {decorations: glyphs, markers};
+}
+
+export const resourceCodeIntel: CodeIntelApply = {
+  name: 'resource',
+  shouldApply: params => {
+    return Boolean(params.selectedResource);
+  },
+  codeIntel: async ({
+    resource,
+    selectResource,
+    selectFilePath,
+    createResource,
+    filterResources,
+    resourceMap,
+    fileMap,
+    model,
+  }) => {
+    const disposables: monaco.IDisposable[] = [];
+    const decorations: monaco.editor.IModelDeltaDecoration[] = [];
+    const markers: monaco.editor.IMarkerData[] = [];
+
+    if (model) {
+      await processSymbols(model, resource, filterResources, disposables, decorations);
+    }
+
+    const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
+    disposables.push(...refIntel.disposables);
+    decorations.push(...refIntel.decorations);
+
+    const policyIntel = applyPolicyIntel(resource);
+    decorations.push(...policyIntel.decorations);
+    markers.push(...policyIntel.markers);
+
+    return {
+      newDecorations: decorations,
+      newDisposables: disposables,
+      newMarkers: markers,
+    };
+  },
+};

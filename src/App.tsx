@@ -48,6 +48,7 @@ import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
+import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
 import * as S from './App.styled';
@@ -182,6 +183,13 @@ const App = () => {
       ipcRenderer.removeListener('executed-from', onExecutedFrom);
     };
   }, [onExecutedFrom]);
+
+  useEffect(() => {
+    ipcRenderer.on('restart-preview', restartEditorPreview);
+    return () => {
+      ipcRenderer.removeListener('executed-from', restartEditorPreview);
+    };
+  }, []);
 
   useEffect(() => {
     fetchAppVersion().then(version => {

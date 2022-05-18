@@ -1,12 +1,12 @@
-import {BrowserWindow, app, nativeImage} from 'electron';
+import {BrowserWindow, app, nativeImage, globalShortcut} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import ElectronStore from 'electron-store';
 
 import * as path from 'path';
 
+import {logToFile} from '@utils/logToFile';
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';
-import {logToFile} from "@utils/logToFile";
 
 Object.assign(console, logToFile.functions);
 
@@ -48,4 +48,20 @@ export const openApplication = async (givenPath?: string) => {
       app.quit();
     }
   });
+
+  app.on('browser-window-focus', () => {
+    globalShortcut.register("CommandOrControl+R", () => {
+        win.webContents.send('restart-preview');
+    });
+
+    globalShortcut.register("CommandOrControl+Shift+R", () => {
+      win.reload();
+  });
+  });
+
+  app.on('browser-window-blur', () => {
+    globalShortcut.unregister('CommandOrControl+R');
+    globalShortcut.unregister('CommandOrControl+Shift+R');
+  });
+  
 };

@@ -8,6 +8,8 @@ import {FileMapType} from '@models/appstate';
 import {useAppDispatch} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
+import {restartEditorPreview} from '@utils/restartEditorPreview';
+
 function useEditorKeybindings(
   editor: monaco.editor.IStandaloneCodeEditor | null,
   hiddenInputRef: React.RefObject<HTMLInputElement>,
@@ -70,6 +72,16 @@ function useEditorKeybindings(
         if (fileMap[ROOT_FILE_ENTRY]) {
           dispatch(openNewResourceWizard());
         }
+      },
+    });
+
+    e.addAction({
+      id: 'monokle-reload-file-preview',
+      label: 'Reload Preview',
+      // eslint-disable-next-line no-bitwise
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_R],
+      run: () => {
+        restartEditorPreview();
       },
     });
   };
