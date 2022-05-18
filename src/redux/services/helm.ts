@@ -189,7 +189,6 @@ export function processHelmChartFolder(
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id});
-      log.info(`helm helm file: ${filePath}`);
 
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
