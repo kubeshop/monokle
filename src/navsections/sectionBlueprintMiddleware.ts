@@ -307,23 +307,12 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
     const isSectionEmpty = Boolean(
       sectionBuilder?.isEmpty ? sectionBuilder.isEmpty(sectionScope, rawItems, itemInstances) : false
     );
-    const sectionGroups = sectionBuilder?.getGroups ? sectionBuilder.getGroups(sectionScope) : [];
-    const sectionInstanceGroups = sectionGroups.map(g => ({
-      ...g,
-      visibleItemIds: g.itemIds.filter(itemId => itemInstanceMap[itemId].isVisible === true),
-    }));
     const visibleItemIds = itemInstances
       ? _(itemInstances)
           .filter(i => i.isVisible === true)
           .map(i => i.id)
           .value()
       : [];
-    const visibleGroupIds = sectionBlueprint.customization?.emptyGroupText
-      ? sectionInstanceGroups.map(g => g.id)
-      : _(sectionInstanceGroups)
-          .filter(g => g.visibleItemIds.length > 0)
-          .map(g => g.id)
-          .value();
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
       name: sectionBuilder?.transformName
@@ -331,16 +320,13 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
         : sectionBlueprint.name,
       rootSectionId: sectionBlueprint.rootSectionId,
       itemIds: itemInstances?.map(i => i.id) || [],
-      groups: sectionInstanceGroups,
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
       isVisible:
         Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
         (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && isSectionEmpty) ||
         (isSectionInitialized &&
           Boolean(
-            sectionBuilder?.isVisible
-              ? sectionBuilder.isVisible(sectionScope, rawItems)
-              : visibleItemIds.length > 0 || visibleGroupIds.length > 0
+            sectionBuilder?.isVisible ? sectionBuilder.isVisible(sectionScope, rawItems) : visibleItemIds.length > 0
           )),
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
@@ -351,7 +337,6 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
       ),
       visibleItemIds,
-      visibleGroupIds,
     };
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
   });

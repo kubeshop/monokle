@@ -136,7 +136,6 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   builder?: {
     transformName?: (originalName: string, scope: ScopeType) => string;
     getRawItems?: (scope: ScopeType) => RawItemType[];
-    getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
     getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
@@ -151,10 +150,6 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   };
   customization?: SectionCustomization;
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
-}
-
-export interface ItemGroupInstance extends ItemGroupBlueprint {
-  visibleItemIds: string[];
 }
 
 export interface ItemInstance {
@@ -178,12 +173,10 @@ export interface SectionInstance {
   name: string;
   rootSectionId: string;
   itemIds: string[];
-  groups: ItemGroupInstance[];
   visibleItemIds: string[];
-  visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
-  visibleDescendantSectionIds?: string[];
   visibleDescendantItemIds?: string[];
+  visibleDescendantSectionIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
@@ -195,7 +188,7 @@ export interface SectionInstance {
     checkItemsAction: AnyAction;
     uncheckItemsAction: AnyAction;
   };
-  shouldExpand: boolean;
+  shouldExpand: boolean; // TODO: maybe this should become .isExpanded
   meta?: any;
 }
 
