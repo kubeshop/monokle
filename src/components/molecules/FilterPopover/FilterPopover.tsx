@@ -23,6 +23,9 @@ type Props = {
 
 export function FilterPopover({filter, onChange}: Props) {
   const filterCount = filter ? Object.keys(filter).length : 0;
+  const labelCount = filter?.labels ? Object.keys(filter.labels).length : 0;
+  const annotationCount = filter?.annotations ? Object.keys(filter.annotations).length : 0;
+
   const [namespace, setNamespace] = useState<string | undefined>(filter?.namespace);
   const [kind, setKind] = useState<string | undefined>(filter?.kind);
 
@@ -147,7 +150,14 @@ export function FilterPopover({filter, onChange}: Props) {
           </Space>
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab="Labels" key="1">
+        <Tabs.TabPane
+          tab={
+            <Badge dot={labelCount > 0} color={Colors.blue7} offset={[4, 3]}>
+              Labels
+            </Badge>
+          }
+          key="1"
+        >
           <Space direction="vertical" style={{width: '100%'}}>
             <NewKeyValue onAddKeyValue={handleAddLabelFilter} />
 
@@ -165,7 +175,14 @@ export function FilterPopover({filter, onChange}: Props) {
           </Space>
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab="Annotations" key="3">
+        <Tabs.TabPane
+          tab={
+            <Badge dot={annotationCount > 0} color={Colors.blue7} offset={[4, 3]}>
+              Annotations
+            </Badge>
+          }
+          key="3"
+        >
           <Space direction="vertical" style={{width: '100%'}}>
             <NewKeyValue onAddKeyValue={handleAddAnnotationFilter} />
 
