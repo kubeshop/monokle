@@ -41,30 +41,14 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
   },
   builder: {
     getRawItems: scope => {
-      return Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
-    },
-    getGroups: scope => {
-      const patchResources = Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
-      const patchResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
-        (acc, resource) => {
-          if (acc[resource.kind]) {
-            acc[resource.kind].push(resource);
-          } else {
-            acc[resource.kind] = [resource];
+      return Object.values(scope.resourceMap)
+        .filter(resource => resource.name.startsWith('Patch:'))
+        .sort((a, b) => {
+          if (a.kind !== b.kind) {
+            return a.kind.localeCompare(b.kind);
           }
-          return acc;
-        },
-        {}
-      );
-      return Object.entries(patchResourcesByKind)
-        .map(([resourceKind, resources]) => {
-          return {
-            id: resourceKind,
-            name: resourceKind,
-            itemIds: resources.map(r => r.id),
-          };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
+          return a.name.localeCompare(b.name);
+        });
     },
     isVisible: (_, rawItems) => {
       return rawItems.length > 0;

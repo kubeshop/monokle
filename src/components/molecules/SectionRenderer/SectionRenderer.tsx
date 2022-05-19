@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
@@ -122,15 +122,6 @@ function SectionRenderer(props: SectionRendererProps) {
     }
   }, [sectionInstance?.shouldExpand, expandSection]);
 
-  const groupInstanceById: Record<string, ItemGroupInstance> = useMemo(() => {
-    return sectionInstance?.groups
-      .map<[string, ItemGroupInstance]>(g => [g.id, g])
-      .reduce<Record<string, ItemGroupInstance>>((acc, [k, v]) => {
-        acc[k] = v;
-        return acc;
-      }, {});
-  }, [sectionInstance?.groups]);
-
   const lastVisibleChildSectionId = useMemo(() => {
     if (!sectionInstance?.visibleChildSectionIds) {
       return undefined;
@@ -149,18 +140,6 @@ function SectionRenderer(props: SectionRendererProps) {
       return itemId === lastVisibleItemId;
     },
     [sectionInstance?.visibleItemIds]
-  );
-
-  const isLastVisibleItemIdInGroup = useCallback(
-    (groupId: string, itemId: string) => {
-      const groupInstance = groupInstanceById[groupId];
-      if (!groupInstance) {
-        return false;
-      }
-      const lastVisibleItemIdInGroup = groupInstance.visibleItemIds[groupInstance.visibleItemIds.length - 1];
-      return itemId === lastVisibleItemIdInGroup;
-    },
-    [groupInstanceById]
   );
 
   if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
@@ -209,7 +188,6 @@ function SectionRenderer(props: SectionRendererProps) {
         sectionInstance.isVisible &&
         !isCollapsed &&
         itemBlueprint &&
-        sectionInstance.groups.length === 0 &&
         sectionInstance.visibleItemIds.map(itemId => (
           <ItemRenderer
             key={itemId}
@@ -223,42 +201,6 @@ function SectionRenderer(props: SectionRendererProps) {
             indentation={sectionIndentation || 0}
           />
         ))}
-      {sectionInstance?.isVisible &&
-        !isCollapsed &&
-        itemBlueprint &&
-        groupInstanceById &&
-        sectionInstance.visibleGroupIds.map(groupId => {
-          const group = groupInstanceById[groupId];
-          return (
-            <React.Fragment key={group.id}>
-              <S.SectionContainer style={{color: 'red'}}>
-                <S.Name $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}>
-                  {group.name}
-                  <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
-                </S.Name>
-              </S.SectionContainer>
-              {group.visibleItemIds.length ? (
-                group.visibleItemIds.map(itemId => (
-                  <ItemRenderer
-                    key={itemId}
-                    itemId={itemId}
-                    sectionId={sectionId}
-                    level={level + 2}
-                    isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
-                    isSectionCheckable={Boolean(sectionInstance.checkable)}
-                    sectionContainerElementId={sectionBlueprint.containerElementId}
-                    options={itemRendererOptions}
-                    indentation={sectionIndentation || 0}
-                  />
-                ))
-              ) : (
-                <S.EmptyGroupText>
-                  {sectionBlueprint.customization?.emptyGroupText || 'No items in this group.'}
-                </S.EmptyGroupText>
-              )}
-            </React.Fragment>
-          );
-        })}
       {childSections &&
         childSections.map(child => (
           <SectionRenderer
