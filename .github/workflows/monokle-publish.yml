@@ -228,6 +228,7 @@ jobs:
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
+          cmd /r dir .\secret
         if: ${{ success() }}
 
       - name: Create release and upload artifacts
