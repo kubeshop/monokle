@@ -1,18 +1,19 @@
 import {useCallback} from 'react';
 
-import {Button, Checkbox, Divider, Input, Select, Space} from 'antd';
-
-import log from 'loglevel';
+import {Checkbox, Input, Select, Space} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   CompareOperation,
   comparisonAllToggled,
+  filterUpdated,
   operationUpdated,
   searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
 } from '@redux/reducers/compare';
+
+import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 
 import * as S from './CompareActionBar.styled';
 
@@ -22,6 +23,7 @@ export const CompareActionBar: React.FC = () => {
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
   const search = useAppSelector(state => state.compare.current.search);
+  const filter = useAppSelector(state => state.compare.current.view.filter);
 
   const handleSelectAll = useCallback(() => {
     dispatch(comparisonAllToggled());
@@ -34,13 +36,12 @@ export const CompareActionBar: React.FC = () => {
     [dispatch]
   );
 
-  const handleSaveView = useCallback(() => {
-    log.debug('dispatch ViewSaved');
-  }, []);
-
-  const handleLoadView = useCallback(() => {
-    log.debug('dispatch ViewLoaded');
-  }, []);
+  const handleFilterUpdated = useCallback(
+    (newFilter: Filter | undefined) => {
+      dispatch(filterUpdated({filter: newFilter}));
+    },
+    [dispatch]
+  );
 
   return (
     <S.ActionBarDiv>
@@ -62,15 +63,7 @@ export const CompareActionBar: React.FC = () => {
 
           <OperationSelect />
 
-          <Divider type="vertical" style={{height: 28}} />
-
-          <Button disabled={disabled} onClick={handleSaveView}>
-            Save Diff
-          </Button>
-
-          <Button disabled={disabled} onClick={handleLoadView}>
-            Load Diff
-          </Button>
+          <FilterPopover filter={filter} onChange={handleFilterUpdated} />
         </Space>
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
