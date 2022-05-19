@@ -169,7 +169,7 @@ jobs:
           echo "::set-output name=nodeversion::$content"
         id: get-node-version
 
-      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+      - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
@@ -208,7 +208,8 @@ jobs:
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-          WIN_CSC_LINK: 'D:\a\monokle\monokle\.secret\kubeshop_msft.p12'
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          # WIN_CSC_LINK: 'D:\a\monokle\monokle\.secret\kubeshop_msft.p12'
           # WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }} # This will be changed
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
