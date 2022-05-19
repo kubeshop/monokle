@@ -183,6 +183,7 @@ jobs:
       # Install Dependencies
       - name: Install Certificate
         run: |
+          mkdir .secret
           az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing  
 
       # Install Dependencies
