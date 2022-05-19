@@ -54,6 +54,9 @@ export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' 
 
 export type CompareFilter = {
   namespace?: string;
+  kind?: string;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
 };
 
 export type ComparisonView = {
@@ -162,17 +165,14 @@ export const compareSlice = createSlice({
     searchUpdated: (state, action: PayloadAction<{search: string}>) => {
       state.current.search = action.payload.search;
     },
-    filterUpdated: (state, action: PayloadAction<{filter: Partial<CompareFilter>}>) => {
-      const currentFilter = state.current.view.filter;
+    filterUpdated: (state, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
       const newFilter = action.payload.filter;
+      const isEmpty = !newFilter || Object.keys(newFilter).length === 0;
 
-      if (!currentFilter) {
-        state.current.view.filter = newFilter;
+      if (isEmpty) {
+        state.current.view.filter = undefined;
       } else {
-        state.current.view.filter = {
-          ...currentFilter,
-          ...newFilter,
-        };
+        state.current.view.filter = action.payload.filter;
       }
     },
     resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
@@ -522,12 +522,12 @@ export const filterListener: AppListenerFn = listen => {
       cancelActiveListeners();
       await delay(3);
 
-      const {search, comparison} = getState().compare.current;
-      const comparisons = comparison?.comparisons ?? [];
-      const filters = createResourceFilters({search});
-      const filteredComparisons = filterComparisons(comparisons, filters);
-      const action = resourceSetFiltered({comparisons: filteredComparisons});
-      dispatch(action);
+      const {search, comparison, view} = getState().compare.current;
+      const allComparisons = comparison?.comparisons ?? [];
+      const filters = createResourceFilters({search, ...view.filter});
+      const comparisons = filterComparisons(allComparisons, filters);
+
+      dispatch(resourceSetFiltered({comparisons}));
     },
   });
 };

@@ -8,11 +8,14 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   CompareOperation,
   comparisonAllToggled,
+  filterUpdated,
   operationUpdated,
   searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
 } from '@redux/reducers/compare';
+
+import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 
 import * as S from './CompareActionBar.styled';
 
@@ -22,6 +25,7 @@ export const CompareActionBar: React.FC = () => {
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
   const search = useAppSelector(state => state.compare.current.search);
+  const filter = useAppSelector(state => state.compare.current.view.filter);
 
   const handleSelectAll = useCallback(() => {
     dispatch(comparisonAllToggled());
@@ -30,6 +34,13 @@ export const CompareActionBar: React.FC = () => {
   const handleSearch = useCallback(
     (newSearch: string) => {
       dispatch(searchUpdated({search: newSearch}));
+    },
+    [dispatch]
+  );
+
+  const handleFilterUpdated = useCallback(
+    (newFilter: Filter | undefined) => {
+      dispatch(filterUpdated({filter: newFilter}));
     },
     [dispatch]
   );
@@ -61,6 +72,8 @@ export const CompareActionBar: React.FC = () => {
           />
 
           <OperationSelect />
+
+          <FilterPopover filter={filter} onChange={handleFilterUpdated} />
 
           <Divider type="vertical" style={{height: 28}} />
 
