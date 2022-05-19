@@ -103,7 +103,7 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         } = itemInstance;
         const [name, tag] = id.split(':');
 
-        dispatch(selectDockerImage({id, name, tag, resourcesIds}));
+        dispatch(selectDockerImage({dockerImage: {id, name, tag, resourcesIds}}));
       },
     },
     customization: {

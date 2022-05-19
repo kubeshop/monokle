@@ -47,6 +47,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const imagesMap = useAppSelector(state => state.main.imagesMap);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -85,12 +86,28 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }, [dispatch, selectedPreviewConfiguration]);
 
   const onClickLeftArrow = useCallback(() => {
-    selectFromHistory('left', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, resourceMap, selectionHistory]);
+    selectFromHistory(
+      'left',
+      currentSelectionHistoryIndex,
+      selectionHistory,
+      resourceMap,
+      fileMap,
+      imagesMap,
+      dispatch
+    );
+  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesMap, resourceMap, selectionHistory]);
 
   const onClickRightArrow = useCallback(() => {
-    selectFromHistory('right', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, resourceMap, selectionHistory]);
+    selectFromHistory(
+      'right',
+      currentSelectionHistoryIndex,
+      selectionHistory,
+      resourceMap,
+      fileMap,
+      imagesMap,
+      dispatch
+    );
+  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesMap, resourceMap, selectionHistory]);
 
   const deployTooltip = useMemo(() => {
     return selectedPath ? (isHelmValuesFile(selectedPath) ? InstallValuesFileTooltip : ApplyFileTooltip) : ApplyTooltip;

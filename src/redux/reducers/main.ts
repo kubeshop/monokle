@@ -68,7 +68,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff} from './ui';
+import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -141,22 +141,32 @@ function getDockerImages(resourceMap: ResourceMapType) {
   return images;
 }
 
-function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
+function updateSelectionHistory(type: 'resource' | 'path' | 'image', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
     return;
   }
+
   if (type === 'resource' && state.selectedResourceId) {
     state.selectionHistory.push({
       type,
       selectedResourceId: state.selectedResourceId,
     });
   }
+
   if (type === 'path' && state.selectedPath) {
     state.selectionHistory.push({
       type,
       selectedPath: state.selectedPath,
     });
   }
+
+  if (type === 'image' && state.selectedDockerImage) {
+    state.selectionHistory.push({
+      type,
+      selectedDockerImage: state.selectedDockerImage,
+    });
+  }
+
   state.currentSelectionHistoryIndex = undefined;
 }
 
@@ -432,6 +442,7 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedDockerImage = undefined;
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
@@ -687,15 +698,22 @@ export const mainSlice = createSlice({
       const allConfig = state.policies.plugins.map(p => p.config);
       electronStore.set('pluginConfig.policies', allConfig);
     },
-    selectDockerImage: (state: Draft<AppState>, action: PayloadAction<DockerImage>) => {
-      state.selectedDockerImage = action.payload;
-
-      if (state.selectedResourceId) {
-        state.selectedResourceId = undefined;
-      }
+    selectDockerImage: (
+      state: Draft<AppState>,
+      action: PayloadAction<{dockerImage: DockerImage; isVirtualSelection?: boolean}>
+    ) => {
+      state.selectedDockerImage = action.payload.dockerImage;
 
       clearResourceSelections(state.resourceMap);
-      action.payload.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
+      action.payload.dockerImage.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
+
+      updateSelectionHistory('image', Boolean(action.payload.isVirtualSelection), state);
+
+      state.selectedResourceId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
+      state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
+      state.selectedValuesFileId = undefined;
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
@@ -1248,16 +1266,23 @@ export const {
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
+const selectingActions = isAnyOf(
+  selectK8sResource,
+  selectDockerImage,
+  selectFile,
+  selectPreviewConfiguration,
+  selectHelmValuesFile
+);
+
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      const ignoringActions = isAnyOf(selectK8sResource, selectDockerImage);
-
-      return !ignoringActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return !selectingActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
     },
+
     effect: async (_action, {dispatch, getState}) => {
       const resourceMap = getState().main.resourceMap;
       const imagesMap = getState().main.imagesMap;
@@ -1265,6 +1290,23 @@ export const resourceMapChangedListener: AppListenerFn = listen => {
 
       if (!shallowEqual(images, imagesMap)) {
         dispatch(setImagesMap(images));
+      }
+    },
+  });
+};
+
+export const dockerImageSelectedListener: AppListenerFn = listen => {
+  listen({
+    type: selectDockerImage.type,
+    effect: async (_action, {dispatch, getState}) => {
+      const leftMenu = getState().ui.leftMenu;
+
+      if (!leftMenu.isActive) {
+        dispatch(toggleLeftMenu());
+      }
+
+      if (leftMenu.selection !== 'docker-images-pane') {
+        dispatch(setLeftMenuSelection('docker-images-pane'));
       }
     },
   });

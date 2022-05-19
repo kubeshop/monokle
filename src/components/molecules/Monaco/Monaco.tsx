@@ -131,7 +131,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     const image = imagesMap.find(im => im.id === imageId);
 
     if (image) {
-      dispatch(selectDockerImage(image));
+      dispatch(selectDockerImage({dockerImage: image}));
     }
   };
 

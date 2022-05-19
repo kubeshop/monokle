@@ -48,12 +48,20 @@ type ResourceSelectionHistoryEntry = {
   selectedResourceId: string;
 };
 
+type DockerImageSelectionHistoryEntry = {
+  type: 'image';
+  selectedDockerImage: DockerImage;
+};
+
 type PathSelectionHistoryEntry = {
   type: 'path';
   selectedPath: string;
 };
 
-type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
+type SelectionHistoryEntry =
+  | ResourceSelectionHistoryEntry
+  | PathSelectionHistoryEntry
+  | DockerImageSelectionHistoryEntry;
 
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 

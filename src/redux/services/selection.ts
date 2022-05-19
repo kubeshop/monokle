@@ -58,6 +58,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   state.selectedPath = undefined;
   state.selectedResourceId = undefined;
   state.selectedPreviewConfigurationId = undefined;
+  state.selectedDockerImage = undefined;
 
   if (resource) {
     resource.isSelected = true;
@@ -71,10 +72,6 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
       getLinkedResources(resource).forEach(resourceId => {
         highlightResource(state.resourceMap, resourceId);
       });
-    }
-
-    if (state.selectedDockerImage) {
-      state.selectedDockerImage = null;
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {

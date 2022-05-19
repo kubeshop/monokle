@@ -46,5 +46,5 @@ export const replaceImageTag = (
   });
 
   dispatch(updateMultipleResources(resourcesToUpdate));
-  dispatch(selectDockerImage({...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}));
+  dispatch(selectDockerImage({dockerImage: {...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}}));
 };
