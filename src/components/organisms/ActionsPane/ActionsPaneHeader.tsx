@@ -50,6 +50,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const imagesMap = useAppSelector(state => state.main.imagesMap);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedDockerImage = useAppSelector(state => state.main.selectedDockerImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const selectedPreviewConfiguration = useAppSelector(state => {
@@ -179,6 +180,28 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             Edit
           </S.DiffButton>
         </Tooltip>
+      </TitleBar>
+    );
+  }
+
+  if (selectedDockerImage) {
+    return (
+      <TitleBar title="Image Info">
+        <S.LeftArrowButton
+          onClick={onClickLeftArrow}
+          disabled={!isLeftArrowEnabled}
+          type="link"
+          size="small"
+          icon={<ArrowLeftOutlined />}
+        />
+
+        <S.RightArrowButton
+          onClick={onClickRightArrow}
+          disabled={!isRightArrowEnabled}
+          type="link"
+          size="small"
+          icon={<ArrowRightOutlined />}
+        />
       </TitleBar>
     );
   }
