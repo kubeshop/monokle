@@ -7,7 +7,7 @@ import {FilterOutlined} from '@ant-design/icons';
 
 import Colors from '@styles/Colors';
 
-import {KeyValue, NewKeyValue} from './KeyValueInput';
+import {KeyValueInput, NewKeyValueInput} from './keyValueInput';
 
 export type Filter = {
   namespace?: string;
@@ -159,12 +159,12 @@ export function FilterPopover({filter, onChange}: Props) {
           key="1"
         >
           <Space direction="vertical" style={{width: '100%'}}>
-            <NewKeyValue onAddKeyValue={handleAddLabelFilter} />
+            <NewKeyValueInput onAddKeyValue={handleAddLabelFilter} />
 
             {filter?.labels &&
               Object.entries(filter.labels).map(kvPair => {
                 return (
-                  <KeyValue
+                  <KeyValueInput
                     key={kvPair[0]}
                     pair={kvPair}
                     onDelete={handleRemoveLabelFilter}
@@ -184,12 +184,12 @@ export function FilterPopover({filter, onChange}: Props) {
           key="3"
         >
           <Space direction="vertical" style={{width: '100%'}}>
-            <NewKeyValue onAddKeyValue={handleAddAnnotationFilter} />
+            <NewKeyValueInput onAddKeyValue={handleAddAnnotationFilter} />
 
             {filter?.annotations &&
               Object.entries(filter.annotations).map(kvPair => {
                 return (
-                  <KeyValue
+                  <KeyValueInput
                     key={kvPair[0]}
                     pair={kvPair}
                     onDelete={handleRemoveAnnotationFilter}
