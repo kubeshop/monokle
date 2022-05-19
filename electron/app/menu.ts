@@ -264,7 +264,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        role: 'forceReload',
       },
       {
         label: 'Previous Resource',

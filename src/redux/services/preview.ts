@@ -30,7 +30,7 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
 };
 
 export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
-  dispatch(clearPreview());
+  dispatch(clearPreview({type: 'restartPreview'}));
   dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetId));
