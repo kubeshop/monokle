@@ -212,7 +212,7 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
-      "certificateSubjectName": "The name of the subject of the signing certificate, which is often labeled with the field name issued to"
+      "certificateSubjectName": "SERIALNUMBER=5671927, C=US, ST=CONNECTICUT, L=GREENWICH, STREET=20 BRYNWOOD LN, O=KUBERNETES INNOVATION LABS, LLC, CN=KUBERNETES INNOVATION LABS, LLC"
     },
     "nsis": {
       "oneClick": false,
