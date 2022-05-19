@@ -1,5 +1,7 @@
 // eslint-disable-next-line
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
+import {shallowEqual} from 'react-redux';
+
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import path from 'path';
@@ -22,9 +24,11 @@ import {
 } from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
+import {DockerImage} from '@models/image';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
+import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -44,7 +48,7 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
-import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
@@ -62,9 +66,9 @@ import {
   recalculateResourceRanges,
   saveResource,
 } from '../services/resource';
-import {updateSelectionAndHighlights} from '../services/selection';
+import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff} from './ui';
+import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -84,7 +88,7 @@ export type UpdateResourcePayload = {
   isInClusterMode?: boolean;
 };
 
-export type UpdateManyResourcesPayload = {
+export type UpdateMultipleResourcesPayload = {
   resourceId: string;
   content: string;
 }[];
@@ -112,22 +116,57 @@ export type StartPreviewLoaderPayload = {
   previewType: PreviewType;
 };
 
-function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
+function getDockerImages(resourceMap: ResourceMapType) {
+  let images: DockerImage[] = [];
+
+  Object.values(resourceMap).forEach(k8sResource => {
+    if (k8sResource.refs?.length) {
+      k8sResource.refs.forEach(ref => {
+        if (ref.type === 'outgoing' && ref.target?.type === 'image') {
+          const refName = ref.name;
+          const refTag = ref.target?.tag || 'latest';
+
+          const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
+
+          if (!foundImage) {
+            images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
+          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
+            foundImage.resourcesIds.push(k8sResource.id);
+          }
+        }
+      });
+    }
+  });
+
+  return images;
+}
+
+function updateSelectionHistory(type: 'resource' | 'path' | 'image', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
     return;
   }
+
   if (type === 'resource' && state.selectedResourceId) {
     state.selectionHistory.push({
       type,
       selectedResourceId: state.selectedResourceId,
     });
   }
+
   if (type === 'path' && state.selectedPath) {
     state.selectionHistory.push({
       type,
       selectedPath: state.selectedPath,
     });
   }
+
+  if (type === 'image' && state.selectedDockerImage) {
+    state.selectionHistory.push({
+      type,
+      selectedDockerImage: state.selectedDockerImage,
+    });
+  }
+
   state.currentSelectionHistoryIndex = undefined;
 }
 
@@ -403,6 +442,7 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedDockerImage = undefined;
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
@@ -657,6 +697,29 @@ export const mainSlice = createSlice({
       // persist latest configuration
       const allConfig = state.policies.plugins.map(p => p.config);
       electronStore.set('pluginConfig.policies', allConfig);
+    },
+    selectDockerImage: (
+      state: Draft<AppState>,
+      action: PayloadAction<{dockerImage: DockerImage; isVirtualSelection?: boolean}>
+    ) => {
+      state.selectedDockerImage = action.payload.dockerImage;
+
+      clearResourceSelections(state.resourceMap);
+      action.payload.dockerImage.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
+
+      updateSelectionHistory('image', Boolean(action.payload.isVirtualSelection), state);
+
+      state.selectedResourceId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
+      state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
+      state.selectedValuesFileId = undefined;
+    },
+    setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.imagesSearchedValue = action.payload;
+    },
+    setImagesMap: (state: Draft<AppState>, action: PayloadAction<DockerImage[]>) => {
+      state.imagesMap = action.payload;
     },
   },
   extraReducers: builder => {
@@ -1040,7 +1103,7 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(updateManyResources.fulfilled, (state, action) => {
+    builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -1156,46 +1219,95 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
 }
 
 export const {
-  setAppRehydrating,
-  selectK8sResource,
-  selectFile,
-  setSelectingFile,
-  setApplyingResource,
-  selectHelmValuesFile,
+  addKindHandler,
+  addMultipleKindHandlers,
+  checkMultipleResourceIds,
+  checkResourceId,
+  clearNotifications,
   clearPreview,
   clearPreviewAndSelectionHistory,
+  clearSelected,
+  closePreviewConfigurationEditor,
+  closeResourceDiffModal,
+  editorHasReloadedSelectedPath,
+  extendResourceFilter,
+  openPreviewConfigurationEditor,
+  openResourceDiffModal,
+  reloadClusterDiff,
+  resetResourceFilter,
+  seenNotifications,
+  selectDockerImage,
+  selectFile,
+  selectHelmValuesFile,
+  selectK8sResource,
+  selectMultipleClusterDiffMatches,
+  selectPreviewConfiguration,
+  setAppRehydrating,
+  setApplyingResource,
+  selectClusterDiffMatch,
+  setClusterDiffRefreshDiffResource,
+  setDiffResourceInClusterDiff,
+  setFiltersToBeChanged,
+  setImagesMap,
+  setImagesSearchedValue,
+  setSelectingFile,
+  setSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
-  updateResourceFilter,
-  extendResourceFilter,
-  setDiffResourceInClusterDiff,
-  setClusterDiffRefreshDiffResource,
-  selectClusterDiffMatch,
-  selectMultipleClusterDiffMatches,
-  unselectClusterDiffMatch,
-  unselectAllClusterDiffMatches,
-  reloadClusterDiff,
-  toggleClusterOnlyResourcesInClusterDiff,
-  setSelectionHistory,
-  editorHasReloadedSelectedPath,
-  checkResourceId,
-  uncheckAllResourceIds,
-  uncheckResourceId,
-  resetResourceFilter,
-  checkMultipleResourceIds,
-  uncheckMultipleResourceIds,
-  closeResourceDiffModal,
-  openResourceDiffModal,
-  setFiltersToBeChanged,
-  addMultipleKindHandlers,
-  addKindHandler,
-  seenNotifications,
-  clearNotifications,
-  openPreviewConfigurationEditor,
-  closePreviewConfigurationEditor,
-  selectPreviewConfiguration,
-  clearSelected,
   toggleAllRules,
+  toggleClusterOnlyResourcesInClusterDiff,
   toggleRule,
+  uncheckAllResourceIds,
+  uncheckMultipleResourceIds,
+  uncheckResourceId,
+  unselectAllClusterDiffMatches,
+  unselectClusterDiffMatch,
+  updateResourceFilter,
 } = mainSlice.actions;
 export default mainSlice.reducer;
+
+const selectingActions = isAnyOf(
+  selectK8sResource,
+  selectDockerImage,
+  selectFile,
+  selectPreviewConfiguration,
+  selectHelmValuesFile
+);
+
+/* * * * * * * * * * * * * *
+ * Listeners
+ * * * * * * * * * * * * * */
+export const resourceMapChangedListener: AppListenerFn = listen => {
+  listen({
+    predicate: (action, currentState, previousState) => {
+      return !selectingActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+    },
+
+    effect: async (_action, {dispatch, getState}) => {
+      const resourceMap = getState().main.resourceMap;
+      const imagesMap = getState().main.imagesMap;
+      const images = getDockerImages(resourceMap);
+
+      if (!shallowEqual(images, imagesMap)) {
+        dispatch(setImagesMap(images));
+      }
+    },
+  });
+};
+
+export const dockerImageSelectedListener: AppListenerFn = listen => {
+  listen({
+    type: selectDockerImage.type,
+    effect: async (_action, {dispatch, getState}) => {
+      const leftMenu = getState().ui.leftMenu;
+
+      if (!leftMenu.isActive) {
+        dispatch(toggleLeftMenu());
+      }
+
+      if (leftMenu.selection !== 'docker-images-pane') {
+        dispatch(setLeftMenuSelection('docker-images-pane'));
+      }
+    },
+  });
+};

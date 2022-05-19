@@ -49,7 +49,12 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
+export type LeftMenuSelectionType =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'templates-pane'
+  | 'docker-images-pane';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -80,6 +85,10 @@ export type UiState = {
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;
+  };
+  replaceImageModal?: {
+    isOpen: boolean;
+    imageId: string;
   };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;

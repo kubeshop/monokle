@@ -1,7 +1,6 @@
 /* eslint-disable import/order */
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useSelector} from 'react-redux';
 import {useMeasure} from 'react-use';
 
 import fs from 'fs';
@@ -25,7 +24,13 @@ import {ResourceRef} from '@models/k8sresource';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
+import {
+  editorHasReloadedSelectedPath,
+  extendResourceFilter,
+  selectDockerImage,
+  selectFile,
+  selectK8sResource,
+} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -66,20 +71,21 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const {diffSelectedResource, applySelection} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const imagesMap = useAppSelector(state => state.main.imagesMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const settings = useAppSelector(settingsSelector);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const settings = useSelector(settingsSelector);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
 
   const resourcesFromSelectedPath = useMemo(() => {
     if (!selectedPath) {
@@ -121,6 +127,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     dispatch(extendResourceFilter(filter));
   };
 
+  const selectImage = (imageId: string) => {
+    const image = imagesMap.find(im => im.id === imageId);
+
+    if (image) {
+      dispatch(selectDockerImage({dockerImage: image}));
+    }
+  };
+
   const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
     if (outoingRef.target?.type === 'resource') {
       const input: NewResourceWizardInput = {
@@ -149,6 +163,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
     filterResources,
+    selectImage,
     selectedPath,
     helmValuesMap,
     helmChartMap,

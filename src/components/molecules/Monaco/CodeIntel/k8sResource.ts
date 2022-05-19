@@ -45,6 +45,7 @@ function applyRefIntel(
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  selectImage: (imageId: string) => void,
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ): {
@@ -59,8 +60,12 @@ function applyRefIntel(
     return {decorations: newDecorations, disposables: newDisposables};
   }
 
-  const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
-    [];
+  const listOfMatchedRefsByEqualPos: {
+    refType: ResourceRefType;
+    position: RefPosition;
+    matchedRefs: ResourceRef[];
+    targetType: string;
+  }[] = [];
 
   // find refs that can be decorated
   refs.forEach(ref => {
@@ -73,6 +78,7 @@ function applyRefIntel(
           refType: ref.type,
           position: refPos,
           matchedRefs: [ref],
+          targetType: ref.target?.type || '',
         });
       } else {
         listOfMatchedRefsByEqualPos[refsByEqualPosIndex].matchedRefs.push(ref);
@@ -81,7 +87,7 @@ function applyRefIntel(
   });
 
   // decorate matched refs
-  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType}) => {
+  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType, targetType}) => {
     const inlineRange = new monaco.Range(
       position.line,
       position.column,
@@ -149,7 +155,9 @@ function applyRefIntel(
 
     const hoverTitle =
       refType === ResourceRefType.Outgoing
-        ? 'Outgoing Links'
+        ? targetType === 'image'
+          ? 'Outgoing Image Link'
+          : 'Outgoing Links'
         : refType === ResourceRefType.Incoming
         ? 'Incoming Links'
         : 'Unsatisfied link';
@@ -176,7 +184,9 @@ function applyRefIntel(
       hasUnsatisfiedRef
         ? GlyphDecorationTypes.UnsatisfiedRef
         : refType === ResourceRefType.Outgoing
-        ? GlyphDecorationTypes.OutgoingRef
+        ? targetType === 'image'
+          ? GlyphDecorationTypes.OutgoingImageRef
+          : GlyphDecorationTypes.OutgoingRef
         : GlyphDecorationTypes.IncomingRef,
       hoverCommandMarkdownLinkList
     );
@@ -188,7 +198,11 @@ function applyRefIntel(
       if (createResource || !isUnsatisfiedRef(matchRef.type)) {
         const linkDisposable = createLinkProvider(
           inlineRange,
-          isUnsatisfiedRef(matchRef.type) ? 'Create resource' : 'Open resource',
+          isUnsatisfiedRef(matchRef.type)
+            ? 'Create resource'
+            : matchRef.target?.type === 'image'
+            ? 'Select image'
+            : 'Open resource',
           () => {
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
               createResource(matchRef, resource.namespace, getResourceFolder(resource));
@@ -196,6 +210,8 @@ function applyRefIntel(
               selectResource(matchRef.target.resourceId);
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
+            } else if (matchRef.target?.type === 'image') {
+              selectImage(`${matchRef.name}:${matchRef.target?.tag}`);
             }
           }
         );
@@ -259,6 +275,7 @@ export const resourceCodeIntel: CodeIntelApply = {
     selectFilePath,
     createResource,
     filterResources,
+    selectImage,
     resourceMap,
     fileMap,
     model,
@@ -271,7 +288,15 @@ export const resourceCodeIntel: CodeIntelApply = {
       await processSymbols(model, resource, filterResources, disposables, decorations);
     }
 
-    const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
+    const refIntel = applyRefIntel(
+      resource,
+      selectResource,
+      selectFilePath,
+      createResource,
+      selectImage,
+      resourceMap,
+      fileMap
+    );
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);
 
