@@ -165,7 +165,7 @@ function SectionRenderer(props: SectionRendererProps) {
 
   if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
     return (
-      <S.BeforeInitializationContainer level={level}>
+      <S.BeforeInitializationContainer>
         <p>{sectionBlueprint.customization.beforeInitializationText}</p>
       </S.BeforeInitializationContainer>
     );
@@ -182,13 +182,13 @@ function SectionRenderer(props: SectionRendererProps) {
   if (sectionInstance?.isEmpty) {
     if (EmptyDisplay && EmptyDisplay.Component) {
       return (
-        <S.EmptyDisplayContainer level={level}>
+        <S.EmptyDisplayContainer>
           <EmptyDisplay.Component sectionInstance={sectionInstance} />
         </S.EmptyDisplayContainer>
       );
     }
     return (
-      <S.EmptyDisplayContainer level={level}>
+      <S.EmptyDisplayContainer>
         <h1>{sectionInstance.name}</h1>
         <p>Section is empty.</p>
       </S.EmptyDisplayContainer>
@@ -201,10 +201,9 @@ function SectionRenderer(props: SectionRendererProps) {
         sectionId={sectionId}
         isCollapsed={isCollapsed}
         isLastSection={isLastSection}
-        level={level}
         expandSection={expandSection}
         collapseSection={collapseSection}
-        indentation={sectionIndentation || 0}
+        // indentation={sectionIndentation || 0}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&
@@ -233,7 +232,7 @@ function SectionRenderer(props: SectionRendererProps) {
           return (
             <React.Fragment key={group.id}>
               <S.SectionContainer style={{color: 'red'}}>
-                <S.Name $level={level + 1}>
+                <S.Name $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}>
                   {group.name}
                   <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
                 </S.Name>

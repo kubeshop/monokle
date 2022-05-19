@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useVirtual} from 'react-virtual';
 
 import {NavigatorRow, SectionBlueprint} from '@models/navigator';
@@ -22,6 +22,11 @@ function SectionRenderer(props: SectionRendererProps) {
 
   const {id: sectionId} = sectionBlueprint;
 
+  const itemRowHeight = useMemo(
+    () => sectionBlueprint.itemBlueprint?.rowHeight,
+    [sectionBlueprint.itemBlueprint?.rowHeight]
+  );
+
   const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
 
   const parentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
@@ -29,7 +34,10 @@ function SectionRenderer(props: SectionRendererProps) {
   const rowVirtualizer = useVirtual({
     size: rows?.length || 0,
     parentRef,
-    estimateSize: React.useCallback(i => (rows[i].type === 'section' ? 50 : 25), [rows]),
+    estimateSize: React.useCallback(
+      i => (rows[i].type === 'section' ? sectionBlueprint.rowHeight || 50 : itemRowHeight || 25),
+      [rows, sectionBlueprint.rowHeight, itemRowHeight]
+    ),
     overscan: 5,
   });
 
@@ -61,8 +69,6 @@ function SectionRenderer(props: SectionRendererProps) {
                   sectionId={row.id}
                   isCollapsed={false}
                   isLastSection={false}
-                  level={row.level}
-                  indentation={0}
                   expandSection={() => {}}
                   collapseSection={() => {}}
                 />

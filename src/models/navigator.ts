@@ -95,6 +95,10 @@ export interface SectionCustomization {
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
+  /** If not specified, the default value will be 25. */
+  rowHeight?: number;
+  /** If not specified, the default value will be rowHeight / 2 */
+  rowFontSize?: number;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;
@@ -123,6 +127,10 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   name: string;
   getScope: (state: RootState) => ScopeType;
   containerElementId: string;
+  /** If not specified, the default value will be 25. */
+  rowHeight?: number;
+  /** If not specified, the default value will be rowHeight / 2 */
+  rowFontSize?: number;
   rootSectionId: string;
   childSectionIds?: string[];
   builder?: {

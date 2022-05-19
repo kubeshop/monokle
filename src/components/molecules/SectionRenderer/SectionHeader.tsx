@@ -15,18 +15,14 @@ import * as S from './styled';
 
 interface SectionHeaderProps {
   sectionId: string;
-  // sectionInstance: SectionInstance;
-  // sectionBlueprint: SectionBlueprint<any>;
-  isCollapsed: boolean;
-  isLastSection: boolean;
-  level: number;
-  indentation: number;
+  isCollapsed: boolean; // TODO: we should handle this in the blueprint middleware and set the .isVisible prop accordingly
+  isLastSection: boolean; // TODO: this should be on the SectionInstance
   expandSection: () => void;
   collapseSection: () => void;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {sectionId, isCollapsed, isLastSection, level, indentation, expandSection, collapseSection} = props;
+  const {sectionId, isCollapsed, isLastSection, expandSection, collapseSection} = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -87,7 +83,7 @@ function SectionHeader(props: SectionHeaderProps) {
         isHovered={isHovered}
         isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
-        $indentation={indentation}
+        $indentation={0} // TODO: indentation should be set on the SectionInstance
       >
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
@@ -101,7 +97,6 @@ function SectionHeader(props: SectionHeaderProps) {
                 checked={sectionInstance.checkable.value === 'checked'}
                 indeterminate={sectionInstance.checkable.value === 'partial'}
                 onChange={() => onCheck()}
-                $level={level}
               />
             </span>
           )}
@@ -119,11 +114,10 @@ function SectionHeader(props: SectionHeaderProps) {
                   $isHighlighted={sectionInstance.isSelected && isCollapsed}
                   $isCheckable={Boolean(sectionInstance.checkable)}
                   $nameColor={sectionBlueprint.customization?.nameColor}
-                  $nameSize={sectionBlueprint.customization?.nameSize}
+                  $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}
                   $nameWeight={sectionBlueprint.customization?.nameWeight}
                   $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
                   $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
-                  $level={level}
                   onClick={toggleCollapse}
                 >
                   {sectionInstance.name}
@@ -135,11 +129,10 @@ function SectionHeader(props: SectionHeaderProps) {
                 $isHighlighted={sectionInstance.isSelected && isCollapsed}
                 $isCheckable={Boolean(sectionInstance.checkable)}
                 $nameColor={sectionBlueprint.customization?.nameColor}
-                $nameSize={sectionBlueprint.customization?.nameSize}
+                $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}
                 $nameWeight={sectionBlueprint.customization?.nameWeight}
                 $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
                 $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
-                $level={level}
                 onClick={toggleCollapse}
               >
                 {sectionInstance.name}
@@ -147,7 +140,7 @@ function SectionHeader(props: SectionHeaderProps) {
             )}
             <Counter sectionInstance={sectionInstance} onClick={toggleCollapse} />
 
-            <S.BlankSpace level={level} onClick={toggleCollapse} />
+            <S.BlankSpace $height={sectionBlueprint.rowHeight || 50} onClick={toggleCollapse} />
 
             {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
               <NameSuffix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />

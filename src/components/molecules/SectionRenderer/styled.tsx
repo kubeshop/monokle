@@ -83,9 +83,8 @@ type NameProps = {
   $isSelected?: boolean;
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
-  $level: number;
   $nameColor?: string;
-  $nameSize?: number;
+  $nameSize: number;
   $nameWeight?: number;
   $nameVerticalPadding?: number;
   $nameHorizontalPadding?: number;
@@ -101,10 +100,7 @@ export const Name = styled.span<NameProps>`
     }px;`}
   cursor: pointer;
   ${props => {
-    if (props.$nameSize) {
-      return `font-size: ${props.$nameSize}px;`;
-    }
-    return `font-size: ${24 - 4 * props.$level}px;`;
+    return `font-size: ${props.$nameSize}px;`;
   }}
   ${props => {
     if (props.$isSelected) {
@@ -146,27 +142,27 @@ export const Counter = styled.span<{selected: boolean}>`
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
 `;
 
-export const EmptyDisplayContainer = styled.div<{level: number}>`
+export const EmptyDisplayContainer = styled.div`
   margin-left: 16px;
 `;
 
-export const BeforeInitializationContainer = styled.div<{level: number}>`
+export const BeforeInitializationContainer = styled.div`
   padding-top: 16px;
   margin-left: 16px;
 `;
 
-export const BlankSpace = styled.span<{level?: number}>`
+export const BlankSpace = styled.span<{$height: number}>`
   flex-grow: 1;
   height: 32px;
   cursor: pointer;
-  ${props => props.level && `height: ${32 - props.level * 8}px;`}
+  ${props => `height: ${props.$height}px;`}
 `;
 
-export const Checkbox = styled(RawCheckbox)<{$level: number}>`
+export const Checkbox = styled(RawCheckbox)`
   margin-left: -16px;
 `;
 
-export const CheckboxPlaceholder = styled.span<{$level: number}>`
+export const CheckboxPlaceholder = styled.span`
   width: 24px;
 `;
 
