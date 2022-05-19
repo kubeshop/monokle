@@ -159,6 +159,7 @@ jobs:
       - name: Install Tools
         run: |
           choco install jq dotnet-5.0-runtime dotnetcore-sdk -y
+          dotnet tool install --global AzureSignTool
 
       - name: Get Node Version
         run: |
