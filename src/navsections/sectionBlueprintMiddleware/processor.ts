@@ -29,6 +29,9 @@ const fullScopeCache: Record<string, any> = {};
  * Build the section and item instances based on the registered section blueprints
  */
 export const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch) => {
+  const previousSectionInstanceMap = state.navigator.sectionInstanceMap;
+  const previousItemInstanceMap = state.navigator.itemInstanceMap;
+
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
 
@@ -47,6 +50,7 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
   await asyncLib.each(sectionBlueprintList, async sectionBlueprint => {
     const sectionScopeKeys: string[] | undefined = scopeKeysBySectionId[sectionBlueprint.id];
     if (
+      previousItemInstanceMap[sectionBlueprint.id] &&
       !hasSectionScopeChanged({
         isChangedByScopeKey,
         sectionScopeKeys,
@@ -54,6 +58,11 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
       sectionScopeKeys.length > 0
     ) {
       log.debug(`Section ${sectionBlueprint.id} scope did not change`);
+      const previousSectionInstance = previousSectionInstanceMap[sectionBlueprint.id];
+      sectionInstanceMap[sectionBlueprint.id] = previousSectionInstance;
+      previousSectionInstance.itemIds.forEach(itemId => {
+        itemInstanceMap[itemId] = previousItemInstanceMap[itemId];
+      });
       return;
     }
 

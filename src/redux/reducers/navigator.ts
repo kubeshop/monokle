@@ -10,12 +10,8 @@ export const navigatorSlice = createSlice({
   reducers: {
     updateNavigatorInstanceState: (state: Draft<NavigatorState>, action: PayloadAction<NavigatorInstanceState>) => {
       const {sectionInstanceMap, itemInstanceMap, rowsByRootSectionId} = action.payload;
-      Object.entries(sectionInstanceMap).forEach(([sectionId, sectionInstance]) => {
-        state.sectionInstanceMap[sectionId] = sectionInstance;
-      });
-      Object.entries(itemInstanceMap).forEach(([itemId, itemInstance]) => {
-        state.itemInstanceMap[itemId] = itemInstance;
-      });
+      state.sectionInstanceMap = sectionInstanceMap;
+      state.itemInstanceMap = itemInstanceMap;
       state.rowsByRootSectionId = rowsByRootSectionId;
     },
     collapseSectionIds: (state: Draft<NavigatorState>, action: PayloadAction<string[]>) => {

@@ -11,63 +11,44 @@ export function computeSectionVisibility(
   sectionInstanceMap: Record<string, SectionInstance>,
   sectionBlueprint: SectionBlueprint<any, any>
 ): [boolean, string[] | undefined, string[] | undefined] {
+  let visibleChildSectionIds: string[] = [];
   let visibleDescendantItemIds: string[] = [];
+  let visibleDescendantSectionIds: string[] = [];
 
-  if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
-    const childSectionVisibilityMap: Record<string, boolean> = {};
+  sectionBlueprint.childSectionIds?.forEach(childSectionId => {
+    const childSectionInstance = sectionInstanceMap[childSectionId];
+    if (!childSectionInstance) {
+      return;
+    }
+    const childSectionBlueprint = sectionBlueprintMap.getById(childSectionInstance.id);
+    if (!childSectionBlueprint) {
+      return;
+    }
+    const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
+      computeSectionVisibility(childSectionInstance, sectionInstanceMap, childSectionBlueprint);
 
-    sectionBlueprint.childSectionIds.forEach(childSectionId => {
-      const childSectionInstance = sectionInstanceMap[childSectionId];
-      if (!childSectionInstance) {
-        return;
-      }
-      const childSectionBlueprint = sectionBlueprintMap.getById(childSectionInstance.id);
-      if (!childSectionBlueprint) {
-        return;
-      }
-      const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
-        computeSectionVisibility(childSectionInstance, sectionInstanceMap, childSectionBlueprint);
-
-      if (visibleDescendantSectionIdsOfChildSection) {
-        if (sectionInstance.visibleDescendantSectionIds) {
-          sectionInstance.visibleDescendantSectionIds.push(...visibleDescendantSectionIdsOfChildSection);
-        } else {
-          sectionInstance.visibleDescendantSectionIds = [...visibleDescendantSectionIdsOfChildSection];
-        }
-      }
-
-      if (visibleDescendantItemIdsOfChildSection) {
-        visibleDescendantItemIds.push(...visibleDescendantItemIdsOfChildSection);
-      }
-
-      childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
-      if (isChildSectionVisible) {
-        if (sectionInstance.visibleChildSectionIds) {
-          sectionInstance.visibleChildSectionIds.push(childSectionId);
-        } else {
-          sectionInstance.visibleChildSectionIds = [childSectionId];
-        }
-      }
-    });
-
-    if (sectionInstance.visibleChildSectionIds) {
-      if (sectionInstance.visibleDescendantSectionIds) {
-        sectionInstance.visibleDescendantSectionIds.push(...sectionInstance.visibleChildSectionIds);
-        sectionInstance.visibleDescendantSectionIds = [...new Set(sectionInstance.visibleDescendantSectionIds)];
-      } else {
-        sectionInstance.visibleDescendantSectionIds = [...sectionInstance.visibleChildSectionIds];
-      }
+    if (isChildSectionVisible) {
+      visibleChildSectionIds.push(childSectionId);
     }
 
-    sectionInstance.isVisible =
-      sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
-  }
+    if (visibleDescendantSectionIdsOfChildSection) {
+      visibleDescendantSectionIds.push(...visibleDescendantSectionIdsOfChildSection);
+    }
 
-  if (sectionInstance.visibleItemIds) {
-    visibleDescendantItemIds.push(...sectionInstance.visibleItemIds);
-  }
+    if (visibleDescendantItemIdsOfChildSection) {
+      visibleDescendantItemIds.push(...visibleDescendantItemIdsOfChildSection);
+    }
+  });
 
+  sectionInstance.isVisible = sectionInstance.isVisible || Boolean(visibleChildSectionIds.length);
+
+  visibleDescendantItemIds.push(...sectionInstance.visibleItemIds);
   sectionInstance.visibleDescendantItemIds = visibleDescendantItemIds;
+
+  sectionInstance.visibleChildSectionIds = visibleChildSectionIds;
+  visibleDescendantSectionIds.push(...visibleChildSectionIds);
+  sectionInstance.visibleDescendantSectionIds = visibleDescendantSectionIds;
+
   return [
     sectionInstance.isVisible,
     sectionInstance.visibleDescendantSectionIds,
