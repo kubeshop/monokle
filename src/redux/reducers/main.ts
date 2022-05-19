@@ -17,6 +17,7 @@ import {
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
+  ImagesMapType,
   PreviewType,
   ResourceFilterType,
   ResourceMapType,
@@ -117,7 +118,7 @@ export type StartPreviewLoaderPayload = {
 };
 
 function getDockerImages(resourceMap: ResourceMapType) {
-  let images: DockerImage[] = [];
+  let images: ImagesMapType = [];
 
   Object.values(resourceMap).forEach(k8sResource => {
     if (k8sResource.refs?.length) {
@@ -718,7 +719,7 @@ export const mainSlice = createSlice({
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
-    setImagesMap: (state: Draft<AppState>, action: PayloadAction<DockerImage[]>) => {
+    setImagesMap: (state: Draft<AppState>, action: PayloadAction<ImagesMapType>) => {
       state.imagesMap = action.payload;
     },
   },

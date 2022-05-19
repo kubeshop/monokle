@@ -3,7 +3,14 @@ import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
 
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmValuesMapType,
+  ImagesMapType,
+  ResourceFilterType,
+  ResourceMapType,
+} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -21,6 +28,7 @@ interface CodeIntelProps {
   code: string | undefined;
   resourceMap: ResourceMapType;
   fileMap: FileMapType;
+  imagesMap: ImagesMapType;
   isEditorMounted: boolean;
   selectResource: (resourceId: string) => void;
   selectFilePath: (filePath: string) => void;
@@ -37,6 +45,7 @@ function useCodeIntel(props: CodeIntelProps) {
     editor,
     selectedResource,
     code,
+    imagesMap,
     resourceMap,
     fileMap,
     isEditorMounted,
@@ -133,7 +142,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor]);
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesMap]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

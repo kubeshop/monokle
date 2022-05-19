@@ -158,6 +158,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     code,
     resourceMap,
     fileMap,
+    imagesMap,
     isEditorMounted,
     selectResource,
     selectFilePath,
