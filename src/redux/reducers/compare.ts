@@ -17,6 +17,8 @@ import type {ComparisonListItem} from '@components/organisms/CompareModal/types'
 
 import {isDefined} from '@utils/filter';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 /* * * * * * * * * * * * * *
  * State definition
  * * * * * * * * * * * * * */
@@ -402,6 +404,7 @@ export const selectComparisonListItems = createSelector(
 
     Object.entries(groups).forEach(([kind, comps]) => {
       result.push({type: 'header', kind, count: comps.length});
+      const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
         if (comparison.isMatch) {
@@ -409,7 +412,7 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: comparison.left.namespace ?? 'default',
+            namespace: isNamespaced ? comparison.left.namespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
             canDiff: comparison.isDifferent,
@@ -419,7 +422,9 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
-            namespace: comparison.left?.namespace ?? comparison.right?.namespace ?? 'default',
+            namespace: isNamespaced
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? 'default'
+              : undefined,
             leftActive: Boolean(comparison.left),
             rightActive: Boolean(comparison.right),
             canDiff: false,
