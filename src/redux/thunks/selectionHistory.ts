@@ -1,7 +1,6 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
-import {DockerImage} from '@models/image';
+import {FileMapType, ImagesMapType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
 
 import {selectDockerImage, selectFile, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
 
@@ -11,7 +10,7 @@ export const selectFromHistory = async (
   selectionHistory: SelectionHistoryEntry[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
-  imagesMap: DockerImage[],
+  imagesMap: ImagesMapType,
   dispatch: (action: AnyAction) => void
 ) => {
   let removedSelectionHistoryEntriesCount = 0;

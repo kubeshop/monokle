@@ -21,6 +21,12 @@ type FileMapType = {
 };
 
 /**
+ * List of images from current project
+ */
+
+type ImagesMapType = DockerImage[];
+
+/**
  * Maps ids to Helm charts
  */
 type HelmChartMapType = {
@@ -171,7 +177,7 @@ interface AppState {
   deviceID: string;
   selectedDockerImage?: DockerImage | null;
   imagesSearchedValue?: string;
-  imagesMap: DockerImage[];
+  imagesMap: ImagesMapType;
 }
 
 export interface PossibleResource {
@@ -192,6 +198,7 @@ export type {
   ResourceMapType,
   ResourceFilterType,
   FileMapType,
+  ImagesMapType,
   HelmChartMapType,
   HelmValuesMapType,
   PreviewLoaderType,

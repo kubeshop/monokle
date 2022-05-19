@@ -1,6 +1,6 @@
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ResourceMapType} from '@models/appstate';
+import {ImagesMapType, ResourceMapType} from '@models/appstate';
 import {DockerImage} from '@models/image';
 import {SectionBlueprint} from '@models/navigator';
 
@@ -15,7 +15,7 @@ export type DockerImagesScopeType = {
   resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
-  imagesMap: DockerImage[];
+  imagesMap: ImagesMapType;
   imagesSearchedValue: string | undefined;
   selectedDockerImage?: DockerImage | null;
   selectedK8sResourceId: string | undefined;
