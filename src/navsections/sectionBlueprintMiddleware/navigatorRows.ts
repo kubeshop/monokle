@@ -19,12 +19,12 @@ export function makeNavigatorRows(
   }
 
   for (let i = 0; i < instance.visibleChildSectionIds.length; i += 1) {
-    const childBlueprintId = instance.visibleChildSectionIds[i];
-    if (!childBlueprintId) {
+    const childSectionId = instance.visibleChildSectionIds[i];
+    if (!childSectionId) {
       // eslint-disable-next-line no-continue
       continue;
     }
-    const childInstance = sectionInstanceMap[childBlueprintId];
+    const childInstance = sectionInstanceMap[childSectionId];
     if (childInstance) {
       rows.push(...makeNavigatorRows(childInstance, sectionInstanceMap, level + 1));
     }
