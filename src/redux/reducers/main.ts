@@ -413,8 +413,10 @@ export const mainSlice = createSlice({
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
     },
-    clearPreview: (state: Draft<AppState>) => {
-      clearSelectedResourceOnPreviewExit(state);
+    clearPreview: (state: Draft<AppState>, action: PayloadAction<{type: 'restartPreview'}>) => {
+      if (action.payload.type !== 'restartPreview') {
+        clearSelectedResourceOnPreviewExit(state);
+      }
       setPreviewData({}, state);
       state.previewType = undefined;
       state.checkedResourceIds = [];
