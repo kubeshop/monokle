@@ -212,7 +212,6 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
-      "certificateSha1": "8E255598C4857E6ACB50094BB76F7CAB6796B1A5",
       "certificateSubjectName": "SERIALNUMBER=5671927, C=US, ST=CONNECTICUT, L=GREENWICH, STREET=20 BRYNWOOD LN, O=KUBERNETES INNOVATION LABS, LLC, CN=KUBERNETES INNOVATION LABS, LLC"
     },
     "nsis": {

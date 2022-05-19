@@ -184,7 +184,7 @@ jobs:
       - name: Install Certificate
         run: |
           mkdir .secret
-          az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing  
+          az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing
 
       # Install Dependencies
       - name: Install Dependencies
@@ -219,7 +219,7 @@ jobs:
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-          WIN_CSC_LINK: .secret/kubeshop_msft.p12
+          WIN_CSC_LINK: .secret\kubeshop_msft.p12
           # WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }} # This will be changed
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
