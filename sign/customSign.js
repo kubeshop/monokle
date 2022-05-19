@@ -19,12 +19,6 @@ const signTask = commandToRun =>
 
 exports.default = async function (configuration) {
   const AZURE_CREDENTIALS = JSON.parse(process.env.AZURE_CREDENTIALS);
-  const command = `AzureSignTool sign 
-                                        -kvu ${KVU} 
-                                        -kvi ${AZURE_CREDENTIALS.clientId} 
-                                        -kvs ${AZURE_CREDENTIALS.clientSecret} 
-                                        -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} 
-                                        -tr ${TR} 
-                                        -v ${configuration.path}`;
+  const command = `AzureSignTool sign -kvu ${KVU} -kvi ${AZURE_CREDENTIALS.clientId} -kvs ${AZURE_CREDENTIALS.clientSecret} -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} -tr ${TR} -v ${configuration.path}`;
   await signTask(command);
 };
