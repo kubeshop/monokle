@@ -134,3 +134,22 @@ test('pair-refs', () => {
   // @ts-ignore
   expect(isOutgoingRef(service.refs[0].type)).toBe(true);
 });
+
+test('configurable-group-matcher', async () => {
+  await awaitKindHandlersLoading;
+
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/issuerRefs'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(2);
+
+  const certificateRequest = findResourceByName(resourceMap, 'testkube-operator-serving-cert-fbtng');
+  expect(certificateRequest).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(certificateRequest.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isOutgoingRef(certificateRequest.refs[0].type)).toBe(true);
+});

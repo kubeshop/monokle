@@ -1,0 +1,37 @@
+apiVersion: cert-manager.io/v1
+kind: CertificateRequest
+metadata:
+  annotations:
+    cert-manager.io/certificate-name: testkube-operator-serving-cert
+    cert-manager.io/certificate-revision: "1"
+    cert-manager.io/private-key-secret-name: testkube-operator-serving-cert-5vjx2
+    meta.helm.sh/release-name: testkube
+    meta.helm.sh/release-namespace: testkube
+  generateName: testkube-operator-serving-cert-
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: testkube-operator-serving-cert-fbtng
+  namespace: testkube
+  ownerReferences:
+    - apiVersion: cert-manager.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Certificate
+      name: testkube-operator-serving-cert
+      uid: 43815a9e-1e2b-4520-9a5d-5067a8f27ad9
+spec:
+  extra:
+    authentication.kubernetes.io/pod-name:
+      - cert-manager-74f46787b6-8w569
+    authentication.kubernetes.io/pod-uid:
+      - e96904b0-bfdc-429d-a456-8a81f42bc559
+  groups:
+    - system:serviceaccounts
+    - system:serviceaccounts:cert-manager
+    - system:authenticated
+  issuerRef:
+    kind: Issuer
+    name: testkube-operator-selfsigned-issuer
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQzREQ0NBY2dDQVFBd0FEQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQU5rNApvMnNWWGxMU3VBUHFlWmZaSnFDOUxWOUR1eS9Lc09jTTgvUFA0ZjZ1VE5hTmNBeXRRYlVzMk5TOURNcExqc2xsCjVlaEJxNFRLTHU1bW5LQWJWZm5NZ0VVVDVweDR1dzNpOUxVcHhUVFVhVXVvRGExRG1KTmUvVWkyNk9GUDZlbzgKL1orNnVIemNxQzBualNtYUJna2NJWFVTNktEcTdzZzRGMlhDNEZZUlllMlE1SjI3d3JaSGs0Qm0wTVJmN3N3OAplTVFWOGFIMG9mS3NnMW02VjhyelJ3ZlJ3VHVjVlk1M3ZWOVZZOCtjekkvNEp2NHpMb2ppQ3FiQk5jZlRNdXo2CmFxd0QveTRUbndvSXRFUmI5NUlpTTBVUVhuMVZyWDhzUTRUZlhQK0hkbUFzcm9mMHJ3dnoyVzYydzRyUS8rdlQKYzh4ejBaRFRtN1Rma2k1Ni9BY0NBd0VBQWFDQm1qQ0Jsd1lKS29aSWh2Y05BUWtPTVlHSk1JR0dNSGNHQTFVZApFUVJ3TUc2Q0xuUmxjM1JyZFdKbExXOXdaWEpoZEc5eUxYZGxZbWh2YjJzdGMyVnlkbWxqWlM1MFpYTjBhM1ZpClpTNXpkbU9DUEhSbGMzUnJkV0psTFc5d1pYSmhkRzl5TFhkbFltaHZiMnN0YzJWeWRtbGpaUzUwWlhOMGEzVmkKWlM1emRtTXVZMngxYzNSbGNpNXNiMk5oYkRBTEJnTlZIUThFQkFNQ0JhQXdEUVlKS29aSWh2Y05BUUVMQlFBRApnZ0VCQURFNkJ6YUUxZmdBUExQcXY4TFYzTE9lZk1qVml2OC9MdU43bWQxeGF5MUUwM2JFR3M3bW1pMUVYWDJhCklVbzFxRjk3bEljbTh2bkR4QmFjbDJubDQrMmpIWk1pQXQrMi9rNHRtdEpGQmFNYUFDUFM0cE4wSDFCdW9hYVcKQW5NSlRZbm8wNUZhUjJIellmL0c5eTR2ajhISk0zSFJBTERla3dNeis1REhtQzlLTS85NGVXcnRaTUdoSGs1UQpkRlFlV3UrN1BuMnBOTVd5aFVnMmI3dGZtcTBVRFExTUVSSWxUdVZOZlZlTTFqZTZJMDVqOGZxSEhNK3pDR2JCCnVUTnh1WGtOSEkvWnFjZWNTbTRrV1BTdzd2NFo4L3F2VnZ1Q3J1K0w0bnZueWRidmZQMUwrR2dmVDI5S3YzVlgKcEEyRUhObzFpRjlnSzhVWTRHclFzU2lIdm5nPQotLS0tLUVORCBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0K
+  uid: c5986645-f1f1-4454-8932-f79d7ac76abf
+  username: system:serviceaccount:cert-manager:cert-manager
