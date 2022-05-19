@@ -12,7 +12,7 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
-import {useFeatureFlags} from '@utils/features';
+import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
@@ -37,8 +37,6 @@ const PaneManagerLeftMenu: React.FC = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
   const isActive = Boolean(activeProject) && (leftActive || leftDrawerVisible);
-
-  const {DockerImagesPane} = useFeatureFlags();
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -162,7 +160,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         </WalkThrough>
       </PaneTooltip>
 
-      {DockerImagesPane && (
+      <FeatureFlag name="DockerImagesPane">
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'docker-images-pane')}
           title="View Docker Images"
@@ -181,7 +179,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             />
           </MenuButton>
         </PaneTooltip>
-      )}
+      </FeatureFlag>
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'templates-pane')}
