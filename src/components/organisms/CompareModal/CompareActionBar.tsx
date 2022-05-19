@@ -1,8 +1,6 @@
 import {useCallback} from 'react';
 
-import {Button, Checkbox, Divider, Input, Select, Space} from 'antd';
-
-import log from 'loglevel';
+import {Checkbox, Input, Select, Space} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -45,14 +43,6 @@ export const CompareActionBar: React.FC = () => {
     [dispatch]
   );
 
-  const handleSaveView = useCallback(() => {
-    log.debug('dispatch ViewSaved');
-  }, []);
-
-  const handleLoadView = useCallback(() => {
-    log.debug('dispatch ViewLoaded');
-  }, []);
-
   return (
     <S.ActionBarDiv>
       <div>
@@ -74,16 +64,6 @@ export const CompareActionBar: React.FC = () => {
           <OperationSelect />
 
           <FilterPopover filter={filter} onChange={handleFilterUpdated} />
-
-          <Divider type="vertical" style={{height: 28}} />
-
-          <Button disabled={disabled} onClick={handleSaveView}>
-            Save Diff
-          </Button>
-
-          <Button disabled={disabled} onClick={handleLoadView}>
-            Load Diff
-          </Button>
         </Space>
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
