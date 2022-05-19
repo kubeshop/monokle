@@ -34,6 +34,7 @@ import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 
 import {
+  DockerImageDetails,
   FormEditor,
   HelmChartModalConfirmWithNamespaceSelect,
   ModalConfirmWithNamespaceSelect,
@@ -76,6 +77,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedDockerImage = useAppSelector(state => state.main.selectedDockerImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
@@ -289,7 +291,11 @@ const ActionsPane: React.FC<Props> = ({height}) => {
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         <ReflexElement flex={1.0}>
-          {!selectedPreviewConfigurationId ? (
+          {selectedPreviewConfigurationId ? (
+            <PreviewConfigurationDetails />
+          ) : selectedDockerImage ? (
+            <DockerImageDetails />
+          ) : (
             <S.Tabs
               defaultActiveKey="source"
               activeKey={activeTabKey}
@@ -383,8 +389,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                 </TabPane>
               )}
             </S.Tabs>
-          ) : (
-            <PreviewConfigurationDetails />
           )}
         </ReflexElement>
       </ReflexContainer>
