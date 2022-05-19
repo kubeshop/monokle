@@ -24,6 +24,6 @@ exports.default = async function (configuration) {
   console.log('configuration', configuration);
   console.log('ENV', AZURE_CREDENTIALS.activeDirectoryEndpointUrl);
 
-  const command = ` sign -kvu ${KVU} -kvi ${AZURE_CREDENTIALS.clientId} -kvs ${AZURE_CREDENTIALS.clientSecret} -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} -tr ${TR} -v ${configuration.path}`;
+  const command = `AzureSignTool sign -kvu ${KVU} -kvi ${AZURE_CREDENTIALS.clientId} -kvs ${AZURE_CREDENTIALS.clientSecret} -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} -tr ${TR} -v ${configuration.path}`;
   await signTask(command);
 };
