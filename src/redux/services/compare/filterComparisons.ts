@@ -4,6 +4,8 @@ import {CompareFilter, ResourceComparison} from '@redux/reducers/compare';
 
 import {isPassingKeyValueFilter} from '@utils/filter';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 type FilterOptions = {
   search?: string;
 } & CompareFilter;
@@ -26,8 +28,11 @@ export function createResourceFilters(options: FilterOptions) {
 
   if (options.namespace) {
     filters.push(comparison => {
-      const namespace = getResource(comparison).namespace;
-      return namespace ? namespace.toLowerCase().includes(options.namespace?.toLowerCase() ?? '') : true;
+      const resource = getResource(comparison);
+      const isNamespaced = getResourceKindHandler(resource.kind)?.isNamespaced ?? true;
+      if (!isNamespaced) return false;
+      const namespace = resource.namespace ?? 'default';
+      return namespace.toLowerCase().includes(options.namespace?.toLowerCase() ?? '');
     });
   }
 
