@@ -180,12 +180,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing  
+      # Install Dependencies
+      - name: Install Certificate
+        run: |
+          az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing  
 
       # Install Dependencies
       - name: Install Dependencies
