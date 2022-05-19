@@ -212,7 +212,7 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
-      "certificateSubjectName": "SERIALNUMBER=5671927, C=US, ST=CONNECTICUT, L=GREENWICH, STREET=20 BRYNWOOD LN, O=KUBERNETES INNOVATION LABS, LLC, CN=KUBERNETES INNOVATION LABS, LLC"
+      "sign": "./sign/customSign.js"
     },
     "nsis": {
       "oneClick": false,

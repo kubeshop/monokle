@@ -158,7 +158,7 @@ jobs:
 
       - name: Install Tools
         run: |
-          choco install jq
+          choco install jq dotnet-5.0-runtime dotnetcore-sdk -y
 
       - name: Get Node Version
         run: |
@@ -174,17 +174,6 @@ jobs:
         with:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
-
-      - name: Azure CLI Login
-        uses: Azure/login@v1.1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # Install Dependencies
-      - name: Install Certificate
-        run: |
-          mkdir .secret
-          az keyvault secret download --file .secret/kubeshop_msft.p12 --encoding base64 --vault-name monokle-signing --name monokle-signing
 
       # Install Dependencies
       - name: Install Dependencies
