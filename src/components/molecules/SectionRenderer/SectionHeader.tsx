@@ -3,6 +3,7 @@ import {useCallback, useMemo, useState} from 'react';
 import {SectionCustomComponent} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
@@ -15,14 +16,11 @@ import * as S from './styled';
 
 interface SectionHeaderProps {
   sectionId: string;
-  isCollapsed: boolean; // TODO: we should handle this in the blueprint middleware and set the .isVisible prop accordingly
   isLastSection: boolean; // TODO: this should be on the SectionInstance
-  expandSection: () => void;
-  collapseSection: () => void;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {sectionId, isCollapsed, isLastSection, expandSection, collapseSection} = props;
+  const {sectionId, isLastSection} = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -38,14 +36,6 @@ function SectionHeader(props: SectionHeaderProps) {
     [NameCounter]
   );
 
-  const toggleCollapse = useCallback(() => {
-    if (isCollapsed) {
-      expandSection();
-    } else {
-      collapseSection();
-    }
-  }, [isCollapsed, expandSection, collapseSection]);
-
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
       return;
@@ -59,6 +49,36 @@ function SectionHeader(props: SectionHeaderProps) {
     }
   }, [sectionInstance, dispatch]);
 
+  const expandSection = useCallback(() => {
+    if (!sectionInstance?.id) {
+      return;
+    }
+    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
+      dispatch(expandSectionIds([sectionInstance.id]));
+    } else {
+      dispatch(expandSectionIds([sectionInstance.id, ...sectionInstance.visibleDescendantSectionIds]));
+    }
+  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
+
+  const collapseSection = useCallback(() => {
+    if (!sectionInstance?.id) {
+      return;
+    }
+    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
+      dispatch(collapseSectionIds([sectionInstance?.id]));
+    } else {
+      dispatch(collapseSectionIds([sectionInstance?.id, ...sectionInstance.visibleDescendantSectionIds]));
+    }
+  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
+
+  const toggleCollapse = useCallback(() => {
+    if (sectionInstance.isCollapsed) {
+      expandSection();
+    } else {
+      collapseSection();
+    }
+  }, [expandSection, collapseSection, sectionInstance.isCollapsed]);
+
   if (!sectionBlueprint) {
     return null;
   }
@@ -68,14 +88,14 @@ function SectionHeader(props: SectionHeaderProps) {
       isHovered={isHovered}
       hasChildSections={Boolean(sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0)}
       disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
-      isSelected={Boolean(sectionInstance.isSelected && isCollapsed)}
-      isHighlighted={Boolean(sectionInstance.isHighlighted && isCollapsed)}
+      isSelected={Boolean(sectionInstance.isSelected && sectionInstance.isCollapsed)}
+      isHighlighted={Boolean(sectionInstance.isHighlighted && sectionInstance.isCollapsed)}
       isInitialized={Boolean(sectionInstance.isInitialized)}
       isVisible={Boolean(sectionInstance.isVisible)}
       isSectionCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
       hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       isLastSection={isLastSection}
-      isCollapsed={isCollapsed}
+      isCollapsed={sectionInstance.isCollapsed}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -110,8 +130,8 @@ function SectionHeader(props: SectionHeaderProps) {
             {sectionInstance.name === 'K8s Resources' ? (
               <WalkThrough placement="rightTop" step="resource" collection="novice">
                 <S.Name
-                  $isSelected={sectionInstance.isSelected && isCollapsed}
-                  $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                  $isSelected={sectionInstance.isSelected && sectionInstance.isCollapsed}
+                  $isHighlighted={sectionInstance.isSelected && sectionInstance.isCollapsed}
                   $isCheckable={Boolean(sectionInstance.checkable)}
                   $nameColor={sectionBlueprint.customization?.nameColor}
                   $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}
@@ -125,8 +145,8 @@ function SectionHeader(props: SectionHeaderProps) {
               </WalkThrough>
             ) : (
               <S.Name
-                $isSelected={sectionInstance.isSelected && isCollapsed}
-                $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                $isSelected={sectionInstance.isSelected && sectionInstance.isCollapsed}
+                $isHighlighted={sectionInstance.isSelected && sectionInstance.isCollapsed}
                 $isCheckable={Boolean(sectionInstance.checkable)}
                 $nameColor={sectionBlueprint.customization?.nameColor}
                 $nameSize={sectionBlueprint.rowFontSize || (sectionBlueprint.rowHeight || 50) / 2}

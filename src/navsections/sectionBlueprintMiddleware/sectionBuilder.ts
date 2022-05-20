@@ -7,10 +7,11 @@ type BuildSectionInstanceProps = {
   rawItems: any[];
   sectionBlueprint: SectionBlueprint<any, any>;
   sectionScope: Record<string, any>;
+  collapsedSectionIds: string[];
 };
 
 export const buildSectionInstance = (props: BuildSectionInstanceProps) => {
-  const {itemInstances, sectionBlueprint, sectionScope, rawItems} = props;
+  const {itemInstances, sectionBlueprint, sectionScope, rawItems, collapsedSectionIds} = props;
   const sectionBuilder = sectionBlueprint.builder;
 
   const isSectionSelected = Boolean(itemInstances?.some(i => i.isSelected === true));
@@ -48,6 +49,7 @@ export const buildSectionInstance = (props: BuildSectionInstanceProps) => {
     isSelected: isSectionSelected,
     isHighlighted: isSectionHighlighted,
     isEmpty: isSectionEmpty,
+    isCollapsed: collapsedSectionIds.includes(sectionBlueprint.id),
     meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
     shouldExpand: Boolean(
       itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)

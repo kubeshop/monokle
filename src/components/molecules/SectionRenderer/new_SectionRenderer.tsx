@@ -65,13 +65,7 @@ function SectionRenderer(props: SectionRendererProps) {
               }}
             >
               {row.type === 'section' ? (
-                <SectionHeader
-                  sectionId={row.id}
-                  isCollapsed={false}
-                  isLastSection={false}
-                  expandSection={() => {}}
-                  collapseSection={() => {}}
-                />
+                <SectionHeader sectionId={row.id} isLastSection={false} />
               ) : (
                 <ItemRenderer
                   itemId={row.id}

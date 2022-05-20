@@ -9,10 +9,12 @@ export function makeNavigatorRows(
   if (!instance.isVisible) {
     return rows;
   }
-  rows.push(
-    {id: instance.id, type: 'section', level},
-    ...instance.visibleItemIds.map(id => ({id, type: 'item' as const, level, sectionId: instance.id}))
-  );
+
+  rows.push({id: instance.id, type: 'section', level});
+
+  if (!instance.isCollapsed) {
+    rows.push(...instance.visibleItemIds.map(id => ({id, type: 'item' as const, level, sectionId: instance.id})));
+  }
 
   if (!instance?.visibleChildSectionIds) {
     return rows;

@@ -178,10 +178,10 @@ function SectionRenderer(props: SectionRendererProps) {
     <>
       <SectionHeader
         sectionId={sectionId}
-        isCollapsed={isCollapsed}
+        // isCollapsed={isCollapsed}
         isLastSection={isLastSection}
-        expandSection={expandSection}
-        collapseSection={collapseSection}
+        // expandSection={expandSection}
+        // collapseSection={collapseSection}
         // indentation={sectionIndentation || 0}
       />
       {sectionInstance &&

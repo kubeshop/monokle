@@ -37,6 +37,8 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
 
   const sectionBlueprintList = sectionBlueprintMap.getAll();
 
+  const collapsedSectionIds = state.navigator.collapsedSectionIds;
+
   const {fullScope, scopeKeysBySectionId, isChangedByScopeKey} = await computeFullScope({
     state,
     sectionBlueprintList,
@@ -82,6 +84,7 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
       sectionScope,
       itemInstances,
       rawItems,
+      collapsedSectionIds,
     });
 
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
