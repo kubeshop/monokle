@@ -1,4 +1,4 @@
-import {NavigatorRow, SectionInstance} from '@models/navigator';
+import {ItemInstance, NavigatorRow, SectionInstance} from '@models/navigator';
 
 export function makeNavigatorRows(
   instance: SectionInstance,
@@ -33,4 +33,37 @@ export function makeNavigatorRows(
   }
 
   return rows;
+}
+
+type GetRowIndexToScrollProps = {
+  itemInstanceMap: Record<string, ItemInstance>;
+  rows: NavigatorRow[];
+};
+export function getRowIndexToScroll(props: GetRowIndexToScrollProps): number | undefined {
+  const {itemInstanceMap, rows} = props;
+
+  let selectedItemIndex: number = -1;
+  let firstHighlightedItemIndex: number = -1;
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    if (row.type === 'item') {
+      const item = itemInstanceMap[row.id];
+      if (item?.isSelected && selectedItemIndex === -1) {
+        selectedItemIndex = i;
+      }
+      if (item?.isHighlighted && firstHighlightedItemIndex === -1) {
+        firstHighlightedItemIndex = i;
+      }
+    }
+  }
+
+  if (selectedItemIndex !== -1) {
+    return selectedItemIndex;
+  }
+
+  if (firstHighlightedItemIndex !== -1) {
+    return firstHighlightedItemIndex;
+  }
+
+  return undefined;
 }

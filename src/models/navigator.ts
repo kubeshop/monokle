@@ -212,6 +212,7 @@ export interface NavigatorInstanceState {
   sectionInstanceMap: Record<string, SectionInstance>;
   itemInstanceMap: Record<string, ItemInstance>;
   rowsByRootSectionId: Record<string, NavigatorRow[]>;
+  rowIndexToScrollByRootSectionId: Record<string, number | undefined>;
 }
 
 export interface NavigatorState extends NavigatorInstanceState {

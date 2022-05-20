@@ -9,10 +9,12 @@ export const navigatorSlice = createSlice({
   initialState: initialState.navigator,
   reducers: {
     updateNavigatorInstanceState: (state: Draft<NavigatorState>, action: PayloadAction<NavigatorInstanceState>) => {
-      const {sectionInstanceMap, itemInstanceMap, rowsByRootSectionId} = action.payload;
+      const {sectionInstanceMap, itemInstanceMap, rowsByRootSectionId, rowIndexToScrollByRootSectionId} =
+        action.payload;
       state.sectionInstanceMap = sectionInstanceMap;
       state.itemInstanceMap = itemInstanceMap;
       state.rowsByRootSectionId = rowsByRootSectionId;
+      state.rowIndexToScrollByRootSectionId = rowIndexToScrollByRootSectionId;
     },
     collapseSectionIds: (state: Draft<NavigatorState>, action: PayloadAction<string[]>) => {
       action.payload.forEach(sectionId => {

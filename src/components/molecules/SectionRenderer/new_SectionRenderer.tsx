@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {useVirtual} from 'react-virtual';
 
 import {NavigatorRow, SectionBlueprint} from '@models/navigator';
@@ -28,10 +28,14 @@ function SectionRenderer(props: SectionRendererProps) {
   );
 
   const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
+  const rowIndexToScroll = useAppSelector(
+    state => state.navigator.rowIndexToScrollByRootSectionId[sectionBlueprint.id]
+  );
 
   const parentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-  const rowVirtualizer = useVirtual({
+  // TODO: we need to compute the rowHeight in the middleware, based on child section blueprints
+  const {virtualItems, scrollToIndex, totalSize} = useVirtual({
     size: rows?.length || 0,
     parentRef,
     estimateSize: React.useCallback(
@@ -41,16 +45,23 @@ function SectionRenderer(props: SectionRendererProps) {
     overscan: 5,
   });
 
+  useEffect(() => {
+    if (rowIndexToScroll) {
+      scrollToIndex(rowIndexToScroll, {align: 'center'});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowIndexToScroll]);
+
   return (
     <div style={{height: `${height}px`, overflow: 'auto'}} ref={parentRef}>
       <div
         style={{
-          height: `${rowVirtualizer.totalSize}px`,
+          height: `${totalSize}px`,
           width: '100%',
           position: 'relative',
         }}
       >
-        {rowVirtualizer.virtualItems.map(virtualRow => {
+        {virtualItems.map(virtualRow => {
           const row = rows[virtualRow.index];
           return (
             <div

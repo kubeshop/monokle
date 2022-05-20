@@ -212,6 +212,7 @@ const initialNavigatorState: NavigatorState = {
   collapsedSectionIds: [],
   registeredSectionBlueprintIds: [],
   rowsByRootSectionId: {},
+  rowIndexToScrollByRootSectionId: {},
 };
 
 const initialUiCoachState: UiCoachState = {

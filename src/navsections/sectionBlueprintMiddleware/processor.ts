@@ -10,9 +10,8 @@ import {updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import {computeSectionCheckable} from './checkable';
 import {buildItemInstances} from './itemBuilder';
-import {makeNavigatorRows} from './navigatorRows';
+import {getRowIndexToScroll, makeNavigatorRows} from './navigatorRows';
 import {computeFullScope, hasFullScopeChanged, hasSectionScopeChanged} from './scope';
-import {computeItemScrollIntoView} from './scrolling';
 import {buildSectionInstance} from './sectionBuilder';
 import {pickPartialRecord} from './utils';
 import {computeSectionVisibility} from './visibility';
@@ -107,11 +106,6 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
   });
 
   // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
-  await asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
-    computeItemScrollIntoView(sectionInstanceRoot, itemInstanceMap)
-  );
-
-  // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
   await asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
     const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
     if (!sectionBlueprint) {
@@ -125,11 +119,19 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
     return;
   }
 
+  const rowsByRootSectionId = Object.fromEntries(
+    sectionInstanceRoots.map(rootInstance => [rootInstance.id, makeNavigatorRows(rootInstance, sectionInstanceMap)])
+  );
+
   const newNavigatorInstanceState: NavigatorInstanceState = {
     sectionInstanceMap,
     itemInstanceMap,
-    rowsByRootSectionId: Object.fromEntries(
-      sectionInstanceRoots.map(rootInstance => [rootInstance.id, makeNavigatorRows(rootInstance, sectionInstanceMap)])
+    rowsByRootSectionId,
+    rowIndexToScrollByRootSectionId: Object.fromEntries(
+      Object.entries(rowsByRootSectionId).map(([sectionId, rows]) => [
+        sectionId,
+        getRowIndexToScroll({rows, itemInstanceMap}),
+      ])
     ),
   };
 
