@@ -6,6 +6,7 @@ export {default as CreateFolderModal} from './CreateFolderModal';
 export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as DockerImagesPane} from './DockerImagesPane';
 export {default as FileTreePane} from './FileTreePane';
+export {default as FiltersPresetModal} from './FiltersPresetModal';
 export {default as HelmPane} from './HelmPane';
 export {default as HotKeysHandler} from './HotKeysHandler';
 export {default as KeyboardShortcuts} from './KeyboardShortcuts';

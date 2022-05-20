@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Input, Select} from 'antd';
+import {Button, Input, Select} from 'antd';
 
 import {mapValues} from 'lodash';
 
@@ -9,6 +9,7 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+import {openFiltersPresetModal} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors';
 
 import {KeyValueInput} from '@components/atoms';
@@ -21,28 +22,6 @@ const ALL_OPTIONS = '<all>';
 const ROOT_OPTIONS = '<root>';
 
 const {Option} = Select;
-
-const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
-  const keyValues: Record<string, string[]> = {};
-  Object.values(objectList).forEach(currentObject => {
-    const nestedObject = getNestedObject(currentObject);
-    if (nestedObject) {
-      Object.entries(nestedObject).forEach(([key, value]) => {
-        if (typeof value !== 'string') {
-          return;
-        }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
-          }
-        } else {
-          keyValues[key] = [value];
-        }
-      });
-    }
-  });
-  return keyValues;
-};
 
 const ResourceFilter = () => {
   const dispatch = useAppDispatch();
@@ -149,6 +128,14 @@ const ResourceFilter = () => {
     }
   };
 
+  const onClickLoadPreset = () => {
+    dispatch(openFiltersPresetModal('load'));
+  };
+
+  const onClickSavePreset = () => {
+    dispatch(openFiltersPresetModal('save'));
+  };
+
   useDebounce(
     () => {
       if (!wasLocalUpdate) {
@@ -187,6 +174,15 @@ const ResourceFilter = () => {
 
   return (
     <S.Container>
+      <S.PresetContainer>
+        <Button type="default" onClick={onClickLoadPreset}>
+          Load preset
+        </Button>
+        <Button type="default" onClick={onClickSavePreset}>
+          Save preset
+        </Button>
+      </S.PresetContainer>
+
       <S.Title>
         <S.TitleLabel>Filter resources by:</S.TitleLabel>
         <S.TitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
@@ -289,6 +285,28 @@ const ResourceFilter = () => {
       </S.Field>
     </S.Container>
   );
+};
+
+const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
+  const keyValues: Record<string, string[]> = {};
+  Object.values(objectList).forEach(currentObject => {
+    const nestedObject = getNestedObject(currentObject);
+    if (nestedObject) {
+      Object.entries(nestedObject).forEach(([key, value]) => {
+        if (typeof value !== 'string') {
+          return;
+        }
+        if (keyValues[key]) {
+          if (!keyValues[key].includes(value)) {
+            keyValues[key].push(value);
+          }
+        } else {
+          keyValues[key] = [value];
+        }
+      });
+    }
+  });
+  return keyValues;
 };
 
 export default ResourceFilter;

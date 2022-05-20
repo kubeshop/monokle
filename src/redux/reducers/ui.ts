@@ -136,6 +136,15 @@ export const uiSlice = createSlice({
         imageId: action.payload,
       };
     },
+    closeFiltersPresetModal: (state: Draft<UiState>) => {
+      state.filtersPresetModal = undefined;
+    },
+    openFiltersPresetModal: (state: Draft<UiState>, action: PayloadAction<'load' | 'save'>) => {
+      state.filtersPresetModal = {
+        isOpen: true,
+        type: action.payload,
+      };
+    },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
@@ -307,6 +316,7 @@ export const {
   closeClusterDiff,
   closeCreateFolderModal,
   closeCreateProjectModal,
+  closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
   closeNewResourceWizard,
@@ -324,6 +334,7 @@ export const {
   openClusterDiff,
   openCreateFolderModal,
   openCreateProjectModal,
+  openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
   openNewResourceWizard,

@@ -90,6 +90,10 @@ export type UiState = {
     isOpen: boolean;
     imageId: string;
   };
+  filtersPresetModal?: {
+    isOpen: boolean;
+    type: 'load' | 'save';
+  };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
     resourcesIds: string[];
