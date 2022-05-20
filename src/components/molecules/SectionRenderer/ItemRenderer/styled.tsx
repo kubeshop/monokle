@@ -25,7 +25,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   user-select: none;
   ${props => {
     const defaultIndentation = props.$isSectionCheckable ? 32 : 26;
-    return `padding-left: ${defaultIndentation + props.$indentation - 2}px;`;
+    return `padding-left: ${defaultIndentation + props.$indentation + 4}px;`;
   }}
   padding-right: 8px;
   margin-bottom: 2px;
@@ -125,5 +125,5 @@ export const BlankSpace = styled.span`
 `;
 
 export const Checkbox = styled(RawCheckbox)<{$level: number}>`
-  margin-left: -18px;
+  margin-left: -22px;
 `;
