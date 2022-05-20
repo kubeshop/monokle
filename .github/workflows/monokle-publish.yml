@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - erdikose/feature/add-new-certificate-signing
   release:
     types:
       - prereleased
