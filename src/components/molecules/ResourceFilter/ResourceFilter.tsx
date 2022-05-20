@@ -16,6 +16,8 @@ import {KeyValueInput} from '@components/atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
+import {FeatureFlag} from '@utils/features';
+
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
@@ -174,14 +176,16 @@ const ResourceFilter = () => {
 
   return (
     <S.Container>
-      <S.PresetContainer>
-        <Button type="default" onClick={onClickLoadPreset}>
-          Load preset
-        </Button>
-        <Button type="default" onClick={onClickSavePreset}>
-          Save preset
-        </Button>
-      </S.PresetContainer>
+      <FeatureFlag name="FiltersPreset">
+        <S.PresetContainer>
+          <Button type="default" onClick={onClickLoadPreset}>
+            Load preset
+          </Button>
+          <Button type="default" onClick={onClickSavePreset}>
+            Save preset
+          </Button>
+        </S.PresetContainer>
+      </FeatureFlag>
 
       <S.Title>
         <S.TitleLabel>Filter resources by:</S.TitleLabel>

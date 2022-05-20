@@ -3,5 +3,6 @@
   "ShowRightMenu": false,
   "ActionsPaneFooter": false,
   "DockerImagesPane": false,
-  "CompareEverything": false
+  "CompareEverything": false,
+  "FiltersPreset": false
 }
