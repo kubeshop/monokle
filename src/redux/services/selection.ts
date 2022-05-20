@@ -39,7 +39,7 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     });
 }
 
-function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
+export function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
   const currentResource = resourceMap[resourceId];
   if (currentResource) {
     currentResource.isHighlighted = true;
@@ -58,6 +58,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   state.selectedPath = undefined;
   state.selectedResourceId = undefined;
   state.selectedPreviewConfigurationId = undefined;
+  state.selectedDockerImage = undefined;
 
   if (resource) {
     resource.isSelected = true;

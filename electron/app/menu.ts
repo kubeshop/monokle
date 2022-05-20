@@ -264,7 +264,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        role: 'forceReload',
       },
       {
         label: 'Previous Resource',
@@ -277,6 +277,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesMap,
             dispatch
           );
         },
@@ -292,6 +293,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesMap,
             dispatch
           );
         },

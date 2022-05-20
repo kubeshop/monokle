@@ -11,10 +11,13 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {kustomizationsSelector} from '@redux/selectors';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
+import {createResourceFilters, filterComparisons} from '@redux/services/compare/filterComparisons';
 
 import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {isDefined} from '@utils/filter';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -29,6 +32,10 @@ export type CompareState = {
     comparison?: ComparisonData;
     selection: string[];
     viewDiff?: string; // comparisonId
+    search?: string;
+    filtering?: {
+      comparisons: ResourceComparison[];
+    };
   };
 };
 
@@ -45,16 +52,19 @@ export type ResourceSetData = {
   resources: K8sResource[];
 };
 
-export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' | 'leftDifference' | 'rightDifference';
+export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' | 'leftJoin' | 'rightJoin';
 
 export type CompareFilter = {
   namespace?: string;
+  kind?: string;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
 };
 
 export type ComparisonView = {
-  leftSet: PartialResourceSet | undefined;
-  rightSet: PartialResourceSet | undefined;
-  operation: CompareOperation;
+  leftSet?: PartialResourceSet;
+  rightSet?: PartialResourceSet;
+  operation?: CompareOperation;
   filter?: CompareFilter;
 };
 
@@ -138,27 +148,33 @@ export const compareSlice = createSlice({
   name: 'compare',
   initialState,
   reducers: {
-    compareToggled: (state, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload === undefined) {
+    compareToggled: (state, action: PayloadAction<{value: boolean | undefined; initialView?: ComparisonView}>) => {
+      const {value, initialView} = action.payload;
+      if (value === undefined) {
         state.isOpen = !state.isOpen;
       } else {
-        state.isOpen = action.payload;
+        state.isOpen = value;
+      }
+
+      if (initialView) {
+        state.current.view = initialView;
       }
     },
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
+      resetComparison(state);
     },
-    filterUpdated: (state, action: PayloadAction<{filter: Partial<CompareFilter>}>) => {
-      const currentFilter = state.current.view.filter;
+    searchUpdated: (state, action: PayloadAction<{search: string}>) => {
+      state.current.search = action.payload.search;
+    },
+    filterUpdated: (state, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
       const newFilter = action.payload.filter;
+      const isEmpty = !newFilter || Object.keys(newFilter).length === 0;
 
-      if (!currentFilter) {
-        state.current.view.filter = newFilter;
+      if (isEmpty) {
+        state.current.view.filter = undefined;
       } else {
-        state.current.view.filter = {
-          ...currentFilter,
-          ...newFilter,
-        };
+        state.current.view.filter = action.payload.filter;
       }
     },
     resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
@@ -166,8 +182,10 @@ export const compareSlice = createSlice({
       resetComparison(state);
       if (side === 'left') {
         state.current.view.leftSet = value;
+        state.current.left = undefined;
       } else {
         state.current.view.rightSet = value;
+        state.current.right = undefined;
       }
     },
     resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
@@ -251,6 +269,11 @@ export const compareSlice = createSlice({
         comparisons: action.payload.comparisons,
       };
     },
+    resourceSetFiltered: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+      state.current.filtering = {
+        comparisons: action.payload.comparisons,
+      };
+    },
   },
 });
 
@@ -258,6 +281,8 @@ function resetComparison(state: WritableDraft<CompareState>) {
   state.current.comparison = undefined;
   state.current.viewDiff = undefined;
   state.current.selection = [];
+
+  state.current.filtering = undefined;
 }
 
 /* * * * * * * * * * * * * *
@@ -266,6 +291,7 @@ function resetComparison(state: WritableDraft<CompareState>) {
 export default compareSlice.reducer;
 export const {
   compareToggled,
+  searchUpdated,
   filterUpdated,
   operationUpdated,
   resourceSetCleared,
@@ -275,6 +301,7 @@ export const {
   resourceSetFetchFailed,
   resourceSetFetched,
   resourceSetCompared,
+  resourceSetFiltered,
   diffViewOpened,
   comparisonAllToggled,
   comparisonToggled,
@@ -366,7 +393,7 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
 };
 
 export const selectComparisonListItems = createSelector(
-  (state: CompareState) => state.current.comparison?.comparisons,
+  (state: CompareState) => state.current.filtering?.comparisons,
   comparisons => {
     const result: ComparisonListItem[] = [];
 
@@ -377,6 +404,7 @@ export const selectComparisonListItems = createSelector(
 
     Object.entries(groups).forEach(([kind, comps]) => {
       result.push({type: 'header', kind, count: comps.length});
+      const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
         if (comparison.isMatch) {
@@ -384,7 +412,7 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: comparison.left.namespace ?? 'default',
+            namespace: isNamespaced ? comparison.left.namespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
             canDiff: comparison.isDifferent,
@@ -394,7 +422,9 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
-            namespace: comparison.left?.namespace ?? comparison.right?.namespace ?? 'default',
+            namespace: isNamespaced
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? 'default'
+              : undefined,
             leftActive: Boolean(comparison.left),
             rightActive: Boolean(comparison.right),
             canDiff: false,
@@ -433,10 +463,15 @@ export const resourceFetchListener =
   listen => {
     listen({
       predicate: (action, state) => {
-        const resourceSetUpdated = isAnyOf(resourceSetSelected, resourceSetRefreshed, resourceSetCleared);
+        const resourceSetUpdated = isAnyOf(
+          compareToggled,
+          resourceSetSelected,
+          resourceSetRefreshed,
+          resourceSetCleared
+        );
         if (!resourceSetUpdated(action)) return false;
 
-        const actionSide = action.payload.side;
+        const actionSide = compareToggled.match(action) ? side : action.payload.side;
         if (actionSide !== side) return false;
 
         const resourceSet = selectResourceSet(state.compare, side);
@@ -468,18 +503,36 @@ export const resourceFetchListener =
 
 export const compareListener: AppListenerFn = listen => {
   listen({
-    actionCreator: resourceSetFetched,
+    matcher: isAnyOf(resourceSetFetched, operationUpdated),
     effect: async (_action, {dispatch, getState}) => {
       const status = selectCompareStatus(getState().compare);
-      const left = getState().compare.current.left;
-      const right = getState().compare.current.right;
+      const current = getState().compare.current;
+      const {left, right, view} = current;
 
       if (status !== 'comparing' || !left || !right) {
         return;
       }
 
-      const comparisons = compareResources(left.resources, right.resources, {operation: 'union'});
+      const options = {operation: view.operation ?? 'union'};
+      const comparisons = compareResources(left.resources, right.resources, options);
       dispatch(resourceSetCompared({comparisons}));
+    },
+  });
+};
+
+export const filterListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(resourceSetCompared, filterUpdated, searchUpdated),
+    effect: async (_, {dispatch, getState, cancelActiveListeners, delay}) => {
+      cancelActiveListeners();
+      await delay(3);
+
+      const {search, comparison, view} = getState().compare.current;
+      const allComparisons = comparison?.comparisons ?? [];
+      const filters = createResourceFilters({search, ...view.filter});
+      const comparisons = filterComparisons(allComparisons, filters);
+
+      dispatch(resourceSetFiltered({comparisons}));
     },
   });
 };

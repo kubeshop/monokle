@@ -25,6 +25,7 @@
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-conventional": "16.2.1",
     "@craco/craco": "6.4.3",
+    "@ladle/react": "0.15.1",
     "@playwright/test": "1.20.1",
     "@testing-library/jest-dom": "5.16.3",
     "@testing-library/react": "12.1.4",

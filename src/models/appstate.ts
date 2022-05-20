@@ -2,6 +2,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
+import {DockerImage} from './image';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -18,6 +19,12 @@ type ResourceMapType = {
 type FileMapType = {
   [id: string]: FileEntry;
 };
+
+/**
+ * List of images from current project
+ */
+
+type ImagesMapType = DockerImage[];
 
 /**
  * Maps ids to Helm charts
@@ -47,12 +54,20 @@ type ResourceSelectionHistoryEntry = {
   selectedResourceId: string;
 };
 
+type DockerImageSelectionHistoryEntry = {
+  type: 'image';
+  selectedDockerImage: DockerImage;
+};
+
 type PathSelectionHistoryEntry = {
   type: 'path';
   selectedPath: string;
 };
 
-type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
+type SelectionHistoryEntry =
+  | ResourceSelectionHistoryEntry
+  | PathSelectionHistoryEntry
+  | DockerImageSelectionHistoryEntry;
 
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
@@ -160,6 +175,9 @@ interface AppState {
     previewConfigurationId?: string;
   };
   deviceID: string;
+  selectedDockerImage?: DockerImage | null;
+  imagesSearchedValue?: string;
+  imagesMap: ImagesMapType;
 }
 
 export interface PossibleResource {
@@ -180,6 +198,7 @@ export type {
   ResourceMapType,
   ResourceFilterType,
   FileMapType,
+  ImagesMapType,
   HelmChartMapType,
   HelmValuesMapType,
   PreviewLoaderType,

@@ -72,12 +72,18 @@ type RefTargetResource = {
   resourceKind?: string;
   isOptional?: boolean; // set true for satisfied refs that were optional
 };
+
 type RefTargetFile = {
   type: 'file';
   filePath: string;
 };
 
-type RefTarget = RefTargetResource | RefTargetFile;
+type RefTargetImage = {
+  type: 'image';
+  tag: string;
+};
+
+type RefTarget = RefTargetResource | RefTargetFile | RefTargetImage;
 
 interface ResourceRef {
   /** the type of ref (see enum) */

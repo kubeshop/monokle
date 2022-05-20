@@ -76,20 +76,23 @@ export interface SectionCustomization {
   namePrefix?: {
     component: SectionCustomComponent;
   };
+
+  beforeInitializationText?: string;
   /** If no value is provided, default value will be "descendants" */
   counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
+  disableHoverStyle?: boolean;
+  emptyGroupText?: string;
+  emptyVisibleItemsText?: string;
   /** Number of pixels to indent this section, by default all sections/susections are aligned */
   indentation?: number;
-  nameColor?: string;
-  nameSize?: number;
-  nameWeight?: number;
-  nameHorizontalPadding?: number;
-  nameVerticalPadding?: number;
-  emptyGroupText?: string;
-  disableHoverStyle?: boolean;
-  beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;
+  nameColor?: string;
+  nameHorizontalPadding?: number;
+  nameSize?: number;
+  nameVerticalPadding?: number;
+  nameWeight?: number;
   sectionMarginBottom?: number;
+  showHeader?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {

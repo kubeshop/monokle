@@ -6,6 +6,7 @@ const FEATURES = createFeatureFlags(featureJson, {
   ShowGraphView: false,
   ShowRightMenu: false,
   ActionsPaneFooter: false,
+  DockerImagesPane: false,
   CompareEverything: false,
 });
 

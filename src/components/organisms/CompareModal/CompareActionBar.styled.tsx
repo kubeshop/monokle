@@ -1,3 +1,5 @@
+import {SearchOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -16,4 +18,8 @@ export const ActionBarDiv = styled.div`
 export const ActionBarRightDiv = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const SearchIcon = styled(SearchOutlined)`
+  color: ${Colors.grey7};
 `;

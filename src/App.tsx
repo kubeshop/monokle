@@ -70,6 +70,7 @@ const PreviewConfigurationEditor = React.lazy(() => import('@components/organism
 const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
+const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@components/organisms/CompareModal'));
@@ -94,6 +95,7 @@ const App = () => {
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
+  const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
@@ -338,7 +340,7 @@ const App = () => {
   }, [dispatch]);
 
   const onCloseCompareModal = useCallback(() => {
-    dispatch(compareToggled(false));
+    dispatch(compareToggled({value: false}));
   }, [dispatch]);
 
   return (
@@ -403,6 +405,7 @@ const App = () => {
           {isQuickSearchActionsVisible && <QuickSearchActions />}
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
+          {isReplaceImageModalVisible && <ReplaceImageModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {showReleaseNotes && (
             <Modal
