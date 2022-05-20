@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 
 import {ItemCustomComponentProps} from '@models/navigator';
 
@@ -45,7 +45,6 @@ function ItemRenderer(props: ItemRendererProps) {
   const {instanceHandler} = itemBlueprint || {};
 
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -54,7 +53,6 @@ function ItemRenderer(props: ItemRendererProps) {
     itemBlueprint?.customization
   );
 
-  const previouslyCheckedResourcesLength = useRef(checkedResourceIds.length);
   const scrollContainer = useRef<ScrollContainerRef>(null);
 
   const onClick = useCallback(() => {
@@ -68,20 +66,6 @@ function ItemRenderer(props: ItemRendererProps) {
       instanceHandler.onCheck(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
-
-  useEffect(() => {
-    if (!itemInstance.shouldScrollIntoView) {
-      return;
-    }
-
-    // checking/unchecking a resource should not scroll
-    if (checkedResourceIds.length !== previouslyCheckedResourcesLength.current) {
-      previouslyCheckedResourcesLength.current = checkedResourceIds.length;
-      return;
-    }
-
-    scrollContainer.current?.scrollIntoView();
-  }, [checkedResourceIds.length, itemInstance.shouldScrollIntoView]);
 
   const Wrapper = useMemo(
     () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : WrapperPlacehoder),

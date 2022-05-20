@@ -51,9 +51,6 @@ export const buildSectionInstance = (props: BuildSectionInstanceProps) => {
     isEmpty: isSectionEmpty,
     isCollapsed: collapsedSectionIds.includes(sectionBlueprint.id),
     meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
-    shouldExpand: Boolean(
-      itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
-    ),
     visibleItemIds,
   };
 

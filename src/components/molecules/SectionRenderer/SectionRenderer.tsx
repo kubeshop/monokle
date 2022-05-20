@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import {SectionBlueprint, SectionInstance} from '@models/navigator';
 
@@ -115,12 +115,6 @@ function SectionRenderer(props: SectionRendererProps) {
       dispatch(collapseSectionIds([sectionInstance?.id, ...sectionInstance.visibleDescendantSectionIds]));
     }
   }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
-
-  useEffect(() => {
-    if (sectionInstance?.shouldExpand) {
-      expandSection();
-    }
-  }, [sectionInstance?.shouldExpand, expandSection]);
 
   const lastVisibleChildSectionId = useMemo(() => {
     if (!sectionInstance?.visibleChildSectionIds) {

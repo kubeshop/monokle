@@ -167,7 +167,6 @@ export interface ItemInstance {
   isDisabled: boolean;
   isCheckable: boolean;
   isChecked: boolean;
-  shouldScrollIntoView?: boolean;
   meta?: any;
 }
 
@@ -192,7 +191,6 @@ export interface SectionInstance {
     checkItemsAction: AnyAction;
     uncheckItemsAction: AnyAction;
   };
-  shouldExpand: boolean; // TODO: maybe this should become .isExpanded
   meta?: any;
 }
 

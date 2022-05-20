@@ -37,6 +37,7 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
   const sectionBlueprintList = sectionBlueprintMap.getAll();
 
   const collapsedSectionIds = state.navigator.collapsedSectionIds;
+  const sectionIdsToExpand: string[] = [];
 
   const {fullScope, scopeKeysBySectionId, isChangedByScopeKey} = await computeFullScope({
     state,
@@ -123,19 +124,23 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
     sectionInstanceRoots.map(rootInstance => [rootInstance.id, makeNavigatorRows(rootInstance, sectionInstanceMap)])
   );
 
+  const rowIndexToScrollByRootSectionId = Object.fromEntries(
+    Object.entries(rowsByRootSectionId).map(([sectionId, rows]) => [
+      sectionId,
+      getRowIndexToScroll({rows, itemInstanceMap}),
+    ])
+  );
+
   const newNavigatorInstanceState: NavigatorInstanceState = {
     sectionInstanceMap,
     itemInstanceMap,
     rowsByRootSectionId,
-    rowIndexToScrollByRootSectionId: Object.fromEntries(
-      Object.entries(rowsByRootSectionId).map(([sectionId, rows]) => [
-        sectionId,
-        getRowIndexToScroll({rows, itemInstanceMap}),
-      ])
-    ),
+    rowIndexToScrollByRootSectionId,
   };
 
   // if (hasNavigatorInstanceStateChanged(state.navigator, newNavigatorInstanceState)) {
   dispatch(updateNavigatorInstanceState(newNavigatorInstanceState));
   // }
+
+  // if ()
 };
