@@ -722,10 +722,11 @@ export const mainSlice = createSlice({
     setImagesMap: (state: Draft<AppState>, action: PayloadAction<ImagesMapType>) => {
       state.imagesMap = action.payload;
     },
+    loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.resourceFilter = state.filtersPresets[action.payload];
+    },
     saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const name = action.payload;
-
-      state.filtersPresets[name] = state.resourceFilter;
+      state.filtersPresets[action.payload] = state.resourceFilter;
       electronStore.set('main.filtersPresets', state.filtersPresets);
     },
   },
@@ -1238,6 +1239,7 @@ export const {
   closeResourceDiffModal,
   editorHasReloadedSelectedPath,
   extendResourceFilter,
+  loadFilterPreset,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
   reloadClusterDiff,
