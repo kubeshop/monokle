@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useLayoutEffect, useMemo, useState} from 'react';
 import {useVirtual} from 'react-virtual';
 
 import {NavigatorRow, SectionBlueprint} from '@models/navigator';
@@ -21,6 +21,8 @@ function SectionRenderer(props: SectionRendererProps) {
   const {sectionBlueprint, height} = props;
 
   const {id: sectionId} = sectionBlueprint;
+
+  const [lastScrollIndex, setLastScrollIndex] = useState<number>(-1);
 
   const itemRowHeight = useMemo(
     () => sectionBlueprint.itemBlueprint?.rowHeight,
@@ -45,12 +47,17 @@ function SectionRenderer(props: SectionRendererProps) {
     overscan: 5,
   });
 
-  useEffect(() => {
-    if (rowIndexToScroll) {
+  useLayoutEffect(() => {
+    if (
+      rowIndexToScroll &&
+      rowIndexToScroll !== lastScrollIndex &&
+      !virtualItems.some(item => item.index === rowIndexToScroll)
+    ) {
       scrollToIndex(rowIndexToScroll, {align: 'center'});
     }
+    setLastScrollIndex(rowIndexToScroll || -1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowIndexToScroll]);
+  }, [rowIndexToScroll, virtualItems, lastScrollIndex]);
 
   return (
     <div style={{height: `${height}px`, overflow: 'auto'}} ref={parentRef}>
