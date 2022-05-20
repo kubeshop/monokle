@@ -3,6 +3,7 @@ import React, {Suspense} from 'react';
 import {Form, Modal, Skeleton} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {saveFilterPreset} from '@redux/reducers/main';
 import {closeFiltersPresetModal} from '@redux/reducers/ui';
 
 const SaveModalContent = React.lazy(() => import('./SaveModalContent'));
@@ -25,8 +26,7 @@ const FiltersPresetModal: React.FC = () => {
     form.validateFields().then(values => {
       const {name} = values;
 
-      console.log(name);
-
+      dispatch(saveFilterPreset(name));
       dispatch(closeFiltersPresetModal());
     });
   };

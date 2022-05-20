@@ -45,6 +45,10 @@ type PreviewLoaderType = {
   targetId?: string;
 };
 
+type FiltersPresetsType = {
+  [name: string]: ResourceFilterType;
+};
+
 type ResourceDiffType = {
   targetResourceId?: string;
 };
@@ -178,6 +182,7 @@ interface AppState {
   selectedDockerImage?: DockerImage | null;
   imagesSearchedValue?: string;
   imagesMap: ImagesMapType;
+  filtersPresets: FiltersPresetsType;
 }
 
 export interface PossibleResource {
@@ -197,6 +202,7 @@ export type {
   AppState,
   ResourceMapType,
   ResourceFilterType,
+  FiltersPresetsType,
   FileMapType,
   ImagesMapType,
   HelmChartMapType,

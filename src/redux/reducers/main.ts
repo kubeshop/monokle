@@ -722,6 +722,12 @@ export const mainSlice = createSlice({
     setImagesMap: (state: Draft<AppState>, action: PayloadAction<ImagesMapType>) => {
       state.imagesMap = action.payload;
     },
+    saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const name = action.payload;
+
+      state.filtersPresets[name] = state.resourceFilter;
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1236,6 +1242,7 @@ export const {
   openResourceDiffModal,
   reloadClusterDiff,
   resetResourceFilter,
+  saveFilterPreset,
   seenNotifications,
   selectDockerImage,
   selectFile,

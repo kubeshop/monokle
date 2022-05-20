@@ -17,6 +17,9 @@ const schema = {
       deviceID: {
         type: 'string',
       },
+      filtersPresets: {
+        type: 'object',
+      },
     },
   },
   appConfig: {
@@ -247,6 +250,9 @@ const schema = {
 };
 
 const defaults = {
+  main: {
+    filtersPresets: {},
+  },
   appConfig: {
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
