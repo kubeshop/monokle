@@ -7,15 +7,15 @@ import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
 import {getK8sResources} from '@redux/services/resource';
 
-import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
+import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
   const fileMap: FileMapType = {};
-  let r = createRootFileEntry('/root', fileMap);
   let e = createFileEntry({
     fileEntryPath: createSafePath('/a/very/long/path'),
     fileMap,
   });
+
   expect(e.isExcluded).toBeFalsy();
   expect(e.name).toBe('path');
   expect(e.filePath).toBe(createSafePath('/a/very/long/path'));

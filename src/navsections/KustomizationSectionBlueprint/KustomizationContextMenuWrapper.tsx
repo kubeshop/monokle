@@ -1,8 +1,6 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 
 import {Menu} from 'antd';
-
-import styled from 'styled-components';
 
 import {ItemCustomComponentProps} from '@models/navigator';
 
@@ -13,24 +11,12 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
-const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-`;
-
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;
 
   const dispatch = useAppDispatch();
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-
-  const isResourceSelected = useMemo(() => {
-    return itemInstance.id === selectedResourceId;
-  }, [itemInstance, selectedResourceId]);
 
   const onClickShowFile = () => {
     const resource = resourceMap[itemInstance.id];
