@@ -212,7 +212,7 @@ jobs:
           # WIN_CSC_LINK: 'D:\a\monokle\monokle\.secret\kubeshop_msft.p12'
           # WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }} # This will be changed
           EP_PRE_RELEASE: true
-          USE_HARD_LINKS: false
+          USE_HARD_LINKS: false 
 
       # Check Binary Size
       - name: Build Succeeded
