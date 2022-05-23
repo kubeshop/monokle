@@ -169,7 +169,7 @@ jobs:
           echo "::set-output name=nodeversion::$content"
         id: get-node-version
 
-      - name: Use Node.js
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}

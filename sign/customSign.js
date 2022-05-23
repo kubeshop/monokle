@@ -5,7 +5,8 @@ const TR = 'http://timestamp.digicert.com';
 
 const signTask = commandToRun =>
   new Promise((resolve, reject) => {
-    exec(commandToRun, {stdio: 'pipe'}, (error, stdout, sdterr) => {
+    exec(commandToRun, (error, stdout, sdterr) => {
+      // {stdio: 'pipe'}
       console.log(sdterr);
       if (error) {
         console.log(error);
