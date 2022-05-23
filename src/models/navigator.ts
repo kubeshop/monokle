@@ -78,12 +78,10 @@ export interface SectionCustomization {
   };
 
   beforeInitializationText?: string;
-  /** If no value is provided, default value will be "descendants" */
+  /** If no value is provided, default value will be "descendants". */
   counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
   disableHoverStyle?: boolean;
-  emptyGroupText?: string;
-  emptyVisibleItemsText?: string;
-  /** Number of pixels to indent this section, by default all sections/susections are aligned */
+  /** Number of pixels to indent this section, by default the value is 0 (all sections/susections are aligned). */
   indentation?: number;
   isCheckVisibleOnHover?: boolean;
   nameColor?: string;
@@ -129,7 +127,6 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   id: string;
   name: string;
   getScope: (state: RootState) => ScopeType;
-  containerElementId: string;
   /** If not specified, the default value will be 25. */
   rowHeight?: number;
   /** If not specified, the default value will be rowHeight / 2 */

@@ -21,7 +21,6 @@ export type RootHelmChartsScopeType = {
 const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmChartsScopeType> = {
   name: HELM_CHART_SECTION_NAME,
   id: HELM_CHART_SECTION_NAME,
-  containerElementId: 'helm-sections-container',
   rootSectionId: HELM_CHART_SECTION_NAME,
   childSectionIds: [],
   getScope: state => {

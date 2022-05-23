@@ -40,7 +40,6 @@ const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
 const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesScopeType> = {
   name: 'Docker Images',
   id: DOCKER_IMAGES_SECTION_NAME,
-  containerElementId: 'docker-images-section-container',
   rootSectionId: DOCKER_IMAGES_SECTION_NAME,
   getScope: state => ({
     resourceMap: state.main.resourceMap,

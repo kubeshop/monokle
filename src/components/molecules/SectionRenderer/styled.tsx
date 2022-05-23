@@ -119,12 +119,6 @@ export const Name = styled.span<NameProps>`
   ${props => props.$nameWeight && `font-weight: ${props.$nameWeight};`}
 `;
 
-export const EmptyGroupText = styled.p`
-  margin-left: 26px;
-  margin-bottom: 12px;
-  font-size: 12px;
-`;
-
 export const Collapsible = styled.span`
   margin-left: auto;
   margin-right: 15px;

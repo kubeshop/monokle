@@ -24,7 +24,6 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
   name: KUSTOMIZE_PATCH_SECTION_NAME,
   id: KUSTOMIZE_PATCH_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
-  containerElementId: 'kustomize-sections-container',
   getScope: state => {
     const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {

@@ -26,7 +26,6 @@ export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
 const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownResourceScopeType> = {
   name: UNKNOWN_RESOURCE_SECTION_NAME,
   id: UNKNOWN_RESOURCE_SECTION_NAME,
-  containerElementId: 'navigator-sections-container',
   rootSectionId: UNKNOWN_RESOURCE_SECTION_NAME,
   getScope: state => {
     return {

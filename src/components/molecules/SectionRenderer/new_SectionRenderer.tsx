@@ -91,7 +91,6 @@ function SectionRenderer(props: SectionRendererProps) {
                   level={row.level}
                   isLastItem={false}
                   isSectionCheckable={false}
-                  sectionContainerElementId=""
                   indentation={0}
                 />
               )}

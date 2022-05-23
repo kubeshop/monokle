@@ -54,7 +54,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   > = {
     name: 'Preview Configurations',
     id: `${helmChart.id}-configurations`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       return {
@@ -133,7 +132,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const templateFilesSectionBlueprint: SectionBlueprint<FileEntry, TemplatesScopeType> = {
     name: 'Templates',
     id: `${helmChart.id}-templates`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       return {
@@ -202,7 +200,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const valuesFilesSectionBlueprint: SectionBlueprint<HelmValuesFile, ValuesFilesScopeType> = {
     name: 'Values Files',
     id: `${helmChart.id}-values`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
@@ -284,7 +281,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const helmChartSectionBlueprint: SectionBlueprint<HelmChart, HelmChartScopeType> = {
     id: helmChart.id,
     name: helmChart.name,
-    containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     childSectionIds: [
       valuesFilesSectionBlueprint.id,

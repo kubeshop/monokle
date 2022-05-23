@@ -41,7 +41,6 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
-    containerElementId: 'navigator-sections-container',
     rowHeight: 26,
     rowFontSize: 16,
     rootSectionId: navSectionNames.K8S_RESOURCES,
