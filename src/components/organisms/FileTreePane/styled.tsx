@@ -235,3 +235,7 @@ export const ActionsWrapper = styled.div`
   flex-direction: row;
   height: 100%;
 `;
+
+export const SearchBox = styled.div`
+  margin: 5px 14px;
+`;

@@ -4,10 +4,12 @@ import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'rea
 import {useSelector} from 'react-redux';
 import {useUpdateEffect} from 'react-use';
 
-import {Button, Modal, Tooltip} from 'antd';
+import {Button, Input, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import fs from 'fs';
+import {cloneDeep, debounce} from 'lodash';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -146,6 +148,11 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     processingType: undefined,
   });
   const [tree, setTree] = useState<TreeNode | null>(null);
+  const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
+  const fileContentBuffer = useRef<
+    Record<FileEntry['name'], {filePath: FileEntry['filePath']; content: string; match: boolean}>
+  >({});
+  const [searchQuery, updateSearchQuery] = useState<string>('');
 
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -431,6 +438,8 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     return treeKeys;
   }, [tree]);
 
+  const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
+
   const onToggleTree = () => {
     dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
   };
@@ -494,6 +503,71 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
+  function filterTree(treeChild: TreeNode): TreeNode {
+    if (!treeChild.isFolder) {
+      return fileContentBuffer.current[treeChild.key].match
+        ? {...treeChild, matchQuery: fileContentBuffer.current[treeChild.key].match}
+        : (null as unknown as TreeNode);
+    }
+    if (treeChild.isFolder) {
+      treeChild.children = treeChild.children
+        .map(filterTree)
+        .filter((v: TreeNode | null) => Boolean(v)) // null
+        .filter((v: TreeNode) => {
+          return !v.isFolder || (v.isFolder === true && v.children.length > 0);
+        }); // filter out folders that don't contain files that match query search
+    }
+
+    return treeChild;
+  }
+
+  const findMatches = (query: string) => {
+    if (!tree) return;
+
+    let searchedTree = cloneDeep(tree);
+    // reset tree to its default state
+    if (!query) {
+      setSearchTree(null);
+      return;
+    }
+
+    if (query && !Object.keys(fileContentBuffer.current).length) {
+      filesOnly.forEach(file => {
+        const fileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, file.filePath), 'utf8');
+        fileContentBuffer.current[file.filePath] = {
+          filePath: file.filePath,
+          content: fileContent,
+          match: fileContent.includes(query),
+        };
+      });
+    }
+
+    if (query && Object.keys(fileContentBuffer.current).length) {
+      filesOnly.forEach(file => {
+        fileContentBuffer.current[file.filePath] = {
+          ...fileContentBuffer.current[file.filePath],
+          match: fileContentBuffer.current[file.filePath].content.includes(query),
+        };
+      });
+    }
+
+    const newTree: TreeNode[] = searchedTree.children
+      .map(currentItem => filterTree(currentItem))
+      .filter(Boolean)
+      .filter((v: TreeNode) => {
+        return !v.isFolder || (v.isFolder === true && v.children.length > 0);
+      });
+    setSearchTree({...searchedTree, children: newTree});
+  };
+
+  const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
+    const debounceFn = debounce(findMatches, 1000);
+    updateSearchQuery(e.target.value);
+    debounceFn(e.target.value);
+  };
+
+  const treeToRender = searchTree || tree;
+
   return (
     <S.FileTreeContainer id="FileExplorer">
       <TitleBar
@@ -530,16 +604,19 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
       {isFolderLoading ? (
         <S.Skeleton active />
-      ) : tree ? (
+      ) : treeToRender ? (
         <S.TreeContainer>
+          <S.SearchBox>
+            <Input placeholder="Search, find, replace..." value={searchQuery} onChange={handleSearchQueryChange} />
+          </S.SearchBox>
           <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
             <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
-            <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
+            <div id="file-explorer-count">{filesOnly.length} files</div>
           </S.RootFolderText>
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onSelect}
-            treeData={[tree]}
+            treeData={[treeToRender]}
             ref={treeRef}
             expandedKeys={expandedFolders}
             onExpand={onExpand}

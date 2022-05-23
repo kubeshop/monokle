@@ -34,6 +34,7 @@ export interface TreeNode {
   children: TreeNode[];
   highlight: boolean;
   isFolder?: boolean;
+  matchQuery?: boolean;
   /**
    * Whether the TreeNode has children
    */
