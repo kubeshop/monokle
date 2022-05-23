@@ -11,8 +11,9 @@ import {ResourceSet} from '@redux/reducers/compare';
 import {performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {applyResource} from '@redux/thunks/applyResource';
-import {getResourceFromCluster} from '@redux/thunks/utils';
+import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
 
+import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 type Type = ResourceSet['type'];
@@ -59,14 +60,29 @@ async function deployResourceToCluster(
   const projectConfig = currentConfigSelector(state);
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
-  const namespace = {name: 'default', new: false}; // TODO use modal for confirm + namespace select.
+  const namespace = source.namespace ?? 'default';
+  const kubeClient = createKubeClient(kubeConfigPath, currentContext);
+  const hasNamespace = await getNamespace(kubeClient, namespace);
 
-  await applyResource(resourceId, resourceMap, fileMap, dispatch, projectConfig, currentContext, namespace, {
-    isClusterPreview: false,
-    shouldPerformDiff: false,
-    isInClusterDiff: false,
-    quiet: true,
-  });
+  if (!hasNamespace) {
+    await createNamespace(kubeClient, namespace);
+  }
+
+  await applyResource(
+    resourceId,
+    resourceMap,
+    fileMap,
+    dispatch,
+    projectConfig,
+    currentContext,
+    {name: namespace, new: !hasNamespace},
+    {
+      isClusterPreview: false,
+      shouldPerformDiff: false,
+      isInClusterDiff: false,
+      quiet: true,
+    }
+  );
 
   // Remark: Cluster adds defaults so copying the source's content
   // is too naive. Instead fetch remotely and fallback to copy if failed.

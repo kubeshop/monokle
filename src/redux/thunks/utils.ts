@@ -1,5 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
+import invariant from 'tiny-invariant';
 import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
@@ -93,7 +94,7 @@ export async function getResourceFromCluster(
   if (resource && resource.text && resourceKindHandler) {
     const kubeClient = createKubeClient(kubeconfigPath, context);
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
-    return JSON.parse(JSON.stringify(resourceFromCluster));
+    return toPojo(resourceFromCluster);
   }
 }
 
@@ -101,4 +102,34 @@ export async function removeNamespaceFromCluster(namespace: string, kubeconfigPa
   const kubeClient = createKubeClient(kubeconfigPath, context);
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
+}
+
+type KubeClient = k8s.KubeConfig;
+
+export async function getNamespace(client: KubeClient, name: string): Promise<KubernetesObject | undefined> {
+  const api = client.makeApiClient(k8s.CoreV1Api);
+  const resource = await api.readNamespace(name, 'true');
+  return toPojo(resource.body);
+}
+
+export async function createNamespace(client: KubeClient, name: string): Promise<KubernetesObject> {
+  const api = client.makeApiClient(k8s.CoreV1Api);
+  const resource = await api.createNamespace({metadata: {name}}, 'true');
+  return toPojoStrict(resource.body);
+}
+
+/**
+ * Transforms the resource to a plain old JavaScript object.
+ *
+ * The Kubernetes client works with JavaScript classes.
+ * These are incompatible with Redux because they are inserializable.
+ */
+function toPojo(resource: k8s.KubernetesObject | undefined): KubernetesObject | undefined {
+  if (!resource) return undefined;
+  return JSON.parse(JSON.stringify(resource));
+}
+
+function toPojoStrict(resource: k8s.KubernetesObject | undefined): KubernetesObject {
+  invariant(resource, 'unexpected undefined resource');
+  return JSON.parse(JSON.stringify(resource));
 }
