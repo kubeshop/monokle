@@ -10,6 +10,8 @@ import {
   selectIsComparisonSelected,
 } from '@redux/reducers/compare';
 
+import Colors from '@styles/Colors';
+
 import * as S from './ComparisonList.styled';
 import {ComparisonItemProps, HeaderItemProps} from './types';
 
@@ -73,7 +75,18 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
           <Button type="primary" shape="round" size="small" onClick={handleViewDiff}>
             <S.DiffLabel>diff</S.DiffLabel>
           </Button>
-        ) : null}
+        ) : (
+          <Button
+            type="primary"
+            ghost
+            style={{color: Colors.blue6}}
+            shape="round"
+            size="small"
+            onClick={handleViewDiff}
+          >
+            view
+          </Button>
+        )}
       </S.ComparisonActionsCol>
 
       <Col span={10}>
