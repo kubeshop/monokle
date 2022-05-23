@@ -31,17 +31,12 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
   } = props;
 
   const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const sectionInstanceByName = useAppSelector(
     state => (sectionNames ? _.pick(state.navigator.sectionInstanceMap, sectionNames) : undefined),
     shallowEqual
   );
-
-  const isAnyHelmValuesFileSelected = useMemo(() => {
-    return Object.values(helmValuesMap).some(v => v.isSelected);
-  }, [helmValuesMap]);
 
   const isAnySectionSelected = useMemo(() => {
     if (!sectionInstanceByName) {
@@ -55,15 +50,12 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     borderRadius: '0px',
     background: !isSelected || !isActive ? 'transparent' : PanelColors.toolBar,
     height: '45px',
-    ...customStyle
+    ...customStyle,
   };
 
   const hasGradientBackground = useMemo(() => {
-    return Boolean(
-      (isAnySectionSelected || (shouldWatchSelectedPath && selectedPath && !isAnyHelmValuesFileSelected)) &&
-        (!isSelected || !isActive)
-    );
-  }, [isAnySectionSelected, shouldWatchSelectedPath, selectedPath, isAnyHelmValuesFileSelected, isSelected, isActive]);
+    return Boolean((isAnySectionSelected || (shouldWatchSelectedPath && selectedPath)) && (!isSelected || !isActive));
+  }, [isAnySectionSelected, shouldWatchSelectedPath, selectedPath, isSelected, isActive]);
 
   if (hasGradientBackground) {
     if (isHovered) {

@@ -4,10 +4,9 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
+import {areRefPosEqual, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {GlyphDecorationTypes, InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {
   createCommandMarkdownLink,
@@ -16,21 +15,14 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
-  createMarker,
 } from '@molecules/Monaco/editorHelpers';
-import {processSymbols} from '@molecules/Monaco/symbolProcessing';
-
-import {isDefined} from '@utils/filter';
-
-function areRefPosEqual(a: RefPosition, b: RefPosition) {
-  return a.line === b.line && a.column === b.column && a.length === b.length;
-}
 
 function applyRefIntel(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  selectImage: (imageId: string) => void,
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ): {
@@ -45,8 +37,12 @@ function applyRefIntel(
     return {decorations: newDecorations, disposables: newDisposables};
   }
 
-  const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
-    [];
+  const listOfMatchedRefsByEqualPos: {
+    refType: ResourceRefType;
+    position: RefPosition;
+    matchedRefs: ResourceRef[];
+    targetType: string;
+  }[] = [];
 
   // find refs that can be decorated
   refs.forEach(ref => {
@@ -59,6 +55,7 @@ function applyRefIntel(
           refType: ref.type,
           position: refPos,
           matchedRefs: [ref],
+          targetType: ref.target?.type || '',
         });
       } else {
         listOfMatchedRefsByEqualPos[refsByEqualPosIndex].matchedRefs.push(ref);
@@ -67,7 +64,7 @@ function applyRefIntel(
   });
 
   // decorate matched refs
-  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType}) => {
+  listOfMatchedRefsByEqualPos.forEach(({matchedRefs, position, refType, targetType}) => {
     const inlineRange = new monaco.Range(
       position.line,
       position.column,
@@ -135,7 +132,9 @@ function applyRefIntel(
 
     const hoverTitle =
       refType === ResourceRefType.Outgoing
-        ? 'Outgoing Links'
+        ? targetType === 'image'
+          ? 'Outgoing Image Link'
+          : 'Outgoing Links'
         : refType === ResourceRefType.Incoming
         ? 'Incoming Links'
         : 'Unsatisfied link';
@@ -162,7 +161,9 @@ function applyRefIntel(
       hasUnsatisfiedRef
         ? GlyphDecorationTypes.UnsatisfiedRef
         : refType === ResourceRefType.Outgoing
-        ? GlyphDecorationTypes.OutgoingRef
+        ? targetType === 'image'
+          ? GlyphDecorationTypes.OutgoingImageRef
+          : GlyphDecorationTypes.OutgoingRef
         : GlyphDecorationTypes.IncomingRef,
       hoverCommandMarkdownLinkList
     );
@@ -174,7 +175,11 @@ function applyRefIntel(
       if (createResource || !isUnsatisfiedRef(matchRef.type)) {
         const linkDisposable = createLinkProvider(
           inlineRange,
-          isUnsatisfiedRef(matchRef.type) ? 'Create resource' : 'Open resource',
+          isUnsatisfiedRef(matchRef.type)
+            ? 'Create resource'
+            : matchRef.target?.type === 'image'
+            ? 'Select image'
+            : 'Open resource',
           () => {
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
               createResource(matchRef, resource.namespace, getResourceFolder(resource));
@@ -182,6 +187,8 @@ function applyRefIntel(
               selectResource(matchRef.target.resourceId);
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
+            } else if (matchRef.target?.type === 'image') {
+              selectImage(`${matchRef.name}:${matchRef.target?.tag}`);
             }
           }
         );
@@ -193,82 +200,4 @@ function applyRefIntel(
   return {decorations: newDecorations, disposables: newDisposables};
 }
 
-function applyPolicyIntel(resource: K8sResource): {
-  decorations: monaco.editor.IModelDeltaDecoration[];
-  markers: monaco.editor.IMarkerData[];
-} {
-  const issues = resource.issues?.errors ?? [];
-
-  const glyphs = issues.map(issue => {
-    const rule = issue.rule!;
-    const message = [createMarkdownString(`${rule.shortDescription.text} __(${issue.message})__`)].filter(isDefined);
-
-    return createGlyphDecoration(issue.errorPos?.line ?? 1, GlyphDecorationTypes.PolicyIssue, message);
-  });
-
-  const markers = issues
-    .map(issue => {
-      if (
-        !issue.rule ||
-        !issue.errorPos ||
-        issue.errorPos.line === 1 ||
-        issue.errorPos.endLine === undefined ||
-        issue.errorPos.endColumn === undefined
-      ) {
-        return undefined;
-      }
-
-      const range = new monaco.Range(
-        issue.errorPos.line,
-        issue.errorPos.column,
-        issue.errorPos.endLine,
-        issue.errorPos.endColumn
-      );
-
-      const message = `${issue.rule.shortDescription.text}\n  ${issue.rule.longDescription.text}\n    ${issue.rule.help.text}`;
-
-      return createMarker(issue.rule.id, message, range);
-    })
-    .filter(isDefined);
-
-  return {decorations: glyphs, markers};
-}
-
-export const resourceCodeIntel: CodeIntelApply = {
-  name: 'resource',
-  shouldApply: params => {
-    return Boolean(params.selectedResource);
-  },
-  codeIntel: async ({
-    resource,
-    selectResource,
-    selectFilePath,
-    createResource,
-    filterResources,
-    resourceMap,
-    fileMap,
-    model,
-  }) => {
-    const disposables: monaco.IDisposable[] = [];
-    const decorations: monaco.editor.IModelDeltaDecoration[] = [];
-    const markers: monaco.editor.IMarkerData[] = [];
-
-    if (model) {
-      await processSymbols(model, resource, filterResources, disposables, decorations);
-    }
-
-    const refIntel = applyRefIntel(resource, selectResource, selectFilePath, createResource, resourceMap, fileMap);
-    disposables.push(...refIntel.disposables);
-    decorations.push(...refIntel.decorations);
-
-    const policyIntel = applyPolicyIntel(resource);
-    decorations.push(...policyIntel.decorations);
-    markers.push(...policyIntel.markers);
-
-    return {
-      newDecorations: decorations,
-      newDisposables: disposables,
-      newMarkers: markers,
-    };
-  },
-};
+export default applyRefIntel;

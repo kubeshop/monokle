@@ -63,7 +63,7 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
       <Col span={11}>
         <S.ResourceDiv>
           <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
-          <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+          {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
           <S.ResourceName $isActive={leftActive}>{name}</S.ResourceName>
         </S.ResourceDiv>
       </Col>
@@ -77,7 +77,7 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
 
       <Col span={11}>
         <S.ResourceDiv>
-          <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+          {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
           <S.ResourceName $isActive={rightActive}>{name}</S.ResourceName>
         </S.ResourceDiv>
       </Col>

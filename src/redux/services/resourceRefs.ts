@@ -655,6 +655,34 @@ export function processRefs(
       const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
       if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
         resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+          if (outgoingRefMapper.type === 'image') {
+            const imageRefNodes = Object.entries(sourceRefNodes)
+              .filter(entry => entry[0].endsWith('image'))
+              .map(entry => entry[1])
+              .flat();
+            sourceResource.refs = sourceResource.refs || [];
+            imageRefNodes.forEach(imageRefNode => {
+              const scalarValue = imageRefNode.scalar.value as string | undefined;
+              const scalarValueParts = scalarValue?.split(':');
+              if (!scalarValueParts) {
+                return;
+              }
+              const [imageName, imageTag = 'latest'] = scalarValueParts;
+              const nodeWrapper = new NodeWrapper(imageRefNode.scalar, getLineCounter(sourceResource));
+              const imageResourceRef = {
+                type: ResourceRefType.Outgoing,
+                name: imageName,
+                target: {
+                  type: 'image' as const,
+                  tag: imageTag,
+                },
+                position: nodeWrapper.getNodePosition(),
+              };
+              sourceResource.refs?.push(imageResourceRef);
+            });
+            return;
+          }
+
           const targetResources = Object.keys(resourcesByKindMap)
             .filter(kind => refMapperMatchesKind(outgoingRefMapper, kind))
             .map(kind => resourcesByKindMap[kind])

@@ -1,7 +1,5 @@
 import {Button, Modal, Typography} from 'antd';
 
-import {entries} from 'lodash';
-
 import hotkeys from '@constants/hotkeys';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,19 +15,19 @@ import * as S from './styled';
 
 const {Text} = Typography;
 
-const shortcutsNavigation = entries(hotkeys)
-  .filter(([_, hotkey]) => {
+const shortcutsNavigation = Object.values(hotkeys)
+  .filter(hotkey => {
     return hotkey.category === 'navigation';
   })
-  .map(([_, hotkey]) => {
+  .map(hotkey => {
     return {name: hotkey.name, value: defineHotkey(hotkey.key)};
   });
 
-const shortcutsTools = entries(hotkeys)
-  .filter(([_, hotkey]) => {
+const shortcutsTools = Object.values(hotkeys)
+  .filter(hotkey => {
     return hotkey.category === 'tool';
   })
-  .map(([_, hotkey]) => {
+  .map(hotkey => {
     return {name: hotkey.name, value: defineHotkey(hotkey.key)};
   });
 

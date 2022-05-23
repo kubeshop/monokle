@@ -1,13 +1,19 @@
 import {useCallback} from 'react';
 
-import {Button, Checkbox, Divider, Dropdown, Input, Menu, Space} from 'antd';
-
-import {DownOutlined} from '@ant-design/icons';
-
-import log from 'loglevel';
+import {Checkbox, Input, Select, Space} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {comparisonAllToggled, selectCompareStatus, selectIsAllComparisonSelected} from '@redux/reducers/compare';
+import {
+  CompareOperation,
+  comparisonAllToggled,
+  filterUpdated,
+  operationUpdated,
+  searchUpdated,
+  selectCompareStatus,
+  selectIsAllComparisonSelected,
+} from '@redux/reducers/compare';
+
+import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 
 import * as S from './CompareActionBar.styled';
 
@@ -16,34 +22,25 @@ export const CompareActionBar: React.FC = () => {
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status === 'selecting';
-  const namespaces = ['default', 'demo'];
+  const search = useAppSelector(state => state.compare.current.search);
+  const filter = useAppSelector(state => state.compare.current.view.filter);
 
   const handleSelectAll = useCallback(() => {
     dispatch(comparisonAllToggled());
   }, [dispatch]);
 
-  const handleSelectNamespace = useCallback((namespace: string) => {
-    log.debug('dispatch FilterUpdated', {namespace});
-  }, []);
+  const handleSearch = useCallback(
+    (newSearch: string) => {
+      dispatch(searchUpdated({search: newSearch}));
+    },
+    [dispatch]
+  );
 
-  const handleSaveView = useCallback(() => {
-    log.debug('dispatch ViewSaved');
-  }, []);
-
-  const handleLoadView = useCallback(() => {
-    log.debug('dispatch ViewLoaded');
-  }, []);
-
-  const menu = (
-    <Menu>
-      {namespaces.map(namespace => {
-        return (
-          <Menu.Item key={namespace} onClick={() => handleSelectNamespace(namespace)}>
-            {namespace}
-          </Menu.Item>
-        );
-      })}
-    </Menu>
+  const handleFilterUpdated = useCallback(
+    (newFilter: Filter | undefined) => {
+      dispatch(filterUpdated({filter: newFilter}));
+    },
+    [dispatch]
   );
 
   return (
@@ -56,27 +53,41 @@ export const CompareActionBar: React.FC = () => {
 
       <S.ActionBarRightDiv>
         <Space>
-          <Input disabled={disabled} value="search" />
-          <Dropdown disabled={disabled} overlay={menu}>
-            <Button>
-              <Space>
-                All namespaces
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
+          <Input
+            disabled={disabled}
+            prefix={<S.SearchIcon />}
+            placeholder="Search"
+            value={search}
+            onChange={e => handleSearch(e.target.value)}
+          />
 
-          <Divider type="vertical" style={{height: 28}} />
+          <OperationSelect />
 
-          <Button disabled={disabled} onClick={handleSaveView}>
-            Save Diff
-          </Button>
-
-          <Button disabled={disabled} onClick={handleLoadView}>
-            Load Diff
-          </Button>
+          <FilterPopover filter={filter} onChange={handleFilterUpdated} />
         </Space>
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
   );
 };
+
+function OperationSelect() {
+  const dispatch = useAppDispatch();
+  const currentOperation = useAppSelector(state => state.compare.current.view.operation);
+
+  const handleSelect = useCallback(
+    (operation: CompareOperation) => {
+      dispatch(operationUpdated({operation}));
+    },
+    [dispatch]
+  );
+
+  return (
+    <Select onChange={handleSelect} defaultValue="union" value={currentOperation} style={{width: '160px'}}>
+      <Select.Option value="union">View all</Select.Option>
+      <Select.Option value="intersection">Only matching</Select.Option>
+      <Select.Option value="symmetricDifference">Only non-matching</Select.Option>
+      <Select.Option value="leftJoin">View left join</Select.Option>
+      <Select.Option value="rightJoin">View right join</Select.Option>
+    </Select>
+  );
+}

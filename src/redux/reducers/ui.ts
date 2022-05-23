@@ -124,6 +124,18 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    closeReplaceImageModal: (state: Draft<UiState>) => {
+      state.replaceImageModal = {
+        isOpen: false,
+        imageId: '',
+      };
+    },
+    openReplaceImageModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.replaceImageModal = {
+        isOpen: true,
+        imageId: action.payload,
+      };
+    },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
@@ -302,6 +314,7 @@ export const {
   closeReleaseNotesDrawer,
   closeRenameEntityModal,
   closeRenameResourceModal,
+  closeReplaceImageModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -315,9 +328,10 @@ export const {
   openKeyboardShortcutsModal,
   openNewResourceWizard,
   openQuickSearchActionsPopup,
+  openReleaseNotesDrawer,
   openRenameEntityModal,
   openRenameResourceModal,
-  openReleaseNotesDrawer,
+  openReplaceImageModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,

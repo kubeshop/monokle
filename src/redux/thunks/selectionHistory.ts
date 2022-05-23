@@ -1,8 +1,8 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
+import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
 
-import {selectFile, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
+import {selectFile, selectImage, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
 
 export const selectFromHistory = async (
   direction: 'left' | 'right',
@@ -10,6 +10,7 @@ export const selectFromHistory = async (
   selectionHistory: SelectionHistoryEntry[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
+  imagesList: ImagesListType,
   dispatch: (action: AnyAction) => void
 ) => {
   let removedSelectionHistoryEntriesCount = 0;
@@ -21,6 +22,11 @@ export const selectFromHistory = async (
     }
     if (historyEntry.type === 'path') {
       if (fileMap[historyEntry.selectedPath] !== undefined) {
+        return true;
+      }
+    }
+    if (historyEntry.type === 'image') {
+      if (imagesList.find(image => image.id === historyEntry.selectedImage.id)) {
         return true;
       }
     }
@@ -79,6 +85,9 @@ export const selectFromHistory = async (
   }
   if (selectionHistoryEntry.type === 'path') {
     dispatch(selectFile({filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true}));
+  }
+  if (selectionHistoryEntry.type === 'image') {
+    dispatch(selectImage({image: selectionHistoryEntry.selectedImage, isVirtualSelection: true}));
   }
 
   dispatch(setSelectionHistory({newSelectionHistory, nextSelectionHistoryIndex}));

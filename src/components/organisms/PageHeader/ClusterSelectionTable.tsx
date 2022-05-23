@@ -3,8 +3,6 @@ import React, {FC, useEffect, useState} from 'react';
 import {Button, Form, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
-import log from 'loglevel';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
@@ -57,7 +55,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
 
     setLocalClusters(clusterTableRows);
   }, [kubeConfigContexts, clusterAccess]);
-  log.info('kubeConfigContexts', kubeConfigContexts);
 
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');

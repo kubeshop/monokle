@@ -4,7 +4,7 @@ import {K8sResource} from '@models/k8sresource';
  * Matcher that ensures the source and target namespace are the same
  */
 
-export function implicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
+export function implicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource) {
   return targetResource.namespace === sourceResource.namespace;
 }
 

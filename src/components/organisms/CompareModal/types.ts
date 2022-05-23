@@ -9,7 +9,7 @@ export type HeaderItemProps = {
 export type ComparisonItemProps = {
   type: 'comparison';
   id: string;
-  namespace: string;
+  namespace: string | undefined;
   name: string;
   leftActive: boolean;
   rightActive: boolean;
