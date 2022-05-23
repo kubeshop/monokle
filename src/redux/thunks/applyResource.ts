@@ -90,8 +90,10 @@ export async function applyResource(
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
+    quiet?: boolean;
   }
 ) {
+  const showAlert = options?.quiet !== true;
   try {
     const resource = resourceMap[resourceId];
     if (resource && resource.text) {
@@ -115,12 +117,12 @@ export async function applyResource(
         if (result.stdout) {
           if (options?.isClusterPreview && kubeconfigPath) {
             getResourceFromCluster(resource, kubeconfigPath, context).then(resourceFromCluster => {
-              delete resourceFromCluster.body.metadata?.managedFields;
-              const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
-              if (resourceMap[resourceFromCluster.body.metadata?.uid]) {
+              delete resourceFromCluster?.metadata?.managedFields;
+              const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});
+              if (resourceMap[resourceFromCluster?.metadata?.uid]) {
                 dispatch(
                   updateResource({
-                    resourceId: resourceFromCluster.body.metadata?.uid,
+                    resourceId: resourceFromCluster?.metadata?.uid,
                     content: updatedResourceText,
                   })
                 );
@@ -130,7 +132,7 @@ export async function applyResource(
               }
 
               if (options?.shouldPerformDiff) {
-                dispatch(openResourceDiffModal(resourceFromCluster.body.metadata?.uid));
+                dispatch(openResourceDiffModal(resourceFromCluster?.metadata?.uid));
               }
             });
           } else if (options?.shouldPerformDiff) {
@@ -148,11 +150,11 @@ export async function applyResource(
               message: '',
             };
 
-            dispatch(setAlert(namespaceAlert));
+            if (showAlert) dispatch(setAlert(namespaceAlert));
           }
 
           const alert = successAlert(`Applied ${resource.name} to cluster ${context} successfully`, result.stdout);
-          setTimeout(() => dispatch(setAlert(alert)), 400);
+          if (showAlert) setTimeout(() => dispatch(setAlert(alert)), 400);
         }
 
         if (result.stderr) {
@@ -161,19 +163,18 @@ export async function applyResource(
           }
 
           const alert = errorAlert(`Applying ${resource.name} to cluster ${context} failed`, result.stderr);
-
-          dispatch(setAlert(alert));
+          if (showAlert) dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         }
       } catch (e: any) {
         log.error(e);
-        dispatch(setAlert(errorAlert('Deploy failed', e.message)));
+        if (showAlert) dispatch(setAlert(errorAlert('Deploy failed', e.message)));
         dispatch(setApplyingResource(false));
       }
     }
   } catch (e: any) {
     log.error(e);
-    dispatch(setAlert(errorAlert('Deploy failed', e.message)));
+    if (showAlert) dispatch(setAlert(errorAlert('Deploy failed', e.message)));
     dispatch(setApplyingResource(false));
   }
 }

@@ -5,7 +5,12 @@ import {Button, Space, Tooltip} from 'antd';
 import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {resourceSetCleared, resourceSetRefreshed, selectResourceSet} from '@redux/reducers/compare';
+import {
+  resourceSetCleared,
+  resourceSetRefreshed,
+  selectCompareStatus,
+  selectResourceSet,
+} from '@redux/reducers/compare';
 
 import {ClusterContextSelect} from './ClusterContextSelect';
 import {HelmChartSelect} from './HelmChartSelect';
@@ -20,6 +25,7 @@ type Props = {
 
 export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
   const dispatch = useAppDispatch();
+  const status = useAppSelector(state => selectCompareStatus(state.compare));
   const resourceSet = useAppSelector(state => selectResourceSet(state.compare, side));
 
   const handleRefresh = useCallback(() => {
@@ -50,11 +56,23 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
 
       <S.ActionsDiv>
         <Tooltip title="Reload resources" placement="bottom">
-          <Button type="link" size="middle" icon={<ReloadOutlined />} onClick={handleRefresh} />
+          <Button
+            type="link"
+            size="middle"
+            icon={<ReloadOutlined />}
+            onClick={handleRefresh}
+            disabled={status === 'transfering'}
+          />
         </Tooltip>
 
         <Tooltip title="Clear resources" placement="bottom">
-          <Button type="link" size="middle" icon={<ClearOutlined />} onClick={handleClear} />
+          <Button
+            type="link"
+            size="middle"
+            icon={<ClearOutlined />}
+            onClick={handleClear}
+            disabled={status === 'transfering'}
+          />
         </Tooltip>
       </S.ActionsDiv>
     </S.ResourceSetSelectorDiv>

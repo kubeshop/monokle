@@ -60,6 +60,14 @@ interface K8sResource {
   issues?: ResourceValidation;
 }
 
+export interface KubernetesObject {
+  apiVersion?: string;
+  kind?: string;
+  metadata?: Record<string, any>;
+  spec?: Record<string, any>;
+  status?: Record<string, any>;
+}
+
 export enum ResourceRefType {
   Incoming = 'incoming',
   Outgoing = 'outgoing',

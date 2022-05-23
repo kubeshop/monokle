@@ -6,7 +6,7 @@ import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/const
 
 import {AlertEnum} from '@models/alert';
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource, KubernetesObject} from '@models/k8sresource';
 import {Policy} from '@models/policy';
 
 import {extractK8sResources, processResources} from '@redux/services/resource';
@@ -83,13 +83,17 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
   });
 }
 
-export async function getResourceFromCluster(resource: K8sResource, kubeconfigPath: string, context?: string) {
+export async function getResourceFromCluster(
+  resource: K8sResource,
+  kubeconfigPath: string,
+  context?: string
+): Promise<KubernetesObject | undefined> {
   const resourceKindHandler = getResourceKindHandler(resource.kind);
 
   if (resource && resource.text && resourceKindHandler) {
     const kubeClient = createKubeClient(kubeconfigPath, context);
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
-    return resourceFromCluster;
+    return JSON.parse(JSON.stringify(resourceFromCluster));
   }
 }
 
