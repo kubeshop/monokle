@@ -6,13 +6,13 @@ import {SectionInstance} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
 
-import * as S from './DockerImagesSectionNameDisplay.styled';
+import * as S from './ImagesSectionNameDisplay.styled';
 
 interface IProps {
   sectionInstance: SectionInstance;
 }
 
-const DockerImagesSectionNameDisplay: React.FC<IProps> = props => {
+const ImagesSectionNameDisplay: React.FC<IProps> = props => {
   const {
     sectionInstance: {itemIds},
   } = props;
@@ -46,4 +46,4 @@ const DockerImagesSectionNameDisplay: React.FC<IProps> = props => {
   );
 };
 
-export default DockerImagesSectionNameDisplay;
+export default ImagesSectionNameDisplay;

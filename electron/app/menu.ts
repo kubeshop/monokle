@@ -277,7 +277,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
-            state.main.imagesMap,
+            state.main.imagesList,
             dispatch
           );
         },
@@ -293,7 +293,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
-            state.main.imagesMap,
+            state.main.imagesList,
             dispatch
           );
         },

@@ -47,7 +47,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const imagesMap = useAppSelector(state => state.main.imagesMap);
+  const imagesList = useAppSelector(state => state.main.imagesList);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -92,10 +92,10 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
       selectionHistory,
       resourceMap,
       fileMap,
-      imagesMap,
+      imagesList,
       dispatch
     );
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesMap, resourceMap, selectionHistory]);
+  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesList, resourceMap, selectionHistory]);
 
   const onClickRightArrow = useCallback(() => {
     selectFromHistory(
@@ -104,10 +104,10 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
       selectionHistory,
       resourceMap,
       fileMap,
-      imagesMap,
+      imagesList,
       dispatch
     );
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesMap, resourceMap, selectionHistory]);
+  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesList, resourceMap, selectionHistory]);
 
   const deployTooltip = useMemo(() => {
     return selectedPath ? (isHelmValuesFile(selectedPath) ? InstallValuesFileTooltip : ApplyFileTooltip) : ApplyTooltip;

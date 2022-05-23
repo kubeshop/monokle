@@ -30,7 +30,7 @@ export interface CodeIntelParams {
   selectResource: (resourceId: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
-  selectImage: (imageId: string) => void;
+  selectImageHandler: (imageId: string) => void;
   resourceMap: ResourceMapType;
   model: monaco.editor.IModel | null;
 }

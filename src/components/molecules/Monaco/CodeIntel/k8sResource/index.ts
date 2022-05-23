@@ -18,7 +18,7 @@ export const resourceCodeIntel: CodeIntelApply = {
     selectFilePath,
     createResource,
     filterResources,
-    selectImage,
+    selectImageHandler,
     resourceMap,
     fileMap,
     model,
@@ -36,7 +36,7 @@ export const resourceCodeIntel: CodeIntelApply = {
       selectResource,
       selectFilePath,
       createResource,
-      selectImage,
+      selectImageHandler,
       resourceMap,
       fileMap
     );

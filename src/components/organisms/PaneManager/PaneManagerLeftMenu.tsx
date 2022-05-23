@@ -167,22 +167,18 @@ const PaneManagerLeftMenu: React.FC = () => {
         </PaneTooltip>
       </WalkThrough>
 
-      <FeatureFlag name="DockerImagesPane">
-        <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'docker-images-pane')}
-          title="View Docker Images"
-          placement="right"
-        >
+      <FeatureFlag name="ImagesPane">
+        <PaneTooltip show={!leftActive || !(leftMenuSelection === 'images-pane')} title="View Images" placement="right">
           <MenuButton
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'docker-images-pane'}
+            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
             isActive={isActive}
-            onClick={() => setLeftActiveMenu('docker-images-pane')}
+            onClick={() => setLeftActiveMenu('images-pane')}
             disabled={!activeProject}
           >
             <MenuIcon
-              iconName="docker-images"
+              iconName="images"
               active={isActive}
-              isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'docker-images-pane'}
+              isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
             />
           </MenuButton>
         </PaneTooltip>

@@ -58,7 +58,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   state.selectedPath = undefined;
   state.selectedResourceId = undefined;
   state.selectedPreviewConfigurationId = undefined;
-  state.selectedDockerImage = undefined;
+  state.selectedImage = undefined;
 
   if (resource) {
     resource.isSelected = true;
