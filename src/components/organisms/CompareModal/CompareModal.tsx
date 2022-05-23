@@ -37,18 +37,19 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
 
       <Row ref={containerRef}>
-        <Col span={11}>
+        <Col span={10}>
           <ResourceSetSelector side="left" />
         </Col>
-        <Col span={2} />
-        <Col span={11}>
+        <Col span={4} />
+        <Col span={10}>
           <ResourceSetSelector side="right" />
         </Col>
       </Row>
 
       <div
         style={{
-          height: `calc(100% - ${height}px - 66px)`,
+          height: `calc(100% - ${height}px - 66px - 66px)`,
+          marginRight: '-8px',
           position: 'relative',
           overflowY: 'auto',
           overflowX: 'hidden',
