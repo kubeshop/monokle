@@ -10,8 +10,6 @@ import SectionHeader from './SectionHeader';
 
 type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
-  level: number;
-  isLastSection: boolean;
   parentIndentation?: number;
   itemRendererOptions?: ItemRendererOptions;
   height: number;
