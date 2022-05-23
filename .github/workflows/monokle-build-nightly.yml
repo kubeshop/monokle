@@ -1,9 +1,6 @@
 name: monokle-build-nightly
 
 on:
-  push:
-    branches:
-      - erdikose/feature/add-new-certificate-signing
   schedule:
     - cron: '0 2 * * *'
 
