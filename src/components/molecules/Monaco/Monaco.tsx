@@ -27,8 +27,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
   extendResourceFilter,
-  selectDockerImage,
   selectFile,
+  selectImage,
   selectK8sResource,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
@@ -73,7 +73,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const imagesMap = useAppSelector(state => state.main.imagesMap);
+  const imagesList = useAppSelector(state => state.main.imagesList);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -127,11 +127,11 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     dispatch(extendResourceFilter(filter));
   };
 
-  const selectImage = (imageId: string) => {
-    const image = imagesMap.find(im => im.id === imageId);
+  const selectImageHandler = (imageId: string) => {
+    const image = imagesList.find(im => im.id === imageId);
 
     if (image) {
-      dispatch(selectDockerImage({dockerImage: image}));
+      dispatch(selectImage({image}));
     }
   };
 
@@ -158,13 +158,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     code,
     resourceMap,
     fileMap,
-    imagesMap,
+    imagesList,
     isEditorMounted,
     selectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
     filterResources,
-    selectImage,
+    selectImageHandler,
     selectedPath,
     helmValuesMap,
     helmChartMap,

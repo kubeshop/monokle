@@ -1,8 +1,8 @@
 export {default as Collapse} from './Collapse';
-export {default as DockerImages} from './DockerImages';
 export {default as Helm} from './Helm';
 export {default as Kustomize} from './Kustomize';
 export {default as Kubernetes} from './Kubernetes';
+export {default as Images} from './Images';
 export {default as IncomingRefs} from './IncomingRefs';
 export {default as OpenPolicyAgent} from './OpenPolicyAgent';
 export {default as OutgoingRefs} from './OutgoingRefs';

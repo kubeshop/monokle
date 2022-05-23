@@ -1,27 +1,27 @@
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ImagesMapType, ResourceMapType} from '@models/appstate';
-import {DockerImage} from '@models/image';
+import {ImagesListType, ResourceMapType} from '@models/appstate';
+import {ImageType} from '@models/image';
 import {SectionBlueprint} from '@models/navigator';
 
-import {selectDockerImage} from '@redux/reducers/main';
+import {selectImage} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
-import DockerImagesQuickAction from './DockerImagesQuickAction';
-import DockerImagesSectionEmptyDisplay from './DockerImagesSectionEmptyDisplay';
-import DockerImagesSectionNameDisplay from './DockerImagesSectionNameDisplay';
+import ImagesQuickAction from './ImagesQuickAction';
+import ImagesSectionEmptyDisplay from './ImagesSectionEmptyDisplay';
+import ImagesSectionNameDisplay from './ImagesSectionNameDisplay';
 
-export type DockerImagesScopeType = {
+export type ImagesScopeType = {
   resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
-  imagesMap: ImagesMapType;
+  imagesList: ImagesListType;
   imagesSearchedValue: string | undefined;
-  selectedDockerImage?: DockerImage | null;
+  selectedImage?: ImageType | null;
   selectedK8sResourceId: string | undefined;
 };
 
-export const DOCKER_IMAGES_SECTION_NAME = 'Docker Images' as const;
+export const IMAGES_SECTION_NAME = 'Images' as const;
 
 const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
   let shouldBeFiltered = true;
@@ -37,30 +37,30 @@ const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
   return shouldBeFiltered;
 };
 
-const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesScopeType> = {
-  name: 'Docker Images',
-  id: DOCKER_IMAGES_SECTION_NAME,
-  containerElementId: 'docker-images-section-container',
-  rootSectionId: DOCKER_IMAGES_SECTION_NAME,
+const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
+  name: 'Images',
+  id: IMAGES_SECTION_NAME,
+  containerElementId: 'images-section-container',
+  rootSectionId: IMAGES_SECTION_NAME,
   getScope: state => ({
     resourceMap: state.main.resourceMap,
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
-    imagesMap: state.main.imagesMap,
+    imagesList: state.main.imagesList,
     imagesSearchedValue: state.main.imagesSearchedValue,
-    selectedDockerImage: state.main.selectedDockerImage,
+    selectedImage: state.main.selectedImage,
     selectedK8sResourceId: state.main.selectedResourceId,
   }),
   builder: {
-    getRawItems: scope => scope.imagesMap,
+    getRawItems: scope => scope.imagesList,
     isLoading: scope => scope.isFolderLoading,
     isInitialized: scope => scope.isFolderOpen,
     isEmpty: (scope, rawItems) => scope.isFolderOpen && rawItems.length === 0,
     isVisible: () => true,
   },
   customization: {
-    emptyDisplay: {component: DockerImagesSectionEmptyDisplay},
-    nameDisplay: {component: DockerImagesSectionNameDisplay},
+    emptyDisplay: {component: ImagesSectionEmptyDisplay},
+    nameDisplay: {component: ImagesSectionNameDisplay},
     beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
     counterDisplayMode: 'items',
     disableHoverStyle: true,
@@ -70,8 +70,8 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
     getInstanceId: rawItem => `${rawItem.name}:${rawItem.tag}`,
     builder: {
       isSelected: (rawItem, scope) =>
-        scope.selectedDockerImage
-          ? rawItem.name === scope.selectedDockerImage.name && rawItem.tag === scope.selectedDockerImage.tag
+        scope.selectedImage
+          ? rawItem.name === scope.selectedImage.name && rawItem.tag === scope.selectedImage.tag
           : false,
       isHighlighted: (rawItem, scope) => {
         const {resourcesIds} = rawItem;
@@ -103,18 +103,18 @@ const DockerImagesSectionBlueprint: SectionBlueprint<DockerImage, DockerImagesSc
         } = itemInstance;
         const [name, tag] = id.split(':');
 
-        dispatch(selectDockerImage({dockerImage: {id, name, tag, resourcesIds}}));
+        dispatch(selectImage({image: {id, name, tag, resourcesIds}}));
       },
     },
     customization: {
       quickAction: {
-        component: DockerImagesQuickAction,
+        component: ImagesQuickAction,
         options: {isVisibleOnHover: true},
       },
     },
   },
 };
 
-sectionBlueprintMap.register(DockerImagesSectionBlueprint);
+sectionBlueprintMap.register(ImagesSectionBlueprint);
 
-export default DockerImagesSectionBlueprint;
+export default ImagesSectionBlueprint;

@@ -10,7 +10,7 @@ import {configSlice} from './reducers/appConfig';
 import {compareListener, compareSlice, filterListener, resourceFetchListener} from './reducers/compare';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
-import {dockerImageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
+import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
@@ -34,7 +34,7 @@ combineListeners([
   compareListener,
   filterListener,
   resourceMapChangedListener,
-  dockerImageSelectedListener,
+  imageSelectedListener,
 ]);
 
 const appReducer = combineReducers({

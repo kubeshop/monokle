@@ -2,6 +2,6 @@
   "ShowGraphView": false,
   "ShowRightMenu": false,
   "ActionsPaneFooter": false,
-  "DockerImagesPane": false,
+  "ImagesPane": false,
   "CompareEverything": false
 }
