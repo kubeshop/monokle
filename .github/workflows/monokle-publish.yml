@@ -191,14 +191,17 @@ jobs:
       - name: Build
         shell: PowerShell
         run: |
-          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
-          ($contents=jq --arg MONOKLE_INSTALLS_URL $env:MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg AMPLITUDE_API_KEY $AMPLITUDE_API_KEY '.AMPLITUDE_API_KEY = $AMPLITUDE_API_KEY' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
+          AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
+
 
       - name: Package
         id: package
@@ -209,8 +212,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-          # WIN_CSC_LINK: 'D:\a\monokle\monokle\.secret\kubeshop_msft.p12'
-          # WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }} # This will be changed
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false 
 
@@ -284,12 +285,14 @@ jobs:
         run: |
           contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg AMPLITUDE_API_KEY $AMPLITUDE_API_KEY '.AMPLITUDE_API_KEY = $AMPLITUDE_API_KEY' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
           NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
+          AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
 
       - name: Package
         id: package
