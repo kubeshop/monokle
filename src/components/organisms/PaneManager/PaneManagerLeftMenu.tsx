@@ -3,6 +3,13 @@ import {useEffect, useMemo, useState} from 'react';
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {
+  FileExplorerTabTooltip,
+  HelmTabTooltip,
+  KustomizeTabTooltip,
+  TemplatesTabTooltip,
+  ValidationTabTooltip,
+} from '@constants/tooltips';
 
 import {LeftMenuSelectionType} from '@models/ui';
 
@@ -82,7 +89,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     <S.Container id="LeftToolbar" isLeftActive={isActive}>
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'file-explorer')}
-        title="View File Explorer"
+        title={FileExplorerTabTooltip}
         placement="right"
       >
         <MenuButton
@@ -104,7 +111,7 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
-        title="View Kustomizations"
+        title={KustomizeTabTooltip}
         placement="right"
       >
         <MenuButton
@@ -130,12 +137,12 @@ const PaneManagerLeftMenu: React.FC = () => {
         </MenuButton>
       </PaneTooltip>
 
-      <PaneTooltip
-        show={!leftActive || !(leftMenuSelection === 'helm-pane')}
-        title="View Helm Charts"
-        placement="right"
-      >
-        <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
+      <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
+        <PaneTooltip
+          show={!leftActive || !(leftMenuSelection === 'helm-pane')}
+          title={HelmTabTooltip}
+          placement="right"
+        >
           <MenuButton
             id="helm-pane"
             isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'helm-pane'}
@@ -157,8 +164,8 @@ const PaneManagerLeftMenu: React.FC = () => {
               />
             </S.Badge>
           </MenuButton>
-        </WalkThrough>
-      </PaneTooltip>
+        </PaneTooltip>
+      </WalkThrough>
 
       <FeatureFlag name="DockerImagesPane">
         <PaneTooltip
@@ -183,7 +190,7 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'templates-pane')}
-        title="View Templates"
+        title={TemplatesTabTooltip}
         placement="right"
       >
         <MenuButton
@@ -202,8 +209,8 @@ const PaneManagerLeftMenu: React.FC = () => {
         </MenuButton>
       </PaneTooltip>
 
-      <PaneTooltip show={!leftDrawerVisible} title="View Validation" placement="right">
-        <WalkThrough placement="rightTop" step="validation" collection="release">
+      <WalkThrough placement="rightTop" step="validation" collection="release">
+        <PaneTooltip show={!leftDrawerVisible} title={ValidationTabTooltip} placement="right">
           <MenuButton
             isSelected={leftDrawerVisible}
             isActive={isActive}
@@ -212,8 +219,8 @@ const PaneManagerLeftMenu: React.FC = () => {
           >
             <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
           </MenuButton>
-        </WalkThrough>
-      </PaneTooltip>
+        </PaneTooltip>
+      </WalkThrough>
     </S.Container>
   );
 };
