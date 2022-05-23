@@ -165,7 +165,8 @@ jobs:
 
       - name: Install Tools
         run: |
-          choco install jq
+          choco install jq dotnet-5.0-runtime dotnetcore-sdk -y
+          dotnet tool install --global AzureSignTool
 
       - name: Get Node Version
         run: |
@@ -181,13 +182,6 @@ jobs:
         with:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
-
-      - name: Get MSFT Cert
-        id: write_file
-        uses: timheuer/base64-to-file@v1
-        with:
-          fileName: 'kubeshop_msft.p12'
-          encodedString: ${{ secrets.CERT_MSFT_KUBESHOP_P12_B64 }}
 
       # Install Dependencies
       - name: Install Dependencies
@@ -233,8 +227,7 @@ jobs:
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
 
