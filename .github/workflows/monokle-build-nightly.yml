@@ -231,8 +231,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-          # WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
-          # WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
 
