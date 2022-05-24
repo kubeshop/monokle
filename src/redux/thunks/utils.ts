@@ -107,9 +107,13 @@ export async function removeNamespaceFromCluster(namespace: string, kubeconfigPa
 type KubeClient = k8s.KubeConfig;
 
 export async function getNamespace(client: KubeClient, name: string): Promise<KubernetesObject | undefined> {
-  const api = client.makeApiClient(k8s.CoreV1Api);
-  const resource = await api.readNamespace(name, 'true');
-  return toPojo(resource.body);
+  try {
+    const api = client.makeApiClient(k8s.CoreV1Api);
+    const resource = await api.readNamespace(name, 'true');
+    return toPojo(resource.body);
+  } catch {
+    return undefined;
+  }
 }
 
 export async function createNamespace(client: KubeClient, name: string): Promise<KubernetesObject> {

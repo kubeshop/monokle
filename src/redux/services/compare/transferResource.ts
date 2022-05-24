@@ -60,7 +60,7 @@ async function deployResourceToCluster(
   const projectConfig = currentConfigSelector(state);
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
-  const namespace = source.namespace ?? 'default';
+  const namespace = source.namespace ?? options.namespace ?? 'default';
   const kubeClient = createKubeClient(kubeConfigPath, currentContext);
   const hasNamespace = await getNamespace(kubeClient, namespace);
 

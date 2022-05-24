@@ -1,16 +1,21 @@
-import {useCallback} from 'react';
+import {useCallback, useMemo, useState} from 'react';
+import {useDebounce} from 'react-use';
 
-import {Checkbox, Input, Select, Space} from 'antd';
+import {AutoComplete, Checkbox, Input, Select, Space} from 'antd';
+
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   CompareOperation,
   comparisonAllToggled,
   filterUpdated,
+  namespaceUpdated,
   operationUpdated,
   searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
+  selectKnownNamespaces,
 } from '@redux/reducers/compare';
 
 import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
@@ -22,19 +27,11 @@ export const CompareActionBar: React.FC = () => {
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
   const disabled = status !== 'comparing';
-  const search = useAppSelector(state => state.compare.current.search);
   const filter = useAppSelector(state => state.compare.current.view.filter);
 
   const handleSelectAll = useCallback(() => {
     dispatch(comparisonAllToggled());
   }, [dispatch]);
-
-  const handleSearch = useCallback(
-    (newSearch: string) => {
-      dispatch(searchUpdated({search: newSearch}));
-    },
-    [dispatch]
-  );
 
   const handleFilterUpdated = useCallback(
     (newFilter: Filter | undefined) => {
@@ -53,13 +50,9 @@ export const CompareActionBar: React.FC = () => {
 
       <S.ActionBarRightDiv>
         <Space>
-          <Input
-            disabled={disabled}
-            prefix={<S.SearchIcon />}
-            placeholder="Search"
-            value={search}
-            onChange={e => handleSearch(e.target.value)}
-          />
+          <SearchInput disabled={disabled} />
+
+          <NamespaceInput disabled={disabled} />
 
           <OperationSelect />
 
@@ -69,6 +62,62 @@ export const CompareActionBar: React.FC = () => {
     </S.ActionBarDiv>
   );
 };
+
+function SearchInput({disabled}: {disabled: boolean}) {
+  const dispatch = useAppDispatch();
+  const search = useAppSelector(state => state.compare.current.search);
+  const [value, setValue] = useState(search);
+
+  useDebounce(
+    () => {
+      dispatch(searchUpdated({search: value}));
+    },
+    50,
+    [value]
+  );
+
+  return (
+    <Input
+      disabled={disabled}
+      prefix={<S.SearchIcon />}
+      placeholder="Search"
+      value={value}
+      onChange={e => setValue(e.target.value)}
+    />
+  );
+}
+
+function NamespaceInput({disabled}: {disabled: boolean}) {
+  const dispatch = useAppDispatch();
+  const knownNamespaces = useAppSelector(state => selectKnownNamespaces(state.compare));
+  const options = useMemo(() => knownNamespaces.map(n => ({value: n})), [knownNamespaces]);
+
+  const namespace = useAppSelector(state => state.compare.current.view.namespace);
+  const [value, setValue] = useState(namespace);
+
+  useDebounce(
+    () => {
+      if (value === '') {
+        dispatch(namespaceUpdated({namespace: undefined}));
+      } else {
+        dispatch(namespaceUpdated({namespace: value}));
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [value]
+  );
+
+  return (
+    <AutoComplete
+      style={{width: 175}}
+      placeholder="Set default namespace"
+      disabled={disabled}
+      value={value}
+      options={options}
+      onChange={setValue}
+    />
+  );
+}
 
 function OperationSelect() {
   const dispatch = useAppDispatch();
