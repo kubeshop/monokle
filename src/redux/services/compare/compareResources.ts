@@ -96,7 +96,7 @@ function compareResourcesAsIntersection(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });
@@ -154,7 +154,7 @@ function compareResourcesAsLeftJoin(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });
@@ -184,7 +184,7 @@ function compareResourcesAsRightJoin(
       result.push({
         id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
         isMatch: true,
-        isDifferent: matchingLeftResource.text === rightResource.text,
+        isDifferent: matchingLeftResource.text !== rightResource.text,
         left: matchingLeftResource,
         right: rightResource,
       });
