@@ -70,6 +70,7 @@ function SearchInput({disabled}: {disabled: boolean}) {
 
   useDebounce(
     () => {
+      if (value === search) return;
       dispatch(searchUpdated({search: value}));
     },
     50,
@@ -97,11 +98,9 @@ function NamespaceInput({disabled}: {disabled: boolean}) {
 
   useDebounce(
     () => {
-      if (value === '') {
-        dispatch(namespaceUpdated({namespace: undefined}));
-      } else {
-        dispatch(namespaceUpdated({namespace: value}));
-      }
+      const newNamespace = value === '' ? undefined : value;
+      if (newNamespace === namespace) return;
+      dispatch(namespaceUpdated({namespace: newNamespace}));
     },
     DEFAULT_EDITOR_DEBOUNCE,
     [value]
