@@ -132,6 +132,11 @@ export const hotkeys: Record<string, HotkeyConf> = {
     key: 'ctrl+/, command+/',
     category: 'tool',
   },
+  RELOAD_PREVIEW: {
+    name: 'Reload Preview',
+    key: 'ctrl+r, command+r',
+    category: 'tool',
+  },
 };
 
 export default hotkeys;

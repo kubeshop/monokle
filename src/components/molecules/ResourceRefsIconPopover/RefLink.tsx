@@ -1,7 +1,6 @@
 import React, {useMemo} from 'react';
 
 import path from 'path';
-import styled from 'styled-components';
 
 import {ResourceMapType} from '@models/appstate';
 import {ResourceRef} from '@models/k8sresource';
@@ -10,14 +9,16 @@ import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/re
 
 import {Icon} from '@atoms';
 
-import Colors, {FontColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
 import * as S from './RefLink.styled';
 
-const StyledPositionText = styled.span`
-  margin-left: 5px;
-  color: ${FontColors.grey};
-`;
+interface IProps {
+  isDisabled: boolean;
+  resourceMap: ResourceMapType;
+  resourceRef: ResourceRef;
+  onClick?: () => void;
+}
 
 const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   if (ref.target?.type === 'resource') {
@@ -33,25 +34,28 @@ const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
 
 const RefIcon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSProperties}) => {
   const {resourceRef, style} = props;
+
   if (isOutgoingRef(resourceRef.type)) {
+    if (resourceRef.target?.type === 'image') {
+      return <Icon name="images" style={style} />;
+    }
+
     return <Icon name="outgoingRefs" style={style} />;
   }
+
   if (isIncomingRef(resourceRef.type)) {
     return <Icon name="incomingRefs" style={style} />;
   }
+
   if (isUnsatisfiedRef(resourceRef.type)) {
     return <Icon name="warning" style={style} color={Colors.yellowWarning} />;
   }
+
   return null;
 });
 
-const ResourceRefLink = (props: {
-  resourceRef: ResourceRef;
-  resourceMap: ResourceMapType;
-  onClick?: () => void;
-  isDisabled: boolean;
-}) => {
-  const {resourceRef, resourceMap, onClick, isDisabled} = props;
+const ResourceRefLink: React.FC<IProps> = props => {
+  const {isDisabled, resourceRef, resourceMap, onClick} = props;
 
   const linkText = useMemo(() => {
     const targetName = getRefTargetName(resourceRef, resourceMap);
@@ -87,6 +91,14 @@ const ResourceRefLink = (props: {
       }
     }
 
+    if (resourceRef.target?.type === 'image') {
+      return (
+        <S.TargetName $isDisabled={isDisabled} $isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
+          {resourceRef.name}:{resourceRef.target?.tag}
+        </S.TargetName>
+      );
+    }
+
     return <span>{targetName}</span>;
   }, [isDisabled, resourceMap, resourceRef]);
 
@@ -103,7 +115,7 @@ const ResourceRefLink = (props: {
 
       {linkText}
 
-      {resourceRef.position && <StyledPositionText>Ln {resourceRef.position.line}</StyledPositionText>}
+      {resourceRef.position && <S.PositionText>Ln {resourceRef.position.line}</S.PositionText>}
     </S.RefLinkContainer>
   );
 };

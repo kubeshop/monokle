@@ -12,6 +12,7 @@ import {
   openAboutModal,
   openCreateProjectModal,
   openFolderExplorer,
+  openKeyboardShortcutsModal,
   openNewResourceWizard,
   resetLayout,
   setMonacoEditor,
@@ -19,12 +20,11 @@ import {
   toggleStartProjectPane,
   zoomIn,
   zoomOut,
-  openKeyboardShortcutsModal,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {defineHotkey} from '@utils/defineHotkey';
 
+import {defineHotkey} from '@utils/defineHotkey';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
@@ -264,7 +264,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        role: 'forceReload',
       },
       {
         label: 'Previous Resource',
@@ -277,6 +277,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },
@@ -292,6 +293,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },

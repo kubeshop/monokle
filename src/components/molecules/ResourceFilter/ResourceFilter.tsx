@@ -50,7 +50,7 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
-  const [kind, setKind] = useState<string>();
+  const [kinds, setKinds] = useState<string[]>([ALL_OPTIONS]);
   const [name, setName] = useState<string>();
   const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
@@ -97,7 +97,7 @@ const ResourceFilter = () => {
   const resetFilters = () => {
     setWasLocalUpdate(true);
     setName('');
-    setKind(ALL_OPTIONS);
+    setKinds([ALL_OPTIONS]);
     setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
@@ -118,13 +118,17 @@ const ResourceFilter = () => {
     setAnnotations(newAnnotations);
   };
 
-  const updateKind = (selectedKind: string) => {
+  const updateKinds = (selectedKinds: string[]) => {
     setWasLocalUpdate(true);
-    if (selectedKind === ALL_OPTIONS) {
-      setKind(undefined);
-    } else {
-      setKind(selectedKind);
+    if (selectedKinds.length > 1) {
+      if (!kinds.includes(ALL_OPTIONS) && selectedKinds.includes(ALL_OPTIONS)) {
+        setKinds([ALL_OPTIONS]);
+      } else {
+        setKinds(selectedKinds.filter(kind => kind !== ALL_OPTIONS));
+      }
+      return;
     }
+    setKinds(selectedKinds);
   };
 
   const updateNamespace = (selectedNamespace: string) => {
@@ -153,7 +157,7 @@ const ResourceFilter = () => {
 
       const updatedFilter = {
         name,
-        kind: kind === ALL_OPTIONS ? undefined : kind,
+        kinds: kinds.includes(ALL_OPTIONS) ? undefined : kinds,
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
@@ -163,13 +167,13 @@ const ResourceFilter = () => {
       dispatch(updateResourceFilter(updatedFilter));
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [name, kind, namespace, labels, annotations, fileOrFolderContainedIn]
+    [name, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
   );
 
   useEffect(() => {
     if (!wasLocalUpdate) {
       setName(filtersMap.name);
-      setKind(filtersMap.kind);
+      setKinds(filtersMap.kinds || [ALL_OPTIONS]);
       setNamespace(filtersMap.namespace);
       setLabels(filtersMap.labels);
       setAnnotations(filtersMap.annotations);
@@ -205,11 +209,12 @@ const ResourceFilter = () => {
       <S.Field>
         <S.FieldLabel>Kind:</S.FieldLabel>
         <Select
+          mode="multiple"
           showSearch
           disabled={areFiltersDisabled}
-          defaultValue={ALL_OPTIONS}
-          value={kind || ALL_OPTIONS}
-          onChange={updateKind}
+          defaultValue={[ALL_OPTIONS]}
+          value={kinds || [ALL_OPTIONS]}
+          onChange={updateKinds}
           style={{width: '100%'}}
         >
           <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>

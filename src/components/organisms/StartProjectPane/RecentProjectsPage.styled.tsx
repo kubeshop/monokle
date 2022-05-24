@@ -2,8 +2,6 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 export const ActionItem = styled.div`
@@ -78,7 +76,6 @@ export const ProjectsContainer = styled.div`
   height: 100%;
   width: 100%;
   overflow-y: auto;
-  ${GlobalScrollbarStyle}
 `;
 
 export const ProjectsContainerWrapper = styled.div`

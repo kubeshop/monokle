@@ -57,9 +57,11 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
     kustomizeCommand: state.projectConfig?.settings?.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig?.settings?.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.projectConfig?.settings?.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
     createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
     setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
+    allowEditInClusterMode: state.projectConfig?.settings?.allowEditInClusterMode,
   };
   applicationConfig.kubeConfig = {
     path: state.projectConfig?.kubeConfig?.path,
@@ -82,9 +84,11 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.settings.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
     createDefaultObjects: state.settings.createDefaultObjects,
     setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
+    allowEditInClusterMode: state.settings.allowEditInClusterMode,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
@@ -117,12 +121,18 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
             ? settings.hideExcludedFilesInFileExplorer
             : undefined,
+          hideUnsupportedFilesInFileExplorer: _.isBoolean(settings.hideUnsupportedFilesInFileExplorer)
+            ? settings.hideUnsupportedFilesInFileExplorer
+            : undefined,
           enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
             ? settings.enableHelmWithKustomize
             : undefined,
           createDefaultObjects: _.isBoolean(settings.createDefaultObjects) ? settings.createDefaultObjects : undefined,
           setDefaultPrimitiveValues: _.isBoolean(settings.setDefaultPrimitiveValues)
             ? settings.setDefaultPrimitiveValues
+            : undefined,
+          allowEditInClusterMode: _.isBoolean(settings.allowEditInClusterMode)
+            ? settings.allowEditInClusterMode
             : undefined,
         }
       : undefined;

@@ -49,7 +49,8 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
     dispatch(handleWalkThroughStep({step, collection}));
   };
 
-  const totalSteps = useMemo(() => walkThroughCollection[collection].length, []);
+  const totalSteps = useMemo(() => walkThroughCollection[collection].length, [collection]);
+
   return (
     <>
       <S.Description>{data.content}</S.Description>

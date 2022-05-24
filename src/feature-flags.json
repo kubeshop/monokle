@@ -1,5 +1,7 @@
 {
   "ShowGraphView": false,
   "ShowRightMenu": false,
-  "ActionsPaneFooter": false
+  "ActionsPaneFooter": false,
+  "ImagesPane": false,
+  "CompareEverything": false
 }

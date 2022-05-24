@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.4](https://github.com/kubeshop/monokle/compare/v1.7.4-nightly-2022-05-23.0...v1.7.4) (2022-05-23)
+
+
+### Features
+
+* add keyboard shortcuts in tooltips ([1354cfe](https://github.com/kubeshop/monokle/commit/1354cfe9efc0cdeebf8872d7a5a1fa6bf5e7f718))
+
+
+### Bug Fixes
+
+* fix test ([0a28c10](https://github.com/kubeshop/monokle/commit/0a28c10064e3882e02c28446502dde6841ab79dd))
+* fix types ([933dc95](https://github.com/kubeshop/monokle/commit/933dc95828d1e45f15693565d8d64e633a4b4e5f))
+* fix warnings ([449042e](https://github.com/kubeshop/monokle/commit/449042ed9f72039d6b58775fc4fc57f43c238eef))
+* upgrade antd from 4.18.9 to 4.20.2 ([20afe07](https://github.com/kubeshop/monokle/commit/20afe07b8b30b105a0996d5637fa743332bd5c2a))
+
+### [1.7.3](https://github.com/kubeshop/monokle/compare/v1.7.3-nightly-2022-05-12.0...v1.7.3) (2022-05-12)
+
+
+### Features
+
+* fix allow editing in cluster mode ([e0a89cf](https://github.com/kubeshop/monokle/commit/e0a89cf92ba2e38a7682eac746255fee1246701f))
+
+
+### Bug Fixes
+
+* force reload on error page ([bade869](https://github.com/kubeshop/monokle/commit/bade86916d1c3cfd11ce9ac8afeada5d09b7054b))
+* hotfix feature flags ([bcc450c](https://github.com/kubeshop/monokle/commit/bcc450c5d133da263c1ffb105397d3d10b137258))
+
 ### [1.7.2](https://github.com/kubeshop/monokle/compare/v1.7.2-nightly-2022-05-05.0...v1.7.2) (2022-05-05)
 
 

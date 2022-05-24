@@ -71,6 +71,11 @@ export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: File
   return dialog.showSaveDialogSync(dialogOptions);
 };
 
+export const forceLoad = (event: Electron.IpcMainInvokeEvent) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+  browserWindow?.webContents.reloadIgnoringCache();
+};
+
 /**
  * Checks for a new version of monokle
  */

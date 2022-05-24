@@ -36,9 +36,10 @@ import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmW
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import featureJson from '@src/feature-flags.json';
+import {useFeatureFlags} from '@utils/features';
 
 const HotKeysHandler = () => {
+  const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
@@ -192,9 +193,8 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
-    if (featureJson.ShowRightMenu) {
-      dispatch(toggleRightMenu());
-    }
+    if (!ShowRightMenu) return;
+    dispatch(toggleRightMenu());
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
@@ -204,6 +204,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });
@@ -215,6 +216,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });

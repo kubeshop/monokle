@@ -6,6 +6,7 @@ import {Dropdown, Tooltip} from 'antd';
 import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 import {ClusterModeTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
@@ -25,6 +26,8 @@ import {
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
+
+import {defineHotkey} from '@utils/defineHotkey';
 
 import * as S from './ClusterSelection.styled';
 
@@ -81,6 +84,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       restartPreview(kubeConfigPath, 'cluster', dispatch);
     }
   };
+
+  useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
+    reconnectToCluster();
+  });
 
   const handleLoadCluster = () => {
     if (isClusterActionDisabled && Boolean(previewType === 'cluster' && previewLoader.isLoading)) {

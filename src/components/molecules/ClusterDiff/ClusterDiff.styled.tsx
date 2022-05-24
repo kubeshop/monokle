@@ -1,6 +1,28 @@
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
+export const Container = styled.div<{height?: number}>`
+  ${props => props.height && `height: ${props.height};`}
+`;
+
+export const FilterContainer = styled.span`
+  margin-left: 10px;
+`;
+
+export const List = styled.ol<{height?: number}>`
+  list-style-type: none;
+  padding: 0;
+  overflow-y: auto;
+  width: 100%;
+
+  ${props => props.height && `height: ${props.height}px;`}
+  padding-bottom: 20px;
+`;
+
+export const ListContainer = styled.div`
+  overflow-y: auto;
+  height: 70vh;
+  width: 100%;
+`;
 
 export const TitleBar = styled.div`
   display: flex;
@@ -17,15 +39,4 @@ export const TitleBarRightButtons = styled.div`
   display: flex;
   align-items: center;
   margin-left: 10px;
-`;
-
-export const List = styled.ol<{height?: number}>`
-  list-style-type: none;
-  padding: 0;
-  overflow-y: auto;
-  width: 100%;
-  ${GlobalScrollbarStyle}
-
-  ${props => props.height && `height: ${props.height}px;`}
-  padding-bottom: 20px;
 `;
