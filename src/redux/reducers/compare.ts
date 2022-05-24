@@ -397,7 +397,7 @@ export const {
 /* * * * * * * * * * * * * *
  * Selectors
  * * * * * * * * * * * * * */
-export type CompareStatus = 'selecting' | 'comparing' | 'transfering';
+export type CompareStatus = 'selecting' | 'comparing' | 'inspecting' | 'transfering';
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
 
@@ -408,7 +408,11 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
     return 'selecting';
   }
 
-  return c.transfering.pending ? 'transfering' : 'comparing';
+  if (c.transfering.pending) {
+    return 'transfering';
+  }
+
+  return c.inspect ? 'inspecting' : 'comparing';
 };
 
 export const selectResourceSet = (state: CompareState, side: CompareSide): PartialResourceSet | undefined => {
@@ -486,22 +490,27 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   );
 };
 
-export const selectCanTransferAllSelected = (state: CompareState, direction: TransferDirection): boolean => {
+export const selectCanTransfer = (state: CompareState, direction: TransferDirection, ids: string[]): boolean => {
+  // Cannot transfer in invalid state.
+  const status = selectCompareStatus(state);
+  if (status === 'selecting' || status === 'transfering' || ids.length === 0) {
+    return false;
+  }
+
+  // Cannot transfer when the resource set type is non-transferable.
   const left = state.current.view.leftSet?.type;
   const right = state.current.view.rightSet?.type;
   const isTransferable = direction === 'left-to-right' ? canTransfer(left, right) : canTransfer(right, left);
-  if (!isTransferable) return false;
+  if (!isTransferable) {
+    return false;
+  }
 
-  const selection = state.current.selection;
-  if (selection.length === 0) return false;
-
+  // Can only transfer if all selected items are transferable.
   const comparisons = state.current.filtering?.comparisons ?? [];
   const transferable = comparisons
-    .filter(comparison => selection.some(s => s === comparison.id))
-    .filter(isDefined)
+    .filter(comparison => ids.some(id => id === comparison.id))
     .filter(comparison => (direction === 'left-to-right' ? comparison.left : comparison.right));
-
-  return selection.length === transferable.length;
+  return ids.length === transferable.length;
 };
 
 export const selectComparisonListItems = createSelector(
