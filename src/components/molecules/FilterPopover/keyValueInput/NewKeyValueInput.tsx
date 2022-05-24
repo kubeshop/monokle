@@ -1,6 +1,6 @@
 import {useCallback, useRef, useState} from 'react';
 
-import {Button, Input} from 'antd';
+import {Button, Input, InputRef} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
@@ -13,14 +13,14 @@ type Props = {
 export const NewKeyValueInput: React.FC<Props> = ({onAddKeyValue}) => {
   const [key, setKey] = useState<string | undefined>();
   const [value, setValue] = useState<string | undefined>();
-  const keyRef = useRef<Input | null>(null);
+  const keyRef = useRef<InputRef | null>(null);
 
   const handleAddKey = useCallback(() => {
     if (!key || !value) return;
     onAddKeyValue([key, value]);
     setKey(undefined);
     setValue(undefined);
-    keyRef.current?.input.focus();
+    keyRef.current?.input?.focus();
   }, [key, onAddKeyValue, value]);
 
   const handleEnter = useCallback(

@@ -17,7 +17,7 @@ import {
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
-  ImagesMapType,
+  ImagesListType,
   PreviewType,
   ResourceFilterType,
   ResourceMapType,
@@ -25,7 +25,7 @@ import {
 } from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
-import {DockerImage} from '@models/image';
+import {ImageType} from '@models/image';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
@@ -69,6 +69,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
+import {transferResource} from './compare';
 import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
@@ -117,8 +118,8 @@ export type StartPreviewLoaderPayload = {
   previewType: PreviewType;
 };
 
-function getDockerImages(resourceMap: ResourceMapType) {
-  let images: ImagesMapType = [];
+function getImages(resourceMap: ResourceMapType) {
+  let images: ImagesListType = [];
 
   Object.values(resourceMap).forEach(k8sResource => {
     if (k8sResource.refs?.length) {
@@ -161,10 +162,10 @@ function updateSelectionHistory(type: 'resource' | 'path' | 'image', isVirtualSe
     });
   }
 
-  if (type === 'image' && state.selectedDockerImage) {
+  if (type === 'image' && state.selectedImage) {
     state.selectionHistory.push({
       type,
-      selectedDockerImage: state.selectedDockerImage,
+      selectedImage: state.selectedImage,
     });
   }
 
@@ -443,7 +444,7 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
-      state.selectedDockerImage = undefined;
+      state.selectedImage = undefined;
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
@@ -699,14 +700,11 @@ export const mainSlice = createSlice({
       const allConfig = state.policies.plugins.map(p => p.config);
       electronStore.set('pluginConfig.policies', allConfig);
     },
-    selectDockerImage: (
-      state: Draft<AppState>,
-      action: PayloadAction<{dockerImage: DockerImage; isVirtualSelection?: boolean}>
-    ) => {
-      state.selectedDockerImage = action.payload.dockerImage;
+    selectImage: (state: Draft<AppState>, action: PayloadAction<{image: ImageType; isVirtualSelection?: boolean}>) => {
+      state.selectedImage = action.payload.image;
 
       clearResourceSelections(state.resourceMap);
-      action.payload.dockerImage.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
+      action.payload.image.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
 
       updateSelectionHistory('image', Boolean(action.payload.isVirtualSelection), state);
 
@@ -719,8 +717,8 @@ export const mainSlice = createSlice({
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
-    setImagesMap: (state: Draft<AppState>, action: PayloadAction<ImagesMapType>) => {
-      state.imagesMap = action.payload;
+    setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
+      state.imagesList = action.payload;
     },
     loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.resourceFilter = state.filtersPresets[action.payload];
@@ -1142,7 +1140,21 @@ export const mainSlice = createSlice({
     builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      const {side, delta} = action.payload;
 
+      // Warning: The compare feature has its own slice and does bookkeeping
+      // of its own resources. This reducer works because transfer only works
+      // for cluster and local which are also in main slice. Should we add
+      // transfer for other resource set types this will give unexpected behavior.
+      delta.forEach(comparison => {
+        if (side === 'left') {
+          state.resourceMap[comparison.left.id] = comparison.left;
+        } else {
+          state.resourceMap[comparison.right.id] = comparison.right;
+        }
+      });
+    });
     builder.addCase(loadPolicies.fulfilled, (state, action) => {
       state.policies = {
         plugins: action.payload,
@@ -1246,9 +1258,9 @@ export const {
   resetResourceFilter,
   saveFilterPreset,
   seenNotifications,
-  selectDockerImage,
   selectFile,
   selectHelmValuesFile,
+  selectImage,
   selectK8sResource,
   selectMultipleClusterDiffMatches,
   selectPreviewConfiguration,
@@ -1258,7 +1270,7 @@ export const {
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
   setFiltersToBeChanged,
-  setImagesMap,
+  setImagesList,
   setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
@@ -1278,7 +1290,7 @@ export default mainSlice.reducer;
 
 const selectingActions = isAnyOf(
   selectK8sResource,
-  selectDockerImage,
+  selectImage,
   selectFile,
   selectPreviewConfiguration,
   selectHelmValuesFile
@@ -1295,19 +1307,19 @@ export const resourceMapChangedListener: AppListenerFn = listen => {
 
     effect: async (_action, {dispatch, getState}) => {
       const resourceMap = getState().main.resourceMap;
-      const imagesMap = getState().main.imagesMap;
-      const images = getDockerImages(resourceMap);
+      const imagesList = getState().main.imagesList;
+      const images = getImages(resourceMap);
 
-      if (!shallowEqual(images, imagesMap)) {
-        dispatch(setImagesMap(images));
+      if (!shallowEqual(images, imagesList)) {
+        dispatch(setImagesList(images));
       }
     },
   });
 };
 
-export const dockerImageSelectedListener: AppListenerFn = listen => {
+export const imageSelectedListener: AppListenerFn = listen => {
   listen({
-    type: selectDockerImage.type,
+    type: selectImage.type,
     effect: async (_action, {dispatch, getState}) => {
       const leftMenu = getState().ui.leftMenu;
 
@@ -1315,8 +1327,8 @@ export const dockerImageSelectedListener: AppListenerFn = listen => {
         dispatch(toggleLeftMenu());
       }
 
-      if (leftMenu.selection !== 'docker-images-pane') {
-        dispatch(setLeftMenuSelection('docker-images-pane'));
+      if (leftMenu.selection !== 'images-pane') {
+        dispatch(setLeftMenuSelection('images-pane'));
       }
     },
   });

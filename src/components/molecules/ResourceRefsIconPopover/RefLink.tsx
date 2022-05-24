@@ -37,7 +37,7 @@ const RefIcon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSPr
 
   if (isOutgoingRef(resourceRef.type)) {
     if (resourceRef.target?.type === 'image') {
-      return <Icon name="docker-images" style={style} />;
+      return <Icon name="images" style={style} />;
     }
 
     return <Icon name="outgoingRefs" style={style} />;

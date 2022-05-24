@@ -23,7 +23,7 @@ export const DiffActionBar: React.FC = () => {
 
   return (
     <S.ActionBarDiv>
-      <div>Resource diff on {diffComparison?.left.name ?? 'unknown'}</div>
+      <div>Resource diff on {diffComparison?.left?.name ?? diffComparison?.right?.name ?? 'unknown'}</div>
 
       <S.ActionBarRightDiv>
         <Space size="middle">

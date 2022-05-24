@@ -1,13 +1,13 @@
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
-import {DockerImage} from '@models/image';
+import {ImageType} from '@models/image';
 
-import {UpdateMultipleResourcesPayload, selectDockerImage} from '@redux/reducers/main';
+import {UpdateMultipleResourcesPayload, selectImage} from '@redux/reducers/main';
 
 import {updateMultipleResources} from './updateMultipleResources';
 
 export const replaceImageTag = (
-  image: DockerImage,
+  image: ImageType,
   newImageTag: string,
   resourceMap: ResourceMapType,
   dispatch: AppDispatch
@@ -46,5 +46,5 @@ export const replaceImageTag = (
   });
 
   dispatch(updateMultipleResources(resourcesToUpdate));
-  dispatch(selectDockerImage({dockerImage: {...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}}));
+  dispatch(selectImage({image: {...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}}));
 };

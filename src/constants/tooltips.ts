@@ -1,10 +1,8 @@
 const KEY_CTRL_CMD = process.platform === 'darwin' ? '⌘' : 'CTRL';
 
-export const BrowseFolderTooltip = `Browse for folder containing manifests, kustomizations or Helm charts (${KEY_CTRL_CMD}+O)`;
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
 export const ExpandTreeTooltip = 'Expand all folders';
 export const CollapseTreeTooltip = 'Collapse all folders';
-export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltips = {
   default: 'Show/hide Cluster Preview',
   firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
@@ -51,7 +49,7 @@ export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a
 export const DocumentationTooltip = 'Open Monokle Documentation Website';
 export const DiscordTooltip = 'Open Kubeshop Discord Server';
 export const GitHubTooltip = 'Open Monokle Github Repository';
-export const SettingsTooltip = 'Open Settings';
+export const SettingsTooltip = `Open Settings (${KEY_CTRL_CMD}+Comma)`;
 export const NotificationsTooltip = 'Show latest notifications';
 export const ProjectManagementTooltip = 'Select and manage your projects';
 export const NewProjectFromTemplateTooltip = 'New Project from Template';
@@ -59,10 +57,15 @@ export const NewProjectFromFolderTooltip = 'New project from existing folder';
 export const NewEmptyProjectTooltip = 'New Empty Project';
 export const SearchProjectTooltip = 'Search for project by name or path';
 export const PluginDrawerTooltip = 'Open Plugins Manager';
-export const QuickFilterTooltip = `Filter results (${KEY_CTRL_CMD} + P)`;
-export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD} + N)`;
+export const QuickFilterTooltip = `Filter results (${KEY_CTRL_CMD}+P)`;
+export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD}+N)`;
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
+export const FileExplorerTabTooltip = `View File Explorer (${KEY_CTRL_CMD}+SHIFT+E)`;
+export const KustomizeTabTooltip = `View Kustomizations (${KEY_CTRL_CMD}+SHIFT+K)`;
+export const HelmTabTooltip = `View Helm Charts (${KEY_CTRL_CMD}+SHIFT+H)`;
+export const TemplatesTabTooltip = `View Templates`;
+export const ValidationTabTooltip = `View Validation (${KEY_CTRL_CMD}+SHIFT+V)`;

@@ -21,7 +21,7 @@ export const CompareActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
-  const disabled = status === 'selecting';
+  const disabled = status !== 'comparing';
   const search = useAppSelector(state => state.compare.current.search);
   const filter = useAppSelector(state => state.compare.current.view.filter);
 
@@ -63,7 +63,7 @@ export const CompareActionBar: React.FC = () => {
 
           <OperationSelect />
 
-          <FilterPopover filter={filter} onChange={handleFilterUpdated} />
+          <FilterPopover disabled={disabled} filter={filter} onChange={handleFilterUpdated} />
         </Space>
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
@@ -72,6 +72,7 @@ export const CompareActionBar: React.FC = () => {
 
 function OperationSelect() {
   const dispatch = useAppDispatch();
+  const status = useAppSelector(state => selectCompareStatus(state.compare));
   const currentOperation = useAppSelector(state => state.compare.current.view.operation);
 
   const handleSelect = useCallback(
@@ -82,7 +83,13 @@ function OperationSelect() {
   );
 
   return (
-    <Select onChange={handleSelect} defaultValue="union" value={currentOperation} style={{width: '160px'}}>
+    <Select
+      disabled={status !== 'comparing'}
+      onChange={handleSelect}
+      defaultValue="union"
+      value={currentOperation}
+      style={{width: '160px'}}
+    >
       <Select.Option value="union">View all</Select.Option>
       <Select.Option value="intersection">Only matching</Select.Option>
       <Select.Option value="symmetricDifference">Only non-matching</Select.Option>

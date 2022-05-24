@@ -2,7 +2,7 @@
   "ShowGraphView": false,
   "ShowRightMenu": false,
   "ActionsPaneFooter": false,
-  "DockerImagesPane": false,
   "CompareEverything": false,
-  "FiltersPreset": false
+  "FiltersPreset": false,
+  "ImagesPane": false
 }

@@ -10,6 +10,8 @@ import {
   selectIsComparisonSelected,
 } from '@redux/reducers/compare';
 
+import Colors from '@styles/Colors';
+
 import * as S from './ComparisonList.styled';
 import {ComparisonItemProps, HeaderItemProps} from './types';
 
@@ -32,15 +34,15 @@ export const ComparisonList: React.FC = () => {
 function HeaderItem({kind, count}: HeaderItemProps) {
   return (
     <S.HeaderRow key={kind}>
-      <Col span={11}>
-        <S.Title>
+      <Col span={10}>
+        <S.Title useCheckboxOffset>
           {kind} <S.ResourceCount>{count}</S.ResourceCount>
         </S.Title>
       </Col>
 
-      <Col span={2} />
+      <Col span={4} />
 
-      <Col span={11}>
+      <Col span={10}>
         <S.Title>
           {kind} <S.ResourceCount>{count}</S.ResourceCount>
         </S.Title>
@@ -60,24 +62,36 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
 
   return (
     <S.ComparisonRow key={id}>
-      <Col span={11}>
+      <Col span={10}>
         <S.ResourceDiv>
           <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
-          {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
+          {namespace && <S.ResourceNamespace $isActive={leftActive}>{namespace}</S.ResourceNamespace>}
           <S.ResourceName $isActive={leftActive}>{name}</S.ResourceName>
         </S.ResourceDiv>
       </Col>
-      <S.ComparisonActionsCol span={2}>
+
+      <S.ComparisonActionsCol span={4}>
         {canDiff ? (
           <Button type="primary" shape="round" size="small" onClick={handleViewDiff}>
             <S.DiffLabel>diff</S.DiffLabel>
           </Button>
-        ) : null}
+        ) : (
+          <Button
+            type="primary"
+            ghost
+            style={{color: Colors.blue6}}
+            shape="round"
+            size="small"
+            onClick={handleViewDiff}
+          >
+            view
+          </Button>
+        )}
       </S.ComparisonActionsCol>
 
-      <Col span={11}>
+      <Col span={10}>
         <S.ResourceDiv>
-          {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
+          {namespace && <S.ResourceNamespace $isActive={rightActive}>{namespace}</S.ResourceNamespace>}
           <S.ResourceName $isActive={rightActive}>{name}</S.ResourceName>
         </S.ResourceDiv>
       </Col>

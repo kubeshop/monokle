@@ -13,9 +13,9 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import ValidationPane from '../ValidationDrawer';
 import * as S from './PaneManagerSplitView.styled';
 
-const DockerImagesPane = React.lazy(() => import('@organisms/DockerImagesPane'));
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
+const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 
@@ -53,7 +53,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftActiveMenu === 'file-explorer' && <FileTreePane height={height} />}
                 {leftActiveMenu === 'helm-pane' && <HelmPane />}
                 {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-                {leftActiveMenu === 'docker-images-pane' && <DockerImagesPane />}
+                {leftActiveMenu === 'images-pane' && <ImagesPane />}
                 {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
               </Suspense>
             </S.LeftPane>

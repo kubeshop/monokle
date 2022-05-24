@@ -55,8 +55,8 @@ const initialAppState: AppState = {
     isOpen: false,
   },
   deviceID: electronStore.get('main.deviceID'),
-  imagesMap: [],
   filtersPresets: electronStore.get('main.filtersPresets') || {},
+  imagesList: [],
 };
 
 const initialAppConfigState: AppConfig = {
