@@ -5,16 +5,24 @@ import {Button, Space, Switch} from 'antd';
 import log from 'loglevel';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {diffViewOpened, selectDiffedComparison} from '@redux/reducers/compare';
+import {comparisonInspected, selectComparison} from '@redux/reducers/compare';
 
 import * as S from './DiffActionBar.styled';
 
-export const DiffActionBar: React.FC = () => {
+export const InspectionActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
+  const inspection = useAppSelector(state => state.compare.current.inspect);
+  const comparison = useAppSelector(state => selectComparison(state.compare, inspection?.comparison));
+  const typeLabel = inspection?.type === 'diff' ? 'diff' : 'content';
+  const resourceName =
+    inspection?.type === 'left'
+      ? comparison?.left?.name
+      : inspection?.type === 'right'
+      ? comparison?.right?.name
+      : comparison?.left?.name ?? comparison?.right?.name;
 
   const handleBack = useCallback(() => {
-    dispatch(diffViewOpened({id: undefined}));
+    dispatch(comparisonInspected());
   }, [dispatch]);
 
   const handleToggleHideIgnoredFields = useCallback(() => {
@@ -23,7 +31,10 @@ export const DiffActionBar: React.FC = () => {
 
   return (
     <S.ActionBarDiv>
-      <div>Resource diff on {diffComparison?.left?.name ?? diffComparison?.right?.name ?? 'unknown'}</div>
+      <div>
+        Resource {typeLabel}
+        {resourceName ? ` for ${resourceName}` : ''}
+      </div>
 
       <S.ActionBarRightDiv>
         <Space size="middle">

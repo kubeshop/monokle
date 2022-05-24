@@ -40,8 +40,7 @@ export type CompareState = {
     right?: ResourceSetData;
     comparison?: ComparisonData;
     selection: string[];
-    viewDiff?: string; // comparisonId
-
+    inspect?: ComparisonInspection;
     search?: string;
     filtering?: {
       comparisons: ResourceComparison[];
@@ -58,6 +57,11 @@ export type TransferDirection = 'left-to-right' | 'right-to-left';
 export type ComparisonData = {
   loading: boolean;
   comparisons: ResourceComparison[];
+};
+
+export type ComparisonInspection = {
+  comparison: string;
+  type: CompareSide | 'diff';
 };
 
 export type ResourceSetData = {
@@ -227,8 +231,11 @@ export const compareSlice = createSlice({
       resetComparison(state);
       state.current[side] = undefined;
     },
-    diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
-      state.current.viewDiff = action.payload.id;
+    comparisonInspecting: (state, action: PayloadAction<ComparisonInspection>) => {
+      state.current.inspect = action.payload;
+    },
+    comparisonInspected: state => {
+      state.current.inspect = undefined;
     },
     comparisonToggled: (state, action: PayloadAction<{id: string}>) => {
       const {id} = action.payload;
@@ -357,7 +364,7 @@ export const compareSlice = createSlice({
 
 function resetComparison(state: WritableDraft<CompareState>) {
   state.current.comparison = undefined;
-  state.current.viewDiff = undefined;
+  state.current.inspect = undefined;
   state.current.selection = [];
 
   state.current.filtering = undefined;
@@ -381,7 +388,8 @@ export const {
   resourceSetFetched,
   resourceSetCompared,
   resourceSetFiltered,
-  diffViewOpened,
+  comparisonInspecting,
+  comparisonInspected,
   comparisonAllToggled,
   comparisonToggled,
 } = compareSlice.actions;
@@ -452,12 +460,9 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   return {allKustomizations, currentKustomization};
 };
 
-export const selectDiffedComparison = (state: CompareState): ResourceComparison | undefined => {
-  const id = state.current.viewDiff;
+export const selectComparison = (state: CompareState, id: string | undefined): ResourceComparison | undefined => {
   if (!id) return undefined;
-  const comparison = state.current.comparison?.comparisons.find(c => c.id === id);
-  if (!comparison) return undefined;
-  return comparison;
+  return state.current.comparison?.comparisons.find(c => c.id === id);
 };
 
 export const selectKnownNamespaces = createSelector(
