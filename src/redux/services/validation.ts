@@ -174,7 +174,7 @@ function determineContainerIndex(
 ): YamlPath {
   for (let i = 0; i < properties.length; i += 1) {
     const property = properties[i];
-    const containers = get<{name: string}[]>(resource.content, prefix.concat(property), []) ?? [];
+    const containers: {name: string}[] = get(resource.content, prefix.concat(property), []) ?? [];
     const containerIndex = containers.findIndex(c => c.name === container);
     if (containerIndex !== -1) {
       return [property, containerIndex];
