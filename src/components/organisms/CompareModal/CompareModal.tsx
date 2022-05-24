@@ -4,13 +4,13 @@ import {useMeasure, useWindowSize} from 'react-use';
 import {Col, Modal, Row} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
-import {selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compare';
+import {selectCompareStatus} from '@redux/reducers/compare';
 
 import {CompareActionBar} from './CompareActionBar';
 import {CompareModalComparing} from './CompareModalComparing';
 import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
-import {DiffActionBar} from './DiffActionBar';
+import {InspectionActionBar} from './DiffActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
 import {TransferButton} from './TransferButton';
 
@@ -22,7 +22,7 @@ type Props = {
 export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
-  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
+  const isInspecting = useAppSelector(state => state.compare.current.inspect);
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
@@ -34,7 +34,7 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       footer={<CompareModalFooter onClose={onClose} />}
       {...sizeProps}
     >
-      {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
+      {!isInspecting ? <CompareActionBar /> : <InspectionActionBar />}
 
       <Row ref={containerRef}>
         <Col span={10}>

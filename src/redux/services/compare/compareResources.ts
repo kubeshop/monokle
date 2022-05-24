@@ -9,6 +9,7 @@ const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 
 export type CompareOptions = {
   operation: CompareOperation;
+  defaultNamespace?: string;
 };
 
 export function compareResources(
@@ -17,8 +18,8 @@ export function compareResources(
   options: CompareOptions
 ): ResourceComparison[] {
   const {operation} = options;
-  const leftMap = createHashMap(left);
-  const rightMap = createHashMap(right);
+  const leftMap = createHashMap(left, options.defaultNamespace);
+  const rightMap = createHashMap(right, options.defaultNamespace);
 
   switch (operation) {
     case 'union':
@@ -200,19 +201,19 @@ function compareResourcesAsRightJoin(
   return result;
 }
 
-function createHashMap(resources: K8sResource[]): Map<string, K8sResource> {
+function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map<string, K8sResource> {
   const result = new Map();
 
   for (const resource of resources) {
-    const id = createFullResourceIdentifier(resource);
+    const id = createFullResourceIdentifier(resource, defaultNamespace);
     result.set(id, resource);
   }
 
   return result;
 }
 
-function createFullResourceIdentifier(resource: K8sResource): string {
-  return `${resource.name}.${resource.kind}.${resource.namespace ?? 'default'}.${resource.version}`;
+function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
+  return `${resource.name}.${resource.kind}.${resource.namespace ?? defaultNamespace ?? 'default'}.${resource.version}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {

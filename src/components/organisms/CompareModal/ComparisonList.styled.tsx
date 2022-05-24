@@ -43,6 +43,7 @@ export const ResourceName = styled.span<{$isActive?: boolean}>`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  cursor: ${({$isActive = true}) => ($isActive ? 'pointer' : 'auto')};
 `;
 
 export const ResourceCount = styled.span`
