@@ -511,8 +511,7 @@ export const selectComparisonListItems = createSelector(
   (comparisons = [], [leftType, rightType], defaultNamespace) => {
     const result: ComparisonListItem[] = [];
 
-    const leftTransferable = canTransfer(leftType, rightType);
-    const rightTransferable = canTransfer(leftType, rightType);
+    const transferable = canTransfer(leftType, rightType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -532,8 +531,8 @@ export const selectComparisonListItems = createSelector(
             namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
-            leftTransferable,
-            rightTransferable,
+            leftTransferable: transferable,
+            rightTransferable: transferable,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -544,10 +543,10 @@ export const selectComparisonListItems = createSelector(
             namespace: isNamespaced
               ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
               : undefined,
-            leftActive: Boolean(comparison.left),
-            rightActive: Boolean(comparison.right),
-            leftTransferable,
-            rightTransferable,
+            leftActive: isDefined(comparison.left),
+            rightActive: isDefined(comparison.right),
+            leftTransferable: transferable && isDefined(comparison.left),
+            rightTransferable: transferable && isDefined(comparison.right),
             canDiff: false,
           });
         }
@@ -682,32 +681,31 @@ export const transferResource = createAsyncThunk<
     const leftSet = getState().compare.current.view.leftSet;
     const rightSet = getState().compare.current.view.rightSet;
     invariant(leftSet && rightSet, 'invalid state');
+    const context =
+      direction === 'left-to-right'
+        ? rightSet.type === 'cluster'
+          ? rightSet.context
+          : undefined
+        : leftSet.type === 'cluster'
+        ? leftSet.context
+        : undefined;
+
     const from = direction === 'left-to-right' ? leftSet.type : rightSet.type;
     const to = direction === 'left-to-right' ? rightSet.type : leftSet.type;
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const comparisonId of ids) {
-      try {
-        const comparison = getState().compare.current.comparison?.comparisons.find(c => c.id === comparisonId);
-        invariant(comparison, 'invalid state');
+    const comparisons = getState().compare.current.comparison?.comparisons.filter(c => ids.includes(c.id)) ?? [];
 
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comparison of comparisons) {
+      try {
         const source = direction === 'left-to-right' ? comparison.left : comparison.right;
         const target = direction === 'left-to-right' ? comparison.right : comparison.left;
-        const context =
-          direction === 'left-to-right'
-            ? rightSet.type === 'cluster'
-              ? rightSet.context
-              : undefined
-            : leftSet.type === 'cluster'
-            ? leftSet.context
-            : undefined;
-        invariant(source && from && to, 'invalid state');
+        invariant(source, 'invalid state');
 
-        let newTarget;
-
+        const options = {from, to, context, namespace};
         // Note: Need to apply one-by-one as it fails in bulk.
         // eslint-disable-next-line no-await-in-loop
-        newTarget = await doTransferResource(source, target, {from, to, context, namespace}, getState(), dispatch);
+        const newTarget = await doTransferResource(source, target, options, getState(), dispatch);
 
         delta.push({
           ...comparison,
@@ -717,7 +715,7 @@ export const transferResource = createAsyncThunk<
           isDifferent: source.text !== newTarget.text,
         });
       } catch (err) {
-        failures.push(comparisonId);
+        failures.push(comparison.id);
         log.debug('transfer resource failed - ', err);
       }
     }

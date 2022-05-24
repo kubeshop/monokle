@@ -107,8 +107,8 @@ async function extractResourceToLocal(
   const fileMap = state.main.fileMap;
 
   if (target) {
-    const result = {...target};
-    performResourceContentUpdate(result, source.content, fileMap, resourceMap);
+    const result = structuredClone(target);
+    performResourceContentUpdate(result, source.text, fileMap, resourceMap);
     return result;
   }
 

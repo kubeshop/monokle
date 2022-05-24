@@ -9,6 +9,7 @@ import {
   comparisonToggled,
   selectComparisonListItems,
   selectIsComparisonSelected,
+  transferResource,
 } from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
@@ -50,10 +51,27 @@ function HeaderItem({kind, count}: HeaderItemProps) {
   );
 }
 
-function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}: ComparisonItemProps) {
+function ComparisonItem({
+  id,
+  namespace,
+  name,
+  leftActive,
+  rightActive,
+  leftTransferable,
+  rightTransferable,
+  canDiff,
+}: ComparisonItemProps) {
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
   const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));
+
+  const handleTransfer = useCallback(
+    (side: CompareSide) => {
+      const direction = side === 'left' ? 'left-to-right' : 'right-to-left';
+      dispatch(transferResource({ids: [id], direction}));
+    },
+    [dispatch, id]
+  );
 
   const handleInspect = useCallback(
     (type: CompareSide | 'diff') => {
@@ -75,11 +93,23 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
       </Col>
 
       <S.ComparisonActionsCol span={4}>
-        {canDiff && (
-          <Button type="primary" shape="round" size="small" onClick={() => handleInspect('diff')}>
-            <S.DiffLabel>diff</S.DiffLabel>
-          </Button>
-        )}
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%'}}>
+          <div style={{width: 25, display: 'flex', alignItems: 'center'}}>
+            {leftTransferable && <S.RightArrow onClick={() => handleTransfer('left')} />}
+          </div>
+
+          <div style={{width: 50}}>
+            {canDiff && (
+              <Button type="primary" shape="round" size="small" onClick={() => handleInspect('diff')}>
+                <S.DiffLabel>diff</S.DiffLabel>
+              </Button>
+            )}
+          </div>
+
+          <div style={{width: 25, display: 'flex', alignItems: 'center'}}>
+            {rightTransferable && <S.LeftArrow onClick={() => handleTransfer('right')} />}
+          </div>
+        </div>
       </S.ComparisonActionsCol>
 
       <Col span={10}>

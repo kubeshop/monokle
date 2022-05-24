@@ -6,8 +6,8 @@ import {stringify} from 'yaml';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
-import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource, KubernetesObject} from '@models/k8sresource';
+import {KubernetesObject, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
 import {Policy} from '@models/policy';
 
 import {extractK8sResources, processResources} from '@redux/services/resource';
@@ -94,7 +94,7 @@ export async function getResourceFromCluster(
   if (resource && resource.text && resourceKindHandler) {
     const kubeClient = createKubeClient(kubeconfigPath, context);
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
-    return toPojo(resourceFromCluster);
+    return toPojo(resourceFromCluster.body);
   }
 }
 
