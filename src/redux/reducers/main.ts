@@ -1,8 +1,6 @@
-// eslint-disable-next-line
-import {shallowEqual} from 'react-redux';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice, isAnyOf} from '@reduxjs/toolkit';
-
+import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -1279,29 +1277,21 @@ export const {
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
-const selectingActions = isAnyOf(
-  selectK8sResource,
-  selectImage,
-  selectFile,
-  selectPreviewConfiguration,
-  selectHelmValuesFile
-);
-
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return !selectingActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return !isEqual(currentState.main.resourceMap, previousState.main.resourceMap);
     },
 
     effect: async (_action, {dispatch, getState}) => {
-      const resourceMap = getState().main.resourceMap;
+      const resourceMap = getActiveResourceMap(getState().main);
       const imagesList = getState().main.imagesList;
       const images = getImages(resourceMap);
 
-      if (!shallowEqual(images, imagesList)) {
+      if (!isEqual(images, imagesList)) {
         dispatch(setImagesList(images));
       }
     },
