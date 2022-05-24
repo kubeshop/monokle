@@ -55,7 +55,7 @@ export const Path = styled.div`
 `;
 
 export const LastOpened = styled.div`
-  color: ${Colors.grey5};
+  color: ${Colors.grey6};
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;

@@ -35,6 +35,7 @@ export interface TreeNode {
   highlight: boolean;
   isFolder?: boolean;
   matchQuery?: boolean;
+  text?: string;
   /**
    * Whether the TreeNode has children
    */

@@ -17,6 +17,8 @@ interface FileEntry {
   timestamp?: number;
   /** the id of the helm chart this file might belong to */
   helmChartId?: string;
+  /** file content */
+  text?: string;
 }
 
 export type {FileEntry};

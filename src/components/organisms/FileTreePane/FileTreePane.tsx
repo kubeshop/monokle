@@ -8,8 +8,7 @@ import {Button, Input, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import fs from 'fs';
-import {cloneDeep, debounce} from 'lodash';
+import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -96,6 +95,7 @@ const createNode = (
     highlight: false,
     isExcluded: fileEntry.isExcluded,
     isSupported: fileEntry.isSupported,
+    text: fileEntry?.text,
   };
 
   if (fileEntry.children) {
@@ -141,6 +141,12 @@ type Props = {
   height: number;
 };
 
+type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
+};
+
 const FileTreePane: React.FC<Props> = ({height}) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
@@ -149,10 +155,13 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   });
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
-  const fileContentBuffer = useRef<
-    Record<FileEntry['name'], {filePath: FileEntry['filePath']; content: string; match: boolean}>
-  >({});
   const [searchQuery, updateSearchQuery] = useState<string>('');
+  const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
+  const [queryMatchParam, setQueryMatchParam] = useState<MatchParamProps>({
+    matchCase: false,
+    matchWholeWord: false,
+    regExp: false,
+  });
 
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -503,19 +512,22 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  function filterTree(treeChild: TreeNode): TreeNode {
-    if (!treeChild.isFolder) {
-      return fileContentBuffer.current[treeChild.key].match
-        ? {...treeChild, matchQuery: fileContentBuffer.current[treeChild.key].match}
-        : (null as unknown as TreeNode);
+  function filterTree(treeChild: TreeNode, query: string): TreeNode {
+    if (treeChild.text) {
+      return treeChild.text.includes(query) ? treeChild : (null as unknown as TreeNode);
     }
-    if (treeChild.isFolder) {
+
+    if (treeChild.isFolder && tree?.children.length) {
       treeChild.children = treeChild.children
-        .map(filterTree)
-        .filter((v: TreeNode | null) => Boolean(v)) // null
+        .map(currentItem => filterTree(currentItem, query))
+        .filter((v: TreeNode | null) => Boolean(v))
         .filter((v: TreeNode) => {
           return !v.isFolder || (v.isFolder === true && v.children.length > 0);
-        }); // filter out folders that don't contain files that match query search
+        }); // filter out folders that don't contain files that match query search;
+    }
+
+    if (!treeChild.text && !treeChild.isFolder) {
+      return null as unknown as TreeNode;
     }
 
     return treeChild;
@@ -523,47 +535,35 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
   const findMatches = (query: string) => {
     if (!tree) return;
-
-    let searchedTree = cloneDeep(tree);
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);
       return;
     }
 
-    if (query && !Object.keys(fileContentBuffer.current).length) {
-      filesOnly.forEach(file => {
-        const fileContent = fs.readFileSync(path.join(fileMap[ROOT_FILE_ENTRY].filePath, file.filePath), 'utf8');
-        fileContentBuffer.current[file.filePath] = {
-          filePath: file.filePath,
-          content: fileContent,
-          match: fileContent.includes(query),
-        };
-      });
-    }
-
-    if (query && Object.keys(fileContentBuffer.current).length) {
-      filesOnly.forEach(file => {
-        fileContentBuffer.current[file.filePath] = {
-          ...fileContentBuffer.current[file.filePath],
-          match: fileContentBuffer.current[file.filePath].content.includes(query),
-        };
-      });
-    }
+    let searchedTree = cloneDeep(tree);
 
     const newTree: TreeNode[] = searchedTree.children
-      .map(currentItem => filterTree(currentItem))
+      .map(currentItem => filterTree(currentItem, query))
       .filter(Boolean)
       .filter((v: TreeNode) => {
-        return !v.isFolder || (v.isFolder === true && v.children.length > 0);
+        return !v.isFolder || (v.isFolder && v.children.length > 0);
       });
+
     setSearchTree({...searchedTree, children: newTree});
   };
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
-    const debounceFn = debounce(findMatches, 1000);
     updateSearchQuery(e.target.value);
-    debounceFn(e.target.value);
+
+    debounceHandler.current && clearTimeout(debounceHandler.current);
+    debounceHandler.current = setTimeout(() => {
+      findMatches(e.target.value);
+    }, 1000);
+  };
+
+  const toggleMatchParam = (param: keyof MatchParamProps) => {
+    setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
   };
 
   const treeToRender = searchTree || tree;
@@ -607,7 +607,19 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       ) : treeToRender ? (
         <S.TreeContainer>
           <S.SearchBox>
-            <Input placeholder="Search, find, replace..." value={searchQuery} onChange={handleSearchQueryChange} />
+            <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
+            <S.StyledButton $isItemSelected={queryMatchParam.matchCase} onClick={() => toggleMatchParam('matchCase')}>
+              Aa
+            </S.StyledButton>
+            <S.StyledButton
+              $isItemSelected={queryMatchParam.matchWholeWord}
+              onClick={() => toggleMatchParam('matchWholeWord')}
+            >
+              [
+            </S.StyledButton>
+            <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+              .*
+            </S.StyledButton>
           </S.SearchBox>
           <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
             <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>

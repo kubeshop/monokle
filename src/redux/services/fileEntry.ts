@@ -65,15 +65,17 @@ interface CreateFileEntryArgs {
   fileEntryPath: string;
   fileMap: FileMapType;
   helmChartId?: string;
+  text?: string;
 }
 
-export function createFileEntry({fileEntryPath, fileMap, helmChartId}: CreateFileEntryArgs) {
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, text}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     isExcluded: false,
     isSupported: false,
     helmChartId,
+    text,
   };
 
   const timestamp = getFileTimestamp(getAbsoluteFilePath(fileEntryPath, fileMap));
@@ -197,15 +199,23 @@ export function readFiles(
     );
   } else {
     files.forEach(file => {
+      let text;
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
+
+      const isDir = getFileStats(filePath)?.isDirectory();
+      if (!isDir) {
+        text = fs.readFileSync(path.join(filePath), 'utf8');
+      }
+
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, text});
+
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
-      } else if (getFileStats(filePath)?.isDirectory()) {
+      } else if (isDir) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);

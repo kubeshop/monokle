@@ -237,5 +237,34 @@ export const ActionsWrapper = styled.div`
 `;
 
 export const SearchBox = styled.div`
+  display: flex;
   margin: 5px 14px;
+`;
+
+export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
+  display: flex;
+  justify-content: center;
+  width: 32px;
+  margin-left: 8px;
+  ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+
+  &:hover {
+    color: ${Colors.lightSeaGreen};
+    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+    ${({$isItemSelected}) => `border-color: ${$isItemSelected ? Colors.grey5b : Colors.lightSeaGreen};`}
+  }
+
+  &:focus {
+    color: ${Colors.whitePure};
+    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+  }
+
+  :nth-child(3) {
+    span {
+      transform: rotate(-90deg);
+      position: absolute;
+      top: 8px;
+      left: 13px;
+    }
+  }
 `;
