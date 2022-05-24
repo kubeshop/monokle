@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Menu, Modal, Tooltip} from 'antd';
@@ -8,6 +9,7 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -18,6 +20,7 @@ import {Spinner} from '@components/atoms';
 import Dots from '@components/atoms/Dots';
 import ContextMenu from '@components/molecules/ContextMenu';
 
+import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
@@ -84,6 +87,23 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   };
 
   const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
+
+  useHotkeys(
+    defineHotkey(hotkeys.DELETE_RESOURCES.key),
+    () => {
+      if (treeKey === selectedPath) {
+        deleteEntityWizard(
+          {entityAbsolutePath: absolutePath},
+          () => {
+            setProcessingEntity({processingEntityID: selectedPath, processingType: 'delete'});
+            deleteEntity(absolutePath, onDelete);
+          },
+          () => {}
+        );
+      }
+    },
+    [selectedPath]
+  );
 
   const canPreview = useCallback(
     (entryPath: string): boolean => {

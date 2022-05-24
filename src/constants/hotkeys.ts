@@ -137,6 +137,11 @@ export const hotkeys: Record<string, HotkeyConf> = {
     key: 'ctrl+r, command+r',
     category: 'tool',
   },
+  DELETE_RESOURCES: {
+    name: 'Delete Resources',
+    key: 'ctrl+backspace, command+backspace',
+    category: 'tool',
+  },
 };
 
 export default hotkeys;
