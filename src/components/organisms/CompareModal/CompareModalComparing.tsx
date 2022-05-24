@@ -1,4 +1,4 @@
-import {MonacoDiffEditor} from 'react-monaco-editor';
+import MonacoEditor, {MonacoDiffEditor} from 'react-monaco-editor';
 
 import {Col, Row} from 'antd';
 
@@ -29,25 +29,43 @@ export const CompareModalComparing: React.FC = () => {
     return (
       <DiffRow>
         <Col span={24}>
-          <MonacoDiffEditor
-            language="yaml"
-            original={diffComparison.left.text}
-            value={diffComparison.right.text}
-            theme={KUBESHOP_MONACO_THEME}
-            options={{
-              renderIndicators: false,
-              renderOverviewRuler: false,
-              renderSideBySide: true,
-              automaticLayout: true,
-              minimap: {
-                enabled: false,
-              },
-              readOnly: true,
-              scrollbar: {
-                vertical: 'hidden',
-              },
-            }}
-          />
+          {diffComparison.isMatch ? (
+            <MonacoDiffEditor
+              language="yaml"
+              original={diffComparison.left?.text}
+              value={diffComparison.right?.text}
+              theme={KUBESHOP_MONACO_THEME}
+              options={{
+                renderIndicators: false,
+                renderOverviewRuler: false,
+                renderSideBySide: true,
+                automaticLayout: true,
+                minimap: {
+                  enabled: false,
+                },
+                readOnly: true,
+                scrollbar: {
+                  vertical: 'hidden',
+                },
+              }}
+            />
+          ) : (
+            <MonacoEditor
+              language="yaml"
+              value={diffComparison.left ? diffComparison.left.text : diffComparison.right.text}
+              theme={KUBESHOP_MONACO_THEME}
+              options={{
+                automaticLayout: true,
+                minimap: {
+                  enabled: false,
+                },
+                readOnly: true,
+                scrollbar: {
+                  vertical: 'hidden',
+                },
+              }}
+            />
+          )}
         </Col>
       </DiffRow>
     );

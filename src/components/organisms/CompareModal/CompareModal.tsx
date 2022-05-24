@@ -12,6 +12,7 @@ import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
 import {DiffActionBar} from './DiffActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
+import {TransferButton} from './TransferButton';
 
 type Props = {
   visible: boolean;
@@ -36,18 +37,19 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
 
       <Row ref={containerRef}>
-        <Col span={11}>
+        <Col span={10}>
           <ResourceSetSelector side="left" />
         </Col>
-        <Col span={2} />
-        <Col span={11}>
+        <Col span={4} />
+        <Col span={10}>
           <ResourceSetSelector side="right" />
         </Col>
       </Row>
 
       <div
         style={{
-          height: `calc(100% - ${height}px - 66px)`,
+          height: `calc(100% - ${height}px - 66px - 66px)`,
+          marginRight: '-8px',
           position: 'relative',
           overflowY: 'auto',
           overflowX: 'hidden',
@@ -55,6 +57,16 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       >
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </div>
+
+      <Row style={{height: 66, alignItems: 'center'}}>
+        <Col span={10}>
+          <TransferButton side="left" />
+        </Col>
+        <Col span={4} />
+        <Col span={10}>
+          <TransferButton side="right" />
+        </Col>
+      </Row>
     </Modal>
   );
 };

@@ -69,6 +69,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
+import {transferResource} from './compare';
 import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
@@ -1132,7 +1133,21 @@ export const mainSlice = createSlice({
     builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      const {side, delta} = action.payload;
 
+      // Warning: The compare feature has its own slice and does bookkeeping
+      // of its own resources. This reducer works because transfer only works
+      // for cluster and local which are also in main slice. Should we add
+      // transfer for other resource set types this will give unexpected behavior.
+      delta.forEach(comparison => {
+        if (side === 'left') {
+          state.resourceMap[comparison.left.id] = comparison.left;
+        } else {
+          state.resourceMap[comparison.right.id] = comparison.right;
+        }
+      });
+    });
     builder.addCase(loadPolicies.fulfilled, (state, action) => {
       state.policies = {
         plugins: action.payload,

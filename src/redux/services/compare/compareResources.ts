@@ -49,7 +49,7 @@ function compareResourcesAsUnion(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });

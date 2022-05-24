@@ -1,23 +1,32 @@
-import {PayloadAction, TaskAbortError, createSelector, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {PayloadAction, TaskAbortError, createAsyncThunk, createSelector, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import {WritableDraft} from 'immer/dist/internal';
 import {groupBy} from 'lodash';
 import log from 'loglevel';
+import invariant from 'tiny-invariant';
 
+import {ERROR_MSG_FALLBACK} from '@constants/constants';
+
+import {AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
+import {ThunkApi} from '@models/thunk';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {kustomizationsSelector} from '@redux/selectors';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 import {createResourceFilters, filterComparisons} from '@redux/services/compare/filterComparisons';
+import {canTransfer, doTransferResource} from '@redux/services/compare/transferResource';
 
 import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
+import {errorAlert, successAlert} from '@utils/alert';
 import {isDefined} from '@utils/filter';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {setAlert} from './alert';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -36,10 +45,14 @@ export type CompareState = {
     filtering?: {
       comparisons: ResourceComparison[];
     };
+    transfering: {
+      pending: boolean;
+    };
   };
 };
 
 export type CompareSide = 'left' | 'right';
+export type TransferDirection = 'left-to-right' | 'right-to-left';
 
 export type ComparisonData = {
   loading: boolean;
@@ -138,6 +151,9 @@ const initialState: CompareState = {
       rightSet: undefined,
     },
     selection: [],
+    transfering: {
+      pending: false,
+    },
   },
 };
 
@@ -275,6 +291,63 @@ export const compareSlice = createSlice({
       };
     },
   },
+  extraReducers: builder => {
+    builder.addCase(transferResource.pending, state => {
+      state.current.transfering.pending = true;
+    });
+    builder.addCase(transferResource.rejected, state => {
+      state.current.transfering.pending = false;
+    });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      state.current.transfering.pending = false;
+
+      const {side, delta} = action.payload;
+
+      // Splice each update into previous results to give smooth UX.
+      delta.forEach(comparison => {
+        // Remove from selection
+        state.current.selection = state.current.selection.filter(s => s !== comparison.id);
+
+        // Update comparison without recomputing
+        if (state.current.comparison) {
+          const index = state.current.comparison.comparisons.findIndex(c => c.id === comparison.id) ?? -1;
+          if (index !== -1) {
+            state.current.comparison.comparisons.splice(index, 1, comparison);
+          } else {
+            state.current.comparison.comparisons.push(comparison);
+          }
+        }
+
+        // Update filtering without recomparing
+        if (state.current.filtering) {
+          const index = state.current.filtering.comparisons.findIndex(c => c.id === comparison.id) ?? -1;
+          if (index !== -1) {
+            state.current.filtering.comparisons.splice(index, 1, comparison);
+          } else {
+            state.current.filtering.comparisons.push(comparison);
+          }
+        }
+
+        // Update resource sets without refetching
+        if (side === 'left' && state.current.left) {
+          const index = state.current.left.resources.findIndex(r => r.id === comparison.left.id) ?? -1;
+          if (index === -1) {
+            state.current.left.resources.push(comparison.left);
+          } else {
+            state.current.left.resources[index] = comparison.left;
+          }
+        }
+        if (side === 'right' && state.current.right) {
+          const index = state.current.right.resources.findIndex(r => r.id === comparison.right.id) ?? -1;
+          if (index === -1) {
+            state.current.right.resources.push(comparison.right);
+          } else {
+            state.current.right.resources[index] = comparison.right;
+          }
+        }
+      });
+    });
+  },
 });
 
 function resetComparison(state: WritableDraft<CompareState>) {
@@ -310,7 +383,7 @@ export const {
 /* * * * * * * * * * * * * *
  * Selectors
  * * * * * * * * * * * * * */
-export type CompareStatus = 'selecting' | 'comparing';
+export type CompareStatus = 'selecting' | 'comparing' | 'transfering';
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
 
@@ -321,7 +394,7 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
     return 'selecting';
   }
 
-  return 'comparing';
+  return c.transfering.pending ? 'transfering' : 'comparing';
 };
 
 export const selectResourceSet = (state: CompareState, side: CompareSide): PartialResourceSet | undefined => {
@@ -373,11 +446,11 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   return {allKustomizations, currentKustomization};
 };
 
-export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
+export const selectDiffedComparison = (state: CompareState): ResourceComparison | undefined => {
   const id = state.current.viewDiff;
   if (!id) return undefined;
   const comparison = state.current.comparison?.comparisons.find(c => c.id === id);
-  if (!comparison || !comparison.isMatch) return undefined;
+  if (!comparison) return undefined;
   return comparison;
 };
 
@@ -392,10 +465,32 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   );
 };
 
+export const selectCanTransferAllSelected = (state: CompareState, direction: TransferDirection): boolean => {
+  const left = state.current.view.leftSet?.type;
+  const right = state.current.view.rightSet?.type;
+  const isTransferable = direction === 'left-to-right' ? canTransfer(left, right) : canTransfer(right, left);
+  if (!isTransferable) return false;
+
+  const selection = state.current.selection;
+  if (selection.length === 0) return false;
+
+  const comparisons = state.current.filtering?.comparisons ?? [];
+  const transferable = comparisons
+    .filter(comparison => selection.some(s => s === comparison.id))
+    .filter(isDefined)
+    .filter(comparison => (direction === 'left-to-right' ? comparison.left : comparison.right));
+
+  return selection.length === transferable.length;
+};
+
 export const selectComparisonListItems = createSelector(
   (state: CompareState) => state.current.filtering?.comparisons,
-  comparisons => {
+  (state: CompareState) => [state.current.view.leftSet?.type, state.current.view.rightSet?.type],
+  (comparisons = [], [leftType, rightType]) => {
     const result: ComparisonListItem[] = [];
+
+    const leftTransferable = canTransfer(leftType, rightType);
+    const rightTransferable = canTransfer(leftType, rightType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -415,6 +510,8 @@ export const selectComparisonListItems = createSelector(
             namespace: isNamespaced ? comparison.left.namespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
+            leftTransferable,
+            rightTransferable,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -427,6 +524,8 @@ export const selectComparisonListItems = createSelector(
               : undefined,
             leftActive: Boolean(comparison.left),
             rightActive: Boolean(comparison.right),
+            leftTransferable,
+            rightTransferable,
             canDiff: false,
           });
         }
@@ -536,3 +635,94 @@ export const filterListener: AppListenerFn = listen => {
     },
   });
 };
+
+/* * * * * * * * * * * * * *
+ * Thunks
+ * * * * * * * * * * * * * */
+type TransferResourceArgs = {
+  ids: string[];
+  direction: TransferDirection;
+};
+
+export const transferResource = createAsyncThunk<
+  {side: CompareSide; delta: MatchingResourceComparison[]},
+  TransferResourceArgs,
+  ThunkApi
+>('compare/transfer', async ({ids, direction}, {getState, dispatch}) => {
+  try {
+    const delta: MatchingResourceComparison[] = [];
+    const failures: string[] = [];
+
+    const leftSet = getState().compare.current.view.leftSet;
+    const rightSet = getState().compare.current.view.rightSet;
+    invariant(leftSet && rightSet, 'invalid state');
+    const from = direction === 'left-to-right' ? leftSet.type : rightSet.type;
+    const to = direction === 'left-to-right' ? rightSet.type : leftSet.type;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comparisonId of ids) {
+      try {
+        const comparison = getState().compare.current.comparison?.comparisons.find(c => c.id === comparisonId);
+        invariant(comparison, 'invalid state');
+
+        const source = direction === 'left-to-right' ? comparison.left : comparison.right;
+        const target = direction === 'left-to-right' ? comparison.right : comparison.left;
+        const context =
+          direction === 'left-to-right'
+            ? rightSet.type === 'cluster'
+              ? rightSet.context
+              : undefined
+            : leftSet.type === 'cluster'
+            ? leftSet.context
+            : undefined;
+        invariant(source && from && to, 'invalid state');
+
+        let newTarget;
+
+        // Note: Need to apply one-by-one as it fails in bulk.
+        // eslint-disable-next-line no-await-in-loop
+        newTarget = await doTransferResource(source, target, {from, to, context}, getState(), dispatch);
+
+        delta.push({
+          ...comparison,
+          left: direction === 'left-to-right' ? source : newTarget,
+          right: direction === 'left-to-right' ? newTarget : source,
+          isMatch: true,
+          isDifferent: source.text !== newTarget.text,
+        });
+      } catch (err) {
+        failures.push(comparisonId);
+        log.debug('transfer resource failed - ', err);
+      }
+    }
+
+    const alert = createTransferAlert(ids, failures, to === 'cluster');
+    dispatch(setAlert(alert));
+
+    return {side: direction === 'left-to-right' ? 'right' : 'left', delta};
+  } catch (err) {
+    log.debug('Transfer failed unexpectedly', err);
+    dispatch(setAlert(errorAlert(ERROR_MSG_FALLBACK)));
+    throw err;
+  }
+});
+
+function createTransferAlert(total: string[], failures: string[], toCluster: boolean): AlertType {
+  const totalCount = total.length;
+  const errorCount = failures.length;
+  const success = errorCount === 0;
+
+  if (!success) {
+    const verb = toCluster ? 'deploy' : 'extract';
+    const title = `Cannot ${verb} resources`;
+    const message =
+      totalCount === errorCount
+        ? `Looks like all resources failed to ${verb}. Please try again later.`
+        : `Looks like ${errorCount} of the ${totalCount} resources failed to ${verb}. Please try again later.`;
+    return errorAlert(title, message);
+  }
+
+  const verb = toCluster ? 'Applied' : 'Extracted';
+  const title = `${verb} ${totalCount} resources`;
+  return successAlert(title);
+}

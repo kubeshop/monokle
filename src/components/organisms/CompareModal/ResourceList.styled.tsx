@@ -11,9 +11,9 @@ export const ResourceListDiv = styled.div`
   overflow: scroll;
 `;
 
-export const HeaderDiv = styled.div`
+export const HeaderDiv = styled.div<{$showCheckbox: boolean}>`
   height: 28px;
-  margin-left: 8px;
+  margin-left: ${props => (props.$showCheckbox ? '32px' : 0)};
   font-size: 16px;
 `;
 
@@ -34,7 +34,6 @@ export const ResourceDiv = styled.div`
   height: 28px;
   display: flex;
   align-items: center;
-  margin-left: 8px;
 `;
 
 export const ResourceNamespace = styled(Tag)`
@@ -55,4 +54,7 @@ export const ResourceName = styled.span<{$isActive?: boolean}>`
   font-weight: 400;
   line-height: 25px;
   color: ${({$isActive = true}) => ($isActive ? Colors.whitePure : Colors.grey5b)};
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;
