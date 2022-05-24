@@ -106,35 +106,34 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
   };
 
-  const menu = (
-    <Menu>
-      {(isInPreviewMode || isUnsavedResource(resource)) && (
-        <>
-          <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
-            Save to file/folder
-          </Menu.Item>
-          <ContextMenuDivider />
-        </>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
-        Rename
-      </Menu.Item>
-
-      {knownResourceKinds.includes(resource.kind) && (
-        <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
-          Clone
-        </Menu.Item>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
-        Delete
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    ...(isInPreviewMode || isUnsavedResource(resource)
+      ? [
+          {
+            key: 'save_to_file_folder',
+            label: 'Save to file/folder',
+            disabled: isInPreviewMode,
+            onClick: onClickSaveToFileFolder,
+          },
+          {key: 'divider', type: 'divider'},
+        ]
+      : []),
+    {key: 'rename', label: 'Rename', onClick: onClickRename},
+    ...(knownResourceKinds.includes(resource.kind)
+      ? [
+          {
+            key: 'clone',
+            label: 'Clone',
+            disabled: isInPreviewMode,
+            onClick: onClickClone,
+          },
+        ]
+      : []),
+    {key: 'delete', label: 'Delete', disabled: isInPreviewMode && previewType !== 'cluster', onClick: onClickDelete},
+  ];
 
   return (
-    <ContextMenu overlay={menu}>
+    <ContextMenu overlay={<Menu items={menuItems} />}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>
