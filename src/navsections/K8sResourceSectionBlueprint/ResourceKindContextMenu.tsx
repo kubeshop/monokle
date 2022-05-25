@@ -1,10 +1,13 @@
 import {useMemo} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Menu, Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+import hotkeys from '@constants/hotkeys';
 
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
@@ -21,6 +24,8 @@ import {removeResources} from '@redux/thunks/removeResources';
 import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
+
+import {defineHotkey} from '@utils/defineHotkey';
 
 import Colors from '@styles/Colors';
 
@@ -75,6 +80,16 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
+
+  useHotkeys(
+    defineHotkey(hotkeys.DELETE_RESOURCES.key),
+    () => {
+      if (selectedResourceId) {
+        deleteResourceWithConfirm(resource, resourceMap, dispatch);
+      }
+    },
+    [selectedResourceId]
+  );
 
   if (!resource) {
     return null;
