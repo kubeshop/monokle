@@ -6,6 +6,7 @@ import {Button, Input, Select, Tooltip} from 'antd';
 import {ClearOutlined} from '@ant-design/icons';
 
 import {mapValues} from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 import {ResetFiltersTooltip} from '@constants/tooltips';
@@ -75,6 +76,17 @@ const ResourceFilter = () => {
       </Option>
     ));
   }, [fileMap]);
+
+  const isSavePresetDisabled = useMemo(
+    () =>
+      !name &&
+      !kinds.length &&
+      (!namespace || namespace === ALL_OPTIONS) &&
+      isEmpty(labels) &&
+      isEmpty(annotations) &&
+      (!fileOrFolderContainedIn || fileOrFolderContainedIn === ROOT_OPTIONS),
+    [annotations, fileOrFolderContainedIn, kinds.length, labels, name, namespace]
+  );
 
   const resetFilters = () => {
     setWasLocalUpdate(true);
@@ -186,7 +198,7 @@ const ResourceFilter = () => {
           <S.PresetButton type="link" onClick={onClickLoadPreset}>
             Load preset
           </S.PresetButton>
-          <S.PresetButton type="link" onClick={onClickSavePreset}>
+          <S.PresetButton disabled={isSavePresetDisabled} type="link" onClick={onClickSavePreset}>
             Save preset
           </S.PresetButton>
 
