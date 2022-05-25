@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Button, Space, Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -13,8 +13,7 @@ import {
 } from '@redux/reducers/compare';
 
 import {ClusterContextSelect} from './ClusterContextSelect';
-import {HelmChartSelect} from './HelmChartSelect';
-import {HelmValuesSelect} from './HelmValuesSelect';
+import {HelmSelect} from './HelmSelect';
 import {KustomizeSelect} from './KustomizeSelect';
 import * as S from './ResourceSetSelector.styled';
 import {ResourceSetTypeSelect} from './ResourceSetTypeSelect';
@@ -40,12 +39,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
     <S.ResourceSetSelectorDiv>
       <S.SelectSpacer>
         <ResourceSetTypeSelect side={side} />
-        {resourceSet?.type === 'helm' && (
-          <Space wrap>
-            <HelmChartSelect side={side} />
-            <HelmValuesSelect side={side} />
-          </Space>
-        )}
+        {resourceSet && ['helm', 'helm-custom'].includes(resourceSet.type) && <HelmSelect side={side} />}
         {resourceSet?.type === 'kustomize' && (
           <S.KustomizeSelectContainer>
             <KustomizeSelect side={side} />
