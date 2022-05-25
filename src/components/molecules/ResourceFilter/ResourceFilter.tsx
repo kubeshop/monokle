@@ -19,8 +19,6 @@ import {KeyValueInput} from '@components/atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {FeatureFlag} from '@utils/features';
-
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';

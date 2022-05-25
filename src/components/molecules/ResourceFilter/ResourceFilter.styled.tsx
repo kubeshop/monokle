@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const CaretUpOutlined = styled(RawCaretUpOutlined)`
-  margin-left: 5px;
   color: ${Colors.whitePure};
   font-size: 10px;
   cursor: pointer;
@@ -37,7 +36,7 @@ export const PresetButton = styled(Button)`
 export const TitleActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 `;
 
 export const TitleContainer = styled.div`
