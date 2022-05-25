@@ -16,7 +16,6 @@ export const CaretUpOutlined = styled(RawCaretUpOutlined)`
 export const Container = styled.div`
   padding: 10px 18px;
   height: 100%;
-  background-color: #0c0d0e;
 `;
 
 export const Field = styled.div`
