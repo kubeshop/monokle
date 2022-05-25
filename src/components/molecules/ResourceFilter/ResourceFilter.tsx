@@ -185,14 +185,12 @@ const ResourceFilter = () => {
         </S.TitleLabel>
 
         <S.TitleActions>
-          <FeatureFlag name="FiltersPreset">
-            <S.PresetButton type="link" onClick={onClickLoadPreset}>
-              Load preset
-            </S.PresetButton>
-            <S.PresetButton type="link" onClick={onClickSavePreset}>
-              Save preset
-            </S.PresetButton>
-          </FeatureFlag>
+          <S.PresetButton type="link" onClick={onClickLoadPreset}>
+            Load preset
+          </S.PresetButton>
+          <S.PresetButton type="link" onClick={onClickSavePreset}>
+            Save preset
+          </S.PresetButton>
 
           <Tooltip title={ResetFiltersTooltip}>
             <Button
@@ -222,7 +220,7 @@ const ResourceFilter = () => {
         <S.FieldLabel>Kind:</S.FieldLabel>
         <Select
           disabled={areFiltersDisabled}
-          placeholder="Select multiple kinds"
+          placeholder="Select one or multiple kinds"
           showArrow
           showSearch
           style={{width: '100%'}}
