@@ -92,25 +92,25 @@ function ComparisonItem({
         </S.ResourceDiv>
       </Col>
 
-      <S.ComparisonActionsCol span={4}>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%'}}>
-          <div style={{width: 25, display: 'flex', alignItems: 'center'}}>
+      <S.ActionsCol span={4}>
+        <S.ActionsDiv>
+          <S.ActionsTransferDiv>
             {leftTransferable && <S.RightArrow onClick={() => handleTransfer('left')} />}
-          </div>
+          </S.ActionsTransferDiv>
 
-          <div style={{width: 50}}>
+          <S.ActionsInspectDiv>
             {canDiff && (
               <Button type="primary" shape="round" size="small" onClick={() => handleInspect('diff')}>
                 <S.DiffLabel>diff</S.DiffLabel>
               </Button>
             )}
-          </div>
+          </S.ActionsInspectDiv>
 
-          <div style={{width: 25, display: 'flex', alignItems: 'center'}}>
+          <S.ActionsTransferDiv>
             {rightTransferable && <S.LeftArrow onClick={() => handleTransfer('right')} />}
-          </div>
-        </div>
-      </S.ComparisonActionsCol>
+          </S.ActionsTransferDiv>
+        </S.ActionsDiv>
+      </S.ActionsCol>
 
       <Col span={10}>
         <S.ResourceDiv>

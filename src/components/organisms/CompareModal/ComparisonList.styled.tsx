@@ -27,10 +27,27 @@ export const ComparisonRow = styled(Row)`
   font-size: 16px;
 `;
 
-export const ComparisonActionsCol = styled(Col)`
+export const ActionsCol = styled(Col)`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+export const ActionsDiv = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+`;
+
+export const ActionsTransferDiv = styled.div`
+  display: flex;
+  align-items: center;
+  width: 25px;
+`;
+
+export const ActionsInspectDiv = styled.div`
+  width: 50px;
 `;
 
 export const RightArrow = styled(RightCircleFilled)`
