@@ -221,17 +221,14 @@ const ResourceFilter = () => {
       <S.Field>
         <S.FieldLabel>Kind:</S.FieldLabel>
         <Select
-          mode="multiple"
-          showSearch
           disabled={areFiltersDisabled}
-          defaultValue={[ALL_OPTIONS]}
-          value={kinds || [ALL_OPTIONS]}
-          onChange={updateKinds}
+          placeholder="Select multiple kinds"
+          showArrow
+          showSearch
           style={{width: '100%'}}
+          value={kinds || []}
+          onChange={updateKinds}
         >
-          <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
-            {ALL_OPTIONS}
-          </Option>
           {allResourceKinds.map(resourceKind => (
             <Option key={resourceKind} value={resourceKind}>
               {resourceKind}
