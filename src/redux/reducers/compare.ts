@@ -172,12 +172,13 @@ export const compareSlice = createSlice({
   reducers: {
     compareToggled: (state, action: PayloadAction<{value: boolean | undefined; initialView?: ComparisonView}>) => {
       const {value, initialView} = action.payload;
-      if (value === undefined) {
-        state.isOpen = !state.isOpen;
-      } else {
-        state.isOpen = value;
+      const close = value === undefined ? state.isOpen : value === false;
+
+      if (close) {
+        return initialState;
       }
 
+      state.isOpen = true;
       if (initialView) {
         state.current.view = initialView;
       }
