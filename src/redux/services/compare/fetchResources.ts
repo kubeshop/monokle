@@ -2,6 +2,7 @@ import {flatten} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import invariant from 'tiny-invariant';
+import {v4 as uuid} from 'uuid';
 
 import {
   CLUSTER_DIFF_PREFIX,
@@ -93,6 +94,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
     if (!kubeconfig || !currentContext) return [];
 
     const command: CommandOptions = {
+      commandId: uuid(),
       cmd: 'helm',
       args:
         helmPreviewMode === 'template'

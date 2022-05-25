@@ -36,6 +36,7 @@ export const previewReferencedHelmChart = async (
   await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
   const options: CommandOptions = {
+    commandId: uuidv4(),
     cmd: 'helm',
     args: [
       'install',

@@ -138,7 +138,11 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
   ensureMainThread();
 
-  const result: CommandResult = {exitCode: null, signal: null};
+  const result: CommandResult = {
+    commandId: options.commandId,
+    exitCode: null,
+    signal: null,
+  };
 
   try {
     const child = spawn(options.cmd, options.args, {
