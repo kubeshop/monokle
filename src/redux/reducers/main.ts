@@ -720,6 +720,10 @@ export const mainSlice = createSlice({
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
     },
+    deleteFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      delete state.filtersPresets[action.payload];
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
     loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.resourceFilter = state.filtersPresets[action.payload];
     },
@@ -1249,6 +1253,7 @@ export const {
   clearSelected,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
+  deleteFilterPreset,
   editorHasReloadedSelectedPath,
   extendResourceFilter,
   loadFilterPreset,
