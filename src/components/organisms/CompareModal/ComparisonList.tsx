@@ -9,6 +9,7 @@ import {
   comparisonToggled,
   selectComparisonListItems,
   selectIsComparisonSelected,
+  transferResource,
 } from '@redux/reducers/compare';
 
 import * as S from './ComparisonList.styled';
@@ -50,10 +51,27 @@ function HeaderItem({kind, count}: HeaderItemProps) {
   );
 }
 
-function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}: ComparisonItemProps) {
+function ComparisonItem({
+  id,
+  namespace,
+  name,
+  leftActive,
+  rightActive,
+  leftTransferable,
+  rightTransferable,
+  canDiff,
+}: ComparisonItemProps) {
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
   const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));
+
+  const handleTransfer = useCallback(
+    (side: CompareSide) => {
+      const direction = side === 'left' ? 'left-to-right' : 'right-to-left';
+      dispatch(transferResource({ids: [id], direction}));
+    },
+    [dispatch, id]
+  );
 
   const handleInspect = useCallback(
     (type: CompareSide | 'diff') => {
@@ -74,13 +92,25 @@ function ComparisonItem({id, namespace, name, leftActive, rightActive, canDiff}:
         </S.ResourceDiv>
       </Col>
 
-      <S.ComparisonActionsCol span={4}>
-        {canDiff && (
-          <Button type="primary" shape="round" size="small" onClick={() => handleInspect('diff')}>
-            <S.DiffLabel>diff</S.DiffLabel>
-          </Button>
-        )}
-      </S.ComparisonActionsCol>
+      <S.ActionsCol span={4}>
+        <S.ActionsDiv>
+          <S.ActionsTransferDiv>
+            {leftTransferable && <S.RightArrow onClick={() => handleTransfer('left')} />}
+          </S.ActionsTransferDiv>
+
+          <S.ActionsInspectDiv>
+            {canDiff && (
+              <Button type="primary" shape="round" size="small" onClick={() => handleInspect('diff')}>
+                <S.DiffLabel>diff</S.DiffLabel>
+              </Button>
+            )}
+          </S.ActionsInspectDiv>
+
+          <S.ActionsTransferDiv>
+            {rightTransferable && <S.LeftArrow onClick={() => handleTransfer('right')} />}
+          </S.ActionsTransferDiv>
+        </S.ActionsDiv>
+      </S.ActionsCol>
 
       <Col span={10}>
         <S.ResourceDiv>

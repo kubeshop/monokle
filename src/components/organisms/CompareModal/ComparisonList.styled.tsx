@@ -1,5 +1,7 @@
 import {Col, Row, Tag, TagProps} from 'antd';
 
+import {LeftCircleFilled, RightCircleFilled} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
@@ -25,10 +27,37 @@ export const ComparisonRow = styled(Row)`
   font-size: 16px;
 `;
 
-export const ComparisonActionsCol = styled(Col)`
+export const ActionsCol = styled(Col)`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+export const ActionsDiv = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+`;
+
+export const ActionsTransferDiv = styled.div`
+  display: flex;
+  align-items: center;
+  width: 25px;
+`;
+
+export const ActionsInspectDiv = styled.div`
+  width: 50px;
+`;
+
+export const RightArrow = styled(RightCircleFilled)`
+  font-size: 24px;
+  color: ${Colors.blue7};
+`;
+
+export const LeftArrow = styled(LeftCircleFilled)`
+  font-size: 24px;
+  color: ${Colors.blue7};
 `;
 
 export const DiffLabel = styled.span`

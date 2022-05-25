@@ -10,7 +10,7 @@ import {CompareActionBar} from './CompareActionBar';
 import {CompareModalComparing} from './CompareModalComparing';
 import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
-import {InspectionActionBar} from './DiffActionBar';
+import {InspectionActionBar} from './InspectionActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
 import {TransferButton} from './TransferButton';
 
