@@ -2,7 +2,10 @@ import React, {useState} from 'react';
 
 import {Form, Input, Modal, Select} from 'antd';
 
+import {AlertEnum} from '@models/alert';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {deleteFilterPreset, loadFilterPreset, saveFilterPreset} from '@redux/reducers/main';
 import {closeFiltersPresetModal} from '@redux/reducers/ui';
 
@@ -31,10 +34,12 @@ const FiltersPresetModal: React.FC = () => {
         const {name} = values;
 
         dispatch(saveFilterPreset(name));
+        dispatch(setAlert({type: AlertEnum.Success, title: `Successfully saved ${name}`, message: ''}));
       } else {
         const {preset} = values;
 
         dispatch(loadFilterPreset(preset));
+        dispatch(setAlert({type: AlertEnum.Success, title: `Successfully loaded ${preset}`, message: ''}));
       }
 
       dispatch(closeFiltersPresetModal());
@@ -60,6 +65,7 @@ const FiltersPresetModal: React.FC = () => {
       title: `Are you sure you want to delete ${key}?`,
       onOk() {
         dispatch(deleteFilterPreset(key));
+        dispatch(setAlert({type: AlertEnum.Success, title: `Successfully deleted ${key}`, message: ''}));
       },
       onCancel() {},
     });
@@ -93,7 +99,7 @@ const FiltersPresetModal: React.FC = () => {
               <S.ReplaceWarning>Duplicate preset name, saving will replace the existing one!</S.ReplaceWarning>
             )}
           </>
-        )}{' '}
+        )}
       </Form>
     </Modal>
   );
