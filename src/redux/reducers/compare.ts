@@ -107,7 +107,7 @@ export type LocalResourceSet = {
 
 export type KustomizeResourceSet = {
   type: 'kustomize';
-  kustomizationId: string; // so resource.filePath (because internal id changes and this persists)
+  kustomizationId: string;
   defaultNamespace?: string;
 };
 
