@@ -34,7 +34,8 @@ export interface TreeNode {
   children: TreeNode[];
   highlight: boolean;
   isFolder?: boolean;
-  matchQuery?: boolean;
+  matchCount?: number;
+  matches?: RegExpMatchArray | null;
   text?: string;
   /**
    * Whether the TreeNode has children

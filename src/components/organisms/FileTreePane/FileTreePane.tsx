@@ -512,14 +512,20 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  function filterTree(treeChild: TreeNode, query: string): TreeNode {
+  function filterTree(treeChild: TreeNode, queryRegExp: RegExp): TreeNode {
     if (treeChild.text) {
-      return treeChild.text.includes(query) ? treeChild : (null as unknown as TreeNode);
+      return queryRegExp.test(treeChild.text)
+        ? {
+            ...treeChild,
+            matches: treeChild.text.match(queryRegExp),
+            matchCount: treeChild.text.match(queryRegExp)?.length,
+          }
+        : (null as unknown as TreeNode);
     }
 
     if (treeChild.isFolder && tree?.children.length) {
       treeChild.children = treeChild.children
-        .map(currentItem => filterTree(currentItem, query))
+        .map(currentItem => filterTree(currentItem, queryRegExp))
         .filter((v: TreeNode | null) => Boolean(v))
         .filter((v: TreeNode) => {
           return !v.isFolder || (v.isFolder === true && v.children.length > 0);
@@ -533,6 +539,11 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     return treeChild;
   }
 
+  useEffect(() => {
+    findMatches(searchQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryMatchParam]);
+
   const findMatches = (query: string) => {
     if (!tree) return;
     // reset tree to its default state
@@ -540,11 +551,22 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       setSearchTree(null);
       return;
     }
-
     let searchedTree = cloneDeep(tree);
+    let matchParams = 'gi'; // global, case insensitive by default
+    if (queryMatchParam.matchCase) {
+      matchParams = 'g';
+    }
+    let queryRegExp = new RegExp(query, matchParams);
+
+    if (queryMatchParam.matchWholeWord) {
+      queryRegExp = new RegExp(`\\b${query}\\b`, matchParams);
+    }
+    if (queryMatchParam.regExp) {
+      queryRegExp = new RegExp(query, matchParams);
+    }
 
     const newTree: TreeNode[] = searchedTree.children
-      .map(currentItem => filterTree(currentItem, query))
+      .map(currentItem => filterTree(currentItem, queryRegExp))
       .filter(Boolean)
       .filter((v: TreeNode) => {
         return !v.isFolder || (v.isFolder && v.children.length > 0);
