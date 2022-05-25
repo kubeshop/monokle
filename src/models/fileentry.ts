@@ -19,6 +19,7 @@ interface FileEntry {
   helmChartId?: string;
   /** file content */
   text?: string;
+  matchCount?: number;
 }
 
 export type {FileEntry};

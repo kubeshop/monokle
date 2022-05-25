@@ -37,6 +37,7 @@ enum Colors {
   yellow7 = '#E8D639',
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
+  yellow11 = '#C9E75D',
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',

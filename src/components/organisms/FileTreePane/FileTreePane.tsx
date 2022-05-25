@@ -8,7 +8,6 @@ import {Button, Input, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -17,7 +16,6 @@ import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@consta
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
-import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -31,7 +29,7 @@ import {
   setExpandedFolders,
 } from '@redux/reducers/ui';
 import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
-import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -44,98 +42,12 @@ import {Icon} from '@atoms';
 import {duplicateEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 
+import {createFilteredNode} from './CreateFilteredNode';
+import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
 
 import * as S from './styled';
-
-const createNode = (
-  fileEntry: FileEntry,
-  fileMap: FileMapType,
-  resourceMap: ResourceMapType,
-  hideExcludedFilesInFileExplorer: boolean,
-  hideUnsupportedFilesInFileExplorer: boolean,
-  fileOrFolderContainedInFilter: string | undefined,
-  rootFolderName: string
-): TreeNode => {
-  const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
-  const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
-  const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
-  const name = isRoot ? rootFolderName : fileEntry.name;
-
-  const node: TreeNode = {
-    key,
-    title: (
-      <S.NodeContainer>
-        <S.NodeTitleContainer>
-          <span
-            className={
-              fileEntry.isExcluded
-                ? 'excluded-file-entry-name'
-                : (fileEntry.isSupported || fileEntry.children) &&
-                  (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true)
-                ? 'file-entry-name'
-                : 'not-supported-file-entry-name'
-            }
-          >
-            {name}
-          </span>
-          {resources.length > 0 ? (
-            <Tooltip
-              mouseEnterDelay={TOOLTIP_DELAY}
-              title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}
-            >
-              <S.NumberOfResources className="file-entry-nr-of-resources">{resources.length}</S.NumberOfResources>
-            </Tooltip>
-          ) : null}
-        </S.NodeTitleContainer>
-      </S.NodeContainer>
-    ),
-    children: [],
-    highlight: false,
-    isExcluded: fileEntry.isExcluded,
-    isSupported: fileEntry.isSupported,
-    text: fileEntry?.text,
-  };
-
-  if (fileEntry.children) {
-    if (fileEntry.children.length) {
-      node.children = fileEntry.children
-        .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-        .filter(childEntry => childEntry)
-        .map(childEntry =>
-          createNode(
-            childEntry,
-            fileMap,
-            resourceMap,
-            hideExcludedFilesInFileExplorer,
-            hideUnsupportedFilesInFileExplorer,
-            fileOrFolderContainedInFilter,
-            rootFolderName
-          )
-        )
-        .filter(childEntry => {
-          if (!hideExcludedFilesInFileExplorer) {
-            return childEntry;
-          }
-
-          return !childEntry.isExcluded;
-        })
-        .filter(childEntry => {
-          if (!hideUnsupportedFilesInFileExplorer || childEntry.isFolder) {
-            return childEntry;
-          }
-
-          return childEntry.isSupported;
-        });
-    }
-    node.isFolder = true;
-  } else {
-    node.isLeaf = true;
-  }
-
-  return node;
-};
 
 type Props = {
   height: number;
@@ -156,6 +68,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
   const [searchQuery, updateSearchQuery] = useState<string>('');
+  const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
   const [queryMatchParam, setQueryMatchParam] = useState<MatchParamProps>({
     matchCase: false,
@@ -512,32 +425,29 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  function filterTree(treeChild: TreeNode, queryRegExp: RegExp): TreeNode {
-    if (treeChild.text) {
-      return queryRegExp.test(treeChild.text)
+  const newFilterTree = (node: FileEntry, queryRegExp: RegExp) => {
+    if (node.text) {
+      const matches = node.text.match(queryRegExp);
+      const matchCount = matches?.length;
+
+      if (matches && matchCount) {
+        searchCounter.current = {
+          filesCount: searchCounter.current.filesCount + 1,
+          totalMatchCount: searchCounter.current.totalMatchCount + matchCount,
+        };
+      }
+
+      return matches
         ? {
-            ...treeChild,
-            matches: treeChild.text.match(queryRegExp),
-            matchCount: treeChild.text.match(queryRegExp)?.length,
+            ...node,
+            matches,
+            matchCount,
           }
-        : (null as unknown as TreeNode);
+        : (null as unknown as FileEntry);
     }
 
-    if (treeChild.isFolder && tree?.children.length) {
-      treeChild.children = treeChild.children
-        .map(currentItem => filterTree(currentItem, queryRegExp))
-        .filter((v: TreeNode | null) => Boolean(v))
-        .filter((v: TreeNode) => {
-          return !v.isFolder || (v.isFolder === true && v.children.length > 0);
-        }); // filter out folders that don't contain files that match query search;
-    }
-
-    if (!treeChild.text && !treeChild.isFolder) {
-      return null as unknown as TreeNode;
-    }
-
-    return treeChild;
-  }
+    return null as unknown as FileEntry;
+  };
 
   useEffect(() => {
     findMatches(searchQuery);
@@ -545,17 +455,21 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   }, [queryMatchParam]);
 
   const findMatches = (query: string) => {
+    searchCounter.current = {filesCount: 0, totalMatchCount: 0};
     if (!tree) return;
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);
       return;
     }
-    let searchedTree = cloneDeep(tree);
     let matchParams = 'gi'; // global, case insensitive by default
     if (queryMatchParam.matchCase) {
       matchParams = 'g';
     }
+    if (!queryMatchParam.regExp) {
+      query = query.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
+    }
+
     let queryRegExp = new RegExp(query, matchParams);
 
     if (queryMatchParam.matchWholeWord) {
@@ -565,14 +479,13 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       queryRegExp = new RegExp(query, matchParams);
     }
 
-    const newTree: TreeNode[] = searchedTree.children
-      .map(currentItem => filterTree(currentItem, queryRegExp))
-      .filter(Boolean)
-      .filter((v: TreeNode) => {
-        return !v.isFolder || (v.isFolder && v.children.length > 0);
-      });
+    const filteredFileMap: FileEntry[] = Object.values(fileMap)
+      .map(file => newFilterTree(file, queryRegExp))
+      .filter(v => Boolean(v));
 
-    setSearchTree({...searchedTree, children: newTree});
+    const treeData = createFilteredNode(filteredFileMap);
+
+    setSearchTree(treeData);
   };
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
@@ -645,7 +558,13 @@ const FileTreePane: React.FC<Props> = ({height}) => {
           </S.SearchBox>
           <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
             <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
-            <div id="file-explorer-count">{filesOnly.length} files</div>
+            {searchTree ? (
+              <S.MatchText id="file-explorer-search-count">
+                {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
+              </S.MatchText>
+            ) : (
+              <div id="file-explorer-count">{filesOnly.length} files</div>
+            )}
           </S.RootFolderText>
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}

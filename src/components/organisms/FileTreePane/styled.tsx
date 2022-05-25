@@ -146,6 +146,21 @@ export const RootFolderText = styled.div`
   margin-left: 14px;
 `;
 
+export const MatchText = styled.div`
+  color: ${Colors.lightSeaGreen};
+`;
+
+export const MatchCount = styled.span`
+  margin-left: 5px;
+  font-size: 14px;
+  color: ${Colors.yellow11};
+`;
+
+export const Path = styled.span`
+  margin-left: 5px;
+  color: ${Colors.grey7};
+`;
+
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
