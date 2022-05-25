@@ -1,5 +1,6 @@
 import {Scalar} from 'yaml';
 
+import {KubernetesObject} from './appstate';
 import {SarifRule} from './policy';
 
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
@@ -45,7 +46,7 @@ interface K8sResource {
   /** unparsed resource content (for editing) */
   text: string;
   /**  contains parsed yaml resource - used for filtering/finding links/refs, etc */
-  content: any;
+  content: KubernetesObject;
   /** array of refs (incoming, outgoing and unsatisfied) to and from other resources */
   refs?: ResourceRef[];
   /**  range of this resource in a multidocument file */
@@ -58,14 +59,6 @@ interface K8sResource {
 
   /** result of policy validation */
   issues?: ResourceValidation;
-}
-
-export interface KubernetesObject {
-  apiVersion?: string;
-  kind?: string;
-  metadata?: Record<string, any>;
-  spec?: Record<string, any>;
-  status?: Record<string, any>;
 }
 
 export enum ResourceRefType {

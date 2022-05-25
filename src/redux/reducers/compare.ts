@@ -40,7 +40,7 @@ export type CompareState = {
     right?: ResourceSetData;
     comparison?: ComparisonData;
     selection: string[];
-    viewDiff?: string; // comparisonId
+    inspect?: ComparisonInspection;
     search?: string;
     filtering?: {
       comparisons: ResourceComparison[];
@@ -57,6 +57,11 @@ export type TransferDirection = 'left-to-right' | 'right-to-left';
 export type ComparisonData = {
   loading: boolean;
   comparisons: ResourceComparison[];
+};
+
+export type ComparisonInspection = {
+  comparison: string;
+  type: CompareSide | 'diff';
 };
 
 export type ResourceSetData = {
@@ -79,6 +84,7 @@ export type ComparisonView = {
   rightSet?: PartialResourceSet;
   operation?: CompareOperation;
   filter?: CompareFilter;
+  namespace?: string;
 };
 
 export type SavedComparisonView = ComparisonView & {
@@ -180,8 +186,11 @@ export const compareSlice = createSlice({
       state.current.view.operation = action.payload.operation;
       resetComparison(state);
     },
-    searchUpdated: (state, action: PayloadAction<{search: string}>) => {
+    searchUpdated: (state, action: PayloadAction<{search: string | undefined}>) => {
       state.current.search = action.payload.search;
+    },
+    namespaceUpdated: (state, action: PayloadAction<{namespace: string | undefined}>) => {
+      state.current.view.namespace = action.payload.namespace;
     },
     filterUpdated: (state, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
       const newFilter = action.payload.filter;
@@ -222,8 +231,11 @@ export const compareSlice = createSlice({
       resetComparison(state);
       state.current[side] = undefined;
     },
-    diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
-      state.current.viewDiff = action.payload.id;
+    comparisonInspecting: (state, action: PayloadAction<ComparisonInspection>) => {
+      state.current.inspect = action.payload;
+    },
+    comparisonInspected: state => {
+      state.current.inspect = undefined;
     },
     comparisonToggled: (state, action: PayloadAction<{id: string}>) => {
       const {id} = action.payload;
@@ -352,7 +364,7 @@ export const compareSlice = createSlice({
 
 function resetComparison(state: WritableDraft<CompareState>) {
   state.current.comparison = undefined;
-  state.current.viewDiff = undefined;
+  state.current.inspect = undefined;
   state.current.selection = [];
 
   state.current.filtering = undefined;
@@ -365,6 +377,7 @@ export default compareSlice.reducer;
 export const {
   compareToggled,
   searchUpdated,
+  namespaceUpdated,
   filterUpdated,
   operationUpdated,
   resourceSetCleared,
@@ -375,7 +388,8 @@ export const {
   resourceSetFetched,
   resourceSetCompared,
   resourceSetFiltered,
-  diffViewOpened,
+  comparisonInspecting,
+  comparisonInspected,
   comparisonAllToggled,
   comparisonToggled,
 } = compareSlice.actions;
@@ -383,7 +397,7 @@ export const {
 /* * * * * * * * * * * * * *
  * Selectors
  * * * * * * * * * * * * * */
-export type CompareStatus = 'selecting' | 'comparing' | 'transfering';
+export type CompareStatus = 'selecting' | 'comparing' | 'inspecting' | 'transfering';
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
 
@@ -394,7 +408,11 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
     return 'selecting';
   }
 
-  return c.transfering.pending ? 'transfering' : 'comparing';
+  if (c.transfering.pending) {
+    return 'transfering';
+  }
+
+  return c.inspect ? 'inspecting' : 'comparing';
 };
 
 export const selectResourceSet = (state: CompareState, side: CompareSide): PartialResourceSet | undefined => {
@@ -446,14 +464,21 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   return {allKustomizations, currentKustomization};
 };
 
-export const selectDiffedComparison = (state: CompareState): ResourceComparison | undefined => {
-  const id = state.current.viewDiff;
+export const selectComparison = (state: CompareState, id: string | undefined): ResourceComparison | undefined => {
   if (!id) return undefined;
-  const comparison = state.current.comparison?.comparisons.find(c => c.id === id);
-  if (!comparison) return undefined;
-  return comparison;
+  return state.current.comparison?.comparisons.find(c => c.id === id);
 };
 
+export const selectKnownNamespaces = createSelector(
+  (state: CompareState) => state.current.left,
+  (state: CompareState) => state.current.right,
+  (left, right) => {
+    const set = new Set();
+    left?.resources.forEach(r => set.add(r.namespace ?? 'default'));
+    right?.resources.forEach(r => set.add(r.namespace ?? 'default'));
+    return Array.from(set.values());
+  }
+);
 export const selectIsComparisonSelected = (state: CompareState, id: string): boolean => {
   return state.current.selection.some(comparisonId => comparisonId === id);
 };
@@ -465,32 +490,37 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   );
 };
 
-export const selectCanTransferAllSelected = (state: CompareState, direction: TransferDirection): boolean => {
+export const selectCanTransfer = (state: CompareState, direction: TransferDirection, ids: string[]): boolean => {
+  // Cannot transfer in invalid state.
+  const status = selectCompareStatus(state);
+  if (status === 'selecting' || status === 'transfering' || ids.length === 0) {
+    return false;
+  }
+
+  // Cannot transfer when the resource set type is non-transferable.
   const left = state.current.view.leftSet?.type;
   const right = state.current.view.rightSet?.type;
   const isTransferable = direction === 'left-to-right' ? canTransfer(left, right) : canTransfer(right, left);
-  if (!isTransferable) return false;
+  if (!isTransferable) {
+    return false;
+  }
 
-  const selection = state.current.selection;
-  if (selection.length === 0) return false;
-
+  // Can only transfer if all selected items are transferable.
   const comparisons = state.current.filtering?.comparisons ?? [];
   const transferable = comparisons
-    .filter(comparison => selection.some(s => s === comparison.id))
-    .filter(isDefined)
+    .filter(comparison => ids.some(id => id === comparison.id))
     .filter(comparison => (direction === 'left-to-right' ? comparison.left : comparison.right));
-
-  return selection.length === transferable.length;
+  return ids.length === transferable.length;
 };
 
 export const selectComparisonListItems = createSelector(
   (state: CompareState) => state.current.filtering?.comparisons,
   (state: CompareState) => [state.current.view.leftSet?.type, state.current.view.rightSet?.type],
-  (comparisons = [], [leftType, rightType]) => {
+  (state: CompareState) => state.current.view.namespace,
+  (comparisons = [], [leftType, rightType], defaultNamespace) => {
     const result: ComparisonListItem[] = [];
 
-    const leftTransferable = canTransfer(leftType, rightType);
-    const rightTransferable = canTransfer(leftType, rightType);
+    const transferable = canTransfer(leftType, rightType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -507,11 +537,11 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: isNamespaced ? comparison.left.namespace ?? 'default' : undefined,
+            namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
-            leftTransferable,
-            rightTransferable,
+            leftTransferable: transferable,
+            rightTransferable: transferable,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -520,12 +550,12 @@ export const selectComparisonListItems = createSelector(
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
             namespace: isNamespaced
-              ? comparison.left?.namespace ?? comparison.right?.namespace ?? 'default'
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
               : undefined,
-            leftActive: Boolean(comparison.left),
-            rightActive: Boolean(comparison.right),
-            leftTransferable,
-            rightTransferable,
+            leftActive: isDefined(comparison.left),
+            rightActive: isDefined(comparison.right),
+            leftTransferable: transferable && isDefined(comparison.left),
+            rightTransferable: transferable && isDefined(comparison.right),
             canDiff: false,
           });
         }
@@ -602,7 +632,7 @@ export const resourceFetchListener =
 
 export const compareListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(resourceSetFetched, operationUpdated),
+    matcher: isAnyOf(resourceSetFetched, operationUpdated, namespaceUpdated),
     effect: async (_action, {dispatch, getState}) => {
       const status = selectCompareStatus(getState().compare);
       const current = getState().compare.current;
@@ -612,8 +642,11 @@ export const compareListener: AppListenerFn = listen => {
         return;
       }
 
-      const options = {operation: view.operation ?? 'union'};
-      const comparisons = compareResources(left.resources, right.resources, options);
+      const comparisons = compareResources(left.resources, right.resources, {
+        operation: view.operation ?? 'union',
+        defaultNamespace: view.namespace,
+      });
+
       dispatch(resourceSetCompared({comparisons}));
     },
   });
@@ -653,35 +686,35 @@ export const transferResource = createAsyncThunk<
     const delta: MatchingResourceComparison[] = [];
     const failures: string[] = [];
 
+    const namespace = getState().compare.current.view.namespace;
     const leftSet = getState().compare.current.view.leftSet;
     const rightSet = getState().compare.current.view.rightSet;
     invariant(leftSet && rightSet, 'invalid state');
+    const context =
+      direction === 'left-to-right'
+        ? rightSet.type === 'cluster'
+          ? rightSet.context
+          : undefined
+        : leftSet.type === 'cluster'
+        ? leftSet.context
+        : undefined;
+
     const from = direction === 'left-to-right' ? leftSet.type : rightSet.type;
     const to = direction === 'left-to-right' ? rightSet.type : leftSet.type;
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const comparisonId of ids) {
-      try {
-        const comparison = getState().compare.current.comparison?.comparisons.find(c => c.id === comparisonId);
-        invariant(comparison, 'invalid state');
+    const comparisons = getState().compare.current.comparison?.comparisons.filter(c => ids.includes(c.id)) ?? [];
 
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comparison of comparisons) {
+      try {
         const source = direction === 'left-to-right' ? comparison.left : comparison.right;
         const target = direction === 'left-to-right' ? comparison.right : comparison.left;
-        const context =
-          direction === 'left-to-right'
-            ? rightSet.type === 'cluster'
-              ? rightSet.context
-              : undefined
-            : leftSet.type === 'cluster'
-            ? leftSet.context
-            : undefined;
-        invariant(source && from && to, 'invalid state');
+        invariant(source, 'invalid state');
 
-        let newTarget;
-
+        const options = {from, to, context, namespace};
         // Note: Need to apply one-by-one as it fails in bulk.
         // eslint-disable-next-line no-await-in-loop
-        newTarget = await doTransferResource(source, target, {from, to, context}, getState(), dispatch);
+        const newTarget = await doTransferResource(source, target, options, getState(), dispatch);
 
         delta.push({
           ...comparison,
@@ -691,7 +724,7 @@ export const transferResource = createAsyncThunk<
           isDifferent: source.text !== newTarget.text,
         });
       } catch (err) {
-        failures.push(comparisonId);
+        failures.push(comparison.id);
         log.debug('transfer resource failed - ', err);
       }
     }

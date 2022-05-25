@@ -1,17 +1,10 @@
 import {useMemo} from 'react';
 
-import {Col, Dropdown, Menu, Row} from 'antd';
+import {Col, Dropdown, Row} from 'antd';
 
-import {
-  FileSearchOutlined,
-  FireOutlined,
-  GithubOutlined,
-  MessageOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import {FileSearchOutlined, FireOutlined, GithubOutlined, MessageOutlined} from '@ant-design/icons';
 
 import semver from 'semver';
-import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
 import {
@@ -30,25 +23,9 @@ import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
 
-import Colors, {FontColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
-const IconContainerSpan = styled.span`
-  width: 18px;
-  height: 18px;
-  color: ${FontColors.elementSelectTitle};
-  font-size: 18px;
-  cursor: pointer;
-`;
-
-const StyledQuestionCircleOutlined = styled(QuestionCircleOutlined)`
-  cursor: pointer;
-  font-size: 20px;
-  color: ${FontColors.elementSelectTitle};
-`;
-
-const MenuItem = styled(Menu.Item)`
-  padding-right: 12px;
-`;
+import * as S from './HelpMenu.styled';
 
 const HelpMenu = () => {
   const dispatch = useAppDispatch();
@@ -70,91 +47,99 @@ const HelpMenu = () => {
     dispatch(openKeyboardShortcutsModal());
   };
 
-  const menu = (
-    <Menu inlineIndent={25} style={{width: '200px'}}>
-      <MenuItem onClick={openDocumentation} key="documentation">
+  const menuItems = [
+    {
+      key: 'documentation',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <FileSearchOutlined />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>Documentation</Col>
         </Row>
-      </MenuItem>
-
-      <MenuItem onClick={onClickReleaseNotes} key="releasenotes">
+      ),
+      onClick: openDocumentation,
+    },
+    {
+      key: 'releasenotes',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <FireOutlined />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>New in {parsedAppVersion || 'this version'}</Col>
         </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys">
+      ),
+      onClick: onClickReleaseNotes,
+    },
+    {
+      key: 'hotkeys',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <Icon name="shortcuts" color={Colors.blue6} />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>Keyboard Shortcuts</Col>
         </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openGitHub} key="github">
+      ),
+      onClick: openKeyboardShortcuts,
+    },
+    {
+      key: 'github',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <GithubOutlined />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>GitHub</Col>
         </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openDiscord} key="discord">
+      ),
+      onClick: openGitHub,
+    },
+    {
+      key: 'discord',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <img src={DiscordLogo} style={{height: '18px', width: '18px'}} />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>Discord</Col>
         </Row>
-      </MenuItem>
-
-      <MenuItem
-        onClick={() => {
-          dispatch(cancelWalkThrough('novice'));
-          dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
-        }}
-        key="replay"
-      >
+      ),
+      onClick: openDiscord,
+    },
+    {
+      key: 'replay',
+      label: (
         <Row align="middle">
           <Col span={5}>
-            <IconContainerSpan>
+            <S.IconContainerSpan>
               <MessageOutlined style={{transform: 'rotate(180deg)'}} />
-            </IconContainerSpan>
+            </S.IconContainerSpan>
           </Col>
-
           <Col span={19}>Re-play Quick Guide</Col>
         </Row>
-      </MenuItem>
-    </Menu>
-  );
+      ),
+      onClick: () => {
+        dispatch(cancelWalkThrough('novice'));
+        dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+      },
+    },
+  ];
 
   return (
-    <Dropdown key="more" overlay={menu}>
-      <StyledQuestionCircleOutlined />
+    <Dropdown key="more" overlay={<S.Menu items={menuItems} />}>
+      <S.QuestionCircleOutlined />
     </Dropdown>
   );
 };

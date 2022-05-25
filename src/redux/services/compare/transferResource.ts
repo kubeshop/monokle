@@ -8,11 +8,12 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {ResourceSet} from '@redux/reducers/compare';
-import {performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {applyResource} from '@redux/thunks/applyResource';
-import {getResourceFromCluster} from '@redux/thunks/utils';
+import {updateResource} from '@redux/thunks/updateResource';
+import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
 
+import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 type Type = ResourceSet['type'];
@@ -40,7 +41,7 @@ export function doTransferResource(
     case 'cluster':
       return deployResourceToCluster(source, target, options, state, dispatch);
     case 'local':
-      return extractResourceToLocal(source, target, state);
+      return extractResourceToLocal(source, target, dispatch);
     default:
       throw new Error('transfer unsupported');
   }
@@ -59,14 +60,29 @@ async function deployResourceToCluster(
   const projectConfig = currentConfigSelector(state);
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
-  const namespace = {name: 'default', new: false}; // TODO use modal for confirm + namespace select.
+  const namespace = source.namespace ?? options.namespace ?? 'default';
+  const kubeClient = createKubeClient(kubeConfigPath, currentContext);
+  const hasNamespace = await getNamespace(kubeClient, namespace);
 
-  await applyResource(resourceId, resourceMap, fileMap, dispatch, projectConfig, currentContext, namespace, {
-    isClusterPreview: false,
-    shouldPerformDiff: false,
-    isInClusterDiff: false,
-    quiet: true,
-  });
+  if (!hasNamespace) {
+    await createNamespace(kubeClient, namespace);
+  }
+
+  await applyResource(
+    resourceId,
+    resourceMap,
+    fileMap,
+    dispatch,
+    projectConfig,
+    currentContext,
+    {name: namespace, new: !hasNamespace},
+    {
+      isClusterPreview: false,
+      shouldPerformDiff: false,
+      isInClusterDiff: false,
+      quiet: true,
+    }
+  );
 
   // Remark: Cluster adds defaults so copying the source's content
   // is too naive. Instead fetch remotely and fallback to copy if failed.
@@ -85,21 +101,18 @@ async function deployResourceToCluster(
 async function extractResourceToLocal(
   source: K8sResource,
   target: K8sResource | undefined,
-  state: RootState
+  dispatch: AppDispatch
 ): Promise<K8sResource> {
-  const resourceMap = state.main.resourceMap;
-  const fileMap = state.main.fileMap;
-
   if (target) {
-    const result = {...target};
-    performResourceContentUpdate(result, source.content, fileMap, resourceMap);
+    const result = structuredClone(target);
+    result.text = source.text;
+    await dispatch(updateResource({resourceId: target.id, text: source.text}));
     return result;
   }
 
-  const result = createResource(source.content, {
+  return createResource(source.content, {
     name: source.name,
   });
-  return result;
 }
 
 function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8sResource {
