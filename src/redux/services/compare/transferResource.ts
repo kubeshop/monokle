@@ -8,9 +8,9 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {ResourceSet} from '@redux/reducers/compare';
-import {performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {applyResource} from '@redux/thunks/applyResource';
+import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
@@ -41,7 +41,7 @@ export function doTransferResource(
     case 'cluster':
       return deployResourceToCluster(source, target, options, state, dispatch);
     case 'local':
-      return extractResourceToLocal(source, target, state);
+      return extractResourceToLocal(source, target, dispatch);
     default:
       throw new Error('transfer unsupported');
   }
@@ -101,21 +101,18 @@ async function deployResourceToCluster(
 async function extractResourceToLocal(
   source: K8sResource,
   target: K8sResource | undefined,
-  state: RootState
+  dispatch: AppDispatch
 ): Promise<K8sResource> {
-  const resourceMap = state.main.resourceMap;
-  const fileMap = state.main.fileMap;
-
   if (target) {
     const result = structuredClone(target);
-    performResourceContentUpdate(result, source.text, fileMap, resourceMap);
+    result.text = source.text;
+    await dispatch(updateResource({resourceId: target.id, text: source.text}));
     return result;
   }
 
-  const result = createResource(source.content, {
+  return createResource(source.content, {
     name: source.name,
   });
-  return result;
 }
 
 function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8sResource {
