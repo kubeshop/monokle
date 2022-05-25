@@ -32,7 +32,7 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
-  const [kinds, setKinds] = useState<string[]>([ALL_OPTIONS]);
+  const [kinds, setKinds] = useState<string[]>([]);
   const [name, setName] = useState<string>();
   const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
@@ -79,7 +79,7 @@ const ResourceFilter = () => {
   const resetFilters = () => {
     setWasLocalUpdate(true);
     setName('');
-    setKinds([ALL_OPTIONS]);
+    setKinds([]);
     setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
@@ -163,7 +163,7 @@ const ResourceFilter = () => {
   useEffect(() => {
     if (!wasLocalUpdate) {
       setName(filtersMap.name);
-      setKinds(filtersMap.kinds || [ALL_OPTIONS]);
+      setKinds(filtersMap.kinds || []);
       setNamespace(filtersMap.namespace);
       setLabels(filtersMap.labels);
       setAnnotations(filtersMap.annotations);
@@ -221,6 +221,7 @@ const ResourceFilter = () => {
           placeholder="Select one or multiple kinds"
           showArrow
           showSearch
+          mode="multiple"
           style={{width: '100%'}}
           value={kinds || []}
           onChange={updateKinds}
