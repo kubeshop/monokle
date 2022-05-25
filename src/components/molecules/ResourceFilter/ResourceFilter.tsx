@@ -1,15 +1,18 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Input, Select} from 'antd';
+import {Button, Input, Select, Tooltip} from 'antd';
+
+import {ClearOutlined} from '@ant-design/icons';
 
 import {mapValues} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+import {ResetFiltersTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {openFiltersPresetModal} from '@redux/reducers/ui';
+import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors';
 
 import {KeyValueInput} from '@components/atoms';
@@ -176,23 +179,32 @@ const ResourceFilter = () => {
 
   return (
     <S.Container>
-      <FeatureFlag name="FiltersPreset">
-        <S.PresetContainer>
-          <Button type="default" onClick={onClickLoadPreset}>
-            Load preset
-          </Button>
-          <Button type="default" onClick={onClickSavePreset}>
-            Save preset
-          </Button>
-        </S.PresetContainer>
-      </FeatureFlag>
+      <S.TitleContainer>
+        <S.TitleLabel>
+          FILTER <S.CaretUpOutlined onClick={() => dispatch(toggleResourceFilters())} />
+        </S.TitleLabel>
 
-      <S.Title>
-        <S.TitleLabel>Filter resources by:</S.TitleLabel>
-        <S.TitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
-          Reset all
-        </S.TitleButton>
-      </S.Title>
+        <S.TitleActions>
+          <FeatureFlag name="FiltersPreset">
+            <S.PresetButton type="link" onClick={onClickLoadPreset}>
+              Load preset
+            </S.PresetButton>
+            <S.PresetButton type="link" onClick={onClickSavePreset}>
+              Save preset
+            </S.PresetButton>
+          </FeatureFlag>
+
+          <Tooltip title={ResetFiltersTooltip}>
+            <Button
+              disabled={areFiltersDisabled}
+              icon={<ClearOutlined />}
+              size="small"
+              type="link"
+              onClick={resetFilters}
+            />
+          </Tooltip>
+        </S.TitleActions>
+      </S.TitleContainer>
 
       <S.Field>
         <S.FieldLabel>Name:</S.FieldLabel>

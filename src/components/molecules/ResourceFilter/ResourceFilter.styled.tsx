@@ -1,11 +1,23 @@
 import {Button} from 'antd';
 
+import {CaretUpOutlined as RawCaretUpOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const CaretUpOutlined = styled(RawCaretUpOutlined)`
+  margin-left: 5px;
+  color: ${Colors.whitePure};
+  font-size: 10px;
+  cursor: pointer;
+  padding: 4px;
+`;
+
 export const Container = styled.div`
-  padding: 8px;
+  padding: 10px 18px;
+  height: 100%;
+  background-color: #0c0d0e;
 `;
 
 export const Field = styled.div`
@@ -18,22 +30,29 @@ export const FieldLabel = styled.p`
   margin-bottom: 5px;
 `;
 
-export const PresetContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin: 10px 0px;
+export const PresetButton = styled(Button)`
+  padding: 0;
 `;
 
-export const Title = styled.div`
+export const TitleActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+export const TitleContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 `;
 
 export const TitleLabel = styled.span`
-  color: ${Colors.grey7};
+  color: ${Colors.grey9};
+  font-weight: 600;
 `;
 
 export const TitleButton = styled(Button)`
   padding: 0;
+  font-size: 16px;
 `;
