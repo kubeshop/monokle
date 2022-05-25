@@ -1,13 +1,11 @@
 import {useCallback} from 'react';
 
-import {Button, Space, Switch} from 'antd';
-
-import log from 'loglevel';
+import {Button} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {comparisonInspected, selectComparison} from '@redux/reducers/compare';
 
-import * as S from './DiffActionBar.styled';
+import * as S from './InspectionActionBar.styled';
 
 export const InspectionActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -25,10 +23,6 @@ export const InspectionActionBar: React.FC = () => {
     dispatch(comparisonInspected());
   }, [dispatch]);
 
-  const handleToggleHideIgnoredFields = useCallback(() => {
-    log.debug('dispatch HideIgnoredFields');
-  }, []);
-
   return (
     <S.ActionBarDiv>
       <div>
@@ -37,16 +31,9 @@ export const InspectionActionBar: React.FC = () => {
       </div>
 
       <S.ActionBarRightDiv>
-        <Space size="middle">
-          <Space size="small">
-            <Switch onChange={handleToggleHideIgnoredFields} />
-            <span>Hide ignored fields</span>
-          </Space>
-
-          <Button type="primary" onClick={handleBack}>
-            Back
-          </Button>
-        </Space>
+        <Button type="primary" onClick={handleBack}>
+          Back
+        </Button>
       </S.ActionBarRightDiv>
     </S.ActionBarDiv>
   );
