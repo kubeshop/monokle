@@ -81,13 +81,6 @@ export type SetRootFolderPayload = {
   isScanIncludesUpdated: 'outdated' | 'applied';
 };
 
-export type UpdateResourcePayload = {
-  resourceId: string;
-  content: string;
-  preventSelectionAndHighlightsUpdate?: boolean;
-  isInClusterMode?: boolean;
-};
-
 export type UpdateMultipleResourcesPayload = {
   resourceId: string;
   content: string;

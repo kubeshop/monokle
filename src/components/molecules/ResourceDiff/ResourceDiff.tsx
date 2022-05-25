@@ -155,7 +155,7 @@ const ResourceDiff = (props: {
     dispatch(
       updateResource({
         resourceId: localResource.id,
-        content: cleanClusterResourceText,
+        text: cleanClusterResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })
     );

@@ -47,7 +47,7 @@ export const renameResource = (
       dispatch(
         updateResource({
           resourceId: dependentResource.id,
-          content: newDependentResourceText,
+          text: newDependentResourceText,
           preventSelectionAndHighlightsUpdate: selectedResourceId !== dependentResource.id,
         })
       );
@@ -56,7 +56,7 @@ export const renameResource = (
   dispatch(
     updateResource({
       resourceId,
-      content: newResourceText,
+      text: newResourceText,
       preventSelectionAndHighlightsUpdate: selectedResourceId !== resourceId,
     })
   );

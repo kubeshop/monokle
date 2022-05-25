@@ -2,14 +2,11 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
+import {AppState} from '@models/appstate';
 import {RootState} from '@models/rootstate';
+import {ThunkApi} from '@models/thunk';
 
-import {
-  UpdateResourcePayload,
-  getActiveResourceMap,
-  getLocalResourceMap,
-  performResourceContentUpdate,
-} from '@redux/reducers/main';
+import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
@@ -17,16 +14,23 @@ import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 
-export const updateResource = createAsyncThunk(
+type UpdateResourcePayload = {
+  resourceId: string;
+  text: string;
+  preventSelectionAndHighlightsUpdate?: boolean;
+  isInClusterMode?: boolean;
+};
+
+export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, ThunkApi>(
   'main/updateResource',
-  async (payload: UpdateResourcePayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+  async (payload, thunkAPI) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
     const policyPlugins = state.main.policies.plugins;
 
-    const {isInClusterMode, resourceId, content, preventSelectionAndHighlightsUpdate} = payload;
+    const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate} = payload;
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
@@ -36,7 +40,7 @@ export const updateResource = createAsyncThunk(
 
         const fileMap = mainState.fileMap;
         if (resource) {
-          performResourceContentUpdate(resource, content, fileMap, resourceMap);
+          performResourceContentUpdate(resource, text, fileMap, resourceMap);
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
           reprocessResources(
             schemaVersion,
@@ -60,7 +64,7 @@ export const updateResource = createAsyncThunk(
             mainState.previewResourceId &&
             isKustomizationResource(resourceMap[mainState.previewResourceId])
           ) {
-            performResourceContentUpdate(r, content, fileMap, resourceMap);
+            performResourceContentUpdate(r, text, fileMap, resourceMap);
             processKustomizations(resourceMap, fileMap);
           } else {
             log.warn('Failed to find updated resource during preview', resourceId);

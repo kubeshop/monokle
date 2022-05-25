@@ -123,7 +123,7 @@ export async function applyResource(
                 dispatch(
                   updateResource({
                     resourceId: resourceFromCluster?.metadata?.uid,
-                    content: updatedResourceText,
+                    text: updatedResourceText,
                   })
                 );
               } else {

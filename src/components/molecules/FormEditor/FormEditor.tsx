@@ -136,7 +136,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         const isChanged = content.trim() !== selectedResource.text.trim();
         setIsResourceUpdated(isChanged);
         if (isChanged) {
-          dispatch(updateResource({resourceId: selectedResource.id, content}));
+          dispatch(updateResource({resourceId: selectedResource.id, text: content}));
         }
       } else if (selectedPath) {
         try {

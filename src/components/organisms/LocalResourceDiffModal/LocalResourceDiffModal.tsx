@@ -154,7 +154,7 @@ const DiffModal = () => {
     dispatch(
       updateResource({
         resourceId: targetResource.id,
-        content: cleanMatchingResourceText,
+        text: cleanMatchingResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })
     );
