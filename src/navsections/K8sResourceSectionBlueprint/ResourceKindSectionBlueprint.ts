@@ -20,7 +20,6 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
-import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSectionNameCounter from './ResourceKindSectionNameCounter';
 import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
@@ -102,6 +101,10 @@ export function makeResourceKindNavSection(
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
+      rowBuilder: {
+        height: 23,
+        marginBottom: instance => (instance.isLast ? 8 : 0),
+      },
       builder: {
         isSelected: rawItem => rawItem.isSelected,
         isHighlighted: rawItem => rawItem.isHighlighted,
@@ -130,7 +133,7 @@ export function makeResourceKindNavSection(
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
-        contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
+        // contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
         isCheckVisibleOnHover: true,
       },
