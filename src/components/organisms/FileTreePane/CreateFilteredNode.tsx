@@ -32,6 +32,7 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): TreeNode => {
       children: [],
       highlight: false,
       isLeaf: true,
+      isFolder: false,
       isSupported: true,
       isExcluded: false,
       key: item.filePath,

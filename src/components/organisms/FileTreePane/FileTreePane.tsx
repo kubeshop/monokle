@@ -102,6 +102,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
   const isCollapsed = expandedFolders.length === 0;
+  const isFilterActive = expandedFolders[0] === 'filter';
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -460,6 +461,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);
+      dispatch(setExpandedFolders(allTreeKeys));
       return;
     }
     let matchParams = 'gi'; // global, case insensitive by default
@@ -486,6 +488,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     const treeData = createFilteredNode(filteredFileMap);
 
     setSearchTree(treeData);
+    dispatch(setExpandedFolders(['filter']));
   };
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
@@ -571,6 +574,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
             onSelect={onSelect}
             treeData={[treeToRender]}
             ref={treeRef}
+            isFilter={isFilterActive}
             expandedKeys={expandedFolders}
             onExpand={onExpand}
             titleRender={(event: any) => (

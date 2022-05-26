@@ -200,13 +200,25 @@ export const TreeContainer = styled.div`
   margin-left: 2px;
 `;
 
-export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
+export const TreeDirectoryTree = styled(Tree.DirectoryTree)<{isFilter: boolean}>`
   margin-top: 10px;
-  .ant-tree-switcher svg {
-    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
+  .ant-tree-switcher {
+    display: ${props => (props.isFilter ? 'none' : 'block')};
+
+    svg {
+      color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
+    }
+  }
+
+  .ant-tree-node-content-wrapper .ant-tree-iconEle {
+    display: ${props => (props.isFilter ? 'none' : 'inline-block')};
   }
 
   opacity: ${props => (props.disabled ? '70%' : '100%')};
+
+  .ant-tree-treenode-leaf-last {
+    display: ${props => (props.isFilter ? 'none' : 'flex')};
+  }
 `;
 
 export const TreeTitleText = styled.span`
