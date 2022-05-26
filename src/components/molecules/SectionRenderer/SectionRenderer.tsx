@@ -48,7 +48,7 @@ function SectionRenderer(props: SectionRendererProps) {
     size: rows?.length || 0,
     parentRef,
     estimateSize: React.useCallback(
-      i => (rows[i].type === 'section' ? sectionBlueprint.rowHeight || 50 : itemRowHeight || 25),
+      i => (rows[i].type === 'section' ? sectionBlueprint.rowHeight || 30 : itemRowHeight || 15),
       [rows, sectionBlueprint.rowHeight, itemRowHeight]
     ),
     overscan: 5,

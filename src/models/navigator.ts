@@ -96,7 +96,7 @@ export interface SectionCustomization {
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
-  /** If not specified, the default value will be 25. */
+  /** If not specified, the default value will be 30. */
   rowHeight?: number;
   /** If not specified, the default value will be rowHeight / 2 */
   rowFontSize?: number;
