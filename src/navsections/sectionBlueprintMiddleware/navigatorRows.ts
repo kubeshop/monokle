@@ -11,18 +11,23 @@ import {
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
-function buildRowProp<InstanceType>(
-  builder: RowBuilder<InstanceType> | undefined,
+function buildRowProp<InstanceType, PropsType extends {sectionInstance: SectionInstance} | undefined>(
+  builder: RowBuilder<InstanceType, PropsType> | undefined,
   propName: keyof RowBuilder<InstanceType>,
   instance: InstanceType,
-  defaultValue: number
+  defaultValue: number,
+  sectionInstance?: SectionInstance
 ) {
   let propValue = defaultValue;
   const propBuilder = builder?.[propName];
   if (typeof propBuilder === 'number') {
     propValue = propBuilder;
   } else if (typeof propBuilder === 'function') {
-    propValue = propBuilder(instance);
+    if (sectionInstance) {
+      propValue = propBuilder(instance, {sectionInstance} as PropsType);
+    } else {
+      propValue = propBuilder(instance);
+    }
   }
   return propValue;
 }

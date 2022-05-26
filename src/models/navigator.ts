@@ -84,21 +84,21 @@ export interface SectionCustomization {
   isCheckVisibleOnHover?: boolean;
 }
 
-export interface RowBuilder<InstanceType> {
+export interface RowBuilder<InstanceType, PropsType = undefined> {
   /** If not specified, the default value will be 25. */
-  height?: number | ((instance: InstanceType) => number);
+  height?: number | ((instance: InstanceType, props?: PropsType) => number);
   /** If not specified, the default value will be rowHeight * 0.75 */
-  fontSize?: number | ((instance: InstanceType) => number);
+  fontSize?: number | ((instance: InstanceType, props?: PropsType) => number);
   /** If not specified, the default value will be 0. */
-  indentation?: number | ((instance: InstanceType) => number);
+  indentation?: number | ((instance: InstanceType, props?: PropsType) => number);
   /** If not specified, the default value will be 0. */
-  marginBottom?: number | ((instance: InstanceType) => number);
+  marginBottom?: number | ((instance: InstanceType, props?: PropsType) => number);
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
-  rowBuilder?: RowBuilder<ItemInstance>;
+  rowBuilder?: RowBuilder<ItemInstance, {sectionInstance: SectionInstance}>;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;
