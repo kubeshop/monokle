@@ -7,7 +7,6 @@ import {SectionBlueprint} from '@models/navigator';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationContextMenu from './KustomizationContextMenu';
 import KustomizationPrefix from './KustomizationPrefix';
@@ -32,7 +31,11 @@ export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
-  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
+  rootSectionId: KUSTOMIZATION_SECTION_NAME,
+  rowBuilder: {
+    height: 25,
+    fontSize: 20,
+  },
   getScope: state => {
     const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {
@@ -79,6 +82,9 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   itemBlueprint: {
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
+    rowBuilder: {
+      height: 23,
+    },
     builder: {
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,

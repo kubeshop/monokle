@@ -4,8 +4,8 @@ import {useMeasure} from 'react-use';
 import {SectionRenderer, TitleBar} from '@molecules';
 
 import KustomizationSectionBlueprint from '@src/navsections/KustomizationSectionBlueprint';
-import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';
 
+// import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';
 import * as S from './styled';
 
 const KustomizePane: React.FC = () => {
@@ -17,7 +17,7 @@ const KustomizePane: React.FC = () => {
 
       <S.List id="kustomize-sections-container" ref={listRef}>
         <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} height={height} />
-        <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} height={height} />
+        {/* <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} height={height} /> */}
       </S.List>
     </S.KustomizePaneContainer>
   );
