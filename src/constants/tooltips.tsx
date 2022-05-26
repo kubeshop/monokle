@@ -1,60 +1,54 @@
 import {HotkeyLabel} from '@components/molecules';
 
-export const ExpandTreeTooltip = 'Expand all folders';
-export const CollapseTreeTooltip = 'Collapse all folders';
 export const ClusterExplorerTooltips = {
   default: 'Show/hide Cluster Preview',
   firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
   noKubeconfigPath: 'Kubeconfig path is missing, configure it to enable Cluster features',
   notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',
 };
-export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
-export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
+export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
+export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
+export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
+export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
+export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
+export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
-export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
-export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
-export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
-export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
-export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
-export const ReloadHelmPreviewTooltip = 'Reload the Helm Chart preview with this values file';
-export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
-export const CannotDeployFileTooltip = 'You do not have permissions to deploy this resource';
-export const NamespacesFilterTooltip = 'Filter visible resources on selected namespace';
-export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
-export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
-export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
-export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
-export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and deploying kustomization files';
-export const AutoLoadLastFolderTooltip = 'Load last folder when starting Monokle';
-export const SaveUnsavedResourceTooltip = 'Save resource to file/folder';
-export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
-export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality when invoking Kustomize';
-export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
+export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
-export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
-export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
-export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
-export const OpenKustomizeDocumentationTooltip = 'Open documentation for Kustomize in external browser';
-export const OpenHelmChartDocumentationTooltip = 'Open documentation for Helm Charts in external browser';
-export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
-export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a newer version available';
-export const DocumentationTooltip = 'Open Monokle Documentation Website';
-export const DiscordTooltip = 'Open Kubeshop Discord Server';
-export const GitHubTooltip = 'Open Monokle Github Repository';
-export const NotificationsTooltip = 'Show latest notifications';
-export const ProjectManagementTooltip = 'Select and manage your projects';
-export const NewProjectFromTemplateTooltip = 'New Project from Template';
-export const NewProjectFromFolderTooltip = 'New project from existing folder';
-export const NewEmptyProjectTooltip = 'New Empty Project';
-export const SearchProjectTooltip = 'Search for project by name or path';
-export const PluginDrawerTooltip = 'Open Plugins Manager';
-export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
-export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
-export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
+export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
+export const CollapseTreeTooltip = 'Collapse all folders';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
+export const DocumentationTooltip = 'Open Monokle Documentation Website';
+export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
+export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality when invoking Kustomize';
+export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
+export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
+export const ExpandTreeTooltip = 'Expand all folders';
+export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
+export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
+export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
+export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
+export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and deploying kustomization files';
+export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
+export const NewEmptyProjectTooltip = 'New Empty Project';
+export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
+export const NewProjectFromFolderTooltip = 'New project from existing folder';
+export const NewProjectFromTemplateTooltip = 'New Project from Template';
+export const NotificationsTooltip = 'Show latest notifications';
+export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
+export const OpenHelmChartDocumentationTooltip = 'Open documentation for Helm Charts in external browser';
+export const OpenKustomizeDocumentationTooltip = 'Open documentation for Kustomize in external browser';
+export const PluginDrawerTooltip = 'Open Plugins Manager';
+export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a newer version available';
+export const ProjectManagementTooltip = 'Select and manage your projects';
+export const ReloadHelmPreviewTooltip = 'Reload the Helm Chart preview with this values file';
+export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
+export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
+export const SaveUnsavedResourceTooltip = 'Save resource to file/folder';
+export const SearchProjectTooltip = 'Search for project by name or path';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
-
+export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
 export const TemplatesTabTooltip = `View Templates`;
 
 export const ApplyFileTooltip = () => (
