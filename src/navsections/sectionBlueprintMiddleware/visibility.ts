@@ -9,13 +9,14 @@ import sectionBlueprintMap from '../sectionBlueprintMap';
 export function computeSectionVisibility(
   sectionInstance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>,
-  sectionBlueprint: SectionBlueprint<any, any>
+  sectionBlueprint: SectionBlueprint<any, any>,
+  isLastChild?: boolean
 ): [boolean, string[] | undefined, string[] | undefined] {
   let visibleChildSectionIds: string[] = [];
   let visibleDescendantItemIds: string[] = [];
   let visibleDescendantSectionIds: string[] = [];
 
-  sectionBlueprint.childSectionIds?.forEach(childSectionId => {
+  sectionBlueprint.childSectionIds?.forEach((childSectionId, index) => {
     const childSectionInstance = sectionInstanceMap[childSectionId];
     if (!childSectionInstance) {
       return;
@@ -25,7 +26,12 @@ export function computeSectionVisibility(
       return;
     }
     const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
-      computeSectionVisibility(childSectionInstance, sectionInstanceMap, childSectionBlueprint);
+      computeSectionVisibility(
+        childSectionInstance,
+        sectionInstanceMap,
+        childSectionBlueprint,
+        index === (sectionBlueprint.childSectionIds?.length || 0) - 1
+      );
 
     if (isChildSectionVisible) {
       visibleChildSectionIds.push(childSectionId);
@@ -40,6 +46,7 @@ export function computeSectionVisibility(
     }
   });
 
+  sectionInstance.isLast = Boolean(isLastChild);
   sectionInstance.isVisible = sectionInstance.isVisible || Boolean(visibleChildSectionIds.length);
 
   visibleDescendantItemIds.push(...sectionInstance.visibleItemIds);

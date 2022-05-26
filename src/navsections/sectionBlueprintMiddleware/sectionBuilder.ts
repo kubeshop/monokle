@@ -50,6 +50,7 @@ export const buildSectionInstance = (props: BuildSectionInstanceProps) => {
     isHighlighted: isSectionHighlighted,
     isEmpty: isSectionEmpty,
     isCollapsed: collapsedSectionIds.includes(sectionBlueprint.id),
+    isLast: false,
     meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
     visibleItemIds,
   };
