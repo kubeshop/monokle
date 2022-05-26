@@ -1,6 +1,5 @@
-const KEY_CTRL_CMD = process.platform === 'darwin' ? '⌘' : 'CTRL';
+import {HotkeyLabel} from '@components/molecules';
 
-export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
 export const ExpandTreeTooltip = 'Expand all folders';
 export const CollapseTreeTooltip = 'Collapse all folders';
 export const ClusterExplorerTooltips = {
@@ -14,19 +13,13 @@ export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Clu
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
-export const ClusterModeTooltip = `Retrieve and show resources in selected context (${KEY_CTRL_CMD}+I)`;
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
 export const ReloadHelmPreviewTooltip = 'Reload the Helm Chart preview with this values file';
 export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
-export const ApplyFileTooltip = `Deploy this file to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
-export const DeployKustomizationTooltip = `Deploy this kustomization to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
-export const InstallValuesFileTooltip = `Install Helm Chart using this values file in your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
 export const CannotDeployFileTooltip = 'You do not have permissions to deploy this resource';
-export const ApplyTooltip = `Deploy this resource to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
-export const DiffTooltip = `Diff this resource against your selected cluster (${KEY_CTRL_CMD}+ALT+D)`;
 export const NamespacesFilterTooltip = 'Filter visible resources on selected namespace';
 export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
 export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
@@ -49,7 +42,6 @@ export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a
 export const DocumentationTooltip = 'Open Monokle Documentation Website';
 export const DiscordTooltip = 'Open Kubeshop Discord Server';
 export const GitHubTooltip = 'Open Monokle Github Repository';
-export const SettingsTooltip = `Open Settings (${KEY_CTRL_CMD}+Comma)`;
 export const NotificationsTooltip = 'Show latest notifications';
 export const ProjectManagementTooltip = 'Select and manage your projects';
 export const NewProjectFromTemplateTooltip = 'New Project from Template';
@@ -57,15 +49,36 @@ export const NewProjectFromFolderTooltip = 'New project from existing folder';
 export const NewEmptyProjectTooltip = 'New Empty Project';
 export const SearchProjectTooltip = 'Search for project by name or path';
 export const PluginDrawerTooltip = 'Open Plugins Manager';
-export const QuickFilterTooltip = `Filter results (${KEY_CTRL_CMD}+P)`;
-export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD}+N)`;
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
-export const FileExplorerTabTooltip = `View File Explorer (${KEY_CTRL_CMD}+SHIFT+E)`;
-export const KustomizeTabTooltip = `View Kustomizations (${KEY_CTRL_CMD}+SHIFT+K)`;
-export const HelmTabTooltip = `View Helm Charts (${KEY_CTRL_CMD}+SHIFT+H)`;
+
 export const TemplatesTabTooltip = `View Templates`;
-export const ValidationTabTooltip = `View Validation (${KEY_CTRL_CMD}+SHIFT+V)`;
+
+export const ApplyFileTooltip = () => (
+  <HotkeyLabel text="Deploy this file to your selected cluster" name="APPLY_SELECTION" />
+);
+export const ApplyTooltip = () => (
+  <HotkeyLabel text="Deploy this resource to your selected cluster" name="APPLY_SELECTION" />
+);
+export const ClusterModeTooltip = () => (
+  <HotkeyLabel text="Retrieve and show resources in selected context" name="PREVIEW_CLUSTER" />
+);
+export const DiffTooltip = () => (
+  <HotkeyLabel text="Diff this resource against your selected cluster" name="DIFF_RESOURCE" />
+);
+export const FileExplorerTabTooltip = () => <HotkeyLabel text="View File Explorer" name="OPEN_EXPLORER_TAB" />;
+export const HelmTabTooltip = () => <HotkeyLabel text="View Helm Charts" name="OPEN_HELM_TAB" />;
+export const InstallValuesFileTooltip = () => (
+  <HotkeyLabel text="Install Helm Chart using this values file in your selected cluster" name="APPLY_SELECTION" />
+);
+export const KustomizeTabTooltip = () => <HotkeyLabel text="View Kustomizations" name="OPEN_KUSTOMIZATION_TAB" />;
+export const NewResourceTooltip = () => <HotkeyLabel text="Create new resource" name="CREATE_NEW_RESOURCE" />;
+export const QuickFilterTooltip = () => <HotkeyLabel text="Filter results" name="OPEN_QUICK_SEARCH" />;
+export const ReloadFolderTooltip = () => (
+  <HotkeyLabel text="Reload manifests from the currently selected folder" name="REFRESH_FOLDER" />
+);
+export const SettingsTooltip = () => <HotkeyLabel text="Open Settings" name="TOGGLE_SETTINGS" />;
+export const ValidationTabTooltip = () => <HotkeyLabel text="View Validation" name="OPEN_VALIDATION_TAB" />;
