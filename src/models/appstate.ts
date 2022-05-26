@@ -2,7 +2,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
-import {DockerImage} from './image';
+import {ImageType} from './image';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -24,7 +24,7 @@ type FileMapType = {
  * List of images from current project
  */
 
-type ImagesMapType = DockerImage[];
+type ImagesListType = ImageType[];
 
 /**
  * Maps ids to Helm charts
@@ -54,9 +54,9 @@ type ResourceSelectionHistoryEntry = {
   selectedResourceId: string;
 };
 
-type DockerImageSelectionHistoryEntry = {
+type ImageSelectionHistoryEntry = {
   type: 'image';
-  selectedDockerImage: DockerImage;
+  selectedImage: ImageType;
 };
 
 type PathSelectionHistoryEntry = {
@@ -64,10 +64,7 @@ type PathSelectionHistoryEntry = {
   selectedPath: string;
 };
 
-type SelectionHistoryEntry =
-  | ResourceSelectionHistoryEntry
-  | PathSelectionHistoryEntry
-  | DockerImageSelectionHistoryEntry;
+type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
 
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
@@ -175,12 +172,12 @@ interface AppState {
     previewConfigurationId?: string;
   };
   deviceID: string;
-  selectedDockerImage?: DockerImage | null;
+  selectedImage?: ImageType | null;
   imagesSearchedValue?: string;
-  imagesMap: ImagesMapType;
+  imagesList: ImagesListType;
 }
 
-export interface PossibleResource {
+export interface KubernetesObject {
   apiVersion: string;
   kind: string;
   metadata: {
@@ -190,7 +187,7 @@ export interface PossibleResource {
   [x: string]: any;
 }
 
-export const isPossibleResource = (obj: any) =>
+export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
 
 export type {
@@ -198,7 +195,7 @@ export type {
   ResourceMapType,
   ResourceFilterType,
   FileMapType,
-  ImagesMapType,
+  ImagesListType,
   HelmChartMapType,
   HelmValuesMapType,
   PreviewLoaderType,

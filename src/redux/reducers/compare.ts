@@ -1,21 +1,32 @@
-import {PayloadAction, TaskAbortError, createSelector, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {PayloadAction, TaskAbortError, createAsyncThunk, createSelector, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import {WritableDraft} from 'immer/dist/internal';
 import {groupBy} from 'lodash';
 import log from 'loglevel';
+import invariant from 'tiny-invariant';
 
+import {ERROR_MSG_FALLBACK} from '@constants/constants';
+
+import {AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
+import {ThunkApi} from '@models/thunk';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {kustomizationsSelector} from '@redux/selectors';
 import {compareResources} from '@redux/services/compare/compareResources';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 import {createResourceFilters, filterComparisons} from '@redux/services/compare/filterComparisons';
+import {canTransfer, doTransferResource} from '@redux/services/compare/transferResource';
 
 import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
+import {errorAlert, successAlert} from '@utils/alert';
 import {isDefined} from '@utils/filter';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {setAlert} from './alert';
 
 /* * * * * * * * * * * * * *
  * State definition
@@ -29,19 +40,28 @@ export type CompareState = {
     right?: ResourceSetData;
     comparison?: ComparisonData;
     selection: string[];
-    viewDiff?: string; // comparisonId
+    inspect?: ComparisonInspection;
     search?: string;
     filtering?: {
       comparisons: ResourceComparison[];
+    };
+    transfering: {
+      pending: boolean;
     };
   };
 };
 
 export type CompareSide = 'left' | 'right';
+export type TransferDirection = 'left-to-right' | 'right-to-left';
 
 export type ComparisonData = {
   loading: boolean;
   comparisons: ResourceComparison[];
+};
+
+export type ComparisonInspection = {
+  comparison: string;
+  type: CompareSide | 'diff';
 };
 
 export type ResourceSetData = {
@@ -54,6 +74,9 @@ export type CompareOperation = 'union' | 'intersection' | 'symmetricDifference' 
 
 export type CompareFilter = {
   namespace?: string;
+  kind?: string;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
 };
 
 export type ComparisonView = {
@@ -61,6 +84,7 @@ export type ComparisonView = {
   rightSet?: PartialResourceSet;
   operation?: CompareOperation;
   filter?: CompareFilter;
+  namespace?: string;
 };
 
 export type SavedComparisonView = ComparisonView & {
@@ -133,6 +157,9 @@ const initialState: CompareState = {
       rightSet: undefined,
     },
     selection: [],
+    transfering: {
+      pending: false,
+    },
   },
 };
 
@@ -159,20 +186,20 @@ export const compareSlice = createSlice({
       state.current.view.operation = action.payload.operation;
       resetComparison(state);
     },
-    searchUpdated: (state, action: PayloadAction<{search: string}>) => {
+    searchUpdated: (state, action: PayloadAction<{search: string | undefined}>) => {
       state.current.search = action.payload.search;
     },
-    filterUpdated: (state, action: PayloadAction<{filter: Partial<CompareFilter>}>) => {
-      const currentFilter = state.current.view.filter;
+    namespaceUpdated: (state, action: PayloadAction<{namespace: string | undefined}>) => {
+      state.current.view.namespace = action.payload.namespace;
+    },
+    filterUpdated: (state, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
       const newFilter = action.payload.filter;
+      const isEmpty = !newFilter || Object.keys(newFilter).length === 0;
 
-      if (!currentFilter) {
-        state.current.view.filter = newFilter;
+      if (isEmpty) {
+        state.current.view.filter = undefined;
       } else {
-        state.current.view.filter = {
-          ...currentFilter,
-          ...newFilter,
-        };
+        state.current.view.filter = action.payload.filter;
       }
     },
     resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
@@ -204,8 +231,11 @@ export const compareSlice = createSlice({
       resetComparison(state);
       state.current[side] = undefined;
     },
-    diffViewOpened: (state, action: PayloadAction<{id: string | undefined}>) => {
-      state.current.viewDiff = action.payload.id;
+    comparisonInspecting: (state, action: PayloadAction<ComparisonInspection>) => {
+      state.current.inspect = action.payload;
+    },
+    comparisonInspected: state => {
+      state.current.inspect = undefined;
     },
     comparisonToggled: (state, action: PayloadAction<{id: string}>) => {
       const {id} = action.payload;
@@ -273,11 +303,68 @@ export const compareSlice = createSlice({
       };
     },
   },
+  extraReducers: builder => {
+    builder.addCase(transferResource.pending, state => {
+      state.current.transfering.pending = true;
+    });
+    builder.addCase(transferResource.rejected, state => {
+      state.current.transfering.pending = false;
+    });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      state.current.transfering.pending = false;
+
+      const {side, delta} = action.payload;
+
+      // Splice each update into previous results to give smooth UX.
+      delta.forEach(comparison => {
+        // Remove from selection
+        state.current.selection = state.current.selection.filter(s => s !== comparison.id);
+
+        // Update comparison without recomputing
+        if (state.current.comparison) {
+          const index = state.current.comparison.comparisons.findIndex(c => c.id === comparison.id) ?? -1;
+          if (index !== -1) {
+            state.current.comparison.comparisons.splice(index, 1, comparison);
+          } else {
+            state.current.comparison.comparisons.push(comparison);
+          }
+        }
+
+        // Update filtering without recomparing
+        if (state.current.filtering) {
+          const index = state.current.filtering.comparisons.findIndex(c => c.id === comparison.id) ?? -1;
+          if (index !== -1) {
+            state.current.filtering.comparisons.splice(index, 1, comparison);
+          } else {
+            state.current.filtering.comparisons.push(comparison);
+          }
+        }
+
+        // Update resource sets without refetching
+        if (side === 'left' && state.current.left) {
+          const index = state.current.left.resources.findIndex(r => r.id === comparison.left.id) ?? -1;
+          if (index === -1) {
+            state.current.left.resources.push(comparison.left);
+          } else {
+            state.current.left.resources[index] = comparison.left;
+          }
+        }
+        if (side === 'right' && state.current.right) {
+          const index = state.current.right.resources.findIndex(r => r.id === comparison.right.id) ?? -1;
+          if (index === -1) {
+            state.current.right.resources.push(comparison.right);
+          } else {
+            state.current.right.resources[index] = comparison.right;
+          }
+        }
+      });
+    });
+  },
 });
 
 function resetComparison(state: WritableDraft<CompareState>) {
   state.current.comparison = undefined;
-  state.current.viewDiff = undefined;
+  state.current.inspect = undefined;
   state.current.selection = [];
 
   state.current.filtering = undefined;
@@ -290,6 +377,7 @@ export default compareSlice.reducer;
 export const {
   compareToggled,
   searchUpdated,
+  namespaceUpdated,
   filterUpdated,
   operationUpdated,
   resourceSetCleared,
@@ -300,7 +388,8 @@ export const {
   resourceSetFetched,
   resourceSetCompared,
   resourceSetFiltered,
-  diffViewOpened,
+  comparisonInspecting,
+  comparisonInspected,
   comparisonAllToggled,
   comparisonToggled,
 } = compareSlice.actions;
@@ -308,7 +397,7 @@ export const {
 /* * * * * * * * * * * * * *
  * Selectors
  * * * * * * * * * * * * * */
-export type CompareStatus = 'selecting' | 'comparing';
+export type CompareStatus = 'selecting' | 'comparing' | 'inspecting' | 'transfering';
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
 
@@ -319,7 +408,11 @@ export const selectCompareStatus = (state: CompareState): CompareStatus => {
     return 'selecting';
   }
 
-  return 'comparing';
+  if (c.transfering.pending) {
+    return 'transfering';
+  }
+
+  return c.inspect ? 'inspecting' : 'comparing';
 };
 
 export const selectResourceSet = (state: CompareState, side: CompareSide): PartialResourceSet | undefined => {
@@ -371,14 +464,21 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   return {allKustomizations, currentKustomization};
 };
 
-export const selectDiffedComparison = (state: CompareState): MatchingResourceComparison | undefined => {
-  const id = state.current.viewDiff;
+export const selectComparison = (state: CompareState, id: string | undefined): ResourceComparison | undefined => {
   if (!id) return undefined;
-  const comparison = state.current.comparison?.comparisons.find(c => c.id === id);
-  if (!comparison || !comparison.isMatch) return undefined;
-  return comparison;
+  return state.current.comparison?.comparisons.find(c => c.id === id);
 };
 
+export const selectKnownNamespaces = createSelector(
+  (state: CompareState) => state.current.left,
+  (state: CompareState) => state.current.right,
+  (left, right) => {
+    const set = new Set();
+    left?.resources.forEach(r => set.add(r.namespace ?? 'default'));
+    right?.resources.forEach(r => set.add(r.namespace ?? 'default'));
+    return Array.from(set.values());
+  }
+);
 export const selectIsComparisonSelected = (state: CompareState, id: string): boolean => {
   return state.current.selection.some(comparisonId => comparisonId === id);
 };
@@ -390,10 +490,37 @@ export const selectIsAllComparisonSelected = (state: CompareState): boolean => {
   );
 };
 
+export const selectCanTransfer = (state: CompareState, direction: TransferDirection, ids: string[]): boolean => {
+  // Cannot transfer in invalid state.
+  const status = selectCompareStatus(state);
+  if (status === 'selecting' || status === 'transfering' || ids.length === 0) {
+    return false;
+  }
+
+  // Cannot transfer when the resource set type is non-transferable.
+  const left = state.current.view.leftSet?.type;
+  const right = state.current.view.rightSet?.type;
+  const isTransferable = direction === 'left-to-right' ? canTransfer(left, right) : canTransfer(right, left);
+  if (!isTransferable) {
+    return false;
+  }
+
+  // Can only transfer if all selected items are transferable.
+  const comparisons = state.current.filtering?.comparisons ?? [];
+  const transferable = comparisons
+    .filter(comparison => ids.some(id => id === comparison.id))
+    .filter(comparison => (direction === 'left-to-right' ? comparison.left : comparison.right));
+  return ids.length === transferable.length;
+};
+
 export const selectComparisonListItems = createSelector(
   (state: CompareState) => state.current.filtering?.comparisons,
-  comparisons => {
+  (state: CompareState) => [state.current.view.leftSet?.type, state.current.view.rightSet?.type],
+  (state: CompareState) => state.current.view.namespace,
+  (comparisons = [], [leftType, rightType], defaultNamespace) => {
     const result: ComparisonListItem[] = [];
+
+    const transferable = canTransfer(leftType, rightType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -402,6 +529,7 @@ export const selectComparisonListItems = createSelector(
 
     Object.entries(groups).forEach(([kind, comps]) => {
       result.push({type: 'header', kind, count: comps.length});
+      const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
         if (comparison.isMatch) {
@@ -409,9 +537,11 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: comparison.left.namespace ?? 'default',
+            namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
+            leftTransferable: transferable,
+            rightTransferable: transferable,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -419,9 +549,13 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
-            namespace: comparison.left?.namespace ?? comparison.right?.namespace ?? 'default',
-            leftActive: Boolean(comparison.left),
-            rightActive: Boolean(comparison.right),
+            namespace: isNamespaced
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
+              : undefined,
+            leftActive: isDefined(comparison.left),
+            rightActive: isDefined(comparison.right),
+            leftTransferable: transferable && isDefined(comparison.left),
+            rightTransferable: transferable && isDefined(comparison.right),
             canDiff: false,
           });
         }
@@ -498,7 +632,7 @@ export const resourceFetchListener =
 
 export const compareListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(resourceSetFetched, operationUpdated),
+    matcher: isAnyOf(resourceSetFetched, operationUpdated, namespaceUpdated),
     effect: async (_action, {dispatch, getState}) => {
       const status = selectCompareStatus(getState().compare);
       const current = getState().compare.current;
@@ -508,8 +642,11 @@ export const compareListener: AppListenerFn = listen => {
         return;
       }
 
-      const options = {operation: view.operation ?? 'union'};
-      const comparisons = compareResources(left.resources, right.resources, options);
+      const comparisons = compareResources(left.resources, right.resources, {
+        operation: view.operation ?? 'union',
+        defaultNamespace: view.namespace,
+      });
+
       dispatch(resourceSetCompared({comparisons}));
     },
   });
@@ -522,12 +659,103 @@ export const filterListener: AppListenerFn = listen => {
       cancelActiveListeners();
       await delay(3);
 
-      const {search, comparison} = getState().compare.current;
-      const comparisons = comparison?.comparisons ?? [];
-      const filters = createResourceFilters({search});
-      const filteredComparisons = filterComparisons(comparisons, filters);
-      const action = resourceSetFiltered({comparisons: filteredComparisons});
-      dispatch(action);
+      const {search, comparison, view} = getState().compare.current;
+      const allComparisons = comparison?.comparisons ?? [];
+      const filters = createResourceFilters({search, ...view.filter});
+      const comparisons = filterComparisons(allComparisons, filters);
+
+      dispatch(resourceSetFiltered({comparisons}));
     },
   });
 };
+
+/* * * * * * * * * * * * * *
+ * Thunks
+ * * * * * * * * * * * * * */
+type TransferResourceArgs = {
+  ids: string[];
+  direction: TransferDirection;
+};
+
+export const transferResource = createAsyncThunk<
+  {side: CompareSide; delta: MatchingResourceComparison[]},
+  TransferResourceArgs,
+  ThunkApi
+>('compare/transfer', async ({ids, direction}, {getState, dispatch}) => {
+  try {
+    const delta: MatchingResourceComparison[] = [];
+    const failures: string[] = [];
+
+    const namespace = getState().compare.current.view.namespace;
+    const leftSet = getState().compare.current.view.leftSet;
+    const rightSet = getState().compare.current.view.rightSet;
+    invariant(leftSet && rightSet, 'invalid state');
+    const context =
+      direction === 'left-to-right'
+        ? rightSet.type === 'cluster'
+          ? rightSet.context
+          : undefined
+        : leftSet.type === 'cluster'
+        ? leftSet.context
+        : undefined;
+
+    const from = direction === 'left-to-right' ? leftSet.type : rightSet.type;
+    const to = direction === 'left-to-right' ? rightSet.type : leftSet.type;
+
+    const comparisons = getState().compare.current.comparison?.comparisons.filter(c => ids.includes(c.id)) ?? [];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const comparison of comparisons) {
+      try {
+        const source = direction === 'left-to-right' ? comparison.left : comparison.right;
+        const target = direction === 'left-to-right' ? comparison.right : comparison.left;
+        invariant(source, 'invalid state');
+
+        const options = {from, to, context, namespace};
+        // Note: Need to apply one-by-one as it fails in bulk.
+        // eslint-disable-next-line no-await-in-loop
+        const newTarget = await doTransferResource(source, target, options, getState(), dispatch);
+
+        delta.push({
+          ...comparison,
+          left: direction === 'left-to-right' ? source : newTarget,
+          right: direction === 'left-to-right' ? newTarget : source,
+          isMatch: true,
+          isDifferent: source.text !== newTarget.text,
+        });
+      } catch (err) {
+        failures.push(comparison.id);
+        log.debug('transfer resource failed - ', err);
+      }
+    }
+
+    const alert = createTransferAlert(ids, failures, to === 'cluster');
+    dispatch(setAlert(alert));
+
+    return {side: direction === 'left-to-right' ? 'right' : 'left', delta};
+  } catch (err) {
+    log.debug('Transfer failed unexpectedly', err);
+    dispatch(setAlert(errorAlert(ERROR_MSG_FALLBACK)));
+    throw err;
+  }
+});
+
+function createTransferAlert(total: string[], failures: string[], toCluster: boolean): AlertType {
+  const totalCount = total.length;
+  const errorCount = failures.length;
+  const success = errorCount === 0;
+
+  if (!success) {
+    const verb = toCluster ? 'deploy' : 'extract';
+    const title = `Cannot ${verb} resources`;
+    const message =
+      totalCount === errorCount
+        ? `Looks like all resources failed to ${verb}. Please try again later.`
+        : `Looks like ${errorCount} of the ${totalCount} resources failed to ${verb}. Please try again later.`;
+    return errorAlert(title, message);
+  }
+
+  const verb = toCluster ? 'Applied' : 'Extracted';
+  const title = `${verb} ${totalCount} resources`;
+  return successAlert(title);
+}

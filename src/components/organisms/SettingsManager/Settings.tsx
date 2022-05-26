@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
@@ -68,7 +68,7 @@ export const Settings = ({
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
-  const [inputRef, focusInput] = useFocus<Input>();
+  const [inputRef, focusInput] = useFocus<InputRef>();
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)

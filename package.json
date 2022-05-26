@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -40,7 +40,7 @@
     "@types/luxon": "2.3.1",
     "@types/micromatch": "4.0.2",
     "@types/module-alias": "2.0.1",
-    "@types/node": "17.0.23",
+    "@types/node": "17.0.35",
     "@types/node-fetch": "2.6.1",
     "@types/react": "17.0.43",
     "@types/react-dom": "17.0.14",
@@ -101,7 +101,7 @@
     "@rjsf/core": "4.1.0",
     "@trodi/electron-splashscreen": "1.0.2",
     "ajv": "6.12.6",
-    "antd": "4.18.9",
+    "antd": "4.20.2",
     "asar": "3.1.0",
     "async": "3.2.3",
     "chokidar": "3.5.3",
@@ -211,7 +211,8 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "sign": "./sign/customSign.js"
     },
     "nsis": {
       "oneClick": false,

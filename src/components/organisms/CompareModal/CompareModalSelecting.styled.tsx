@@ -11,7 +11,7 @@ export const FloatingFigure = styled.div<{side: 'left' | 'right'; noEvents?: boo
   position: absolute;
   ${({side}) => (side === 'left' ? 'left: 0;' : 'right: 0;')}
   top: 0px;
-  width: 45%;
+  width: 42%;
   height: calc(100% - 72px);
   overflow: hidden;
   pointer-events: ${props => (props.noEvents ? 'none' : 'auto')};

@@ -7,7 +7,7 @@ import {
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
-  ImagesMapType,
+  ImagesListType,
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
@@ -28,13 +28,13 @@ interface CodeIntelProps {
   code: string | undefined;
   resourceMap: ResourceMapType;
   fileMap: FileMapType;
-  imagesMap: ImagesMapType;
+  imagesList: ImagesListType;
   isEditorMounted: boolean;
   selectResource: (resourceId: string) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
-  selectImage: (imageId: string) => void;
+  selectImageHandler: (imageId: string) => void;
   selectedPath?: string;
   helmChartMap?: HelmChartMapType;
   helmValuesMap?: HelmValuesMapType;
@@ -45,7 +45,7 @@ function useCodeIntel(props: CodeIntelProps) {
     editor,
     selectedResource,
     code,
-    imagesMap,
+    imagesList,
     resourceMap,
     fileMap,
     isEditorMounted,
@@ -53,7 +53,7 @@ function useCodeIntel(props: CodeIntelProps) {
     selectFilePath,
     createResource,
     filterResources,
-    selectImage,
+    selectImageHandler,
     selectedPath,
     helmChartMap,
     helmValuesMap,
@@ -105,7 +105,7 @@ function useCodeIntel(props: CodeIntelProps) {
           selectResource,
           createResource,
           filterResources,
-          selectImage,
+          selectImageHandler,
           resourceMap,
           model: editor.getModel(),
         })
@@ -142,7 +142,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesMap]);
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

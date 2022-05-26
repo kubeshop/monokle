@@ -46,16 +46,17 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item disabled={isInPreviewMode} key="show_file" onClick={onClickShowFile}>
-        Go to file
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    {
+      key: 'show_file',
+      label: 'Go to file',
+      disabled: isInPreviewMode,
+      onClick: onClickShowFile,
+    },
+  ];
 
   return (
-    <ContextMenu overlay={menu}>
+    <ContextMenu overlay={<Menu items={menuItems} />}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>
