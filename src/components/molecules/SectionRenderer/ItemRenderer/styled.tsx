@@ -25,7 +25,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   user-select: none;
   ${props => {
     const defaultIndentation = props.$isSectionCheckable ? 32 : 26;
-    return `padding-left: ${defaultIndentation + props.$indentation + 4}px;`;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
   }}
   padding-right: 8px;
   margin-bottom: 2px;

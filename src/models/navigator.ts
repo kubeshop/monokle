@@ -180,6 +180,7 @@ export interface SectionInstance {
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
+  isLast: boolean;
   checkable?: {
     value: 'unchecked' | 'partial' | 'checked';
     checkItemsAction: AnyAction;

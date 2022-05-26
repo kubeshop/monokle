@@ -78,6 +78,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getInstanceId: rawItem => rawItem.id,
       getName: rawItem => rawItem.name,
+      rowBuilder: {
+        indentation: 12,
+      },
       builder: {
         getMeta: () => {
           return {
@@ -170,6 +173,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.filePath,
+      rowBuilder: {
+        indentation: 12,
+      },
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -245,6 +251,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
+      rowBuilder: {
+        indentation: 12,
+      },
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -317,6 +326,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getName: () => 'Chart.yaml',
       getInstanceId: chart => chart.id,
+      rowBuilder: {
+        indentation: 0,
+      },
       builder: {
         getMeta: chart => ({
           filePath: chart.filePath,
@@ -343,7 +355,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
     },
     rowBuilder: {
-      indentation: 10,
+      indentation: 0,
       fontSize: 14,
     },
     customization: {
