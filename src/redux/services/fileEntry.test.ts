@@ -11,11 +11,12 @@ import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} fr
 
 test('create-file-entry', () => {
   const fileMap: FileMapType = {};
-  let r = createRootFileEntry('/root', fileMap);
+  createRootFileEntry('/root', fileMap);
   let e = createFileEntry({
     fileEntryPath: createSafePath('/a/very/long/path'),
     fileMap,
   });
+
   expect(e.isExcluded).toBeFalsy();
   expect(e.name).toBe('path');
   expect(e.filePath).toBe(createSafePath('/a/very/long/path'));

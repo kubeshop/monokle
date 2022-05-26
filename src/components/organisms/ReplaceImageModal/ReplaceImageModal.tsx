@@ -10,7 +10,7 @@ const ReplaceImageModal: React.FC = () => {
   const [form] = Form.useForm();
 
   const dispatch = useAppDispatch();
-  const imagesMap = useAppSelector(state => state.main.imagesMap);
+  const imagesList = useAppSelector(state => state.main.imagesList);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const uiState = useAppSelector(state => state.ui.replaceImageModal);
 
@@ -19,8 +19,8 @@ const ReplaceImageModal: React.FC = () => {
       return null;
     }
 
-    return imagesMap.find(im => im.id === uiState.imageId);
-  }, [imagesMap, uiState]);
+    return imagesList.find(im => im.id === uiState.imageId);
+  }, [imagesList, uiState]);
 
   if (!uiState || !image) {
     return null;

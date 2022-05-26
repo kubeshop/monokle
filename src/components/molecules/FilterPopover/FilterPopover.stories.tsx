@@ -9,7 +9,6 @@ export function Default() {
 
   const handleFilterChange = useCallback((newFilter: Filter | undefined) => {
     setFilter(newFilter);
-    console.log('filter changed', JSON.stringify(newFilter, null, 2));
   }, []);
 
   return <FilterPopover filter={filter} onChange={handleFilterChange} />;

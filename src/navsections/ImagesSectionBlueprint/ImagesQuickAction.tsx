@@ -3,9 +3,9 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
 
-import * as S from './DockerImagesQuickAction.styled';
+import * as S from './ImagesQuickAction.styled';
 
-const DockerImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
+const ImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
@@ -21,4 +21,4 @@ const DockerImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
   );
 };
 
-export default DockerImagesQuickAction;
+export default ImagesQuickAction;

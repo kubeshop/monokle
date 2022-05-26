@@ -1,8 +1,8 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ImagesMapType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
+import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '@models/appstate';
 
-import {selectDockerImage, selectFile, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
+import {selectFile, selectImage, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
 
 export const selectFromHistory = async (
   direction: 'left' | 'right',
@@ -10,7 +10,7 @@ export const selectFromHistory = async (
   selectionHistory: SelectionHistoryEntry[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
-  imagesMap: ImagesMapType,
+  imagesList: ImagesListType,
   dispatch: (action: AnyAction) => void
 ) => {
   let removedSelectionHistoryEntriesCount = 0;
@@ -26,7 +26,7 @@ export const selectFromHistory = async (
       }
     }
     if (historyEntry.type === 'image') {
-      if (imagesMap.find(image => image.id === historyEntry.selectedDockerImage.id)) {
+      if (imagesList.find(image => image.id === historyEntry.selectedImage.id)) {
         return true;
       }
     }
@@ -87,7 +87,7 @@ export const selectFromHistory = async (
     dispatch(selectFile({filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true}));
   }
   if (selectionHistoryEntry.type === 'image') {
-    dispatch(selectDockerImage({dockerImage: selectionHistoryEntry.selectedDockerImage, isVirtualSelection: true}));
+    dispatch(selectImage({image: selectionHistoryEntry.selectedImage, isVirtualSelection: true}));
   }
 
   dispatch(setSelectionHistory({newSelectionHistory, nextSelectionHistoryIndex}));

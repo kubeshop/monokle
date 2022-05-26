@@ -39,7 +39,7 @@ function useDebouncedCodeSave(
       }
     } else if (selectedResourceId && resourceMap[selectedResourceId]) {
       try {
-        dispatch(updateResource({resourceId: selectedResourceId, content: value.toString()}));
+        dispatch(updateResource({resourceId: selectedResourceId, text: value.toString()}));
         setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);

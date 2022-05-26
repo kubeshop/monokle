@@ -204,7 +204,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
-      mainState.imagesMap,
+      mainState.imagesList,
       dispatch
     );
   });
@@ -216,7 +216,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
-      mainState.imagesMap,
+      mainState.imagesList,
       dispatch
     );
   });

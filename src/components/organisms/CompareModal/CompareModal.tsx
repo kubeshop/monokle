@@ -4,14 +4,15 @@ import {useMeasure, useWindowSize} from 'react-use';
 import {Col, Modal, Row} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
-import {selectCompareStatus, selectDiffedComparison} from '@redux/reducers/compare';
+import {selectCompareStatus} from '@redux/reducers/compare';
 
 import {CompareActionBar} from './CompareActionBar';
 import {CompareModalComparing} from './CompareModalComparing';
 import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
-import {DiffActionBar} from './DiffActionBar';
+import {InspectionActionBar} from './InspectionActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
+import {TransferButton} from './TransferButton';
 
 type Props = {
   visible: boolean;
@@ -21,7 +22,7 @@ type Props = {
 export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
-  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
+  const isInspecting = useAppSelector(state => state.compare.current.inspect);
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
@@ -33,21 +34,22 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       footer={<CompareModalFooter onClose={onClose} />}
       {...sizeProps}
     >
-      {!diffComparison ? <CompareActionBar /> : <DiffActionBar />}
+      {!isInspecting ? <CompareActionBar /> : <InspectionActionBar />}
 
       <Row ref={containerRef}>
-        <Col span={11}>
+        <Col span={10}>
           <ResourceSetSelector side="left" />
         </Col>
-        <Col span={2} />
-        <Col span={11}>
+        <Col span={4} />
+        <Col span={10}>
           <ResourceSetSelector side="right" />
         </Col>
       </Row>
 
       <div
         style={{
-          height: `calc(100% - ${height}px - 66px)`,
+          height: `calc(100% - ${height}px - 66px - 66px)`,
+          marginRight: '-8px',
           position: 'relative',
           overflowY: 'auto',
           overflowX: 'hidden',
@@ -55,6 +57,16 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
       >
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </div>
+
+      <Row style={{height: 66, alignItems: 'center'}}>
+        <Col span={10}>
+          <TransferButton side="left" />
+        </Col>
+        <Col span={4} />
+        <Col span={10}>
+          <TransferButton side="right" />
+        </Col>
+      </Row>
     </Modal>
   );
 };
