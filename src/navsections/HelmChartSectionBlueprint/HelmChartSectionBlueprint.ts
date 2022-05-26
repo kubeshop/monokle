@@ -80,6 +80,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getName: rawItem => rawItem.name,
       rowBuilder: {
         indentation: 12,
+        height: 23,
+        marginBottom: instance => (instance.isLast ? 12 : 0),
       },
       builder: {
         getMeta: () => {
@@ -113,6 +115,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     rowBuilder: {
       indentation: 10,
       fontSize: 14,
+      marginBottom: instance => (instance.isCollapsed || instance.isEmpty || !instance.visibleItemIds?.length ? 12 : 0),
     },
     customization: {
       counterDisplayMode: 'items',
@@ -175,6 +178,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getInstanceId: rawItem => rawItem.filePath,
       rowBuilder: {
         indentation: 12,
+        height: 23,
       },
       builder: {
         isSelected: (rawItem, scope) => {
@@ -253,6 +257,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getInstanceId: rawItem => rawItem.id,
       rowBuilder: {
         indentation: 12,
+        height: 23,
       },
       builder: {
         isSelected: (rawItem, scope) => {
@@ -328,6 +333,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getInstanceId: chart => chart.id,
       rowBuilder: {
         indentation: 0,
+        height: 23,
       },
       builder: {
         getMeta: chart => ({
