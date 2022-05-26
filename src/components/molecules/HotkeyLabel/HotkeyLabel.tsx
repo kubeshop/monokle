@@ -24,19 +24,13 @@ const HotkeyLabel: React.FC<IProps> = props => {
 
       <S.CommandsContainer>
         {defineHotkey(hotkey.key)
-          .split(',')
-          .filter((item: string) => item)
-          .map(command =>
-            command
-              .split('+')
-              .map(keyboardKey => (
-                <S.Command key={`${command}-${keyboardKey}`}>
-                  {keyboardKey === 'command'
-                    ? 'Cmd'
-                    : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || '+'}
-                </S.Command>
-              ))
-          )}
+          .split(',')[0]
+          .split('+')
+          .map(keyboardKey => (
+            <S.KeyboardKey key={`${keyboardKey}`}>
+              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ','}
+            </S.KeyboardKey>
+          ))}
       </S.CommandsContainer>
     </S.HotkeyLabelContainer>
   );

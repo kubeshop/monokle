@@ -13,7 +13,7 @@ const BoardKeys = ({bindings}: BoardKeysProps) => {
         <S.StyledShortCell key={command}>
           {command.split('+').map((keyboardKey: string) => (
             <S.StyledKey key={`${command}_${keyboardKey}`}>
-              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || '+'}
+              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ','}
             </S.StyledKey>
           ))}
         </S.StyledShortCell>

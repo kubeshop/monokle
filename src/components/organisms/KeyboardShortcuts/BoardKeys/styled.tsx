@@ -28,4 +28,6 @@ export const StyledKey = styled.div`
   box-sizing: border-box;
   box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.016);
   border-radius: 2px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
 `;

@@ -9,7 +9,7 @@ type HotkeyConf = {
 export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
     name: 'Toggle Settings',
-    key: `ctrl+\, , command+\,`,
+    key: `ctrl+\,, command+\,`,
     category: 'tool',
   },
   PREVIEW_CLUSTER: {
