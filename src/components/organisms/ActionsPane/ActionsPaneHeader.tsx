@@ -50,7 +50,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const imagesList = useAppSelector(state => state.main.imagesList);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedDockerImage = useAppSelector(state => state.main.selectedDockerImage);
+  const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const selectedPreviewConfiguration = useAppSelector(state => {
@@ -184,7 +184,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     );
   }
 
-  if (selectedDockerImage) {
+  if (selectedImage) {
     return (
       <TitleBar title="Image Info">
         <S.LeftArrowButton

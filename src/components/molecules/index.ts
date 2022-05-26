@@ -1,9 +1,9 @@
 export {default as ClusterDiff} from './ClusterDiff';
-export {default as DockerImageDetails} from './DockerImageDetails';
 export {default as FilePatternList} from './FilePatternList';
 export {default as FormEditor} from './FormEditor';
 export {default as GraphView} from './GraphView';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
+export {default as ImageDetails} from './ImageDetails';
 export {default as ModalConfirm} from './ModalConfirm';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
 export {default as Monaco} from './Monaco';
