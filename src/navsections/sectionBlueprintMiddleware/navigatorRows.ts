@@ -1,19 +1,97 @@
-import {ItemInstance, NavigatorRow, SectionInstance} from '@models/navigator';
+import {
+  ItemBlueprint,
+  ItemInstance,
+  NavigatorItemRow,
+  NavigatorRow,
+  NavigatorSectionRow,
+  RowBuilder,
+  SectionBlueprint,
+  SectionInstance,
+} from '@models/navigator';
+
+import sectionBlueprintMap from '../sectionBlueprintMap';
+
+function buildRowProp<InstanceType>(
+  builder: RowBuilder<InstanceType> | undefined,
+  propName: keyof RowBuilder<InstanceType>,
+  instance: InstanceType,
+  defaultValue: number
+) {
+  let propValue = defaultValue;
+  const propBuilder = builder?.[propName];
+  if (typeof propBuilder === 'number') {
+    propValue = propBuilder;
+  } else if (typeof propBuilder === 'function') {
+    propValue = propBuilder(instance);
+  }
+  return propValue;
+}
+
+function makeSectionRow(payload: {
+  instance: SectionInstance;
+  blueprint: SectionBlueprint<any>;
+  parentIndentation: number;
+  level: number;
+}): NavigatorSectionRow {
+  const {instance, blueprint, parentIndentation, level} = payload;
+  const {rowBuilder} = blueprint;
+  const height = buildRowProp(rowBuilder, 'height', instance, 30);
+  const fontSize = buildRowProp(rowBuilder, 'fontSize', instance, 30 * 0.75);
+  const marginBottom = buildRowProp(rowBuilder, 'marginBottom', instance, 0);
+  const indentation = parentIndentation + buildRowProp(rowBuilder, 'indentation', instance, 0);
+  return {id: instance.id, type: 'section', level, height, indentation, marginBottom, fontSize};
+}
+
+function makeItemRow(payload: {
+  instance: ItemInstance;
+  blueprint: ItemBlueprint<any, any>;
+  sectionId: string;
+  parentIndentation: number;
+  level: number;
+}): NavigatorItemRow {
+  const {instance, blueprint, sectionId, parentIndentation, level} = payload;
+  const {rowBuilder} = blueprint;
+  const height = buildRowProp(rowBuilder, 'height', instance, 30);
+  const fontSize = buildRowProp(rowBuilder, 'fontSize', instance, 30 * 0.75);
+  const marginBottom = buildRowProp(rowBuilder, 'marginBottom', instance, 0);
+  const indentation = parentIndentation + buildRowProp(rowBuilder, 'indentation', instance, 0);
+  return {id: instance.id, type: 'item', sectionId, level, height, indentation, marginBottom, fontSize};
+}
 
 export function makeNavigatorRows(
   instance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>,
-  level = 0
+  itemInstanceMap: Record<string, ItemInstance>,
+  level = 0,
+  parentIndentation = 0
 ): NavigatorRow[] {
   const rows: NavigatorRow[] = [];
-  if (!instance.isVisible) {
+  const blueprint = sectionBlueprintMap.getById(instance.id);
+
+  if (!instance.isVisible || !blueprint) {
     return rows;
   }
 
-  rows.push({id: instance.id, type: 'section', level});
+  const sectionRow = makeSectionRow({instance, blueprint, parentIndentation, level});
+  rows.push(sectionRow);
 
-  if (!instance.isCollapsed) {
-    rows.push(...instance.visibleItemIds.map(id => ({id, type: 'item' as const, level, sectionId: instance.id})));
+  const itemBlueprint = blueprint.itemBlueprint;
+
+  if (!instance.isCollapsed && itemBlueprint) {
+    rows.push(
+      ...instance.visibleItemIds
+        .map(itemId => itemInstanceMap[itemId])
+        .filter(item => Boolean(item))
+        .map(item =>
+          makeItemRow({
+            instance: item,
+            blueprint: itemBlueprint,
+            sectionId: blueprint.id,
+            parentIndentation,
+            level,
+          })
+        )
+    );
   }
 
   if (!instance?.visibleChildSectionIds) {
@@ -28,7 +106,9 @@ export function makeNavigatorRows(
     }
     const childInstance = sectionInstanceMap[childSectionId];
     if (childInstance) {
-      rows.push(...makeNavigatorRows(childInstance, sectionInstanceMap, level + 1));
+      rows.push(
+        ...makeNavigatorRows(childInstance, sectionInstanceMap, itemInstanceMap, level + 1, sectionRow.indentation)
+      );
     }
   }
 

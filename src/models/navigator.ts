@@ -76,30 +76,29 @@ export interface SectionCustomization {
   namePrefix?: {
     component: SectionCustomComponent;
   };
-
   beforeInitializationText?: string;
   /** If no value is provided, default value will be "descendants". */
   counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
+  // TODO: can we remove disableHoverStyle? maybe allow a custom `style` object? or probably a method that receives the old style and creates the new one?
   disableHoverStyle?: boolean;
-  /** Number of pixels to indent this section, by default the value is 0 (all sections/susections are aligned). */
-  indentation?: number;
   isCheckVisibleOnHover?: boolean;
-  nameColor?: string;
-  nameHorizontalPadding?: number;
-  nameSize?: number;
-  nameVerticalPadding?: number;
-  nameWeight?: number;
-  sectionMarginBottom?: number;
-  showHeader?: boolean;
+}
+
+export interface RowBuilder<InstanceType> {
+  /** If not specified, the default value will be 25. */
+  height?: number | ((instance: InstanceType) => number);
+  /** If not specified, the default value will be rowHeight * 0.75 */
+  fontSize?: number | ((instance: InstanceType) => number);
+  /** If not specified, the default value will be 0. */
+  indentation?: number | ((instance: InstanceType) => number);
+  /** If not specified, the default value will be 0. */
+  marginBottom?: number | ((instance: InstanceType) => number);
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
-  /** If not specified, the default value will be 30. */
-  rowHeight?: number;
-  /** If not specified, the default value will be rowHeight / 2 */
-  rowFontSize?: number;
+  rowBuilder?: RowBuilder<ItemInstance>;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;
@@ -127,10 +126,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   id: string;
   name: string;
   getScope: (state: RootState) => ScopeType;
-  /** If not specified, the default value will be 25. */
-  rowHeight?: number;
-  /** If not specified, the default value will be rowHeight / 2 */
-  rowFontSize?: number;
+  rowBuilder?: RowBuilder<SectionInstance>;
   rootSectionId: string;
   childSectionIds?: string[];
   builder?: {
@@ -164,6 +160,7 @@ export interface ItemInstance {
   isDisabled: boolean;
   isCheckable: boolean;
   isChecked: boolean;
+  isLast: boolean;
   meta?: any;
 }
 
@@ -191,17 +188,25 @@ export interface SectionInstance {
   meta?: any;
 }
 
-type NavigatorSectionRow = {
+export type NavigatorSectionRow = {
   type: 'section';
   id: string;
-  level: number;
+  level: number; // TODO: is the level needed?
+  fontSize: number;
+  indentation: number;
+  height: number;
+  marginBottom: number;
 };
 
-type NavigatorItemRow = {
+export type NavigatorItemRow = {
   type: 'item';
   id: string;
   sectionId: string;
   level: number;
+  fontSize: number;
+  indentation: number;
+  height: number;
+  marginBottom: number;
 };
 
 export type NavigatorRow = NavigatorSectionRow | NavigatorItemRow;

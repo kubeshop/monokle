@@ -87,6 +87,14 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
       collapsedSectionIds,
     });
 
+    const lastVisibleItemId = sectionInstance.visibleItemIds.at(-1);
+    if (lastVisibleItemId) {
+      itemInstanceMap[lastVisibleItemId] = {
+        ...itemInstanceMap[lastVisibleItemId],
+        isLast: true,
+      };
+    }
+
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
   });
 
@@ -121,7 +129,10 @@ export const processSectionBlueprints = async (state: RootState, dispatch: AppDi
   }
 
   const rowsByRootSectionId = Object.fromEntries(
-    sectionInstanceRoots.map(rootInstance => [rootInstance.id, makeNavigatorRows(rootInstance, sectionInstanceMap)])
+    sectionInstanceRoots.map(rootInstance => [
+      rootInstance.id,
+      makeNavigatorRows(rootInstance, sectionInstanceMap, itemInstanceMap),
+    ])
   );
 
   const rowIndexToScrollByRootSectionId = Object.fromEntries(

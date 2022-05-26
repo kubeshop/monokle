@@ -51,12 +51,14 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
     },
     shouldBeVisibleBeforeInitialized: true,
   },
+  rowBuilder: {
+    fontSize: 16,
+  },
   customization: {
     counterDisplayMode: 'subsections',
     emptyDisplay: {
       component: RootHelmChartsSectionEmptyDisplay,
     },
-    nameSize: 16,
   },
 };
 

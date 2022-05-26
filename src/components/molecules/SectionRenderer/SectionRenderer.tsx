@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useMemo, useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 import {useVirtual} from 'react-virtual';
 
 import {NavigatorRow, SectionBlueprint, SectionInstance} from '@models/navigator';
@@ -31,11 +31,6 @@ function SectionRenderer(props: SectionRendererProps) {
 
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
-  const itemRowHeight = useMemo(
-    () => sectionBlueprint.itemBlueprint?.rowHeight,
-    [sectionBlueprint.itemBlueprint?.rowHeight]
-  );
-
   const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
   const rowIndexToScroll = useAppSelector(
     state => state.navigator.rowIndexToScrollByRootSectionId[sectionBlueprint.id]
@@ -47,10 +42,7 @@ function SectionRenderer(props: SectionRendererProps) {
   const {virtualItems, scrollToIndex, totalSize} = useVirtual({
     size: rows?.length || 0,
     parentRef,
-    estimateSize: React.useCallback(
-      i => (rows[i].type === 'section' ? sectionBlueprint.rowHeight || 30 : itemRowHeight || 15),
-      [rows, sectionBlueprint.rowHeight, itemRowHeight]
-    ),
+    estimateSize: React.useCallback(i => rows[i].height + rows[i].marginBottom, [rows]),
     overscan: 5,
   });
 
@@ -122,7 +114,7 @@ function SectionRenderer(props: SectionRendererProps) {
               }}
             >
               {row.type === 'section' ? (
-                <SectionHeader sectionId={row.id} isLastSection={false} />
+                <SectionHeader sectionRow={row} isLastSection={false} />
               ) : (
                 <ItemRenderer
                   itemId={row.id}
@@ -130,7 +122,7 @@ function SectionRenderer(props: SectionRendererProps) {
                   level={row.level}
                   isLastItem={false}
                   isSectionCheckable={false}
-                  indentation={0}
+                  indentation={row.indentation}
                 />
               )}
             </div>

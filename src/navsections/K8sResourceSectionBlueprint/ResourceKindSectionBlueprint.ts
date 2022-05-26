@@ -41,8 +41,10 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
-    rowHeight: 26,
-    rowFontSize: 16,
+    rowBuilder: {
+      height: 26,
+      fontSize: 16,
+    },
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {

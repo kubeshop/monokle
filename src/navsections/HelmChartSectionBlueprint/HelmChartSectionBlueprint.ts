@@ -10,8 +10,6 @@ import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@red
 
 import {isDefined} from '@utils/filter';
 
-import Colors from '@styles/Colors';
-
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
@@ -109,17 +107,19 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         lastItemMarginBottom: 0,
       },
     },
+    rowBuilder: {
+      indentation: 10,
+      fontSize: 14,
+    },
     customization: {
       counterDisplayMode: 'items',
-      indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
+      // nameWeight: 400,
+      // nameSize: 14,
+      // nameColor: Colors.grey9,
       namePrefix: {
         component: CollapseSectionPrefix,
       },
-      sectionMarginBottom: 12,
+      // sectionMarginBottom: 12,
       nameSuffix: {
         component: PreviewConfigurationNameSuffix,
         options: {
@@ -156,13 +156,13 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         return scope.isFolderOpen && rawItems.length === 0;
       },
     },
+    rowBuilder: {
+      indentation: 10,
+      fontSize: 14,
+    },
     customization: {
       counterDisplayMode: 'items',
-      indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
+      // nameColor: Colors.grey9,
       namePrefix: {
         component: CollapseSectionPrefix,
       },
@@ -231,13 +231,13 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         return scope.isFolderOpen && rawItems.length === 0;
       },
     },
+    rowBuilder: {
+      indentation: 10,
+      fontSize: 14,
+    },
     customization: {
       counterDisplayMode: 'items',
-      indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
+      // nameColor: Colors.grey9,
       namePrefix: {
         component: CollapseSectionPrefix,
       },
@@ -342,12 +342,13 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         lastItemMarginBottom: 0,
       },
     },
+    rowBuilder: {
+      indentation: 10,
+      fontSize: 14,
+    },
     customization: {
       counterDisplayMode: 'none',
-      indentation: 0,
-      nameWeight: 600,
-      nameSize: 14,
-      nameColor: Colors.grey9,
+      // nameColor: Colors.grey9,
     },
   };
 

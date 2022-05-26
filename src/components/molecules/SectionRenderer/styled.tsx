@@ -84,23 +84,17 @@ type NameProps = {
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
   $nameColor?: string;
-  $nameSize: number;
+  $fontSize: number;
   $nameWeight?: number;
-  $nameVerticalPadding?: number;
-  $nameHorizontalPadding?: number;
 };
 
 export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  ${props =>
-    `padding: ${props.$nameVerticalPadding !== undefined ? props.$nameVerticalPadding : 0}px ${
-      props.$nameHorizontalPadding !== undefined ? props.$nameHorizontalPadding : 5
-    }px;`}
   cursor: pointer;
   ${props => {
-    return `font-size: ${props.$nameSize}px;`;
+    return `font-size: ${props.$fontSize}px;`;
   }}
   ${props => {
     if (props.$isSelected) {

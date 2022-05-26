@@ -42,8 +42,10 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
   const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
     name: subsectionName,
     id: subsectionName,
-    rowHeight: 32,
-    rowFontSize: 20,
+    rowBuilder: {
+      height: 32,
+      fontSize: 20,
+    },
     childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
@@ -100,8 +102,10 @@ export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
 const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
-  rowHeight: 38,
-  rowFontSize: 24,
+  rowBuilder: {
+    height: 38,
+    fontSize: 24,
+  },
   rootSectionId: navSectionNames.K8S_RESOURCES,
   childSectionIds: childSectionNames,
   getScope: state => {
