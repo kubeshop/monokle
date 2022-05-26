@@ -53,7 +53,9 @@ function SectionRenderer(props: SectionRendererProps) {
     ) {
       scrollToIndex(rowIndexToScroll, {align: 'center'});
     }
+    // we need to set the last index that we scrolled to so we don't end up scrolling to the row unintentionally
     setLastScrollIndex(rowIndexToScroll || -1);
+    // disabled the below eslint rule because it was causing too many re-renders
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowIndexToScroll, virtualItems, lastScrollIndex]);
 
@@ -105,6 +107,7 @@ function SectionRenderer(props: SectionRendererProps) {
               key={virtualRow.index}
               ref={virtualRow.measureRef}
               style={{
+                // this has to be defined inline because of the virtualization
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -112,11 +115,7 @@ function SectionRenderer(props: SectionRendererProps) {
                 transform: `translateY(${virtualRow.start}px)`,
               }}
             >
-              {row.type === 'section' ? (
-                <SectionHeader sectionRow={row} />
-              ) : (
-                <ItemRenderer itemRow={row} isSectionCheckable={false} />
-              )}
+              {row.type === 'section' ? <SectionHeader sectionRow={row} /> : <ItemRenderer itemRow={row} />}
             </div>
           );
         })}

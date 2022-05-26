@@ -116,12 +116,6 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
   customization?: ItemCustomization;
 }
 
-export interface ItemGroupBlueprint {
-  id: string;
-  name: string;
-  itemIds: string[];
-}
-
 export interface SectionBlueprint<RawItemType, ScopeType = any> {
   id: string;
   name: string;
@@ -210,6 +204,9 @@ export type NavigatorItemRow = {
   marginBottom: number;
 };
 
+/**
+ * This model represents the virtualized rows that will be rendered using react-virtual
+ */
 export type NavigatorRow = NavigatorSectionRow | NavigatorItemRow;
 
 export interface NavigatorInstanceState {

@@ -112,5 +112,5 @@ export const BlankSpace = styled.span`
 `;
 
 export const Checkbox = styled(RawCheckbox)`
-  margin-left: -22px;
+  margin-left: -24px;
 `;

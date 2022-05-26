@@ -80,6 +80,7 @@ export const Name = styled.span<NameProps>`
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+  padding: 0 5px;
   ${props => {
     return `font-size: ${props.$fontSize}px;`;
   }}

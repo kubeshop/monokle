@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react';
 
-import {NavigatorItemRow} from '@models/navigator';
+import {NavigatorItemRow, SectionInstance} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -19,7 +19,6 @@ export type ItemRendererOptions = {
 
 export type ItemRendererProps = {
   itemRow: NavigatorItemRow;
-  isSectionCheckable: boolean;
   options?: ItemRendererOptions;
 };
 
@@ -29,8 +28,9 @@ const WrapperPlacehoder: React.FC<{style: React.CSSProperties}> = props => {
 };
 
 function ItemRenderer(props: ItemRendererProps) {
-  const {itemRow, isSectionCheckable, options} = props;
-  const {sectionId, id: itemId} = itemRow;
+  const {itemRow, options} = props;
+  const itemId = itemRow.id;
+  const sectionId = itemRow.sectionId;
 
   const sectionBlueprint = useMemo(() => sectionBlueprintMap.getById(sectionId), [sectionId]);
   const {itemBlueprint} = sectionBlueprint || {};
@@ -38,6 +38,10 @@ function ItemRenderer(props: ItemRendererProps) {
 
   const dispatch = useAppDispatch();
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
+  const isSectionCheckable = useAppSelector(state => {
+    const sectionInstance: SectionInstance | undefined = state.navigator.sectionInstanceMap[sectionId];
+    return Boolean(sectionInstance?.checkable);
+  });
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
