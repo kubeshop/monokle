@@ -43,6 +43,8 @@ export function makeResourceKindNavSection(
     rowBuilder: {
       height: 26,
       fontSize: 16,
+      marginBottom: instance =>
+        instance.isCollapsed || instance.isEmpty || !instance.visibleItemIds?.length ? (instance.isLast ? 16 : 8) : 0,
     },
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
@@ -103,7 +105,7 @@ export function makeResourceKindNavSection(
       getInstanceId: rawItem => rawItem.id,
       rowBuilder: {
         height: 23,
-        marginBottom: instance => (instance.isLast ? 8 : 0),
+        marginBottom: (instance, props) => (instance.isLast ? (props?.sectionInstance?.isLast ? 16 : 8) : 0),
       },
       builder: {
         isSelected: rawItem => rawItem.isSelected,
