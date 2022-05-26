@@ -1,12 +1,15 @@
 import React, {useLayoutEffect, useMemo, useState} from 'react';
 import {useVirtual} from 'react-virtual';
 
-import {NavigatorRow, SectionBlueprint} from '@models/navigator';
+import {NavigatorRow, SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
+import {useSectionCustomization} from './useSectionCustomization';
+
+import * as S from './styled';
 
 type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
@@ -21,6 +24,12 @@ function SectionRenderer(props: SectionRendererProps) {
   const {id: sectionId} = sectionBlueprint;
 
   const [lastScrollIndex, setLastScrollIndex] = useState<number>(-1);
+
+  const rootSectionInstance: SectionInstance | undefined = useAppSelector(
+    state => state.navigator.sectionInstanceMap[sectionId]
+  );
+
+  const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const itemRowHeight = useMemo(
     () => sectionBlueprint.itemBlueprint?.rowHeight,
@@ -56,6 +65,38 @@ function SectionRenderer(props: SectionRendererProps) {
     setLastScrollIndex(rowIndexToScroll || -1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowIndexToScroll, virtualItems, lastScrollIndex]);
+
+  if (!rootSectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
+    return (
+      <S.BeforeInitializationContainer>
+        <p>{sectionBlueprint.customization.beforeInitializationText}</p>
+      </S.BeforeInitializationContainer>
+    );
+  }
+
+  if (!rootSectionInstance?.isVisible) {
+    return null;
+  }
+
+  if (rootSectionInstance?.isLoading) {
+    return <S.Skeleton />;
+  }
+
+  if (rootSectionInstance?.isEmpty) {
+    if (EmptyDisplay && EmptyDisplay.Component) {
+      return (
+        <S.EmptyDisplayContainer>
+          <EmptyDisplay.Component sectionInstance={rootSectionInstance} />
+        </S.EmptyDisplayContainer>
+      );
+    }
+    return (
+      <S.EmptyDisplayContainer>
+        <h1>{rootSectionInstance.name}</h1>
+        <p>Section is empty.</p>
+      </S.EmptyDisplayContainer>
+    );
+  }
 
   return (
     <div style={{height: `${height}px`, overflow: 'auto'}} ref={parentRef}>
