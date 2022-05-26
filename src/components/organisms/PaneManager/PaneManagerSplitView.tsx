@@ -19,6 +19,7 @@ const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
+const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -55,6 +56,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftActiveMenu === 'images-pane' && <ImagesPane />}
                 {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
                 {leftActiveMenu === 'validation-pane' && <ValidationPane height={height} />}
+                {leftActiveMenu === 'search' && <SearchPane height={height} />}
               </Suspense>
             </S.LeftPane>
           </ReflexElement>

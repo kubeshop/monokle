@@ -1,4 +1,4 @@
-import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
+import {Button, Tree} from 'antd';
 
 import styled from 'styled-components';
 
@@ -111,12 +111,6 @@ export const ContextMenuDivider = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 `;
 
-export const FilePathLabel = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
 export const NoFilesContainer = styled.div`
   margin-left: 16px;
   margin-top: 10px;
@@ -140,14 +134,13 @@ export const NumberOfResources = styled.span`
 
 export const RootFolderText = styled.div`
   font-size: 12px;
-  line-height: 22px;
   color: ${Colors.grey7};
-  margin-top: 10px;
-  margin-left: 14px;
+  margin: 15px 17px 0;
 `;
 
 export const MatchText = styled.div`
   color: ${Colors.lightSeaGreen};
+  padding: 0 15px;
 `;
 
 export const MatchCount = styled.span`
@@ -159,11 +152,6 @@ export const MatchCount = styled.span`
 export const Path = styled.span`
   margin-left: 5px;
   color: ${Colors.grey7};
-`;
-
-export const Skeleton = styled(RawSkeleton)`
-  margin: 20px;
-  width: 90%;
 `;
 
 export const SpinnerWrapper = styled.div`
@@ -203,9 +191,17 @@ export const TreeContainer = styled.div`
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   margin-top: 10px;
   .ant-tree-switcher {
-    svg {
-      color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
+    display: none;
+  }
+
+  .ant-tree-node-content-wrapper {
+    .ant-tree-iconEle {
+      display: none;
     }
+  }
+
+  .ant-tree-treenode-switcher-open.ant-tree-treenode-leaf-last {
+    display: none;
   }
 
   opacity: ${props => (props.disabled ? '70%' : '100%')};
@@ -250,7 +246,6 @@ export const ActionsWrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   flex-direction: row;
-  height: 100%;
 `;
 
 export const SearchBox = styled.div`
@@ -283,5 +278,25 @@ export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
       top: 8px;
       left: 13px;
     }
+  }
+`;
+
+export const RecentSearchTitle = styled.div`
+  color: ${Colors.cyan7};
+  text-transform: uppercase;
+  margin: 10px 0;
+`;
+
+export const RecentSearchItem = styled.div`
+  color: ${Colors.grey9};
+  font-weight: 400;
+  font-size: 14px;
+  padding: 2px;
+  margin: 5px 0;
+
+  &:hover {
+    cursor: pointer;
+    color: ${Colors.cyan7};
+    transition: all 0.5s ease;
   }
 `;

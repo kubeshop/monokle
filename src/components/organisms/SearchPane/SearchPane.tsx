@@ -4,25 +4,25 @@ import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'rea
 import {useSelector} from 'react-redux';
 import {useUpdateEffect} from 'react-use';
 
-import {Button, Modal, Tooltip} from 'antd';
+import {Input, Modal} from 'antd';
 
-import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
+import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
-  openCreateFileFolderModal,
+  openCreateFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
   setExpandedFolders,
@@ -36,12 +36,12 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {TitleBar} from '@molecules';
 
-import {Icon} from '@atoms';
-
-import {duplicateEntity} from '@utils/files';
+import electronStore from '@utils/electronStore';
 import {uniqueArr} from '@utils/index';
 
+import {createFilteredNode} from './CreateFilteredNode';
 import {createNode} from './CreateNode';
+import RecentSearch from './RecentSearch';
 import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
 
@@ -51,26 +51,38 @@ type Props = {
   height: number;
 };
 
-const FileTreePane: React.FC<Props> = ({height}) => {
+type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
+};
+
+const SearchPane: React.FC<Props> = ({height}) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
     processingEntityID: undefined,
     processingType: undefined,
   });
   const [tree, setTree] = useState<TreeNode | null>(null);
+  const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
+  const [searchQuery, updateSearchQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
+  const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
+  const [queryMatchParam, setQueryMatchParam] = useState<MatchParamProps>({
+    matchCase: false,
+    matchWholeWord: false,
+    regExp: false,
+  });
 
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const dispatch = useAppDispatch();
   const configState = useAppSelector(state => state.config);
-  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
-  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -84,8 +96,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
   const treeRef = useRef<any>();
 
-  const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
-  const isCollapsed = expandedFolders.length === 0;
+  const expandedFolders = ['filter'];
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -207,30 +218,6 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     }, 2000);
   };
 
-  const onDuplicate = (absolutePathToEntity: string, entityName: string, dirName: string) => {
-    duplicateEntity(absolutePathToEntity, entityName, dirName, args => {
-      const {duplicatedFileName, err} = args;
-
-      if (err) {
-        dispatch(
-          setAlert({
-            title: 'Duplication failed',
-            message: `Something went wrong during duplicating "${absolutePathToEntity}"`,
-            type: AlertEnum.Error,
-          })
-        );
-      } else {
-        dispatch(
-          setAlert({
-            title: `Duplication succeded`,
-            message: `You have successfully created ${duplicatedFileName}`,
-            type: AlertEnum.Success,
-          })
-        );
-      }
-    });
-  };
-
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
   };
@@ -344,14 +331,8 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     return treeKeys;
   }, [tree]);
 
-  const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
-
-  const onToggleTree = () => {
-    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
-  };
-
-  const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
-    dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
+  const onCreateFolder = (absolutePath: string) => {
+    dispatch(openCreateFolderModal(absolutePath));
   };
 
   const onPreview = useCallback(
@@ -409,67 +390,144 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  return (
-    <S.FileTreeContainer id="FileExplorer">
-      <TitleBar
-        title="File Explorer"
-        closable
-        leftButtons={
-          <>
-            {isScanExcludesUpdated === 'outdated' && (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
-                <ExclamationCircleOutlined />
-              </Tooltip>
-            )}
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-              <Button
-                size="small"
-                onClick={refreshFolder}
-                icon={<ReloadOutlined />}
-                type="link"
-                disabled={isButtonDisabled}
-              />
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
-              <Button
-                icon={<Icon name="collapse" />}
-                onClick={onToggleTree}
-                type="link"
-                size="small"
-                disabled={isButtonDisabled}
-              />
-            </Tooltip>
-          </>
-        }
-      />
+  const newFilterTree = (node: FileEntry, queryRegExp: RegExp) => {
+    if (node.text) {
+      const matches = node.text.match(queryRegExp);
+      const matchCount = matches?.length;
 
-      {isFolderLoading ? (
-        <S.Skeleton active />
-      ) : tree ? (
-        <S.TreeContainer>
-          <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
-            <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
-            {tree && <div id="file-explorer-count">{filesOnly.length} files</div>}
-          </S.RootFolderText>
+      if (matches && matchCount) {
+        searchCounter.current = {
+          filesCount: searchCounter.current.filesCount + 1,
+          totalMatchCount: searchCounter.current.totalMatchCount + matchCount,
+        };
+      }
+
+      return matches
+        ? {
+            ...node,
+            matches,
+            matchCount,
+          }
+        : (null as unknown as FileEntry);
+    }
+
+    return null as unknown as FileEntry;
+  };
+
+  const saveQueryHistory = (query: string) => {
+    const recentSearch = electronStore.get('appConfig.recentSearch') || [];
+    if (!recentSearch.includes(query)) {
+      electronStore.set('appConfig.recentSearch', [...recentSearch, query]);
+    }
+  };
+
+  useEffect(() => {
+    findMatches(searchQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryMatchParam]);
+
+  const findMatches = (query: string) => {
+    searchCounter.current = {filesCount: 0, totalMatchCount: 0};
+    if (!tree) return;
+    // reset tree to its default state
+    if (!query) {
+      setSearchTree(null);
+      dispatch(setExpandedFolders(allTreeKeys));
+      return;
+    }
+    let matchParams = 'gi'; // global, case insensitive by default
+    if (queryMatchParam.matchCase) {
+      matchParams = 'g';
+    }
+    if (!queryMatchParam.regExp) {
+      query = query.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
+    }
+
+    let queryRegExp = new RegExp(query, matchParams);
+
+    if (queryMatchParam.matchWholeWord) {
+      queryRegExp = new RegExp(`\\b${query}\\b`, matchParams);
+    }
+    if (queryMatchParam.regExp) {
+      queryRegExp = new RegExp(query, matchParams);
+    }
+
+    const filteredFileMap: FileEntry[] = Object.values(fileMap)
+      .map(file => newFilterTree(file, queryRegExp))
+      .filter(v => Boolean(v));
+
+    const treeData = createFilteredNode(filteredFileMap);
+
+    setSearchTree(treeData);
+    saveQueryHistory(query);
+  };
+
+  const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
+    updateSearchQuery(e.target.value);
+
+    debounceHandler.current && clearTimeout(debounceHandler.current);
+    debounceHandler.current = setTimeout(() => {
+      findMatches(e.target.value);
+    }, 1000);
+  };
+
+  const toggleMatchParam = (param: keyof MatchParamProps) => {
+    setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
+  };
+
+  return (
+    <S.FileTreeContainer id="AdvancedSearch">
+      <TitleBar title="Advanced Search" closable />
+      <S.TreeContainer>
+        <S.SearchBox>
+          <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
+          <S.StyledButton $isItemSelected={queryMatchParam.matchCase} onClick={() => toggleMatchParam('matchCase')}>
+            Aa
+          </S.StyledButton>
+          <S.StyledButton
+            $isItemSelected={queryMatchParam.matchWholeWord}
+            onClick={() => toggleMatchParam('matchWholeWord')}
+          >
+            [
+          </S.StyledButton>
+          <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+            .*
+          </S.StyledButton>
+        </S.SearchBox>
+        <S.RootFolderText>
+          {searchTree ? (
+            <S.MatchText id="file-explorer-search-count">
+              {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
+            </S.MatchText>
+          ) : (
+            <RecentSearch
+              handleClick={query => {
+                updateSearchQuery(query);
+                findMatches(query);
+              }}
+            />
+          )}
+        </S.RootFolderText>
+
+        {searchTree && (
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onSelect}
-            treeData={[tree]}
+            treeData={[searchTree]}
             ref={treeRef}
             expandedKeys={expandedFolders}
             onExpand={onExpand}
-            titleRender={(event: any) => (
+            titleRender={event => (
               <TreeItem
                 treeKey={String(event.key)}
                 title={event.title}
                 processingEntity={processingEntity}
                 setProcessingEntity={setProcessingEntity}
                 onDelete={onDelete}
-                onDuplicate={onDuplicate}
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFileFolder={onCreateFileFolder}
+                onCreateFolder={onCreateFolder}
                 onCreateResource={onCreateResource}
                 onFilterByFileOrFolder={onFilterByFileOrFolder}
                 onPreview={onPreview}
@@ -486,14 +544,10 @@ const FileTreePane: React.FC<Props> = ({height}) => {
             showIcon
             showLine={{showLeafIcon: false}}
           />
-        </S.TreeContainer>
-      ) : (
-        <S.NoFilesContainer>
-          Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
-        </S.NoFilesContainer>
-      )}
+        )}
+      </S.TreeContainer>
     </S.FileTreeContainer>
   );
 };
 
-export default FileTreePane;
+export default SearchPane;

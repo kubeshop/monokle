@@ -55,7 +55,8 @@ export type LeftMenuSelectionType =
   | 'kustomize-pane'
   | 'templates-pane'
   | 'images-pane'
-  | 'validation-pane';
+  | 'validation-pane'
+  | 'search';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {

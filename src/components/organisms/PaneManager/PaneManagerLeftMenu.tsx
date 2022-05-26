@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
+import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined, SearchOutlined} from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
@@ -213,6 +213,23 @@ const PaneManagerLeftMenu: React.FC = () => {
           disabled={!activeProject}
         >
           <MenuIcon iconName="validation" active={isActive} isSelected={checkIsTabSelected('validation-pane')} />
+        </MenuButton>
+      </PaneTooltip>
+
+      <PaneTooltip show={!leftActive || !(leftMenuSelection === 'search')} title="Advanced Search" placement="right">
+        <MenuButton
+          isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
+          isActive={isActive}
+          onClick={() => setLeftActiveMenu('search')}
+          disabled={!activeProject}
+        >
+          <MenuIcon
+            className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
+            style={highlightedItems.browseTemplates ? {fontSize: '20px', marginLeft: '2px'} : {}}
+            icon={SearchOutlined}
+            active={isActive}
+            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
+          />
         </MenuButton>
       </PaneTooltip>
     </S.Container>
