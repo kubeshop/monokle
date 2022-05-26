@@ -1,4 +1,5 @@
 import React from 'react';
+import {useMeasure} from 'react-use';
 
 import {SectionRenderer, TitleBar} from '@molecules';
 
@@ -7,11 +8,13 @@ import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlu
 import * as S from './styled';
 
 const HelmPane: React.FC = () => {
+  const [listRef, {height}] = useMeasure<HTMLDivElement>();
+
   return (
     <S.HelmPaneContainer id="HelmPane">
       <TitleBar title="Helm" closable />
-      <S.List id="helm-sections-container">
-        <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />
+      <S.List id="helm-sections-container" ref={listRef}>
+        <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} height={height} />
       </S.List>
     </S.HelmPaneContainer>
   );

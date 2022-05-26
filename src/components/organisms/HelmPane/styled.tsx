@@ -6,7 +6,7 @@ export const HelmPaneContainer = styled.div`
   grid-template-rows: max-content 1fr;
 `;
 
-export const List = styled.ol`
+export const List = styled.div`
   height: 100%;
   list-style-type: none;
   padding: 0;

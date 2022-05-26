@@ -15,9 +15,8 @@ import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {MonoPaneTitle} from '@components/atoms';
-import {ResourceFilter} from '@components/molecules';
+import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
-import SectionRenderer from '@components/molecules/SectionRenderer/new_SectionRenderer';
 
 import {FeatureFlag} from '@utils/features';
 
