@@ -64,7 +64,7 @@ function ItemRenderer(props: ItemRendererProps) {
 
   return (
     <Wrapper
-      style={{width: '100%', marginBottom: itemRow.marginBottom}}
+      style={{width: '100%', marginBottom: itemRow.marginBottom, height: itemRow.height}}
       itemInstance={itemInstance}
       options={ContextMenuWrapper.options}
     >
