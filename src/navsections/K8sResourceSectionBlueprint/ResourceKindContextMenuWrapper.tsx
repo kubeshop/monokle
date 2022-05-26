@@ -2,8 +2,6 @@ import {Menu, Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import styled from 'styled-components';
-
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -17,10 +15,6 @@ import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import ContextMenu from '@components/molecules/ContextMenu';
-
-const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
@@ -88,35 +82,34 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
     dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
   };
 
-  const menu = (
-    <Menu>
-      {(isInPreviewMode || isUnsavedResource(resource)) && (
-        <>
-          <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
-            Save to file/folder
-          </Menu.Item>
-          <ContextMenuDivider />
-        </>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
-        Rename
-      </Menu.Item>
-
-      {knownResourceKinds.includes(resource.kind) && (
-        <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
-          Clone
-        </Menu.Item>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
-        Delete
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    ...(isInPreviewMode || isUnsavedResource(resource)
+      ? [
+          {
+            key: 'save_to_file_folder',
+            label: 'Save to file/folder',
+            disabled: isInPreviewMode,
+            onClick: onClickSaveToFileFolder,
+          },
+          {key: 'divider', type: 'divider'},
+        ]
+      : []),
+    {key: 'rename', label: 'Rename', onClick: onClickRename},
+    ...(knownResourceKinds.includes(resource.kind)
+      ? [
+          {
+            key: 'clone',
+            label: 'Clone',
+            disabled: isInPreviewMode,
+            onClick: onClickClone,
+          },
+        ]
+      : []),
+    {key: 'delete', label: 'Delete', disabled: isInPreviewMode && previewType !== 'cluster', onClick: onClickDelete},
+  ];
 
   return (
-    <ContextMenu overlay={menu} triggerOnRightClick>
+    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       {children}
     </ContextMenu>
   );

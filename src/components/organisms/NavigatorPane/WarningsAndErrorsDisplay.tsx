@@ -143,7 +143,7 @@ function WarningsAndErrorsDisplay() {
         <Dropdown
           overlay={<RefDropdownMenu type="warning" warnings={warnings} />}
           trigger={['click']}
-          placement="bottomCenter"
+          placement="bottom"
         >
           <S.ErrorWarningContainer $type="warning">
             <Icon name="warning" />
@@ -153,11 +153,7 @@ function WarningsAndErrorsDisplay() {
       )}
 
       {errorsCount > 0 && (
-        <Dropdown
-          overlay={<RefDropdownMenu type="error" warnings={errors} />}
-          trigger={['click']}
-          placement="bottomCenter"
-        >
+        <Dropdown overlay={<RefDropdownMenu type="error" warnings={errors} />} trigger={['click']} placement="bottom">
           <S.ErrorWarningContainer $type="error">
             <Icon name="error" style={{paddingTop: '2px'}} />
             <S.Label>{errorsCount}</S.Label>

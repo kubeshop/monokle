@@ -49,7 +49,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         if (row.type === 'header') {
           const {kind, count: resourceCount} = row;
           return (
-            <S.HeaderDiv key={kind}>
+            <S.HeaderDiv $showCheckbox={showCheckbox} key={kind}>
               <S.Header>
                 {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>

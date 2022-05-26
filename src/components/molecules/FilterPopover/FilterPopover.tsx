@@ -19,9 +19,10 @@ export type Filter = {
 type Props = {
   filter: Filter | undefined;
   onChange: (newFilter: Filter | undefined) => void;
+  disabled?: boolean;
 };
 
-export function FilterPopover({filter, onChange}: Props) {
+export function FilterPopover({filter, onChange, disabled}: Props) {
   const filterCount = filter ? Object.keys(filter).length : 0;
   const labelCount = filter?.labels ? Object.keys(filter.labels).length : 0;
   const annotationCount = filter?.annotations ? Object.keys(filter.annotations).length : 0;
@@ -216,6 +217,7 @@ export function FilterPopover({filter, onChange}: Props) {
     <Popover content={content} placement="bottomRight">
       <Badge count={filterCount} offset={[-6, 6]} size="small" color={Colors.blue7} style={{borderColor: Colors.blue7}}>
         <Button
+          disabled={disabled}
           icon={<FilterOutlined />}
           type="link"
           color={filterCount > 0 ? Colors.greenOkay : undefined}

@@ -9,7 +9,7 @@ const ContextMenu: React.FC<ContextMenuProps> = props => {
   const {overlay, children, triggerOnRightClick = false} = props;
 
   return (
-    <Dropdown overlay={overlay} trigger={triggerOnRightClick ? ['contextMenu'] : ['click']} placement="bottomCenter">
+    <Dropdown overlay={overlay} trigger={triggerOnRightClick ? ['contextMenu'] : ['click']} placement="bottom">
       {children}
     </Dropdown>
   );
