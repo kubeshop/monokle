@@ -27,14 +27,11 @@ type SectionContainerProps = {
   isSelected?: boolean;
   isHighlighted?: boolean;
   isHovered?: boolean;
-  isLastSection?: boolean;
-  isCollapsed?: boolean;
-  hasChildSections?: boolean;
-  isVisible?: boolean;
   isInitialized?: boolean;
   disableHoverStyle?: boolean;
   isSectionCheckable?: boolean;
   hasCustomNameDisplay?: boolean;
+  $marginBottom?: number;
 };
 
 export const SectionContainer = styled.li<SectionContainerProps>`
@@ -46,17 +43,7 @@ export const SectionContainer = styled.li<SectionContainerProps>`
   user-select: none;
   ${props =>
     (!props.isSectionCheckable && !props.hasCustomNameDisplay) || !props.isInitialized ? 'padding-left: 16px;' : ''}
-  ${props => {
-    if (props.isVisible === false) {
-      return 'visibility: hidden; height: 0;';
-    }
-    return 'visibility: visible;';
-  }}
-  ${props => {
-    if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasChildSections) {
-      return `margin-bottom: 16px;`;
-    }
-  }}
+  ${props => `margin-bottom: ${props.$marginBottom || 0}px;`}
     ${props => {
     if (props.disableHoverStyle) {
       return;

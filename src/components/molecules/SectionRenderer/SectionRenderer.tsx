@@ -38,7 +38,6 @@ function SectionRenderer(props: SectionRendererProps) {
 
   const parentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-  // TODO: we need to compute the rowHeight in the middleware, based on child section blueprints
   const {virtualItems, scrollToIndex, totalSize} = useVirtual({
     size: rows?.length || 0,
     parentRef,
@@ -114,16 +113,9 @@ function SectionRenderer(props: SectionRendererProps) {
               }}
             >
               {row.type === 'section' ? (
-                <SectionHeader sectionRow={row} isLastSection={false} />
+                <SectionHeader sectionRow={row} />
               ) : (
-                <ItemRenderer
-                  itemId={row.id}
-                  sectionId={row.sectionId}
-                  level={row.level}
-                  isLastItem={false}
-                  isSectionCheckable={false}
-                  indentation={row.indentation}
-                />
+                <ItemRenderer itemRow={row} isSectionCheckable={false} />
               )}
             </div>
           );

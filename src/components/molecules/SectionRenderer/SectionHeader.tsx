@@ -16,11 +16,10 @@ import * as S from './styled';
 
 interface SectionHeaderProps {
   sectionRow: NavigatorSectionRow;
-  isLastSection: boolean; // TODO: this should be on the SectionInstance
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {sectionRow, isLastSection} = props;
+  const {sectionRow} = props;
   const sectionId = sectionRow.id;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -87,18 +86,15 @@ function SectionHeader(props: SectionHeaderProps) {
   return (
     <S.SectionContainer
       isHovered={isHovered}
-      hasChildSections={Boolean(sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0)}
       disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
       isSelected={Boolean(sectionInstance.isSelected && sectionInstance.isCollapsed)}
       isHighlighted={Boolean(sectionInstance.isHighlighted && sectionInstance.isCollapsed)}
       isInitialized={Boolean(sectionInstance.isInitialized)}
-      isVisible={Boolean(sectionInstance.isVisible)}
       isSectionCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
       hasCustomNameDisplay={Boolean(NameDisplay.Component)}
-      isLastSection={isLastSection}
-      isCollapsed={sectionInstance.isCollapsed}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      $marginBottom={sectionRow.marginBottom}
     >
       <S.NameContainer
         isHovered={isHovered}
