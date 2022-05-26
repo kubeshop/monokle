@@ -3,6 +3,12 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import Colors from '@styles/Colors';
 
+export const ImageDetailsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+`;
+
 export const ImageName = styled.div`
   font-size: 18px;
   font-weight: 700;
