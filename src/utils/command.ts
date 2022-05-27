@@ -5,6 +5,7 @@ import log from 'loglevel';
 import {ensureRendererThread} from '@utils/thread';
 
 export type CommandOptions = {
+  commandId: string;
   cmd: string;
   args: string[];
   env?: any;
@@ -12,6 +13,7 @@ export type CommandOptions = {
 };
 
 export type CommandResult = {
+  commandId: string;
   exitCode: null | number;
   signal: null | string;
   stderr?: string;
@@ -24,9 +26,12 @@ export function runCommandInMainThread(options: CommandOptions): Promise<Command
   log.info('sending command to main thread', options);
 
   return new Promise<CommandResult>(resolve => {
-    ipcRenderer.once('command-result', (event, arg: CommandResult) => {
-      return resolve(arg);
-    });
+    const cb = (_event: unknown, arg: CommandResult) => {
+      if (arg.commandId !== options.commandId) return;
+      ipcRenderer.off('command-result', cb);
+      resolve(arg);
+    };
+    ipcRenderer.on('command-result', cb);
     ipcRenderer.send('run-command', options);
   });
 }

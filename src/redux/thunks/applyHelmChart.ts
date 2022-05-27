@@ -1,5 +1,6 @@
 import log from 'loglevel';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
@@ -48,6 +49,7 @@ function applyHelmChartToCluster(
   }
 
   return runCommandInMainThread({
+    commandId: uuid(),
     cmd: 'helm',
     args,
     env: {
