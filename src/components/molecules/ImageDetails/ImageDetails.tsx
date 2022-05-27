@@ -1,13 +1,10 @@
 import {useEffect, useState} from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import {Skeleton} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
-
-import {openUrlInExternalBrowser} from '@utils/shell';
 
 import * as S from './ImageDetails.styled';
 
@@ -48,30 +45,27 @@ const ImageDetails: React.FC = () => {
 
   return (
     <>
-      <S.ImageName>
-        <Icon name="images" style={{fontSize: 20, paddingTop: '4px'}} />
-        {selectedImage.name}:{selectedImage.tag}
-      </S.ImageName>
-
-      <S.ImageDetailsContainer>
-        {isLoading ? (
+      {isLoading ? (
+        <div style={{padding: '10px'}}>
           <Skeleton />
-        ) : imageInfo ? (
-          <ReactMarkdown
-            components={{
-              a({href, children, ...restProps}) {
-                return (
-                  <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
-                    {children}
-                  </a>
-                );
-              },
-            }}
-          >
-            {imageInfo['full_description']}
-          </ReactMarkdown>
-        ) : null}
-      </S.ImageDetailsContainer>
+        </div>
+      ) : imageInfo ? (
+        <>
+          <S.ImageName>
+            <Icon name="images" style={{fontSize: 20, paddingTop: '4px'}} />
+            {selectedImage.name}:{selectedImage.tag}
+            <S.ImageExtraInfoContainer>
+              <S.StarFilled />
+              {imageInfo?.['star_count']}
+
+              <S.PullRequestOutlined />
+              {imageInfo?.['pull_count']}
+            </S.ImageExtraInfoContainer>
+          </S.ImageName>
+
+          <S.ImageDetailsContainer>test</S.ImageDetailsContainer>
+        </>
+      ) : null}
     </>
   );
 };

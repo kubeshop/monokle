@@ -1,3 +1,5 @@
+import {PullRequestOutlined as RawPullRequestOutlined, StarFilled as RawStarFilled} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
@@ -7,6 +9,12 @@ export const ImageDetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 10px;
+`;
+
+export const ImageExtraInfoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 export const ImageName = styled.div`
@@ -19,4 +27,15 @@ export const ImageName = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+export const PullRequestOutlined = styled(RawPullRequestOutlined)`
+  font-size: 16px;
+  margin-right: -5px;
+`;
+
+export const StarFilled = styled(RawStarFilled)`
+  font-size: 16px;
+  margin-right: -5px;
+  color: ${Colors.yellow6};
 `;
