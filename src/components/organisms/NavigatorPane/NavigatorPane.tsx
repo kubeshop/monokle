@@ -115,7 +115,7 @@ const NavPane: React.FC<Props> = ({height}) => {
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         {isResourceFiltersOpen && (
-          <ReflexElement flex={0.4} minSize={100}>
+          <ReflexElement style={{background: Colors.black9}} flex={0.4} minSize={100}>
             <ResourceFilter />
           </ReflexElement>
         )}

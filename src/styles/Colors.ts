@@ -44,6 +44,7 @@ enum Colors {
   whitePure = '#ffffff',
   blackPure = '#000000',
   blackPearl = '#111d2c',
+  black9 = '#0C0D0E',
 
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',

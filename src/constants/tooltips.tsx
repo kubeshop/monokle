@@ -74,5 +74,6 @@ export const QuickFilterTooltip = () => <HotkeyLabel text="Filter results" name=
 export const ReloadFolderTooltip = () => (
   <HotkeyLabel text="Reload manifests from the currently selected folder" name="REFRESH_FOLDER" />
 );
+export const ResetFiltersTooltip = () => <HotkeyLabel text="Reset Filters" name="RESET_RESOURCE_FILTERS" />;
 export const SettingsTooltip = () => <HotkeyLabel text="Open Settings" name="TOGGLE_SETTINGS" />;
 export const ValidationTabTooltip = () => <HotkeyLabel text="View Validation" name="OPEN_VALIDATION_TAB" />;

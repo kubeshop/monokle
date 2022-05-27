@@ -45,6 +45,10 @@ type PreviewLoaderType = {
   targetId?: string;
 };
 
+type FiltersPresetsType = {
+  [name: string]: ResourceFilterType;
+};
+
 type ResourceDiffType = {
   targetResourceId?: string;
 };
@@ -174,6 +178,7 @@ interface AppState {
   deviceID: string;
   selectedImage?: ImageType | null;
   imagesSearchedValue?: string;
+  filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
 }
 
@@ -194,6 +199,7 @@ export type {
   AppState,
   ResourceMapType,
   ResourceFilterType,
+  FiltersPresetsType,
   FileMapType,
   ImagesListType,
   HelmChartMapType,
