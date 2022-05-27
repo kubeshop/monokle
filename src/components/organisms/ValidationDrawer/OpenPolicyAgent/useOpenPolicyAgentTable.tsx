@@ -6,6 +6,8 @@ import {useDispatch} from 'react-redux';
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
 import Icon, {IconNames} from '@components/atoms/Icon';
@@ -35,6 +37,7 @@ export function useOpenPolicyAgentTable() {
           const {description, learnMoreUrl} = record;
           return (
             <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
               title={
                 <p>
                   {description}{' '}

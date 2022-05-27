@@ -4,7 +4,7 @@ import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TOOLTIP_DELAY} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -94,7 +94,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
         title="Templates"
         closable
         leftButtons={
-          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TemplateManagerPaneReloadTooltip} placement="bottom">
             <Button
               disabled={templates.length === 0}
               onClick={onClickReload}

@@ -6,6 +6,8 @@ import {PushpinFilled, PushpinOutlined} from '@ant-design/icons';
 
 import {DateTime} from 'luxon';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {Project} from '@models/appconfig';
 
 import * as S from './RecentProject.styled';
@@ -48,6 +50,7 @@ const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItem
   return (
     <S.Container key={project.rootFolder} activeproject={isActive} onClick={handleOnProjectItemClick}>
       <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
         visible={isTooltipMessageVisible}
         onVisibleChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
         title={project.isPinned ? 'Unpin this project from the top' : 'Pin this project to the top'}
@@ -60,7 +63,7 @@ const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItem
       </Tooltip>
 
       <S.Name>{project.name}</S.Name>
-      <Tooltip title={project.rootFolder} placement="bottom">
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={project.rootFolder} placement="bottom">
         <S.Path>{project.rootFolder}</S.Path>
       </Tooltip>
       <S.LastOpened>

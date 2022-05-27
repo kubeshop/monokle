@@ -79,7 +79,10 @@ const createNode = (
             {name}
           </span>
           {resources.length > 0 ? (
-            <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}
+            >
               <S.NumberOfResources className="file-entry-nr-of-resources">{resources.length}</S.NumberOfResources>
             </Tooltip>
           ) : null}
@@ -474,7 +477,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
         leftButtons={
           <>
             {isScanExcludesUpdated === 'outdated' && (
-              <Tooltip title={FileExplorerChanged}>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
                 <ExclamationCircleOutlined />
               </Tooltip>
             )}

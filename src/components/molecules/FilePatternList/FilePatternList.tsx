@@ -4,6 +4,8 @@ import {Button, Input, InputRef, Tooltip} from 'antd';
 
 import styled from 'styled-components';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import {useFocus} from '@utils/hooks';
@@ -113,7 +115,7 @@ const FilePatternList = (props: FilePatternListProps) => {
         </div>
       ) : (
         <>
-          <Tooltip title={tooltip}>
+          <Tooltip title={tooltip} mouseEnterDelay={TOOLTIP_DELAY}>
             <Button onClick={() => setIsAddingPattern(true)} style={{marginRight: 10}}>
               {showButtonLabel || 'Add Pattern'}
             </Button>

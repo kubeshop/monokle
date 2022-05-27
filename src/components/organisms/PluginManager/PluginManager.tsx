@@ -4,7 +4,7 @@ import {Button, Skeleton, Tooltip, Typography} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
+import {DEFAULT_TEMPLATES_PLUGIN_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -46,7 +46,7 @@ const PluginManagerDrawer: React.FC = () => {
     <>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
-        <Tooltip title={PluginManagerDrawerReloadTooltip} placement="bottom">
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerDrawerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}
