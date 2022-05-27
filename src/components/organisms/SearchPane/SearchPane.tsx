@@ -303,34 +303,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
     };
   }, [onSelectRootFolderFromMainThread]);
 
-  const allTreeKeys = useMemo(() => {
-    if (!tree) return [];
-
-    // The root element goes first anyway if tree exists
-    const treeKeys: string[] = [tree.key];
-
-    /**
-     * Recursively finds all the keys and pushes them into array.
-     */
-    const recursivelyGetAllTheKeys = (arr: TreeNode[]) => {
-      if (!arr) return;
-
-      arr.forEach((data: TreeNode) => {
-        const {children} = data;
-
-        if (!children.length) return;
-
-        treeKeys.push(data.key);
-
-        recursivelyGetAllTheKeys(data.children);
-      });
-    };
-
-    recursivelyGetAllTheKeys(tree?.children);
-
-    return treeKeys;
-  }, [tree]);
-
   const onCreateFolder = (absolutePath: string) => {
     dispatch(openCreateFolderModal(absolutePath));
   };
@@ -391,7 +363,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   const newFilterTree = (node: FileEntry, queryRegExp: RegExp) => {
-    if (node.text) {
+    if (node.text && node.isSupported && !node.isExcluded) {
       const matches = node.text.match(queryRegExp);
       const matchCount = matches?.length;
 
@@ -432,7 +404,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);
-      dispatch(setExpandedFolders(allTreeKeys));
       return;
     }
     let matchParams = 'gi'; // global, case insensitive by default

@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined, SearchOutlined} from '@ant-design/icons';
+import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
@@ -226,7 +226,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           <MenuIcon
             className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
             style={highlightedItems.browseTemplates ? {fontSize: '20px', marginLeft: '2px'} : {}}
-            icon={SearchOutlined}
+            icon={S.SearchIcon}
             active={isActive}
             isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
           />

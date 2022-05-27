@@ -204,6 +204,7 @@ export function readFiles(
       const fileEntryPath = filePath.substring(rootFolder.length);
 
       const isDir = getFileStats(filePath)?.isDirectory();
+
       if (!isDir) {
         text = fs.readFileSync(path.join(filePath), 'utf8');
       }

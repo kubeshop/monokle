@@ -2,6 +2,8 @@ import {Badge as RawBadge} from 'antd';
 
 import styled from 'styled-components';
 
+import Search from '@assets/Search.svg';
+
 import {BackgroundColors, PanelColors} from '@styles/Colors';
 
 export const Badge = styled(RawBadge)`
@@ -21,3 +23,7 @@ export const Container = styled.div<{isLeftActive: boolean}>`
   gap: 7px;
   background-color: ${props => (props.isLeftActive ? BackgroundColors.darkThemeBackground : PanelColors.toolBar)}};
 `;
+
+export const SearchIcon: React.FC = () => {
+  return <img src={Search} />;
+};

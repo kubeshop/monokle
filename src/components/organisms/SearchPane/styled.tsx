@@ -135,7 +135,7 @@ export const NumberOfResources = styled.span`
 export const RootFolderText = styled.div`
   font-size: 12px;
   color: ${Colors.grey7};
-  margin: 15px 17px 0;
+  margin: 15px 15px 0;
 `;
 
 export const MatchText = styled.div`
@@ -291,8 +291,11 @@ export const RecentSearchItem = styled.div`
   color: ${Colors.grey9};
   font-weight: 400;
   font-size: 14px;
-  padding: 2px;
+  padding: 2px 1px;
   margin: 5px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 
   &:hover {
     cursor: pointer;
