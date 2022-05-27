@@ -16,7 +16,7 @@ const ImageTags: React.FC<IProps> = props => {
   const {name, tags, user} = props;
 
   return (
-    <>
+    <S.ImageTagsContainer>
       {tags.map(tag => (
         <Tooltip key={tag.id} title={ImageTagTooltip}>
           <S.Tag
@@ -30,7 +30,7 @@ const ImageTags: React.FC<IProps> = props => {
           </S.Tag>
         </Tooltip>
       ))}
-    </>
+    </S.ImageTagsContainer>
   );
 };
 

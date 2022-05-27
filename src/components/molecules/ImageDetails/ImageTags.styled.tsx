@@ -4,6 +4,12 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const ImageTagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+`;
+
 export const Tag = styled(RawTag)`
   color: rgba(255, 255, 255, 0.72);
   background-color: ${Colors.geekblue4};
@@ -12,8 +18,9 @@ export const Tag = styled(RawTag)`
   font-size: 14px;
   padding: 2px 5px;
   cursor: pointer;
+  margin-bottom: 10px;
 
   &:hover {
-    background: ${Colors.cyan};
+    background: ${Colors.cyan5};
   }
 `;

@@ -33,7 +33,7 @@ const ImageDetails: React.FC = () => {
 
       const [infoResponse, tagsResponse] = await Promise.all([
         fetch(`https://hub.docker.com/v2/repositories/${user}/${name}`, {method: 'GET'}),
-        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}/tags?page_size=5`, {
+        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}/tags?page_size=30`, {
           method: 'GET',
         }),
       ]);
