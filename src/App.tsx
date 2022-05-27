@@ -60,20 +60,21 @@ const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'))
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
-const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
+const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManager = React.lazy(() => import('@components/organisms/PluginManager'));
-const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
-const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
+const PluginManager = React.lazy(() => import('@organisms/PluginManager'));
+const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@components/organisms/CompareModal'));
+const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -87,6 +88,7 @@ const App = () => {
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
+  const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
@@ -399,6 +401,7 @@ const App = () => {
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
+          {isFiltersPresetModalVisible && <FiltersPresetModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}

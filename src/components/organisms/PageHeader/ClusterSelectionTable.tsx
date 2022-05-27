@@ -3,6 +3,8 @@ import React, {FC, useEffect, useState} from 'react';
 import {Button, Form, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
+import {v4 as uuid} from 'uuid';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
@@ -161,6 +163,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     }
 
     runCommandInMainThread({
+      commandId: uuid(),
       cmd: `kubectl`,
       args: ['config', 'use-context', clusterName],
     }).then(arg => {

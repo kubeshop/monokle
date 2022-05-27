@@ -711,6 +711,17 @@ export const mainSlice = createSlice({
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
     },
+    deleteFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      delete state.filtersPresets[action.payload];
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.resourceFilter = state.filtersPresets[action.payload];
+    },
+    saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.filtersPresets[action.payload] = state.resourceFilter;
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1233,12 +1244,15 @@ export const {
   clearSelected,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
+  deleteFilterPreset,
   editorHasReloadedSelectedPath,
   extendResourceFilter,
+  loadFilterPreset,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
   reloadClusterDiff,
   resetResourceFilter,
+  saveFilterPreset,
   seenNotifications,
   selectFile,
   selectHelmValuesFile,

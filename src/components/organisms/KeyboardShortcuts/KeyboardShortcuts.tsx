@@ -1,4 +1,4 @@
-import {Button, Modal, Typography} from 'antd';
+import {Modal, Typography} from 'antd';
 
 import hotkeys from '@constants/hotkeys';
 
@@ -10,8 +10,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import Keyboard from '@assets/Keyboard.svg';
 
 import BoardKeys from './BoardKeys';
-
-import * as S from './styled';
+import * as S from './KeyboardShortcuts.styled';
 
 const {Text} = Typography;
 
@@ -47,27 +46,23 @@ const KeyboardShortcuts = () => {
       onCancel={handleClose}
       title="Keyboard shortcuts"
       footer={
-        <Button
-          style={{zIndex: 100, marginBottom: 24, marginRight: 24, display: 'inline-block'}}
-          type="primary"
-          onClick={handleClose}
-        >
+        <S.Button type="primary" onClick={handleClose}>
           Got it!
-        </Button>
+        </S.Button>
       }
     >
       <div id="KeyboardShortcuts">
-        <S.HeightFillDiv />
-        <S.ContentContainerDiv>
+        <S.HeightFill />
+
+        <S.ContentContainer>
           <img src={Keyboard} />
-          <S.StyledContainer>
-            <S.StyledTextBlock>
+
+          <S.Container>
+            <S.TextBlock>
               <thead>
                 <tr>
                   <th>
-                    <Text strong style={{fontSize: '16px'}}>
-                      Navigation
-                    </Text>
+                    <S.TextHeader strong>Navigation</S.TextHeader>
                   </th>
                 </tr>
               </thead>
@@ -83,14 +78,13 @@ const KeyboardShortcuts = () => {
                   </tr>
                 ))}
               </tbody>
-            </S.StyledTextBlock>
-            <S.StyledTextBlock>
+            </S.TextBlock>
+
+            <S.TextBlock>
               <thead>
                 <tr>
                   <th>
-                    <Text strong style={{fontSize: '16px'}}>
-                      Tools
-                    </Text>
+                    <S.TextHeader strong>Tools</S.TextHeader>
                   </th>
                 </tr>
               </thead>
@@ -106,9 +100,9 @@ const KeyboardShortcuts = () => {
                   </tr>
                 ))}
               </tbody>
-            </S.StyledTextBlock>
-          </S.StyledContainer>
-        </S.ContentContainerDiv>
+            </S.TextBlock>
+          </S.Container>
+        </S.ContentContainer>
       </div>
     </Modal>
   );

@@ -369,3 +369,13 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 ::-webkit-scrollbar-thumb:hover {
   background: #242424;
 }
+
+.filters-preset-dropdown .ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
+  display: block;
+}

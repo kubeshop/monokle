@@ -89,7 +89,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     <S.Container id="LeftToolbar" isLeftActive={isActive}>
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'file-explorer')}
-        title={FileExplorerTabTooltip}
+        title={<FileExplorerTabTooltip />}
         placement="right"
       >
         <MenuButton
@@ -111,7 +111,7 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
-        title={KustomizeTabTooltip}
+        title={<KustomizeTabTooltip />}
         placement="right"
       >
         <MenuButton
@@ -140,7 +140,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'helm-pane')}
-          title={HelmTabTooltip}
+          title={<HelmTabTooltip />}
           placement="right"
         >
           <MenuButton
@@ -206,7 +206,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       </PaneTooltip>
 
       <WalkThrough placement="rightTop" step="validation" collection="release">
-        <PaneTooltip show={!leftDrawerVisible} title={ValidationTabTooltip} placement="right">
+        <PaneTooltip show={!leftDrawerVisible} title={<ValidationTabTooltip />} placement="right">
           <MenuButton
             isSelected={leftDrawerVisible}
             isActive={isActive}
