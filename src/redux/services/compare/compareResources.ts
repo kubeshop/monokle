@@ -3,7 +3,7 @@ import {v5 as uuid} from 'uuid';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {CompareOperation, ResourceComparison} from '@redux/reducers/compare';
+import {CompareOperation, ResourceComparison} from '@redux/compare';
 
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 

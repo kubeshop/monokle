@@ -14,7 +14,7 @@ import {RootState} from '@models/rootstate';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
 

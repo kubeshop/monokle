@@ -5,7 +5,7 @@ import {Checkbox} from 'antd';
 
 import {groupBy} from 'lodash';
 
-import {ResourceSetData} from '@redux/reducers/compare';
+import {ResourceSetData} from '@redux/compare';
 
 import * as S from './ResourceList.styled';
 

@@ -4,8 +4,8 @@ import {Select} from 'antd';
 
 import invariant from 'tiny-invariant';
 
+import {PartialResourceSet, resourceSetSelected, selectKustomizeResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {PartialResourceSet, resourceSetSelected, selectKustomizeResourceSet} from '@redux/reducers/compare';
 
 type Props = {
   side: 'left' | 'right';

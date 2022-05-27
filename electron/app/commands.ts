@@ -11,7 +11,7 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions, CommandResult} from '@utils/command';
+import {CommandOptions, CommandResult} from '@utils/commands';
 import {ensureMainThread} from '@utils/thread';
 
 import autoUpdater from './autoUpdater';
