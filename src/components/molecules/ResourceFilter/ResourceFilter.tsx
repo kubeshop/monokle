@@ -45,6 +45,7 @@ const ResourceFilter = () => {
   );
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
@@ -195,10 +196,10 @@ const ResourceFilter = () => {
 
         <S.TitleActions>
           <S.PresetButton type="link" onClick={onClickLoadPreset}>
-            Load preset
+            Load {paneConfiguration.navPane < 0.18 ? '' : 'preset'}
           </S.PresetButton>
           <S.PresetButton disabled={isSavePresetDisabled} type="link" onClick={onClickSavePreset}>
-            Save preset
+            Save {paneConfiguration.navPane < 0.18 ? '' : 'preset'}
           </S.PresetButton>
 
           <Tooltip title={ResetFiltersTooltip}>
