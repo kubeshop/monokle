@@ -81,7 +81,13 @@ const FiltersPresetModal: React.FC = () => {
       <Form form={form} layout="vertical">
         {uiState.type === 'load' ? (
           <Form.Item name="preset" rules={[{required: true, message: 'Please select a preset first!'}]}>
-            <S.Select dropdownClassName="filters-preset-dropdown" placeholder="Select filter preset" showSearch>
+            <S.Select
+              autoFocus
+              defaultOpen
+              dropdownClassName="filters-preset-dropdown"
+              placeholder="Select filter preset"
+              showSearch
+            >
               {Object.keys(filtersPresets).map(key => (
                 <Select.Option key={key} value={key}>
                   {key} <S.DeleteOutlined onClick={(e: any) => onPresetDelete(e, key)} />

@@ -5,8 +5,7 @@ import {Button, Input, Select, Tooltip} from 'antd';
 
 import {ClearOutlined} from '@ant-design/icons';
 
-import {mapValues} from 'lodash';
-import isEmpty from 'lodash/isEmpty';
+import {isEmpty, mapValues} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 import {ResetFiltersTooltip} from '@constants/tooltips';
