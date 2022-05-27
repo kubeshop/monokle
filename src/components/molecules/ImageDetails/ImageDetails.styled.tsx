@@ -8,6 +8,7 @@ import Colors from '@styles/Colors';
 export const ImageDetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 30px;
   padding: 10px;
 `;
 
@@ -32,6 +33,14 @@ export const ImageName = styled.div`
 export const PullRequestOutlined = styled(RawPullRequestOutlined)`
   font-size: 16px;
   margin-right: -5px;
+`;
+
+export const SectionContainer = styled.div`
+  font-size: 14px;
+`;
+
+export const SectionTitle = styled.h3`
+  font-weight: bold;
 `;
 
 export const StarFilled = styled(RawStarFilled)`

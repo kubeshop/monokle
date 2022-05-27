@@ -6,6 +6,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
 
+import {openUrlInExternalBrowser} from '@utils/shell';
+
 import * as S from './ImageDetails.styled';
 
 const ImageDetails: React.FC = () => {
@@ -13,6 +15,7 @@ const ImageDetails: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [imageInfo, setImageInfo] = useState<Record<string, any>>();
+  const [imageUrl, setImageUrl] = useState<string>();
 
   useEffect(() => {
     if (!selectedImage) {
@@ -30,6 +33,7 @@ const ImageDetails: React.FC = () => {
         const data = await response.json();
 
         setImageInfo(data);
+        setImageUrl(`https://hub.docker.com/r/${user}/${name}`);
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -56,14 +60,26 @@ const ImageDetails: React.FC = () => {
             {selectedImage.name}:{selectedImage.tag}
             <S.ImageExtraInfoContainer>
               <S.StarFilled />
-              {imageInfo?.['star_count']}
+              {imageInfo['star_count']}
 
               <S.PullRequestOutlined />
-              {imageInfo?.['pull_count']}
+              {imageInfo['pull_count']}
             </S.ImageExtraInfoContainer>
           </S.ImageName>
 
-          <S.ImageDetailsContainer>test</S.ImageDetailsContainer>
+          <S.ImageDetailsContainer>
+            {imageUrl && (
+              <S.SectionContainer>
+                <S.SectionTitle>Image link</S.SectionTitle>
+                <a onClick={() => openUrlInExternalBrowser(imageUrl)}>{imageUrl}</a>
+              </S.SectionContainer>
+            )}
+
+            <S.SectionContainer>
+              <S.SectionTitle>Description</S.SectionTitle>
+              {imageInfo.description}
+            </S.SectionContainer>
+          </S.ImageDetailsContainer>
         </>
       ) : null}
     </>
