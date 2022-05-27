@@ -4,6 +4,8 @@ import {Button, Tooltip} from 'antd';
 
 import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   resourceSetCleared,
@@ -49,7 +51,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
       </S.SelectSpacer>
 
       <S.ActionsDiv>
-        <Tooltip title="Reload resources" placement="bottom">
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Reload resources" placement="bottom">
           <Button
             type="link"
             size="middle"
@@ -59,7 +61,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
           />
         </Tooltip>
 
-        <Tooltip title="Clear resources" placement="bottom">
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Clear resources" placement="bottom">
           <Button
             type="link"
             size="middle"

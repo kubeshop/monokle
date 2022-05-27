@@ -6,7 +6,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
@@ -202,7 +202,7 @@ const SettingsManager: React.FC = () => {
           </Form>
           <S.Div>
             <S.Span>On Startup</S.Span>
-            <Tooltip title={AutoLoadLastProjectTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
               <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
                 Automatically load last project
               </Checkbox>

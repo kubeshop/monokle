@@ -5,7 +5,7 @@ import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -80,7 +80,7 @@ const NavPane: React.FC<Props> = ({height}) => {
             </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
-            <Tooltip title={NewResourceTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
               <S.PlusButton
                 id="create-resource-button"
                 $disabled={!isFolderOpen || isInPreviewMode}
@@ -94,7 +94,7 @@ const NavPane: React.FC<Props> = ({height}) => {
               />
             </Tooltip>
 
-            <Tooltip title={QuickFilterTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
               <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
                 <Button
                   disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
