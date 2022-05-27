@@ -10,6 +10,7 @@ import sectionBlueprintMap from '../sectionBlueprintMap';
 import ImagesQuickAction from './ImagesQuickAction';
 import ImagesSectionEmptyDisplay from './ImagesSectionEmptyDisplay';
 import ImagesSectionNameDisplay from './ImagesSectionNameDisplay';
+import ImagesSectionNameSuffix from './ImagesSectionNameSuffix';
 
 export type ImagesScopeType = {
   resourceMap: ResourceMapType;
@@ -110,6 +111,9 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
       quickAction: {
         component: ImagesQuickAction,
         options: {isVisibleOnHover: true},
+      },
+      suffix: {
+        component: ImagesSectionNameSuffix,
       },
     },
   },

@@ -153,7 +153,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     dispatch(
       updateResource({
         resourceId: firstLocalResource.id,
-        content: clusterResourceContentText,
+        text: clusterResourceContentText,
         preventSelectionAndHighlightsUpdate: true,
       })
     );

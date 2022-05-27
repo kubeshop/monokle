@@ -171,7 +171,7 @@ const ClusterResourceDiffModal = () => {
     dispatch(
       updateResource({
         resourceId: selectedMatchingResourceId,
-        content: cleanTargetResourceText,
+        text: cleanTargetResourceText,
         preventSelectionAndHighlightsUpdate: true,
         isInClusterMode: true,
       })

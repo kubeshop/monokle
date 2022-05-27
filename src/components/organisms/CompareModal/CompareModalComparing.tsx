@@ -1,19 +1,15 @@
-import {MonacoDiffEditor} from 'react-monaco-editor';
-
 import {Col, Row} from 'antd';
 
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {selectDiffedComparison} from '@redux/reducers/compare';
 
-import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-
+import {ComparisonInspection} from './ComparisonInspection';
 import {ComparisonList} from './ComparisonList';
 
 export const CompareModalComparing: React.FC = () => {
   const {comparison} = useAppSelector(state => state.compare.current);
-  const diffComparison = useAppSelector(state => selectDiffedComparison(state.compare));
+  const inspecting = useAppSelector(state => state.compare.current.inspect);
 
   if (!comparison || comparison.loading) {
     return (
@@ -25,29 +21,11 @@ export const CompareModalComparing: React.FC = () => {
     );
   }
 
-  if (diffComparison) {
+  if (inspecting) {
     return (
       <DiffRow>
         <Col span={24}>
-          <MonacoDiffEditor
-            language="yaml"
-            original={diffComparison.left.text}
-            value={diffComparison.right.text}
-            theme={KUBESHOP_MONACO_THEME}
-            options={{
-              renderIndicators: false,
-              renderOverviewRuler: false,
-              renderSideBySide: true,
-              automaticLayout: true,
-              minimap: {
-                enabled: false,
-              },
-              readOnly: true,
-              scrollbar: {
-                vertical: 'hidden',
-              },
-            }}
-          />
+          <ComparisonInspection />
         </Col>
       </DiffRow>
     );

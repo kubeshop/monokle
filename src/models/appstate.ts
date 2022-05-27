@@ -177,7 +177,7 @@ interface AppState {
   imagesList: ImagesListType;
 }
 
-export interface PossibleResource {
+export interface KubernetesObject {
   apiVersion: string;
   kind: string;
   metadata: {
@@ -187,7 +187,7 @@ export interface PossibleResource {
   [x: string]: any;
 }
 
-export const isPossibleResource = (obj: any) =>
+export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
 
 export type {

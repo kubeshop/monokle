@@ -12,6 +12,8 @@ export type ComparisonItemProps = {
   namespace: string | undefined;
   name: string;
   leftActive: boolean;
+  leftTransferable: boolean;
   rightActive: boolean;
+  rightTransferable: boolean;
   canDiff: boolean;
 };

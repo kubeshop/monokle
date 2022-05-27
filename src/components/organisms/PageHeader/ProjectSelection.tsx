@@ -260,7 +260,7 @@ const ProjectSelection = () => {
           arrow
           disabled={previewLoader.isLoading || isInPreviewMode}
           overlay={projectMenu}
-          placement="bottomCenter"
+          placement="bottom"
           trigger={['click']}
           visible={isDropdownMenuVisible}
           onVisibleChange={onDropdownVisibleChange}

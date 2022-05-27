@@ -1,8 +1,6 @@
-// eslint-disable-next-line
-import {shallowEqual} from 'react-redux';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice, isAnyOf} from '@reduxjs/toolkit';
-
+import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -69,6 +67,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
+import {transferResource} from './compare';
 import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
@@ -80,13 +79,6 @@ export type SetRootFolderPayload = {
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
-};
-
-export type UpdateResourcePayload = {
-  resourceId: string;
-  content: string;
-  preventSelectionAndHighlightsUpdate?: boolean;
-  isInClusterMode?: boolean;
 };
 
 export type UpdateMultipleResourcesPayload = {
@@ -1132,7 +1124,21 @@ export const mainSlice = createSlice({
     builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      const {side, delta} = action.payload;
 
+      // Warning: The compare feature has its own slice and does bookkeeping
+      // of its own resources. This reducer works because transfer only works
+      // for cluster and local which are also in main slice. Should we add
+      // transfer for other resource set types this will give unexpected behavior.
+      delta.forEach(comparison => {
+        if (side === 'left') {
+          state.resourceMap[comparison.left.id] = comparison.left;
+        } else {
+          state.resourceMap[comparison.right.id] = comparison.right;
+        }
+      });
+    });
     builder.addCase(loadPolicies.fulfilled, (state, action) => {
       state.policies = {
         plugins: action.payload,
@@ -1264,29 +1270,21 @@ export const {
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
-const selectingActions = isAnyOf(
-  selectK8sResource,
-  selectImage,
-  selectFile,
-  selectPreviewConfiguration,
-  selectHelmValuesFile
-);
-
 /* * * * * * * * * * * * * *
  * Listeners
  * * * * * * * * * * * * * */
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return !selectingActions(action) && !shallowEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return !isEqual(currentState.main.resourceMap, previousState.main.resourceMap);
     },
 
     effect: async (_action, {dispatch, getState}) => {
-      const resourceMap = getState().main.resourceMap;
+      const resourceMap = getActiveResourceMap(getState().main);
       const imagesList = getState().main.imagesList;
       const images = getImages(resourceMap);
 
-      if (!shallowEqual(images, imagesList)) {
+      if (!isEqual(images, imagesList)) {
         dispatch(setImagesList(images));
       }
     },
