@@ -29,10 +29,6 @@ import {defineHotkey} from '@utils/defineHotkey';
 
 import Colors from '@styles/Colors';
 
-const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
-
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
   padding: 8px;
