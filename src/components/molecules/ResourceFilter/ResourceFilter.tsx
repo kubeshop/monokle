@@ -19,6 +19,8 @@ import {KeyValueInput} from '@components/atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
+import {useWindowSize} from '@utils/hooks';
+
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
@@ -37,6 +39,8 @@ const ResourceFilter = () => {
   const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
 
+  const {width: windowWidth} = useWindowSize();
+
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
@@ -45,7 +49,7 @@ const ResourceFilter = () => {
   );
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
-  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
+  const isPaneWideEnough = useAppSelector(state => windowWidth * state.ui.paneConfiguration.navPane > 330);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
@@ -196,10 +200,10 @@ const ResourceFilter = () => {
 
         <S.TitleActions>
           <S.PresetButton type="link" onClick={onClickLoadPreset}>
-            Load {paneConfiguration.navPane < 0.18 ? '' : 'preset'}
+            Load {isPaneWideEnough ? 'preset' : ''}
           </S.PresetButton>
           <S.PresetButton disabled={isSavePresetDisabled} type="link" onClick={onClickSavePreset}>
-            Save {paneConfiguration.navPane < 0.18 ? '' : 'preset'}
+            Save {isPaneWideEnough ? 'preset' : ''}
           </S.PresetButton>
 
           <Tooltip title={ResetFiltersTooltip}>
