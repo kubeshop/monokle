@@ -20,7 +20,7 @@ type Props = {
   onClose: () => void;
 };
 
-export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
+export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isInspecting = useAppSelector(state => state.compare.current.inspect);
@@ -89,4 +89,4 @@ function useModalSize(): ModalSizeProps {
   };
 }
 
-export default DiffModal;
+export default CompareModal;
