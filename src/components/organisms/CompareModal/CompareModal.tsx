@@ -7,6 +7,7 @@ import {useAppSelector} from '@redux/hooks';
 import {selectCompareStatus} from '@redux/reducers/compare';
 
 import {CompareActionBar} from './CompareActionBar';
+import * as S from './CompareModal.styled';
 import {CompareModalComparing} from './CompareModalComparing';
 import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
@@ -46,19 +47,11 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
         </Col>
       </Row>
 
-      <div
-        style={{
-          height: `calc(100% - ${height}px - 66px - 66px)`,
-          marginRight: '-8px',
-          position: 'relative',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
-      >
+      <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 66px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
-      </div>
+      </S.ContentDiv>
 
-      <Row style={{height: 66, alignItems: 'center'}}>
+      <S.ActionsRow>
         <Col span={10}>
           <TransferButton side="left" />
         </Col>
@@ -66,7 +59,7 @@ export const DiffModal: React.FC<Props> = ({visible, onClose}) => {
         <Col span={10}>
           <TransferButton side="right" />
         </Col>
-      </Row>
+      </S.ActionsRow>
     </Modal>
   );
 };
