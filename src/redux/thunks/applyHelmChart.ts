@@ -11,7 +11,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import {APPLY_HELM_CHART, trackEvent} from '@utils/telemetry';
 
 /**

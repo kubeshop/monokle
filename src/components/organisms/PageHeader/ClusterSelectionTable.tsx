@@ -16,7 +16,7 @@ import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/sele
 
 import FilePatternList from '@molecules/FilePatternList';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
