@@ -7,7 +7,7 @@ type RecentSearchProps = {
 };
 
 const RecentSearch = ({handleClick}: RecentSearchProps) => {
-  const recentSearch: string[] = electronStore.get('appConfig.recentSearch').reverse() || [];
+  const recentSearch: string[] = electronStore.get('appConfig.recentSearch')?.reverse() || [];
   return (
     <>
       <S.RecentSearchTitle>Recent Searches</S.RecentSearchTitle>
