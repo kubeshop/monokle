@@ -82,7 +82,6 @@ export const loadContexts = async (
             dispatch(updateProjectKubeAccess(clusterAccess));
           }
         } catch (e) {
-          // error catched here
           showError(dispatch, {
             title: 'Cluster access failed',
             message: (e as Error).message,
@@ -91,7 +90,6 @@ export const loadContexts = async (
           dispatch(setAccessLoading(false));
         }
       } catch (e: any) {
-        // or maybe error catched here
         showError(dispatch, {
           title: 'Loading kubeconfig file failed',
           message: (e as Error).message,
