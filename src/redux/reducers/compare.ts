@@ -22,6 +22,7 @@ import {canTransfer, doTransferResource} from '@redux/services/compare/transferR
 import type {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {errorMsg} from '@utils/error';
 import {isDefined} from '@utils/filter';
 import {trackEvent} from '@utils/telemetry';
 
@@ -672,8 +673,9 @@ export const resourceFetchListener =
           dispatch(resourceSetFetched({side, resources}));
         } catch (err) {
           if (err instanceof TaskAbortError) return;
-          const reason = err instanceof Error ? err.message : 'unknown failure';
+          const reason = errorMsg(err);
           dispatch(resourceSetFetchFailed({side, reason}));
+          dispatch(setAlert(errorAlert('Cannot retrieve resources', reason)));
         }
       },
     });
