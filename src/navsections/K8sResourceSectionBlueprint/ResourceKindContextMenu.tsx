@@ -78,7 +78,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   }, [itemInstance, selectedResourceId]);
 
   useHotkeys(
-    defineHotkey(hotkeys.DELETE_RESOURCES.key),
+    defineHotkey(hotkeys.DELETE_RESOURCE.key),
     () => {
       if (selectedResourceId) {
         deleteResourceWithConfirm(resource, resourceMap, dispatch);

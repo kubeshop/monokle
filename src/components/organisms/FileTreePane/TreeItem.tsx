@@ -89,7 +89,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
   useHotkeys(
-    defineHotkey(hotkeys.DELETE_RESOURCES.key),
+    defineHotkey(hotkeys.DELETE_RESOURCE.key),
     () => {
       if (treeKey === selectedPath) {
         deleteEntityWizard(
