@@ -105,6 +105,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     }
   };
 
+  const onClickExit = () => {
+    stopPreview(dispatch);
+  };
+
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!kubeConfigPath) || !isKubeConfigPathValid);
   }, [kubeConfigPath, isKubeConfigPathValid]);
@@ -178,33 +182,42 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               </Dropdown>
             </>
           )}
-          <S.ClusterStatusText connected={isKubeConfigPathValid}>
-            {isKubeConfigPathValid && (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-                <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-              </Tooltip>
+          <S.ClusterStatusText isKubeConfigPathValid={isKubeConfigPathValid} isInClusterMode={isInClusterMode}>
+            {isKubeConfigPathValid ? (
+              <S.CheckCircleOutlined isKubeConfigPathValid={isKubeConfigPathValid} isInClusterMode={isInClusterMode} />
+            ) : (
+              <S.ClusterOutlined />
             )}
-            <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
+            <span style={{fontWeight: '600', fontSize: '10px', textTransform: 'uppercase'}}>
+              {isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}
+            </span>
           </S.ClusterStatusText>
 
-          {isKubeConfigPathValid ? (
-            <>
-              <S.Divider type="vertical" />
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
-                <S.Button type="link" disabled={isAccessLoading} onClick={handleLoadCluster}>
-                  {createClusterObjectsLabel()}
-                </S.Button>
-              </Tooltip>
-            </>
-          ) : (
-            <>
-              <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
-                Configure
-              </S.ClusterActionButton>
-            </>
+          {!isKubeConfigPathValid && (
+            <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
+              Configure
+            </S.ClusterActionButton>
           )}
         </S.ClusterStatus>
       )}
+      <>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
+          <S.Button
+            disabled={isAccessLoading}
+            onClick={handleLoadCluster}
+            isInClusterMode={isInClusterMode}
+            loading={previewType === 'cluster' && previewLoader.isLoading}
+          >
+            {previewType === 'cluster' && previewLoader.isLoading ? '' : isInClusterMode ? 'Reload' : 'Load'}
+          </S.Button>
+        </Tooltip>
+
+        {isInClusterMode && (
+          <S.ExitButton onClick={onClickExit} isInClusterMode={isInClusterMode}>
+            Exit
+          </S.ExitButton>
+        )}
+      </>
     </S.ClusterContainer>
   );
 };

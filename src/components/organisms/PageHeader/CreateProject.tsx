@@ -21,7 +21,7 @@ const itemsMenu = () => {
   return (
     <S.MenuContainer>
       {menuItems.map(item => (
-        <S.MenuItem>
+        <S.MenuItem key={item.label}>
           <S.MenuItemIcon>{item.icon}</S.MenuItemIcon>
           <S.MenuItemLabel>{item.label}</S.MenuItemLabel>
         </S.MenuItem>

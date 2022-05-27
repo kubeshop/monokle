@@ -139,6 +139,13 @@ const HelpMenu = () => {
 
   return (
     <Dropdown key="more" overlay={<S.Menu items={menuItems} />}>
+      {/* <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+                  <S.ApiOutlined onClick={showPluginsDrawer} />
+                </Tooltip>
+    
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+                  <S.SettingsOutlined onClick={toggleSettingsDrawer} />
+                </Tooltip> */}
       <S.QuestionCircleOutlined />
     </Dropdown>
   );

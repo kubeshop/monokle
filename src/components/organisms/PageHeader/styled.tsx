@@ -17,10 +17,10 @@ import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors, PanelColors} from '@styles/Colors';
 
 export const Row = styled(RawRow.default)`
-  display: grid;
-  grid-template-columns: max-content 1fr max-content;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0px 15px 0px 10px;
+  padding: 0px 10px;
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
@@ -36,8 +36,7 @@ export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
 export const ClusterRow = styled(Row)`
   background: ${BackgroundColors.clusterModeBackground};
   margin: 0;
-  padding: 0 10px;
-  height: 25px;
+  height: 8px;
   color: ${Colors.blackPure};
   display: flex;
   justify-content: space-between;
@@ -88,8 +87,7 @@ export const ModeSpan = styled.span`
 export const PreviewRow = styled(Row)`
   background: ${BackgroundColors.previewModeBackground};
   margin: 0;
-  padding: 0 10px;
-  height: 25px;
+  height: 8px;
   color: ${Colors.blackPure};
   display: flex;
   justify-content: space-between;
@@ -97,20 +95,12 @@ export const PreviewRow = styled(Row)`
 
 export const PageHeaderContainer = styled.div``;
 
-export const ProjectClusterSelectionContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
 export const ResourceSpan = styled.span`
   font-weight: 700;
 `;
 
 export const SettingsCol = styled(Col)`
-  display: grid;
-  grid-template-columns: repeat(4, 18px);
-  align-items: center;
-  grid-column-gap: 16px;
+  display: flex;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`

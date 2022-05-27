@@ -118,25 +118,25 @@ const PageHeader = () => {
     <S.PageHeaderContainer ref={pageHeaderRef}>
       {isInPreviewMode && previewType === 'kustomization' && (
         <S.PreviewRow noborder="true">
-          <S.ModeSpan>PREVIEW MODE</S.ModeSpan>
+          {/* <S.ModeSpan>PREVIEW MODE</S.ModeSpan>
           {previewResource && (
             <S.ResourceSpan>
               Previewing [{previewResource.name}] kustomization - {activeResources.length} resources
             </S.ResourceSpan>
           )}
-          <ExitButton onClick={onClickExit} />
+          <ExitButton onClick={onClickExit} /> */}
         </S.PreviewRow>
       )}
 
       {isInPreviewMode && previewType === 'cluster' && (
         <S.ClusterRow>
-          <S.ModeSpan>CLUSTER MODE</S.ModeSpan>
+          {/* <S.ModeSpan>CLUSTER MODE</S.ModeSpan>
           {previewResourceId && (
             <S.ResourceSpan>
               Previewing context [{currentContext}] - {activeResources.length} resources
             </S.ResourceSpan>
           )}
-          <ExitButton onClick={onClickExit} />
+          <ExitButton onClick={onClickExit} /> */}
         </S.ClusterRow>
       )}
 
@@ -173,27 +173,25 @@ const PageHeader = () => {
             <CreateProject />
           </div>
 
-          <S.ProjectClusterSelectionContainer>
+          <div style={{display: 'flex'}}>
             <ClusterSelection previewResource={previewResource} />
-          </S.ProjectClusterSelectionContainer>
+            <S.SettingsCol>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
+                <Badge count={unseenNotificationsCount} size="small">
+                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
+                </Badge>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+                <S.ApiOutlined onClick={showPluginsDrawer} />
+              </Tooltip>
 
-          <S.SettingsCol>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-              <Badge count={unseenNotificationsCount} size="small">
-                <S.BellOutlined onClick={toggleNotificationsDrawer} />
-              </Badge>
-            </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+                <S.SettingsOutlined onClick={toggleSettingsDrawer} />
+              </Tooltip>
 
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-              <S.ApiOutlined onClick={showPluginsDrawer} />
-            </Tooltip>
-
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-              <S.SettingsOutlined onClick={toggleSettingsDrawer} />
-            </Tooltip>
-
-            <HelpMenu />
-          </S.SettingsCol>
+              <HelpMenu />
+            </S.SettingsCol>
+          </div>
         </S.Row>
       </S.Header>
     </S.PageHeaderContainer>

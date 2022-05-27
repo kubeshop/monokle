@@ -23,8 +23,8 @@ export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
   margin-right: 0px !important;
-  padding: 0px;
-  width: 148px;
+  padding: 0px !important;
+  width: 100% !important;
 
   :hover,
   :focus {
@@ -48,7 +48,7 @@ export const Divider = styled(RawDivider)`
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
   position: absolute;
-  right: 0;
+  right: 8px !important;
   color: ${Colors.whitePure};
 `;
 
@@ -80,7 +80,6 @@ export const ProjectContainer = styled.div`
   align-items: center;
   border: none;
   border-radius: 4px;
-  padding: 4px 16px;
   height: 28px;
   width: 180px;
   gap: 32px;
@@ -102,12 +101,13 @@ export const ProjectLabel = styled.span`
   font-size: 10px;
   letter-spacing: 0.05em;
   color: ${Colors.grey7};
-  width: 48px;
+  width: 56px;
   text-align: left;
+  padding-left: 8px;
 `;
 
 export const ProjectName = styled.span`
-  max-width: 85px;
+  max-width: 104px;
   width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -115,6 +115,7 @@ export const ProjectName = styled.span`
   color: ${Colors.whitePure};
   font-weight: 600;
   font-size: 12px;
+  text-align: left;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`

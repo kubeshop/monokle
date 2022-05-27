@@ -10,25 +10,45 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const Button = styled(RawButton)`
-  padding: 0;
-  margin: 0;
-  color: ${Colors.blue6};
+export const Button = styled(RawButton)<{isInClusterMode?: boolean}>`
+  margin: 0 0 0 10px;
+  border: 1px solid ${props => (props.isInClusterMode ? Colors.volcano : Colors.blue6)};
+  color: ${props => (props.isInClusterMode ? Colors.volcano : Colors.blue6)};
+  border-radius: 4px !important;
+  font-weight: 600;
+  font-size: 12px;
 
-  &:hover {
-    color: ${Colors.blue6};
+  &:hover,
+  &:focus {
+    opacity: 0.8;
+    border: 1px solid ${props => (props.isInClusterMode ? Colors.volcano : Colors.blue6)};
+    color: ${props => (props.isInClusterMode ? Colors.volcano : Colors.blue6)};
+  }
+`;
+
+export const ExitButton = styled(RawButton)<{isInClusterMode?: boolean}>`
+  margin: 0 0 0 10px;
+  color: ${props => (props.isInClusterMode ? Colors.blackPure : Colors.volcano)};
+  background-color: ${props => (props.isInClusterMode ? Colors.volcano : Colors.blackPure)};
+  border-radius: 4px !important;
+  font-weight: 600;
+  font-size: 12px;
+
+  &:hover,
+  &:focus {
+    color: ${props => (props.isInClusterMode ? Colors.blackPure : Colors.volcano)};
+    background-color: ${props => (props.isInClusterMode ? Colors.volcano : Colors.blackPure)};
     opacity: 0.8;
   }
 `;
 
 export const ClusterActionButton = styled(RawButton)`
   padding: 0px;
-
   margin-left: 5px;
   margin-right: 8px;
-
-  color: ${Colors.blue6};
+  font-weight: 400;
   font-size: 12px;
+  color: ${Colors.blue7};
 `;
 
 export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
@@ -53,8 +73,11 @@ export const ClusterButton = styled(RawButton)`
 
 export const ClusterContainer = styled.div`
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  padding: 0 8px;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -85,6 +108,7 @@ export const ClusterContextName = styled.span`
 export const ClusterAccessContainer = styled.span`
   padding: 5px;
   margin-right: 5px;
+  color: ${Colors.grey8} !important;
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
@@ -100,15 +124,16 @@ export const ClusterOutlined = styled(RawClusterOutlined)`
 export const ClusterStatus = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey5};
   border-radius: 4px;
   padding: 0px 8px;
+  background: ${Colors.grey3b};
 `;
 
-export const ClusterStatusText = styled.span<{connected: Boolean}>`
+export const ClusterStatusText = styled.span<{isKubeConfigPathValid?: Boolean; isInClusterMode?: Boolean}>`
   padding-left: 5px;
   font-size: 14px;
-  color: ${Colors.grey7};
+  color: ${props =>
+    props.isKubeConfigPathValid ? (props.isInClusterMode ? Colors.volcano : Colors.greenOkay) : Colors.grey8};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -120,9 +145,14 @@ export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
 `;
 
-export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
-  color: ${Colors.greenOkay};
+export const CheckCircleOutlined = styled(RawCheckCircleOutlined)<{
+  isInClusterMode?: Boolean;
+  isKubeConfigPathValid?: Boolean;
+}>`
+  color: ${props =>
+    props.isKubeConfigPathValid ? (props.isInClusterMode ? Colors.volcano : Colors.greenOkay) : Colors.grey8};
   font-size: 13px;
+  margin-right: 4px;
 `;
 
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
