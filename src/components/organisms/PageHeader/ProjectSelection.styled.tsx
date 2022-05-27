@@ -24,11 +24,7 @@ export const Button = styled(RawButton)`
   align-items: center;
   margin-right: 0px !important;
   padding: 0px;
-  color: ${Colors.whitePure};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 10px;
-  line-height: 20px;
+  width: 148px;
 
   :hover,
   :focus {
@@ -51,6 +47,9 @@ export const Divider = styled(RawDivider)`
 
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
+  position: absolute;
+  right: 0;
+  color: ${Colors.whitePure};
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -79,21 +78,43 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey5};
+  border: none;
   border-radius: 4px;
-  margin-right: 10px;
-  padding: 0px 10px;
+  padding: 4px 16px;
+  height: 28px;
+  width: 180px;
+  gap: 32px;
+  background: ${Colors.grey3b};
+  margin: 10px 0;
 `;
 
 export const ProjectMenu = styled(Menu)`
   background-color: ${Colors.grey1000};
+  margin: 10px 0;
 `;
 
-export const ProjectName = styled.span`
+export const ProjectLabel = styled.span`
   max-width: 200px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: ${Colors.grey7};
+  width: 48px;
+  text-align: left;
+`;
+
+export const ProjectName = styled.span`
+  max-width: 85px;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: ${Colors.whitePure};
+  font-weight: 600;
+  font-size: 12px;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`

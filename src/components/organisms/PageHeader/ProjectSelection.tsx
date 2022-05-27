@@ -257,17 +257,16 @@ const ProjectSelection = () => {
     <S.ProjectContainer id="projects-dropdown-container">
       <WalkThrough placement="leftTop" step="template" collection="novice">
         <Dropdown
-          arrow
           disabled={previewLoader.isLoading || isInPreviewMode}
           overlay={projectMenu}
-          placement="bottom"
+          placement="bottomRight"
           trigger={['click']}
           visible={isDropdownMenuVisible}
           onVisibleChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
-              <S.FolderOpenOutlined />
+              <S.ProjectLabel>Project</S.ProjectLabel>
               <S.ProjectName>{activeProject.name}</S.ProjectName>
               <S.DownOutlined />
             </S.Button>

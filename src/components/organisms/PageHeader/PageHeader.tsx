@@ -18,6 +18,7 @@ import {stopPreview} from '@redux/services/preview';
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
+import CreateProject from './CreateProject';
 import HelpMenu from './HelpMenu';
 import ProjectSelection from './ProjectSelection';
 
@@ -166,10 +167,13 @@ const PageHeader = () => {
 
       <S.Header noborder="true">
         <S.Row noborder="true">
-          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          <div style={{display: 'flex', height: '100%'}}>
+            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+            <ProjectSelection />
+            <CreateProject />
+          </div>
 
           <S.ProjectClusterSelectionContainer>
-            <ProjectSelection />
             <ClusterSelection previewResource={previewResource} />
           </S.ProjectClusterSelectionContainer>
 
