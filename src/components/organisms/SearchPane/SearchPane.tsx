@@ -39,11 +39,11 @@ import {TitleBar} from '@molecules';
 import electronStore from '@utils/electronStore';
 import {uniqueArr} from '@utils/index';
 
+import {createNode} from '../FileTreePane/CreateNode';
+import TreeItem from '../FileTreePane/TreeItem';
+import {ProcessingEntity, TreeNode} from '../FileTreePane/types';
 import {createFilteredNode} from './CreateFilteredNode';
-import {createNode} from './CreateNode';
 import RecentSearch from './RecentSearch';
-import TreeItem from './TreeItem';
-import {ProcessingEntity, TreeNode} from './types';
 
 import * as S from './styled';
 
@@ -362,7 +362,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  const newFilterTree = (node: FileEntry, queryRegExp: RegExp) => {
+  const filterFileMap = (node: FileEntry, queryRegExp: RegExp) => {
     if (node.text && node.isSupported && !node.isExcluded) {
       const matches = node.text.match(queryRegExp);
       const matchCount = matches?.length;
@@ -396,7 +396,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   useEffect(() => {
     findMatches(searchQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryMatchParam]);
+  }, [queryMatchParam, fileMap]);
 
   const findMatches = (query: string) => {
     searchCounter.current = {filesCount: 0, totalMatchCount: 0};
@@ -424,7 +424,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
 
     const filteredFileMap: FileEntry[] = Object.values(fileMap)
-      .map(file => newFilterTree(file, queryRegExp))
+      .map(file => filterFileMap(file, queryRegExp))
       .filter(v => Boolean(v));
 
     const treeData = createFilteredNode(filteredFileMap);

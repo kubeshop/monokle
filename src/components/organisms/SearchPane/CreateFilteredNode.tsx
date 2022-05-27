@@ -1,6 +1,6 @@
 import {FileEntry} from '@models/fileentry';
 
-import {TreeNode} from './types';
+import {TreeNode} from '../FileTreePane/types';
 
 import * as S from './styled';
 

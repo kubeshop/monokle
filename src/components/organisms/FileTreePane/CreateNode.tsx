@@ -24,7 +24,6 @@ export const createNode = (
   const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
   const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
   const name = isRoot ? rootFolderName : fileEntry.name;
-  // console.log(' createNode fileEntry', fileEntry);
 
   const node: TreeNode = {
     key,

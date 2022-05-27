@@ -42,6 +42,7 @@ export const updateFileEntry = createAsyncThunk(
         if (getFileStats(filePath)?.isDirectory() === false) {
           fs.writeFileSync(filePath, payload.content);
           fileEntry.timestamp = getFileTimestamp(filePath);
+          fileEntry.text = payload.content;
 
           if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
             try {

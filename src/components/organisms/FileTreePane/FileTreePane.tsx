@@ -58,8 +58,6 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     processingType: undefined,
   });
   const [tree, setTree] = useState<TreeNode | null>(null);
-  const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
-
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 

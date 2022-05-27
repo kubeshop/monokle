@@ -146,21 +146,6 @@ export const RootFolderText = styled.div`
   margin-left: 14px;
 `;
 
-export const MatchText = styled.div`
-  color: ${Colors.lightSeaGreen};
-`;
-
-export const MatchCount = styled.span`
-  margin-left: 5px;
-  font-size: 14px;
-  color: ${Colors.yellow11};
-`;
-
-export const Path = styled.span`
-  margin-left: 5px;
-  color: ${Colors.grey7};
-`;
-
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
@@ -202,10 +187,8 @@ export const TreeContainer = styled.div`
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   margin-top: 10px;
-  .ant-tree-switcher {
-    svg {
-      color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
-    }
+  .ant-tree-switcher svg {
+    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
 
   opacity: ${props => (props.disabled ? '70%' : '100%')};
@@ -251,37 +234,4 @@ export const ActionsWrapper = styled.div`
   justify-content: flex-end;
   flex-direction: row;
   height: 100%;
-`;
-
-export const SearchBox = styled.div`
-  display: flex;
-  margin: 5px 14px;
-`;
-
-export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
-  display: flex;
-  justify-content: center;
-  width: 32px;
-  margin-left: 8px;
-  ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
-
-  &:hover {
-    color: ${Colors.lightSeaGreen};
-    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
-    ${({$isItemSelected}) => `border-color: ${$isItemSelected ? Colors.grey5b : Colors.lightSeaGreen};`}
-  }
-
-  &:focus {
-    color: ${Colors.whitePure};
-    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
-  }
-
-  :nth-child(3) {
-    span {
-      transform: rotate(-90deg);
-      position: absolute;
-      top: 8px;
-      left: 13px;
-    }
-  }
 `;
