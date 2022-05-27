@@ -29,9 +29,10 @@ export const transferResource = createAsyncThunk<
     const delta: MatchingResourceComparison[] = [];
     const failures: string[] = [];
 
-    const namespace = getState().compare.current.view.namespace;
-    const leftSet = getState().compare.current.view.leftSet;
-    const rightSet = getState().compare.current.view.rightSet;
+    const compareState = getState().compare;
+    const namespace = compareState.current.view.namespace;
+    const leftSet = compareState.current.view.leftSet;
+    const rightSet = compareState.current.view.rightSet;
     invariant(leftSet && rightSet, 'invalid state');
     const context =
       direction === 'left-to-right'
@@ -45,7 +46,7 @@ export const transferResource = createAsyncThunk<
     const from = direction === 'left-to-right' ? leftSet.type : rightSet.type;
     const to = direction === 'left-to-right' ? rightSet.type : leftSet.type;
 
-    const comparisons = getState().compare.current.comparison?.comparisons.filter(c => ids.includes(c.id)) ?? [];
+    const comparisons = compareState.current.comparison?.comparisons.filter(c => ids.includes(c.id)) ?? [];
 
     // eslint-disable-next-line no-restricted-syntax
     for (const comparison of comparisons) {

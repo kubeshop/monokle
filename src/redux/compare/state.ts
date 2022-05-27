@@ -2,7 +2,6 @@ import {K8sResource} from '@models/k8sresource';
 
 export const initialState: CompareState = {
   isOpen: false,
-  views: [],
   current: {
     view: {
       operation: 'union',
@@ -17,19 +16,60 @@ export const initialState: CompareState = {
 };
 
 export type CompareState = {
+  /**
+   * Whether the compare everything modal is opened.
+   */
   isOpen: boolean;
-  views: SavedComparisonView[];
+
+  /**
+   * The currently viewed comparison.
+   */
   current: {
+    /**
+     * The view configuration.
+     */
     view: ComparisonView | SavedComparisonView;
+
+    /**
+     * Resources of the left side.
+     */
     left?: ResourceSetData;
+
+    /**
+     * Resources of the right side.
+     */
     right?: ResourceSetData;
+
+    /**
+     * Comparisons between left and right resources.
+     */
     comparison?: ComparisonData;
+
+    /**
+     * A list of identifiers of comparisons.
+     */
     selection: string[];
+
+    /**
+     * When set it will let you inspect the comparison.
+     */
     inspect?: ComparisonInspection;
+
+    /**
+     * Filters resources by name.
+     */
     search?: string;
+
+    /**
+     * A list of comparisons that remain after filtering.
+     */
     filtering?: {
       comparisons: ResourceComparison[];
     };
+
+    /**
+     * State of the transfer resource action.
+     */
     transfering: {
       pending: boolean;
     };
@@ -66,10 +106,40 @@ export type CompareFilter = {
 };
 
 export type ComparisonView = {
+  /**
+   * The resource set definition of the left side.
+   *
+   * @remarks Updating this will trigger `fetch`.
+   */
   leftSet?: PartialResourceSet;
+
+  /**
+   * The resource set definition of the right side.
+   *
+   * @remarks Updating this will trigger `fetch`.
+   */
   rightSet?: PartialResourceSet;
+
+  /**
+   * The comparison strategy.
+   *
+   * @remarks Updating this will trigger `compare`.
+   */
   operation?: CompareOperation;
+
+  /**
+   * The filter configuration.
+   *
+   * @remarks Updating this will trigger `filter`.
+   */
   filter?: CompareFilter;
+
+  /**
+   * The default namespace.
+   *
+   * @remarks Only updates resource withou a namespace, those with `namespace: 'default'` will not be updated.
+   * @remarks Updating this will trigger `compare`.
+   */
   namespace?: string;
 };
 
