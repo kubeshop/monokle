@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react';
 
+import {ComparisonView, compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
-import {ComparisonView, compareToggled} from '@redux/reducers/compare';
 
 import * as S from './styled';
 

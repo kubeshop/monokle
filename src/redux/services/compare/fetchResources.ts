@@ -22,7 +22,7 @@ import {
   HelmResourceSet,
   KustomizeResourceSet,
   ResourceSet,
-} from '@redux/reducers/compare';
+} from '@redux/compare';
 import {currentConfigSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 

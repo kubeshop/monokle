@@ -6,8 +6,8 @@ import {SwapOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
-import {compareToggled} from '@redux/reducers/compare';
 
 export const CompareButton: React.FC = ({children}) => {
   const dispatch = useAppDispatch();

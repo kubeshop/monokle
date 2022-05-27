@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {Select} from 'antd';
 
+import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/reducers/compare';
 
 type Props = {
   side: 'left' | 'right';

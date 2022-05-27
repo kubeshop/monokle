@@ -9,8 +9,8 @@ import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} fr
 import {ItemCustomComponentProps} from '@models/navigator';
 import {RootState} from '@models/rootstate';
 
+import {ResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {ResourceSet} from '@redux/reducers/compare';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {selectHelmConfig, selectHelmValues} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';

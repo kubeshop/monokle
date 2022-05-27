@@ -1,6 +1,6 @@
 import {Space} from 'antd';
 
-import {CompareSide} from '@redux/reducers/compare';
+import {CompareSide} from '@redux/compare';
 
 import {HelmChartSelect} from './HelmChartSelect';
 import {HelmValuesOrConfigSelect} from './HelmValuesOrConfigSelect';

@@ -3,8 +3,8 @@ import {useMeasure, useWindowSize} from 'react-use';
 
 import {Col, Modal, Row} from 'antd';
 
+import {selectCompareStatus} from '@redux/compare';
 import {useAppSelector} from '@redux/hooks';
-import {selectCompareStatus} from '@redux/reducers/compare';
 
 import {CompareActionBar} from './CompareActionBar';
 import * as S from './CompareModal.styled';
