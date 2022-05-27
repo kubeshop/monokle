@@ -6,10 +6,10 @@ type HotkeyConf = {
   category: 'navigation' | 'tool';
 };
 
-export const hotkeys: Record<string, HotkeyConf> = {
+export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
     name: 'Toggle Settings',
-    key: `ctrl+\, , command+\,`,
+    key: `ctrl+\,, command+\,`,
     category: 'tool',
   },
   PREVIEW_CLUSTER: {
@@ -142,6 +142,10 @@ export const hotkeys: Record<string, HotkeyConf> = {
     key: 'ctrl+backspace, command+backspace',
     category: 'tool',
   },
-};
+});
+
+function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {
+  return config;
+}
 
 export default hotkeys;

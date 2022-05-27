@@ -1,3 +1,5 @@
+import {v4 as uuid} from 'uuid';
+
 import {runCommandInMainThread} from '@utils/command';
 
 /**
@@ -20,5 +22,11 @@ export function applyYamlToCluster({yaml, context, namespace, kubeconfig}: Apply
   if (namespace) {
     kubectlArgs.unshift(...['--namespace', namespace.name]);
   }
-  return runCommandInMainThread({args: kubectlArgs, cmd: 'kubectl', input: yaml, env: {KUBECONFIG: kubeconfig}});
+  return runCommandInMainThread({
+    commandId: uuid(),
+    args: kubectlArgs,
+    cmd: 'kubectl',
+    input: yaml,
+    env: {KUBECONFIG: kubeconfig},
+  });
 }

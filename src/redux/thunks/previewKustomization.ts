@@ -2,6 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {ERROR_MSG_FALLBACK, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -104,6 +105,7 @@ export function runKustomize(
   }
 
   return runCommandInMainThread({
+    commandId: uuid(),
     cmd: projectConfig?.settings?.kustomizeCommand ? String(projectConfig.settings.kustomizeCommand) : 'kubectl',
     args,
     env: {

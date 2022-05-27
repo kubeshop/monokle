@@ -93,7 +93,12 @@ export type SavedComparisonView = ComparisonView & {
 };
 
 export type PartialResourceSet = Pick<ResourceSet, 'type'> & Partial<ResourceSet>;
-export type ResourceSet = LocalResourceSet | KustomizeResourceSet | HelmResourceSet | ClusterResourceSet;
+export type ResourceSet =
+  | LocalResourceSet
+  | KustomizeResourceSet
+  | HelmResourceSet
+  | CustomHelmResourceSet
+  | ClusterResourceSet;
 
 export type LocalResourceSet = {
   type: 'local';
@@ -102,7 +107,7 @@ export type LocalResourceSet = {
 
 export type KustomizeResourceSet = {
   type: 'kustomize';
-  kustomizationId: string; // so resource.filePath (because internal id changes and this persists)
+  kustomizationId: string;
   defaultNamespace?: string;
 };
 
@@ -110,6 +115,13 @@ export type HelmResourceSet = {
   type: 'helm';
   chartId: string;
   valuesId: string;
+  defaultNamespace?: string;
+};
+
+export type CustomHelmResourceSet = {
+  type: 'helm-custom';
+  chartId: string;
+  configId: string;
   defaultNamespace?: string;
 };
 
@@ -172,12 +184,13 @@ export const compareSlice = createSlice({
   reducers: {
     compareToggled: (state, action: PayloadAction<{value: boolean | undefined; initialView?: ComparisonView}>) => {
       const {value, initialView} = action.payload;
-      if (value === undefined) {
-        state.isOpen = !state.isOpen;
-      } else {
-        state.isOpen = value;
+      const close = value === undefined ? state.isOpen : value === false;
+
+      if (close) {
+        return initialState;
       }
 
+      state.isOpen = true;
       if (initialView) {
         state.current.view = initialView;
       }
@@ -435,21 +448,31 @@ export const selectClusterResourceSet = (state: RootState, side: CompareSide) =>
 
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
   const resourceSet = selectResourceSet(state.compare, side);
-  if (resourceSet?.type !== 'helm') return undefined;
-  const {chartId, valuesId} = resourceSet;
+  if (resourceSet?.type !== 'helm' && resourceSet?.type !== 'helm-custom') {
+    return undefined;
+  }
+  const chartId = resourceSet.chartId;
 
-  const currentHelmChart = chartId ? state.main.helmChartMap[chartId] : undefined;
-  const currentHelmValues = valuesId ? state.main.helmValuesMap[valuesId] : undefined;
   const allHelmCharts = Object.values(state.main.helmChartMap);
+  const currentHelmChart = chartId ? state.main.helmChartMap[chartId] : undefined;
   const availableHelmValues = currentHelmChart
     ? Object.values(state.main.helmValuesMap).filter(values => currentHelmChart.valueFileIds.includes(values.id))
     : [];
+  const availableHelmConfigs = Object.values(state.config.projectConfig?.helm?.previewConfigurationMap ?? {})
+    .filter(isDefined)
+    .filter(config => config.helmChartFilePath === currentHelmChart?.filePath);
+
+  const currentHelmValuesOrConfig =
+    resourceSet.type === 'helm'
+      ? availableHelmValues.find(v => v.id === resourceSet.valuesId)
+      : availableHelmConfigs.find(c => c.id === resourceSet.configId);
 
   return {
-    currentHelmChart,
-    currentHelmValues,
     allHelmCharts,
+    currentHelmChart,
     availableHelmValues,
+    availableHelmConfigs,
+    currentHelmValuesOrConfig,
   };
 };
 
@@ -579,6 +602,8 @@ export function isCompleteResourceSet(options: PartialResourceSet | undefined): 
       return isDefined(options.kustomizationId);
     case 'helm':
       return isDefined(options.chartId) && isDefined(options.valuesId);
+    case 'helm-custom':
+      return isDefined(options.chartId) && isDefined(options.configId);
     default:
       return false;
   }

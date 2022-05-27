@@ -1,7 +1,9 @@
-import {flatten} from 'lodash';
+import fs from 'fs';
+import {flatten, sortBy} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import invariant from 'tiny-invariant';
+import {v4 as uuid} from 'uuid';
 
 import {
   CLUSTER_DIFF_PREFIX,
@@ -14,11 +16,19 @@ import {
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import {ClusterResourceSet, HelmResourceSet, KustomizeResourceSet, ResourceSet} from '@redux/reducers/compare';
+import {
+  ClusterResourceSet,
+  CustomHelmResourceSet,
+  HelmResourceSet,
+  KustomizeResourceSet,
+  ResourceSet,
+} from '@redux/reducers/compare';
 import {currentConfigSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {isDefined} from '@utils/filter';
+import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 
 import getClusterObjects from '../getClusterObjects';
@@ -35,6 +45,8 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
       return fetchResourcesFromCluster(state, options);
     case 'helm':
       return previewHelmResources(state, options);
+    case 'helm-custom':
+      return previewCustomHelmResources(state, options);
     case 'kustomize':
       return previewKustomizeResources(state, options);
     default:
@@ -93,6 +105,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
     if (!kubeconfig || !currentContext) return [];
 
     const command: CommandOptions = {
+      commandId: uuid(),
       cmd: 'helm',
       args:
         helmPreviewMode === 'template'
@@ -122,6 +135,73 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
   } catch (err) {
     log.debug('preview Helm resources failed', err);
     throw err;
+  }
+}
+
+async function previewCustomHelmResources(state: RootState, options: CustomHelmResourceSet): Promise<K8sResource[]> {
+  try {
+    const {chartId, configId} = options;
+    const projectConfig = currentConfigSelector(state);
+    const kubeconfig = projectConfig.kubeConfig?.path;
+    const currentContext = projectConfig.kubeConfig?.currentContext;
+    const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
+
+    const chart = state.main.helmChartMap[chartId];
+    const helmConfig = state.config.projectConfig?.helm?.previewConfigurationMap?.[configId];
+    invariant(chart && helmConfig, 'invalid_configuration');
+
+    if (!kubeconfig || !currentContext) return [];
+
+    const valuesFileItems = Object.values(helmConfig.valuesFileItemMap)
+      .filter(isDefined)
+      .filter(item => item.isChecked);
+    const orderedValuesFilePaths = sortBy(valuesFileItems, ['order']).map(i => i.filePath);
+
+    checkAllFilesExist(orderedValuesFilePaths, rootFolder);
+
+    const args = buildHelmCommand(
+      chart,
+      orderedValuesFilePaths,
+      helmConfig.command,
+      helmConfig.options,
+      rootFolder,
+      currentContext
+    );
+
+    const command: CommandOptions = {
+      commandId: uuid(),
+      cmd: 'helm',
+      args: args.splice(1),
+      env: {KUBECONFIG: kubeconfig},
+    };
+
+    const result = await runCommandInMainThread(command);
+
+    if (!result.stdout) {
+      const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+      throw new Error(msg);
+    }
+
+    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + helmConfig.id);
+    return resources;
+  } catch (err) {
+    log.debug('preview custom Helm resources failed', err);
+    throw err;
+  }
+}
+
+function checkAllFilesExist(files: string[], root: string): void {
+  const valuesFilePathsNotFound: string[] = [];
+  files.forEach(filePath => {
+    const absoluteFilePath = path.join(root, filePath);
+    if (!fs.existsSync(absoluteFilePath)) {
+      valuesFilePathsNotFound.push(absoluteFilePath);
+    }
+  });
+
+  if (valuesFilePathsNotFound.length > 0) {
+    const unfoundFiles = valuesFilePathsNotFound.join(', ');
+    throw new Error(`Helm Values file not found: ${unfoundFiles}`);
   }
 }
 

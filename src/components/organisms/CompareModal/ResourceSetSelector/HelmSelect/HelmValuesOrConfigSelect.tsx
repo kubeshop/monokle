@@ -11,19 +11,26 @@ type Props = {
   side: 'left' | 'right';
 };
 
-export const HelmValuesSelect: React.FC<Props> = ({side}) => {
+export const HelmValuesOrConfigSelect: React.FC<Props> = ({side}) => {
   const dispatch = useAppDispatch();
   const resourceSet = useAppSelector(state => selectHelmResourceSet(state, side));
   invariant(resourceSet, 'invalid_state');
-  const {currentHelmChart, currentHelmValues, availableHelmValues} = resourceSet;
+  const {currentHelmChart, currentHelmValuesOrConfig, availableHelmValues, availableHelmConfigs} = resourceSet;
+
+  const options = [...availableHelmValues, ...availableHelmConfigs];
 
   const handleSelect = useCallback(
-    (valuesId: string) => {
+    (id: string) => {
+      const isHelmValues = availableHelmValues.map(v => v.id).includes(id);
       invariant(currentHelmChart, 'invalid_State');
-      const value: PartialResourceSet = {type: 'helm', chartId: currentHelmChart.id, valuesId};
+
+      const value: PartialResourceSet = isHelmValues
+        ? {type: 'helm', chartId: currentHelmChart.id, valuesId: id}
+        : {type: 'helm-custom', chartId: currentHelmChart.id, configId: id};
+
       dispatch(resourceSetSelected({side, value}));
     },
-    [currentHelmChart, dispatch, side]
+    [availableHelmValues, currentHelmChart, dispatch, side]
   );
 
   if (!currentHelmChart) {
@@ -31,8 +38,13 @@ export const HelmValuesSelect: React.FC<Props> = ({side}) => {
   }
 
   return (
-    <Select placeholder="Select values…" onSelect={handleSelect} value={currentHelmValues?.id} style={{width: 160}}>
-      {availableHelmValues.map(values => {
+    <Select
+      placeholder="Select values…"
+      onSelect={handleSelect}
+      value={currentHelmValuesOrConfig?.id}
+      style={{width: 160}}
+    >
+      {options.map(values => {
         return (
           <Select.Option key={values.id} value={values.id}>
             {values.name}
