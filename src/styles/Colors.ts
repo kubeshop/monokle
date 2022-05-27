@@ -52,6 +52,7 @@ enum Colors {
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
   blue10 = '#B7E3FA',
+  geekblue4 = '#203175',
 
   green7 = '#6ABE39', // Polar Green
 

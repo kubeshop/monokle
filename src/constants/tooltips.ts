@@ -69,3 +69,4 @@ export const KustomizeTabTooltip = `View Kustomizations (${KEY_CTRL_CMD}+SHIFT+K
 export const HelmTabTooltip = `View Helm Charts (${KEY_CTRL_CMD}+SHIFT+H)`;
 export const TemplatesTabTooltip = `View Templates`;
 export const ValidationTabTooltip = `View Validation (${KEY_CTRL_CMD}+SHIFT+V)`;
+export const ImageTagTooltip = 'Click to follow the tag link';

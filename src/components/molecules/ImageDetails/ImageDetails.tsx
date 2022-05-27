@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
+import numeral from 'numeral';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
@@ -9,13 +11,15 @@ import {Icon} from '@atoms';
 import {openUrlInExternalBrowser} from '@utils/shell';
 
 import * as S from './ImageDetails.styled';
+import ImageTags from './ImageTags';
 
 const ImageDetails: React.FC = () => {
   const selectedImage = useAppSelector(state => state.main.selectedImage);
 
   const [isLoading, setIsLoading] = useState(true);
   const [imageInfo, setImageInfo] = useState<Record<string, any>>();
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [imageTags, setImageTags] = useState<any>();
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
     if (!selectedImage) {
@@ -27,12 +31,18 @@ const ImageDetails: React.FC = () => {
       setIsLoading(true);
       const {name, user} = getImageUserAndName(selectedImage.name);
 
-      const response = await fetch(`https://hub.docker.com/v2/repositories/${user}/${name}`, {method: 'GET'});
+      const [infoResponse, tagsResponse] = await Promise.all([
+        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}`, {method: 'GET'}),
+        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}/tags?page_size=5`, {
+          method: 'GET',
+        }),
+      ]);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (infoResponse.ok && tagsResponse.ok) {
+        const [infoData, tagsData] = await Promise.all([infoResponse.json(), tagsResponse.json()]);
 
-        setImageInfo(data);
+        setImageInfo(infoData);
+        setImageTags(tagsData);
         setImageUrl(`https://hub.docker.com/r/${user}/${name}`);
         setIsLoading(false);
       } else {
@@ -47,6 +57,8 @@ const ImageDetails: React.FC = () => {
     return null;
   }
 
+  const {name, user} = getImageUserAndName(selectedImage.name);
+
   return (
     <>
       {isLoading ? (
@@ -60,18 +72,25 @@ const ImageDetails: React.FC = () => {
             {selectedImage.name}:{selectedImage.tag}
             <S.ImageExtraInfoContainer>
               <S.StarFilled />
-              {imageInfo['star_count']}
+              {numeral(imageInfo['star_count']).format('0.0a')}
 
               <S.PullRequestOutlined />
-              {imageInfo['pull_count']}
+              {numeral(imageInfo['pull_count']).format('0.0a')}
             </S.ImageExtraInfoContainer>
           </S.ImageName>
 
           <S.ImageDetailsContainer>
             {imageUrl && (
               <S.SectionContainer>
-                <S.SectionTitle>Image link</S.SectionTitle>
                 <a onClick={() => openUrlInExternalBrowser(imageUrl)}>{imageUrl}</a>
+              </S.SectionContainer>
+            )}
+
+            {imageTags?.results.length && (
+              <S.SectionContainer>
+                <S.SectionTitle>Tags</S.SectionTitle>
+
+                <ImageTags name={name} user={user} tags={imageTags.results} />
               </S.SectionContainer>
             )}
 
