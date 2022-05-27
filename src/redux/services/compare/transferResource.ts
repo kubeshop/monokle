@@ -1,3 +1,5 @@
+import {KubernetesObject} from '@kubernetes/client-node';
+
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
@@ -86,8 +88,15 @@ async function deployResourceToCluster(
 
   // Remark: Cluster adds defaults so copying the source's content
   // is too naive. Instead fetch remotely and fallback to copy if failed.
-  const clusterContent = await getResourceFromCluster(source, kubeConfigPath, currentContext);
-  const updatedContent = clusterContent ?? source.content;
+  let updatedContent: KubernetesObject;
+  try {
+    const sourceCopy = structuredClone(source);
+    sourceCopy.namespace = namespace;
+    const clusterContent = await getResourceFromCluster(sourceCopy, kubeConfigPath, currentContext);
+    updatedContent = clusterContent ?? source.content;
+  } catch {
+    updatedContent = source.content;
+  }
 
   const id = target?.id ?? uuid();
   const resource = createResource(updatedContent, {
