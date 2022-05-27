@@ -23,6 +23,7 @@ import type {ComparisonListItem} from '@components/organisms/CompareModal/types'
 
 import {errorAlert, successAlert} from '@utils/alert';
 import {isDefined} from '@utils/filter';
+import {trackEvent} from '@utils/telemetry';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -182,7 +183,14 @@ export const compareSlice = createSlice({
   name: 'compare',
   initialState,
   reducers: {
-    compareToggled: (state, action: PayloadAction<{value: boolean | undefined; initialView?: ComparisonView}>) => {
+    compareToggled: (
+      state,
+      action: PayloadAction<{
+        value: boolean | undefined;
+        initialView?: ComparisonView;
+        from?: 'compare-button' | 'quick-helm-compare' | 'quick-kustomize-compare';
+      }>
+    ) => {
       const {value, initialView} = action.payload;
       const close = value === undefined ? state.isOpen : value === false;
 
@@ -194,6 +202,8 @@ export const compareSlice = createSlice({
       if (initialView) {
         state.current.view = initialView;
       }
+
+      trackEvent('COMPARE_OPENED', {from: action.payload.from});
     },
     operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
@@ -245,6 +255,7 @@ export const compareSlice = createSlice({
       state.current[side] = undefined;
     },
     comparisonInspecting: (state, action: PayloadAction<ComparisonInspection>) => {
+      trackEvent('COMPARE_INSPECTED', {type: state.current.inspect?.type});
       state.current.inspect = action.payload;
     },
     comparisonInspected: state => {
@@ -305,6 +316,12 @@ export const compareSlice = createSlice({
       };
     },
     resourceSetCompared: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+      trackEvent('COMPARE_COMPARED', {
+        left: state.current.view.leftSet?.type,
+        right: state.current.view.rightSet?.type,
+        operation: state.current.view.operation ?? 'default',
+      });
+
       state.current.comparison = {
         loading: false,
         comparisons: action.payload.comparisons,
@@ -324,9 +341,16 @@ export const compareSlice = createSlice({
       state.current.transfering.pending = false;
     });
     builder.addCase(transferResource.fulfilled, (state, action) => {
-      state.current.transfering.pending = false;
-
       const {side, delta} = action.payload;
+
+      const direction = action.meta.arg.direction;
+      const leftSet = state.current.view.leftSet;
+      const rightSet = state.current.view.rightSet;
+      const from = direction === 'left-to-right' ? leftSet?.type : rightSet?.type;
+      const to = direction === 'left-to-right' ? rightSet?.type : leftSet?.type;
+      trackEvent('COMPARE_TRANSFERED', {from, to, count: delta.length});
+
+      state.current.transfering.pending = false;
 
       // Splice each update into previous results to give smooth UX.
       delta.forEach(comparison => {
@@ -703,7 +727,7 @@ type TransferResourceArgs = {
 };
 
 export const transferResource = createAsyncThunk<
-  {side: CompareSide; delta: MatchingResourceComparison[]},
+  {side: CompareSide; delta: MatchingResourceComparison[]; from: string; to: string},
   TransferResourceArgs,
   ThunkApi
 >('compare/transfer', async ({ids, direction}, {getState, dispatch}) => {
@@ -757,7 +781,7 @@ export const transferResource = createAsyncThunk<
     const alert = createTransferAlert(ids, failures, to === 'cluster');
     dispatch(setAlert(alert));
 
-    return {side: direction === 'left-to-right' ? 'right' : 'left', delta};
+    return {side: direction === 'left-to-right' ? 'right' : 'left', delta, from, to};
   } catch (err) {
     log.debug('Transfer failed unexpectedly', err);
     dispatch(setAlert(errorAlert(ERROR_MSG_FALLBACK)));

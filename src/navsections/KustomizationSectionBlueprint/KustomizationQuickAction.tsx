@@ -59,6 +59,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   if (isAnyPreviewing && !isThisPreviewing) {
     return (
       <QuickActionCompare
+        from="quick-kustomize-compare"
         isItemSelected={itemInstance.isSelected}
         view={{
           leftSet: {

@@ -84,6 +84,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
     return (
       <QuickActionCompare
         isItemSelected={itemInstance.isSelected}
+        from="quick-helm-compare"
         view={{
           leftSet: previewingResourceSet,
           rightSet: {
