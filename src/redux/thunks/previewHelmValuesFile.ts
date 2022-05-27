@@ -3,6 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -49,6 +50,7 @@ export const previewHelmValuesFile = createAsyncThunk<
       const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
       const options: CommandOptions = {
+        commandId: uuid(),
         cmd: 'helm',
         args:
           helmPreviewMode === 'template'

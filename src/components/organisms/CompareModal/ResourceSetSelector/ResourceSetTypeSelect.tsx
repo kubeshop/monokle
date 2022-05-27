@@ -21,7 +21,12 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   );
 
   return (
-    <Select onChange={handleSelectType} placeholder="Choose…" value={resourceSet?.type} style={{width: 180}}>
+    <Select
+      onChange={handleSelectType}
+      placeholder="Choose…"
+      value={resourceSet?.type === 'helm-custom' ? 'helm' : resourceSet?.type}
+      style={{width: 180}}
+    >
       <Select.Option value="local">Local</Select.Option>
       <Select.Option value="cluster">Cluster</Select.Option>
       <Select.Option value="helm">Helm Preview</Select.Option>

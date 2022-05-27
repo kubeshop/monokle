@@ -1,6 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
+import {v4 as uuid} from 'uuid';
 
 import {AppConfig, ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
 
@@ -110,6 +111,7 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
 export async function getKubeAccess(namespaces: string[], currentContext: string): Promise<ClusterAccessWithContext[]> {
   const promises = namespaces.map(namespace => {
     return runCommandInMainThread({
+      commandId: uuid(),
       cmd: 'kubectl',
       args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
     });

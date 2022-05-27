@@ -3,6 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import fs from 'fs';
 import {sortBy} from 'lodash';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -110,6 +111,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   );
 
   const commandOptions: CommandOptions = {
+    commandId: uuid(),
     cmd: 'helm',
     args: args.splice(1),
     env: {KUBECONFIG: kubeconfig},
