@@ -61,6 +61,7 @@ export const getKubeConfigContext = (configPath: string): KubeConfig => {
     return {
       path: configPath,
       isPathValid: false,
+      contexts: [],
     };
   }
 };
