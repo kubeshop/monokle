@@ -3,6 +3,8 @@ import React, {FC, useEffect, useState} from 'react';
 import {Button, Form, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
+import {v4 as uuid} from 'uuid';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
@@ -14,7 +16,7 @@ import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/sele
 
 import FilePatternList from '@molecules/FilePatternList';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
@@ -161,6 +163,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     }
 
     runCommandInMainThread({
+      commandId: uuid(),
       cmd: `kubectl`,
       args: ['config', 'use-context', clusterName],
     }).then(arg => {

@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {Button} from 'antd';
 
+import {comparisonInspected, selectComparison} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {comparisonInspected, selectComparison} from '@redux/reducers/compare';
 
 import * as S from './InspectionActionBar.styled';
 

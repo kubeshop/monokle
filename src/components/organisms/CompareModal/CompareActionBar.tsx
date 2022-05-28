@@ -5,7 +5,6 @@ import {AutoComplete, Checkbox, Input, Select, Space} from 'antd';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   CompareOperation,
   comparisonAllToggled,
@@ -16,7 +15,8 @@ import {
   selectCompareStatus,
   selectIsAllComparisonSelected,
   selectKnownNamespaces,
-} from '@redux/reducers/compare';
+} from '@redux/compare';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 

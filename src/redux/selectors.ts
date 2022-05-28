@@ -3,7 +3,9 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig, ProjectConfig} from '@models/appconfig';
+import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@models/appconfig';
+import {AppState} from '@models/appstate';
+import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
@@ -94,6 +96,16 @@ export const helmValuesSelector = createSelector(
   (state: RootState) => state.main.helmValuesMap,
   helmValuesMap => helmValuesMap
 );
+
+export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile | undefined => {
+  if (!id) return undefined;
+  return state.helmValuesMap[id];
+};
+
+export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConfiguration | undefined => {
+  if (!id) return undefined;
+  return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
+};
 
 export const isInPreviewModeSelector = (state: RootState) =>
   Boolean(state.main.previewResourceId) ||

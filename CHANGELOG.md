@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.5](https://github.com/kubeshop/monokle/compare/v1.7.5-nightly-2022-05-27.0...v1.7.5) (2022-05-27)
+
+
+### Features
+
+* add alerts ([2e9ba83](https://github.com/kubeshop/monokle/commit/2e9ba8379bd61ace4eb818fbde8dbd8b52805436))
+* add Custom Helm resource set type ([2089cb5](https://github.com/kubeshop/monokle/commit/2089cb5c78dfcb398619d03515f0a7fca0001a73))
+* add feature flag ([7b7b9c4](https://github.com/kubeshop/monokle/commit/7b7b9c4343752ab04727cb749b621cec7f90393d))
+* add quick compare action ([9f1f0f4](https://github.com/kubeshop/monokle/commit/9f1f0f44f4c4a0a48053d7ddb57790710bd4d70a))
+* add quick compare action to Kustomize ([d16ebd1](https://github.com/kubeshop/monokle/commit/d16ebd129aea845390d866ab834e7b3aec9baad7))
+* add quick compare from helmConfig to helmvalues ([9411c8c](https://github.com/kubeshop/monokle/commit/9411c8cd1087d8c20c91a4a6a1e1d0799687635e))
+* delete filter preset ([3fcbaed](https://github.com/kubeshop/monokle/commit/3fcbaed6b773fc8cbd371eab811a9f4d1a667be2))
+* disable save preset if empty ([a220295](https://github.com/kubeshop/monokle/commit/a22029581fdc32508c32046a7fbd9d5e4157e9c4))
+* filters preset modal redux + basic ([7c14f42](https://github.com/kubeshop/monokle/commit/7c14f42ecdc332328da153083224d8d5beed97fb))
+* hotkey label ([dba4289](https://github.com/kubeshop/monokle/commit/dba428963de829c571d0b2dd624f34d460eb1dd0))
+* load filters preset ([0a036d0](https://github.com/kubeshop/monokle/commit/0a036d06dcad67a73bf1f24443ac251bad0c18de))
+* remove feature flag ([e1dda36](https://github.com/kubeshop/monokle/commit/e1dda36c90421746e60034e89509ee934a26b4ff))
+* replace warning for save ([2b45654](https://github.com/kubeshop/monokle/commit/2b45654f5b173ffd67a96a45921c38b816223e70))
+* resource filters new styling ([8fe3a33](https://github.com/kubeshop/monokle/commit/8fe3a33bf984bc890fda6d87c5187bfee688c150))
+* save filter preset ([366b1c0](https://github.com/kubeshop/monokle/commit/366b1c07b0b860f5a93da942cb1a8a09a55d602d))
+* save modal content ([bcb16eb](https://github.com/kubeshop/monokle/commit/bcb16eb4b9736bef01c3192ddaa734c97aa93d5b))
+* update tooltip text ([c5a27aa](https://github.com/kubeshop/monokle/commit/c5a27aa23b594f05a06b69e5e1340762102f4d31))
+
+
+### Bug Fixes
+
+* add tooltips delay ([6ec32f0](https://github.com/kubeshop/monokle/commit/6ec32f0c153679380588295e4a22552be3286cc9))
+* background color ([bc6e52b](https://github.com/kubeshop/monokle/commit/bc6e52bed98d76dffb54af129784bc2731beb3a2))
+* changes ([30726d8](https://github.com/kubeshop/monokle/commit/30726d84c78ba25eb7e8ebbbbb68d06eb40f6b47))
+* clear compare slice on close modal ([e9e6060](https://github.com/kubeshop/monokle/commit/e9e6060bcaa3171827fdfc2b81c7db7c47765745))
+* fix merge project config ([9fc65b7](https://github.com/kubeshop/monokle/commit/9fc65b7c3c13eb530e8ecd89932583dff4ef5cfc))
+* fix parallel command execution ([b6bb745](https://github.com/kubeshop/monokle/commit/b6bb7458528e3af3c7ee64e93ff2f67bedf02ad5))
+* fix test ([e22aa4b](https://github.com/kubeshop/monokle/commit/e22aa4bc849488d75869fa69efcacab792ad353d))
+* load/save filter preset width ([ead0b49](https://github.com/kubeshop/monokle/commit/ead0b49c36b14376725a923d4b1bdeaf9da7c9e5))
+* load/save preset width ([56f722b](https://github.com/kubeshop/monokle/commit/56f722b3c5122c0bcee03a9ac5a9c5c282af85c1))
+* resource kind ([cc13bb6](https://github.com/kubeshop/monokle/commit/cc13bb6fd1347da60c2f9bb286f5c9f01b3ddb60))
+* wip bug investigation ([39ddf0e](https://github.com/kubeshop/monokle/commit/39ddf0efcc49a833db0afe1d7caf142b76b22184))
+* wrong shortcut for toggle settings ([c460851](https://github.com/kubeshop/monokle/commit/c4608518bf04f06bf812c4674889a24b4e52cb0c))
+
 ### [1.7.4](https://github.com/kubeshop/monokle/compare/v1.7.4-nightly-2022-05-23.0...v1.7.4) (2022-05-23)
 
 
