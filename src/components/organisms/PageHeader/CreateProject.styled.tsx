@@ -16,9 +16,7 @@ export const DropdownContainer = styled.div`
   border-radius: 4px;
   height: 28px;
   width: 28px;
-  gap: 32px;
   background: ${Colors.grey3b};
-  margin: 10px 0;
   margin-left: 4px;
 `;
 

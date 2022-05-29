@@ -1,4 +1,4 @@
-import {Menu, Button as RawButton, Divider as RawDivider, Input as RawInput, Table as RawTable} from 'antd';
+import {Menu, Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
 import {
   DeleteOutlined as RawDeleteOutlined,
@@ -12,13 +12,6 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const BackToProjectButton = styled(RawButton)`
-  margin-right: 0px !important;
-  padding: 0px;
-  font-size: 12px;
-  color: ${Colors.blue6};
-`;
-
 export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
@@ -29,6 +22,9 @@ export const Button = styled(RawButton)`
   :hover,
   :focus {
     color: ${Colors.lightSeaGreen};
+    span {
+      position: inherit;
+    }
   }
 `;
 
@@ -40,14 +36,9 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   }
 `;
 
-export const Divider = styled(RawDivider)`
-  border-color: ${Colors.grey3};
-  height: 1em;
-`;
-
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
-  position: absolute;
+  position: absolute !important;
   right: 8px !important;
   color: ${Colors.whitePure};
 `;
@@ -80,11 +71,9 @@ export const ProjectContainer = styled.div`
   align-items: center;
   border: none;
   border-radius: 4px;
-  height: 28px;
   width: 180px;
-  gap: 32px;
   background: ${Colors.grey3b};
-  margin: 10px 0;
+  padding 2px 4px;
 `;
 
 export const ProjectMenu = styled(Menu)`
@@ -92,7 +81,7 @@ export const ProjectMenu = styled(Menu)`
   margin: 10px 0;
 `;
 
-export const ProjectLabel = styled.span`
+export const ProjectLabel = styled.div`
   max-width: 200px;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -106,8 +95,8 @@ export const ProjectLabel = styled.span`
   padding-left: 8px;
 `;
 
-export const ProjectName = styled.span`
-  max-width: 104px;
+export const ProjectName = styled.div`
+  max-width: 6rem;
   width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;

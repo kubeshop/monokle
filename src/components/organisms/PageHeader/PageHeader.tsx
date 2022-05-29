@@ -12,7 +12,12 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
 import {setLayoutSize, toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {
+  activeProjectSelector,
+  activeResourcesSelector,
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
@@ -46,6 +51,7 @@ const PageHeader = () => {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
+  const activeProject = useAppSelector(activeProjectSelector);
 
   const runningPreviewConfiguration = useAppSelector(state => {
     if (!state.main.previewConfigurationId) {
@@ -167,8 +173,22 @@ const PageHeader = () => {
         <S.Row noborder="true">
           <div style={{display: 'flex', alignItems: 'center'}}>
             <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
-            <ProjectSelection />
-            <CreateProject />
+
+            {activeProject && (
+              <>
+                <S.Divider type="vertical" style={{marginRight: '1rem'}} />
+                <ProjectSelection />
+                <CreateProject />
+              </>
+            )}
+            {isStartProjectPaneVisible && activeProject && (
+              <>
+                <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
+                <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
+                  Back to Project
+                </S.BackToProjectButton>
+              </>
+            )}
           </div>
 
           <div style={{display: 'flex', alignItems: 'center'}}>

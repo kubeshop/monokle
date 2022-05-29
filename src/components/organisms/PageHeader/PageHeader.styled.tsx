@@ -1,3 +1,5 @@
+import {Button as RawButton, Divider as RawDivider} from 'antd';
+
 import {
   ApiOutlined as RawApiOutlined,
   BellOutlined as RawBellOutlined,
@@ -26,9 +28,9 @@ export const Row = styled(RawRow.default)`
 
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
+  font-size: 1rem;
   cursor: pointer;
-  margin-left: 1rem;
+  margin-left: 1.5rem;
 `;
 
 export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
@@ -126,7 +128,20 @@ export const HeaderContent = styled.div`
 
 export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   color: ${Colors.blue6};
-  font-size: 20px;
+  font-size: 1rem;
   cursor: pointer;
-  margin-left: 1rem;
+  margin-left: 1.5rem;
+`;
+
+export const BackToProjectButton = styled(RawButton)`
+  margin-right: 0px !important;
+  padding: 0px;
+  font-size: 12px;
+  color: ${Colors.blue6};
+`;
+
+export const Divider = styled(RawDivider)`
+  border-color: ${Colors.grey3};
+  height: 28px;
+  margin: 0;
 `;

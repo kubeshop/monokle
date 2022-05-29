@@ -34,7 +34,7 @@ const CreateProject = () => {
   return (
     <S.DropdownContainer>
       <Dropdown overlay={itemsMenu} placement="bottomLeft" trigger={['click']}>
-        <S.Button type="link">
+        <S.Button type="link" size="small">
           <S.PlusIcon />
         </S.Button>
       </Dropdown>
