@@ -129,6 +129,7 @@
     "node-fetch": "2.6.7",
     "node-machine-id": "1.1.12",
     "nucleus-nodejs": "3.0.9",
+    "polished": "^4.2.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-error-boundary": "3.1.4",

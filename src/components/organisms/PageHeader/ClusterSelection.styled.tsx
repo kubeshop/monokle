@@ -6,6 +6,7 @@ import {
   ExclamationCircleOutlined as RawExclamationCircleOutlined,
 } from '@ant-design/icons/lib/icons';
 
+import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {PreviewType} from '@models/appstate';
@@ -28,6 +29,8 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
+  letter-spacing: 0.05em;
+  background-color: ${Colors.grey11};
 
   &:hover,
   &:focus {
@@ -48,24 +51,25 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
 
 export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewType?: PreviewType}>`
   margin: 0 0 0 10px;
-  color: ${props => (props.isInPreviewMode && Colors.blackPure) || Colors.whitePure};
+  color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
   background-color: ${props =>
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.blackPure};
+    Colors.grey11};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
+  letter-spacing: 0.05em;
 
   &:hover,
   &:focus {
-    color: ${props => (props.isInPreviewMode && Colors.blackPure) || Colors.whitePure};
+    color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
     background-color: ${props =>
       (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
       (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
       (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-      Colors.blackPure};
+      Colors.grey11};
     opacity: 0.8;
   }
 `;
@@ -140,19 +144,16 @@ export const ClusterAccessContainer = styled.span`
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
-  font-size: 12px;
-  margin-top: 4px;
-  margin-right: 4px;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  margin-right: 8px;
   font-weight: 600;
-  line-height: 20px;
   text-transform: uppercase;
 `;
 
-export const ClusterStatus = styled.div`
+export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
   display: flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: ${props => (props.isInPreviewMode ? '0 4px 4px 0' : '4px')};
   padding: 0px 8px;
   background: ${Colors.grey3b};
 `;
@@ -162,8 +163,9 @@ export const ClusterStatusText = styled.span<{
   isInPreviewMode?: Boolean;
   previewType?: PreviewType;
 }>`
-  padding-left: 5px;
-  font-size: 14px;
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 12px;
   color: ${props =>
     (!props.isKubeConfigPathValid && Colors.grey8) ||
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
@@ -192,11 +194,31 @@ export const CheckCircleOutlined = styled(RawCheckCircleOutlined)<{
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.greenOkay};
-  font-size: 13px;
-  margin-right: 4px;
+  font-size: 14px;
+  margin-right: 8px;
 `;
 
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
   color: ${Colors.yellowWarning};
   font-size: 13px;
+`;
+
+export const PreviewMode = styled.div<{
+  previewType?: PreviewType;
+}>`
+  border-radius: 4px 0 0 4px;
+  padding: 1px 8px;
+  color: ${props =>
+    (props.previewType === 'cluster' && Colors.volcano) ||
+    (props.previewType === 'helm' && Colors.cyan) ||
+    (props.previewType === 'kustomization' && Colors.cyan) ||
+    Colors.blackPure};
+  background-color: ${props =>
+    (props.previewType === 'cluster' && rgba(Colors.volcano, 0.2)) ||
+    (props.previewType === 'helm' && rgba(Colors.cyan, 0.2)) ||
+    (props.previewType === 'kustomization' && rgba(Colors.cyan, 0.2)) ||
+    Colors.blackPure};
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
 `;

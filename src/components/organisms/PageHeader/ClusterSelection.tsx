@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Dropdown, Tooltip} from 'antd';
@@ -33,7 +33,6 @@ import * as S from './ClusterSelection.styled';
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
@@ -111,25 +110,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     setIsClusterActionDisabled(Boolean(!kubeConfigPath) || !isKubeConfigPathValid);
   }, [kubeConfigPath, isKubeConfigPathValid]);
 
-  const createClusterObjectsLabel = useCallback(() => {
-    let content: any;
-    let className = '';
-    if (isInPreviewMode && previewType === 'cluster') {
-      content = 'Reload';
-    } else if (previewType === 'cluster' && previewLoader.isLoading) {
-      content = <LoadingOutlined />;
-    } else {
-      content = 'Load';
-      className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
-    }
-
-    return (
-      <S.ClusterActionText className={className} $highlighted={highlightedItems.connectToCluster}>
-        {content}
-      </S.ClusterActionText>
-    );
-  }, [previewType, previewLoader, isInPreviewMode, highlightedItems]);
-
   const {icon, tooltip} = useMemo(() => {
     if (isAccessLoading) {
       return {
@@ -160,13 +140,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          <div>
-            {isInPreviewMode && previewType === 'cluster' && <span>CLUSTER MODE</span>}
-            {isInPreviewMode && previewType === 'kustomization' && <span>PREVIEW MODE</span>}
-            {isInPreviewMode && previewType === 'helm' && <span>PREVIEW MODE</span>}
-          </div>
+          {isInPreviewMode && (
+            <S.PreviewMode previewType={previewType}>
+              {previewType === 'cluster' && <span>CLUSTER MODE</span>}
+              {previewType === 'kustomization' && <span>PREVIEW MODE</span>}
+              {previewType === 'helm' && <span>PREVIEW MODE</span>}
+            </S.PreviewMode>
+          )}
 
-          <S.ClusterStatus>
+          <S.ClusterStatus isInPreviewMode={isInPreviewMode}>
             {isKubeConfigPathValid && (
               <>
                 <S.ClusterOutlined />
@@ -176,7 +158,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                   placement="bottom"
                   arrow
                   trigger={['click']}
-                  disabled={previewLoader.isLoading || (isInPreviewMode && previewType === 'cluster')}
+                  disabled={previewLoader.isLoading || isInPreviewMode}
                   visible={isClusterDropdownOpen}
                   onVisibleChange={setIsClusterDropdownOpen}
                 >
@@ -201,9 +183,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               ) : (
                 <S.ClusterOutlined />
               )}
-              <span style={{fontWeight: '600', fontSize: '10px', textTransform: 'uppercase'}}>
-                {isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}
-              </span>
+              <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
             </S.ClusterStatusText>
 
             {!isKubeConfigPathValid && (
@@ -215,7 +195,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         </>
       )}
       <>
-        {isKubeConfigPathValid && (
+        {isKubeConfigPathValid && activeProject && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
             <S.Button
               disabled={isAccessLoading}
