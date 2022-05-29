@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Menu, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import semver from 'semver';
 
@@ -61,114 +61,112 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
   };
 
   return (
-    <Menu>
-      <S.MenuContainer>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-          <S.MenuItem
-            onClick={() => {
-              toggleSettingsDrawer();
-              handleMenuClose();
-            }}
-          >
-            <S.MenuItemIcon>
-              <S.SettingsOutlined />
-            </S.MenuItemIcon>
-            <S.MenuItemLabel>Settings</S.MenuItemLabel>
-          </S.MenuItem>
-        </Tooltip>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-          <S.MenuItem
-            onClick={() => {
-              showPluginsDrawer();
-              handleMenuClose();
-            }}
-          >
-            <S.MenuItemIcon>
-              <S.ApiOutlined />
-            </S.MenuItemIcon>
-            <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
-          </S.MenuItem>
-        </Tooltip>
-        <S.MenuItem style={{borderBottom: 'none'}}>
+    <S.MenuContainer>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            toggleSettingsDrawer();
+            handleMenuClose();
+          }}
+        >
           <S.MenuItemIcon>
-            <S.QuestionCircleOutlined />
+            <S.SettingsOutlined />
           </S.MenuItemIcon>
-          <S.MenuItemLabel>Help</S.MenuItemLabel>
+          <S.MenuItemLabel>Settings</S.MenuItemLabel>
         </S.MenuItem>
-        <S.MenuItemLinks>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              openKeyboardShortcuts();
-              handleMenuClose();
-            }}
-          >
-            Keyboard Shortcuts
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              openDocumentation();
-              handleMenuClose();
-            }}
-          >
-            Documentation
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              onClickReleaseNotes();
-              handleMenuClose();
-            }}
-          >
-            New in {parsedAppVersion || 'this version'}
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              dispatch(cancelWalkThrough('novice'));
-              dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
-              handleMenuClose();
-            }}
-          >
-            Re-play Quick Guide
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              openGitHub();
-              handleMenuClose();
-            }}
-          >
-            Github
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              openDiscord();
-              handleMenuClose();
-            }}
-          >
-            Discord
-          </S.HelpLink>
-          <S.HelpLink
-            type="link"
-            size="small"
-            onClick={() => {
-              dispatch(openAboutModal());
-              handleMenuClose();
-            }}
-          >
-            About Monokle
-          </S.HelpLink>
-        </S.MenuItemLinks>
-      </S.MenuContainer>
-    </Menu>
+      </Tooltip>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            showPluginsDrawer();
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.ApiOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+      <S.MenuItem style={{borderBottom: 'none'}}>
+        <S.MenuItemIcon>
+          <S.QuestionCircleOutlined />
+        </S.MenuItemIcon>
+        <S.MenuItemLabel>Help</S.MenuItemLabel>
+      </S.MenuItem>
+      <S.MenuItemLinks>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openKeyboardShortcuts();
+            handleMenuClose();
+          }}
+        >
+          Keyboard Shortcuts
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDocumentation();
+            handleMenuClose();
+          }}
+        >
+          Documentation
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            onClickReleaseNotes();
+            handleMenuClose();
+          }}
+        >
+          New in {parsedAppVersion || 'this version'}
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(cancelWalkThrough('novice'));
+            dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+            handleMenuClose();
+          }}
+        >
+          Re-play Quick Guide
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openGitHub();
+            handleMenuClose();
+          }}
+        >
+          Github
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDiscord();
+            handleMenuClose();
+          }}
+        >
+          Discord
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(openAboutModal());
+            handleMenuClose();
+          }}
+        >
+          About Monokle
+        </S.HelpLink>
+      </S.MenuItemLinks>
+    </S.MenuContainer>
   );
 };

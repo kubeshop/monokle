@@ -1,4 +1,4 @@
-import {Button as RawButton, Divider as RawDivider} from 'antd';
+import {ButtonProps, Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 import {
@@ -14,37 +14,43 @@ import {PreviewType} from '@models/appstate';
 
 import Colors from '@styles/Colors';
 
-const getPreviewTheme = (
+interface RawButtonProps extends ButtonProps {
+  isInPreviewMode?: boolean;
+  previewType?: PreviewType;
+}
+interface IAntdIconProps extends React.RefAttributes<HTMLSpanElement> {
+  isInPreviewMode?: boolean;
+  previewType?: PreviewType;
+  isKubeConfigPathValid?: boolean;
+}
+
+export const getPreviewTheme = (
   fallBackColor: string,
   previewType?: PreviewType,
   rgbaRatio?: number,
   isInPreviewMode?: boolean
 ) => {
-  if (isBoolean(isInPreviewMode)) {
-    return (
-      (isInPreviewMode &&
-        previewType === 'cluster' &&
-        (rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano)) ||
-      (isInPreviewMode && previewType === 'helm' && (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-      (isInPreviewMode &&
-        previewType === 'helm-preview-config' &&
-        (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-      (isInPreviewMode &&
-        previewType === 'kustomization' &&
-        (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-      fallBackColor
-    );
+  let color = fallBackColor;
+
+  if (previewType === 'cluster') {
+    color = rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano;
   }
-  return (
-    (previewType === 'cluster' && (rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano)) ||
-    (previewType === 'helm' && (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-    (previewType === 'helm-preview-config' && (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-    (previewType === 'kustomization' && (rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan)) ||
-    fallBackColor
-  );
+  if (previewType === 'helm') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+  if (previewType === 'helm-preview-config') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+  if (previewType === 'kustomization') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+
+  return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
 };
 
-export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?: PreviewType}>`
+export const Button = styled(({children, previewType, isInPreviewMode, ...rest}: RawButtonProps) => (
+  <RawButton {...rest}>{children}</RawButton>
+))`
   margin: 0 0 0 10px;
   border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
   color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
@@ -63,7 +69,9 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
   }
 `;
 
-export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewType?: PreviewType}>`
+export const ExitButton = styled(({children, previewType, isInPreviewMode, ...rest}: RawButtonProps) => (
+  <RawButton {...rest}>{children}</RawButton>
+))`
   margin: 0 0 0 10px;
   color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
   background-color: ${props => getPreviewTheme(Colors.grey11, props.previewType, 0, props.isInPreviewMode)};
@@ -178,11 +186,11 @@ export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
 `;
 
-export const CheckCircleOutlined = styled(RawCheckCircleOutlined)<{
-  isKubeConfigPathValid?: boolean;
-  isInPreviewMode?: boolean;
-  previewType?: PreviewType;
-}>`
+export const CheckCircleOutlined = styled(
+  ({isKubeConfigPathValid, previewType, isInPreviewMode, ...props}: IAntdIconProps) => (
+    <RawCheckCircleOutlined {...props} />
+  )
+)`
   color: ${props =>
     (!props.isKubeConfigPathValid && Colors.grey8) ||
     getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};

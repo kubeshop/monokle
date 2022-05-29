@@ -10,14 +10,14 @@ import {
 
 import styled from 'styled-components';
 
-import {PreviewType} from '@models/appstate';
-
 import Col from '@components/atoms/Col';
 import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors, PanelColors} from '@styles/Colors';
+
+import {getPreviewTheme} from './ClusterSelection.styled';
 
 export const Row = styled(RawRow.default)`
   display: flex;
@@ -88,13 +88,8 @@ export const ModeSpan = styled.span`
   font-weight: 500;
 `;
 
-export const PreviewRow = styled(Row)<{previewType?: PreviewType}>`
-  background: ${props =>
-    (props.previewType === 'cluster' && Colors.volcano) ||
-    (props.previewType === 'helm' && Colors.cyan) ||
-    (props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.blackPure};
+export const PreviewRow = styled(({previewType, ...rest}: any) => <Row {...rest} />)`
+  background: ${props => getPreviewTheme(Colors.blackPure, props.previewType, 0)};
   margin: 0;
   height: 8px;
   color: ${Colors.blackPure};
