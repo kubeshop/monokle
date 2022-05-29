@@ -1,13 +1,11 @@
 import {Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {
-  ApiOutlined as RawApiOutlined,
   BellOutlined as RawBellOutlined,
   CloseCircleOutlined as RawCloseCircleOutlined,
   CopyOutlined as RawCopyOutlined,
   EditOutlined as RawEditOutlined,
   EllipsisOutlined as RawEllipsisOutlined,
-  SettingOutlined as RawSettingOutlined,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -115,16 +113,6 @@ export const SettingsCol = styled(Col)`
   align-items: center;
 `;
 
-export const SettingsOutlined = styled(RawSettingOutlined)`
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-export const ApiOutlined = styled(RawApiOutlined)`
-  font-size: 14px;
-  cursor: pointer;
-`;
-
 export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
@@ -149,41 +137,4 @@ export const Divider = styled(RawDivider)`
   border-color: ${Colors.grey3};
   height: 28px;
   margin: 0;
-`;
-
-export const MenuContainer = styled.div`
-  background-color: ${Colors.grey4000};
-`;
-
-export const MenuItem = styled.div`
-  background-color: transparent;
-  color: ${Colors.grey9};
-  font-weight: 700;
-  font-size: 14px;
-  border-bottom: 1px solid ${Colors.grey5b};
-
-  &:last-child {
-    border-bottom: none;
-  }
-  height: 40px;
-  display: flex;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-export const MenuItemIcon = styled.span`
-  width: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const MenuItemLabel = styled.span`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 8px;
 `;

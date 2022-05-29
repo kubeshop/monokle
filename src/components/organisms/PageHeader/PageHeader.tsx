@@ -1,17 +1,16 @@
 import {useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Badge, Dropdown, Menu, Tooltip} from 'antd';
+import {Badge, Dropdown, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NotificationsTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
+import {NotificationsTooltip} from '@constants/tooltips';
 
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openPluginsDrawer} from '@redux/reducers/extension';
-import {setLayoutSize, toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
+import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   activeResourcesSelector,
@@ -23,6 +22,7 @@ import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
+import {HelpMenu} from './HelpMenu';
 import * as S from './PageHeader.styled';
 import ProjectSelection from './ProjectSelection';
 
@@ -41,6 +41,7 @@ const PageHeader = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const activeProject = useAppSelector(activeProjectSelector);
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
 
   const runningPreviewConfiguration = useAppSelector(state => {
     if (!state.main.previewConfigurationId) {
@@ -55,16 +56,8 @@ const PageHeader = () => {
 
   const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 
-  const toggleSettingsDrawer = () => {
-    dispatch(toggleSettings());
-  };
-
   const toggleNotificationsDrawer = () => {
     dispatch(toggleNotifications());
-  };
-
-  const showPluginsDrawer = () => {
-    dispatch(openPluginsDrawer());
   };
 
   const showGetStartingPage = () => {
@@ -138,27 +131,16 @@ const PageHeader = () => {
                 </Badge>
               </Tooltip>
               <Dropdown
+                visible={isHelpMenuOpen}
+                onVisibleChange={() => {
+                  setIsHelpMenuOpen(!isHelpMenuOpen);
+                }}
                 overlay={
-                  <Menu>
-                    <S.MenuContainer>
-                      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-                        <S.MenuItem onClick={toggleSettingsDrawer}>
-                          <S.MenuItemIcon>
-                            <S.SettingsOutlined />
-                          </S.MenuItemIcon>
-                          <S.MenuItemLabel>Settings</S.MenuItemLabel>
-                        </S.MenuItem>
-                      </Tooltip>
-                      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-                        <S.MenuItem onClick={showPluginsDrawer}>
-                          <S.MenuItemIcon>
-                            <S.ApiOutlined />
-                          </S.MenuItemIcon>
-                          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
-                        </S.MenuItem>
-                      </Tooltip>
-                    </S.MenuContainer>
-                  </Menu>
+                  <HelpMenu
+                    onMenuClose={() => {
+                      setIsHelpMenuOpen(false);
+                    }}
+                  />
                 }
                 placement="bottom"
               >
