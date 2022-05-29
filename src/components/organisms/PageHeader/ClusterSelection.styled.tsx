@@ -31,6 +31,7 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
   font-size: 12px;
   letter-spacing: 0.05em;
   background-color: ${Colors.grey11};
+  height: 28px;
 
   &:hover,
   &:focus {
@@ -61,6 +62,7 @@ export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewT
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.05em;
+  height: 28px;
 
   &:hover,
   &:focus {
@@ -83,14 +85,6 @@ export const ClusterActionButton = styled(RawButton)`
   color: ${Colors.blue7};
 `;
 
-export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
-  ${({$highlighted}) => `
-    font-size: ${$highlighted ? '9px' : '12px'};
-    line-height: ${$highlighted ? '30px' : '20px'};
-    color: ${$highlighted ? Colors.whitePure : Colors.blue6};
-`}
-`;
-
 export const ClusterButton = styled(RawButton)`
   display: flex;
   align-items: center;
@@ -109,7 +103,7 @@ export const ClusterContainer = styled.div`
   align-items: center;
   border: none;
   border-radius: 4px;
-  padding: 0 8px;
+  line-height: 28px !important;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -154,7 +148,7 @@ export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
   display: flex;
   align-items: center;
   border-radius: ${props => (props.isInPreviewMode ? '0 4px 4px 0' : '4px')};
-  padding: 0px 8px;
+  padding: 0 1rem;
   background: ${Colors.grey3b};
 `;
 
@@ -207,7 +201,7 @@ export const PreviewMode = styled.div<{
   previewType?: PreviewType;
 }>`
   border-radius: 4px 0 0 4px;
-  padding: 1px 8px;
+  padding: 0 0.5rem;
   color: ${props =>
     (props.previewType === 'cluster' && Colors.volcano) ||
     (props.previewType === 'helm' && Colors.cyan) ||

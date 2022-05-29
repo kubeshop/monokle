@@ -162,7 +162,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                   visible={isClusterDropdownOpen}
                   onVisibleChange={setIsClusterDropdownOpen}
                 >
-                  <S.ClusterButton type="link" ref={dropdownButtonRef}>
+                  <S.ClusterButton type="link" ref={dropdownButtonRef} size="small">
                     <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
                     <S.DownOutlined />
                   </S.ClusterButton>
@@ -203,6 +203,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               isInPreviewMode={isInPreviewMode}
               previewType={previewType}
               loading={previewLoader.isLoading}
+              size="small"
             >
               {previewLoader.isLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
             </S.Button>

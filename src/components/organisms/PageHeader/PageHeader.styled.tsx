@@ -4,6 +4,7 @@ import {
   CloseCircleOutlined as RawCloseCircleOutlined,
   CopyOutlined as RawCopyOutlined,
   EditOutlined as RawEditOutlined,
+  EllipsisOutlined as RawEllipsisOutlined,
   SettingOutlined as RawSettingOutlined,
 } from '@ant-design/icons';
 
@@ -27,6 +28,7 @@ export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 20px;
   cursor: pointer;
+  margin-left: 1rem;
 `;
 
 export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
@@ -101,6 +103,7 @@ export const ResourceSpan = styled.span`
 
 export const SettingsCol = styled(Col)`
   display: flex;
+  align-items: center;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
@@ -119,4 +122,11 @@ export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+export const EllipsisOutlined = styled(RawEllipsisOutlined)`
+  color: ${Colors.blue6};
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 1rem;
 `;

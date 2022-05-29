@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Badge, Tooltip} from 'antd';
+import {Badge, Divider, Dropdown, Menu, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
@@ -19,10 +19,8 @@ import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
-import HelpMenu from './HelpMenu';
+import * as S from './PageHeader.styled';
 import ProjectSelection from './ProjectSelection';
-
-import * as S from './styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
@@ -167,13 +165,13 @@ const PageHeader = () => {
 
       <S.Header noborder="true">
         <S.Row noborder="true">
-          <div style={{display: 'flex', height: '100%'}}>
+          <div style={{display: 'flex', alignItems: 'center'}}>
             <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
             <ProjectSelection />
             <CreateProject />
           </div>
 
-          <div style={{display: 'flex'}}>
+          <div style={{display: 'flex', alignItems: 'center'}}>
             <ClusterSelection previewResource={previewResource} />
             <S.SettingsCol>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
@@ -181,15 +179,29 @@ const PageHeader = () => {
                   <S.BellOutlined onClick={toggleNotificationsDrawer} />
                 </Badge>
               </Tooltip>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-                <S.ApiOutlined onClick={showPluginsDrawer} />
-              </Tooltip>
-
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-                <S.SettingsOutlined onClick={toggleSettingsDrawer} />
-              </Tooltip>
-
-              <HelpMenu />
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <div>
+                      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+                        <S.SettingsOutlined onClick={toggleSettingsDrawer} />
+                      </Tooltip>
+                      <span>Settings</span>
+                    </div>
+                    <Divider />
+                    <div>
+                      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+                        <S.ApiOutlined onClick={showPluginsDrawer} />
+                      </Tooltip>
+                      <span>Plugins Manager</span>
+                    </div>
+                    <Divider />
+                  </Menu>
+                }
+                placement="bottom"
+              >
+                <S.EllipsisOutlined />
+              </Dropdown>
             </S.SettingsCol>
           </div>
         </S.Row>
