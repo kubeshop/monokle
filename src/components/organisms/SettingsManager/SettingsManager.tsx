@@ -58,7 +58,7 @@ const SettingsManager: React.FC = () => {
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const [activeTab, setActiveTab] = useState<string>(
-    String(activeSettingsPanel) || SettingsPanel.ActiveProjectSettings
+    activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
   );
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
