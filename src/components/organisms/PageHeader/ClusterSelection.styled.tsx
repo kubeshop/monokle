@@ -6,6 +6,7 @@ import {
   ExclamationCircleOutlined as RawExclamationCircleOutlined,
 } from '@ant-design/icons/lib/icons';
 
+import {isSet} from 'lodash';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
@@ -13,21 +14,29 @@ import {PreviewType} from '@models/appstate';
 
 import Colors from '@styles/Colors';
 
+const getPreviewTheme = (fallBackColor: string, previewType?: PreviewType, isInPreviewMode?: boolean) => {
+  if (isSet(isInPreviewMode)) {
+    return (
+      (isInPreviewMode && previewType === 'cluster' && Colors.volcano) ||
+      (isInPreviewMode && previewType === 'helm' && Colors.cyan) ||
+      (isInPreviewMode && previewType === 'helm-preview-config' && Colors.cyan) ||
+      (isInPreviewMode && previewType === 'kustomization' && Colors.cyan) ||
+      fallBackColor
+    );
+  }
+  return (
+    (previewType === 'cluster' && Colors.volcano) ||
+    (previewType === 'helm' && Colors.cyan) ||
+    (previewType === 'helm-preview-config' && Colors.cyan) ||
+    (previewType === 'kustomization' && Colors.cyan) ||
+    fallBackColor
+  );
+};
+
 export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?: PreviewType}>`
   margin: 0 0 0 10px;
-  border: 1px solid
-    ${props =>
-      (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-      (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-      Colors.blue6};
-  color: ${props =>
-    (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-    (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.blue6};
+  border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, props.isInPreviewMode)};
+  color: ${props => getPreviewTheme(Colors.blue6, props.previewType, props.isInPreviewMode)};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -38,31 +47,15 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
   &:hover,
   &:focus {
     opacity: 0.8;
-    border: 1px solid
-      ${props =>
-        (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-        (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-        (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-        (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-        Colors.blue6};
-    color: ${props =>
-      (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-      (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-      Colors.blue6};
+    border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, props.isInPreviewMode)};
+    color: ${props => getPreviewTheme(Colors.blue6, props.previewType, props.isInPreviewMode)};
   }
 `;
 
 export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewType?: PreviewType}>`
   margin: 0 0 0 10px;
   color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
-  background-color: ${props =>
-    (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-    (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.grey11};
+  background-color: ${props => getPreviewTheme(Colors.grey11, props.previewType, props.isInPreviewMode)};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -72,12 +65,7 @@ export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewT
   &:hover,
   &:focus {
     color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
-    background-color: ${props =>
-      (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-      (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-      (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-      Colors.grey11};
+    background-color: ${props => getPreviewTheme(Colors.grey11, props.previewType, props.isInPreviewMode)};
     opacity: 0.8;
   }
 `;
@@ -138,7 +126,6 @@ export const ClusterContextName = styled.span`
 `;
 
 export const ClusterAccessContainer = styled.span`
-  padding: 5px;
   margin-right: 5px;
   color: ${Colors.grey8} !important;
 `;
@@ -159,8 +146,8 @@ export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
 `;
 
 export const ClusterStatusText = styled.span<{
-  isKubeConfigPathValid?: Boolean;
-  isInPreviewMode?: Boolean;
+  isKubeConfigPathValid?: boolean;
+  isInPreviewMode?: boolean;
   previewType?: PreviewType;
 }>`
   margin-left: 8px;
@@ -168,11 +155,7 @@ export const ClusterStatusText = styled.span<{
   font-size: 12px;
   color: ${props =>
     (!props.isKubeConfigPathValid && Colors.grey8) ||
-    (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-    (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.greenOkay};
+    getPreviewTheme(Colors.greenOkay, props.previewType, props.isInPreviewMode)};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -185,17 +168,13 @@ export const DownOutlined = styled(RawDownOutlined)`
 `;
 
 export const CheckCircleOutlined = styled(RawCheckCircleOutlined)<{
-  isKubeConfigPathValid?: Boolean;
-  isInPreviewMode?: Boolean;
+  isKubeConfigPathValid?: boolean;
+  isInPreviewMode?: boolean;
   previewType?: PreviewType;
 }>`
   color: ${props =>
     (!props.isKubeConfigPathValid && Colors.grey8) ||
-    (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
-    (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.greenOkay};
+    getPreviewTheme(Colors.greenOkay, props.previewType, props.isInPreviewMode)};
   font-size: 14px;
   margin-right: 8px;
 `;
@@ -210,12 +189,7 @@ export const PreviewMode = styled.div<{
 }>`
   border-radius: 4px 0 0 4px;
   padding: 0 0.5rem;
-  color: ${props =>
-    (props.previewType === 'cluster' && Colors.volcano) ||
-    (props.previewType === 'helm' && Colors.cyan) ||
-    (props.previewType === 'helm-preview-config' && Colors.cyan) ||
-    (props.previewType === 'kustomization' && Colors.cyan) ||
-    Colors.blackPure};
+  color: ${props => getPreviewTheme(Colors.blackPure, props.previewType)};
   background-color: ${props =>
     (props.previewType === 'cluster' && rgba(Colors.volcano, 0.2)) ||
     (props.previewType === 'helm' && rgba(Colors.cyan, 0.2)) ||

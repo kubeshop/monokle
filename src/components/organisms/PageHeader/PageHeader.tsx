@@ -6,17 +6,11 @@ import {Badge, Dropdown, Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
-import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {
-  activeProjectSelector,
-  activeResourcesSelector,
-  isInPreviewModeSelector,
-  kubeConfigContextSelector,
-} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -28,8 +22,6 @@ import ProjectSelection from './ProjectSelection';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
-  const activeResources = useAppSelector(activeResourcesSelector);
-  const currentContext = useAppSelector(kubeConfigContextSelector);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -50,9 +42,7 @@ const PageHeader = () => {
     return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
   });
 
-  const [helmChart, setHelmChart] = useState<HelmChart>();
   const [previewResource, setPreviewResource] = useState<K8sResource>();
-  const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
 
   const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 
@@ -71,20 +61,6 @@ const PageHeader = () => {
       setPreviewResource(resourceMap[previewResourceId]);
     } else {
       setPreviewResource(undefined);
-    }
-
-    if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
-      const valuesFile = helmValuesMap[previewValuesFileId];
-      setPreviewValuesFile(valuesFile);
-      setHelmChart(helmChartMap[valuesFile.helmChartId]);
-    } else {
-      setPreviewValuesFile(undefined);
-      setHelmChart(undefined);
-    }
-
-    if (runningPreviewConfiguration) {
-      const chart = Object.values(helmChartMap).find(c => c.filePath === runningPreviewConfiguration.helmChartFilePath);
-      setHelmChart(chart);
     }
   }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap, runningPreviewConfiguration]);
 

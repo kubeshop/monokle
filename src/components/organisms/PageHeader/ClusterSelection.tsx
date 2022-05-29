@@ -1,10 +1,11 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Dropdown} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
@@ -173,6 +174,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           <S.ClusterStatus isInPreviewMode={isInPreviewMode}>
             {isKubeConfigPathValid && (
               <>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                  <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+                </Tooltip>
                 <S.ClusterOutlined />
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
