@@ -162,7 +162,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {isInPreviewMode && (
+          {!previewLoader.isLoading && isInPreviewMode && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>PREVIEW MODE</span>}
@@ -171,7 +171,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isInPreviewMode={isInPreviewMode}>
+          <S.ClusterStatus isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}>
             {isKubeConfigPathValid && (
               <>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
@@ -197,13 +197,13 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             )}
             <S.ClusterStatusText
               isKubeConfigPathValid={isKubeConfigPathValid}
-              isInPreviewMode={isInPreviewMode}
+              isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
               previewType={previewType}
             >
               {isKubeConfigPathValid ? (
                 <S.CheckCircleOutlined
                   isKubeConfigPathValid={isKubeConfigPathValid}
-                  isInPreviewMode={isInPreviewMode}
+                  isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
                   previewType={previewType}
                 />
               ) : (
@@ -226,7 +226,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           <S.Button
             disabled={isAccessLoading}
             onClick={loadOrReloadPreview}
-            isInPreviewMode={isInPreviewMode}
+            isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
             previewType={previewType}
             loading={previewLoader.isLoading}
             size="small"
@@ -235,8 +235,12 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           </S.Button>
           // </Tooltip>
         )}
-        {isInPreviewMode && (
-          <S.ExitButton onClick={onClickExit} isInPreviewMode={isInPreviewMode} previewType={previewType}>
+        {!previewLoader.isLoading && isInPreviewMode && (
+          <S.ExitButton
+            onClick={onClickExit}
+            isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
+            previewType={previewType}
+          >
             Exit
           </S.ExitButton>
         )}
