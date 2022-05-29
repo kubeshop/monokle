@@ -1,4 +1,4 @@
-import {Menu, Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
+import {Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
 import {
   DeleteOutlined as RawDeleteOutlined,
@@ -74,7 +74,7 @@ export const ProjectContainer = styled.div`
   padding 2px 4px;
 `;
 
-export const ProjectMenu = styled(Menu)`
+export const ProjectMenu = styled.div`
   background-color: ${Colors.grey1000};
   margin: 10px 0;
 `;
