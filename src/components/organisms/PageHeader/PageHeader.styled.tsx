@@ -12,6 +12,8 @@ import {
 
 import styled from 'styled-components';
 
+import {PreviewType} from '@models/appstate';
+
 import Col from '@components/atoms/Col';
 import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
@@ -88,8 +90,13 @@ export const ModeSpan = styled.span`
   font-weight: 500;
 `;
 
-export const PreviewRow = styled(Row)`
-  background: ${BackgroundColors.previewModeBackground};
+export const PreviewRow = styled(Row)<{previewType?: PreviewType}>`
+  background: ${props =>
+    (props.previewType === 'cluster' && Colors.volcano) ||
+    (props.previewType === 'helm' && Colors.cyan) ||
+    (props.previewType === 'helm-preview-config' && Colors.cyan) ||
+    (props.previewType === 'kustomization' && Colors.cyan) ||
+    Colors.blackPure};
   margin: 0;
   height: 8px;
   color: ${Colors.blackPure};
@@ -109,14 +116,12 @@ export const SettingsCol = styled(Col)`
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
+  font-size: 14px;
   cursor: pointer;
 `;
 
 export const ApiOutlined = styled(RawApiOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
+  font-size: 14px;
   cursor: pointer;
 `;
 
@@ -144,4 +149,41 @@ export const Divider = styled(RawDivider)`
   border-color: ${Colors.grey3};
   height: 28px;
   margin: 0;
+`;
+
+export const MenuContainer = styled.div`
+  background-color: ${Colors.grey4000};
+`;
+
+export const MenuItem = styled.div`
+  background-color: transparent;
+  color: ${Colors.grey9};
+  font-weight: 700;
+  font-size: 14px;
+  border-bottom: 1px solid ${Colors.grey5b};
+
+  &:last-child {
+    border-bottom: none;
+  }
+  height: 40px;
+  display: flex;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const MenuItemIcon = styled.span`
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const MenuItemLabel = styled.span`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 8px;
 `;

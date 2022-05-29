@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Badge, Divider, Dropdown, Menu, Tooltip} from 'antd';
+import {Badge, Dropdown, Menu, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
@@ -18,7 +18,6 @@ import {
   isInPreviewModeSelector,
   kubeConfigContextSelector,
 } from '@redux/selectors';
-import {stopPreview} from '@redux/services/preview';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -26,16 +25,6 @@ import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
 import * as S from './PageHeader.styled';
 import ProjectSelection from './ProjectSelection';
-
-const ExitButton = (props: {onClick: () => void}) => {
-  const {onClick} = props;
-  return (
-    <S.ExitButton onClick={onClick}>
-      <S.CloseCircleOutlined />
-      Exit
-    </S.ExitButton>
-  );
-};
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
@@ -84,10 +73,6 @@ const PageHeader = () => {
     }
   };
 
-  const onClickExit = () => {
-    stopPreview(dispatch);
-  };
-
   useEffect(() => {
     if (previewResourceId) {
       setPreviewResource(resourceMap[previewResourceId]);
@@ -120,54 +105,7 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && previewType === 'kustomization' && (
-        <S.PreviewRow noborder="true">
-          {/* <S.ModeSpan>PREVIEW MODE</S.ModeSpan>
-          {previewResource && (
-            <S.ResourceSpan>
-              Previewing [{previewResource.name}] kustomization - {activeResources.length} resources
-            </S.ResourceSpan>
-          )}
-          <ExitButton onClick={onClickExit} /> */}
-        </S.PreviewRow>
-      )}
-
-      {isInPreviewMode && previewType === 'cluster' && (
-        <S.ClusterRow>
-          {/* <S.ModeSpan>CLUSTER MODE</S.ModeSpan>
-          {previewResourceId && (
-            <S.ResourceSpan>
-              Previewing context [{currentContext}] - {activeResources.length} resources
-            </S.ResourceSpan>
-          )}
-          <ExitButton onClick={onClickExit} /> */}
-        </S.ClusterRow>
-      )}
-
-      {isInPreviewMode && previewType === 'helm' && (
-        <S.PreviewRow noborder="true">
-          {/* <S.ModeSpan>HELM MODE</S.ModeSpan>
-          {previewValuesFileId && (
-            <S.ResourceSpan>
-              Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart - {activeResources.length} resources
-            </S.ResourceSpan>
-          )}
-          <ExitButton onClick={onClickExit} /> */}
-        </S.PreviewRow>
-      )}
-
-      {isInPreviewMode && previewType === 'helm-preview-config' && (
-        <S.PreviewRow noborder="true">
-          <S.ModeSpan>HELM MODE</S.ModeSpan>
-          {previewValuesFileId && (
-            <S.ResourceSpan>
-              Running the preview configuration {runningPreviewConfiguration?.name} for {helmChart?.name} Helm chart
-              {activeResources.length} resources
-            </S.ResourceSpan>
-          )}
-          <ExitButton onClick={onClickExit} />
-        </S.PreviewRow>
-      )}
+      {isInPreviewMode && <S.PreviewRow noborder="true" previewType={previewType} />}
 
       <S.Header noborder="true">
         <S.Row noborder="true">
@@ -202,20 +140,24 @@ const PageHeader = () => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <div>
+                    <S.MenuContainer>
                       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-                        <S.SettingsOutlined onClick={toggleSettingsDrawer} />
+                        <S.MenuItem onClick={toggleSettingsDrawer}>
+                          <S.MenuItemIcon>
+                            <S.SettingsOutlined />
+                          </S.MenuItemIcon>
+                          <S.MenuItemLabel>Settings</S.MenuItemLabel>
+                        </S.MenuItem>
                       </Tooltip>
-                      <span>Settings</span>
-                    </div>
-                    <Divider />
-                    <div>
                       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-                        <S.ApiOutlined onClick={showPluginsDrawer} />
+                        <S.MenuItem onClick={showPluginsDrawer}>
+                          <S.MenuItemIcon>
+                            <S.ApiOutlined />
+                          </S.MenuItemIcon>
+                          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
+                        </S.MenuItem>
                       </Tooltip>
-                      <span>Plugins Manager</span>
-                    </div>
-                    <Divider />
+                    </S.MenuContainer>
                   </Menu>
                 }
                 placement="bottom"

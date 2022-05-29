@@ -19,11 +19,13 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
     ${props =>
       (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
       (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
       (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
       Colors.blue6};
   color: ${props =>
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.blue6};
   border-radius: 4px !important;
@@ -40,11 +42,13 @@ export const Button = styled(RawButton)<{isInPreviewMode?: boolean; previewType?
       ${props =>
         (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
         (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+        (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
         (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
         Colors.blue6};
     color: ${props =>
       (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
       (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
       (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
       Colors.blue6};
   }
@@ -56,6 +60,7 @@ export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewT
   background-color: ${props =>
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.grey11};
   border-radius: 4px !important;
@@ -70,6 +75,7 @@ export const ExitButton = styled(RawButton)<{isInPreviewMode?: boolean; previewT
     background-color: ${props =>
       (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
       (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+      (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
       (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
       Colors.grey11};
     opacity: 0.8;
@@ -164,6 +170,7 @@ export const ClusterStatusText = styled.span<{
     (!props.isKubeConfigPathValid && Colors.grey8) ||
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.greenOkay};
 `;
@@ -186,6 +193,7 @@ export const CheckCircleOutlined = styled(RawCheckCircleOutlined)<{
     (!props.isKubeConfigPathValid && Colors.grey8) ||
     (props.isInPreviewMode && props.previewType === 'cluster' && Colors.volcano) ||
     (props.isInPreviewMode && props.previewType === 'helm' && Colors.cyan) ||
+    (props.isInPreviewMode && props.previewType === 'helm-preview-config' && Colors.cyan) ||
     (props.isInPreviewMode && props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.greenOkay};
   font-size: 14px;
@@ -205,11 +213,13 @@ export const PreviewMode = styled.div<{
   color: ${props =>
     (props.previewType === 'cluster' && Colors.volcano) ||
     (props.previewType === 'helm' && Colors.cyan) ||
+    (props.previewType === 'helm-preview-config' && Colors.cyan) ||
     (props.previewType === 'kustomization' && Colors.cyan) ||
     Colors.blackPure};
   background-color: ${props =>
     (props.previewType === 'cluster' && rgba(Colors.volcano, 0.2)) ||
     (props.previewType === 'helm' && rgba(Colors.cyan, 0.2)) ||
+    (props.previewType === 'helm-preview-config' && rgba(Colors.cyan, 0.2)) ||
     (props.previewType === 'kustomization' && rgba(Colors.cyan, 0.2)) ||
     Colors.blackPure};
   font-weight: 700;

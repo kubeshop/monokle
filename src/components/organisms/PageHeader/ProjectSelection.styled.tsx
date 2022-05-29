@@ -15,16 +15,13 @@ import Colors from '@styles/Colors';
 export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
-  margin-right: 0px !important;
-  padding: 0px !important;
-  width: 100% !important;
+  margin-right: 0px;
+  padding: 0px;
+  width: 172px;
 
   :hover,
   :focus {
     color: ${Colors.lightSeaGreen};
-    span {
-      position: inherit;
-    }
   }
 `;
 
@@ -41,6 +38,7 @@ export const DownOutlined = styled(RawDownOutlined)`
   position: absolute !important;
   right: 8px !important;
   color: ${Colors.whitePure};
+  font-size: 10px !important;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -105,6 +103,15 @@ export const ProjectName = styled.div`
   font-weight: 600;
   font-size: 12px;
   text-align: left;
+
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
+
+  &:disabled {
+    color: inherit !important;
+  }
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`

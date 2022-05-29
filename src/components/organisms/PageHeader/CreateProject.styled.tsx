@@ -57,7 +57,7 @@ export const MenuItem = styled.div`
   color: ${Colors.whitePure};
   font-weight: 700;
   font-size: 14px;
-  border-bottom: 1px solid ${Colors.blackPure};
+  border-bottom: 1px solid ${Colors.grey5b};
 
   &:last-child {
     border-bottom: none;
