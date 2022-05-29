@@ -142,13 +142,13 @@ const PageHeader = () => {
 
       {isInPreviewMode && previewType === 'helm' && (
         <S.PreviewRow noborder="true">
-          <S.ModeSpan>HELM MODE</S.ModeSpan>
+          {/* <S.ModeSpan>HELM MODE</S.ModeSpan>
           {previewValuesFileId && (
             <S.ResourceSpan>
               Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart - {activeResources.length} resources
             </S.ResourceSpan>
           )}
-          <ExitButton onClick={onClickExit} />
+          <ExitButton onClick={onClickExit} /> */}
         </S.PreviewRow>
       )}
 
