@@ -23,7 +23,6 @@ const LazyDrawer: React.FC<IProps> = props => {
       visible={visible}
       width="400"
       onClose={onClose}
-      headerStyle={{backgroundColor: '#293235'}}
       {...rest}
     >
       {visible ? <Suspense fallback={null}>{children}</Suspense> : null}
