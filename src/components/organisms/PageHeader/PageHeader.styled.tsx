@@ -1,10 +1,11 @@
+import {Button as RawButton, Divider as RawDivider} from 'antd';
+
 import {
-  ApiOutlined as RawApiOutlined,
   BellOutlined as RawBellOutlined,
   CloseCircleOutlined as RawCloseCircleOutlined,
   CopyOutlined as RawCopyOutlined,
   EditOutlined as RawEditOutlined,
-  SettingOutlined as RawSettingOutlined,
+  EllipsisOutlined as RawEllipsisOutlined,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -16,17 +17,20 @@ import * as RawRow from '@components/atoms/Row';
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors, PanelColors} from '@styles/Colors';
 
+import {getPreviewTheme} from './ClusterSelection.styled';
+
 export const Row = styled(RawRow.default)`
-  display: grid;
-  grid-template-columns: max-content 1fr max-content;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0px 15px 0px 10px;
+  padding: 0px 10px;
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
+  font-size: 1rem;
   cursor: pointer;
+  margin-left: 1.5rem;
 `;
 
 export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
@@ -36,8 +40,7 @@ export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
 export const ClusterRow = styled(Row)`
   background: ${BackgroundColors.clusterModeBackground};
   margin: 0;
-  padding: 0 10px;
-  height: 25px;
+  height: 8px;
   color: ${Colors.blackPure};
   display: flex;
   justify-content: space-between;
@@ -85,11 +88,10 @@ export const ModeSpan = styled.span`
   font-weight: 500;
 `;
 
-export const PreviewRow = styled(Row)`
-  background: ${BackgroundColors.previewModeBackground};
+export const PreviewRow = styled(({previewType, ...rest}: any) => <Row {...rest} />)`
+  background: ${props => getPreviewTheme(Colors.blackPure, props.previewType, 0)};
   margin: 0;
-  padding: 0 10px;
-  height: 25px;
+  height: 8px;
   color: ${Colors.blackPure};
   display: flex;
   justify-content: space-between;
@@ -97,36 +99,37 @@ export const PreviewRow = styled(Row)`
 
 export const PageHeaderContainer = styled.div``;
 
-export const ProjectClusterSelectionContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
 export const ResourceSpan = styled.span`
   font-weight: 700;
 `;
 
 export const SettingsCol = styled(Col)`
-  display: grid;
-  grid-template-columns: repeat(4, 18px);
+  display: flex;
   align-items: center;
-  grid-column-gap: 16px;
-`;
-
-export const SettingsOutlined = styled(RawSettingOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
-  cursor: pointer;
-`;
-
-export const ApiOutlined = styled(RawApiOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 20px;
-  cursor: pointer;
 `;
 
 export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+export const EllipsisOutlined = styled(RawEllipsisOutlined)`
+  color: ${Colors.blue6};
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 1.5rem;
+`;
+
+export const BackToProjectButton = styled(RawButton)`
+  margin-right: 0px !important;
+  padding: 0px;
+  font-size: 12px;
+  color: ${Colors.blue6};
+`;
+
+export const Divider = styled(RawDivider)`
+  border-color: ${Colors.grey3};
+  height: 28px;
+  margin: 0;
 `;
