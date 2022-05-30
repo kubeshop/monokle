@@ -222,7 +222,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       )}
       <>
         {isKubeConfigPathValid && activeProject && (
-          // <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
           <S.Button
             disabled={isAccessLoading}
             onClick={loadOrReloadPreview}
@@ -233,7 +232,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           >
             {previewLoader.isLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
           </S.Button>
-          // </Tooltip>
         )}
         {!previewLoader.isLoading && isInPreviewMode && (
           <S.ExitButton

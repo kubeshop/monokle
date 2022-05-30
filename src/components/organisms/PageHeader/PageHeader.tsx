@@ -118,7 +118,7 @@ const PageHeader = () => {
                     }}
                   />
                 }
-                placement="bottom"
+                placement="bottomLeft"
               >
                 <S.EllipsisOutlined />
               </Dropdown>
