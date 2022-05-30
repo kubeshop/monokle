@@ -100,7 +100,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
 
     const distance = extraButtonEl.left - tabsListEl.right;
 
-    if (isButtonShrinked && distance > 280) {
+    if (isButtonShrinked && distance > 330) {
       setButtonShrinkedState(false);
     }
 
