@@ -17,6 +17,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
+import Icon from '@atoms/Icon';
+
 import WalkThrough from '@components/molecules/WalkThrough';
 
 import {FeatureFlag} from '@utils/features';
@@ -222,11 +224,10 @@ const PaneManagerLeftMenu: React.FC = () => {
           isActive={isActive}
           onClick={() => setLeftActiveMenu('search')}
           disabled={!activeProject}
+          icon={<Icon name="search" style={{opacity: leftMenuSelection === 'search' ? '1' : '0.5'}} />}
         >
           <MenuIcon
             className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
-            style={highlightedItems.browseTemplates ? {fontSize: '20px', marginLeft: '2px'} : {}}
-            icon={S.SearchIcon}
             active={isActive}
             isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
           />
