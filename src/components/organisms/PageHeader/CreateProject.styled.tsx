@@ -82,5 +82,5 @@ export const MenuItemLabel = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 1.5rem 0 0;
 `;
