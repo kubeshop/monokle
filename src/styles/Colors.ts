@@ -33,6 +33,7 @@ enum Colors {
 
   yellowWarning = '#ffe17f',
   yellowWarningCompliment = '#FFF3CA',
+  yellow5 = '#F3CC62',
   yellow6 = '#D8BD14',
   yellow7 = '#E8D639',
   yellow8 = '#F3EA62',
