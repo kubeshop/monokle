@@ -39,6 +39,7 @@ type Props = {
 
 const SearchPane: React.FC<Props> = ({height}) => {
   const [tree, setTree] = useState<TreeNode | null>(null);
+  const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
@@ -219,6 +220,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);
+      setFindingMatches(false);
       return;
     }
 
@@ -232,9 +234,11 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
     setSearchTree(treeData);
     saveQueryHistory(query);
+    setFindingMatches(false);
   };
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
+    setFindingMatches(true);
     updateSearchQuery(e.target.value);
 
     debounceHandler.current && clearTimeout(debounceHandler.current);
@@ -244,8 +248,11 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   const toggleMatchParam = (param: keyof MatchParamProps) => {
+    setFindingMatches(true);
     setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
   };
+
+  const isReady = searchTree && !isFindingMatches;
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
@@ -267,11 +274,12 @@ const SearchPane: React.FC<Props> = ({height}) => {
           </S.StyledButton>
         </S.SearchBox>
         <S.RootFolderText>
-          {searchTree ? (
-            <S.MatchText id="file-explorer-search-count">
+          {isReady && (
+            <S.MatchText id="search-count">
               {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
             </S.MatchText>
-          ) : (
+          )}
+          {!searchTree && !isFindingMatches && (
             <RecentSearch
               handleClick={query => {
                 updateSearchQuery(query);
@@ -280,8 +288,9 @@ const SearchPane: React.FC<Props> = ({height}) => {
             />
           )}
         </S.RootFolderText>
+        {isFindingMatches && <S.Skeleton active />}
 
-        {searchTree && (
+        {isReady && (
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onFileSelect}

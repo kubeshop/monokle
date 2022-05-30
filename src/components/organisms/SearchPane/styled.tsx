@@ -1,4 +1,4 @@
-import {Button, Tree} from 'antd';
+import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 
 import styled from 'styled-components';
 
@@ -104,6 +104,11 @@ export const FileTreeContainer = styled.div`
   & .not-supported-file-entry-name {
     color: ${Colors.grey800};
   }
+`;
+
+export const Skeleton = styled(RawSkeleton)`
+  margin: 20px;
+  width: 90%;
 `;
 
 export const NodeContainer = styled.div`
