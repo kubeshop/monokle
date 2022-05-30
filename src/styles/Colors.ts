@@ -1,5 +1,6 @@
 enum Colors {
   // Greys
+  grey4000 = '#1F1F1F',
   grey3000 = '#191F21',
   grey2000 = '#081A20',
   grey1000 = '#141414',
@@ -20,6 +21,7 @@ enum Colors {
   grey5b = '#434343', // gray, gray 5 as in Figma - FIXME!
   greyXY = '#31393c80', // Missing color - FIXME!
   grey4 = '#303030', // gray, gray 4
+  grey3b = '#293235',
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1
 
