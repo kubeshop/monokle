@@ -63,6 +63,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 function fetchLocalResources(state: RootState): K8sResource[] {
   return Object.values(state.main.resourceMap).filter(
     resource =>
+      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
       !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
       !resource.name.startsWith('Patch:') &&
       !isKustomizationResource(resource)
