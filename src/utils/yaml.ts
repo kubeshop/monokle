@@ -1,4 +1,4 @@
-import {Document, LineCounter, parseAllDocuments, parseDocument} from 'yaml';
+import {LineCounter, parseAllDocuments, parseDocument, stringify} from 'yaml';
 
 /**
  * Wrapper that ensures consistent options
@@ -17,7 +17,9 @@ export function parseAllYamlDocuments(text: string, lineCounter?: LineCounter) {
 }
 
 export function jsonToYaml(resource: any): string {
-  const doc = new Document();
-  doc.contents = resource;
-  return doc.toString();
+  return stringify(resource, {
+    // In plain mode, scalar value `yes` and `no` are parsed as booleans
+    // though most often they are intended as string scalars.
+    defaultStringType: 'QUOTE_DOUBLE',
+  });
 }
