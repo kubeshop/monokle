@@ -95,10 +95,12 @@ const ImageDetails: React.FC = () => {
               </S.SectionContainer>
             )}
 
-            <S.SectionContainer>
-              <S.SectionTitle>Description</S.SectionTitle>
-              {imageInfo.description}
-            </S.SectionContainer>
+            {imageInfo.description && (
+              <S.SectionContainer>
+                <S.SectionTitle>Description</S.SectionTitle>
+                {imageInfo.description}
+              </S.SectionContainer>
+            )}
           </S.ImageDetailsContainer>
         </>
       ) : null}
