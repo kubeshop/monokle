@@ -302,7 +302,7 @@ const ResourceFilter = () => {
           defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
           showSearch
-          style={{width: '100%'}}
+          style={{width: '100%', marginBottom: '1rem'}}
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
         >
