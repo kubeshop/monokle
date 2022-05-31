@@ -54,7 +54,7 @@ const CreateProject = () => {
               <S.MenuItemIcon>
                 <S.TemplateSmallWhite />
               </S.MenuItemIcon>
-              <S.MenuItemLabel>New From template</S.MenuItemLabel>
+              <S.MenuItemLabel>New from template</S.MenuItemLabel>
             </S.MenuItem>
           </S.MenuContainer>
         }
