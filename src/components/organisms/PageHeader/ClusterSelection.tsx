@@ -165,9 +165,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           {!previewLoader.isLoading && isInPreviewMode && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
-              {previewType === 'kustomization' && <span>PREVIEW MODE</span>}
-              {previewType === 'helm' && <span>PREVIEW MODE</span>}
-              {previewType === 'helm-preview-config' && <span>PREVIEW MODE</span>}
+              {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
+              {previewType === 'helm' && <span>HELM PREVIEW</span>}
+              {previewType === 'helm-preview-config' && <span>HELM CONFIG PREVIEW</span>}
             </S.PreviewMode>
           )}
 

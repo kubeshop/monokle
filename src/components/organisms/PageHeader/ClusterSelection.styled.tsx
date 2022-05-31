@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {ButtonProps, Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
@@ -36,10 +37,10 @@ export const getPreviewTheme = (
     color = rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano;
   }
   if (previewType === 'helm') {
-    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.yellow5;
   }
   if (previewType === 'helm-preview-config') {
-    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.yellow5;
   }
   if (previewType === 'kustomization') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
