@@ -137,6 +137,11 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+r, command+r',
     category: 'tool',
   },
+  DELETE_RESOURCE: {
+    name: 'Delete Resource',
+    key: 'ctrl+backspace, command+backspace',
+    category: 'tool',
+  },
 });
 
 function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {
