@@ -5,6 +5,7 @@ import {Button, Tooltip} from 'antd';
 import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {resourceSetCleared, resourceSetRefreshed, selectCompareStatus, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 

@@ -28,6 +28,7 @@ export const ExpandTreeTooltip = 'Expand all folders';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
+export const ImageTagTooltip = 'Open in external browser';
 export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
 export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and deploying kustomization files';
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
