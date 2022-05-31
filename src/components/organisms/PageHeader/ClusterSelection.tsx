@@ -217,7 +217,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               ) : (
                 <S.ClusterOutlined />
               )}
-              {size.width > 860 && <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>}
+              {(!isInPreviewMode || size.width > 860) && (
+                <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
+              )}
             </S.ClusterStatusText>
 
             {!isKubeConfigPathValid && (

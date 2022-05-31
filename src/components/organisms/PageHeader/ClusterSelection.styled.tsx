@@ -53,8 +53,8 @@ export const Button = styled(({children, previewType, isInPreviewMode, ...rest}:
   <RawButton {...rest}>{children}</RawButton>
 ))`
   margin: 0 0 0 10px;
-  border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
-  color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+  border: 1px solid ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
+  color: ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -65,8 +65,8 @@ export const Button = styled(({children, previewType, isInPreviewMode, ...rest}:
   &:hover,
   &:focus {
     opacity: 0.8;
-    border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
-    color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+    border: 1px solid ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
+    color: ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
   }
 `;
 
