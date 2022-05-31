@@ -1,22 +1,27 @@
 import React, {useCallback} from 'react';
 
+import {ComparisonView, compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
-import {ComparisonView, compareToggled} from '@redux/reducers/compare';
 
 import * as S from './styled';
 
-export const QuickActionCompare = (props: {isItemSelected: boolean; view: ComparisonView}) => {
-  const {isItemSelected, view} = props;
+type Props = {
+  isItemSelected: boolean;
+  from: 'quick-helm-compare' | 'quick-kustomize-compare';
+  view: ComparisonView;
+};
 
+export const QuickActionCompare: React.FC<Props> = ({isItemSelected, from, view}) => {
   const dispatch = useAppDispatch();
   const handleCompare = useCallback(() => {
     dispatch(
       compareToggled({
+        from,
         value: true,
         initialView: view,
       })
     );
-  }, [dispatch, view]);
+  }, [dispatch, from, view]);
 
   return (
     <S.Container>

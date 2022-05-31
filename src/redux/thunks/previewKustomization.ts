@@ -15,7 +15,7 @@ import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/command';
+import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
 
 /**

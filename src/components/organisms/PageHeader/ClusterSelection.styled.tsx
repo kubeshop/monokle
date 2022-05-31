@@ -1,4 +1,4 @@
-import {Button as RawButton, Divider as RawDivider} from 'antd';
+import {ButtonProps, Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 import {
@@ -6,37 +6,96 @@ import {
   ExclamationCircleOutlined as RawExclamationCircleOutlined,
 } from '@ant-design/icons/lib/icons';
 
+import {isBoolean} from 'lodash';
+import {rgba} from 'polished';
 import styled from 'styled-components';
+
+import {PreviewType} from '@models/appstate';
 
 import Colors from '@styles/Colors';
 
-export const Button = styled(RawButton)`
-  padding: 0;
-  margin: 0;
-  color: ${Colors.blue6};
+interface RawButtonProps extends ButtonProps {
+  isInPreviewMode?: boolean;
+  previewType?: PreviewType;
+}
+interface IAntdIconProps extends React.RefAttributes<HTMLSpanElement> {
+  isInPreviewMode?: boolean;
+  previewType?: PreviewType;
+  isKubeConfigPathValid?: boolean;
+}
 
-  &:hover {
-    color: ${Colors.blue6};
+export const getPreviewTheme = (
+  fallBackColor: string,
+  previewType?: PreviewType,
+  rgbaRatio?: number,
+  isInPreviewMode?: boolean
+) => {
+  let color = fallBackColor;
+
+  if (previewType === 'cluster') {
+    color = rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano;
+  }
+  if (previewType === 'helm') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+  if (previewType === 'helm-preview-config') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+  if (previewType === 'kustomization') {
+    color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
+  }
+
+  return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
+};
+
+export const Button = styled(({children, previewType, isInPreviewMode, ...rest}: RawButtonProps) => (
+  <RawButton {...rest}>{children}</RawButton>
+))`
+  margin: 0 0 0 10px;
+  border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+  color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+  border-radius: 4px !important;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  background-color: ${Colors.grey11};
+  height: 28px;
+
+  &:hover,
+  &:focus {
+    opacity: 0.8;
+    border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+    color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+  }
+`;
+
+export const ExitButton = styled(({children, previewType, isInPreviewMode, ...rest}: RawButtonProps) => (
+  <RawButton {...rest}>{children}</RawButton>
+))`
+  margin: 0 0 0 10px;
+  color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
+  background-color: ${props => getPreviewTheme(Colors.grey11, props.previewType, 0, props.isInPreviewMode)};
+  border-radius: 4px !important;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  height: 28px;
+
+  &:hover,
+  &:focus {
+    color: ${props => (props.isInPreviewMode && Colors.grey11) || Colors.whitePure};
+    background-color: ${props => getPreviewTheme(Colors.grey11, props.previewType, 0, props.isInPreviewMode)};
     opacity: 0.8;
   }
 `;
 
 export const ClusterActionButton = styled(RawButton)`
   padding: 0px;
-
   margin-left: 5px;
   margin-right: 8px;
-
-  color: ${Colors.blue6};
+  font-weight: 400;
   font-size: 12px;
-`;
-
-export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
-  ${({$highlighted}) => `
-    font-size: ${$highlighted ? '9px' : '12px'};
-    line-height: ${$highlighted ? '30px' : '20px'};
-    color: ${$highlighted ? Colors.whitePure : Colors.blue6};
-`}
+  color: ${Colors.blue7};
 `;
 
 export const ClusterButton = styled(RawButton)`
@@ -53,8 +112,11 @@ export const ClusterButton = styled(RawButton)`
 
 export const ClusterContainer = styled.div`
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  line-height: 28px !important;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -83,32 +145,36 @@ export const ClusterContextName = styled.span`
 `;
 
 export const ClusterAccessContainer = styled.span`
-  padding: 5px;
   margin-right: 5px;
+  color: ${Colors.grey8} !important;
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
-  font-size: 12px;
-  margin-top: 4px;
-  margin-right: 4px;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  margin-right: 8px;
   font-weight: 600;
-  line-height: 20px;
   text-transform: uppercase;
 `;
 
-export const ClusterStatus = styled.div`
+export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey5};
-  border-radius: 4px;
-  padding: 0px 8px;
+  border-radius: ${props => (props.isInPreviewMode ? '0 4px 4px 0' : '4px')};
+  padding: 0 1rem;
+  background: ${Colors.grey3b};
 `;
 
-export const ClusterStatusText = styled.span<{connected: Boolean}>`
-  padding-left: 5px;
-  font-size: 14px;
-  color: ${Colors.grey7};
+export const ClusterStatusText = styled.span<{
+  isKubeConfigPathValid?: boolean;
+  isInPreviewMode?: boolean;
+  previewType?: PreviewType;
+}>`
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  color: ${props =>
+    (!props.isKubeConfigPathValid && Colors.grey8) ||
+    getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -120,12 +186,31 @@ export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
 `;
 
-export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
-  color: ${Colors.greenOkay};
-  font-size: 13px;
+export const CheckCircleOutlined = styled(
+  ({isKubeConfigPathValid, previewType, isInPreviewMode, ...props}: IAntdIconProps) => (
+    <RawCheckCircleOutlined {...props} />
+  )
+)`
+  color: ${props =>
+    (!props.isKubeConfigPathValid && Colors.grey8) ||
+    getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
+  font-size: 14px;
+  margin-right: 8px;
 `;
 
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
   color: ${Colors.yellowWarning};
   font-size: 13px;
+`;
+
+export const PreviewMode = styled.div<{
+  previewType?: PreviewType;
+}>`
+  border-radius: 4px 0 0 4px;
+  padding: 0 0.5rem;
+  color: ${props => getPreviewTheme(Colors.blackPure, props.previewType, 0)};
+  background-color: ${props => getPreviewTheme(Colors.blackPure, props.previewType, 0.2)};
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
 `;

@@ -2,6 +2,9 @@ import {ipcRenderer} from 'electron';
 
 import log from 'loglevel';
 
+import {ERROR_MSG_FALLBACK} from '@constants/constants';
+
+import {isDefined} from '@utils/filter';
 import {ensureRendererThread} from '@utils/thread';
 
 export type CommandOptions = {
@@ -34,6 +37,17 @@ export function runCommandInMainThread(options: CommandOptions): Promise<Command
     ipcRenderer.on('command-result', cb);
     ipcRenderer.send('run-command', options);
   });
+}
+
+export async function execute(options: CommandOptions): Promise<string> {
+  const result = await runCommandInMainThread(options);
+
+  if (hasCommandFailed(result) || !isDefined(result.stdout)) {
+    const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+    throw new Error(msg);
+  }
+
+  return result.stdout;
 }
 
 export function hasCommandFailed({exitCode, error, stderr}: CommandResult): boolean {

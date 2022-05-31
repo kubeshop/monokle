@@ -1,33 +1,32 @@
 import {useMemo} from 'react';
 
-import {Col, Dropdown, Row} from 'antd';
-
-import {FileSearchOutlined, FireOutlined, GithubOutlined, MessageOutlined} from '@ant-design/icons';
+import {Tooltip} from 'antd';
 
 import semver from 'semver';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
+
 import {useAppDispatch} from '@redux/hooks';
+import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
   cancelWalkThrough,
   handleWalkThroughStep,
+  openAboutModal,
   openKeyboardShortcutsModal,
   openReleaseNotesDrawer,
+  toggleSettings,
 } from '@redux/reducers/ui';
 
-import {Icon} from '@components/atoms';
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
 import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 
-import DiscordLogo from '@assets/DiscordLogo.svg';
-
-import Colors from '@styles/Colors';
-
 import * as S from './HelpMenu.styled';
 
-const HelpMenu = () => {
+export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
   const dispatch = useAppDispatch();
   const appVersion = useAppVersion();
 
@@ -47,101 +46,127 @@ const HelpMenu = () => {
     dispatch(openKeyboardShortcutsModal());
   };
 
-  const menuItems = [
-    {
-      key: 'documentation',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <FileSearchOutlined />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>Documentation</Col>
-        </Row>
-      ),
-      onClick: openDocumentation,
-    },
-    {
-      key: 'releasenotes',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <FireOutlined />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>New in {parsedAppVersion || 'this version'}</Col>
-        </Row>
-      ),
-      onClick: onClickReleaseNotes,
-    },
-    {
-      key: 'hotkeys',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <Icon name="shortcuts" color={Colors.blue6} />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>Keyboard Shortcuts</Col>
-        </Row>
-      ),
-      onClick: openKeyboardShortcuts,
-    },
-    {
-      key: 'github',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <GithubOutlined />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>GitHub</Col>
-        </Row>
-      ),
-      onClick: openGitHub,
-    },
-    {
-      key: 'discord',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <img src={DiscordLogo} style={{height: '18px', width: '18px'}} />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>Discord</Col>
-        </Row>
-      ),
-      onClick: openDiscord,
-    },
-    {
-      key: 'replay',
-      label: (
-        <Row align="middle">
-          <Col span={5}>
-            <S.IconContainerSpan>
-              <MessageOutlined style={{transform: 'rotate(180deg)'}} />
-            </S.IconContainerSpan>
-          </Col>
-          <Col span={19}>Re-play Quick Guide</Col>
-        </Row>
-      ),
-      onClick: () => {
-        dispatch(cancelWalkThrough('novice'));
-        dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
-      },
-    },
-  ];
+  const toggleSettingsDrawer = () => {
+    dispatch(toggleSettings());
+  };
+
+  const showPluginsDrawer = () => {
+    dispatch(openPluginsDrawer());
+  };
+
+  const handleMenuClose = () => {
+    if (onMenuClose) {
+      onMenuClose();
+    }
+  };
 
   return (
-    <Dropdown key="more" overlay={<S.Menu items={menuItems} />}>
-      <S.QuestionCircleOutlined />
-    </Dropdown>
+    <S.MenuContainer>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            toggleSettingsDrawer();
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.SettingsOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Settings</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            showPluginsDrawer();
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.ApiOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+      <S.MenuItem style={{borderBottom: 'none'}}>
+        <S.MenuItemIcon>
+          <S.QuestionCircleOutlined />
+        </S.MenuItemIcon>
+        <S.MenuItemLabel>Help</S.MenuItemLabel>
+      </S.MenuItem>
+      <S.MenuItemLinks>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openKeyboardShortcuts();
+            handleMenuClose();
+          }}
+        >
+          Keyboard Shortcuts
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDocumentation();
+            handleMenuClose();
+          }}
+        >
+          Documentation
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            onClickReleaseNotes();
+            handleMenuClose();
+          }}
+        >
+          New in {parsedAppVersion || 'this version'}
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(cancelWalkThrough('novice'));
+            dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+            handleMenuClose();
+          }}
+        >
+          Re-play Quick Guide
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openGitHub();
+            handleMenuClose();
+          }}
+        >
+          Github
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDiscord();
+            handleMenuClose();
+          }}
+        >
+          Discord
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(openAboutModal());
+            handleMenuClose();
+          }}
+        >
+          About Monokle
+        </S.HelpLink>
+      </S.MenuItemLinks>
+    </S.MenuContainer>
   );
 };
-
-export default HelpMenu;

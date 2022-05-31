@@ -22,11 +22,17 @@ import {
   HelmResourceSet,
   KustomizeResourceSet,
   ResourceSet,
-} from '@redux/reducers/compare';
+} from '@redux/compare';
 import {currentConfigSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {
+  CommandOptions,
+  createHelmInstallCommand,
+  createHelmTemplateCommand,
+  hasCommandFailed,
+  runCommandInMainThread,
+} from '@utils/commands';
 import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
@@ -57,6 +63,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 function fetchLocalResources(state: RootState): K8sResource[] {
   return Object.values(state.main.resourceMap).filter(
     resource =>
+      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
       !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
       !resource.name.startsWith('Patch:') &&
       !isKustomizationResource(resource)
@@ -101,36 +108,51 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
 
     const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
     const folder = path.join(rootFolder, path.dirname(chart.filePath));
+    const values = path.join(folder, valuesFile.name);
 
-    if (!kubeconfig || !currentContext) return [];
+    if (!fs.existsSync(values)) {
+      throw new Error(`Values not found: ${values}`);
+    }
 
-    const command: CommandOptions = {
-      commandId: uuid(),
-      cmd: 'helm',
-      args:
-        helmPreviewMode === 'template'
-          ? ['template', '-f', `"${path.join(folder, valuesFile.name)}"`, chart.name, `"${folder}"`]
-          : [
-              'install',
-              '--kube-context',
-              currentContext,
-              '-f',
-              `"${path.join(folder, valuesFile.name)}"`,
-              chart.name,
-              `"${folder}"`,
-              '--dry-run',
-            ],
-      env: {KUBECONFIG: kubeconfig},
-    };
+    let command: CommandOptions;
+    if (helmPreviewMode === 'install') {
+      if (!kubeconfig || !currentContext) {
+        throw new Error('Kube context not found');
+      }
+
+      command = createHelmInstallCommand(
+        {
+          kubeContext: currentContext,
+          values: path.join(folder, valuesFile.name),
+          name: folder,
+          chart: chart.name,
+        },
+        {
+          KUBECONFIG: kubeconfig,
+        }
+      );
+    } else {
+      command = createHelmTemplateCommand(
+        {
+          values: path.join(folder, valuesFile.name),
+          chart: chart.name,
+          name: folder,
+        },
+        {
+          KUBECONFIG: kubeconfig,
+        }
+      );
+    }
 
     const result = await runCommandInMainThread(command);
 
-    if (!result.stdout) {
+    if (hasCommandFailed(result) || !isDefined(result.stdout)) {
       const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
       throw new Error(msg);
     }
 
     const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + valuesFile.id);
+
     return resources;
   } catch (err) {
     log.debug('preview Helm resources failed', err);

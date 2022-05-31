@@ -1,6 +1,6 @@
 import {K8sResource} from '@models/k8sresource';
 
-import {CompareFilter, ResourceComparison} from '@redux/reducers/compare';
+import {CompareFilter, ResourceComparison} from '@redux/compare';
 
 import {isPassingKeyValueFilter} from '@utils/filter';
 

@@ -50,6 +50,30 @@ export function createPreviewResult(
   processOptions?: {policyPlugins?: Policy[]}
 ) {
   const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
+  return createPreviewResultFromResources(
+    schemaVersion,
+    userDataDir,
+    resources,
+    previewResourceId,
+    title,
+    resourceRefsProcessingOptions,
+    previewKubeConfigPath,
+    previewKubeConfigContext,
+    processOptions
+  );
+}
+
+export function createPreviewResultFromResources(
+  schemaVersion: string,
+  userDataDir: string,
+  resources: K8sResource[],
+  previewResourceId: string,
+  title: string,
+  resourceRefsProcessingOptions: ResourceRefsProcessingOptions,
+  previewKubeConfigPath?: string,
+  previewKubeConfigContext?: string,
+  processOptions?: {policyPlugins?: Policy[]}
+) {
   const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
     rm[r.id] = r;
     return rm;

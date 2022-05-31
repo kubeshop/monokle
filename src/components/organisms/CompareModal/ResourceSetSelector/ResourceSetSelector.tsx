@@ -6,13 +6,8 @@ import {ClearOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {resourceSetCleared, resourceSetRefreshed, selectCompareStatus, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  resourceSetCleared,
-  resourceSetRefreshed,
-  selectCompareStatus,
-  selectResourceSet,
-} from '@redux/reducers/compare';
 
 import {ClusterContextSelect} from './ClusterContextSelect';
 import {HelmSelect} from './HelmSelect';

@@ -5,7 +5,7 @@ import {v4 as uuid} from 'uuid';
 
 import {AppConfig, ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import electronStore from '@utils/electronStore';
 import {getMainProcessEnv} from '@utils/env';
 

@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -131,6 +131,7 @@
     "node-machine-id": "1.1.12",
     "nucleus-nodejs": "3.0.9",
     "numeral": "2.0.6",
+    "polished": "4.2.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-error-boundary": "3.1.4",

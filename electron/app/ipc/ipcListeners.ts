@@ -33,7 +33,7 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions} from '@utils/command';
+import {CommandOptions} from '@utils/commands';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
 

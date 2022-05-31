@@ -2,8 +2,8 @@ import MonacoEditor, {MonacoDiffEditor} from 'react-monaco-editor';
 
 import invariant from 'tiny-invariant';
 
+import {selectComparison} from '@redux/compare';
 import {useAppSelector} from '@redux/hooks';
-import {selectComparison} from '@redux/reducers/compare';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 

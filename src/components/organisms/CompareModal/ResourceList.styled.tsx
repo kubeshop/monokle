@@ -8,7 +8,7 @@ export const ResourceListDiv = styled.div`
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 export const HeaderDiv = styled.div<{$showCheckbox: boolean}>`
