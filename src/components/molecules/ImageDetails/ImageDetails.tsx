@@ -18,7 +18,7 @@ const ImageDetails: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [imageInfo, setImageInfo] = useState<Record<string, any>>();
-  const [imageTags, setImageTags] = useState<any>();
+  const [initialImageTags, setInitialImageTags] = useState<any>();
   const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const ImageDetails: React.FC = () => {
 
       const [infoResponse, tagsResponse] = await Promise.all([
         fetch(`https://hub.docker.com/v2/repositories/${user}/${name}`, {method: 'GET'}),
-        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}/tags?page_size=30`, {
+        fetch(`https://hub.docker.com/v2/repositories/${user}/${name}/tags?page_size=50`, {
           method: 'GET',
         }),
       ]);
@@ -42,12 +42,11 @@ const ImageDetails: React.FC = () => {
         const [infoData, tagsData] = await Promise.all([infoResponse.json(), tagsResponse.json()]);
 
         setImageInfo(infoData);
-        setImageTags(tagsData);
+        setInitialImageTags(tagsData);
         setImageUrl(`https://hub.docker.com/r/${user}/${name}`);
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
       }
+
+      setIsLoading(false);
     };
 
     fetchImageInfo();
@@ -86,11 +85,11 @@ const ImageDetails: React.FC = () => {
               </S.SectionContainer>
             )}
 
-            {imageTags?.results.length && (
+            {initialImageTags?.results.length && (
               <S.SectionContainer>
                 <S.SectionTitle>Tags</S.SectionTitle>
 
-                <ImageTags name={name} user={user} tags={imageTags.results} />
+                <ImageTags name={name} user={user} initialTags={initialImageTags} />
               </S.SectionContainer>
             )}
 

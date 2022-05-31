@@ -1,4 +1,4 @@
-import {Tag as RawTag} from 'antd';
+import {Pagination as RawPagination, Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
@@ -8,6 +8,10 @@ export const ImageTagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+`;
+
+export const Pagination = styled(RawPagination)`
+  margin-top: 20px;
 `;
 
 export const Tag = styled(RawTag)`
