@@ -1,8 +1,8 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {Skeleton, Tooltip} from 'antd';
 
-import {isEqual} from 'lodash';
+import {debounce, isEqual} from 'lodash';
 
 import {ImageTagTooltip} from '@constants/tooltips';
 
@@ -23,10 +23,23 @@ const ImageTags: React.FC<IProps> = props => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [searchedValue, setSearchedValue] = useState<string>('');
   const [tags, setTags] = useState<DockerHubImageTags>(initialTags);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce(nextValue => setSearchedValue(nextValue), 200),
+    []
+  );
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.persist();
+    const {value: nextValue} = event.target;
+    debouncedSearch(nextValue);
+  };
+
   useEffect(() => {
-    if (!tags || !initialTags || (isEqual(tags, initialTags) && pageNumber === 1)) {
+    if (!tags || !initialTags || (isEqual(tags, initialTags) && pageNumber === 1 && !searchedValue)) {
       return;
     }
 
@@ -34,7 +47,7 @@ const ImageTags: React.FC<IProps> = props => {
       setIsLoading(true);
 
       const response = await fetch(
-        `https://hub.docker.com/v2/repositories/${user}/${name}/tags?page=${pageNumber}&page_size=50`,
+        `https://hub.docker.com/v2/repositories/${user}/${name}/tags?page=${pageNumber}&page_size=50&name=${searchedValue}`,
         {method: 'GET'}
       );
 
@@ -50,10 +63,12 @@ const ImageTags: React.FC<IProps> = props => {
     fetchTags();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageNumber]);
+  }, [pageNumber, searchedValue]);
 
   return (
     <>
+      <S.SearchInput placeholder="Search image tag" onChange={handleSearch} />
+
       {isLoading ? (
         <Skeleton />
       ) : (

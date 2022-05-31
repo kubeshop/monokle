@@ -1,4 +1,4 @@
-import {Pagination as RawPagination, Tag as RawTag} from 'antd';
+import {Input, Pagination as RawPagination, Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
@@ -12,6 +12,11 @@ export const ImageTagsContainer = styled.div`
 
 export const Pagination = styled(RawPagination)`
   margin-top: 20px;
+`;
+
+export const SearchInput = styled(Input.Search)`
+  margin-bottom: 25px;
+  max-width: 300px;
 `;
 
 export const Tag = styled(RawTag)`
