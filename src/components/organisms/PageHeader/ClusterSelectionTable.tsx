@@ -229,8 +229,9 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
         <Column
           className="table-column-actions"
           key="clusterActions"
+          dataIndex="clusterActions"
           ellipsis
-          width={70}
+          width={140}
           render={(_: any, record: ClusterTableRow) => {
             const editing = isEditing(record);
             if (editing) {
@@ -242,6 +243,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
             }
             return (
               <span
+                className="edit-span-btn"
                 onClick={e => {
                   e.stopPropagation();
                   edit(record);

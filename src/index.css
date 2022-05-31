@@ -235,7 +235,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   font-size: 12px;
 }
 
-.table-column-actions {
+.table-column-actions .edit-span-btn {
   display: none;
 }
 
@@ -279,8 +279,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions {
-  display: flex;
+.ant-table-body .ant-table-row:hover .table-column-actions .edit-span-btn{
+  display: block;
 }
 
 .ant-table-body .ant-table-row:hover {
