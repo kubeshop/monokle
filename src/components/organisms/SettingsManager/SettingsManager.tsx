@@ -44,8 +44,6 @@ import {Settings} from './Settings';
 
 import * as S from './styled';
 
-const {Panel} = S.Collapse;
-
 const SettingsManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject: Project | undefined = useAppSelector(activeProjectSelector);
@@ -59,22 +57,22 @@ const SettingsManager: React.FC = () => {
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
-  const [activePanels, setActivePanels] = useState<SettingsPanel[]>([
-    activeSettingsPanel || SettingsPanel.ActiveProjectSettings,
-  ]);
+  const [activeTab, setActiveTab] = useState<string>(
+    activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
+  );
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, SettingsPanel.ActiveProjectSettings]));
+      setActiveTab(SettingsPanel.ActiveProjectSettings);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
 
-  const handlePaneCollapse = (value: any) => {
-    setActivePanels(_.uniq([...value]));
+  const handlePaneCollapse = (value: string) => {
+    setActiveTab(value);
   };
 
   const changeProjectConfig = (config: ProjectConfig) => {
@@ -166,8 +164,27 @@ const SettingsManager: React.FC = () => {
 
   return (
     <>
-      <S.Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
-        <Panel header="Global Settings" key={SettingsPanel.GlobalSettings}>
+      <S.Tabs
+        activeKey={activeTab}
+        onChange={handlePaneCollapse}
+        renderTabBar={(props: any, DefaultTabBar: any) => <DefaultTabBar {...props} style={{padding: '0 1rem'}} />}
+      >
+        {activeProject && (
+          <S.StyledTabPane tab="Active project" key={SettingsPanel.ActiveProjectSettings}>
+            <Settings
+              config={mergedConfig}
+              onConfigChange={changeProjectConfig}
+              showProjectName
+              projectName={activeProject.name}
+              onProjectNameChange={onProjectNameChange}
+              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+            />
+          </S.StyledTabPane>
+        )}
+        <S.StyledTabPane tab="Default project" key={SettingsPanel.DefaultProjectSettings}>
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
+        </S.StyledTabPane>
+        <S.StyledTabPane tab="Global" key={SettingsPanel.GlobalSettings}>
           <Form
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
@@ -235,23 +252,8 @@ const SettingsManager: React.FC = () => {
               </Checkbox>
             </S.Div>
           </S.Div>
-        </Panel>
-        <Panel header="Default Project Settings" key={SettingsPanel.DefaultProjectSettings}>
-          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
-        </Panel>
-        {activeProject && (
-          <Panel header="Active Project Settings" key={SettingsPanel.ActiveProjectSettings}>
-            <Settings
-              config={mergedConfig}
-              onConfigChange={changeProjectConfig}
-              showProjectName
-              projectName={activeProject.name}
-              onProjectNameChange={onProjectNameChange}
-              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
-            />
-          </Panel>
-        )}
-      </S.Collapse>
+        </S.StyledTabPane>
+      </S.Tabs>
       <FileExplorer {...fileExplorerProps} />
     </>
   );
