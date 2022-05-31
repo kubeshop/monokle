@@ -139,7 +139,7 @@ export const ClusterDropdownClusterName = styled.div`
 `;
 
 export const ClusterContextName = styled.span`
-  max-width: 200px;
+  max-width: 100px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;

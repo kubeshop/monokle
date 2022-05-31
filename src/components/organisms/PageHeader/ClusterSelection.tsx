@@ -49,10 +49,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const size: Size = useWindowSize();
 
-  useEffect(() => {
-    console.log('size', size);
-  }, [size]);
-
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
   );
@@ -169,7 +165,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {!previewLoader.isLoading && isInPreviewMode && size.width > 1030 && (
+          {!previewLoader.isLoading && isInPreviewMode && size.width > 1070 && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
@@ -178,13 +174,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isHalfBordered={!previewLoader.isLoading && isInPreviewMode && size.width > 1030}>
+          <S.ClusterStatus isHalfBordered={!previewLoader.isLoading && isInPreviewMode && size.width > 1070}>
             {isKubeConfigPathValid && (
               <>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-                  <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-                </Tooltip>
-                <S.ClusterOutlined />
+                {size.width > 810 && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                    <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+                  </Tooltip>
+                )}
+                {size.width > 830 && <S.ClusterOutlined />}
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
                   overlayClassName="cluster-dropdown-item"
@@ -217,7 +215,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               ) : (
                 <S.ClusterOutlined />
               )}
-              {(!isInPreviewMode || size.width > 860) && (
+              {(!isInPreviewMode || size.width > 900) && (
                 <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
               )}
             </S.ClusterStatusText>
