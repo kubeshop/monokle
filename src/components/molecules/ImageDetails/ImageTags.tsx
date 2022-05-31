@@ -6,22 +6,24 @@ import {isEqual} from 'lodash';
 
 import {ImageTagTooltip} from '@constants/tooltips';
 
+import {DockerHubImageTags} from '@models/image';
+
 import {openUrlInExternalBrowser} from '@utils/shell';
 
 import * as S from './ImageTags.styled';
 
 interface IProps {
   name: string;
-  initialTags: any;
+  initialTags: DockerHubImageTags;
   user: string;
 }
 
 const ImageTags: React.FC<IProps> = props => {
   const {initialTags, name, user} = props;
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [tags, setTags] = useState(initialTags);
+  const [tags, setTags] = useState<DockerHubImageTags>(initialTags);
 
   useEffect(() => {
     if (!tags || !initialTags || (isEqual(tags, initialTags) && pageNumber === 1)) {
@@ -56,7 +58,7 @@ const ImageTags: React.FC<IProps> = props => {
         <Skeleton />
       ) : (
         <S.ImageTagsContainer>
-          {tags.results.map((tag: any) => (
+          {tags.results.map(tag => (
             <Tooltip key={tag.id} title={ImageTagTooltip}>
               <S.Tag
                 onClick={() =>

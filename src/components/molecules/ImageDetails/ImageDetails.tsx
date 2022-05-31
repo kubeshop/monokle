@@ -4,6 +4,8 @@ import {Skeleton} from 'antd';
 
 import numeral from 'numeral';
 
+import {DockerHubImage, DockerHubImageTags} from '@models/image';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
@@ -17,8 +19,8 @@ const ImageDetails: React.FC = () => {
   const selectedImage = useAppSelector(state => state.main.selectedImage);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [imageInfo, setImageInfo] = useState<Record<string, any>>();
-  const [initialImageTags, setInitialImageTags] = useState<any>();
+  const [imageInfo, setImageInfo] = useState<DockerHubImage>();
+  const [initialImageTags, setInitialImageTags] = useState<DockerHubImageTags>();
   const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
