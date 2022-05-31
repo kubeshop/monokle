@@ -157,10 +157,10 @@ export const ClusterOutlined = styled(RawClusterOutlined)`
   text-transform: uppercase;
 `;
 
-export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
+export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   display: flex;
   align-items: center;
-  border-radius: ${props => (props.isInPreviewMode ? '0 4px 4px 0' : '4px')};
+  border-radius: ${props => (props.isHalfBordered ? '0 4px 4px 0' : '4px')};
   padding: 0 1rem;
   background: ${Colors.grey3b};
 `;
