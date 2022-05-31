@@ -73,19 +73,23 @@ const ImageTags: React.FC<IProps> = props => {
         <Skeleton />
       ) : (
         <S.ImageTagsContainer>
-          {tags.results.map(tag => (
-            <Tooltip key={tag.id} title={ImageTagTooltip}>
-              <S.Tag
-                onClick={() =>
-                  openUrlInExternalBrowser(
-                    `https://hub.docker.com/layers/${name}/${user}/${name}/${tag.name}/images/${tag.images[0].digest}?content=explore`
-                  )
-                }
-              >
-                {tag.name}
-              </S.Tag>
-            </Tooltip>
-          ))}
+          {tags.results.length ? (
+            tags.results.map(tag => (
+              <Tooltip key={tag.id} title={ImageTagTooltip}>
+                <S.Tag
+                  onClick={() =>
+                    openUrlInExternalBrowser(
+                      `https://hub.docker.com/layers/${name}/${user}/${name}/${tag.name}/images/${tag.images[0].digest}?content=explore`
+                    )
+                  }
+                >
+                  {tag.name}
+                </S.Tag>
+              </Tooltip>
+            ))
+          ) : (
+            <S.NotFoundLabel>No tags were found.</S.NotFoundLabel>
+          )}
         </S.ImageTagsContainer>
       )}
 
@@ -95,6 +99,7 @@ const ImageTags: React.FC<IProps> = props => {
             setPageNumber(page);
           }
         }}
+        hideOnSinglePage
         showSizeChanger={false}
         pageSize={50}
         total={tags.count}

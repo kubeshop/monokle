@@ -10,6 +10,10 @@ export const ImageTagsContainer = styled.div`
   gap: 4px;
 `;
 
+export const NotFoundLabel = styled.span`
+  color: ${Colors.grey7};
+`;
+
 export const Pagination = styled(RawPagination)`
   margin-top: 20px;
 `;
