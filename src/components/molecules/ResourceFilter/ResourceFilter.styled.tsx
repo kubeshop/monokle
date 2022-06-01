@@ -1,4 +1,4 @@
-import {Button} from 'antd';
+import {Button, Select} from 'antd';
 
 import {CaretUpOutlined as RawCaretUpOutlined} from '@ant-design/icons';
 
@@ -16,6 +16,11 @@ export const CaretUpOutlined = styled(RawCaretUpOutlined)`
 export const Container = styled.div`
   padding: 10px 18px;
   height: 100%;
+`;
+
+export const SelectStyled = styled(props => <Select {...props} />)`
+  width: 100%;
+  margin-bottom: 1rem;
 `;
 
 export const Field = styled.div`
