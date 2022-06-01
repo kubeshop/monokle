@@ -231,7 +231,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           key="clusterActions"
           dataIndex="clusterActions"
           ellipsis
-          width={140}
+          width={70}
           render={(_: any, record: ClusterTableRow) => {
             const editing = isEditing(record);
             if (editing) {
