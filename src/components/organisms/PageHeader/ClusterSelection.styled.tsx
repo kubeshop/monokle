@@ -60,7 +60,8 @@ export const Button = styled(({children, previewType, isInPreviewMode, ...rest}:
   font-size: 12px;
   letter-spacing: 0.05em;
   background-color: ${Colors.grey11};
-  height: 28px;
+  height: 28px !important;
+  min-width: 28px !important;
 
   &:hover,
   &:focus {
