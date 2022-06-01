@@ -235,7 +235,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       <>
         {isKubeConfigPathValid && activeProject && (
           <S.Button
-            disabled={isAccessLoading}
+            disabled={isPreviewLoading && isAccessLoading}
             onClick={loadOrReloadPreview}
             isInPreviewMode={!isPreviewLoading && isInPreviewMode}
             previewType={previewType}
