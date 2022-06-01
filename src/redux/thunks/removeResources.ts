@@ -18,6 +18,8 @@ export const removeResources = createAsyncThunk(
     const state: RootState = thunkAPI.getState();
 
     const nextMainState = createNextState(state.main, mainState => {
+      let deletedCheckedResourcesIds: string[] = [];
+
       resourceIds.forEach(resourceId => {
         const resource = mainState.resourceMap[resourceId];
         if (!resource) {
@@ -25,6 +27,10 @@ export const removeResources = createAsyncThunk(
         }
 
         updateReferringRefsOnDelete(resource, mainState.resourceMap);
+
+        if (mainState.checkedResourceIds.includes(resourceId)) {
+          deletedCheckedResourcesIds.push(resourceId);
+        }
 
         if (mainState.selectedResourceId === resourceId) {
           clearResourceSelections(mainState.resourceMap);
@@ -60,6 +66,10 @@ export const removeResources = createAsyncThunk(
           }
         }
       });
+
+      mainState.checkedResourceIds = mainState.checkedResourceIds.filter(
+        id => !deletedCheckedResourcesIds.includes(id)
+      );
     });
 
     return nextMainState;
