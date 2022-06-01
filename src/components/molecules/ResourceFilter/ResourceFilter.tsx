@@ -298,16 +298,15 @@ const ResourceFilter = () => {
 
       <S.Field>
         <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
-        <Select
+        <S.SelectStyled
           defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
           showSearch
-          style={{width: '100%', marginBottom: '1rem'}}
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
         >
           {fileOrFolderContainedInOptions}
-        </Select>
+        </S.SelectStyled>
       </S.Field>
     </S.Container>
   );
