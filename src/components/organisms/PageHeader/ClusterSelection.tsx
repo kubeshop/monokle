@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
+import {useWindowSize} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
 
@@ -10,6 +11,7 @@ import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
+import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -26,6 +28,7 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
 import {defineHotkey} from '@utils/defineHotkey';
+import {sleep} from '@utils/sleep';
 
 import * as S from './ClusterSelection.styled';
 
@@ -45,6 +48,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const size: Size = useWindowSize();
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -89,7 +94,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   });
 
   const handleLoadCluster = () => {
-    if (isClusterActionDisabled && Boolean(previewType === 'cluster' && previewLoader.isLoading)) {
+    if (isClusterActionDisabled && Boolean(previewType === 'cluster' && isPreviewLoading)) {
       return;
     }
 
@@ -134,7 +139,17 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     };
   }, [clusterAccess, isAccessLoading]);
 
-  const loadOrReloadPreview = () => {
+  useEffect(() => {
+    if (!(isPreviewLoading && previewLoader.isLoading)) {
+      setIsPreviewLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewLoader.isLoading]);
+
+  const loadOrReloadPreview = async () => {
+    setIsPreviewLoading(true);
+    await sleep(500);
+
     if (!isInPreviewMode) {
       handleLoadCluster();
       return;
@@ -162,7 +177,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {!previewLoader.isLoading && isInPreviewMode && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 1070 && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
@@ -171,20 +186,22 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 1070}>
             {isKubeConfigPathValid && (
               <>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-                  <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-                </Tooltip>
-                <S.ClusterOutlined />
+                {size.width > 810 && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                    <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+                  </Tooltip>
+                )}
+                {size.width > 830 && <S.ClusterOutlined />}
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
                   overlayClassName="cluster-dropdown-item"
                   placement="bottom"
                   arrow
                   trigger={['click']}
-                  disabled={previewLoader.isLoading || isInPreviewMode}
+                  disabled={isPreviewLoading || isInPreviewMode}
                   visible={isClusterDropdownOpen}
                   onVisibleChange={setIsClusterDropdownOpen}
                 >
@@ -195,21 +212,24 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 </Dropdown>
               </>
             )}
+
             <S.ClusterStatusText
               isKubeConfigPathValid={isKubeConfigPathValid}
-              isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
+              isInPreviewMode={!isPreviewLoading && isInPreviewMode}
               previewType={previewType}
             >
               {isKubeConfigPathValid ? (
                 <S.CheckCircleOutlined
                   isKubeConfigPathValid={isKubeConfigPathValid}
-                  isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
+                  isInPreviewMode={!isPreviewLoading && isInPreviewMode}
                   previewType={previewType}
                 />
               ) : (
                 <S.ClusterOutlined />
               )}
-              <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
+              {(!isInPreviewMode || size.width > 900) && (
+                <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
+              )}
             </S.ClusterStatusText>
 
             {!isKubeConfigPathValid && (
@@ -223,20 +243,20 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       <>
         {isKubeConfigPathValid && activeProject && (
           <S.Button
-            disabled={isAccessLoading}
+            disabled={isPreviewLoading && isAccessLoading}
             onClick={loadOrReloadPreview}
-            isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
             previewType={previewType}
-            loading={previewLoader.isLoading}
+            loading={isPreviewLoading}
             size="small"
           >
-            {previewLoader.isLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
+            {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
           </S.Button>
         )}
-        {!previewLoader.isLoading && isInPreviewMode && (
+        {!isPreviewLoading && isInPreviewMode && (
           <S.ExitButton
             onClick={onClickExit}
-            isInPreviewMode={!previewLoader.isLoading && isInPreviewMode}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
             previewType={previewType}
           >
             Exit
