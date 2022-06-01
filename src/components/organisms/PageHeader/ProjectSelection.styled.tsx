@@ -71,7 +71,7 @@ export const ProjectContainer = styled.div`
   border-radius: 4px;
   width: 180px;
   background: ${Colors.grey3b};
-  padding 2px 4px;
+  padding: 2px 4px;
 `;
 
 export const ProjectMenu = styled.div`
@@ -143,4 +143,8 @@ export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;
+
+  & .ant-table-container .ant-table-body {
+    overflow-y: auto !important;
+  }
 `;
