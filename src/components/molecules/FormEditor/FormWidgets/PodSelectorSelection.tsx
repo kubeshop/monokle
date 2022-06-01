@@ -7,6 +7,8 @@ import {uniq} from 'lodash';
 import {useAppSelector} from '@redux/hooks';
 import {getK8sResources} from '@redux/services/resource';
 
+import * as S from './styled';
+
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -77,7 +79,7 @@ export const PodSelectorSelection = (params: any) => {
   }, [resourceMap]);
 
   return (
-    <Select
+    <S.SelectStyled
       value={selectValue}
       showSearch
       optionFilterProp="children"
@@ -96,6 +98,6 @@ export const PodSelectorSelection = (params: any) => {
           {apiGroup}
         </Option>
       ))}
-    </Select>
+    </S.SelectStyled>
   );
 };

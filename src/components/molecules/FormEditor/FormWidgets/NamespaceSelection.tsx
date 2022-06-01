@@ -79,7 +79,6 @@ export const NamespaceSelection = (params: any) => {
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       disabled={disabled || readonly}
-      style={{width: '100%'}}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (

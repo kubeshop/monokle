@@ -10,7 +10,9 @@ import {v4 as uuidv4} from 'uuid';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import * as S from './styled';
+import * as S from './SecretKindResourceForm.styled';
+
+import {SelectStyled} from './styled';
 
 const Option = Select.Option;
 const {TextArea} = Input;
@@ -173,13 +175,13 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
     <S.FormContainer>
       <div>
         <S.StyledSpanTitle>Type</S.StyledSpanTitle>
-        <S.SelectStyled value={formData.type} style={{width: '100%'}} onChange={handleTypeChange} disabled={disabled}>
+        <SelectStyled value={formData.type} style={{width: '100%'}} onChange={handleTypeChange} disabled={disabled}>
           {secretTypes.map(secretType => (
             <Option key={secretType} value={secretType}>
               {secretType}
             </Option>
           ))}
-        </S.SelectStyled>
+        </SelectStyled>
       </div>
       <div>
         {formData.type === 'Opaque' && (
