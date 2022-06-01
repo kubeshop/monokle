@@ -256,7 +256,7 @@ const ProjectSelection = () => {
     <S.ProjectContainer id="projects-dropdown-container">
       <WalkThrough placement="leftTop" step="template" collection="novice">
         <Dropdown
-          disabled={previewLoader.isLoading || isInPreviewMode}
+          disabled={previewLoader.isLoading}
           overlay={projectMenu}
           placement="bottomRight"
           trigger={['click']}
@@ -264,12 +264,7 @@ const ProjectSelection = () => {
           onVisibleChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-            <S.Button
-              ref={dropdownButtonRef}
-              disabled={previewLoader.isLoading || isInPreviewMode}
-              type="link"
-              size="small"
-            >
+            <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
               <S.ProjectLabel>Project</S.ProjectLabel>
               <S.ProjectName>{activeProject.name}</S.ProjectName>
               <S.DownOutlined />
