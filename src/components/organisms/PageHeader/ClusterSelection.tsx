@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
+import {useWindowSize} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
 
@@ -10,6 +11,7 @@ import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
+import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -46,6 +48,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const size: Size = useWindowSize();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
@@ -174,7 +177,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {!isPreviewLoading && isInPreviewMode && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 1070 && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
@@ -183,13 +186,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isInPreviewMode={!isPreviewLoading && isInPreviewMode}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 1070}>
             {isKubeConfigPathValid && (
               <>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-                  <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-                </Tooltip>
-                <S.ClusterOutlined />
+                {size.width > 810 && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                    <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+                  </Tooltip>
+                )}
+                {size.width > 830 && <S.ClusterOutlined />}
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
                   overlayClassName="cluster-dropdown-item"
@@ -207,6 +212,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 </Dropdown>
               </>
             )}
+
             <S.ClusterStatusText
               isKubeConfigPathValid={isKubeConfigPathValid}
               isInPreviewMode={!isPreviewLoading && isInPreviewMode}
@@ -221,7 +227,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               ) : (
                 <S.ClusterOutlined />
               )}
-              <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
+              {(!isInPreviewMode || size.width > 900) && (
+                <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
+              )}
             </S.ClusterStatusText>
 
             {!isKubeConfigPathValid && (

@@ -53,8 +53,8 @@ export const Button = styled(({children, previewType, isInPreviewMode, ...rest}:
   <RawButton {...rest}>{children}</RawButton>
 ))`
   margin: 0 0 0 10px;
-  border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
-  color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+  border: 1px solid ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
+  color: ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -66,8 +66,8 @@ export const Button = styled(({children, previewType, isInPreviewMode, ...rest}:
   &:hover,
   &:focus {
     opacity: 0.8;
-    border: 1px solid ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
-    color: ${props => getPreviewTheme(Colors.blue6, props.previewType, 0, props.isInPreviewMode)};
+    border: 1px solid ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
+    color: ${props => getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
   }
 `;
 
@@ -140,7 +140,7 @@ export const ClusterDropdownClusterName = styled.div`
 `;
 
 export const ClusterContextName = styled.span`
-  max-width: 200px;
+  max-width: 100px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -158,10 +158,10 @@ export const ClusterOutlined = styled(RawClusterOutlined)`
   text-transform: uppercase;
 `;
 
-export const ClusterStatus = styled.div<{isInPreviewMode?: boolean}>`
+export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   display: flex;
   align-items: center;
-  border-radius: ${props => (props.isInPreviewMode ? '0 4px 4px 0' : '4px')};
+  border-radius: ${props => (props.isHalfBordered ? '0 4px 4px 0' : '4px')};
   padding: 0 1rem;
   background: ${Colors.grey3b};
 `;
