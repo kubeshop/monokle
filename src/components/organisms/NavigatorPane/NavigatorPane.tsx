@@ -94,8 +94,8 @@ const NavPane: React.FC<Props> = ({height}) => {
               />
             </Tooltip>
 
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
-              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
                 <Button
                   disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
                   type="link"
@@ -103,8 +103,8 @@ const NavPane: React.FC<Props> = ({height}) => {
                   icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
                   onClick={resourceFilterButtonHandler}
                 />
-              </Badge>
-            </Tooltip>
+              </Tooltip>
+            </Badge>
 
             <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
               <CompareButton />
