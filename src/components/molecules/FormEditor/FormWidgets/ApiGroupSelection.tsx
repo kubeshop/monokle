@@ -68,6 +68,7 @@ export const ApiGroupSelection = (params: any) => {
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       disabled={disabled || readonly}
+      style={{minWidth: '35%'}}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && apiGroups.filter(apiGroup => apiGroup === inputValue).length === 0 && (
