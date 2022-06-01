@@ -38,7 +38,6 @@ const performSaveUnsavedResource = async (
   resource: K8sResource,
   rootFolder: FileEntry | undefined,
   absolutePath: string,
-  fileIncludes: string[],
   saveMode: 'saveToFolder' | 'appendToFile'
 ) => {
   let resourceRange: {start: number; length: number} | undefined;
@@ -88,7 +87,6 @@ export const saveUnsavedResources = createAsyncThunk<
   }
 >('main/saveUnsavedResources', async (args, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
-  const configState = thunkAPI.getState().config;
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
 
   let resourcePayloads: ResourcePayload[] = [];
@@ -102,7 +100,6 @@ export const saveUnsavedResources = createAsyncThunk<
         resource,
         rootFolder,
         absolutePath,
-        configState.fileIncludes,
         args.saveMode
       );
 

@@ -922,6 +922,10 @@ export const mainSlice = createSlice({
         if (resource) {
           resource.filePath = relativeFilePath;
           resource.range = resourcePayload.resourceRange;
+
+          if (state.selectedPath === relativeFilePath) {
+            resource.isHighlighted = true;
+          }
         }
       });
     });
