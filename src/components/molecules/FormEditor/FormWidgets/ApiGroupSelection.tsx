@@ -6,6 +6,8 @@ import {uniq} from 'lodash';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
+import * as S from './styled';
+
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -61,14 +63,13 @@ export const ApiGroupSelection = (params: any) => {
   }, []);
 
   return (
-    <Select
+    <S.SelectStyled
       value={selectValue}
       showSearch
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       disabled={disabled || readonly}
-      style={{minWidth: '35%'}}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && apiGroups.filter(apiGroup => apiGroup === inputValue).length === 0 && (
@@ -81,6 +82,6 @@ export const ApiGroupSelection = (params: any) => {
           {apiGroup}
         </Option>
       ))}
-    </Select>
+    </S.SelectStyled>
   );
 };

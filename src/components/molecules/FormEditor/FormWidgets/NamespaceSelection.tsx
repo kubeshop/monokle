@@ -12,6 +12,8 @@ import {selectedResourceSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
+import * as S from './styled';
+
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -70,14 +72,14 @@ export const NamespaceSelection = (params: any) => {
   }, [resourceMap, clusterNamespaces]);
 
   return (
-    <Select
+    <S.SelectStyled
       value={selectValue}
       showSearch
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       disabled={disabled || readonly}
-      style={{minWidth: '35%'}}
+      style={{width: '100%'}}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
@@ -90,6 +92,6 @@ export const NamespaceSelection = (params: any) => {
           {namespace}
         </Option>
       ))}
-    </Select>
+    </S.SelectStyled>
   );
 };
