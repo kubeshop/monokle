@@ -30,6 +30,13 @@ export const ImageName = styled.div`
   gap: 10px;
 `;
 
+export const NotFoundLabel = styled.div`
+  margin-left: 20px;
+  margin-top: 20px;
+  font-size: 16px;
+  color: ${Colors.grey7};
+`;
+
 export const PullRequestOutlined = styled(RawPullRequestOutlined)`
   font-size: 16px;
   margin-right: -5px;
