@@ -20,6 +20,7 @@ import {
   resourceSetFetchFailed,
   resourceSetFetchPending,
   resourceSetFetched,
+  resourceSetFilterPending,
   resourceSetFiltered,
   resourceSetRefreshed,
   resourceSetSelected,
@@ -99,6 +100,7 @@ export const filterListener: AppListenerFn = listen => {
     matcher: isAnyOf(resourceSetCompared, filterUpdated, searchUpdated),
     effect: async (_, {dispatch, getState, cancelActiveListeners, delay}) => {
       cancelActiveListeners();
+      dispatch(resourceSetFilterPending());
       await delay(3);
 
       const {search, comparison, view} = getState().compare.current;

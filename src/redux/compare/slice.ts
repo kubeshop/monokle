@@ -169,8 +169,15 @@ export const compareSlice = createSlice({
         comparisons: action.payload.comparisons,
       };
     },
+    resourceSetFilterPending: state => {
+      state.current.filtering = {
+        pending: true,
+        comparisons: [],
+      };
+    },
     resourceSetFiltered: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
       state.current.filtering = {
+        pending: false,
         comparisons: action.payload.comparisons,
       };
     },
@@ -262,6 +269,7 @@ export const {
   resourceSetFetchFailed,
   resourceSetFetched,
   resourceSetCompared,
+  resourceSetFilterPending,
   resourceSetFiltered,
   comparisonInspecting,
   comparisonInspected,
