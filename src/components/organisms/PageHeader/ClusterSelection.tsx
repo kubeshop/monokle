@@ -72,21 +72,17 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   };
 
   const connectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigContext) {
       stopPreview(dispatch);
     }
-    if (kubeConfigPath) {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
-    }
+    startPreview(kubeConfigContext, 'cluster', dispatch);
   };
 
   const reconnectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigContext) {
       stopPreview(dispatch);
     }
-    if (kubeConfigPath) {
-      restartPreview(kubeConfigPath, 'cluster', dispatch);
-    }
+    restartPreview(kubeConfigContext, 'cluster', dispatch);
   };
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
