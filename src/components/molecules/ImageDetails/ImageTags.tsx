@@ -4,6 +4,7 @@ import {Skeleton, Tooltip} from 'antd';
 
 import {debounce, isEqual} from 'lodash';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
 import {ImageTagTooltip} from '@constants/tooltips';
 
 import {DockerHubImageTags} from '@models/image';
@@ -75,7 +76,7 @@ const ImageTags: React.FC<IProps> = props => {
         <S.ImageTagsContainer>
           {tags.results.length ? (
             tags.results.map(tag => (
-              <Tooltip key={tag.id} title={ImageTagTooltip}>
+              <Tooltip key={tag.id} title={ImageTagTooltip} mouseEnterDelay={TOOLTIP_DELAY}>
                 <S.Tag
                   onClick={() =>
                     openUrlInExternalBrowser(
