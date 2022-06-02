@@ -163,6 +163,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "dev": "npm run electron:dev",
     "build": "craco --max_old_space_size=4096 build",
     "test": "craco test --watchAll=false",
     "postinstall": "patch-package && electron-builder install-app-deps",
