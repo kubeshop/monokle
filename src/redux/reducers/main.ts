@@ -462,6 +462,7 @@ export const mainSlice = createSlice({
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
       state.checkedResourceIds = [];
+      state.selectedImage = null;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -799,6 +800,7 @@ export const mainSlice = createSlice({
         state.selectedValuesFileId = undefined;
         state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
+        state.selectedImage = null;
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
           resource.isHighlighted = false;
