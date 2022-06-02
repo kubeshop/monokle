@@ -86,7 +86,7 @@ export function mergeManifests(template: string, values: string) {
   // cleanup
   visit(templateDoc, {
     Pair(key, node) {
-      if ((isMap(node.value) || isSeq(node.value)) && node.value.items.length === 0) {
+      if ((isMap(node.value) || isSeq(node.value)) && typeof node.value.items === 'undefined') {
         return visit.REMOVE;
       }
     },
