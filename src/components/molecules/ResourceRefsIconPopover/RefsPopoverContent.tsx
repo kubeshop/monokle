@@ -145,14 +145,20 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
 
   const onLinkClick = (ref: ResourceRef) => {
     trackEvent(FOLLOW_LINK, {type: ref.type});
+
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
         selectResource(resource.id);
       }
+
       const refRange = getRefRange(ref);
+
       if (refRange) {
-        makeMonacoSelection('resource', resource.id, refRange);
+        setImmediate(() => {
+          makeMonacoSelection('resource', resource.id, refRange);
+        });
       }
+
       return;
     }
 
@@ -164,15 +170,19 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (!targetResource) {
         return;
       }
+
       if (selectedResourceId !== targetResource.id) {
         selectResource(targetResource.id);
       }
+
       const targetOutgoingRef = targetResource.refs?.find(
         r => r.type === ResourceRefType.Outgoing && r.target?.type === 'resource' && r.target.resourceId === resource.id
       );
+
       if (!targetOutgoingRef) {
         return;
       }
+
       const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
       if (targetOutgoingRefRange) {
         makeMonacoSelection('resource', targetResource.id, targetOutgoingRefRange);
