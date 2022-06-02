@@ -21,5 +21,6 @@ export function jsonToYaml(resource: any): string {
     // In plain mode, scalar value `yes` and `no` are parsed as booleans
     // though most often they are intended as string scalars.
     defaultStringType: 'QUOTE_DOUBLE',
+    defaultKeyType: 'PLAIN',
   });
 }
