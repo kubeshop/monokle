@@ -213,7 +213,8 @@ function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map
 }
 
 function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
-  return `${resource.name}.${resource.kind}.${resource.namespace ?? defaultNamespace ?? 'default'}.${resource.version}`;
+  const namespace = !resource.namespace || resource.namespace === 'default' ? defaultNamespace : resource.namespace;
+  return `${resource.name}.${resource.kind}.${namespace}.${resource.version}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {
