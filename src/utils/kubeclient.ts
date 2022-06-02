@@ -19,9 +19,10 @@ export function createKubeClient(config: string | AppConfig, context?: string) {
 
   kc.loadFromFile(path);
   let currentContext =
-    typeof config === 'string'
-      ? context
-      : config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
+    context ??
+    (typeof config === 'string'
+      ? undefined
+      : config.projectConfig?.kubeConfig?.currentContext ?? config.kubeConfig?.currentContext);
 
   if (!currentContext) {
     currentContext = kc.currentContext;
