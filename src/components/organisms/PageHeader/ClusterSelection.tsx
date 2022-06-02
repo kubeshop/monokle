@@ -154,10 +154,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [clusterAccess, isAccessLoading, isKubeConfigPathValid, isPreviewLoading, isInPreviewMode]);
 
   useEffect(() => {
-    console.log(size.width);
-  }, [size]);
-
-  useEffect(() => {
     if (!(isPreviewLoading && previewLoader.isLoading)) {
       setIsPreviewLoading(false);
     }
@@ -195,7 +191,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {!isPreviewLoading && isInPreviewMode && size.width > 876 && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 928 && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
@@ -204,7 +200,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 876}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 928}>
             {isKubeConfigPathValid && (
               <>
                 <S.ClusterOutlined />
