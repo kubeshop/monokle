@@ -3,7 +3,7 @@ import {createSelector} from 'reselect';
 
 import {RootState} from '@models/rootstate';
 
-import {kustomizationsSelector} from '@redux/selectors';
+import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 
 import {ComparisonListItem} from '@components/organisms/CompareModal/types';
@@ -47,7 +47,8 @@ export const selectClusterResourceSet = (state: RootState, side: CompareSide) =>
   if (resourceSet?.type !== 'cluster') return undefined;
   const {context} = resourceSet;
 
-  const allContexts = state.config.kubeConfig.contexts ?? [];
+  const kubeConfig = selectCurrentKubeConfig(state);
+  const allContexts = kubeConfig.contexts ?? [];
   const currentContext = allContexts.find(c => c.name === context);
 
   return {

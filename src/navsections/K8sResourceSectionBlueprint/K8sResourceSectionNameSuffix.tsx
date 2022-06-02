@@ -5,7 +5,7 @@ import {Tag} from 'antd';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector, selectCurrentKubeConfig} from '@redux/selectors';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
@@ -33,7 +33,7 @@ const S = {
 function K8sResourceSectionNameSuffix() {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const kubeConfig = useAppSelector(state => state.config.kubeConfig);
+  const kubeConfig = useAppSelector(selectCurrentKubeConfig);
 
   if (isInPreviewMode) {
     return (

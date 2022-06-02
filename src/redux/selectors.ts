@@ -238,6 +238,10 @@ export const kubeConfigPathValidSelector = createSelector(
   }
 );
 
+export const selectCurrentKubeConfig = (state: RootState) => {
+  return state.config.projectConfig?.kubeConfig ?? state.config.kubeConfig;
+};
+
 export const registeredKindHandlersSelector = createSelector(
   (state: RootState) => state.main.registeredKindHandlers,
   registeredKindHandlers => {

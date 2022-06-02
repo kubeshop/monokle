@@ -466,6 +466,7 @@ export const mainSlice = createSlice({
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
       state.checkedResourceIds = [];
+      state.selectedImage = undefined;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -653,6 +654,7 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedImage = undefined;
     },
     toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       const enable = action.payload;
@@ -706,7 +708,6 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedPath = undefined;
-      state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
@@ -763,6 +764,7 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
           selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
@@ -783,6 +785,7 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.selectedPath = undefined;
         state.checkedResourceIds = [];
       })
@@ -803,6 +806,7 @@ export const mainSlice = createSlice({
         state.selectedValuesFileId = undefined;
         state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
+        state.selectedImage = undefined;
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
           resource.isHighlighted = false;
@@ -848,6 +852,7 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
+      state.selectedImage = undefined;
       state.selectedValuesFileId = undefined;
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
