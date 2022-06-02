@@ -46,6 +46,8 @@ const ImageDetails: React.FC = () => {
         setImageInfo(infoData);
         setInitialImageTags(tagsData);
         setImageUrl(`https://hub.docker.com/r/${user}/${name}`);
+      } else {
+        setImageInfo(undefined);
       }
 
       setIsLoading(false);
@@ -103,7 +105,9 @@ const ImageDetails: React.FC = () => {
             )}
           </S.ImageDetailsContainer>
         </>
-      ) : null}
+      ) : (
+        <S.NotFoundLabel>No data could be retrieved.</S.NotFoundLabel>
+      )}
     </>
   );
 };
