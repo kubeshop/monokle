@@ -142,13 +142,13 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             previewType={previewType}
           />
         ),
-        tooltip: 'Configured, You have full access to this cluster',
+        tooltip: 'Configured with full access.',
       };
     }
 
     return {
       icon: <S.ExclamationCircleOutlinedWarning />,
-      tooltip: 'Configured, You do not have full access to this cluster',
+      tooltip: 'Configured with restricted access.',
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clusterAccess, isAccessLoading, isKubeConfigPathValid, isPreviewLoading, isInPreviewMode]);
