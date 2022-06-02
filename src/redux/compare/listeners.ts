@@ -57,7 +57,7 @@ export const resourceFetchListener =
           dispatch(resourceSetFetchPending({side}));
 
           const state = getState();
-          const options = side === 'left' ? state.compare.current.view.leftSet : state.compare.current.view.rightSet;
+          const options = selectResourceSet(state.compare, side);
           if (!isCompleteResourceSet(options)) return;
 
           const resources = await fetchResources(state, options);
