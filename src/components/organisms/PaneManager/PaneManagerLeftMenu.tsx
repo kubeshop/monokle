@@ -168,20 +168,26 @@ const PaneManagerLeftMenu: React.FC = () => {
       </WalkThrough>
 
       <FeatureFlag name="ImagesPane">
-        <PaneTooltip show={!leftActive || !(leftMenuSelection === 'images-pane')} title="View Images" placement="right">
-          <MenuButton
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
-            isActive={isActive}
-            onClick={() => setLeftActiveMenu('images-pane')}
-            disabled={!activeProject}
+        <WalkThrough placement="leftTop" collection="release" step="images">
+          <PaneTooltip
+            show={!leftActive || !(leftMenuSelection === 'images-pane')}
+            title="View Images"
+            placement="right"
           >
-            <MenuIcon
-              iconName="images"
-              active={isActive}
+            <MenuButton
               isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
-            />
-          </MenuButton>
-        </PaneTooltip>
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('images-pane')}
+              disabled={!activeProject}
+            >
+              <MenuIcon
+                iconName="images"
+                active={isActive}
+                isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
+              />
+            </MenuButton>
+          </PaneTooltip>
+        </WalkThrough>
       </FeatureFlag>
 
       <PaneTooltip
@@ -205,18 +211,16 @@ const PaneManagerLeftMenu: React.FC = () => {
         </MenuButton>
       </PaneTooltip>
 
-      <WalkThrough placement="rightTop" step="validation" collection="release">
-        <PaneTooltip show={!leftDrawerVisible} title={<ValidationTabTooltip />} placement="right">
-          <MenuButton
-            isSelected={leftDrawerVisible}
-            isActive={isActive}
-            onClick={() => dispatch(toggleValidationDrawer())}
-            disabled={!activeProject}
-          >
-            <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
-          </MenuButton>
-        </PaneTooltip>
-      </WalkThrough>
+      <PaneTooltip show={!leftDrawerVisible} title={<ValidationTabTooltip />} placement="right">
+        <MenuButton
+          isSelected={leftDrawerVisible}
+          isActive={isActive}
+          onClick={() => dispatch(toggleValidationDrawer())}
+          disabled={!activeProject}
+        >
+          <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
+        </MenuButton>
+      </PaneTooltip>
     </S.Container>
   );
 };
