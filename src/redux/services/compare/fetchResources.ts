@@ -74,7 +74,7 @@ async function fetchResourcesFromCluster(state: RootState, options: ClusterResou
   try {
     const currentContext = options.context;
     const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(state.config);
+    const kc = createKubeClient(state.config, currentContext);
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))

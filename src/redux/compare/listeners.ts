@@ -20,6 +20,7 @@ import {
   resourceSetFetchFailed,
   resourceSetFetchPending,
   resourceSetFetched,
+  resourceSetFilterPending,
   resourceSetFiltered,
   resourceSetRefreshed,
   resourceSetSelected,
@@ -56,7 +57,7 @@ export const resourceFetchListener =
           dispatch(resourceSetFetchPending({side}));
 
           const state = getState();
-          const options = side === 'left' ? state.compare.current.view.leftSet : state.compare.current.view.rightSet;
+          const options = selectResourceSet(state.compare, side);
           if (!isCompleteResourceSet(options)) return;
 
           const resources = await fetchResources(state, options);
@@ -99,6 +100,7 @@ export const filterListener: AppListenerFn = listen => {
     matcher: isAnyOf(resourceSetCompared, filterUpdated, searchUpdated),
     effect: async (_, {dispatch, getState, cancelActiveListeners, delay}) => {
       cancelActiveListeners();
+      dispatch(resourceSetFilterPending());
       await delay(3);
 
       const {search, comparison, view} = getState().compare.current;

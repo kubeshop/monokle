@@ -177,9 +177,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER.key,
     () => {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
+      startPreview(kubeConfigContext, 'cluster', dispatch);
     },
-    [kubeConfigPath]
+    [kubeConfigContext]
   );
 
   useHotkeys(

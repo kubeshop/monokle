@@ -64,6 +64,7 @@ export type CompareState = {
      * A list of comparisons that remain after filtering.
      */
     filtering?: {
+      pending: boolean;
       comparisons: ResourceComparison[];
     };
 
