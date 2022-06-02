@@ -211,6 +211,10 @@ export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
 
     const nextMainState = createNextState(state.main, mainState => {
       mainState.resourceMap[resource.id] = resource;
+      clearResourceSelections(mainState.resourceMap);
+      resource.isSelected = true;
+      resource.isHighlighted = true;
+      mainState.selectedResourceId = resource.id;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
       processResources(
