@@ -114,6 +114,13 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [kubeConfigPath, isKubeConfigPathValid]);
 
   const {icon, tooltip} = useMemo(() => {
+    if (!isKubeConfigPathValid) {
+      return {
+        icon: <S.ClusterOutlined />,
+        tooltip: '',
+      };
+    }
+
     if (isAccessLoading) {
       return {
         icon: <LoadingOutlined />,
@@ -124,16 +131,23 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     const hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
     if (hasFullAccess) {
       return {
-        icon: <S.CheckCircleOutlined />,
-        tooltip: 'You have full access to this cluster',
+        icon: (
+          <S.CheckCircleOutlined
+            isKubeConfigPathValid={isKubeConfigPathValid}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            previewType={previewType}
+          />
+        ),
+        tooltip: 'Configured with full access.',
       };
     }
 
     return {
       icon: <S.ExclamationCircleOutlinedWarning />,
-      tooltip: 'You do not have full access to this cluster',
+      tooltip: 'Configured with restricted access.',
     };
-  }, [clusterAccess, isAccessLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clusterAccess, isAccessLoading, isKubeConfigPathValid, isPreviewLoading, isInPreviewMode]);
 
   useEffect(() => {
     if (!(isPreviewLoading && previewLoader.isLoading)) {
@@ -173,7 +187,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <>
-          {!isPreviewLoading && isInPreviewMode && size.width > 1070 && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 928 && (
             <S.PreviewMode previewType={previewType}>
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
@@ -182,15 +196,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 1070}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 928}>
             {isKubeConfigPathValid && (
               <>
-                {size.width > 810 && (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-                    <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-                  </Tooltip>
-                )}
-                {size.width > 830 && <S.ClusterOutlined />}
+                <S.ClusterOutlined />
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
                   overlayClassName="cluster-dropdown-item"
@@ -214,18 +223,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               isInPreviewMode={!isPreviewLoading && isInPreviewMode}
               previewType={previewType}
             >
-              {isKubeConfigPathValid ? (
-                <S.CheckCircleOutlined
-                  isKubeConfigPathValid={isKubeConfigPathValid}
-                  isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-                  previewType={previewType}
-                />
-              ) : (
-                <S.ClusterOutlined />
-              )}
-              {(!isInPreviewMode || size.width > 900) && (
-                <span>{isKubeConfigPathValid ? 'Configured' : 'NO CLUSTER CONFIGURED'}</span>
-              )}
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+              </Tooltip>
+              {!isKubeConfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
             </S.ClusterStatusText>
 
             {!isKubeConfigPathValid && (

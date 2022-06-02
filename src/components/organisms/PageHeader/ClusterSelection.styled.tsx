@@ -147,7 +147,6 @@ export const ClusterContextName = styled.span`
 `;
 
 export const ClusterAccessContainer = styled.span`
-  margin-right: 5px;
   color: ${Colors.grey8} !important;
 `;
 
@@ -197,7 +196,6 @@ export const CheckCircleOutlined = styled(
     (!props.isKubeConfigPathValid && Colors.grey8) ||
     getPreviewTheme(Colors.greenOkay, props.previewType, 0, props.isInPreviewMode)};
   font-size: 14px;
-  margin-right: 8px;
 `;
 
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
