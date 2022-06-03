@@ -87,6 +87,7 @@ export const loadContexts = async (
             message: (e as Error).message,
             type: AlertEnum.Warning,
           });
+        } finally {
           dispatch(setAccessLoading(false));
         }
       } catch (e: any) {
