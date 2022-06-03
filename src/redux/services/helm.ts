@@ -94,7 +94,7 @@ const get = (t: object, objPath: string) => objPath.split('.').reduce((r, k) => 
 const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
   const keyParts = keyPath.split('.');
   const keyStart = keyParts.shift();
-  const pair = contents.items.find((item: any) => {
+  const pair = contents?.items?.find((item: any) => {
     return item.key.value === keyStart;
   });
   if (!pair) {
