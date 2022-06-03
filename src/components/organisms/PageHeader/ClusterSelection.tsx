@@ -203,7 +203,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 <Dropdown
                   overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
                   overlayClassName="cluster-dropdown-item"
-                  placement="bottom"
+                  placement="bottomLeft"
                   arrow
                   trigger={['click']}
                   disabled={isPreviewLoading || isInPreviewMode}
