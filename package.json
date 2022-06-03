@@ -216,6 +216,7 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
+      "certificateSubjectName": "Kubernetes Innovation Labs, LLC",
       "publisherName": "Kubernetes Innovation Labs, LLC",
       "sign": "./sign/customSign.js"
     },
