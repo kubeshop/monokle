@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/kubeshop/monokle/compare/v1.7.6-nightly-2022-06-03.0...v1.8.0) (2022-06-03)
+
+
+### Bug Fixes
+
+* fix cluster mode selector ([bb2914a](https://github.com/kubeshop/monokle/commit/bb2914ad3ef4b97a227316ded54e202f03c34aa4))
+* loading helm chart folder ([b84d822](https://github.com/kubeshop/monokle/commit/b84d822477b61c9cd3ec33b1a4d9a3db082b94c0))
+* stop access loading ([153a3c0](https://github.com/kubeshop/monokle/commit/153a3c073fe6713e2c4b65db704c7838b2f0f45e))
+
 ### [1.7.5](https://github.com/kubeshop/monokle/compare/v1.7.5-nightly-2022-05-27.0...v1.7.5) (2022-05-27)
 
 
