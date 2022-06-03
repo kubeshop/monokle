@@ -216,9 +216,12 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico",
-      "certificateSubjectName": "Kubernetes Innovation Labs, LLC",
-      "publisherName": "Kubernetes Innovation Labs, LLC",
-      "sign": "./sign/customSign.js"
+      "sign": "./sign/customSign.js",
+      "publisherName": [
+        "Kubernetes Innovation Labs, LLC",
+        "KUBERNETES INNOVATION LABS, LLC"
+      ],
+      "verifyUpdateCodeSignature": false
     },
     "nsis": {
       "oneClick": false,
