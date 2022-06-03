@@ -12,6 +12,7 @@ import {RootState} from '@models/rootstate';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -114,12 +115,10 @@ export const isInPreviewModeSelector = (state: RootState) =>
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
-  ({main, config}) => {
-    const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
-    if (kubeConfigPath) {
-      return Boolean(main.previewResourceId && main.previewResourceId.endsWith(kubeConfigPath));
-    }
-    return false;
+  state => {
+    const kubeConfig = selectCurrentKubeConfig(state);
+    const previewId = state.main.previewResourceId;
+    return kubeConfig && isDefined(previewId) && previewId === kubeConfig.currentContext;
   }
 );
 
