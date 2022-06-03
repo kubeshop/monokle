@@ -159,7 +159,7 @@
     "vm2": "3.9.9",
     "web-vitals": "2.1.4",
     "yaml": "2.0.1",
-    "yargs": "17.4.0"
+    "yargs": "17.5.0"
   },
   "scripts": {
     "start": "craco start",
