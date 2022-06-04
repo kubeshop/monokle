@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {Col, Row} from 'antd';
 
+import {CompareSide, resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
 import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
 import CompareSingleFigure from '@assets/figures/compareSingle.svg';
@@ -33,7 +33,7 @@ export const CompareModalSelecting: React.FC = () => {
     return (
       <>
         <S.ListRow>
-          <Col span={11}>
+          <Col span={10}>
             {left.loading ? (
               <div>loading...</div>
             ) : left.error ? (
@@ -63,9 +63,9 @@ export const CompareModalSelecting: React.FC = () => {
     return (
       <>
         <S.ListRow>
-          <Col span={13} />
+          <Col span={14} />
 
-          <Col span={11}>
+          <Col span={10}>
             {right.loading ? (
               <div>loading...</div>
             ) : right.error ? (

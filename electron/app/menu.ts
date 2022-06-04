@@ -2,7 +2,6 @@ import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
-import {ReloadFolderTooltip} from '@constants/tooltips';
 
 import {NewVersionCode, Project} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
@@ -106,8 +105,8 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Refresh Folder',
+        accelerator: defineHotkey(hotkeys.REFRESH_FOLDER.key),
         enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        toolTip: ReloadFolderTooltip,
         click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
@@ -264,7 +263,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        role: 'forceReload',
       },
       {
         label: 'Previous Resource',
@@ -277,6 +276,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },
@@ -292,6 +292,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },

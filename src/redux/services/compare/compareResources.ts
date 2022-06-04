@@ -3,12 +3,13 @@ import {v5 as uuid} from 'uuid';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {CompareOperation, ResourceComparison} from '@redux/reducers/compare';
+import {CompareOperation, ResourceComparison} from '@redux/compare';
 
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 
 export type CompareOptions = {
   operation: CompareOperation;
+  defaultNamespace?: string;
 };
 
 export function compareResources(
@@ -17,8 +18,8 @@ export function compareResources(
   options: CompareOptions
 ): ResourceComparison[] {
   const {operation} = options;
-  const leftMap = createHashMap(left);
-  const rightMap = createHashMap(right);
+  const leftMap = createHashMap(left, options.defaultNamespace);
+  const rightMap = createHashMap(right, options.defaultNamespace);
 
   switch (operation) {
     case 'union':
@@ -49,7 +50,7 @@ function compareResourcesAsUnion(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });
@@ -95,7 +96,7 @@ function compareResourcesAsIntersection(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });
@@ -153,7 +154,7 @@ function compareResourcesAsLeftJoin(
       result.push({
         id: createStableComparisonIdentifier(leftResource, matchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text === matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
       });
@@ -183,7 +184,7 @@ function compareResourcesAsRightJoin(
       result.push({
         id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
         isMatch: true,
-        isDifferent: matchingLeftResource.text === rightResource.text,
+        isDifferent: matchingLeftResource.text !== rightResource.text,
         left: matchingLeftResource,
         right: rightResource,
       });
@@ -200,19 +201,20 @@ function compareResourcesAsRightJoin(
   return result;
 }
 
-function createHashMap(resources: K8sResource[]): Map<string, K8sResource> {
+function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map<string, K8sResource> {
   const result = new Map();
 
   for (const resource of resources) {
-    const id = createFullResourceIdentifier(resource);
+    const id = createFullResourceIdentifier(resource, defaultNamespace);
     result.set(id, resource);
   }
 
   return result;
 }
 
-function createFullResourceIdentifier(resource: K8sResource): string {
-  return `${resource.name}.${resource.kind}.${resource.namespace ?? 'default'}.${resource.version}`;
+function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
+  const namespace = !resource.namespace || resource.namespace === 'default' ? defaultNamespace : resource.namespace;
+  return `${resource.name}.${resource.kind}.${namespace}.${resource.version}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {

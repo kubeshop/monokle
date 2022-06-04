@@ -31,7 +31,7 @@ interface RefMapper {
     pathParts?: string[];
   };
 
-  type: 'path' | 'name' | 'pairs';
+  type: 'path' | 'name' | 'pairs' | 'image';
 
   // called to validate if an unsatisfied ref should be created for this mapper
   shouldCreateUnsatisfiedRef?: (

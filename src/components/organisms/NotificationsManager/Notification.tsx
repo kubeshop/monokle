@@ -4,6 +4,8 @@ import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {AlertEnum, AlertType} from '@models/alert';
 
 import NotificationMarkdown from '@molecules/NotificationMarkdown';
@@ -54,7 +56,7 @@ const Notification: React.FC<NotificationProps> = props => {
       </S.DateSpan>
       <S.MessageContainer>
         <S.StatusBadge>{badge}</S.StatusBadge>
-        <Tooltip title={isCopied ? 'Copied!' : 'Copy'}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCopied ? 'Copied!' : 'Copy'}>
           <S.CopyOutlined onClick={onCopyToClipboard} />
         </Tooltip>
         <S.MessageBodyContainer>

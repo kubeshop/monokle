@@ -57,15 +57,28 @@ div.hover-row {
   padding: 5px;
 }
 
-div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass {
-  margin-left: 22px;
+div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass,
+div.monokleEditorErrorRefGlyphClass.monokleEditorOutgoingImageRefGlyphClass,
+div.monokleEditorPolicyIssueGlyphClass.monokleEditorOutgoingImageRefGlyphClass {
+  margin-left: 24px;
   background: #e84749;
+}
+
+div.monokleEditorPolicyIssueGlyphClass.monokleEditorOutgoingImageRefGlyphClass::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  background-image: url('./assets/OutgoingImageRefIcon.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 12px;
+  width: 12px;
 }
 
 div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after {
   content: '';
   position: absolute;
-  left: -15px;
+  left: -16px;
   background-color: #f3ea62;
   height: 10px;
   width: 10px;
@@ -110,6 +123,16 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   background-size: cover;
   max-height: 10px;
   max-width: 10px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
+.monokleEditorOutgoingImageRefGlyphClass {
+  background-image: url('./assets/OutgoingImageRefIcon.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-height: 12px;
+  max-width: 12px;
   margin-top: 5px;
   margin-left: 15px;
 }
@@ -212,7 +235,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   font-size: 12px;
 }
 
-.table-column-actions {
+.table-column-actions .edit-span-btn {
   display: none;
 }
 
@@ -256,8 +279,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions {
-  display: flex;
+.ant-table-body .ant-table-row:hover .table-column-actions .edit-span-btn{
+  display: block;
 }
 
 .ant-table-body .ant-table-row:hover {
@@ -345,4 +368,14 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 ::-webkit-scrollbar-thumb:hover {
   background: #242424;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
+  display: block;
 }

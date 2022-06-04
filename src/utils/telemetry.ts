@@ -49,6 +49,10 @@ export type EventMap = {
   VALIDATION_PANE_OPENED: {id: string};
   OPA_ENABLED: {all: boolean};
   OPA_DISABLED: {all: boolean};
+  COMPARE_OPENED: {from?: string};
+  COMPARE_COMPARED: {left?: string; right?: string; operation: string};
+  COMPARE_INSPECTED: {type?: string};
+  COMPARE_TRANSFERED: {from?: string; to?: string; count: number};
 };
 
 export const CREATE_EMPTY_PROJECT = 'CREATE_EMPTY_PROJECT';

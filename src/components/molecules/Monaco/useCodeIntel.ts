@@ -3,7 +3,14 @@ import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
 
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmValuesMapType,
+  ImagesListType,
+  ResourceFilterType,
+  ResourceMapType,
+} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -21,11 +28,13 @@ interface CodeIntelProps {
   code: string | undefined;
   resourceMap: ResourceMapType;
   fileMap: FileMapType;
+  imagesList: ImagesListType;
   isEditorMounted: boolean;
   selectResource: (resourceId: string) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
+  selectImageHandler: (imageId: string) => void;
   selectedPath?: string;
   helmChartMap?: HelmChartMapType;
   helmValuesMap?: HelmValuesMapType;
@@ -36,6 +45,7 @@ function useCodeIntel(props: CodeIntelProps) {
     editor,
     selectedResource,
     code,
+    imagesList,
     resourceMap,
     fileMap,
     isEditorMounted,
@@ -43,6 +53,7 @@ function useCodeIntel(props: CodeIntelProps) {
     selectFilePath,
     createResource,
     filterResources,
+    selectImageHandler,
     selectedPath,
     helmChartMap,
     helmValuesMap,
@@ -94,6 +105,7 @@ function useCodeIntel(props: CodeIntelProps) {
           selectResource,
           createResource,
           filterResources,
+          selectImageHandler,
           resourceMap,
           model: editor.getModel(),
         })
@@ -130,7 +142,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor]);
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

@@ -5,7 +5,9 @@ import {Checkbox} from 'antd';
 
 import {groupBy} from 'lodash';
 
-import {ResourceSetData} from '@redux/reducers/compare';
+import {ResourceSetData} from '@redux/compare';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './ResourceList.styled';
 
@@ -18,7 +20,7 @@ type HeaderItem = {
 type ResourceItem = {
   type: 'resource';
   id: string;
-  namespace: string;
+  namespace?: string;
   name: string;
 };
 
@@ -34,9 +36,10 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
     for (const [kind, resources] of Object.entries(groups)) {
       result.push({type: 'header', kind, count: resources.length});
+      const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
-        result.push({type: 'resource', id, name, namespace: namespace ?? 'default'});
+        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace ?? 'default' : undefined});
       }
     }
 
@@ -49,7 +52,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         if (row.type === 'header') {
           const {kind, count: resourceCount} = row;
           return (
-            <S.HeaderDiv key={kind}>
+            <S.HeaderDiv $showCheckbox={showCheckbox} key={kind}>
               <S.Header>
                 {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
@@ -61,7 +64,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         return (
           <S.ResourceDiv key={id}>
             {showCheckbox ? <Checkbox style={{marginRight: 16}} disabled /> : null}
-            <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+            {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
             <S.ResourceName>{name}</S.ResourceName>
           </S.ResourceDiv>
         );

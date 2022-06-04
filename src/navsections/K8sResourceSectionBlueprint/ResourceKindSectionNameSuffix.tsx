@@ -6,7 +6,7 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {SectionCustomComponentProps} from '@models/navigator';
 import {NewResourceWizardInput} from '@models/ui';
@@ -65,7 +65,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Tooltip title={`Create a new ${resourceKind}`}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={`Create a new ${resourceKind}`}>
           <Button
             icon={<PlusOutlined />}
             type="link"

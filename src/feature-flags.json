@@ -2,5 +2,6 @@
   "ShowGraphView": false,
   "ShowRightMenu": false,
   "ActionsPaneFooter": false,
-  "CompareEverything": false
+  "ImagesPane": true,
+  "CompareEverything": true
 }

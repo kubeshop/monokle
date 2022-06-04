@@ -125,7 +125,9 @@ metadata:
   name: argo-rollouts-notification-configmap
   namespace: test
   volumes:
-    - name: static-files
+    - emptyDir: {}
+      hostPath: {}
+      name: static-files
 immutable: false`;
 
   const result = mergeManifests(orgYaml, newYaml);

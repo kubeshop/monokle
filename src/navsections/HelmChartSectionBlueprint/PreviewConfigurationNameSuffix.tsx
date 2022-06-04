@@ -6,6 +6,7 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
 
 import {SectionCustomComponentProps} from '@models/navigator';
@@ -43,7 +44,7 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Tooltip title={NewPreviewConfigurationTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewPreviewConfigurationTooltip}>
           <Button
             icon={<PlusOutlined />}
             type="link"

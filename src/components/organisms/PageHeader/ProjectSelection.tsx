@@ -24,7 +24,7 @@ import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
-import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui';
+import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
@@ -38,7 +38,6 @@ const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -257,17 +256,16 @@ const ProjectSelection = () => {
     <S.ProjectContainer id="projects-dropdown-container">
       <WalkThrough placement="leftTop" step="template" collection="novice">
         <Dropdown
-          arrow
-          disabled={previewLoader.isLoading || isInPreviewMode}
+          disabled={previewLoader.isLoading}
           overlay={projectMenu}
-          placement="bottomCenter"
+          placement="bottomRight"
           trigger={['click']}
           visible={isDropdownMenuVisible}
           onVisibleChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-            <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
-              <S.FolderOpenOutlined />
+            <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
+              <S.ProjectLabel>Project</S.ProjectLabel>
               <S.ProjectName>{activeProject.name}</S.ProjectName>
               <S.DownOutlined />
             </S.Button>
@@ -275,14 +273,6 @@ const ProjectSelection = () => {
         </Dropdown>
       </WalkThrough>
 
-      {isStartProjectPaneVisible && activeProject && (
-        <>
-          <S.Divider type="vertical" />
-          <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-            Back to Project
-          </S.BackToProjectButton>
-        </>
-      )}
       <FileExplorer {...fileExplorerProps} />
     </S.ProjectContainer>
   );

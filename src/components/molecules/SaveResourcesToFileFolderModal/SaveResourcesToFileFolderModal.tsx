@@ -244,7 +244,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         type: AlertEnum.Success,
         title: `${savingDestination === 'saveToFolder' ? 'Saved' : 'Added'} ${
           resourcesIds.length - writeAppendErrors
-        } resources succesfully`,
+        } resources successfully`,
         message: '',
       })
     );

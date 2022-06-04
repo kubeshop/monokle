@@ -2,6 +2,11 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+export const PositionText = styled.span`
+  margin-left: 5px;
+  color: ${FontColors.grey};
+`;
+
 export const RefLinkContainer = styled.div`
   display: flex;
   align-items: center;

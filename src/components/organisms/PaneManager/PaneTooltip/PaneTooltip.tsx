@@ -7,7 +7,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 type PaneTooltipProps = {
   show: boolean;
   mouseEnterDelay?: number;
-  title: string;
+  title: string | JSX.Element;
   placement: TooltipProps['placement'];
   children: React.ReactNode;
 };

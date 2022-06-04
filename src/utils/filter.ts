@@ -1,6 +1,8 @@
 import {isNil} from 'lodash';
 
 export function isPassingKeyValueFilter(target: any, keyValueFilter: Record<string, string | null>) {
+  if (!target) return false;
+
   return Object.entries(keyValueFilter).every(([key, value]) => {
     if (!target[key]) {
       return false;

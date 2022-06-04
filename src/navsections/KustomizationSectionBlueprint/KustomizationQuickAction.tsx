@@ -14,15 +14,19 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
+import {QuickActionCompare} from '@components/molecules/QuickActionCompare';
 import QuickActionPreview from '@components/molecules/QuickActionPreview';
 
 import {defineHotkey} from '@utils/defineHotkey';
+import {isDefined} from '@utils/filter';
 
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const isAnyPreviewing = isDefined(previewResourceId);
+  const isThisPreviewing = itemInstance.id === previewResourceId;
 
   const isItemBeingPreviewed = useMemo(
     () => previewResourceId !== undefined && previewResourceId === itemInstance.id,
@@ -51,6 +55,25 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
   });
+
+  if (isAnyPreviewing && !isThisPreviewing) {
+    return (
+      <QuickActionCompare
+        from="quick-kustomize-compare"
+        isItemSelected={itemInstance.isSelected}
+        view={{
+          leftSet: {
+            type: 'kustomize',
+            kustomizationId: previewResourceId,
+          },
+          rightSet: {
+            type: 'kustomize',
+            kustomizationId: itemInstance.id,
+          },
+        }}
+      />
+    );
+  }
 
   return (
     <QuickActionPreview

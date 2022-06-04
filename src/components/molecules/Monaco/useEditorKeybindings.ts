@@ -5,8 +5,8 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType} from '@models/appstate';
 
-import {useAppDispatch} from '@redux/hooks';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducers/ui';
 
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 
@@ -18,6 +18,7 @@ function useEditorKeybindings(
   diffSelectedResource: () => void
 ) {
   const dispatch = useAppDispatch();
+  const uiState = useAppSelector(state => state.ui);
   const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 
@@ -82,6 +83,18 @@ function useEditorKeybindings(
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_R],
       run: () => {
         restartEditorPreview();
+      },
+    });
+
+    e.addAction({
+      id: 'open-quick-search',
+      label: 'Open Quick Search',
+      // eslint-disable-next-line no-bitwise
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_P],
+      run: () => {
+        if (!uiState.quickSearchActionsPopup.isOpen) {
+          dispatch(openQuickSearchActionsPopup());
+        }
       },
     });
   };
