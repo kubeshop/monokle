@@ -12,9 +12,9 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): TreeNode => {
   const Title = ({item}: Props) => (
     <S.NodeContainer>
       <S.NodeTitleContainer>
-        <span>{item.name}</span>
+        <span className="file-entry-name">{item.name}</span>
         <S.MatchCount>{item.matchCount}</S.MatchCount>
-        <S.Path>{item.filePath}</S.Path>
+        <S.Path className="file-entry-path">{item.filePath}</S.Path>
       </S.NodeTitleContainer>
     </S.NodeContainer>
   );

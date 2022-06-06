@@ -56,7 +56,8 @@ export const FileTreeContainer = styled.div`
   & .file-entry-name {
     color: ${Colors.blue10};
   }
-  & .ant-tree-treenode-selected .file-entry-name {
+  & .ant-tree-treenode-selected .file-entry-name,
+  & .ant-tree-treenode-selected .file-entry-path {
     color: ${Colors.blackPure} !important;
   }
   & .ant-tree-treenode-selected .ant-tree-switcher {

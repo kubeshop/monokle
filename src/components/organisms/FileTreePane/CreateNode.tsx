@@ -54,7 +54,6 @@ export const createNode = (
     highlight: false,
     isExcluded: fileEntry.isExcluded,
     isSupported: fileEntry.isSupported,
-    // text: fileEntry?.text,
   };
 
   if (fileEntry.children) {
