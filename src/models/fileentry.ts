@@ -19,7 +19,10 @@ interface FileEntry {
   helmChartId?: string;
   /** file content */
   text?: string;
+  /** quantity of found matches for query */
   matchCount?: number;
+  /** lines containing matches */
+  matchLines?: string[];
 }
 
 export type {FileEntry};

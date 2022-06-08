@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+export const NodeContainer = styled.div`
+  position: relative;
+`;
+
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -96,24 +100,11 @@ export const FileTreeContainer = styled.div`
   & .ant-tree-switcher {
     background: transparent;
   }
-
-  & .excluded-file-entry-name {
-    color: ${Colors.grey800};
-    font-style: italic;
-  }
-
-  & .not-supported-file-entry-name {
-    color: ${Colors.grey800};
-  }
 `;
 
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
-`;
-
-export const NodeContainer = styled.div`
-  position: relative;
 `;
 
 export const NodeTitleContainer = styled.div`
@@ -134,6 +125,10 @@ export const MatchText = styled.div`
   padding: 0 15px;
 `;
 
+export const EntryName = styled.span`
+  margin-left: 5px;
+`;
+
 export const MatchCount = styled.span`
   margin-left: 5px;
   font-size: 14px;
@@ -145,6 +140,19 @@ export const Path = styled.span`
   color: ${Colors.grey7};
 `;
 
+export const MatchLine = styled.div`
+  margin-left: 17px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+
+  em {
+    background: ${Colors.yellow11};
+    color: ${Colors.green10};
+    font-style: normal;
+  }
+`;
+
 export const TreeContainer = styled.div`
   margin-left: 2px;
 `;
@@ -152,17 +160,17 @@ export const TreeContainer = styled.div`
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   margin-top: 10px;
   .ant-tree-switcher {
-    display: none;
+    /* display: none; */
   }
 
   .ant-tree-node-content-wrapper {
     .ant-tree-iconEle {
-      display: none;
+      /* display: none; */
     }
   }
 
   .ant-tree-treenode-switcher-open.ant-tree-treenode-leaf-last {
-    display: none;
+    /* display: none; */
   }
 
   opacity: ${props => (props.disabled ? '70%' : '100%')};

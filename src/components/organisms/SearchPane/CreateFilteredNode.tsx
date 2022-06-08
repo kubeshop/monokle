@@ -1,3 +1,7 @@
+import {RightOutlined} from '@ant-design/icons';
+
+import parse from 'html-react-parser';
+
 import {FileEntry} from '@models/fileentry';
 
 import {TreeNode} from '../FileTreePane/types';
@@ -12,12 +16,15 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): TreeNode => {
   const Title = ({item}: Props) => (
     <S.NodeContainer>
       <S.NodeTitleContainer>
-        <span className="file-entry-name">{item.name}</span>
+        <RightOutlined />
+        <S.EntryName className="file-entry-name">{item.name}</S.EntryName>
         <S.MatchCount>{item.matchCount}</S.MatchCount>
         <S.Path className="file-entry-path">{item.filePath}</S.Path>
       </S.NodeTitleContainer>
     </S.NodeContainer>
   );
+
+  const MatchLine = ({line}: {line: string}) => <S.MatchLine>{parse(line)}</S.MatchLine>;
 
   return {
     key: 'filter',
@@ -26,12 +33,20 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): TreeNode => {
     isLeaf: false,
     title: <></>,
     highlight: false,
-    isFolder: false,
+    isFolder: true,
     children: filteredFileMap.map((item: FileEntry) => ({
       ...item,
-      children: [],
+      children:
+        (item.matchLines?.map(line => ({
+          title: <MatchLine line={line} />,
+          highlight: false,
+          isLeaf: true,
+          isFolder: false,
+          isSupported: true,
+          isExcluded: false,
+        })) as TreeNode[]) || [],
       highlight: false,
-      isLeaf: true,
+      isLeaf: false,
       isFolder: false,
       isSupported: item.isSupported,
       isExcluded: item.isExcluded,

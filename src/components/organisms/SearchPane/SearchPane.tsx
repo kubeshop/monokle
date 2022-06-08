@@ -23,7 +23,7 @@ import {TitleBar} from '@molecules';
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview, useProcessing} from '@hooks/fileTreeHooks';
 
 import electronStore from '@utils/electronStore';
-import {MatchParamProps, getRegexp} from '@utils/getRegexp';
+import {MatchParamProps, getMatchLines, getRegexp} from '@utils/getRegexp';
 
 import {createNode} from '../FileTreePane/CreateNode';
 import TreeItem from '../FileTreePane/TreeItem';
@@ -70,7 +70,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const {onCreateResource} = useCreate();
 
   const treeRef = useRef<any>();
-  const expandedFolders = ['filter'];
+  // const expandedFolders = ['filter'];
+  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
 
   const rootFolderName = useMemo(() => {
@@ -180,10 +181,12 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
   const filterFileMap = (node: FileEntry, queryRegExp: RegExp) => {
     if (node.text && node.isSupported && !node.isExcluded) {
+      let matchLines;
       const matches = node.text.match(queryRegExp);
       const matchCount = matches?.length;
+      if (matchCount) {
+        matchLines = getMatchLines(node.text, matches);
 
-      if (matches && matchCount) {
         searchCounter.current = {
           filesCount: searchCounter.current.filesCount + 1,
           totalMatchCount: searchCounter.current.totalMatchCount + matchCount,
@@ -195,6 +198,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
             ...node,
             matches,
             matchCount,
+            matchLines,
           }
         : (null as unknown as FileEntry);
     }
@@ -253,6 +257,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   const isReady = searchTree && !isFindingMatches;
+  console.log('searchTree', searchTree);
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">

@@ -121,6 +121,7 @@
     "flat": "5.0.2",
     "git-url-parse": "12.0.0",
     "framer-motion": "6.3.11",
+    "html-react-parser": "1.4.14",
     "jsonpath-plus": "6.0.1",
     "lodash": "4.17.21",
     "loglevel": "1.8.0",
