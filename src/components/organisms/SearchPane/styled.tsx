@@ -125,9 +125,7 @@ export const MatchText = styled.div`
   padding: 0 15px;
 `;
 
-export const EntryName = styled.span`
-  margin-left: 5px;
-`;
+export const EntryName = styled.span``;
 
 export const MatchCount = styled.span`
   margin-left: 5px;
@@ -141,7 +139,6 @@ export const Path = styled.span`
 `;
 
 export const MatchLine = styled.div`
-  margin-left: 17px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -159,18 +156,9 @@ export const TreeContainer = styled.div`
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   margin-top: 10px;
-  .ant-tree-switcher {
-    /* display: none; */
-  }
-
-  .ant-tree-node-content-wrapper {
-    .ant-tree-iconEle {
-      /* display: none; */
-    }
-  }
 
   .ant-tree-treenode-switcher-open.ant-tree-treenode-leaf-last {
-    /* display: none; */
+    display: none;
   }
 
   opacity: ${props => (props.disabled ? '70%' : '100%')};

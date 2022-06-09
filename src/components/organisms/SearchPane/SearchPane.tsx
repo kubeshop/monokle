@@ -5,6 +5,8 @@ import {useSelector} from 'react-redux';
 
 import {Input} from 'antd';
 
+import {DownOutlined} from '@ant-design/icons';
+
 import log from 'loglevel';
 import path from 'path';
 
@@ -14,7 +16,7 @@ import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
-import {openRenameEntityModal, setExpandedFolders, openCreateFileFolderModal} from '@redux/reducers/ui';
+import {openRenameEntityModal, setExpandedSearchedFiles, openCreateFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -27,7 +29,7 @@ import {MatchParamProps, getMatchLines, getRegexp} from '@utils/getRegexp';
 
 import {createNode} from '../FileTreePane/CreateNode';
 import TreeItem from '../FileTreePane/TreeItem';
-import {TreeNode} from '../FileTreePane/types';
+import {FilterTreeNode} from '../FileTreePane/types';
 import {createFilteredNode} from './CreateFilteredNode';
 import RecentSearch from './RecentSearch';
 
@@ -38,9 +40,9 @@ type Props = {
 };
 
 const SearchPane: React.FC<Props> = ({height}) => {
-  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [tree, setTree] = useState<FilterTreeNode | null>(null);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
-  const [searchTree, setSearchTree] = useState<TreeNode | null>(null);
+  const [searchTree, setSearchTree] = useState<FilterTreeNode | null>(null);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
@@ -63,16 +65,16 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
-  const onFileSelect = useFileSelect();
+  const onLineSelect = useFileSelect();
   const onPreview = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
   const {onCreateResource} = useCreate();
 
   const treeRef = useRef<any>();
-  // const expandedFolders = ['filter'];
-  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
-  const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
+  const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);
+
+  const highlightFilePath = useHighlightNode(tree, treeRef, expandedFiles);
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -153,8 +155,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
   }, [isSelectingFile, dispatch]);
 
-  const onExpand = (newExpandedFolders: Key[]) => {
-    dispatch(setExpandedFolders(newExpandedFolders));
+  const onExpand = (newExpandedFiles: Key[]) => {
+    dispatch(setExpandedSearchedFiles(newExpandedFiles));
   };
 
   const onSelectRootFolderFromMainThread = useCallback(
@@ -179,7 +181,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  const filterFileMap = (node: FileEntry, queryRegExp: RegExp) => {
+  const filterFilesByQuery = (node: FileEntry, queryRegExp: RegExp) => {
     if (node.text && node.isSupported && !node.isExcluded) {
       let matchLines;
       const matches = node.text.match(queryRegExp);
@@ -213,11 +215,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
   };
 
-  useEffect(() => {
-    findMatches(searchQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryMatchParam, fileMap]);
-
   const findMatches = (query: string) => {
     searchCounter.current = {filesCount: 0, totalMatchCount: 0};
     if (!tree) return;
@@ -231,7 +228,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
     const queryRegExp = getRegexp(query, queryMatchParam);
 
     const filteredFileMap: FileEntry[] = Object.values(fileMap)
-      .map(file => filterFileMap(file, queryRegExp))
+      .map(file => filterFilesByQuery(file, queryRegExp))
       .filter(v => Boolean(v));
 
     const treeData = createFilteredNode(filteredFileMap);
@@ -240,6 +237,11 @@ const SearchPane: React.FC<Props> = ({height}) => {
     saveQueryHistory(query);
     setFindingMatches(false);
   };
+
+  useEffect(() => {
+    findMatches(searchQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryMatchParam, fileMap]);
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
     setFindingMatches(true);
@@ -257,7 +259,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   const isReady = searchTree && !isFindingMatches;
-  console.log('searchTree', searchTree);
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
@@ -298,10 +299,10 @@ const SearchPane: React.FC<Props> = ({height}) => {
         {isReady && (
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
-            onSelect={onFileSelect}
+            onSelect={onLineSelect}
             treeData={[searchTree]}
             ref={treeRef}
-            expandedKeys={expandedFolders}
+            expandedKeys={expandedFiles}
             onExpand={onExpand}
             titleRender={event => (
               <TreeItem
@@ -328,8 +329,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
               return node.highlight;
             }}
             disabled={isInPreviewMode || previewLoader.isLoading}
-            showIcon
-            showLine={{showLeafIcon: false}}
+            switcherIcon={<DownOutlined />}
+            icon={<></>}
           />
         )}
       </S.TreeContainer>

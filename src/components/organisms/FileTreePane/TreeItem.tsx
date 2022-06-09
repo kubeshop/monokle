@@ -46,7 +46,7 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
+  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey} = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -279,7 +279,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
+        <Tooltip
+          overlayStyle={parentKey ? {display: 'none'} : {}}
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={absolutePath}
+          placement="bottom"
+        >
           <S.TitleWrapper>
             <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (

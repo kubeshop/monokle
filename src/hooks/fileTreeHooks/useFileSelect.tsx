@@ -15,18 +15,20 @@ export const useFileSelect = () => {
   const dispatch = useAppDispatch();
 
   return function onSelect(selectedKeysValue: React.Key[], info: any) {
-    if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
+    const nodeKey = info.node.parentKey || info.node.key;
+
+    if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(nodeKey), fileInclude))) {
       return;
     }
-    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(info.node.key), scanExclude))) {
+    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(nodeKey), scanExclude))) {
       return;
     }
-    if (info.node.key) {
+    if (nodeKey) {
       if (isInPreviewMode) {
         stopPreview(dispatch);
       }
       dispatch(setSelectingFile(true));
-      dispatch(selectFile({filePath: info.node.key}));
+      dispatch(selectFile({filePath: nodeKey}));
     }
   };
 };

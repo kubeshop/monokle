@@ -207,6 +207,9 @@ export const uiSlice = createSlice({
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
     },
+    setExpandedSearchedFiles: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
+      state.leftMenu.expandedSearchedFiles = action.payload;
+    },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
     },
@@ -343,6 +346,7 @@ export const {
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
+  setExpandedSearchedFiles,
   setLayoutSize,
   setLeftMenuIsActive,
   setLeftMenuSelection,
