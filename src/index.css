@@ -239,6 +239,10 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   display: none;
 }
 
+.ant-tooltip {
+  max-width: 300px;
+}
+
 .ant-table-header {
   margin-bottom: 18px;
 }
@@ -279,7 +283,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions .edit-span-btn{
+.ant-table-body .ant-table-row:hover .table-column-actions .edit-span-btn {
   display: block;
 }
 
