@@ -46,7 +46,7 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey} = props;
+  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -192,7 +192,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }
       },
     },
-    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey
+    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey && onIncludeToProcessing && onExcludeFromProcessing
       ? [
           {
             key: 'add_to_files_exclude',
@@ -280,7 +280,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
-          overlayStyle={parentKey ? {display: 'none'} : {}}
+          overlayStyle={isMatchItem ? {display: 'none'} : {}}
           mouseEnterDelay={TOOLTIP_DELAY}
           title={absolutePath}
           placement="bottom"
@@ -316,7 +316,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
                   e.stopPropagation();
                 }}
               >
-                <Dots color={isFileSelected ? Colors.blackPure : undefined} />
+                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
               </div>
             </ContextMenu>
           </S.ActionsWrapper>

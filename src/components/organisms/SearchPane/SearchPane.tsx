@@ -1,21 +1,17 @@
-import {ipcRenderer} from 'electron';
-
-import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Input} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
-import log from 'loglevel';
-import path from 'path';
-
-import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
+<<<<<<< HEAD
 import {openRenameEntityModal, setExpandedSearchedFiles, openCreateFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -23,11 +19,18 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview, useProcessing} from '@hooks/fileTreeHooks';
+=======
+import {openRenameEntityModal, setExpandedSearchedFiles} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
+
+import {TitleBar} from '@molecules';
+
+import {useCreate, useDelete, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
+>>>>>>> refactor: cleanup searchPane, remove tree dots on hover for match lines
 
 import electronStore from '@utils/electronStore';
 import {MatchParamProps, getMatchLines, getRegexp} from '@utils/getRegexp';
 
-import {createNode} from '../FileTreePane/CreateNode';
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode} from '../FileTreePane/types';
 import {createFilteredNode} from './CreateFilteredNode';
@@ -40,9 +43,8 @@ type Props = {
 };
 
 const SearchPane: React.FC<Props> = ({height}) => {
-  const [tree, setTree] = useState<FilterTreeNode | null>(null);
-  const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchTree, setSearchTree] = useState<FilterTreeNode | null>(null);
+  const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
@@ -56,15 +58,12 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
   const onLineSelect = useFileSelect();
   const onPreview = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
@@ -74,6 +73,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const treeRef = useRef<any>();
   const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);
 
+<<<<<<< HEAD
   const highlightFilePath = useHighlightNode(tree, treeRef, expandedFiles);
 
   const rootFolderName = useMemo(() => {
@@ -96,45 +96,12 @@ const SearchPane: React.FC<Props> = ({height}) => {
   }, [fileMap, setFolder]);
 
   const {onExcludeFromProcessing, onIncludeToProcessing} = useProcessing(refreshFolder);
+=======
+  const highlightFilePath = useHighlightNode(searchTree, treeRef, expandedFiles);
+>>>>>>> refactor: cleanup searchPane, remove tree dots on hover for match lines
 
   useEffect(() => {
-    if (isFolderLoading) {
-      setTree(null);
-      return;
-    }
-
-    const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const treeData =
-      rootEntry &&
-      createNode(
-        rootEntry,
-        fileMap,
-        resourceMap,
-        Boolean(hideExcludedFilesInFileExplorer),
-        Boolean(hideUnsupportedFilesInFileExplorer),
-        fileOrFolderContainedInFilter,
-        rootFolderName
-      );
-
-    setTree(treeData);
-  }, [
-    isFolderLoading,
-    resourceMap,
-    fileMap,
-    hideExcludedFilesInFileExplorer,
-    hideUnsupportedFilesInFileExplorer,
-    fileOrFolderContainedInFilter,
-    rootFolderName,
-    dispatch,
-  ]);
-
-  /**
-   * This useEffect ensures that the right treeNodes are expanded and highlighted
-   * when a resource is selected
-   */
-
-  useEffect(() => {
-    if (selectedResourceId && tree) {
+    if (selectedResourceId && searchTree) {
       const resource = resourceMap[selectedResourceId];
 
       if (resource) {
@@ -143,7 +110,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, tree]);
+  }, [selectedResourceId, searchTree]);
 
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
@@ -158,24 +125,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const onExpand = (newExpandedFiles: Key[]) => {
     dispatch(setExpandedSearchedFiles(newExpandedFiles));
   };
-
-  const onSelectRootFolderFromMainThread = useCallback(
-    (_: any, data: string) => {
-      if (data) {
-        log.info('setting root folder from main thread', data);
-        setFolder(data);
-      }
-    },
-    [setFolder]
-  );
-
-  // called from main thread because thunks cannot be dispatched by main
-  useEffect(() => {
-    ipcRenderer.on('set-root-folder', onSelectRootFolderFromMainThread);
-    return () => {
-      ipcRenderer.removeListener('set-root-folder', onSelectRootFolderFromMainThread);
-    };
-  }, [onSelectRootFolderFromMainThread]);
 
   const onFilterByFileOrFolder = (relativePath: string | undefined) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
@@ -217,7 +166,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
   const findMatches = (query: string) => {
     searchCounter.current = {filesCount: 0, totalMatchCount: 0};
-    if (!tree) return;
+    if (!fileMap) return;
     // reset tree to its default state
     if (!query) {
       setSearchTree(null);

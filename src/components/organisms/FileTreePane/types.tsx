@@ -18,9 +18,9 @@ export interface TreeItemProps {
   onDuplicate: (absolutePath: string, entityName: string, dirName: string) => void;
   onDelete: (args: DeleteEntityCallback) => void;
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
-  onExcludeFromProcessing: (relativePath: string) => void;
-  onIncludeToProcessing: (relativePath: string) => void;
   onCreateFileFolder: (absolutePath: string, type: 'file' | 'folder') => void;
+  onExcludeFromProcessing?: (relativePath: string) => void;
+  onIncludeToProcessing?: (relativePath: string) => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
   onFilterByFileOrFolder: (relativePath: string | undefined) => void;
   onPreview: (relativePath: string) => void;
