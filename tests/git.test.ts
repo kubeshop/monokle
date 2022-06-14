@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -70,28 +71,28 @@ const testData = [
     fileExplorerCount: 54,
     kustomizeCount: 13,
     helmCount: 13,
-    navigatorCount: 54,
+    navigatorCount: 35,
   },
   {
     hash: removeSomeFiles,
     fileExplorerCount: 33,
     kustomizeCount: 6,
     helmCount: 13,
-    navigatorCount: 47,
+    navigatorCount: 28,
   },
   {
     hash: removeMoreFiles,
     fileExplorerCount: 16,
     kustomizeCount: 3,
     helmCount: 13,
-    navigatorCount: 34,
+    navigatorCount: 15,
   },
   {
     hash: startCommit,
     fileExplorerCount: 54,
     kustomizeCount: 13,
     helmCount: 13,
-    navigatorCount: 54,
+    navigatorCount: 35,
   },
 ];
 
