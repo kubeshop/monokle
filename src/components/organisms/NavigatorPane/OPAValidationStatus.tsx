@@ -1,3 +1,9 @@
+import {useMemo} from 'react';
+
+import {Tooltip} from 'antd';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@components/atoms';
@@ -5,7 +11,7 @@ import {Icon} from '@components/atoms';
 import * as S from './OPAValidationStatus.styled';
 
 const OPAValidationStatus: React.FC = () => {
-  const activeRules = useAppSelector(state => {
+  const activeRulesCount = useAppSelector(state => {
     const plugins = state.main.policies.plugins;
     let numberOfActiveRules = 0;
 
@@ -16,11 +22,21 @@ const OPAValidationStatus: React.FC = () => {
     return numberOfActiveRules;
   });
 
+  const tooltipTitle = useMemo(() => {
+    if (!activeRulesCount) {
+      return 'OPA validation is inactive. Click to activate.';
+    }
+
+    return `${activeRulesCount} OPA rules active. Click to manage.`;
+  }, [activeRulesCount]);
+
   return (
-    <S.Container $status={activeRules ? 'active' : 'inactive'}>
-      <Icon name="opa-status" />
-      {activeRules || '-'}
-    </S.Container>
+    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle}>
+      <S.Container $status={activeRulesCount ? 'active' : 'inactive'}>
+        <Icon name="opa-status" />
+        {activeRulesCount || '-'}
+      </S.Container>
+    </Tooltip>
   );
 };
 

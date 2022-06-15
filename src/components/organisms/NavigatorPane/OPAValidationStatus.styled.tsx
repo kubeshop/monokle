@@ -11,4 +11,5 @@ export const Container = styled.div<{$status: 'active' | 'inactive'}>`
   align-items: center;
   gap: 5px;
   margin-left: 10px;
+  cursor: pointer;
 `;
