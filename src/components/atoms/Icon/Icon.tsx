@@ -11,18 +11,21 @@ import {
   Helm,
   Images,
   IncomingRefs,
+  K8sSchema,
   Kubernetes,
   Kustomize,
   OPAStatus,
+  OpenPolicyAgent,
   OutgoingRefs,
+  ResourceLinks,
   SeverityHigh,
   SeverityLow,
   SeverityMedium,
   Shortcuts,
   Validation,
   Warning,
+  YAMLSyntax,
 } from './Icons';
-import OpenPolicyAgent from './Icons/OpenPolicyAgent';
 
 type IconProps = {
   name: IconNames;
@@ -50,6 +53,9 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'severity-medium': SeverityMedium,
   'severity-low': SeverityLow,
   shortcuts: Shortcuts,
+  'yaml-syntax': YAMLSyntax,
+  'resource-links': ResourceLinks,
+  'k8s-schema': K8sSchema,
 };
 
 const Icon: React.FC<IconProps> = props => {

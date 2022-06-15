@@ -14,4 +14,7 @@ export type IconNames =
   | 'severity-high'
   | 'severity-medium'
   | 'severity-low'
-  | 'shortcuts';
+  | 'shortcuts'
+  | 'yaml-syntax'
+  | 'resource-links'
+  | 'k8s-schema';

@@ -2,7 +2,12 @@ import React from 'react';
 
 import {Col, Row} from 'antd';
 
-import {OPA_INTEGRATION} from '@models/integrations';
+import {
+  K8S_SCHEMA_INTEGRATION,
+  OPA_INTEGRATION,
+  RESOURCE_LINKS_INTEGRATION,
+  YAML_SYNTAX_INTEGRATION,
+} from '@models/integrations';
 
 import ValidationFigure from '@assets/ValidationFigure.svg';
 
@@ -19,6 +24,15 @@ export const ValidationOverView: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <ValidationCard integration={OPA_INTEGRATION} />
+        </Col>
+        <Col span={12}>
+          <ValidationCard integration={YAML_SYNTAX_INTEGRATION} />
+        </Col>
+        <Col span={12}>
+          <ValidationCard integration={K8S_SCHEMA_INTEGRATION} />
+        </Col>
+        <Col span={12}>
+          <ValidationCard integration={RESOURCE_LINKS_INTEGRATION} />
         </Col>
         <Col span={12}>
           <ValidationCardUpnext />
