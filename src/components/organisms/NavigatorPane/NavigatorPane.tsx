@@ -28,6 +28,7 @@ import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSec
 import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
+import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 type Props = {
@@ -76,7 +77,7 @@ const NavPane: React.FC<Props> = ({height}) => {
         <S.TitleBar>
           <MonoPaneTitle>
             <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay />
+              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
             </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>

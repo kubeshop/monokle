@@ -11,6 +11,7 @@ import {
   IncomingRefs,
   Kubernetes,
   Kustomize,
+  OPAStatus,
   OutgoingRefs,
   SeverityHigh,
   SeverityLow,
@@ -25,6 +26,7 @@ export type IconNames =
   | 'images'
   | 'kubernetes'
   | 'collapse'
+  | 'opa-status'
   | 'helm'
   | 'kustomize'
   | 'incomingRefs'
@@ -48,6 +50,7 @@ type IconProps = {
 };
 
 const icons: Record<IconNames, React.ComponentType<any>> = {
+  'opa-status': OPAStatus,
   images: Images,
   kubernetes: Kubernetes,
   collapse: Collapse,
