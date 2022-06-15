@@ -1,11 +1,13 @@
 import * as ASAR from 'asar';
 import * as fs from 'fs';
+import os from 'os';
 import * as path from 'path';
 import {Page} from 'playwright';
-import {_electron as electron, ElectronApplication} from 'playwright-core';
-import {getRecordingPath, pause} from './utils';
+import {ElectronApplication, _electron as electron} from 'playwright-core';
+
 import {StartupFlags} from '../src/utils/startupFlag';
 import {waitForModalToHide, waitForModalToShow} from './antdHelpers';
+import {getRecordingPath, pause} from './utils';
 
 export async function clickOnMonokleLogo(appWindow: Page) {
   await appWindow.click('#monokle-logo-header', {noWaitAfter: true, force: true});
@@ -27,6 +29,7 @@ export async function startApp(): Promise<StartAppResponse> {
   const latestBuild = findLatestBuild();
   // parse the directory and find paths and other info
   const appInfo = parseElectronApp(latestBuild);
+  deleteApplicationConfig(appInfo.platform);
   const electronApp = await electron.launch({
     args: [appInfo.main, StartupFlags.AUTOMATION],
     executablePath: appInfo.executable,
@@ -34,7 +37,7 @@ export async function startApp(): Promise<StartAppResponse> {
       dir: getRecordingPath(appInfo.platform),
       size: {
         width: 1200,
-        height: 800
+        height: 800,
       },
     },
   });
@@ -54,7 +57,7 @@ export async function startApp(): Promise<StartAppResponse> {
   appWindow.on('console', console.log);
 
   await appWindow.screenshot({
-    path: getRecordingPath(appInfo.platform, 'before-modals.png')
+    path: getRecordingPath(appInfo.platform, 'before-modals.png'),
   });
 
   for (const modalName of modalsToWait) {
@@ -64,13 +67,13 @@ export async function startApp(): Promise<StartAppResponse> {
       await waitForModalToHide(appWindow, modalName);
     }
     await appWindow.screenshot({
-      path: getRecordingPath(appInfo.platform, `modal-gone-${modalName}.png`)
+      path: getRecordingPath(appInfo.platform, `modal-gone-${modalName}.png`),
     });
   }
 
   // Capture a screenshot.
   await appWindow.screenshot({
-    path: getRecordingPath(appInfo.platform, 'initial-screen.png')
+    path: getRecordingPath(appInfo.platform, 'initial-screen.png'),
   });
 
   return {appWindow, appInfo, electronApp};
@@ -276,3 +279,24 @@ export function parseElectronApp(buildDir: string): ElectronAppInfo {
     arch,
   };
 }
+
+const MAC_CONFIG_PATH = ['Library', 'Application Support', 'monokle'];
+const WIN_CONFIG_PATH = ['AppData', 'Roaming', 'monokle'];
+
+export const deleteApplicationConfig = (platform: string) => {
+  try {
+    let tempPath;
+
+    if (platform === 'darwin') {
+      tempPath = MAC_CONFIG_PATH.join(path.sep);
+    }
+    if (platform === 'win32') {
+      tempPath = WIN_CONFIG_PATH.join(path.sep);
+    }
+
+    fs.unlinkSync(path.join(os.homedir(), tempPath, 'config.json'));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error.message);
+  }
+};
