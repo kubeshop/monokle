@@ -72,7 +72,7 @@ export async function findModal(page: Page, title: string) {
 export async function waitForModalToShow(page: Page, title: string, timeout?: number) {
   console.log(`waiting for modal ${title}`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and descendant::span[contains(@id, '${title}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and //div[@class='ant-modal-title']//text()='${title}']`
   );
   try {
     const elm = await modal.elementHandle({timeout});
@@ -82,10 +82,19 @@ export async function waitForModalToShow(page: Page, title: string, timeout?: nu
   }
 }
 
+export async function closeModal(modal: Locator) {
+  const closeIcon = modal.locator(`//span[contains(@class,'ant-modal-close-icon')]`);
+  if (closeIcon) {
+    closeIcon.click();
+    return true;
+  }
+  return false;
+}
+
 export async function waitForModalToHide(page: Page, id: string, timeout?: number) {
   console.log(`waiting for modal ${id} to hide`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none;') and descendant::span[contains(@id, '${id}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none') and //div[@class='ant-modal-title']//text()='${id}']`
   );
   try {
     const elm = await modal.elementHandle({timeout});
@@ -149,5 +158,16 @@ export async function closeWalktrough(page: Page, timeout: number) {
     walkthrough.click();
   } catch (e: any) {
     console.log(`walkthrough did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeTelemetry(page: Page, timeout: number) {
+  console.log(`closing telemetry`);
+  const telemetry = page.locator(`#accept-telemetry >> visible=true`);
+  try {
+    await telemetry.elementHandle({timeout});
+    telemetry.click();
+  } catch (e: any) {
+    console.log(`telemetry did not hide within ${timeout}ms`, e.name);
   }
 }

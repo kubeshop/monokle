@@ -9,7 +9,7 @@ import {Page} from 'playwright';
 import {ElectronApplication, _electron as electron} from 'playwright-core';
 
 import {StartupFlags} from '../src/utils/startupFlag';
-import {waitForModalToHide, waitForModalToShow} from './antdHelpers';
+import {closeModal, closeTelemetry, waitForModalToHide, waitForModalToShow} from './antdHelpers';
 import {getRecordingPath, pause} from './utils';
 
 export async function clickOnMonokleLogo(appWindow: Page) {
@@ -22,7 +22,7 @@ interface StartAppResponse {
   appInfo: ElectronAppInfo;
 }
 
-const modalsToWait: string[] = ['NewRelease'];
+const modalsToWait: string[] = ['New Release'];
 
 /**
  * Find the latest build and start monokle app for testing
@@ -63,11 +63,16 @@ export async function startApp(): Promise<StartAppResponse> {
     path: getRecordingPath(appInfo.platform, 'before-modals.png'),
   });
 
+  await closeTelemetry(appWindow, 20000);
+
   for (const modalName of modalsToWait) {
-    if (await waitForModalToShow(appWindow, modalName, 20000)) {
-      await clickOnMonokleLogo(appWindow);
+    const modal = await waitForModalToShow(appWindow, modalName, 20000);
+    if (modal) {
+      await closeModal(modal);
       await pause(500);
-      await waitForModalToHide(appWindow, modalName);
+      await waitForModalToHide(appWindow, modalName, 20000);
+      await pause(500);
+      await clickOnMonokleLogo(appWindow);
     }
     await appWindow.screenshot({
       path: getRecordingPath(appInfo.platform, `modal-gone-${modalName}.png`),
