@@ -4,13 +4,17 @@ import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {useAppSelector} from '@redux/hooks';
+import {OPA_INTEGRATION} from '@models/integrations';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {toggleValidationDrawer, updateValidationIntegration} from '@redux/reducers/ui';
 
 import {Icon} from '@components/atoms';
 
 import * as S from './OPAValidationStatus.styled';
 
 const OPAValidationStatus: React.FC = () => {
+  const dispatch = useAppDispatch();
   const activeRulesCount = useAppSelector(state => {
     const plugins = state.main.policies.plugins;
     let numberOfActiveRules = 0;
@@ -30,9 +34,14 @@ const OPAValidationStatus: React.FC = () => {
     return `${activeRulesCount} OPA rules active. Click to manage.`;
   }, [activeRulesCount]);
 
+  const onClickHandler = () => {
+    dispatch(updateValidationIntegration(OPA_INTEGRATION));
+    dispatch(toggleValidationDrawer());
+  };
+
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle}>
-      <S.Container $status={activeRulesCount ? 'active' : 'inactive'}>
+      <S.Container onClick={onClickHandler} $status={activeRulesCount ? 'active' : 'inactive'}>
         <Icon name="opa-status" />
         {activeRulesCount || '-'}
       </S.Container>
