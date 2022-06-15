@@ -1,7 +1,8 @@
 import {Locator, Page} from 'playwright';
 
-export class NewResourceModal {
+import {closeWalktrough} from '../antdHelpers';
 
+export class NewResourceModal {
   private _page: Page;
 
   private readonly _resourceName: Locator;
@@ -23,6 +24,7 @@ export class NewResourceModal {
     await this._page.keyboard.press('Enter');
 
     await this._okButton.click();
-  }
 
+    await closeWalktrough(this._page, 5000);
+  }
 }

@@ -1,19 +1,20 @@
+import {readdirSync} from 'fs';
 import {Page} from 'playwright';
-import {expect, test} from '@playwright/test';
 import {ElectronApplication} from 'playwright-core';
 import {v4 as uuidV4} from 'uuid';
-import {readdirSync} from 'fs';
+
+import {expect, test} from '@playwright/test';
 
 import {ElectronAppInfo, startApp} from './electronHelpers';
-import {getRecordingPath, pause} from './utils';
-import {StartProjectPane} from './models/startProjectPane';
+import {EditorPane} from './models/editorPane';
+import {FileExplorerPane} from './models/fileExplorerPane';
 import {MainWindow} from './models/mainWindow';
-import {ProjectsDropdown} from './models/projectsDropdown';
 import {NavigatorPane} from './models/navigatorPane';
 import {NewResourceModal} from './models/newResourceModal';
-import {EditorPane} from './models/editorPane';
+import {ProjectsDropdown} from './models/projectsDropdown';
 import {SaveResourceModal} from './models/saveResourceModal';
-import {FileExplorerPane} from './models/fileExplorerPane';
+import {StartProjectPane} from './models/startProjectPane';
+import {getRecordingPath, pause} from './utils';
 
 let appWindow: Page;
 let electronApp: ElectronApplication;
@@ -50,7 +51,7 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await pause(1000);
+  await pause(3000);
 });
 
 test('should create empty project from welcome screen', async () => {
@@ -108,10 +109,10 @@ test('should autocomplete path & create .monokle file', async () => {
   projectContents.includes('.monokle');
 
   await projectsDropdown.click();
-  const pathColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectPath}"]`);
+  const pathColumn = appWindow.locator(`.ant-dropdown .ant-table-tbody td[title="${projectPath}"]`);
   expect(await pathColumn.textContent()).toEqual(projectPath);
 
-  const nameColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectName}"]`);
+  const nameColumn = appWindow.locator(`.ant-dropdown .ant-table-tbody td[title="${projectName}"]`);
   expect(await nameColumn.textContent()).toEqual(projectName);
 });
 
@@ -120,16 +121,14 @@ test('should delete project', async () => {
   await pause(2000);
 
   await projectsDropdown.click();
-  const nameColumn = appWindow.locator(`.ant-dropdown-menu [title="${projectName}"]`);
+  const nameColumn = appWindow.locator(`.ant-dropdown .ant-table-tbody td[title="${projectName}"]`);
   await nameColumn.hover();
   await appWindow.locator('.ant-table-cell-row-hover span.anticon-delete').click();
   await appWindow.locator('.ant-modal-confirm-confirm button.ant-btn-primary').click();
   await pause(2000);
 
   expect(await appWindow.locator('#recent-project-title').isVisible()).toEqual(true);
-  expect(
-    (await appWindow.locator('#recent-projects-container').textContent())?.includes(projectName)
-  ).toEqual(false);
+  expect((await appWindow.locator('#recent-projects-container').textContent())?.includes(projectName)).toEqual(false);
 });
 
 test.afterAll(async () => {

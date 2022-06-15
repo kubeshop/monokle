@@ -1,11 +1,12 @@
 import {Locator, Page} from 'playwright';
-import {v4 as uuidV4} from 'uuid';
 import {ElectronApplication} from 'playwright-core';
+import {v4 as uuidV4} from 'uuid';
+
 import {getChannelName} from '../../src/utils/ipc';
+import {closeWalktrough} from '../antdHelpers';
 import {mockHandle} from './util';
 
 export class StartProjectPane {
-
   private _page: Page;
 
   private readonly _selectExisingFolderLink: Locator;
@@ -36,6 +37,8 @@ export class StartProjectPane {
 
     await this._emptyProjectSave.click();
 
+    await closeWalktrough(this._page, 5000);
+
     return name;
   }
 
@@ -45,9 +48,13 @@ export class StartProjectPane {
 
     await this._selectExisingFolderLink.click();
 
-    await electronApp.evaluate(({ ipcMain }, params) => {
-      ipcMain.removeAllListeners(params.chanel);
-    }, { chanel });
+    await electronApp.evaluate(
+      ({ipcMain}, params) => {
+        ipcMain.removeAllListeners(params.chanel);
+      },
+      {chanel}
+    );
+    await closeWalktrough(this._page, 5000);
   }
 
   get createEmptyProjectLink(): Locator {

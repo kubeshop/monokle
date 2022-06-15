@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+
+/* eslint-disable no-restricted-syntax */
 import * as ASAR from 'asar';
 import * as fs from 'fs';
 import os from 'os';
@@ -284,17 +287,19 @@ const MAC_CONFIG_PATH = ['Library', 'Application Support', 'monokle'];
 const WIN_CONFIG_PATH = ['AppData', 'Roaming', 'monokle'];
 
 export const deleteApplicationConfig = (platform: string) => {
+  let tempPath;
+
+  if (platform === 'darwin') {
+    tempPath = MAC_CONFIG_PATH.join(path.sep);
+  }
+  if (platform === 'win32') {
+    tempPath = WIN_CONFIG_PATH.join(path.sep);
+  }
+
   try {
-    let tempPath;
-
-    if (platform === 'darwin') {
-      tempPath = MAC_CONFIG_PATH.join(path.sep);
+    if (tempPath) {
+      fs.unlinkSync(path.join(os.homedir(), tempPath, 'config.json'));
     }
-    if (platform === 'win32') {
-      tempPath = WIN_CONFIG_PATH.join(path.sep);
-    }
-
-    fs.unlinkSync(path.join(os.homedir(), tempPath, 'config.json'));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);

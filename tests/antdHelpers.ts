@@ -113,3 +113,41 @@ export async function isInvisible(leftsection: Locator) {
   const style = await leftsection.getAttribute('style');
   return style && style.includes('display: none;');
 }
+
+export async function findDropdown(page: Page) {
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown')]`);
+  return dropdown;
+}
+
+export async function waitForDropdownToShow(page: Page, timeout: number) {
+  console.log(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and not(contains(@style,'display: none'))]`);
+  try {
+    const elm = await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    console.log(`dropdown  did not show within ${timeout}ms`, e.name);
+  }
+}
+
+export async function waitForDropdownToHide(page: Page, timeout: number) {
+  console.log(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and contains(@style,'display: none')]`);
+  try {
+    const elm = await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    console.log(`dropdown did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeWalktrough(page: Page, timeout: number) {
+  console.log(`closing walkthrough`);
+  const walkthrough = page.locator(`#close-walkthrough >> visible=true`);
+  try {
+    await walkthrough.elementHandle({timeout});
+    walkthrough.click();
+  } catch (e: any) {
+    console.log(`walkthrough did not hide within ${timeout}ms`, e.name);
+  }
+}
