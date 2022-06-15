@@ -1,4 +1,4 @@
-import {IconNames} from '@components/atoms/Icon';
+import {IconNames} from './icons';
 
 export type ValidationIntegrationId = 'open-policy-agent';
 

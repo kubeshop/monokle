@@ -2,7 +2,9 @@ import React from 'react';
 
 import {Button, Popover} from 'antd';
 
-import Icon, {IconNames} from '@components/atoms/Icon';
+import {IconNames} from '@models/icons';
+
+import {Icon} from '@components/atoms';
 
 interface IconWithPopoverProps {
   popoverContent: React.ReactNode | (() => React.ReactNode);

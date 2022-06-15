@@ -2,6 +2,8 @@ import React, {useMemo} from 'react';
 
 import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {IconNames} from '@models/icons';
+
 import Colors from '@styles/Colors';
 
 import {
@@ -21,24 +23,6 @@ import {
   Warning,
 } from './Icons';
 import OpenPolicyAgent from './Icons/OpenPolicyAgent';
-
-export type IconNames =
-  | 'images'
-  | 'kubernetes'
-  | 'collapse'
-  | 'opa-status'
-  | 'helm'
-  | 'kustomize'
-  | 'incomingRefs'
-  | 'outgoingRefs'
-  | 'warning'
-  | 'error'
-  | 'validation'
-  | 'open-policy-agent'
-  | 'severity-high'
-  | 'severity-medium'
-  | 'severity-low'
-  | 'shortcuts';
 
 type IconProps = {
   name: IconNames;

@@ -1,0 +1,17 @@
+export type IconNames =
+  | 'images'
+  | 'kubernetes'
+  | 'collapse'
+  | 'opa-status'
+  | 'helm'
+  | 'kustomize'
+  | 'incomingRefs'
+  | 'outgoingRefs'
+  | 'warning'
+  | 'error'
+  | 'validation'
+  | 'open-policy-agent'
+  | 'severity-high'
+  | 'severity-medium'
+  | 'severity-low'
+  | 'shortcuts';

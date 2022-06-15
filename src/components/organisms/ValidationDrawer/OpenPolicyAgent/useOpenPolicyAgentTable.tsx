@@ -1,6 +1,6 @@
 import {shell} from 'electron';
 
-import React, {useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {Switch, Tooltip} from 'antd';
@@ -8,9 +8,11 @@ import {ColumnsType} from 'antd/lib/table';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {IconNames} from '@models/icons';
+
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
-import Icon, {IconNames} from '@components/atoms/Icon';
+import {Icon} from '@components/atoms';
 
 import Colors from '@styles/Colors';
 

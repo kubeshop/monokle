@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleValidationDrawer} from '@redux/reducers/ui';
@@ -7,7 +7,6 @@ import {ValidationOpenPolicyAgent} from './OpenPolicyAgent/ValidationOpenPolicyA
 import {ValidationOverView} from './Overview/ValidationOverview';
 import * as S from './ValidationDrawer.styled';
 import {DrawerHeading} from './ValidationDrawerHeading';
-import {ValidationIntegrationId} from './integrations';
 
 type Props = {
   height: number;
@@ -15,8 +14,8 @@ type Props = {
 
 const ValidationPane: React.FC<Props> = ({height}) => {
   const dispatch = useAppDispatch();
-  const isVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
-  const [integration, setIntegration] = useState<ValidationIntegrationId | undefined>(undefined);
+  const integration = useAppSelector(state => state.ui.validationDrawer.integration);
+  const isVisible = useAppSelector(state => state.ui.validationDrawer.isVisible);
 
   return (
     <S.Drawer
@@ -30,11 +29,7 @@ const ValidationPane: React.FC<Props> = ({height}) => {
       getContainer={false}
       height={height}
     >
-      {integration === 'open-policy-agent' ? (
-        <ValidationOpenPolicyAgent onBack={() => setIntegration(undefined)} />
-      ) : (
-        <ValidationOverView onDiscover={setIntegration} />
-      )}
+      {integration?.id === 'open-policy-agent' ? <ValidationOpenPolicyAgent /> : <ValidationOverView />}
     </S.Drawer>
   );
 };
