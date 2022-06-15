@@ -473,7 +473,7 @@ export function reloadFile(
   }
 
   if (wasFileSelected) {
-    selectFilePath(fileEntry.filePath, state);
+    selectFilePath({filePath: fileEntry.filePath, state});
     state.shouldEditorReloadSelectedPath = true;
   }
 }
@@ -786,7 +786,15 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
  * Selects the specified filePath - used by several reducers
  */
 
-export function selectFilePath(filePath: string, state: AppState) {
+export function selectFilePath({
+  filePath,
+  lineNumber = 0,
+  state,
+}: {
+  filePath: string;
+  lineNumber?: number;
+  state: AppState;
+}) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
 
@@ -809,4 +817,5 @@ export function selectFilePath(filePath: string, state: AppState) {
   state.selectedPreviewConfigurationId = undefined;
   state.selectedImage = undefined;
   state.selectedPath = filePath;
+  state.lineNumber = lineNumber;
 }

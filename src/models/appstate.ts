@@ -139,6 +139,8 @@ interface AppState {
   checkedResourceIds: string[];
   /** the currently selected path */
   selectedPath?: string;
+  /** the line number for the match in file */
+  lineNumber?: number;
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */

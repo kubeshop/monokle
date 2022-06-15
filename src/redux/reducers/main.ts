@@ -430,16 +430,20 @@ export const mainSlice = createSlice({
       });
 
       state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
-      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      selectFilePath({filePath: state.helmValuesMap[valuesFileId].filePath, state});
       updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
      * Marks the specified file as selected and highlights all related resources
      */
-    selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
+    selectFile: (
+      state: Draft<AppState>,
+      action: PayloadAction<{filePath: string; isVirtualSelection?: boolean; lineNumber?: number}>
+    ) => {
       const filePath = action.payload.filePath;
+      const lineNumber = action.payload.lineNumber;
       if (filePath.length > 0) {
-        selectFilePath(filePath, state);
+        selectFilePath({filePath, lineNumber, state});
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
@@ -783,7 +787,7 @@ export const mainSlice = createSlice({
         state.selectedImage = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-          selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
+          selectFilePath({filePath: state.helmValuesMap[action.payload.previewResourceId].filePath, state});
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
         state.previousSelectionHistory = [];

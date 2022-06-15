@@ -1,6 +1,6 @@
 import parse from 'html-react-parser';
 
-import {FileEntry} from '@models/fileentry';
+import {FileEntry, MatchNode} from '@models/fileentry';
 
 import {FilterTreeNode} from '../FileTreePane/types';
 
@@ -8,6 +8,10 @@ import * as S from './styled';
 
 type Props = {
   item: FileEntry;
+};
+
+type MatchLineProps = {
+  lineMatches: MatchNode[];
 };
 
 export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode => {
@@ -21,7 +25,10 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
     </S.NodeContainer>
   );
 
-  const StyledMatchLine = ({line}: {line: string}) => <S.MatchLine>{parse(line)}</S.MatchLine>;
+  const StyledMatchLine = ({lineMatches}: MatchLineProps) => {
+    const wholeLine = lineMatches.reduce((acc: string, lm: MatchNode) => acc + lm.textWithHighlights, '');
+    return <S.MatchLine>{parse(wholeLine)}</S.MatchLine>;
+  };
 
   return {
     key: 'filter',
@@ -41,12 +48,13 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
       key: item.filePath,
       title: <Title item={item} />,
       children:
-        item.matchLines?.map((line, idx) => ({
+        item.matchLines?.map((lineMatches, idx) => ({
           key: `ml_${item.filePath}_${idx}`,
           parentKey: item.filePath,
-          title: <StyledMatchLine line={line} />,
+          title: <StyledMatchLine lineMatches={lineMatches} />,
           isFolder: false,
           isLeaf: true,
+          lineNumber: lineMatches[0].lineNumber,
         })) || [],
     })),
   };

@@ -2,6 +2,13 @@
  * A file or folder in the file system.
  */
 
+export interface MatchNode {
+  textWithHighlights: string;
+  lineNumber: number;
+  indexStart: number;
+  indexEnd: number;
+}
+
 interface FileEntry {
   /** the name of the file */
   name: string;
@@ -22,7 +29,7 @@ interface FileEntry {
   /** quantity of found matches for query */
   matchCount?: number;
   /** lines containing matches */
-  matchLines?: string[];
+  matchLines?: MatchNode[][];
 }
 
 export type {FileEntry};

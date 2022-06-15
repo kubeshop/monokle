@@ -29,7 +29,7 @@ import {useCreate, useDelete, useFileSelect, useHighlightNode, usePreview} from 
 >>>>>>> refactor: cleanup searchPane, remove tree dots on hover for match lines
 
 import electronStore from '@utils/electronStore';
-import {MatchParamProps, getMatchLines, getRegexp} from '@utils/getRegexp';
+import {MatchParamProps, filterFilesByQuery, getRegexp} from '@utils/getRegexp';
 
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode} from '../FileTreePane/types';
@@ -130,33 +130,6 @@ const SearchPane: React.FC<Props> = ({height}) => {
     dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
-  const filterFilesByQuery = (node: FileEntry, queryRegExp: RegExp) => {
-    if (node.text && node.isSupported && !node.isExcluded) {
-      let matchLines;
-      const matches = node.text.match(queryRegExp);
-      const matchCount = matches?.length;
-      if (matchCount) {
-        matchLines = getMatchLines(node.text, matches);
-
-        searchCounter.current = {
-          filesCount: searchCounter.current.filesCount + 1,
-          totalMatchCount: searchCounter.current.totalMatchCount + matchCount,
-        };
-      }
-
-      return matches
-        ? {
-            ...node,
-            matches,
-            matchCount,
-            matchLines,
-          }
-        : (null as unknown as FileEntry);
-    }
-
-    return null as unknown as FileEntry;
-  };
-
   const saveQueryHistory = (query: string) => {
     const recentSearch = electronStore.get('appConfig.recentSearch') || [];
     if (!recentSearch.includes(query)) {
@@ -177,8 +150,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
     const queryRegExp = getRegexp(query, queryMatchParam);
 
     const filteredFileMap: FileEntry[] = Object.values(fileMap)
-      .map(file => filterFilesByQuery(file, queryRegExp))
-      .filter(v => Boolean(v));
+      .map(file => filterFilesByQuery(file, queryRegExp, searchCounter))
+      .filter(v => Boolean(v)); // filter not supported files
 
     const treeData = createFilteredNode(filteredFileMap);
 

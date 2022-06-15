@@ -1,3 +1,5 @@
+import {FileEntry} from '@models/fileentry';
+
 export type MatchParamProps = {
   matchCase: boolean;
   matchWholeWord: boolean;
@@ -25,29 +27,75 @@ export function getRegexp(query: string, params: MatchParamProps): RegExp {
   return queryRegExp;
 }
 
-function decorateMatch(text: string, word: string): string {
-  const wordIdx = text.indexOf(word);
-  const textWithHighlights = `${text.slice(0, wordIdx)}<em>${text.slice(
-    wordIdx,
-    wordIdx + word.length
-  )}</em>${text.slice(wordIdx + word.length)}`;
-  return textWithHighlights;
+type Props = {
+  textWithHighlights: string;
+  indexStart: number;
+  indexEnd: number;
+};
+
+function decorateMatch(text: string, query: string, fromIndex = 0): Props {
+  const textToSearch = text.slice(fromIndex);
+
+  const queryIdx = textToSearch.slice(0).indexOf(query);
+  const textWithHighlights = `${textToSearch.slice(0, queryIdx)}<em>${textToSearch.slice(
+    queryIdx,
+    queryIdx + query.length
+  )}</em>${textToSearch.slice(queryIdx + query.length)}`;
+
+  return {textWithHighlights, indexStart: fromIndex + queryIdx, indexEnd: fromIndex + queryIdx + query.length};
 }
 
-function getTextRest(text: string, word: string) {
-  const wordIdx = text.indexOf(word);
-  return text.slice(wordIdx + word.length);
+function getMatchLines(text: string, queryRegExp: RegExp) {
+  const lineArr = text.split('\n');
+
+  const fileLineData = lineArr
+    .map((line: string, index: number) => {
+      const matchesInLine = line.match(queryRegExp);
+      if (!matchesInLine) return null;
+
+      return matchesInLine?.reduce((acc: any, currQuery) => {
+        const {textWithHighlights, indexStart, indexEnd} = decorateMatch(
+          line,
+          currQuery,
+          (acc.length && acc[acc.length - 1].indexEnd) || 0
+        );
+        return [
+          ...acc,
+          {
+            textWithHighlights,
+            lineNumber: index + 1,
+            indexStart,
+            indexEnd,
+          },
+        ];
+      }, []);
+    })
+    .filter(el => el);
+  return fileLineData;
 }
 
-export function getMatchLines(text: string, matches: RegExpMatchArray): string[] {
-  const highlightedLines = matches.map(m => {
-    const textWithHighlight = decorateMatch(text, m);
-    text = getTextRest(text, m);
-    return textWithHighlight;
-  });
+export const filterFilesByQuery = (node: FileEntry, queryRegExp: RegExp, searchCounterRef: any) => {
+  if (node.text && node.isSupported && !node.isExcluded) {
+    const matches = node.text.match(queryRegExp);
+    const matchCount = matches?.length;
+    if (matchCount) {
+      const matchLines = getMatchLines(node.text, queryRegExp);
 
-  return highlightedLines
-    .join('')
-    .split('\n')
-    .filter(el => el.includes('<em>'));
-}
+      searchCounterRef.current = {
+        filesCount: searchCounterRef.current.filesCount + 1,
+        totalMatchCount: searchCounterRef.current.totalMatchCount + matchCount,
+      };
+
+      return {
+        ...node,
+        matches,
+        matchCount,
+        matchLines,
+      };
+    }
+
+    return null as unknown as FileEntry;
+  }
+
+  return null as unknown as FileEntry;
+};

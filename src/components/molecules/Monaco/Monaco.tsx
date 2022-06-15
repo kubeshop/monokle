@@ -84,6 +84,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const lineNumber = useAppSelector(state => state.main.lineNumber);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const settings = useAppSelector(settingsSelector);
@@ -264,6 +265,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath, selectedResourceId]);
+
+  useEffect(() => {
+    if (editor && lineNumber) {
+      editor.setPosition({lineNumber, column: 1});
+      editor.revealLine(lineNumber);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lineNumber]);
 
   useEffect(() => {
     if (!selectedPath || !shouldEditorReloadSelectedPath) {
