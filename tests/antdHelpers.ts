@@ -72,7 +72,7 @@ export async function findModal(page: Page, title: string) {
 export async function waitForModalToShow(page: Page, title: string, timeout?: number) {
   console.log(`waiting for modal ${title}`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and descendant::span[contains(@id, '${title}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and //div[@class='ant-modal-title']//text()='${title}']`
   );
   try {
     const elm = await modal.elementHandle({timeout});
@@ -82,10 +82,19 @@ export async function waitForModalToShow(page: Page, title: string, timeout?: nu
   }
 }
 
+export async function closeModal(modal: Locator) {
+  const closeIcon = modal.locator(`//span[contains(@class,'ant-modal-close-icon')]`);
+  if (closeIcon) {
+    closeIcon.click();
+    return true;
+  }
+  return false;
+}
+
 export async function waitForModalToHide(page: Page, id: string, timeout?: number) {
   console.log(`waiting for modal ${id} to hide`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none;') and descendant::span[contains(@id, '${id}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none') and //div[@class='ant-modal-title']//text()='${id}']`
   );
   try {
     const elm = await modal.elementHandle({timeout});
@@ -112,4 +121,53 @@ export async function isInvisible(leftsection: Locator) {
 
   const style = await leftsection.getAttribute('style');
   return style && style.includes('display: none;');
+}
+
+export async function findDropdown(page: Page) {
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown')]`);
+  return dropdown;
+}
+
+export async function waitForDropdownToShow(page: Page, timeout: number) {
+  console.log(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and not(contains(@style,'display: none'))]`);
+  try {
+    const elm = await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    console.log(`dropdown  did not show within ${timeout}ms`, e.name);
+  }
+}
+
+export async function waitForDropdownToHide(page: Page, timeout: number) {
+  console.log(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and contains(@style,'display: none')]`);
+  try {
+    const elm = await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    console.log(`dropdown did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeWalktrough(page: Page, timeout: number) {
+  console.log(`closing walkthrough`);
+  const walkthrough = page.locator(`#close-walkthrough >> visible=true`);
+  try {
+    await walkthrough.elementHandle({timeout});
+    walkthrough.click();
+  } catch (e: any) {
+    console.log(`walkthrough did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeNotification(page: Page, timeout: number) {
+  console.log(`closing notification`);
+  const notification = page.locator(`.ant-notification-notice .ant-notification-notice-close-icon >> visible=true`);
+  try {
+    await notification.elementHandle({timeout});
+    notification.click();
+  } catch (e: any) {
+    console.log(`notification did not hide within ${timeout}ms`, e.name);
+  }
 }
