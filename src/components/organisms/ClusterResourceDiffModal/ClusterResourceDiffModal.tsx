@@ -274,7 +274,7 @@ const ClusterResourceDiffModal = () => {
           maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
           axis="x"
           resizeHandles={['w', 'e']}
-          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          handle={(h: any, ref: LegacyRef<HTMLSpanElement>) => (
             <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
           )}
         >
