@@ -2,16 +2,22 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {OPA_INTEGRATION} from '../integrations';
+import {OPA_INTEGRATION} from '@models/integrations';
+
+import {useAppDispatch} from '@redux/hooks';
+import {updateValidationIntegration} from '@redux/reducers/main';
+
 import * as S from './ValidationOpenPolicyAgentHeading.styled';
 
-type Props = {
-  onBack: () => void;
-};
-
-export const ValidationOpenPolicyAgentHeading: React.FC<Props> = ({onBack}) => {
+export const ValidationOpenPolicyAgentHeading: React.FC = () => {
   const {icon, name, learnMoreUrl} = OPA_INTEGRATION;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
+
+  const dispatch = useAppDispatch();
+
+  const onBackHandler = () => {
+    dispatch(updateValidationIntegration(undefined));
+  };
 
   return (
     <S.Heading>
@@ -24,7 +30,7 @@ export const ValidationOpenPolicyAgentHeading: React.FC<Props> = ({onBack}) => {
         </S.HeadingTextContainer>
       </S.HeadingLeft>
 
-      <S.Button onClick={onBack}>Back</S.Button>
+      <S.Button onClick={onBackHandler}>Back</S.Button>
     </S.Heading>
   );
 };

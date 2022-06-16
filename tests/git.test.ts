@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';

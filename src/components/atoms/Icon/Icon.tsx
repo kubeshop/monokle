@@ -2,6 +2,8 @@ import React, {useMemo} from 'react';
 
 import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {IconNames} from '@models/icons';
+
 import Colors from '@styles/Colors';
 
 import {
@@ -9,34 +11,21 @@ import {
   Helm,
   Images,
   IncomingRefs,
+  K8sSchema,
   Kubernetes,
   Kustomize,
+  OPAStatus,
+  OpenPolicyAgent,
   OutgoingRefs,
+  ResourceLinks,
   SeverityHigh,
   SeverityLow,
   SeverityMedium,
   Shortcuts,
   Validation,
   Warning,
+  YAMLSyntax,
 } from './Icons';
-import OpenPolicyAgent from './Icons/OpenPolicyAgent';
-
-export type IconNames =
-  | 'images'
-  | 'kubernetes'
-  | 'collapse'
-  | 'helm'
-  | 'kustomize'
-  | 'incomingRefs'
-  | 'outgoingRefs'
-  | 'warning'
-  | 'error'
-  | 'validation'
-  | 'open-policy-agent'
-  | 'severity-high'
-  | 'severity-medium'
-  | 'severity-low'
-  | 'shortcuts';
 
 type IconProps = {
   name: IconNames;
@@ -48,6 +37,7 @@ type IconProps = {
 };
 
 const icons: Record<IconNames, React.ComponentType<any>> = {
+  'opa-status': OPAStatus,
   images: Images,
   kubernetes: Kubernetes,
   collapse: Collapse,
@@ -63,6 +53,9 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'severity-medium': SeverityMedium,
   'severity-low': SeverityLow,
   shortcuts: Shortcuts,
+  'yaml-syntax': YAMLSyntax,
+  'resource-links': ResourceLinks,
+  'k8s-schema': K8sSchema,
 };
 
 const Icon: React.FC<IconProps> = props => {
