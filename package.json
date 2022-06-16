@@ -42,7 +42,7 @@
     "@types/module-alias": "2.0.1",
     "@types/node": "17.0.35",
     "@types/node-fetch": "2.6.1",
-    "@types/numeral": "^2.0.2",
+    "@types/numeral": "2.0.2",
     "@types/react": "17.0.43",
     "@types/react-dom": "17.0.14",
     "@types/react-resizable": "1.7.4",
@@ -72,6 +72,7 @@
     "eslint-plugin-unused-imports": "2.0.0",
     "file-loader": "6.2.0",
     "husky": "7.0.4",
+    "jest-playwright-preset": "1.7.2",
     "lint-staged": "12.3.7",
     "monaco-editor-webpack-plugin": "4.2.0",
     "patch-package": "6.4.7",
@@ -85,13 +86,14 @@
     "stylelint-config-standard": "25.0.0",
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.10.0",
+    "ts-jest": "28.0.5",
     "typescript": "4.6.3",
     "wait-on": "6.0.1",
     "worker-loader": "3.0.8",
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
-    "@amplitude/node": "^1.10.0",
+    "@amplitude/node": "1.10.0",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
@@ -108,7 +110,7 @@
     "chokidar": "3.5.3",
     "dagre": "0.8.5",
     "electron-devtools-installer": "3.2.0",
-    "electron-log": "^4.4.6",
+    "electron-log": "4.4.6",
     "electron-store": "8.0.1",
     "electron-unhandled": "4.0.1",
     "electron-updater": "4.6.5",
@@ -333,12 +335,5 @@
     "development": [
       "last 1 chrome version"
     ]
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "@models/(.+)": "<rootDir>/src/models/$1",
-      "@redux/(.+)": "<rootDir>/src/redux/$1",
-      "@src/(.+)": "<rootDir>/src/$1"
-    }
   }
 }
