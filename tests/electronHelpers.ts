@@ -9,7 +9,7 @@ import {Page} from 'playwright';
 import {ElectronApplication, _electron as electron} from 'playwright-core';
 
 import {StartupFlags} from '../src/utils/startupFlag';
-import {closeModal, closeTelemetry, waitForModalToHide, waitForModalToShow} from './antdHelpers';
+import {closeModal, closeNotification, waitForModalToHide, waitForModalToShow} from './antdHelpers';
 import {getRecordingPath, pause} from './utils';
 
 export async function clickOnMonokleLogo(appWindow: Page) {
@@ -63,7 +63,7 @@ export async function startApp(): Promise<StartAppResponse> {
     path: getRecordingPath(appInfo.platform, 'before-modals.png'),
   });
 
-  await closeTelemetry(appWindow, 20000);
+  await closeNotification(appWindow, 20000);
 
   for (const modalName of modalsToWait) {
     const modal = await waitForModalToShow(appWindow, modalName, 20000);

@@ -3,7 +3,7 @@ import {ElectronApplication} from 'playwright-core';
 import {v4 as uuidV4} from 'uuid';
 
 import {getChannelName} from '../../src/utils/ipc';
-import {closeWalktrough} from '../antdHelpers';
+import {closeNotification, closeWalktrough} from '../antdHelpers';
 import {mockHandle} from './util';
 
 export class StartProjectPane {
@@ -38,6 +38,7 @@ export class StartProjectPane {
     await this._emptyProjectSave.click();
 
     await closeWalktrough(this._page, 5000);
+    await closeNotification(this._page, 5000);
 
     return name;
   }
@@ -55,6 +56,7 @@ export class StartProjectPane {
       {chanel}
     );
     await closeWalktrough(this._page, 5000);
+    await closeNotification(this._page, 5000);
   }
 
   get createEmptyProjectLink(): Locator {

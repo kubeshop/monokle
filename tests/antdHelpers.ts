@@ -161,13 +161,13 @@ export async function closeWalktrough(page: Page, timeout: number) {
   }
 }
 
-export async function closeTelemetry(page: Page, timeout: number) {
-  console.log(`closing telemetry`);
-  const telemetry = page.locator(`#accept-telemetry >> visible=true`);
+export async function closeNotification(page: Page, timeout: number) {
+  console.log(`closing notification`);
+  const notification = page.locator(`.ant-notification-notice .ant-notification-notice-close-icon >> visible=true`);
   try {
-    await telemetry.elementHandle({timeout});
-    telemetry.click();
+    await notification.elementHandle({timeout});
+    notification.click();
   } catch (e: any) {
-    console.log(`telemetry did not hide within ${timeout}ms`, e.name);
+    console.log(`notification did not hide within ${timeout}ms`, e.name);
   }
 }

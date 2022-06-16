@@ -1,6 +1,6 @@
 import {Locator, Page} from 'playwright';
 
-import {closeWalktrough} from '../antdHelpers';
+import {closeNotification, closeWalktrough} from '../antdHelpers';
 
 export class NewResourceModal {
   private _page: Page;
@@ -26,5 +26,6 @@ export class NewResourceModal {
     await this._okButton.click();
 
     await closeWalktrough(this._page, 5000);
+    await closeNotification(this._page, 5000);
   }
 }
