@@ -1,7 +1,5 @@
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
-import {ValidationIntegration} from './integrations';
-
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -51,7 +49,13 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane' | 'images-pane';
+export type LeftMenuSelectionType =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'templates-pane'
+  | 'images-pane'
+  | 'validation-pane';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -139,10 +143,6 @@ export type UiState = {
     release: {
       currentStep: number;
     };
-  };
-  validationDrawer: {
-    isVisible: boolean;
-    integration: ValidationIntegration | undefined;
   };
 };
 

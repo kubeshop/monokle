@@ -5,7 +5,7 @@ import {useCallback} from 'react';
 import {ValidationIntegration} from '@models/integrations';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/ui';
+import {updateValidationIntegration} from '@redux/reducers/main';
 
 import {trackEvent} from '@utils/telemetry';
 
@@ -15,7 +15,7 @@ type Props = {
   integration: ValidationIntegration;
 };
 
-export const ValidationCard: React.FC<Props> = ({integration}) => {
+const ValidationCard: React.FC<Props> = ({integration}) => {
   const {id, icon, name, description, learnMoreUrl} = integration;
 
   const dispatch = useAppDispatch();
@@ -31,11 +31,13 @@ export const ValidationCard: React.FC<Props> = ({integration}) => {
     <S.Card key={id}>
       <S.Icon name={icon} key={icon} />
       <S.Name>{name}</S.Name>
-      <p>
-        <S.Description>{description}</S.Description> <S.Link onClick={openLearnMore}>Learn more</S.Link>
-      </p>
-
+      <span>
+        <S.Description>{description}</S.Description>
+        <S.Link onClick={openLearnMore}>Learn more</S.Link>
+      </span>
       {id === 'open-policy-agent' && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
     </S.Card>
   );
 };
+
+export default ValidationCard;
