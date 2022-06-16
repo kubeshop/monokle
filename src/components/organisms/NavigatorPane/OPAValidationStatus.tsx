@@ -43,7 +43,7 @@ const OPAValidationStatus: React.FC = () => {
       dispatch(toggleLeftMenu());
     }
 
-    dispatch(setLeftMenuSelection('validation'));
+    dispatch(setLeftMenuSelection('validation-pane'));
   };
 
   return (

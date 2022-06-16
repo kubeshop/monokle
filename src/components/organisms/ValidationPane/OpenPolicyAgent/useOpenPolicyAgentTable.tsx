@@ -6,7 +6,7 @@ import {useDispatch} from 'react-redux';
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
 import {IconNames} from '@models/icons';
 
@@ -63,18 +63,22 @@ export function useOpenPolicyAgentTable(width: number) {
       },
       {
         key: 'severity',
-        title: `${width < 420 ? '' : 'Severity'}`,
+        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
-        ...(width >= 420 && {sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity]}),
+        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
+          sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
+        }),
         render: (_value, record) => <Icon {...SEVERITY_ICON_MAP[record.severity]} />,
       },
       {
         key: 'enabled',
-        title: `${width < 420 ? '' : 'Enabled?'}`,
+        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
           return <Switch checked={rule.enabled} onChange={() => handleToggle(rule.id)} />;
         },
-        ...(width >= 420 && {sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1)}),
+        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
+          sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
+        }),
       },
     ];
   }, [handleToggle, width]);

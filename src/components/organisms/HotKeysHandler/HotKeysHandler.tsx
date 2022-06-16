@@ -243,7 +243,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('validation'));
+    dispatch(setLeftMenuSelection('validation-pane'));
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
