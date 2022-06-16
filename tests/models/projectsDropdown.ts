@@ -1,11 +1,11 @@
 import {Locator, Page} from 'playwright';
-import {v4 as uuidV4} from 'uuid';
 import {ElectronApplication} from 'playwright-core';
+import {v4 as uuidV4} from 'uuid';
+
 import {getChannelName} from '../../src/utils/ipc';
 import {mockHandle} from './util';
 
 export class ProjectsDropdown {
-
   private _page: Page;
 
   private readonly _theLogo: Locator;
@@ -16,8 +16,8 @@ export class ProjectsDropdown {
     this._page = page;
 
     this._theLogo = page.locator('#monokle-logo-header');
-    this._projectsDropdown = page.locator('#projects-dropdown-container button:first-child');
-    this._openProjectFromFolder = page.locator('div.ant-dropdown ul.ant-dropdown-menu #open-new-project');
+    this._projectsDropdown = page.locator('#projects-dropdown-container button:first-child div:nth-child(2)');
+    this._openProjectFromFolder = page.locator('div.ant-dropdown #open-new-project');
   }
 
   async createNewProject(electronApp: ElectronApplication, name = `project-${uuidV4()}`) {
@@ -27,9 +27,12 @@ export class ProjectsDropdown {
 
     await this._openProjectFromFolder.click();
 
-    await electronApp.evaluate(({ ipcMain }, params) => {
-      ipcMain.removeAllListeners(params.chanel);
-    }, { chanel });
+    await electronApp.evaluate(
+      ({ipcMain}, params) => {
+        ipcMain.removeAllListeners(params.chanel);
+      },
+      {chanel}
+    );
 
     return name;
   }
@@ -37,5 +40,4 @@ export class ProjectsDropdown {
   async click() {
     await this._projectsDropdown.click();
   }
-
 }
