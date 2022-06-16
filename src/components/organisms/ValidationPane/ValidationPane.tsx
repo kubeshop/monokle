@@ -6,13 +6,7 @@ import ValidationOpenPolicyAgent from './OpenPolicyAgent';
 import ValidationOverView from './ValidationOverview';
 import * as S from './ValidationPane.styled';
 
-interface IProps {
-  height: number;
-}
-
-const ValidationPane: React.FC<IProps> = ({height}) => {
-  console.log(height);
-
+const ValidationPane: React.FC = () => {
   const integration = useAppSelector(state => state.ui.validationDrawer.integration);
 
   return (
