@@ -21,7 +21,7 @@ const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const layout = useAppSelector(store => store.ui.paneConfiguration);
+  const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
