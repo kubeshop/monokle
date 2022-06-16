@@ -37,7 +37,7 @@ const MessageBox: React.FC = () => {
       key: alert.id,
       message: alert.title,
       description: <NotificationMarkdown notification={alert} type={notificationType} />,
-      duration: 60,
+      duration: alert.duration || 4,
     });
 
     dispatch(clearAlert());
