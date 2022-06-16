@@ -6,8 +6,8 @@ import {parse, stringify} from 'yaml';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
-import {UpdateManyResourcesPayload} from '@redux/reducers/main';
-import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {UpdateMultipleResourcesPayload} from '@redux/reducers/main';
+import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -30,7 +30,7 @@ export const replaceSelectedResourceMatches = createAsyncThunk<
   }
   setImmediate(() => {
     try {
-      const updateManyResourcesPayload: UpdateManyResourcesPayload = selectedMatches
+      const updateMultipleResourcesPayload: UpdateMultipleResourcesPayload = selectedMatches
         .map(matchId => {
           const currentMatch = clusterToLocalResourcesMatches.find(m => m.id === matchId);
           if (!currentMatch?.localResourceIds?.length || !currentMatch?.clusterResourceId) {
@@ -51,7 +51,7 @@ export const replaceSelectedResourceMatches = createAsyncThunk<
         })
         .filter((id): id is {resourceId: string; content: string} => Boolean(id) === true);
 
-      thunkAPI.dispatch(updateManyResources(updateManyResourcesPayload));
+      thunkAPI.dispatch(updateMultipleResources(updateMultipleResourcesPayload));
     } catch (e) {
       log.error('Failed to replace selected resources');
       log.error(e);

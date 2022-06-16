@@ -149,7 +149,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         if (!currentHelmChart) {
           return [];
         }
-        return currentHelmChart.templateFilePaths.map(filePath => scope.fileMap[filePath]).filter(isDefined);
+        return currentHelmChart.templateFilePaths.map(filePath => scope.fileMap[filePath.filePath]).filter(isDefined);
       },
       isInitialized: scope => {
         return scope.isFolderOpen;

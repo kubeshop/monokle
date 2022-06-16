@@ -2,7 +2,6 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-// import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div<{$singleColumn?: boolean}>`

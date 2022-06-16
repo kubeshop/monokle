@@ -3,7 +3,7 @@ import React, {FC, useEffect, useState} from 'react';
 import {Button, Form, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
-import log from 'loglevel';
+import {v4 as uuid} from 'uuid';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -16,7 +16,7 @@ import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/sele
 
 import FilePatternList from '@molecules/FilePatternList';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
@@ -57,7 +57,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
 
     setLocalClusters(clusterTableRows);
   }, [kubeConfigContexts, clusterAccess]);
-  log.info('kubeConfigContexts', kubeConfigContexts);
 
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
@@ -164,6 +163,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     }
 
     runCommandInMainThread({
+      commandId: uuid(),
       cmd: `kubectl`,
       args: ['config', 'use-context', clusterName],
     }).then(arg => {
@@ -229,6 +229,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
         <Column
           className="table-column-actions"
           key="clusterActions"
+          dataIndex="clusterActions"
           ellipsis
           width={70}
           render={(_: any, record: ClusterTableRow) => {
@@ -242,6 +243,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
             }
             return (
               <span
+                className="edit-span-btn"
                 onClick={e => {
                   e.stopPropagation();
                   edit(record);

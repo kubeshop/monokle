@@ -7,6 +7,7 @@ import Colors from '@styles/Colors';
 import {
   Collapse,
   Helm,
+  Images,
   IncomingRefs,
   Kubernetes,
   Kustomize,
@@ -21,6 +22,7 @@ import {
 import OpenPolicyAgent from './Icons/OpenPolicyAgent';
 
 export type IconNames =
+  | 'images'
   | 'kubernetes'
   | 'collapse'
   | 'helm'
@@ -46,6 +48,7 @@ type IconProps = {
 };
 
 const icons: Record<IconNames, React.ComponentType<any>> = {
+  images: Images,
   kubernetes: Kubernetes,
   collapse: Collapse,
   helm: Helm,

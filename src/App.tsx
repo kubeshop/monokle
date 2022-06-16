@@ -18,6 +18,7 @@ import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
+import {compareToggled} from '@redux/compare';
 import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
@@ -47,6 +48,7 @@ import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
+import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
 import * as S from './App.styled';
@@ -58,18 +60,21 @@ const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'))
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
-const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
+const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManager = React.lazy(() => import('@components/organisms/PluginManager'));
-const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
-const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
+const PluginManager = React.lazy(() => import('@organisms/PluginManager'));
+const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
+const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
+const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -83,6 +88,7 @@ const App = () => {
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
+  const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
@@ -91,9 +97,11 @@ const App = () => {
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
+  const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
+  const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
@@ -177,6 +185,13 @@ const App = () => {
       ipcRenderer.removeListener('executed-from', onExecutedFrom);
     };
   }, [onExecutedFrom]);
+
+  useEffect(() => {
+    ipcRenderer.on('restart-preview', restartEditorPreview);
+    return () => {
+      ipcRenderer.removeListener('executed-from', restartEditorPreview);
+    };
+  }, []);
 
   useEffect(() => {
     fetchAppVersion().then(version => {
@@ -318,13 +333,17 @@ const App = () => {
     dispatch(reprocessAllResources());
   }, [k8sVersion, dispatch]);
 
-  const previewConfigurationDrawerOnClose = () => {
+  const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
-  };
+  }, [dispatch]);
 
-  const onCloseReleaseNotesDrawer = () => {
+  const onCloseReleaseNotesDrawer = useCallback(() => {
     dispatch(closeReleaseNotesDrawer());
-  };
+  }, [dispatch]);
+
+  const onCloseCompareModal = useCallback(() => {
+    dispatch(compareToggled({value: false}));
+  }, [dispatch]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
@@ -379,14 +398,17 @@ const App = () => {
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
+          {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
+          {isFiltersPresetModalVisible && <FiltersPresetModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
           {isQuickSearchActionsVisible && <QuickSearchActions />}
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
+          {isReplaceImageModalVisible && <ReplaceImageModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {showReleaseNotes && (
             <Modal

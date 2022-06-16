@@ -4,11 +4,14 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
+import * as compareListeners from './compare/listeners';
+import {compareSlice} from './compare/slice';
+import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
-import {mainSlice} from './reducers/main';
+import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
@@ -26,6 +29,15 @@ if (process.env.NODE_ENV === `development`) {
 
 export const resetStore = createAction('app/reset');
 
+combineListeners([
+  compareListeners.resourceFetchListener('left'),
+  compareListeners.resourceFetchListener('right'),
+  compareListeners.compareListener,
+  compareListeners.filterListener,
+  resourceMapChangedListener,
+  imageSelectedListener,
+]);
+
 const appReducer = combineReducers({
   config: configSlice.reducer,
   main: mainSlice.reducer,
@@ -35,6 +47,7 @@ const appReducer = combineReducers({
   navigator: navigatorSlice.reducer,
   uiCoach: uiCoachSlice.reducer,
   extension: extensionSlice.reducer,
+  compare: compareSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
@@ -49,7 +62,11 @@ const rootReducer: typeof appReducer = (state, action) => {
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares).concat(sectionBlueprintMiddleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware()
+      .prepend(listenerMiddleware.middleware)
+      .concat(middlewares)
+      .concat(sectionBlueprintMiddleware),
 });
 
 export default store;

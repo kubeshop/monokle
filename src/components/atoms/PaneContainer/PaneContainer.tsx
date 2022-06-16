@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import {BackgroundColors} from '@styles/Colors';
 
 const PaneContainer = styled.div`
@@ -9,8 +7,7 @@ const PaneContainer = styled.div`
   height: 100%;
   width: 100%;
   margin: 0px;
-  overflow-y: scroll;
-  ${GlobalScrollbarStyle}
+  overflow-y: auto;
 `;
 
 export default PaneContainer;

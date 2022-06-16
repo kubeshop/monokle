@@ -4,8 +4,6 @@ import styled from 'styled-components';
 
 import {Icon as RawIcon} from '@components/atoms';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 export const ErrorWarningContainer = styled.div<{$type: 'warning' | 'error'}>`
@@ -35,7 +33,6 @@ export const StyledMenu = styled(Menu)`
   padding: 4px 0;
   border-right: none;
   overflow-y: scroll;
-  ${GlobalScrollbarStyle};
 `;
 
 export const StyledMenuItem = styled(Menu.Item)`

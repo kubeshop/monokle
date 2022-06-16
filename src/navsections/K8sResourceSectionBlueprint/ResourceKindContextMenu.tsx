@@ -1,10 +1,13 @@
 import {useMemo} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Menu, Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+import hotkeys from '@constants/hotkeys';
 
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
@@ -22,11 +25,9 @@ import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import Colors from '@styles/Colors';
+import {defineHotkey} from '@utils/defineHotkey';
 
-const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
+import Colors from '@styles/Colors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
@@ -76,6 +77,16 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
 
+  useHotkeys(
+    defineHotkey(hotkeys.DELETE_RESOURCE.key),
+    () => {
+      if (selectedResourceId) {
+        deleteResourceWithConfirm(resource, resourceMap, dispatch);
+      }
+    },
+    [selectedResourceId]
+  );
+
   if (!resource) {
     return null;
   }
@@ -106,35 +117,34 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
   };
 
-  const menu = (
-    <Menu>
-      {(isInPreviewMode || isUnsavedResource(resource)) && (
-        <>
-          <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
-            Save to file/folder
-          </Menu.Item>
-          <ContextMenuDivider />
-        </>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
-        Rename
-      </Menu.Item>
-
-      {knownResourceKinds.includes(resource.kind) && (
-        <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
-          Clone
-        </Menu.Item>
-      )}
-
-      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
-        Delete
-      </Menu.Item>
-    </Menu>
-  );
+  const menuItems = [
+    ...(isInPreviewMode || isUnsavedResource(resource)
+      ? [
+          {
+            key: 'save_to_file_folder',
+            label: 'Save to file/folder',
+            disabled: isInPreviewMode,
+            onClick: onClickSaveToFileFolder,
+          },
+          {key: 'divider', type: 'divider'},
+        ]
+      : []),
+    {key: 'rename', label: 'Rename', onClick: onClickRename},
+    ...(knownResourceKinds.includes(resource.kind)
+      ? [
+          {
+            key: 'clone',
+            label: 'Clone',
+            disabled: isInPreviewMode,
+            onClick: onClickClone,
+          },
+        ]
+      : []),
+    {key: 'delete', label: 'Delete', disabled: isInPreviewMode && previewType !== 'cluster', onClick: onClickDelete},
+  ];
 
   return (
-    <ContextMenu overlay={menu}>
+    <ContextMenu overlay={<Menu items={menuItems} />}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>

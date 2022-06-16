@@ -177,9 +177,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER.key,
     () => {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
+      startPreview(kubeConfigContext, 'cluster', dispatch);
     },
-    [kubeConfigPath]
+    [kubeConfigContext]
   );
 
   useHotkeys(
@@ -204,6 +204,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });
@@ -215,6 +216,7 @@ const HotKeysHandler = () => {
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });

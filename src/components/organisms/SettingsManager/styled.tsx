@@ -1,12 +1,12 @@
-import {Button as RawButton, Collapse as RawCollapse, Select as RawSelect} from 'antd';
+import {Button as RawButton, Select as RawSelect, Tabs as RawTabs} from 'antd';
 
 import {WarningOutlined as RawWarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
+
+const {TabPane} = RawTabs;
 
 export const Div = styled.div`
   margin-bottom: 20px;
@@ -31,10 +31,12 @@ export const Select = styled(RawSelect)`
   width: 100%;
 `;
 
-export const Collapse = styled(RawCollapse)`
+export const Tabs = styled(RawTabs)``;
+
+export const StyledTabPane = styled(TabPane)`
   max-height: 100%;
-  overflow-y: scroll;
-  ${GlobalScrollbarStyle};
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
 `;
 
 export const OptionContainer = styled.div`

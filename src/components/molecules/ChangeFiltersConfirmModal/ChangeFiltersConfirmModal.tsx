@@ -29,11 +29,11 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           ? undefined
           : filtersToBeChanged.namespace
         : resourceFilter.namespace,
-      kind: filtersToBeChanged.kind
-        ? filtersToBeChanged.kind === resourceFilter.kind
+      kinds: filtersToBeChanged.kinds
+        ? filtersToBeChanged.kinds === resourceFilter.kinds
           ? undefined
-          : filtersToBeChanged.kind
-        : resourceFilter.kind,
+          : filtersToBeChanged.kinds
+        : resourceFilter.kinds,
       fileOrFolderContainedIn: filtersToBeChanged.fileOrFolderContainedIn
         ? filtersToBeChanged.fileOrFolderContainedIn === resourceFilter.fileOrFolderContainedIn
           ? undefined
@@ -64,7 +64,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     filtersToBeChanged,
     resourceFilter.annotations,
     resourceFilter.fileOrFolderContainedIn,
-    resourceFilter.kind,
+    resourceFilter.kinds,
     resourceFilter.labels,
     resourceFilter.name,
     resourceFilter.namespace,

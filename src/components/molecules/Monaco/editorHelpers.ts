@@ -69,7 +69,8 @@ export function createMarkdownString(text: string): monaco.IMarkdownString {
 export function createCommandMarkdownLink(
   text: string,
   altText: string,
-  handler: monaco.editor.ICommandHandler
+  handler: monaco.editor.ICommandHandler,
+  beforeText?: string
 ): {commandMarkdownLink: monaco.IMarkdownString; commandDisposable: monaco.IDisposable} {
   const commandId = `cmd_${uuidv4()}`;
   const commandDisposable: monaco.IDisposable = CommandsRegistry.registerCommand(commandId, handler);
@@ -77,7 +78,7 @@ export function createCommandMarkdownLink(
   return {
     commandMarkdownLink: {
       isTrusted: true,
-      value: `[${text}](command:${commandId} '${altText}')`,
+      value: `${beforeText || ''}[${text}](command:${commandId} '${altText}')`,
     },
     commandDisposable,
   };

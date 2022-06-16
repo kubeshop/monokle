@@ -6,58 +6,16 @@ import {Button, Input, Select} from 'antd';
 import {DeleteOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
-import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
+import * as S from './SecretKindResourceForm.styled';
+
+import {SelectStyled} from './styled';
+
 const Option = Select.Option;
 const {TextArea} = Input;
-
-const FormContainer = styled.div`
-  width: 100%;
-  margin-top: 16px;
-`;
-
-const DynamicKeyValueContainer = styled.div`
-  display: flex;
-  align-items: space-between;
-  width: 100%;
-  margin-top: 16px;
-`;
-
-const DynamicKeyValueItem = styled.div`
-  width: 40%;
-  margin-left: 0.33%;
-`;
-
-const DynamicKeyValueActionItem = styled.div`
-  width: 19%;
-  margin-left: 0.33%;
-`;
-
-const ButtonContainer = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StyledSpanTitle = styled.span`
-  display: block;
-  margin-bottom: 4px;
-  margin-top: 6px;
-`;
-
-const StyledSpanToggler = styled.span`
-  cursor: pointer;
-  text-decoration: underline;
-  float: right;
-  text-transform: uppercase;
-  font-size: 9px;
-  font-weight: 700;
-  margin-top: 4px;
-`;
 
 const secretTypes = [
   'Opaque',
@@ -214,16 +172,16 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
   };
 
   return (
-    <FormContainer>
+    <S.FormContainer>
       <div>
-        <StyledSpanTitle>Type</StyledSpanTitle>
-        <Select value={formData.type} style={{width: '100%'}} onChange={handleTypeChange} disabled={disabled}>
+        <S.StyledSpanTitle>Type</S.StyledSpanTitle>
+        <SelectStyled value={formData.type} style={{width: '100%'}} onChange={handleTypeChange} disabled={disabled}>
           {secretTypes.map(secretType => (
             <Option key={secretType} value={secretType}>
               {secretType}
             </Option>
           ))}
-        </Select>
+        </SelectStyled>
       </div>
       <div>
         {formData.type === 'Opaque' && (
@@ -295,7 +253,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
           />
         )}
       </div>
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 
@@ -333,8 +291,8 @@ const KeyValuePairForm = ({
   };
 
   return (
-    <FormContainer>
-      <StyledSpanTitle>Data</StyledSpanTitle>
+    <S.FormContainer>
+      <S.StyledSpanTitle>Data</S.StyledSpanTitle>
       {localValues.map(value => (
         <DynamicKeyValue
           key={value.id}
@@ -349,7 +307,7 @@ const KeyValuePairForm = ({
           Add New
         </Button>
       </div>
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 
@@ -372,15 +330,15 @@ const TextAreaForm = ({value, onChange, disabled}: {value: string; onChange: Fun
   }, [localValue]);
 
   return (
-    <FormContainer>
-      <StyledSpanTitle>Data</StyledSpanTitle>
+    <S.FormContainer>
+      <S.StyledSpanTitle>Data</S.StyledSpanTitle>
       <Base64Input
         type="TEXT_AREA"
         value={localValue}
         onChange={(emittedValue: string) => handleValueChange(emittedValue)}
         disabled={disabled}
       />
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 
@@ -402,10 +360,10 @@ const TLSForm = ({
   };
 
   return (
-    <FormContainer>
-      <StyledSpanTitle>Data</StyledSpanTitle>
+    <S.FormContainer>
+      <S.StyledSpanTitle>Data</S.StyledSpanTitle>
       <div>
-        <StyledSpanTitle>CRT</StyledSpanTitle>
+        <S.StyledSpanTitle>CRT</S.StyledSpanTitle>
         <Base64Input
           type="TEXT_AREA"
           value={tlscrt}
@@ -414,7 +372,7 @@ const TLSForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Key</StyledSpanTitle>
+        <S.StyledSpanTitle>Key</S.StyledSpanTitle>
         <Base64Input
           type="TEXT_AREA"
           value={tlskey}
@@ -422,7 +380,7 @@ const TLSForm = ({
           disabled={disabled}
         />
       </div>
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 
@@ -452,10 +410,10 @@ const TokenForm = ({
   };
 
   return (
-    <FormContainer>
-      <StyledSpanTitle>Data</StyledSpanTitle>
+    <S.FormContainer>
+      <S.StyledSpanTitle>Data</S.StyledSpanTitle>
       <div>
-        <StyledSpanTitle>Auth Extra Groups</StyledSpanTitle>
+        <S.StyledSpanTitle>Auth Extra Groups</S.StyledSpanTitle>
         <Base64Input
           value={authExtraGroups}
           onChange={(emittedValue: string) => handleValueChange('auth-extra-groups', emittedValue)}
@@ -463,7 +421,7 @@ const TokenForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Expiration</StyledSpanTitle>
+        <S.StyledSpanTitle>Expiration</S.StyledSpanTitle>
         <Base64Input
           value={expiration}
           onChange={(emittedValue: string) => handleValueChange('expiration', emittedValue)}
@@ -471,7 +429,7 @@ const TokenForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Token Id</StyledSpanTitle>
+        <S.StyledSpanTitle>Token Id</S.StyledSpanTitle>
         <Base64Input
           value={tokenId}
           onChange={(emittedValue: string) => handleValueChange('token-id', emittedValue)}
@@ -479,7 +437,7 @@ const TokenForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Token Secret</StyledSpanTitle>
+        <S.StyledSpanTitle>Token Secret</S.StyledSpanTitle>
         <Base64Input
           value={tokenSecret}
           onChange={(emittedValue: string) => handleValueChange('token-secret', emittedValue)}
@@ -487,7 +445,7 @@ const TokenForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Usage Bootstrap Authentication</StyledSpanTitle>
+        <S.StyledSpanTitle>Usage Bootstrap Authentication</S.StyledSpanTitle>
         <Base64Input
           value={usageBootstrapAuthentication}
           onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-authentication', emittedValue)}
@@ -495,14 +453,14 @@ const TokenForm = ({
         />
       </div>
       <div>
-        <StyledSpanTitle>Usage Bootstrap Signing</StyledSpanTitle>
+        <S.StyledSpanTitle>Usage Bootstrap Signing</S.StyledSpanTitle>
         <Base64Input
           value={usageBootstrapSigning}
           onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-signing', emittedValue)}
           disabled={disabled}
         />
       </div>
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 
@@ -556,32 +514,32 @@ const DynamicKeyValue = ({value, onChange, onDelete, disabled}: any) => {
   );
 
   return (
-    <DynamicKeyValueContainer>
-      <DynamicKeyValueItem>
-        <StyledSpanTitle>Key</StyledSpanTitle>
+    <S.DynamicKeyValueContainer>
+      <S.DynamicKeyValueItem>
+        <S.StyledSpanTitle>Key</S.StyledSpanTitle>
         <Input
           value={localValue.key}
           onChange={event => handleValueChange('KEY', event.target.value)}
           disabled={disabled}
         />
-      </DynamicKeyValueItem>
-      <DynamicKeyValueItem>
-        <StyledSpanTitle>Value</StyledSpanTitle>
+      </S.DynamicKeyValueItem>
+      <S.DynamicKeyValueItem>
+        <S.StyledSpanTitle>Value</S.StyledSpanTitle>
         <Base64Input
           value={localValue.value}
           onChange={(emittedValue: string) => handleValueChange('VALUE', emittedValue)}
           disabled={disabled}
         />
-      </DynamicKeyValueItem>
-      <DynamicKeyValueActionItem>
-        <StyledSpanTitle>&nbsp;</StyledSpanTitle>
-        <ButtonContainer>
+      </S.DynamicKeyValueItem>
+      <S.DynamicKeyValueActionItem>
+        <S.StyledSpanTitle>&nbsp;</S.StyledSpanTitle>
+        <S.ButtonContainer>
           <Button onClick={handleDeleteValue} disabled={disabled}>
             <DeleteOutlined />
           </Button>
-        </ButtonContainer>
-      </DynamicKeyValueActionItem>
-    </DynamicKeyValueContainer>
+        </S.ButtonContainer>
+      </S.DynamicKeyValueActionItem>
+    </S.DynamicKeyValueContainer>
   );
 };
 
@@ -665,9 +623,9 @@ export const Base64Input = ({value, onChange, type = 'INPUT', disabled}: any) =>
       )}
 
       {!isEncoded ? (
-        <StyledSpanToggler onClick={() => encode()}>Encode</StyledSpanToggler>
+        <S.StyledSpanToggler onClick={() => encode()}>Encode</S.StyledSpanToggler>
       ) : (
-        <StyledSpanToggler onClick={() => decode()}>Decode</StyledSpanToggler>
+        <S.StyledSpanToggler onClick={() => decode()}>Decode</S.StyledSpanToggler>
       )}
     </>
   );

@@ -2,6 +2,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
+import {ImageType} from './image';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -18,6 +19,12 @@ type ResourceMapType = {
 type FileMapType = {
   [id: string]: FileEntry;
 };
+
+/**
+ * List of images from current project
+ */
+
+type ImagesListType = ImageType[];
 
 /**
  * Maps ids to Helm charts
@@ -38,6 +45,10 @@ type PreviewLoaderType = {
   targetId?: string;
 };
 
+type FiltersPresetsType = {
+  [name: string]: ResourceFilterType;
+};
+
 type ResourceDiffType = {
   targetResourceId?: string;
 };
@@ -47,18 +58,23 @@ type ResourceSelectionHistoryEntry = {
   selectedResourceId: string;
 };
 
+type ImageSelectionHistoryEntry = {
+  type: 'image';
+  selectedImage: ImageType;
+};
+
 type PathSelectionHistoryEntry = {
   type: 'path';
   selectedPath: string;
 };
 
-type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
+type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
 
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
 type ResourceFilterType = {
   name?: string;
-  kind?: string;
+  kinds?: string[];
   namespace?: string;
   labels: Record<string, string | null>;
   annotations: Record<string, string | null>;
@@ -160,9 +176,13 @@ interface AppState {
     previewConfigurationId?: string;
   };
   deviceID: string;
+  selectedImage?: ImageType | null;
+  imagesSearchedValue?: string;
+  filtersPresets: FiltersPresetsType;
+  imagesList: ImagesListType;
 }
 
-export interface PossibleResource {
+export interface KubernetesObject {
   apiVersion: string;
   kind: string;
   metadata: {
@@ -172,14 +192,16 @@ export interface PossibleResource {
   [x: string]: any;
 }
 
-export const isPossibleResource = (obj: any) =>
+export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
 
 export type {
   AppState,
   ResourceMapType,
   ResourceFilterType,
+  FiltersPresetsType,
   FileMapType,
+  ImagesListType,
   HelmChartMapType,
   HelmValuesMapType,
   PreviewLoaderType,

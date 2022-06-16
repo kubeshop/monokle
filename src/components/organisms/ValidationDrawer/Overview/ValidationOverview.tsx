@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 
 import {Col, Row} from 'antd';
+
+import {trackEvent} from '@utils/telemetry';
 
 import ValidationFigure from '@assets/ValidationFigure.svg';
 
@@ -14,6 +16,14 @@ type Props = {
 };
 
 export const ValidationOverView: React.FC<Props> = ({onDiscover}) => {
+  const handleDiscover = useCallback(
+    (id: ValidationIntegrationId) => {
+      trackEvent('VALIDATION_PANE_OPENED', {id});
+      onDiscover(id);
+    },
+    [onDiscover]
+  );
+
   return (
     <>
       <S.ValidationImg src={ValidationFigure} />
@@ -21,7 +31,7 @@ export const ValidationOverView: React.FC<Props> = ({onDiscover}) => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <ValidationCard integration={OPA_INTEGRATION} onDiscover={() => onDiscover('open-policy-agent')} />
+          <ValidationCard integration={OPA_INTEGRATION} onDiscover={() => handleDiscover('open-policy-agent')} />
         </Col>
         <Col span={12}>
           <ValidationCardUpnext />

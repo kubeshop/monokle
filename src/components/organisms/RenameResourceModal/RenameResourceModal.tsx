@@ -69,6 +69,7 @@ const RenameResourceModel: React.FC = () => {
       onCancel={handleCancel}
     >
       <Form
+        initialValues={{name: newResourceName}}
         form={form}
         layout="vertical"
         onFieldsChange={() => setButtonDisabled(form.getFieldsError().some(field => field.errors.length > 0))}
@@ -86,7 +87,6 @@ const RenameResourceModel: React.FC = () => {
             id="resource-name-input"
             placeholder="Enter resource name"
             ref={inputNameRef}
-            defaultValue={newResourceName}
             onChange={e => setNewResourceName(e.target.value)}
           />
         </Form.Item>

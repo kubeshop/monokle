@@ -124,6 +124,27 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    closeReplaceImageModal: (state: Draft<UiState>) => {
+      state.replaceImageModal = {
+        isOpen: false,
+        imageId: '',
+      };
+    },
+    openReplaceImageModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.replaceImageModal = {
+        isOpen: true,
+        imageId: action.payload,
+      };
+    },
+    closeFiltersPresetModal: (state: Draft<UiState>) => {
+      state.filtersPresetModal = undefined;
+    },
+    openFiltersPresetModal: (state: Draft<UiState>, action: PayloadAction<'load' | 'save'>) => {
+      state.filtersPresetModal = {
+        isOpen: true,
+        type: action.payload,
+      };
+    },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
@@ -295,6 +316,7 @@ export const {
   closeClusterDiff,
   closeCreateFolderModal,
   closeCreateProjectModal,
+  closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
   closeNewResourceWizard,
@@ -302,6 +324,7 @@ export const {
   closeReleaseNotesDrawer,
   closeRenameEntityModal,
   closeRenameResourceModal,
+  closeReplaceImageModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -311,13 +334,15 @@ export const {
   openClusterDiff,
   openCreateFolderModal,
   openCreateProjectModal,
+  openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
   openNewResourceWizard,
   openQuickSearchActionsPopup,
+  openReleaseNotesDrawer,
   openRenameEntityModal,
   openRenameResourceModal,
-  openReleaseNotesDrawer,
+  openReplaceImageModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,

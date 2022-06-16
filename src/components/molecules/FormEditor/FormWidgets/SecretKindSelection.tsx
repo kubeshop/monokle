@@ -8,6 +8,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
 
+import * as S from './styled';
+
 const Option = Select.Option;
 
 const FormContainer = styled.div`
@@ -84,7 +86,7 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled}: any)
 
   return (
     <FormContainer>
-      <Select
+      <S.SelectStyled
         style={{marginRight: secretType === 'Opaque' ? '4px' : 'opx'}}
         value={selectedRef}
         onChange={onRefChange}
@@ -95,15 +97,20 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled}: any)
             {ref}
           </Option>
         ))}
-      </Select>
+      </S.SelectStyled>
       {secretType === 'Opaque' && (
-        <Select style={{marginLeft: '4px'}} value={selectedProperty} onChange={onPropertyChange} disabled={disabled}>
+        <S.SelectStyled
+          style={{marginLeft: '4px'}}
+          value={selectedProperty}
+          onChange={onPropertyChange}
+          disabled={disabled}
+        >
           {properties.map(property => (
             <Option key={property} value={property}>
               {property}
             </Option>
           ))}
-        </Select>
+        </S.SelectStyled>
       )}
     </FormContainer>
   );
