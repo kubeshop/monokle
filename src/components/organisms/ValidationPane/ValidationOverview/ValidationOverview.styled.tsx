@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const ValidationCards = styled.div`
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-auto-rows: 275px;
 `;
 
 export const ValidationImg = styled.img`
