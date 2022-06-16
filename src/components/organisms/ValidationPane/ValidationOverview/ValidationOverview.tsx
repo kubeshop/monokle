@@ -26,24 +26,6 @@ const ValidationOverview: React.FC = () => {
         <ValidationCard integration={RESOURCE_LINKS_INTEGRATION} />
         <ValidationCardUpNext />
       </S.ValidationCards>
-
-      {/* <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <ValidationCard integration={OPA_INTEGRATION} />
-        </Col>
-        <Col span={12}>
-          <ValidationCard integration={YAML_SYNTAX_INTEGRATION} />
-        </Col>
-        <Col span={12}>
-          <ValidationCard integration={K8S_SCHEMA_INTEGRATION} />
-        </Col>
-        <Col span={12}>
-          <ValidationCard integration={RESOURCE_LINKS_INTEGRATION} />
-        </Col>
-        <Col span={12}>
-        
-        </Col>
-      </Row> */}
     </S.ValidationOverviewContainer>
   );
 };
