@@ -15,7 +15,7 @@ type Props = {
   integration: ValidationIntegration;
 };
 
-export const ValidationCard: React.FC<Props> = ({integration}) => {
+const ValidationCard: React.FC<Props> = ({integration}) => {
   const {id, icon, name, description, learnMoreUrl} = integration;
 
   const dispatch = useAppDispatch();
@@ -39,3 +39,5 @@ export const ValidationCard: React.FC<Props> = ({integration}) => {
     </S.Card>
   );
 };
+
+export default ValidationCard;

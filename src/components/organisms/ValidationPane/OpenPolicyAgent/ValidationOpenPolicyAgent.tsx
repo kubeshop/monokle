@@ -9,7 +9,7 @@ import * as S from './ValidationOpenPolicyAgent.styled';
 import {ValidationOpenPolicyAgentHeading} from './ValidationOpenPolicyAgentHeading';
 import {ValidationOpenPolicyAgentTable} from './ValidationOpenPolicyAgentTable';
 
-export const ValidationOpenPolicyAgent: React.FC = () => {
+const ValidationOpenPolicyAgent: React.FC = () => {
   const dispatch = useDispatch();
 
   const toggleRules = useCallback(
@@ -37,3 +37,5 @@ export const ValidationOpenPolicyAgent: React.FC = () => {
     </>
   );
 };
+
+export default ValidationOpenPolicyAgent;

@@ -51,7 +51,13 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane' | 'images-pane';
+export type LeftMenuSelectionType =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'templates-pane'
+  | 'images-pane'
+  | 'validation';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {

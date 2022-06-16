@@ -29,3 +29,4 @@ export {default as SettingsManager} from './SettingsManager';
 export {default as TemplateManagerPane} from './TemplateManagerPane';
 export {default as TemplateModal} from './TemplateModal';
 export {default as UpdateModal} from './UpdateNotice';
+export {default as ValidationPane} from './ValidationPane';

@@ -3,8 +3,8 @@ import React from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleValidationDrawer} from '@redux/reducers/ui';
 
-import {ValidationOpenPolicyAgent} from './OpenPolicyAgent/ValidationOpenPolicyAgent';
-import {ValidationOverView} from './Overview/ValidationOverview';
+import ValidationOpenPolicyAgent from '../ValidationPane/OpenPolicyAgent';
+import ValidationOverView from '../ValidationPane/ValidationOverview';
 import * as S from './ValidationDrawer.styled';
 import {DrawerHeading} from './ValidationDrawerHeading';
 
