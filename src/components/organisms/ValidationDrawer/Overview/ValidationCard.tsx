@@ -29,13 +29,13 @@ export const ValidationCard: React.FC<Props> = ({integration}) => {
 
   return (
     <S.Card key={id}>
-      <S.Icon name={icon} />
+      <S.Icon name={icon} key={icon} />
       <S.Name>{name}</S.Name>
       <p>
         <S.Description>{description}</S.Description> <S.Link onClick={openLearnMore}>Learn more</S.Link>
       </p>
 
-      <S.Button onClick={onConfigureHandler}>Configure</S.Button>
+      {id === 'open-policy-agent' && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
     </S.Card>
   );
 };

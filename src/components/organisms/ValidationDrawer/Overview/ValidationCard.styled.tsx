@@ -9,9 +9,12 @@ import Colors from '@styles/Colors';
 export const Card = styled(AntdCard)`
   border: 2px solid #31393c;
   border-radius: 2px;
+  height: 100%;
 
   .ant-card-body {
     background-color: #31393c;
+    height: 100%;
+    min-height: 255px;
   }
 `;
 
@@ -31,11 +34,10 @@ export const Name = styled.h1`
 
 export const Description = styled.span`
   color: ${Colors.grey8};
-  font-size: 12px;
 `;
 
 export const Link = styled.a`
-  color: ${Colors.blue6};
+  color: ${Colors.blue7};
 `;
 
 export const Button = styled(AntdButton)`
