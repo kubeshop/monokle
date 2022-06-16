@@ -9,11 +9,7 @@ import * as S from './ValidationOpenPolicyAgent.styled';
 import {ValidationOpenPolicyAgentHeading} from './ValidationOpenPolicyAgentHeading';
 import {ValidationOpenPolicyAgentTable} from './ValidationOpenPolicyAgentTable';
 
-type Props = {
-  onBack: () => void;
-};
-
-export const ValidationOpenPolicyAgent: React.FC<Props> = ({onBack}) => {
+export const ValidationOpenPolicyAgent: React.FC = () => {
   const dispatch = useDispatch();
 
   const toggleRules = useCallback(
@@ -26,7 +22,7 @@ export const ValidationOpenPolicyAgent: React.FC<Props> = ({onBack}) => {
 
   return (
     <>
-      <ValidationOpenPolicyAgentHeading onBack={onBack} />
+      <ValidationOpenPolicyAgentHeading />
 
       <S.DescriptionContainer>
         <S.Description>Validate your resources with policies. Enable or disable OPA rules in this list.</S.Description>

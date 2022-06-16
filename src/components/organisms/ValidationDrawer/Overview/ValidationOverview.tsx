@@ -1,29 +1,16 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 
 import {Col, Row} from 'antd';
 
-import {trackEvent} from '@utils/telemetry';
+import {OPA_INTEGRATION} from '@models/integrations';
 
 import ValidationFigure from '@assets/ValidationFigure.svg';
 
-import {OPA_INTEGRATION, ValidationIntegrationId} from '../integrations';
 import {ValidationCard} from './ValidationCard';
 import {ValidationCardUpnext} from './ValidationCardUpnext';
 import * as S from './ValidationOverview.styled';
 
-type Props = {
-  onDiscover: (id: ValidationIntegrationId) => void;
-};
-
-export const ValidationOverView: React.FC<Props> = ({onDiscover}) => {
-  const handleDiscover = useCallback(
-    (id: ValidationIntegrationId) => {
-      trackEvent('VALIDATION_PANE_OPENED', {id});
-      onDiscover(id);
-    },
-    [onDiscover]
-  );
-
+export const ValidationOverView: React.FC = () => {
   return (
     <>
       <S.ValidationImg src={ValidationFigure} />
@@ -31,7 +18,7 @@ export const ValidationOverView: React.FC<Props> = ({onDiscover}) => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <ValidationCard integration={OPA_INTEGRATION} onDiscover={() => handleDiscover('open-policy-agent')} />
+          <ValidationCard integration={OPA_INTEGRATION} />
         </Col>
         <Col span={12}>
           <ValidationCardUpnext />

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {Icon} from '@atoms';
+import {IconNames} from '@models/icons';
 
-import {IconNames} from '@components/atoms/Icon';
+import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 

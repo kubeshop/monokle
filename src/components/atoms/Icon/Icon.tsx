@@ -2,6 +2,8 @@ import React, {useMemo} from 'react';
 
 import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {IconNames} from '@models/icons';
+
 import Colors from '@styles/Colors';
 
 import {
@@ -11,6 +13,7 @@ import {
   IncomingRefs,
   Kubernetes,
   Kustomize,
+  OPAStatus,
   OutgoingRefs,
   SeverityHigh,
   SeverityLow,
@@ -20,23 +23,6 @@ import {
   Warning,
 } from './Icons';
 import OpenPolicyAgent from './Icons/OpenPolicyAgent';
-
-export type IconNames =
-  | 'images'
-  | 'kubernetes'
-  | 'collapse'
-  | 'helm'
-  | 'kustomize'
-  | 'incomingRefs'
-  | 'outgoingRefs'
-  | 'warning'
-  | 'error'
-  | 'validation'
-  | 'open-policy-agent'
-  | 'severity-high'
-  | 'severity-medium'
-  | 'severity-low'
-  | 'shortcuts';
 
 type IconProps = {
   name: IconNames;
@@ -48,6 +34,7 @@ type IconProps = {
 };
 
 const icons: Record<IconNames, React.ComponentType<any>> = {
+  'opa-status': OPAStatus,
   images: Images,
   kubernetes: Kubernetes,
   collapse: Collapse,

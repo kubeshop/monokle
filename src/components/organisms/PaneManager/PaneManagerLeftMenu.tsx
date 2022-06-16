@@ -38,7 +38,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const leftDrawerVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
+  const leftDrawerVisible = useAppSelector(state => state.ui.validationDrawer.isVisible);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
