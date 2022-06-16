@@ -174,17 +174,18 @@ export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
   justify-content: center;
   width: 32px;
   margin-left: 8px;
-  ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+  ${({$isItemSelected}) => `background-color: ${$isItemSelected ? Colors.blue6 : Colors.grey6};`}
 
   &:hover {
-    color: ${Colors.lightSeaGreen};
-    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+    color: ${Colors.whitePure};
+    ${({$isItemSelected}) => `background-color: ${$isItemSelected ? Colors.blue6 : Colors.grey6};`};
     ${({$isItemSelected}) => `border-color: ${$isItemSelected ? Colors.grey5b : Colors.lightSeaGreen};`}
   }
 
   &:focus {
     color: ${Colors.whitePure};
-    ${({$isItemSelected}) => $isItemSelected && `background-color: ${Colors.grey6}`};
+    ${({$isItemSelected}) => `background-color: ${$isItemSelected ? Colors.blue6 : Colors.grey6};`};
+    border-color: none;
   }
 
   :nth-child(3) {
