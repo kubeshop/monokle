@@ -6,11 +6,15 @@ import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
+import fs from 'fs';
 import path from 'path';
+import util from 'util';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
+import {FileMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
@@ -27,11 +31,79 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
+import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
 
 const {Option, OptGroup} = Select;
+
+const fetchFullFileName = (filename: string, suffix?: string) => {
+  return `${filename}${suffix || ''}.yaml`;
+};
+
+const createFullFileName = (
+  subfiles: fs.Dirent[],
+  resourceName: K8sResource['name'],
+  resourceKind: K8sResource['kind'],
+  selectedFolder: string,
+  fileMap: FileMapType,
+  suffix: number,
+  includeKind?: boolean
+): string => {
+  const name = resourceName;
+  const nameKind = includeKind ? `-${resourceKind.toLowerCase()}` : '';
+  const nameSuffix = suffix ? ` (${suffix})` : '';
+  const fullFileName = fetchFullFileName(`${name}${nameKind}${nameSuffix}`);
+  let foundFile: fs.Dirent | FileEntry | undefined;
+
+  if (subfiles.length) {
+    foundFile = subfiles.find(dirent => dirent.name === fullFileName);
+  } else if (selectedFolder === ROOT_FILE_ENTRY) {
+    foundFile = fileMap[`${path.sep}${fullFileName}`];
+  } else {
+    foundFile = fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`];
+  }
+
+  if (foundFile) {
+    if (includeKind) {
+      return createFullFileName(
+        subfiles,
+        resourceName,
+        resourceKind,
+        selectedFolder,
+        fileMap,
+        suffix ? suffix + 1 : 2,
+        true
+      );
+    }
+    return createFullFileName(
+      subfiles,
+      resourceName,
+      resourceKind,
+      selectedFolder,
+      fileMap,
+      suffix ? suffix + 1 : 0,
+      true
+    );
+  }
+
+  return fullFileName;
+};
+
+const generateFullFileName = async (
+  resourceName: K8sResource['name'],
+  resourceKind: K8sResource['kind'],
+  selectedFolder: string,
+  fileMap: FileMapType
+) => {
+  let subfiles: fs.Dirent[] = [];
+  const fsReaddirPromise = util.promisify(fs.readdir);
+  subfiles = (await fsReaddirPromise(selectedFolder, {withFileTypes: true})).filter(dirent => !dirent.isDirectory());
+
+  const hasNameClash = subfiles.map(x => x.name.split('.')[0]).some(subfile => subfile === resourceName);
+
+  return createFullFileName(subfiles, resourceName, resourceKind, selectedFolder, fileMap, 0, hasNameClash);
+};
 
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
@@ -49,6 +121,7 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const [exportFileName, setExportFileName] = useState<string | undefined>('');
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -161,7 +234,7 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const onFormValuesChange = (data: any) => {
+  const onFormValuesChange = async (data: any) => {
     let shouldFilterResources = false;
 
     if (data.kind && data.kind !== lastKindRef.current) {
@@ -229,6 +302,16 @@ const NewResourceWizard = () => {
       if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
         form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
       }
+    }
+
+    if (savingDestination === 'saveToFolder') {
+      const generatedFileName = await generateFullFileName(
+        form.getFieldValue('name'),
+        form.getFieldValue('kind'),
+        selectedFolder,
+        fileMap
+      );
+      setExportFileName(generatedFileName);
     }
   };
 
@@ -509,6 +592,13 @@ const NewResourceWizard = () => {
             </StyledSelect>
           )}
         </SaveDestinationWrapper>
+
+        {savingDestination === 'saveToFolder' && (
+          <div style={{marginTop: '16px'}}>
+            <FileCategoryLabel>File to be created:</FileCategoryLabel>
+            <FileNameLabel>{exportFileName}</FileNameLabel>
+          </div>
+        )}
       </Form>
     </Modal>
   );
