@@ -53,7 +53,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
                 {leftActiveMenu === 'images-pane' && <ImagesPane />}
                 {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
-                {leftActiveMenu === 'validation' && <ValidationPane />}
+                {leftActiveMenu === 'validation' && <ValidationPane height={height} />}
               </Suspense>
             </S.LeftPane>
           </ReflexElement>

@@ -9,7 +9,11 @@ import * as S from './ValidationOpenPolicyAgent.styled';
 import {ValidationOpenPolicyAgentHeading} from './ValidationOpenPolicyAgentHeading';
 import {ValidationOpenPolicyAgentTable} from './ValidationOpenPolicyAgentTable';
 
-const ValidationOpenPolicyAgent: React.FC = () => {
+interface IProps {
+  height: number;
+}
+
+const ValidationOpenPolicyAgent: React.FC<IProps> = ({height}) => {
   const dispatch = useDispatch();
 
   const toggleRules = useCallback(
@@ -33,7 +37,7 @@ const ValidationOpenPolicyAgent: React.FC = () => {
         </S.DescriptionActions>
       </S.DescriptionContainer>
 
-      <ValidationOpenPolicyAgentTable />
+      <ValidationOpenPolicyAgentTable height={height} />
     </>
   );
 };

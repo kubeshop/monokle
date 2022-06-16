@@ -34,3 +34,11 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
     display: none;
   }
 `;
+
+export const TableContainer = styled.div<{$height: number}>`
+  ${({$height}) => `
+    height: ${$height}px;
+`}
+  overflow-y: auto;
+  margin-top: 10px;
+`;

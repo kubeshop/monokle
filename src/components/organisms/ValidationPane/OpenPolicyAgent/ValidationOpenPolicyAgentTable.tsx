@@ -18,7 +18,11 @@ export type Rule = {
   enabled: boolean;
 };
 
-export const ValidationOpenPolicyAgentTable: React.FC = () => {
+interface IProps {
+  height: number;
+}
+
+export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({height}) => {
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
   const columns = useOpenPolicyAgentTable(width);
@@ -66,13 +70,15 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
         />
       </S.InputContainer>
 
-      <S.Table
-        columns={columns}
-        dataSource={filteredRules}
-        pagination={false}
-        rowKey="id"
-        locale={{emptyText: 'No rules found'}}
-      />
+      <S.TableContainer $height={height - 227}>
+        <S.Table
+          columns={columns}
+          dataSource={filteredRules}
+          pagination={false}
+          rowKey="id"
+          locale={{emptyText: 'No rules found'}}
+        />
+      </S.TableContainer>
     </S.Container>
   );
 };
