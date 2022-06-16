@@ -37,9 +37,12 @@ export const Description = styled.span`
 
 export const Link = styled.a`
   color: ${Colors.blue7};
+  margin-left: 5px;
 `;
 
 export const Button = styled(AntdButton)`
   color: ${Colors.whitePure};
   background-color: ${Colors.blue7};
+  margin-top: 10px;
+  display: block;
 `;

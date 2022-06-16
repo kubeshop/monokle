@@ -31,10 +31,10 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
     <S.Card key={id}>
       <S.Icon name={icon} key={icon} />
       <S.Name>{name}</S.Name>
-      <p>
-        <S.Description>{description}</S.Description> <S.Link onClick={openLearnMore}>Learn more</S.Link>
-      </p>
-
+      <span>
+        <S.Description>{description}</S.Description>
+        <S.Link onClick={openLearnMore}>Learn more</S.Link>
+      </span>
       {id === 'open-policy-agent' && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
     </S.Card>
   );
