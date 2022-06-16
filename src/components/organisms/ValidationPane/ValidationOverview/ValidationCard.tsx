@@ -5,7 +5,7 @@ import {useCallback} from 'react';
 import {ValidationIntegration} from '@models/integrations';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/ui';
+import {updateValidationIntegration} from '@redux/reducers/main';
 
 import {trackEvent} from '@utils/telemetry';
 

@@ -7,7 +7,7 @@ import ValidationOverView from './ValidationOverview';
 import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
-  const integration = useAppSelector(state => state.ui.validationDrawer.integration);
+  const integration = useAppSelector(state => state.main.validationIntegration);
 
   return (
     <S.ValidationPaneContainer>

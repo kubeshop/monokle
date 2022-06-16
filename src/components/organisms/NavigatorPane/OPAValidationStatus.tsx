@@ -7,7 +7,8 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {OPA_INTEGRATION} from '@models/integrations';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleValidationDrawer, updateValidationIntegration} from '@redux/reducers/ui';
+import {updateValidationIntegration} from '@redux/reducers/main';
+import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 
 import {Icon} from '@components/atoms';
 
@@ -25,6 +26,7 @@ const OPAValidationStatus: React.FC = () => {
 
     return numberOfActiveRules;
   });
+  const isLeftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
 
   const tooltipTitle = useMemo(() => {
     if (!activeRulesCount) {
@@ -36,7 +38,12 @@ const OPAValidationStatus: React.FC = () => {
 
   const onClickHandler = () => {
     dispatch(updateValidationIntegration(OPA_INTEGRATION));
-    dispatch(toggleValidationDrawer());
+
+    if (!isLeftMenuActive) {
+      dispatch(toggleLeftMenu());
+    }
+
+    dispatch(setLeftMenuSelection('validation'));
   };
 
   return (

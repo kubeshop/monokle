@@ -1,7 +1,5 @@
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
-import {ValidationIntegration} from './integrations';
-
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -145,10 +143,6 @@ export type UiState = {
     release: {
       currentStep: number;
     };
-  };
-  validationDrawer: {
-    isVisible: boolean;
-    integration: ValidationIntegration | undefined;
   };
 };
 
