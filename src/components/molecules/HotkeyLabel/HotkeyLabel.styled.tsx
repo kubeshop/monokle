@@ -11,6 +11,7 @@ export const KeyboardKey = styled.div`
 export const CommandsContainer = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 5px;
 `;
 

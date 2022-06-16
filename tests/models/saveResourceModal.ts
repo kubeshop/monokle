@@ -1,4 +1,5 @@
 import {Locator, Page} from 'playwright';
+import { closeNotification } from '../antdHelpers';
 
 export class SaveResourceModal {
 
@@ -14,6 +15,7 @@ export class SaveResourceModal {
 
   async clickSave() {
     await this._okButton.click();
+    await closeNotification(this._page, 5000);
   }
 
 }

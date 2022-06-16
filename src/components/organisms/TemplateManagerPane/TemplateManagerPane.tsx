@@ -19,12 +19,17 @@ import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
 import * as S from './TemplateManagerPane.styled';
 
-const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
+const filterTemplateBySearchedValue = (searchedValue: string, name: string, author: string) => {
   let shouldBeFiltered = true;
   const splittedSearchedValue = searchedValue.split(' ');
+  const splittedName = name.split(' ');
+  const splittedAuthorName = author.split(' ');
 
   for (let i = 0; i < splittedSearchedValue.length; i += 1) {
-    if (!name.split(' ').find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))) {
+    if (
+      !splittedName.find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase())) &&
+      !splittedAuthorName.find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))
+    ) {
       shouldBeFiltered = false;
       break;
     }
@@ -81,7 +86,9 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
         Object.entries(templateMap)
           .filter(templateEntry => {
             const templateName = templateEntry[1].name;
-            return filterTemplateBySearchedValue(searchedValue, templateName);
+            const templateAuthor = templateEntry[1].author;
+
+            return filterTemplateBySearchedValue(searchedValue, templateName, templateAuthor);
           })
           .sort((a, b) => a[1].name.localeCompare(b[1].name))
       );
