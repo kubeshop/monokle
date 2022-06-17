@@ -1,5 +1,4 @@
 import React, {Suspense, useCallback} from 'react';
-import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
@@ -12,6 +11,8 @@ import {useMainPaneDimensions} from '@utils/hooks';
 
 import ValidationPane from '../ValidationDrawer';
 import * as S from './PaneManagerSplitView.styled';
+// eslint-disable-next-line import/no-relative-packages
+import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
