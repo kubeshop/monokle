@@ -80,7 +80,9 @@ export const helmFileCodeIntel: CodeIntelApply = {
         const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
         keyPathsInFile.forEach(keyPathInFile => {
           const value =
-            typeof keyPathInFile.value === 'object' ? JSON.stringify(keyPathInFile.value) : keyPathInFile.value;
+            typeof keyPathInFile.value === 'object'
+              ? JSON.stringify(keyPathInFile.value, null, 4)
+              : keyPathInFile.value;
 
           const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
             `${keyPathInFile.filePath}`,
