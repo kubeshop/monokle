@@ -23,7 +23,7 @@ import {
   KustomizeResourceSet,
   ResourceSet,
 } from '@redux/compare';
-import {currentConfigSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {
@@ -72,9 +72,10 @@ function fetchLocalResources(state: RootState): K8sResource[] {
 
 async function fetchResourcesFromCluster(state: RootState, options: ClusterResourceSet): Promise<K8sResource[]> {
   try {
+    const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
     const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(state.config, currentContext);
+    const kc = createKubeClient(kubeConfigPath, currentContext);
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))
