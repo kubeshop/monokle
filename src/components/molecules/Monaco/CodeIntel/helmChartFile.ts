@@ -79,6 +79,9 @@ export const helmFileCodeIntel: CodeIntelApply = {
       if (canFindKeyInValuesFile) {
         const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
         keyPathsInFile.forEach(keyPathInFile => {
+          const value =
+            typeof keyPathInFile.value === 'object' ? JSON.stringify(keyPathInFile.value) : keyPathInFile.value;
+
           const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
             `${keyPathInFile.filePath}`,
             'Select file',
@@ -89,7 +92,7 @@ export const helmFileCodeIntel: CodeIntelApply = {
                 setEditorSelection,
               });
             },
-            `Value: ${keyPathInFile.value}\n\nGo to `
+            `Value: ${value}\n\nGo to `
           );
           commandMarkdownLinkList.push(commandMarkdownLink);
           newDisposables.push(commandDisposable);
