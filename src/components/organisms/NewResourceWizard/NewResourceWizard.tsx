@@ -8,7 +8,6 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
 import path from 'path';
-import util from 'util';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
@@ -41,8 +40,7 @@ const fetchFullFileName = (filename: string, suffix?: string) => {
   return `${filename}${suffix || ''}.yaml`;
 };
 
-const createFullFileName = (
-  subfiles: fs.Dirent[],
+const generateFullFileName = (
   resourceName: K8sResource['name'],
   resourceKind: K8sResource['kind'],
   selectedFolder: string,
@@ -56,9 +54,7 @@ const createFullFileName = (
   const fullFileName = fetchFullFileName(`${name}${nameKind}${nameSuffix}`);
   let foundFile: fs.Dirent | FileEntry | undefined;
 
-  if (subfiles.length) {
-    foundFile = subfiles.find(dirent => dirent.name === fullFileName);
-  } else if (selectedFolder === ROOT_FILE_ENTRY) {
+  if (selectedFolder === ROOT_FILE_ENTRY) {
     foundFile = fileMap[`${path.sep}${fullFileName}`];
   } else {
     foundFile = fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`];
@@ -66,43 +62,12 @@ const createFullFileName = (
 
   if (foundFile) {
     if (includeKind) {
-      return createFullFileName(
-        subfiles,
-        resourceName,
-        resourceKind,
-        selectedFolder,
-        fileMap,
-        suffix ? suffix + 1 : 2,
-        true
-      );
+      return generateFullFileName(resourceName, resourceKind, selectedFolder, fileMap, suffix ? suffix + 1 : 2, true);
     }
-    return createFullFileName(
-      subfiles,
-      resourceName,
-      resourceKind,
-      selectedFolder,
-      fileMap,
-      suffix ? suffix + 1 : 0,
-      true
-    );
+    return generateFullFileName(resourceName, resourceKind, selectedFolder, fileMap, suffix ? suffix + 1 : 0, true);
   }
 
   return fullFileName;
-};
-
-const generateFullFileName = async (
-  resourceName: K8sResource['name'],
-  resourceKind: K8sResource['kind'],
-  selectedFolder: string,
-  fileMap: FileMapType
-) => {
-  let subfiles: fs.Dirent[] = [];
-  const fsReaddirPromise = util.promisify(fs.readdir);
-  subfiles = (await fsReaddirPromise(selectedFolder, {withFileTypes: true})).filter(dirent => !dirent.isDirectory());
-
-  const hasNameClash = subfiles.map(x => x.name.split('.')[0]).some(subfile => subfile === resourceName);
-
-  return createFullFileName(subfiles, resourceName, resourceKind, selectedFolder, fileMap, 0, hasNameClash);
 };
 
 const NewResourceWizard = () => {
@@ -164,6 +129,32 @@ const NewResourceWizard = () => {
     [registeredKindHandlers, resourceMap]
   );
 
+  const generateExportFileName = async () => {
+    if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
+      const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
+
+      if (currentFolder) {
+        setSelectedFolder(currentFolder.slice(1));
+      } else {
+        setSelectedFolder(ROOT_FILE_ENTRY);
+      }
+      return;
+    }
+
+    const resourceNames = Object.keys(resourceMap).map(id => resourceMap[id].name);
+    const hasNameClash = resourceNames.some(resource => resource === form.getFieldValue('name'));
+
+    let fullFileName = generateFullFileName(
+      form.getFieldValue('name'),
+      form.getFieldValue('kind'),
+      selectedFolder,
+      fileMap,
+      0,
+      hasNameClash
+    );
+    setExportFileName(fullFileName);
+  };
+
   const [resourceKindOptions, setResourceKindOptions] =
     useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
@@ -218,6 +209,14 @@ const NewResourceWizard = () => {
 
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
   }, [defaultInput, defaultValues, isFolderOpen]);
+
+  useEffect(() => {
+    if (savingDestination !== 'saveToFolder') {
+      return;
+    }
+
+    generateExportFileName();
+  }, [selectedFolder]);
 
   const closeWizard = () => {
     setSubmitDisabled(true);
@@ -302,16 +301,6 @@ const NewResourceWizard = () => {
       if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
         form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
       }
-    }
-
-    if (savingDestination === 'saveToFolder') {
-      const generatedFileName = await generateFullFileName(
-        form.getFieldValue('name'),
-        form.getFieldValue('kind'),
-        selectedFolder,
-        fileMap
-      );
-      setExportFileName(generatedFileName);
     }
   };
 
