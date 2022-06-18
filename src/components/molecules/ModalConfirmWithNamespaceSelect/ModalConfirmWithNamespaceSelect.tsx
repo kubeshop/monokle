@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
-import {currentClusterAccessSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -60,10 +60,12 @@ interface IProps {
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
-  const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources, defaultClusterNamespace);
   const [namespaces] = useTargetClusterNamespaces();
 
@@ -81,7 +83,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         return;
       }
 
-      const kc = createKubeClient(configState);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api
@@ -101,7 +103,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [createNamespaceName, selectedNamespace, selectedOption, onOk, configState]);
+  }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {
