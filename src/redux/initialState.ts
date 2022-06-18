@@ -57,6 +57,7 @@ const initialAppState: AppState = {
   deviceID: electronStore.get('main.deviceID'),
   filtersPresets: electronStore.get('main.filtersPresets') || {},
   imagesList: [],
+  validationIntegration: undefined,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -165,7 +166,6 @@ const initialUiState: UiState = {
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     expandedFolders: [],
-    isValidationDrawerVisible: false,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

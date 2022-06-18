@@ -3,6 +3,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {ImageType} from './image';
+import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -180,6 +181,7 @@ interface AppState {
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
+  validationIntegration: ValidationIntegration | undefined;
 }
 
 export interface KubernetesObject {

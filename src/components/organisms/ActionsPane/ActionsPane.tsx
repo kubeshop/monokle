@@ -282,7 +282,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   }, [selectedPath, fileMap]);
 
   return (
-    <S.ActionsPaneMainContainer ref={actionsPaneRef}>
+    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane">
       <ActionsPaneHeader
         selectedResource={selectedResource}
         applySelection={applySelection}

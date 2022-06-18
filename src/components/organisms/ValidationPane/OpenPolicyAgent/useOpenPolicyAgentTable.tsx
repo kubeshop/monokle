@@ -1,22 +1,24 @@
 import {shell} from 'electron';
 
-import React, {useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
+
+import {IconNames} from '@models/icons';
 
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
-import Icon, {IconNames} from '@components/atoms/Icon';
+import {Icon} from '@components/atoms';
 
 import Colors from '@styles/Colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 
-export function useOpenPolicyAgentTable() {
+export function useOpenPolicyAgentTable(width: number) {
   const dispatch = useDispatch();
 
   const handleToggle = useCallback(
@@ -61,21 +63,25 @@ export function useOpenPolicyAgentTable() {
       },
       {
         key: 'severity',
-        title: 'Severity',
+        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
-        sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
+        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
+          sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
+        }),
         render: (_value, record) => <Icon {...SEVERITY_ICON_MAP[record.severity]} />,
       },
       {
         key: 'enabled',
-        title: 'Enabled?',
+        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
           return <Switch checked={rule.enabled} onChange={() => handleToggle(rule.id)} />;
         },
-        sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
+        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
+          sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
+        }),
       },
     ];
-  }, [handleToggle]);
+  }, [handleToggle, width]);
 
   return columns;
 }
