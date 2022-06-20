@@ -30,6 +30,7 @@ import {
   selectFile,
   selectImage,
   selectK8sResource,
+  setAutosavingStatus,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
@@ -74,6 +75,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
+  const isAutosaving = useAppSelector(state => state.main.isAutosaving);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -216,6 +218,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const onChange = (newValue: any) => {
     setDirty(orgCode !== newValue);
     setCode(newValue);
+
+    if (!isAutosaving) {
+      dispatch(setAutosavingStatus(true));
+    }
 
     if (selectedResourceId) {
       // this will slow things down if document gets large - need to find a better solution...

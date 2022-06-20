@@ -6,7 +6,6 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
 
 import {useAppDispatch} from '@redux/hooks';
-import {setAutosavingStatus} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -54,7 +53,6 @@ function useDebouncedCodeSave(
         return;
       }
       if (orgCode !== undefined && code !== undefined && orgCode !== code) {
-        dispatch(setAutosavingStatus(true));
         saveContent();
       }
     },
