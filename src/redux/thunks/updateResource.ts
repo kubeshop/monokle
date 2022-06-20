@@ -73,6 +73,10 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
       } catch (e) {
         log.error(e);
         return original(mainState);
+      } finally {
+        if (state.main.isAutosaving) {
+          mainState.isAutosaving = false;
+        }
       }
     });
 

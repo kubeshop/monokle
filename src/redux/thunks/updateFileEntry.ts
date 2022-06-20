@@ -95,6 +95,10 @@ export const updateFileEntry = createAsyncThunk(
       } catch (e) {
         log.error(e);
         return original(mainState);
+      } finally {
+        if (state.main.isAutosaving) {
+          mainState.isAutosaving = false;
+        }
       }
     });
 
