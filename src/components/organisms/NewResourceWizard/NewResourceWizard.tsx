@@ -141,8 +141,17 @@ const NewResourceWizard = () => {
       return;
     }
 
-    const resourceNames = Object.keys(resourceMap).map(id => resourceMap[id].name);
-    const hasNameClash = resourceNames.some(resource => resource === form.getFieldValue('name'));
+    let selectedFolderResources;
+    if (selectedFolder === ROOT_FILE_ENTRY) {
+      selectedFolderResources = Object.values(resourceMap).filter(
+        resource => resource.filePath.split('/').length === 2
+      );
+    } else {
+      selectedFolderResources = Object.values(resourceMap).filter(
+        resource => resource.filePath.split('/').length > 2 && resource.filePath.startsWith(`/${selectedFolder}/`)
+      );
+    }
+    const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
 
     let fullFileName = generateFullFileName(
       form.getFieldValue('name'),
@@ -216,7 +225,8 @@ const NewResourceWizard = () => {
     }
 
     generateExportFileName();
-  }, [selectedFolder]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFolder, savingDestination]);
 
   const closeWizard = () => {
     setSubmitDisabled(true);
