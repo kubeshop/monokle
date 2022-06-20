@@ -40,6 +40,7 @@ import {TitleBar} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
 
+import {duplicateEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 
 import TreeItem from './TreeItem';
@@ -293,6 +294,30 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     }, 2000);
   };
 
+  const onDuplicate = (absolutePathToEntity: string, entityName: string, dirName: string) => {
+    duplicateEntity(absolutePathToEntity, entityName, dirName, args => {
+      const {duplicatedFileName, err} = args;
+
+      if (err) {
+        dispatch(
+          setAlert({
+            title: 'Duplicating failed',
+            message: `Something went wrong during duplicating "${absolutePathToEntity}"`,
+            type: AlertEnum.Error,
+          })
+        );
+      } else {
+        dispatch(
+          setAlert({
+            title: `Duplicating succeded`,
+            message: `You have successfully created ${duplicatedFileName}`,
+            type: AlertEnum.Success,
+          })
+        );
+      }
+    });
+  };
+
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
   };
@@ -525,6 +550,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
                 processingEntity={processingEntity}
                 setProcessingEntity={setProcessingEntity}
                 onDelete={onDelete}
+                onDuplicate={onDuplicate}
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
