@@ -104,7 +104,7 @@
     "@rjsf/core": "4.2.0",
     "@trodi/electron-splashscreen": "1.0.2",
     "ajv": "6.12.6",
-    "antd": "4.20.3",
+    "antd": "4.20.7",
     "asar": "3.1.0",
     "async": "3.2.3",
     "chokidar": "3.5.3",
