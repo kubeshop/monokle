@@ -10,7 +10,7 @@ import {
 
 import styled from 'styled-components';
 
-import Col from '@components/atoms/Col';
+import {Col} from '@components/atoms';
 import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
 
@@ -18,6 +18,14 @@ import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors, PanelColors} from '@styles/Colors';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
+
+export const AutosavingContainer = styled.div`
+  margin-left: 10px;
+  color: ${Colors.grey7};
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
 
 export const Row = styled(RawRow.default)`
   display: flex;

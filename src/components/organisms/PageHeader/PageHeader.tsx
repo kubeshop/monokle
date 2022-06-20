@@ -3,6 +3,8 @@ import {useMeasure} from 'react-use';
 
 import {Badge, Dropdown, Tooltip} from 'antd';
 
+import {ReloadOutlined} from '@ant-design/icons';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
@@ -22,8 +24,10 @@ import ProjectSelection from './ProjectSelection';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isAutosaving = useAppSelector(state => state.main.isAutosaving);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
@@ -31,9 +35,11 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
-  const activeProject = useAppSelector(activeProjectSelector);
+
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+  const [showAutosaving, setShowAutosaving] = useState(false);
 
   const runningPreviewConfiguration = useAppSelector(state => {
     if (!state.main.previewConfigurationId) {
@@ -72,6 +78,18 @@ const PageHeader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageHeaderHeight]);
 
+  useEffect(() => {
+    if (typeof isAutosaving === 'undefined') {
+      return;
+    }
+
+    if (!isAutosaving) {
+      setTimeout(() => setShowAutosaving(false), 2000);
+    } else {
+      setShowAutosaving(true);
+    }
+  }, [isAutosaving]);
+
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
       {isInPreviewMode && <S.PreviewRow noborder="true" previewType={previewType} />}
@@ -96,6 +114,15 @@ const PageHeader = () => {
                 </S.BackToProjectButton>
               </>
             )}
+
+            {isAutosaving ? (
+              <S.AutosavingContainer>
+                <ReloadOutlined spin />
+                Saving...
+              </S.AutosavingContainer>
+            ) : isAutosaving === false && showAutosaving ? (
+              <S.AutosavingContainer>Saved</S.AutosavingContainer>
+            ) : null}
           </div>
 
           <div style={{display: 'flex', alignItems: 'center'}}>

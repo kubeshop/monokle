@@ -182,7 +182,7 @@ interface AppState {
   filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
   validationIntegration: ValidationIntegration | undefined;
-  isAutosaving: boolean;
+  isAutosaving?: boolean;
 }
 
 export interface KubernetesObject {
