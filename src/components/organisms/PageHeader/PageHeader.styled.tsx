@@ -27,6 +27,12 @@ export const AutosavingContainer = styled.div`
   gap: 5px;
 `;
 
+export const AutosavingErrorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  color: ${Colors.red6};
+`;
+
 export const Row = styled(RawRow.default)`
   display: flex;
   justify-content: space-between;

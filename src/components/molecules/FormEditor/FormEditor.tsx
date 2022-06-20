@@ -13,7 +13,7 @@ import {stringify} from 'yaml';
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAutosavingStatus} from '@redux/reducers/main';
+import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
@@ -36,7 +36,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const {formSchema, formUiSchema} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const isAutosaving = useAppSelector(state => state.main.isAutosaving);
+  const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -47,13 +47,41 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
   const [schema, setSchema] = useState<any>({});
 
-  const onFormUpdate = (e: any) => {
-    if (!isAutosaving) {
-      dispatch(setAutosavingStatus(true));
+  const changed = useMemo(() => {
+    if (!formData) {
+      return false;
     }
 
+    let formString = stringify(formData);
+
+    if (selectedResource) {
+      const content = mergeManifests(selectedResource.text, formString);
+      return content.trim() !== selectedResource.text.trim();
+    }
+
+    if (selectedPath) {
+      const filePath = getAbsoluteFilePath(selectedPath, fileMap);
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const content = mergeManifests(fileContent, formString);
+      return content.trim() !== fileContent.trim();
+    }
+
+    return false;
+  }, [fileMap, formData, selectedPath, selectedResource]);
+
+  const onFormUpdate = (e: any) => {
     setFormData(e.formData);
   };
+
+  useEffect(() => {
+    if (!formData) {
+      return;
+    }
+
+    if (changed && !autosavingStatus) {
+      dispatch(setAutosavingStatus(true));
+    }
+  }, [autosavingStatus, changed, dispatch, formData]);
 
   useDebounce(
     () => {
@@ -66,6 +94,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         setIsResourceUpdated(isChanged);
         if (isChanged) {
           dispatch(updateResource({resourceId: selectedResource.id, text: content}));
+        } else {
+          dispatch(setAutosavingStatus(false));
         }
       } else if (selectedPath) {
         try {
@@ -77,8 +107,10 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
           if (isChanged) {
             fs.writeFileSync(filePath, content);
           }
-        } catch (e) {
-          // TODO: autosaving error report
+        } catch (e: any) {
+          const {message, stack} = e;
+
+          dispatch(setAutosavingError({message, stack}));
 
           log.error(`Failed to update file [${selectedPath}]`, e);
         } finally {
