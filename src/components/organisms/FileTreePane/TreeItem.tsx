@@ -49,11 +49,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
   const {
     setProcessingEntity,
+    onDuplicate,
     onDelete,
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
-    onCreateFolder,
+    onCreateFileFolder,
     onCreateResource,
     onFilterByFileOrFolder,
     onPreview,
@@ -74,6 +75,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   }, [treeKey, selectedPath]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
+  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
 
   const isRoot = treeKey === ROOT_FILE_ENTRY;
   const root = fileMap[ROOT_FILE_ENTRY];
@@ -145,7 +147,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             disabled: isInPreviewMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
+              onCreateFileFolder(absolutePath, 'folder');
+            },
+          },
+          {
+            key: 'create_file',
+            label: 'New File',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onCreateFileFolder(absolutePath, 'file');
             },
           },
         ]
@@ -218,6 +229,15 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey
       ? [
           {key: 'divider-3', type: 'divider'},
+          {
+            key: 'duplicate_entity',
+            label: 'Duplicate',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onDuplicate(absolutePath, getBasename(absolutePath), getDirname(absolutePath));
+            },
+          },
           {
             key: 'rename_entity',
             label: 'Rename',

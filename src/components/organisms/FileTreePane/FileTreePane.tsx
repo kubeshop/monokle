@@ -24,7 +24,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
-  openCreateFolderModal,
+  openCreateFileFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
   setExpandedFolders,
@@ -40,6 +40,7 @@ import {TitleBar} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
 
+import {duplicateEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 
 import TreeItem from './TreeItem';
@@ -293,6 +294,30 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     }, 2000);
   };
 
+  const onDuplicate = (absolutePathToEntity: string, entityName: string, dirName: string) => {
+    duplicateEntity(absolutePathToEntity, entityName, dirName, args => {
+      const {duplicatedFileName, err} = args;
+
+      if (err) {
+        dispatch(
+          setAlert({
+            title: 'Duplication failed',
+            message: `Something went wrong during duplicating "${absolutePathToEntity}"`,
+            type: AlertEnum.Error,
+          })
+        );
+      } else {
+        dispatch(
+          setAlert({
+            title: `Duplication succeded`,
+            message: `You have successfully created ${duplicatedFileName}`,
+            type: AlertEnum.Success,
+          })
+        );
+      }
+    });
+  };
+
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
   };
@@ -410,8 +435,8 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
   };
 
-  const onCreateFolder = (absolutePath: string) => {
-    dispatch(openCreateFolderModal(absolutePath));
+  const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
+    dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
   };
 
   const onPreview = useCallback(
@@ -525,10 +550,11 @@ const FileTreePane: React.FC<Props> = ({height}) => {
                 processingEntity={processingEntity}
                 setProcessingEntity={setProcessingEntity}
                 onDelete={onDelete}
+                onDuplicate={onDuplicate}
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFolder={onCreateFolder}
+                onCreateFileFolder={onCreateFileFolder}
                 onCreateResource={onCreateResource}
                 onFilterByFileOrFolder={onFilterByFileOrFolder}
                 onPreview={onPreview}

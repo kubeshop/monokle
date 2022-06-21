@@ -12,11 +12,12 @@ export interface TreeItemProps {
   treeKey: string;
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
+  onDuplicate: (absolutePath: string, entityName: string, dirName: string) => void;
   onDelete: (args: DeleteEntityCallback) => void;
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
-  onCreateFolder: (absolutePath: string) => void;
+  onCreateFileFolder: (absolutePath: string, type: 'file' | 'folder') => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
   onFilterByFileOrFolder: (relativePath: string | undefined) => void;
   onPreview: (relativePath: string) => void;

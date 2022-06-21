@@ -157,16 +157,19 @@ export const uiSlice = createSlice({
         resourcesIds: [],
       };
     },
-    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.createFolderModal = {
-        isOpen: true,
-        rootDir: action.payload,
-      };
+    openCreateFileFolderModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<{rootDir: string; type: 'file' | 'folder'}>
+    ) => {
+      const {rootDir, type} = action.payload;
+
+      state.createFileFolderModal = {isOpen: true, rootDir, type};
     },
-    closeCreateFolderModal: (state: Draft<UiState>) => {
-      state.createFolderModal = {
+    closeCreateFileFolderModal: (state: Draft<UiState>) => {
+      state.createFileFolderModal = {
         isOpen: false,
         rootDir: '',
+        type: 'folder',
       };
     },
     openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
@@ -307,7 +310,7 @@ export const {
   cancelWalkThrough,
   closeAboutModal,
   closeClusterDiff,
-  closeCreateFolderModal,
+  closeCreateFileFolderModal,
   closeCreateProjectModal,
   closeFiltersPresetModal,
   closeFolderExplorer,
@@ -325,7 +328,7 @@ export const {
   highlightItem,
   openAboutModal,
   openClusterDiff,
-  openCreateFolderModal,
+  openCreateFileFolderModal,
   openCreateProjectModal,
   openFiltersPresetModal,
   openFolderExplorer,
