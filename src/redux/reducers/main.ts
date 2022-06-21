@@ -384,6 +384,12 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
+    setAutosavingError: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      state.autosaving.error = action.payload;
+    },
+    setAutosavingStatus: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.autosaving.status = action.payload;
+    },
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -1279,6 +1285,8 @@ export const {
   selectPreviewConfiguration,
   setAppRehydrating,
   setApplyingResource,
+  setAutosavingError,
+  setAutosavingStatus,
   selectClusterDiffMatch,
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
