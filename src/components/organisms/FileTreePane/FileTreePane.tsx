@@ -24,7 +24,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
-  openCreateFolderModal,
+  openCreateFileFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
   setExpandedFolders,
@@ -435,8 +435,8 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
   };
 
-  const onCreateFolder = (absolutePath: string) => {
-    dispatch(openCreateFolderModal(absolutePath));
+  const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
+    dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
   };
 
   const onPreview = useCallback(
@@ -554,7 +554,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFolder={onCreateFolder}
+                onCreateFileFolder={onCreateFileFolder}
                 onCreateResource={onCreateResource}
                 onFilterByFileOrFolder={onFilterByFileOrFolder}
                 onPreview={onPreview}
