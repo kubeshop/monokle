@@ -1,4 +1,4 @@
-import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
+import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
@@ -31,6 +31,8 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     const policyPlugins = state.main.policies.plugins;
 
     const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate} = payload;
+
+    let error: any;
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
@@ -70,11 +72,20 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
             log.warn('Failed to find updated resource during preview', resourceId);
           }
         }
-      } catch (e) {
+
+        if (state.main.autosaving.status) {
+          mainState.autosaving.status = false;
+        }
+      } catch (e: any) {
+        const {message, stack} = e || {};
+        error = {message, stack};
         log.error(e);
-        return original(mainState);
       }
     });
+
+    if (error) {
+      return {...state.main, autosaving: {status: false, error}};
+    }
 
     return nextMainState;
   }

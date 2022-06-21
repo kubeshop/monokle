@@ -58,7 +58,7 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
-const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
+const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
@@ -86,7 +86,7 @@ const App = () => {
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
-  const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
+  const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -399,7 +399,7 @@ const App = () => {
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
-          {isCreateFolderModalVisible && <CreateFolderModal />}
+          {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isFiltersPresetModalVisible && <FiltersPresetModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}

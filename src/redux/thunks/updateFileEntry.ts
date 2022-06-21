@@ -1,4 +1,4 @@
-import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
+import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -24,6 +24,8 @@ export const updateFileEntry = createAsyncThunk(
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
+
+    let error: any;
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
@@ -92,11 +94,20 @@ export const updateFileEntry = createAsyncThunk(
             );
           }
         }
-      } catch (e) {
+
+        if (state.main.autosaving.status) {
+          mainState.autosaving.status = false;
+        }
+      } catch (e: any) {
+        const {message, stack} = e || {};
+        error = {message, stack};
         log.error(e);
-        return original(mainState);
       }
     });
+
+    if (error) {
+      return {...state.main, autosaving: {status: false, error}};
+    }
 
     return nextMainState;
   }

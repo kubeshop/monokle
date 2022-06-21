@@ -58,6 +58,7 @@ const initialAppState: AppState = {
   filtersPresets: electronStore.get('main.filtersPresets') || {},
   imagesList: [],
   validationIntegration: undefined,
+  autosaving: {},
 };
 
 const initialAppConfigState: AppConfig = {
@@ -139,9 +140,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: false,
   },
-  createFolderModal: {
+  createFileFolderModal: {
     isOpen: false,
     rootDir: '',
+    type: 'folder',
   },
   createProjectModal: {
     isOpen: false,

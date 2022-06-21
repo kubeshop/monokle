@@ -54,7 +54,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
-    onCreateFolder,
+    onCreateFileFolder,
     onCreateResource,
     onFilterByFileOrFolder,
     onPreview,
@@ -147,7 +147,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             disabled: isInPreviewMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
+              onCreateFileFolder(absolutePath, 'folder');
+            },
+          },
+          {
+            key: 'create_file',
+            label: 'New File',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onCreateFileFolder(absolutePath, 'file');
             },
           },
         ]
