@@ -26,7 +26,6 @@ import {StartupFlags} from '@utils/startupFlag';
 
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
-import {disableAmplitude, enableAmplitude} from './amplitude';
 import autoUpdater from './autoUpdater';
 import {checkNewVersion} from './commands';
 import initKubeconfig from './initKubeconfig';
@@ -37,6 +36,7 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
+import {disableSegment, enableSegment, getSegmentClient} from './segment';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
@@ -148,14 +148,15 @@ export const createWindow = (givenPath?: string) => {
       setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
 
-      // disableTracking = storeState.config.disableEventTracking;
-      // disableErrorReports = storeState.config.disableErrorReporting;
       if (storeState.config.disableEventTracking) {
         Nucleus.disableTracking();
-        disableAmplitude();
+        disableSegment();
       } else {
         Nucleus.enableTracking();
-        enableAmplitude();
+        const segmentClient = getSegmentClient();
+        if (!segmentClient) {
+          enableSegment();
+        }
       }
     });
 
