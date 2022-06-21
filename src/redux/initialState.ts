@@ -57,6 +57,7 @@ const initialAppState: AppState = {
   deviceID: electronStore.get('main.deviceID'),
   filtersPresets: electronStore.get('main.filtersPresets') || {},
   imagesList: [],
+  validationIntegration: undefined,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -204,10 +205,6 @@ const initialUiState: UiState = {
     release: {
       currentStep: -1,
     },
-  },
-  validationDrawer: {
-    isVisible: false,
-    integration: undefined,
   },
 };
 

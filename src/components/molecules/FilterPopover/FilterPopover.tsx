@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Badge, Button, Col, Input, Popover, Row, Space, Tabs} from 'antd';
@@ -29,6 +29,21 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
 
   const [namespace, setNamespace] = useState<string | undefined>(filter?.namespace);
   const [kind, setKind] = useState<string | undefined>(filter?.kind);
+
+  const filterButton = useMemo(
+    () => (
+      <Badge count={filterCount} offset={[-6, 6]} size="small" color={Colors.blue7} style={{borderColor: Colors.blue7}}>
+        <Button
+          disabled={disabled}
+          icon={<FilterOutlined />}
+          type="link"
+          color={filterCount > 0 ? Colors.greenOkay : undefined}
+          style={{marginLeft: 8}}
+        />
+      </Badge>
+    ),
+    [disabled, filterCount]
+  );
 
   const handleChange = useCallback(
     (newFilter: Filter) => {
@@ -213,17 +228,13 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
     </div>
   );
 
+  if (disabled) {
+    return <>{filterButton}</>;
+  }
+
   return (
     <Popover content={content} placement="bottomRight">
-      <Badge count={filterCount} offset={[-6, 6]} size="small" color={Colors.blue7} style={{borderColor: Colors.blue7}}>
-        <Button
-          disabled={disabled}
-          icon={<FilterOutlined />}
-          type="link"
-          color={filterCount > 0 ? Colors.greenOkay : undefined}
-          style={{marginLeft: 8}}
-        />
-      </Badge>
+      {filterButton}
     </Popover>
   );
 }

@@ -8,16 +8,15 @@ import Colors from '@styles/Colors';
 
 export const Heading = styled.div`
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   padding: 18px 16px;
   background-color: #31393c;
-  border-radius: 2px;
 `;
 
 export const HeadingLeft = styled.div`
   display: flex;
-  flex-direction: row;
+  align-items: center;
 `;
 
 export const HeadingTextContainer = styled.div`

@@ -3,26 +3,21 @@ import * as k8s from '@kubernetes/client-node';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
-import {AppConfig, ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
+import {ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
 
 import {runCommandInMainThread} from '@utils/commands';
 import electronStore from '@utils/electronStore';
 import {getMainProcessEnv} from '@utils/env';
 
-export function createKubeClient(config: string | AppConfig, context?: string) {
+export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();
 
-  const path = typeof config === 'string' ? config : config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
   if (!path) {
     throw new Error('Missing path to kubeconfing');
   }
 
   kc.loadFromFile(path);
-  let currentContext =
-    context ??
-    (typeof config === 'string'
-      ? undefined
-      : config.projectConfig?.kubeConfig?.currentContext ?? config.kubeConfig?.currentContext);
+  let currentContext = context;
 
   if (!currentContext) {
     currentContext = kc.currentContext;

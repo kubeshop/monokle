@@ -6,7 +6,6 @@ import path from 'path';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ValidationIntegration} from '@models/integrations';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -188,16 +187,6 @@ export const uiSlice = createSlice({
     toggleStartProjectPane: (state: Draft<UiState>) => {
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
-    toggleValidationDrawer: (state: Draft<UiState>, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload !== undefined) {
-        state.validationDrawer.isVisible = action.payload;
-      } else {
-        state.validationDrawer.isVisible = !state.validationDrawer.isVisible;
-      }
-    },
-    updateValidationIntegration: (state: Draft<UiState>, action: PayloadAction<ValidationIntegration | undefined>) => {
-      state.validationDrawer.integration = action.payload;
-    },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
       if (expandedSections.length > 0) {
@@ -365,8 +354,6 @@ export const {
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
-  toggleValidationDrawer,
-  updateValidationIntegration,
   zoomIn,
   zoomOut,
 } = uiSlice.actions;

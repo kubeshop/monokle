@@ -24,6 +24,7 @@ import {
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
+import {ValidationIntegration} from '@models/integrations';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
@@ -727,6 +728,9 @@ export const mainSlice = createSlice({
       state.filtersPresets[action.payload] = state.resourceFilter;
       electronStore.set('main.filtersPresets', state.filtersPresets);
     },
+    updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
+      state.validationIntegration = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1294,6 +1298,7 @@ export const {
   unselectAllClusterDiffMatches,
   unselectClusterDiffMatch,
   updateResourceFilter,
+  updateValidationIntegration,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

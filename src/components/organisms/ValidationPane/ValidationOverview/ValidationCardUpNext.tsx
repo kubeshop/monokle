@@ -4,9 +4,9 @@ import {LET_US_KNOW_URL} from '@constants/constants';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import * as S from './ValidationCardUpnext.styled';
+import * as S from './ValidationCardUpNext.styled';
 
-export const ValidationCardUpnext: React.FC = () => {
+const ValidationCardUpNext: React.FC = () => {
   return (
     <S.Card>
       <S.Icon />
@@ -17,3 +17,5 @@ export const ValidationCardUpnext: React.FC = () => {
     </S.Card>
   );
 };
+
+export default ValidationCardUpNext;

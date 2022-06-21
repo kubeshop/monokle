@@ -9,7 +9,6 @@ import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import ValidationPane from '../ValidationDrawer';
 import * as S from './PaneManagerSplitView.styled';
 // eslint-disable-next-line import/no-relative-packages
 import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
@@ -19,10 +18,11 @@ const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
+const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const layout = useAppSelector(store => store.ui.paneConfiguration);
+  const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
@@ -44,8 +44,6 @@ const PaneManagerSplitView: React.FC = () => {
 
   return (
     <S.SplitViewContainer style={{width, height}}>
-      <ValidationPane height={height} />
-
       <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
         {leftActiveMenu && (
           <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
@@ -56,6 +54,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
                 {leftActiveMenu === 'images-pane' && <ImagesPane />}
                 {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
+                {leftActiveMenu === 'validation-pane' && <ValidationPane height={height} />}
               </Suspense>
             </S.LeftPane>
           </ReflexElement>
