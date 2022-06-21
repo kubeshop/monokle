@@ -156,7 +156,7 @@
     "styled-components": "5.3.5",
     "tar": "6.1.11",
     "tiny-invariant": "1.2.0",
-    "type-fest": "2.12.2",
+    "type-fest": "2.13.0",
     "uuid": "8.3.2",
     "vm2": "3.9.9",
     "web-vitals": "2.1.4",
