@@ -69,6 +69,53 @@ export interface RenameEntityCallback {
   err: NodeJS.ErrnoException | null;
 }
 
+export interface DuplicateEntityCallback {
+  duplicatedFileName: string;
+  err: NodeJS.ErrnoException | null;
+}
+
+/**
+ * Duplicates entity
+ *
+ * @param absolutePath
+ * Absolute path to your entity
+ * @param entityName
+ * Entity name
+ * @param dirName
+ * Directory name
+ * @param callback
+ * Function which is called whenever the entity was duplicated or not
+ */
+
+export function duplicateEntity(
+  absolutePath: string,
+  entityName: string,
+  dirName: string,
+  callback: (args: DuplicateEntityCallback) => any
+) {
+  if (path.isAbsolute(absolutePath)) {
+    const {name, ext} = path.parse(entityName);
+    let newName = `${name} (1)`;
+
+    let files = fs.readdirSync(dirName);
+    let i = 1;
+
+    while (i) {
+      if (files.includes(`${newName}${ext}`)) {
+        i += 1;
+        newName = `${name} (${i})`;
+      } else {
+        i = 0;
+        const duplicatedFileName = `${dirName}${path.sep}${newName}${ext}`;
+
+        fs.copyFile(absolutePath, duplicatedFileName, err => {
+          callback({duplicatedFileName, err});
+        });
+      }
+    }
+  }
+}
+
 /**
  * Renames entity by specified path
  *
