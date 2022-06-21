@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeCreateFileFolderModal} from '@redux/reducers/ui';
 
-import {CreateFileFolderCallback, checkIfEntityExists, createFile, createFolder} from '@utils/files';
+import {CreateFileFolderCallback, createFile, createFolder, doesPathExist} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
@@ -104,7 +104,7 @@ const CreateFileFolderModal: React.FC = () => {
                     );
                   }
 
-                  if (checkIfEntityExists(path.join(uiState.rootDir, path.sep, fileFolderNameValue))) {
+                  if (doesPathExist(path.join(uiState.rootDir, fileFolderNameValue))) {
                     reject(new Error('A file or folder with this name already exists in this location'));
                   }
 

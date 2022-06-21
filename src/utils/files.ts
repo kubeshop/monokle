@@ -3,7 +3,7 @@ import {lstat} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
-export function checkIfEntityExists(absolutePath: string) {
+export function doesPathExist(absolutePath: string) {
   try {
     fs.accessSync(absolutePath);
 
@@ -150,11 +150,11 @@ export interface CreateFileFolderCallback {
 }
 
 export function createFolder(rootDir: string, folderName: string, callback: (args: CreateFileFolderCallback) => any) {
-  return fs.mkdir(`${rootDir}${path.sep}${folderName}`, err => callback({rootDir, fileFolderName: folderName, err}));
+  return fs.mkdir(path.join(rootDir, folderName), err => callback({rootDir, fileFolderName: folderName, err}));
 }
 
 export function createFile(rootDir: string, fileName: string, callback: (args: CreateFileFolderCallback) => any) {
-  return fs.open(`${rootDir}${path.sep}${fileName}`, 'wx', err => callback({rootDir, fileFolderName: fileName, err}));
+  return fs.open(path.join(rootDir, fileName), 'wx', err => callback({rootDir, fileFolderName: fileName, err}));
 }
 
 export function hasValidExtension(file: string | undefined, extensions: string[]): boolean {
