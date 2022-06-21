@@ -1,4 +1,4 @@
-import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
+import {Button, Skeleton as RawSkeleton, Tabs as RawTabs, Tree} from 'antd';
 
 import styled from 'styled-components';
 
@@ -22,6 +22,11 @@ export const FileTreeContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
+
+  .ant-tree-indent {
+    display: none;
+  }
+
   & .ant-tree-list-scrollbar {
     width: 8px;
     background: ${Colors.grey1000};
@@ -121,8 +126,15 @@ export const RootFolderText = styled.div`
 `;
 
 export const MatchText = styled.div`
-  color: ${Colors.lightSeaGreen};
-  padding: 0 15px;
+  margin: 0 15px 0 0;
+
+  p {
+    color: ${Colors.lightSeaGreen};
+    margin: 0;
+  }
+  span {
+    color: ${Colors.grey7};
+  }
 `;
 
 export const EntryName = styled.span``;
@@ -151,7 +163,7 @@ export const MatchLine = styled.div`
 `;
 
 export const TreeContainer = styled.div`
-  margin-left: 2px;
+  margin: 14px 0 0 2px;
 `;
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
@@ -164,9 +176,13 @@ export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   opacity: ${props => (props.disabled ? '70%' : '100%')};
 `;
 
+export const Form = styled.div`
+  margin: 5px 14px;
+`;
+
 export const SearchBox = styled.div`
   display: flex;
-  margin: 5px 14px;
+  margin: 12px 0;
 `;
 
 export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
@@ -218,5 +234,46 @@ export const RecentSearchItem = styled.div`
     cursor: pointer;
     color: ${Colors.cyan7};
     transition: all 0.5s ease;
+  }
+`;
+
+export const Tabs = styled(RawTabs)`
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  & .ant-tabs-nav {
+    padding: 0 16px;
+    margin-bottom: 0px;
+  }
+
+  & .ant-tabs-nav::before {
+    border-bottom: 1px solid #363636;
+  }
+
+  & .ant-tabs-content {
+    height: 100%;
+  }
+`;
+
+export const Label = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: ${Colors.grey9};
+  margin-bottom: 5px;
+`;
+
+export const ResultContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin-left: 10px;
   }
 `;

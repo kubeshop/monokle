@@ -5,8 +5,8 @@
 export interface MatchNode {
   textWithHighlights: string;
   lineNumber: number;
-  indexStart: number;
-  indexEnd: number;
+  start: number;
+  end: number;
 }
 
 interface FileEntry {

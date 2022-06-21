@@ -161,6 +161,16 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   text-decoration: underline;
 }
 
+.monokleEditorMatchInlineClass {
+  background-color: #6F9412;
+  color: #0d0b0b !important;
+}
+
+.monokleEditorCurrentMatchInlineClass {
+  background-color: #C9E75D;
+  color: #0d0b0b !important;
+}
+
 .monokleEditorSatisfiedRefInlineClass {
   color: #1890ff !important;
   text-decoration: underline;

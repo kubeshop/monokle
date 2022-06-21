@@ -1,7 +1,7 @@
 import React, {Key, useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Input} from 'antd';
+import {Button, Input, Tabs} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
@@ -10,23 +10,14 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
-<<<<<<< HEAD
+
 import {openRenameEntityModal, setExpandedSearchedFiles, openCreateFileFolderModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-import {TitleBar} from '@molecules';
-
-import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview, useProcessing} from '@hooks/fileTreeHooks';
-=======
-import {openRenameEntityModal, setExpandedSearchedFiles} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {TitleBar} from '@molecules';
 
-import {useCreate, useDelete, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
->>>>>>> refactor: cleanup searchPane, remove tree dots on hover for match lines
+import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
+import {highlightFileMatches, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 
 import electronStore from '@utils/electronStore';
 import {MatchParamProps, filterFilesByQuery, getRegexp} from '@utils/getRegexp';
@@ -46,6 +37,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode | null>(null);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchQuery, updateSearchQuery] = useState<string>('');
+  const [replaceQuery, updateReplaceQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
   const [queryMatchParam, setQueryMatchParam] = useState<MatchParamProps>({
@@ -63,8 +55,9 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const onLineSelect = useFileSelect();
+  const onSelect = useFileSelect();
   const onPreview = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
@@ -72,33 +65,13 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
   const treeRef = useRef<any>();
   const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);
+  const {TabPane} = Tabs;
 
-<<<<<<< HEAD
-  const highlightFilePath = useHighlightNode(tree, treeRef, expandedFiles);
-
-  const rootFolderName = useMemo(() => {
-    return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
-  }, [fileMap]);
-
-  const setFolder = useCallback(
-    (folder: string) => {
-      dispatch(setRootFolder(folder));
-    },
-    [dispatch]
-  );
+  const highlightFilePath = useHighlightNode(searchTree, treeRef, expandedFiles);
 
   const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
   };
-
-  const refreshFolder = useCallback(() => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
-  }, [fileMap, setFolder]);
-
-  const {onExcludeFromProcessing, onIncludeToProcessing} = useProcessing(refreshFolder);
-=======
-  const highlightFilePath = useHighlightNode(searchTree, treeRef, expandedFiles);
->>>>>>> refactor: cleanup searchPane, remove tree dots on hover for match lines
 
   useEffect(() => {
     if (selectedResourceId && searchTree) {
@@ -160,6 +133,19 @@ const SearchPane: React.FC<Props> = ({height}) => {
     setFindingMatches(false);
   };
 
+  const onNodeSelect = (selectedKeysValue: React.Key[], info: any) => {
+    let parentNode = info.node;
+    if (info.node.parentKey) {
+      parentNode = searchTree?.children.find(({key}) => info.node.parentKey === key);
+    }
+    const options = {
+      currentMatchItem: info.node.matchItem || info.node.matchLines[0][0],
+      matchLines: parentNode.matchLines,
+    };
+    onSelect(selectedKeysValue, info);
+    dispatch(highlightFileMatches(options));
+  };
+
   useEffect(() => {
     findMatches(searchQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -175,6 +161,10 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }, 1000);
   };
 
+  const handleReplaceQuery = (e: {target: HTMLInputElement}) => {
+    updateReplaceQuery(e.target.value);
+  };
+
   const toggleMatchParam = (param: keyof MatchParamProps) => {
     setFindingMatches(true);
     setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
@@ -185,77 +175,132 @@ const SearchPane: React.FC<Props> = ({height}) => {
   return (
     <S.FileTreeContainer id="AdvancedSearch">
       <TitleBar title="Advanced Search" closable />
-      <S.TreeContainer>
-        <S.SearchBox>
-          <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
-          <S.StyledButton $isItemSelected={queryMatchParam.matchCase} onClick={() => toggleMatchParam('matchCase')}>
-            Aa
-          </S.StyledButton>
-          <S.StyledButton
-            $isItemSelected={queryMatchParam.matchWholeWord}
-            onClick={() => toggleMatchParam('matchWholeWord')}
-          >
-            [
-          </S.StyledButton>
-          <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
-            .*
-          </S.StyledButton>
-        </S.SearchBox>
-        <S.RootFolderText>
-          {isReady && (
-            <S.MatchText id="search-count">
-              {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
-            </S.MatchText>
-          )}
-          {!searchTree && !isFindingMatches && (
-            <RecentSearch
-              handleClick={query => {
-                updateSearchQuery(query);
-                findMatches(query);
-              }}
-            />
-          )}
-        </S.RootFolderText>
-        {isFindingMatches && <S.Skeleton active />}
+      <S.Tabs>
+        <TabPane key="search" tab="Search">
+          <S.TreeContainer>
+            <S.Form>
+              <S.SearchBox>
+                <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
+                <S.StyledButton
+                  $isItemSelected={queryMatchParam.matchCase}
+                  onClick={() => toggleMatchParam('matchCase')}
+                >
+                  Aa
+                </S.StyledButton>
+                <S.StyledButton
+                  $isItemSelected={queryMatchParam.matchWholeWord}
+                  onClick={() => toggleMatchParam('matchWholeWord')}
+                >
+                  [
+                </S.StyledButton>
+                <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+                  .*
+                </S.StyledButton>
+              </S.SearchBox>
+            </S.Form>
+            <S.RootFolderText>
+              {isReady && (
+                <S.MatchText id="search-count">
+                  <p>
+                    {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
+                  </p>
+                </S.MatchText>
+              )}
+              {!searchTree && !isFindingMatches && (
+                <RecentSearch
+                  handleClick={query => {
+                    updateSearchQuery(query);
+                    findMatches(query);
+                  }}
+                />
+              )}
+            </S.RootFolderText>
+            {isFindingMatches && <S.Skeleton active />}
 
-        {isReady && (
-          <S.TreeDirectoryTree
-            height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
-            onSelect={onLineSelect}
-            treeData={[searchTree]}
-            ref={treeRef}
-            expandedKeys={expandedFiles}
-            onExpand={onExpand}
-            titleRender={event => (
-              <TreeItem
-                treeKey={String(event.key)}
-                title={event.title}
-                processingEntity={processingEntity}
-                setProcessingEntity={setProcessingEntity}
-                onDelete={onDelete}
-                onRename={onRename}
-                onExcludeFromProcessing={onExcludeFromProcessing}
-                onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFileFolder={onCreateFileFolder}
-                onDuplicate={onDuplicate}
-                onCreateResource={onCreateResource}
-                onFilterByFileOrFolder={onFilterByFileOrFolder}
-                onPreview={onPreview}
-                {...event}
+            {isReady && (
+              <S.TreeDirectoryTree
+                height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
+                onSelect={onNodeSelect}
+                treeData={[searchTree]}
+                ref={treeRef}
+                expandedKeys={expandedFiles}
+                onExpand={onExpand}
+                titleRender={event => (
+                  <TreeItem
+                    treeKey={String(event.key)}
+                    title={event.title}
+                    processingEntity={processingEntity}
+                    setProcessingEntity={setProcessingEntity}
+                    onDelete={onDelete}
+                    onRename={onRename}
+                    onCreateFileFolder={onCreateFileFolder}
+                    onDuplicate={onDuplicate}
+                    onCreateResource={onCreateResource}
+                    onFilterByFileOrFolder={onFilterByFileOrFolder}
+                    onPreview={onPreview}
+                    {...event}
+                  />
+                )}
+                autoExpandParent={false}
+                selectedKeys={[selectedPath || '-']}
+                filterTreeNode={node => {
+                  // @ts-ignore
+                  return node.highlight;
+                }}
+                disabled={isInPreviewMode || previewLoader.isLoading}
+                switcherIcon={<DownOutlined />}
+                icon={<></>}
               />
             )}
-            autoExpandParent={false}
-            selectedKeys={[selectedPath || '-']}
-            filterTreeNode={node => {
-              // @ts-ignore
-              return node.highlight;
-            }}
-            disabled={isInPreviewMode || previewLoader.isLoading}
-            switcherIcon={<DownOutlined />}
-            icon={<></>}
-          />
-        )}
-      </S.TreeContainer>
+          </S.TreeContainer>
+        </TabPane>
+
+        <TabPane key="FindReplace" tab="Find &#38; Replace">
+          <S.TreeContainer>
+            <S.Form>
+              <S.Label>Find:</S.Label>
+              <S.SearchBox>
+                <Input value={searchQuery} onChange={handleSearchQueryChange} />
+                <S.StyledButton
+                  $isItemSelected={queryMatchParam.matchCase}
+                  onClick={() => toggleMatchParam('matchCase')}
+                >
+                  Aa
+                </S.StyledButton>
+                <S.StyledButton
+                  $isItemSelected={queryMatchParam.matchWholeWord}
+                  onClick={() => toggleMatchParam('matchWholeWord')}
+                >
+                  [
+                </S.StyledButton>
+                <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+                  .*
+                </S.StyledButton>
+              </S.SearchBox>
+
+              <S.Label>Replace:</S.Label>
+              <S.SearchBox>
+                <Input value={replaceQuery} onChange={handleReplaceQuery} />
+              </S.SearchBox>
+            </S.Form>
+            <S.RootFolderText>
+              {isReady && (
+                <S.ResultContainer>
+                  <S.MatchText id="search-count-replace">
+                    <p>1 of {searchCounter.current.totalMatchCount}</p>
+                    <span> View in Editor</span>
+                  </S.MatchText>
+                  <S.ButtonContainer>
+                    <Button type="primary">Previous</Button>
+                    <Button type="primary">Next</Button>
+                  </S.ButtonContainer>
+                </S.ResultContainer>
+              )}
+            </S.RootFolderText>
+            {isFindingMatches && <S.Skeleton active />}
+          </S.TreeContainer>
+        </TabPane>
+      </S.Tabs>
     </S.FileTreeContainer>
   );
 };

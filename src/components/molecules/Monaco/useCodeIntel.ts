@@ -12,6 +12,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
+import {MatchNode} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -40,6 +41,7 @@ interface CodeIntelProps {
   helmChartMap?: HelmChartMapType;
   helmValuesMap?: HelmValuesMapType;
   helmTemplatesMap?: HelmTemplatesMapType;
+  matchOptions?: {currentMatchItem: MatchNode; matchLines: []};
 }
 
 function useCodeIntel(props: CodeIntelProps) {
@@ -60,6 +62,7 @@ function useCodeIntel(props: CodeIntelProps) {
     helmChartMap,
     helmValuesMap,
     helmTemplatesMap,
+    matchOptions,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -86,6 +89,7 @@ function useCodeIntel(props: CodeIntelProps) {
       helmValuesMap,
       currentFile,
       selectedResource,
+      matchOptions,
     };
     const codeIntelForFile = codeIntels.find(ci => ci.shouldApply(shouldApplyParams));
     if (codeIntelForFile) {
@@ -112,12 +116,14 @@ function useCodeIntel(props: CodeIntelProps) {
           selectImageHandler,
           resourceMap,
           model: editor.getModel(),
+          matchOptions,
         })
         .then(data => {
           if (!data) {
             return;
           }
-          const {newDecorations, newDisposables, newMarkers} = data;
+          const {newDecorations, newDisposables, newMarkers, currentSelection} = data;
+
           if (newDecorations) {
             idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
           }
@@ -128,6 +134,11 @@ function useCodeIntel(props: CodeIntelProps) {
           const model = editor.getModel();
           if (model && newMarkers) {
             setMarkers(model, newMarkers);
+          }
+
+          if (currentSelection) {
+            editor.setPosition({lineNumber: currentSelection.lineNumber, column: 1});
+            editor.revealLine(currentSelection.lineNumber);
           }
         });
     }

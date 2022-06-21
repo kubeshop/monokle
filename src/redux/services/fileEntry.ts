@@ -786,15 +786,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
  * Selects the specified filePath - used by several reducers
  */
 
-export function selectFilePath({
-  filePath,
-  lineNumber = 0,
-  state,
-}: {
-  filePath: string;
-  lineNumber?: number;
-  state: AppState;
-}) {
+export function selectFilePath({filePath, state}: {filePath: string; state: AppState}) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
 
@@ -817,5 +809,4 @@ export function selectFilePath({
   state.selectedPreviewConfigurationId = undefined;
   state.selectedImage = undefined;
   state.selectedPath = filePath;
-  state.lineNumber = lineNumber;
 }

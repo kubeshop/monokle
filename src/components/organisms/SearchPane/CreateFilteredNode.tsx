@@ -54,7 +54,7 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
           title: <StyledMatchLine lineMatches={lineMatches} />,
           isFolder: false,
           isLeaf: true,
-          lineNumber: lineMatches[0].lineNumber,
+          matchItem: lineMatches[0],
         })) || [],
     })),
   };

@@ -22,7 +22,7 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
+import {FileEntry, MatchNode} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
@@ -436,16 +436,18 @@ export const mainSlice = createSlice({
     /**
      * Marks the specified file as selected and highlights all related resources
      */
-    selectFile: (
-      state: Draft<AppState>,
-      action: PayloadAction<{filePath: string; isVirtualSelection?: boolean; lineNumber?: number}>
-    ) => {
+    selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
       const filePath = action.payload.filePath;
-      const lineNumber = action.payload.lineNumber;
       if (filePath.length > 0) {
-        selectFilePath({filePath, lineNumber, state});
+        selectFilePath({filePath, state});
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
+    },
+    highlightFileMatches: (
+      state: Draft<AppState>,
+      action: PayloadAction<{currentMatchItem: MatchNode; matchLines: []}>
+    ) => {
+      state.matchOptions = action.payload;
     },
     selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.selectedPreviewConfigurationId = action.payload;
@@ -1327,6 +1329,7 @@ export const {
   unselectClusterDiffMatch,
   updateResourceFilter,
   updateValidationIntegration,
+  highlightFileMatches,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

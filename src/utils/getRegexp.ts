@@ -64,8 +64,8 @@ function getMatchLines(text: string, queryRegExp: RegExp) {
           {
             textWithHighlights,
             lineNumber: index + 1,
-            indexStart,
-            indexEnd,
+            start: indexStart + 1,
+            end: indexEnd + 1,
           },
         ];
       }, []);

@@ -18,6 +18,8 @@ export enum InlineDecorationTypes {
   UnsatisfiedRef,
   SatisfiedRef,
   PolicyIssue,
+  Match,
+  CurrentMatch,
 }
 
 const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.IModelDecorationOptions> = {
@@ -71,6 +73,12 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
       position: monaco.editor.OverviewRulerLane.Left,
       color: Colors.red7,
     },
+  },
+  [InlineDecorationTypes.Match]: {
+    inlineClassName: 'monokleEditorMatchInlineClass',
+  },
+  [InlineDecorationTypes.CurrentMatch]: {
+    inlineClassName: 'monokleEditorCurrentMatchInlineClass',
   },
 };
 

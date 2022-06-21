@@ -16,7 +16,6 @@ export const useFileSelect = () => {
 
   return function onSelect(selectedKeysValue: React.Key[], info: any) {
     const nodeKey = info.node.parentKey || info.node.key;
-    const lineNumber = info.node.lineNumber || 0;
 
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(nodeKey), fileInclude))) {
       return;
@@ -29,7 +28,7 @@ export const useFileSelect = () => {
         stopPreview(dispatch);
       }
       dispatch(setSelectingFile(true));
-      dispatch(selectFile({filePath: nodeKey, lineNumber}));
+      dispatch(selectFile({filePath: nodeKey}));
     }
   };
 };
