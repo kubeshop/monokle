@@ -12,6 +12,7 @@ export interface TreeItemProps {
   treeKey: string;
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
+  onDuplicate: (absolutePath: string, entityName: string, dirName: string) => void;
   onDelete: (args: DeleteEntityCallback) => void;
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onExcludeFromProcessing: (relativePath: string) => void;
