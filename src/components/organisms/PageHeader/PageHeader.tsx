@@ -103,7 +103,7 @@ const PageHeader = () => {
   }, [pageHeaderHeight]);
 
   useEffect(() => {
-    if (typeof autosavingStatus === 'undefined') {
+    if (autosavingStatus === undefined) {
       return;
     }
 
