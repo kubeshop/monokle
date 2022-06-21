@@ -301,7 +301,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       if (err) {
         dispatch(
           setAlert({
-            title: 'Duplicating failed',
+            title: 'Duplication failed',
             message: `Something went wrong during duplicating "${absolutePathToEntity}"`,
             type: AlertEnum.Error,
           })
@@ -309,7 +309,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       } else {
         dispatch(
           setAlert({
-            title: `Duplicating succeded`,
+            title: `Duplication succeded`,
             message: `You have successfully created ${duplicatedFileName}`,
             type: AlertEnum.Success,
           })
