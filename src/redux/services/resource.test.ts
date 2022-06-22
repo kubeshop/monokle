@@ -16,7 +16,7 @@ test('get-namespaces', () => {
     version: '1.0',
     isHighlighted: false,
     isSelected: false,
-    isNamespaced: true,
+    isKindNamespaced: true,
     content: {
       apiVersion: 'v1',
       kind: 'Deployment',

@@ -39,8 +39,8 @@ interface K8sResource {
   version: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;
-  /** if resource is namespaced */
-  isNamespaced: boolean;
+  /** if resource kind is namespaced */
+  isKindNamespaced: boolean;
   /** if highlighted in UI (should probalby move to UI state object) */
   isHighlighted: boolean;
   /** if selected in UI (should probably move to UI state object) */
