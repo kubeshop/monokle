@@ -93,7 +93,6 @@
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
-    "@amplitude/node": "1.10.0",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
@@ -103,7 +102,9 @@
     "@rjsf/antd": "4.2.0",
     "@rjsf/core": "4.2.0",
     "@trodi/electron-splashscreen": "1.0.2",
+    "@types/analytics-node": "3.1.9",
     "ajv": "6.12.6",
+    "analytics-node": "6.0.0",
     "antd": "4.20.7",
     "asar": "3.1.0",
     "async": "3.2.3",
