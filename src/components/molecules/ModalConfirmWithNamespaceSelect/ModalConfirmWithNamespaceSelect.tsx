@@ -14,8 +14,6 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 import {createKubeClient} from '@utils/kubeclient';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
-import Colors from '@styles/Colors';
-
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
 interface IProps {
@@ -74,7 +72,15 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
 
+  const clusterScopedResourcesCount = useMemo(() => resources.filter(r => r.isClusterScoped).length, [resources]);
+  const hasClusterScopedResources = useMemo(() => resources.some(r => !r.isClusterScoped), [resources]);
+  const onlyClusterScopedResources = useMemo(() => resources.every(r => !r.isClusterScoped), [resources]);
+
   useEffect(() => {
+    if (onlyClusterScopedResources) {
+      return;
+    }
+
     if (defaultOption && defaultOption === 'none') {
       setSelectedOption('none');
       setSelectedNamespace('default');
@@ -88,23 +94,20 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess]);
+  }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess, onlyClusterScopedResources]);
 
-  const clusterScopedResourcesCount = useMemo(() => resources.filter(r => r.isClusterScoped).length, [resources]);
-  const hasClusterScopedResources = useMemo(() => resources.some(r => !r.isClusterScoped), [resources]);
-  const onlyClusterScopedResources = useMemo(() => resources.every(r => !r.isClusterScoped), [resources]);
-
-  if (!selectedOption) {
+  if (!onlyClusterScopedResources && !selectedOption) {
     return null;
   }
 
   return (
     <Modal
+      bodyStyle={{display: onlyClusterScopedResources ? 'none' : 'block'}}
       centered
       visible={isVisible}
       title={
         <S.TitleContainer>
-          <S.TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
+          <S.TitleIcon />
           {title}
         </S.TitleContainer>
       }
@@ -113,7 +116,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     >
       <>
         <S.HeadlineLabel>
-          Select namespace
+          Select target namespace
           {hasClusterScopedResources &&
             !onlyClusterScopedResources &&
             ` for ${clusterScopedResourcesCount} namespaced resources`}
