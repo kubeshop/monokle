@@ -4,10 +4,6 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
@@ -20,34 +16,7 @@ import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
-import {getResourceKindHandler} from '@src/kindhandlers';
-
-const ErrorMessageLabel = styled.div`
-  color: ${Colors.redError};
-  margin-top: 10px;
-`;
-
-const HeadlineLabel = styled.div`
-  margin-bottom: 16px;
-`;
-
-const NamespaceContainer = styled.div`
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  grid-column-gap: 10px;
-  align-items: center;
-  margin-top: 24px;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const TitleIcon = styled(ExclamationCircleOutlined)`
-  margin-right: 10px;
-  color: ${Colors.yellowWarning};
-`;
+import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
 interface IProps {
   isVisible: boolean;
@@ -121,14 +90,9 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess]);
 
-  const onlyClusterScopedResources = useMemo(
-    () => resources.every(r => !getResourceKindHandler(r.kind)?.isNamespaced),
-    [resources]
-  );
-  const hasClusterScopedResources = useMemo(
-    () => resources.some(r => !getResourceKindHandler(r.kind)?.isNamespaced),
-    [resources]
-  );
+  const clusterScopedResourcesCount = useMemo(() => resources.filter(r => r.isClusterScoped).length, [resources]);
+  const hasClusterScopedResources = useMemo(() => resources.some(r => !r.isClusterScoped), [resources]);
+  const onlyClusterScopedResources = useMemo(() => resources.every(r => !r.isClusterScoped), [resources]);
 
   if (!selectedOption) {
     return null;
@@ -139,19 +103,22 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       centered
       visible={isVisible}
       title={
-        <TitleContainer>
-          <TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
+        <S.TitleContainer>
+          <S.TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
           {title}
-        </TitleContainer>
+        </S.TitleContainer>
       }
       onOk={onClickOk}
       onCancel={onCancel}
     >
       <>
-        <HeadlineLabel>
-          Select namespace {hasClusterScopedResources && !onlyClusterScopedResources && ' for all namespaced resources'}
+        <S.HeadlineLabel>
+          Select namespace
+          {hasClusterScopedResources &&
+            !onlyClusterScopedResources &&
+            ` for ${clusterScopedResourcesCount} namespaced resources`}
           :
-        </HeadlineLabel>
+        </S.HeadlineLabel>
         <Radio.Group
           key={selectedOption}
           disabled={onlyClusterScopedResources}
@@ -168,7 +135,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         </Radio.Group>
 
         {selectedOption === 'existing' ? (
-          <NamespaceContainer>
+          <S.NamespaceContainer>
             <span>Namespace:</span>
             <Select
               disabled={onlyClusterScopedResources}
@@ -185,10 +152,10 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                   </Select.Option>
                 ))}
             </Select>
-          </NamespaceContainer>
+          </S.NamespaceContainer>
         ) : selectedOption === 'create' ? (
           <>
-            <NamespaceContainer>
+            <S.NamespaceContainer>
               <span>Namespace name:</span>
               <Input
                 disabled={onlyClusterScopedResources}
@@ -204,8 +171,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                   }
                 }}
               />
-            </NamespaceContainer>
-            {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
+            </S.NamespaceContainer>
+            {errorMessage && <S.ErrorMessageLabel>*{errorMessage}</S.ErrorMessageLabel>}
           </>
         ) : null}
       </>
