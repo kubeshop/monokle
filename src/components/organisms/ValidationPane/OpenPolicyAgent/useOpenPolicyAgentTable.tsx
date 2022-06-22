@@ -18,6 +18,7 @@ import {Icon} from '@components/atoms';
 import Colors from '@styles/Colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
+import * as S from './ValidationOpenPolicyAgentTable.styled';
 
 export function useOpenPolicyAgentTable(width: number) {
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ export function useOpenPolicyAgentTable(width: number) {
               placement="bottomLeft"
               overlayStyle={{maxWidth: '500px'}}
             >
-              {record.name}
+              {record.name} <S.RuleId>{record.id}</S.RuleId>
             </Tooltip>
           );
         },

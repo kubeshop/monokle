@@ -14,6 +14,11 @@ export const InputContainer = styled.div`
   padding: 0px 16px;
 `;
 
+export const RuleId = styled.span`
+  color: ${Colors.grey7};
+  font-size: 12px;
+`;
+
 export const SearchIcon = styled(SearchOutlined)`
   color: ${Colors.grey7};
 `;
