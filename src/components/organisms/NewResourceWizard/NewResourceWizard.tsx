@@ -45,6 +45,7 @@ const NewResourceWizard = () => {
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
+  const [isResourceKindNamespaced, setIsResourceKindNamespaced] = useState<boolean>(true);
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
@@ -170,6 +171,12 @@ const NewResourceWizard = () => {
 
       if (kindHandler) {
         form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
+
+        if (!kindHandler.isNamespaced) {
+          form.setFieldsValue({namespace: SELECT_OPTION_NONE});
+        }
+
+        setIsResourceKindNamespaced(kindHandler.isNamespaced || false);
       }
 
       shouldFilterResources = true;
@@ -205,10 +212,15 @@ const NewResourceWizard = () => {
         const kindHandler = getResourceKindHandler(selectedResource.kind);
 
         if (kindHandler) {
-          form.setFieldsValue({kind: selectedResource.kind});
-          form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
+          form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion, kind: selectedResource.kind});
+
+          if (!kindHandler.isNamespaced) {
+            form.setFieldsValue({namespace: SELECT_OPTION_NONE});
+          }
+
           setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
 
+          setIsResourceKindNamespaced(kindHandler.isNamespaced);
           shouldFilterResources = true;
         }
       }
@@ -263,7 +275,10 @@ const NewResourceWizard = () => {
       {
         name: formValues.name,
         kind: formValues.kind,
-        namespace: formValues.namespace === SELECT_OPTION_NONE ? undefined : formValues.namespace,
+        namespace:
+          formValues.namespace === SELECT_OPTION_NONE || !getResourceKindHandler(formValues.kind)?.isNamespaced
+            ? undefined
+            : formValues.namespace,
         apiVersion: formValues.apiVersion,
       },
       dispatch,
@@ -428,41 +443,43 @@ const NewResourceWizard = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item
-          name="namespace"
-          label="Namespace"
-          tooltip={{
-            title: () => (
-              <span>
-                Namespace - <a onClick={openNamespaceTopic}>read more</a>
-              </span>
-            ),
-            icon: <InfoCircleOutlined />,
-          }}
-          initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
-        >
-          <Select
-            showSearch
-            onSearch={text => {
-              setInputValue(text);
+        {isResourceKindNamespaced && (
+          <Form.Item
+            name="namespace"
+            label="Namespace"
+            tooltip={{
+              title: () => (
+                <span>
+                  Namespace - <a onClick={openNamespaceTopic}>read more</a>
+                </span>
+              ),
+              icon: <InfoCircleOutlined />,
             }}
-            onChange={onSelectChange}
+            initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
           >
-            {inputValue && namespaces.every(namespace => namespace !== inputValue) ? (
-              <Option key={inputValue} value={inputValue}>
-                {inputValue}
-              </Option>
-            ) : null}
-
-            {namespaces
-              .filter(ns => typeof ns === 'string')
-              .map(namespace => (
-                <Option key={namespace} value={namespace}>
-                  {namespace}
+            <Select
+              showSearch
+              onSearch={text => {
+                setInputValue(text);
+              }}
+              onChange={onSelectChange}
+            >
+              {inputValue && namespaces.every(namespace => namespace !== inputValue) ? (
+                <Option key={inputValue} value={inputValue}>
+                  {inputValue}
                 </Option>
-              ))}
-          </Select>
-        </Form.Item>
+              ) : null}
+
+              {namespaces
+                .filter(ns => typeof ns === 'string')
+                .map(namespace => (
+                  <Option key={namespace} value={namespace}>
+                    {namespace}
+                  </Option>
+                ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Form.Item
           name="selectedResourceId"
