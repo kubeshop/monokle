@@ -14,7 +14,6 @@ export const Card = styled(AntdCard)`
   .ant-card-body {
     background-color: #191f21;
     height: 100%;
-    min-height: 255px;
   }
 `;
 

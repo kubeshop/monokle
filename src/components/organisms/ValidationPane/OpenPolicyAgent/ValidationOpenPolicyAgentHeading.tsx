@@ -5,7 +5,7 @@ import React, {useCallback} from 'react';
 import {OPA_INTEGRATION} from '@models/integrations';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/ui';
+import {updateValidationIntegration} from '@redux/reducers/main';
 
 import * as S from './ValidationOpenPolicyAgentHeading.styled';
 

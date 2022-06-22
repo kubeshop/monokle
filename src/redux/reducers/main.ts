@@ -24,6 +24,7 @@ import {
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
+import {ValidationIntegration} from '@models/integrations';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
@@ -383,6 +384,12 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
+    setAutosavingError: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      state.autosaving.error = action.payload;
+    },
+    setAutosavingStatus: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.autosaving.status = action.payload;
+    },
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -726,6 +733,9 @@ export const mainSlice = createSlice({
     saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.filtersPresets[action.payload] = state.resourceFilter;
       electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
+      state.validationIntegration = action.payload;
     },
   },
   extraReducers: builder => {
@@ -1275,6 +1285,8 @@ export const {
   selectPreviewConfiguration,
   setAppRehydrating,
   setApplyingResource,
+  setAutosavingError,
+  setAutosavingStatus,
   selectClusterDiffMatch,
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
@@ -1294,6 +1306,7 @@ export const {
   unselectAllClusterDiffMatches,
   unselectClusterDiffMatch,
   updateResourceFilter,
+  updateValidationIntegration,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

@@ -42,6 +42,7 @@ enum Colors {
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
   red7 = '#E84749', // Dust Red
+  red6 = '#D32029',
   errorBg = '#E84749',
 
   whitePure = '#ffffff',

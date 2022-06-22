@@ -14,7 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {currentClusterAccessSelector, currentConfigSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
@@ -40,11 +40,14 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const k8sVersion = getK8sVersion(projectConfig);
-  const userDataDir = thunkAPI.getState().config.userDataDir;
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
+  const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+
+  const config = thunkAPI.getState().config;
+  const {userDataDir} = config;
 
   try {
-    const kc = createKubeClient(thunkAPI.getState().config, context);
+    const kc = createKubeClient(kubeConfigPath, context);
     const results =
       clusterAccess && clusterAccess.length > 0
         ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
@@ -72,7 +75,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       context,
       'Get Cluster Resources',
       resourceRefsProcessingOptions,
-      context,
+      kubeConfigPath,
       kc.currentContext
     );
 

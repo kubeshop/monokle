@@ -22,6 +22,7 @@ import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextSelector,
+  kubeConfigPathSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
@@ -50,6 +51,7 @@ const DiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -210,7 +212,7 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(configState);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {

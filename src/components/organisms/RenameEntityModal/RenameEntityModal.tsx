@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeRenameEntityModal} from '@redux/reducers/ui';
 
-import {RenameEntityCallback, checkIfEntityExists, renameEntity} from '@utils/files';
+import {RenameEntityCallback, doesPathExist, renameEntity} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
@@ -126,9 +126,7 @@ const RenameEntityModal: React.FC = () => {
                   }
 
                   // If the new name equals to any name of any children on the same nesting level - it is not valid
-                  if (
-                    checkIfEntityExists(uiState.absolutePathToEntity.replace(uiState.entityName, newEntityNameValue))
-                  ) {
+                  if (doesPathExist(uiState.absolutePathToEntity.replace(uiState.entityName, newEntityNameValue))) {
                     reject(new Error('File or folder with this name already exists in this location'));
                   }
 

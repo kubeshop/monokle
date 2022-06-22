@@ -1,4 +1,5 @@
 import React, {useMemo, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Input, Skeleton} from 'antd';
 
@@ -17,8 +18,15 @@ export type Rule = {
   enabled: boolean;
 };
 
-export const ValidationOpenPolicyAgentTable: React.FC = () => {
-  const columns = useOpenPolicyAgentTable();
+interface IProps {
+  descriptionHeight: number;
+  height: number;
+}
+
+export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHeight, height}) => {
+  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
+
+  const columns = useOpenPolicyAgentTable(width);
   const rules = useAppSelector(state => {
     const plugins = state.main.policies.plugins;
 
@@ -54,15 +62,24 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
   }
 
   return (
-    <>
-      <Input prefix={<S.SearchIcon />} value={filter} onChange={event => setFilter(event.target.value.toLowerCase())} />
-      <S.Table
-        columns={columns}
-        dataSource={filteredRules}
-        pagination={false}
-        rowKey="id"
-        locale={{emptyText: 'No rules found'}}
-      />
-    </>
+    <S.Container ref={containerRef}>
+      <S.InputContainer>
+        <Input
+          prefix={<S.SearchIcon />}
+          value={filter}
+          onChange={event => setFilter(event.target.value.toLowerCase())}
+        />
+      </S.InputContainer>
+
+      <S.TableContainer $height={height - descriptionHeight - 83}>
+        <S.Table
+          columns={columns}
+          dataSource={filteredRules}
+          pagination={false}
+          rowKey="id"
+          locale={{emptyText: 'No rules found'}}
+        />
+      </S.TableContainer>
+    </S.Container>
   );
 };
