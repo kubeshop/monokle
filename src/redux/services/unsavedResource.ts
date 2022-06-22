@@ -62,7 +62,7 @@ export function createUnsavedResource(
     namespace: input.namespace,
     text: newResourceText,
     content: newResourceContent,
-    isKindNamespaced: getResourceKindHandler(input.kind)?.isNamespaced || false,
+    isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
   };
   dispatch(addResource(newResource));
   dispatch(selectK8sResource({resourceId: newResource.id}));
@@ -110,7 +110,7 @@ export function createMultipleUnsavedResources(
     namespace: resourceMap[resourceId].input.namespace,
     text: resourceMap[resourceId].text,
     content: resourceMap[resourceId].content,
-    isKindNamespaced: getResourceKindHandler(resourceMap[resourceId].input.kind)?.isNamespaced || false,
+    isClusterScoped: getResourceKindHandler(resourceMap[resourceId].input.kind)?.isNamespaced || false,
   }));
 
   dispatch(addMultipleResources(newResources));

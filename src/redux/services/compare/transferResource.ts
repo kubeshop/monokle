@@ -141,7 +141,7 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     filePath: `${UNSAVED_PREFIX}${id}`,
     isHighlighted: false,
     isSelected: false,
-    isKindNamespaced: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
+    isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };
 }
