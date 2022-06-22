@@ -1,6 +1,7 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
 import {indexOf} from 'lodash';
+import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
@@ -23,6 +24,7 @@ import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors'
 
 import utilsElectronStore from '@utils/electronStore';
 import {StartupFlags} from '@utils/startupFlag';
+import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
@@ -56,6 +58,7 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
+const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
@@ -147,13 +150,18 @@ export const createWindow = (givenPath?: string) => {
       let projectName = activeProjectSelector(storeState)?.name;
       setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
+      const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {
+        Nucleus.track(DISABLED_TELEMETRY);
         Nucleus.disableTracking();
+        segmentClient?.track({
+          userId: machineId,
+          event: DISABLED_TELEMETRY,
+        });
         disableSegment();
       } else {
         Nucleus.enableTracking();
-        const segmentClient = getSegmentClient();
         if (!segmentClient) {
           enableSegment();
         }
