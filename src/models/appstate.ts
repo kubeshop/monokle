@@ -140,7 +140,7 @@ interface AppState {
   /** the currently selected path */
   selectedPath?: string;
   /** the line number for the match in file */
-  matchOptions?: {currentMatchItem: MatchNode; matchLines: []};
+  matchOptions?: {currentMatchItem: MatchNode; matchLines: [][]} | null;
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */

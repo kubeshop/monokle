@@ -7,7 +7,7 @@ import {DownOutlined} from '@ant-design/icons';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {FileEntry} from '@models/fileentry';
+import {FileEntry, MatchNode} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -34,7 +34,7 @@ type Props = {
 };
 
 const SearchPane: React.FC<Props> = ({height}) => {
-  const [searchTree, setSearchTree] = useState<FilterTreeNode | null>(null);
+  const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const [replaceQuery, updateReplaceQuery] = useState<string>('');
@@ -74,7 +74,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   useEffect(() => {
-    if (selectedResourceId && searchTree) {
+    if (selectedResourceId && searchTree.length) {
       const resource = resourceMap[selectedResourceId];
 
       if (resource) {
@@ -95,6 +95,27 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
   }, [isSelectingFile, dispatch]);
 
+  useEffect(() => {
+    const selectedFileData = searchTree.find(child => child?.filePath === selectedPath);
+
+    if (selectedFileData && selectedFileData.matchLines?.length) {
+      const options: {
+        currentMatchItem: MatchNode;
+        matchLines: any;
+      } = {
+        currentMatchItem: selectedFileData?.matchLines[0][0],
+        matchLines: selectedFileData?.matchLines,
+      };
+
+      dispatch(highlightFileMatches(options));
+    } else {
+      // file doesn't contain any matches
+      dispatch(highlightFileMatches(null));
+    }
+
+    // update highlights in code editor for currently selected file
+  }, [dispatch, searchTree, selectedPath]);
+
   const onExpand = (newExpandedFiles: Key[]) => {
     dispatch(setExpandedSearchedFiles(newExpandedFiles));
   };
@@ -110,12 +131,25 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
   };
 
+  const decorate = (arr: any) => {
+    return {
+      key: 'filter',
+      isExcluded: true,
+      isSupported: true,
+      isLeaf: false,
+      title: <></>,
+      highlight: false,
+      isFolder: true,
+      children: arr,
+    };
+  };
+
   const findMatches = (query: string) => {
     searchCounter.current = {filesCount: 0, totalMatchCount: 0};
     if (!fileMap) return;
     // reset tree to its default state
     if (!query) {
-      setSearchTree(null);
+      setSearchTree([]);
       setFindingMatches(false);
       return;
     }
@@ -135,10 +169,11 @@ const SearchPane: React.FC<Props> = ({height}) => {
 
   const onNodeSelect = (selectedKeysValue: React.Key[], info: any) => {
     let parentNode = info.node;
+
     if (info.node.parentKey) {
-      parentNode = searchTree?.children.find(({key}) => info.node.parentKey === key);
+      parentNode = searchTree.find(({key}) => info.node.parentKey === key);
     }
-    const options = {
+    const options: {currentMatchItem: MatchNode; matchLines: [][]} = {
       currentMatchItem: info.node.matchItem || info.node.matchLines[0][0],
       matchLines: parentNode.matchLines,
     };
@@ -170,7 +205,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
     setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
   };
 
-  const isReady = searchTree && !isFindingMatches;
+  const isReady = searchTree.length && !isFindingMatches;
+  // console.log('searchTree', searchTree);
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
@@ -206,7 +242,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
                   </p>
                 </S.MatchText>
               )}
-              {!searchTree && !isFindingMatches && (
+              {!searchTree.length && !isFindingMatches && (
                 <RecentSearch
                   handleClick={query => {
                     updateSearchQuery(query);
@@ -221,7 +257,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
               <S.TreeDirectoryTree
                 height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
                 onSelect={onNodeSelect}
-                treeData={[searchTree]}
+                treeData={[decorate(searchTree)]}
                 ref={treeRef}
                 expandedKeys={expandedFiles}
                 onExpand={onExpand}

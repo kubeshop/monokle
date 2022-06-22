@@ -91,7 +91,9 @@ function useCodeIntel(props: CodeIntelProps) {
       selectedResource,
       matchOptions,
     };
+
     const codeIntelForFile = codeIntels.find(ci => ci.shouldApply(shouldApplyParams));
+
     if (codeIntelForFile) {
       codeIntelForFile
         .codeIntel({
@@ -157,7 +159,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList, helmTemplatesMap, helmValuesMap]);
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList, helmTemplatesMap, helmValuesMap, matchOptions]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

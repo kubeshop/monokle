@@ -14,7 +14,7 @@ type MatchLineProps = {
   lineMatches: MatchNode[];
 };
 
-export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode => {
+export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode[] => {
   const Title = ({item}: Props) => (
     <S.NodeContainer>
       <S.NodeTitleContainer>
@@ -30,32 +30,24 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
     return <S.MatchLine>{parse(wholeLine)}</S.MatchLine>;
   };
 
-  return {
-    key: 'filter',
-    isExcluded: true,
-    isSupported: true,
-    isLeaf: false,
-    title: <></>,
+  return filteredFileMap.map((item: FileEntry) => ({
+    ...item,
     highlight: false,
-    isFolder: true,
-    children: filteredFileMap.map((item: FileEntry) => ({
-      ...item,
-      highlight: false,
-      isLeaf: false,
-      isFolder: false,
-      isSupported: item.isSupported,
-      isExcluded: item.isExcluded,
-      key: item.filePath,
-      title: <Title item={item} />,
-      children:
-        item.matchLines?.map((lineMatches, idx) => ({
-          key: `ml_${item.filePath}_${idx}`,
-          parentKey: item.filePath,
-          title: <StyledMatchLine lineMatches={lineMatches} />,
-          isFolder: false,
-          isLeaf: true,
-          matchItem: lineMatches[0],
-        })) || [],
-    })),
-  };
+    isLeaf: false,
+    isFolder: false,
+    isSupported: item.isSupported,
+    isExcluded: item.isExcluded,
+    filePath: item.filePath,
+    key: item.filePath,
+    title: <Title item={item} />,
+    children:
+      item.matchLines?.map((lineMatches, idx) => ({
+        key: `ml_${item.filePath}_${idx}`,
+        parentKey: item.filePath,
+        title: <StyledMatchLine lineMatches={lineMatches} />,
+        isFolder: false,
+        isLeaf: true,
+        matchItem: lineMatches[0],
+      })) || [],
+  }));
 };

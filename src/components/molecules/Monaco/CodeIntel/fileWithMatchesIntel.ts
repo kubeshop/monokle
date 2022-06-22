@@ -16,32 +16,34 @@ export const fileWithMatchesIntel: CodeIntelApply = {
     const newDisposables: monaco.IDisposable[] = [];
 
     const {matchOptions} = params;
-    const currentMatchItem: MatchNode = matchOptions?.currentMatchItem || ({} as MatchNode);
 
-    if (matchOptions?.matchLines) {
-      matchOptions.matchLines.forEach((matchArr: MatchNode[]) => {
-        matchArr.forEach((match: MatchNode) => {
-          newDecorations.push(
-            createInlineDecoration(
-              new monaco.Range(match.lineNumber, match.start, match.lineNumber, match.end),
-              InlineDecorationTypes.Match
-            )
-          );
+    if (matchOptions) {
+      const currentMatchItem: MatchNode = matchOptions?.currentMatchItem;
+      if (matchOptions.matchLines) {
+        matchOptions.matchLines.forEach((matchArr: MatchNode[]) => {
+          matchArr.forEach((match: MatchNode) => {
+            newDecorations.push(
+              createInlineDecoration(
+                new monaco.Range(match.lineNumber, match.start, match.lineNumber, match.end),
+                InlineDecorationTypes.Match
+              )
+            );
+          });
         });
-      });
-    }
+      }
 
-    newDecorations.push(
-      createInlineDecoration(
-        new monaco.Range(
-          currentMatchItem.lineNumber,
-          currentMatchItem.start,
-          currentMatchItem.lineNumber,
-          currentMatchItem.end
-        ),
-        InlineDecorationTypes.CurrentMatch
-      )
-    );
+      newDecorations.push(
+        createInlineDecoration(
+          new monaco.Range(
+            currentMatchItem.lineNumber,
+            currentMatchItem.start,
+            currentMatchItem.lineNumber,
+            currentMatchItem.end
+          ),
+          InlineDecorationTypes.CurrentMatch
+        )
+      );
+    }
 
     return {
       newDecorations,

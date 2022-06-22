@@ -23,7 +23,7 @@ export interface ShouldApplyCodeIntelParams {
   selectedResource?: K8sResource;
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
-  matchOptions?: {currentMatchItem: MatchNode; matchLines: []};
+  matchOptions?: {currentMatchItem: MatchNode; matchLines: [][]} | null;
 }
 
 export interface CodeIntelParams {
@@ -43,7 +43,7 @@ export interface CodeIntelParams {
   selectImageHandler: (imageId: string) => void;
   resourceMap: ResourceMapType;
   model: monaco.editor.IModel | null;
-  matchOptions?: {currentMatchItem: MatchNode; matchLines: []};
+  matchOptions?: {currentMatchItem: MatchNode; matchLines: [][]} | null;
 }
 
 export interface CodeIntelApply {

@@ -445,7 +445,7 @@ export const mainSlice = createSlice({
     },
     highlightFileMatches: (
       state: Draft<AppState>,
-      action: PayloadAction<{currentMatchItem: MatchNode; matchLines: []}>
+      action: PayloadAction<{currentMatchItem: MatchNode; matchLines: [][]} | null>
     ) => {
       state.matchOptions = action.payload;
     },
