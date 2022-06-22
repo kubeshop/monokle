@@ -19,6 +19,8 @@ import {createKubectlApplyCommand} from '@utils/commands/kubectl';
 import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 type Type = ResourceSet['type'];
 
 export function canTransfer(from: Type | undefined, to: Type | undefined): boolean {
@@ -139,6 +141,7 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     filePath: `${UNSAVED_PREFIX}${id}`,
     isHighlighted: false,
     isSelected: false,
+    isNamespaced: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };
 }
