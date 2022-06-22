@@ -10,6 +10,7 @@ import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constant
 
 import {IconNames} from '@models/icons';
 
+import {useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
 import {Icon} from '@components/atoms';
@@ -20,6 +21,7 @@ import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 
 export function useOpenPolicyAgentTable(width: number) {
   const dispatch = useDispatch();
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const handleToggle = useCallback(
     (ruleId: string) => {
@@ -28,6 +30,24 @@ export function useOpenPolicyAgentTable(width: number) {
     },
     [dispatch]
   );
+
+  const errorsCounter = useMemo(() => {
+    return Object.values(resourceMap).reduce<{[key: string]: number}>((validationsCounter, resource) => {
+      if (!resource.issues?.errors.length) {
+        return validationsCounter;
+      }
+
+      resource.issues.errors.forEach(error => {
+        if (validationsCounter[error.message]) {
+          validationsCounter[error.message] += 1;
+        } else {
+          validationsCounter[error.message] = 1;
+        }
+      });
+
+      return validationsCounter;
+    }, {});
+  }, [resourceMap]);
 
   const columns: ColumnsType<Rule> = useMemo(() => {
     return [
@@ -42,8 +62,7 @@ export function useOpenPolicyAgentTable(width: number) {
               mouseEnterDelay={TOOLTIP_DELAY}
               title={
                 <p>
-                  {description}{' '}
-                  {!learnMoreUrl ? null : <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
+                  {description} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
                 </p>
               }
               placement="bottomLeft"
@@ -55,11 +74,13 @@ export function useOpenPolicyAgentTable(width: number) {
         },
       },
       {
-        key: 'id',
-        title: 'ID',
-        dataIndex: 'id',
-        defaultSortOrder: 'ascend',
-        sorter: (a, b) => (a.id === b.id ? 0 : a.id > b.id ? 1 : -1),
+        key: 'violations',
+        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Violations'}`,
+        dataIndex: 'violations',
+        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
+          sorter: (a, b) => (errorsCounter[a.id] || 0) - (errorsCounter[b.id] || 0),
+        }),
+        render: (_value, record) => (!record.enabled ? '-' : errorsCounter[record.id] || 0),
       },
       {
         key: 'severity',
@@ -68,7 +89,9 @@ export function useOpenPolicyAgentTable(width: number) {
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
           sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
         }),
-        render: (_value, record) => <Icon {...SEVERITY_ICON_MAP[record.severity]} />,
+        render: (_value, record) => (
+          <Icon {...SEVERITY_ICON_MAP[record.severity]} style={{height: 15, width: 15, paddingTop: 15}} />
+        ),
       },
       {
         key: 'enabled',
@@ -81,7 +104,7 @@ export function useOpenPolicyAgentTable(width: number) {
         }),
       },
     ];
-  }, [handleToggle, width]);
+  }, [errorsCounter, handleToggle, width]);
 
   return columns;
 }

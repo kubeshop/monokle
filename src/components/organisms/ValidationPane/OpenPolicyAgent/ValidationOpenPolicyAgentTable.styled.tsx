@@ -30,6 +30,10 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
     background: #191f21;
   }
 
+  .ant-table-thead > tr > th:nth-child(2)::before {
+    display: none;
+  }
+
   .ant-table-thead > tr > th:nth-child(3)::before {
     display: none;
   }

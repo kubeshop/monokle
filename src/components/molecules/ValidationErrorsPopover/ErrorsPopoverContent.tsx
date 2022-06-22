@@ -99,7 +99,7 @@ const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
       <PopoverTitle>Validation Errors</PopoverTitle>
       <StyledDivider />
       {errors.map(error => (
-        <StyledRefDiv key={`${error.property}:${error.message}`}>
+        <StyledRefDiv key={`${error.property}:${error.message}-${error.errorPos?.line}:${error.errorPos?.column}`}>
           <ValidationErrorLink validationError={error} onClick={() => onLinkClick(error)} />
           {error.description && <StyledDescription>{error.description}</StyledDescription>}
         </StyledRefDiv>
