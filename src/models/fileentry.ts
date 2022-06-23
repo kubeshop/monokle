@@ -9,6 +9,11 @@ export interface MatchNode {
   end: number;
 }
 
+export interface CurrentMatch {
+  matchesInFile: MatchNode[];
+  currentMatchIdx: number;
+}
+
 interface FileEntry {
   /** the name of the file */
   name: string;

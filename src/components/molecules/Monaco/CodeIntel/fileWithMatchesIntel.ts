@@ -16,29 +16,25 @@ export const fileWithMatchesIntel: CodeIntelApply = {
     const newDisposables: monaco.IDisposable[] = [];
 
     const {matchOptions} = params;
+    const {matchesInFile, currentMatchIdx = 0} = matchOptions || {};
 
-    if (matchOptions) {
-      const currentMatchItem: MatchNode = matchOptions?.currentMatchItem;
-      if (matchOptions.matchLines) {
-        matchOptions.matchLines.forEach((matchArr: MatchNode[]) => {
-          matchArr.forEach((match: MatchNode) => {
-            newDecorations.push(
-              createInlineDecoration(
-                new monaco.Range(match.lineNumber, match.start, match.lineNumber, match.end),
-                InlineDecorationTypes.Match
-              )
-            );
-          });
-        });
-      }
+    if (matchesInFile) {
+      matchesInFile.forEach((match: MatchNode) => {
+        newDecorations.push(
+          createInlineDecoration(
+            new monaco.Range(match.lineNumber, match.start, match.lineNumber, match.end),
+            InlineDecorationTypes.Match
+          )
+        );
+      });
 
       newDecorations.push(
         createInlineDecoration(
           new monaco.Range(
-            currentMatchItem.lineNumber,
-            currentMatchItem.start,
-            currentMatchItem.lineNumber,
-            currentMatchItem.end
+            matchesInFile[currentMatchIdx].lineNumber,
+            matchesInFile[currentMatchIdx].start,
+            matchesInFile[currentMatchIdx].lineNumber,
+            matchesInFile[currentMatchIdx].end
           ),
           InlineDecorationTypes.CurrentMatch
         )
@@ -48,7 +44,7 @@ export const fileWithMatchesIntel: CodeIntelApply = {
     return {
       newDecorations,
       newDisposables,
-      currentSelection: matchOptions?.currentMatchItem,
+      currentSelection: matchesInFile && matchesInFile[currentMatchIdx],
     };
   },
 };

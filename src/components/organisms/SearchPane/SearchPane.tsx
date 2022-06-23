@@ -5,19 +5,20 @@ import {Button, Input, Tabs} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
+import {flatten} from 'lodash';
+
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {FileEntry, MatchNode} from '@models/fileentry';
+import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-
+import {highlightFileMatches, selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {openRenameEntityModal, setExpandedSearchedFiles, openCreateFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
-import {highlightFileMatches, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 
 import electronStore from '@utils/electronStore';
 import {MatchParamProps, filterFilesByQuery, getRegexp} from '@utils/getRegexp';
@@ -35,6 +36,7 @@ type Props = {
 
 const SearchPane: React.FC<Props> = ({height}) => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
+  const [currentMatch, setCurrentMatch] = useState<CurrentMatch | null>(null);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const [replaceQuery, updateReplaceQuery] = useState<string>('');
@@ -82,8 +84,16 @@ const SearchPane: React.FC<Props> = ({height}) => {
         highlightFilePath(filePath);
       }
     }
+
+    if (!selectedPath && searchTree.length) {
+      dispatch(selectFile({filePath: searchTree[0].filePath}));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, searchTree]);
+  }, [selectedResourceId, searchTree, selectedPath]);
+
+  useEffect(() => {
+    dispatch(highlightFileMatches(currentMatch));
+  }, [currentMatch, dispatch]);
 
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
@@ -95,25 +105,21 @@ const SearchPane: React.FC<Props> = ({height}) => {
     }
   }, [isSelectingFile, dispatch]);
 
+  // update current match once searchTree or selectedPath is updated
   useEffect(() => {
-    const selectedFileData = searchTree.find(child => child?.filePath === selectedPath);
-
+    const selectedFileData: FilterTreeNode | undefined = searchTree.find(child => child?.filePath === selectedPath);
     if (selectedFileData && selectedFileData.matchLines?.length) {
-      const options: {
-        currentMatchItem: MatchNode;
-        matchLines: any;
-      } = {
-        currentMatchItem: selectedFileData?.matchLines[0][0],
-        matchLines: selectedFileData?.matchLines,
+      const matchesInFile: MatchNode[] = flatten(selectedFileData?.matchLines);
+      const options: CurrentMatch = {
+        matchesInFile,
+        currentMatchIdx: 0,
       };
 
-      dispatch(highlightFileMatches(options));
+      setCurrentMatch(options);
     } else {
       // file doesn't contain any matches
-      dispatch(highlightFileMatches(null));
+      setCurrentMatch(null);
     }
-
-    // update highlights in code editor for currently selected file
   }, [dispatch, searchTree, selectedPath]);
 
   const onExpand = (newExpandedFiles: Key[]) => {
@@ -173,12 +179,14 @@ const SearchPane: React.FC<Props> = ({height}) => {
     if (info.node.parentKey) {
       parentNode = searchTree.find(({key}) => info.node.parentKey === key);
     }
-    const options: {currentMatchItem: MatchNode; matchLines: [][]} = {
-      currentMatchItem: info.node.matchItem || info.node.matchLines[0][0],
-      matchLines: parentNode.matchLines,
-    };
+
+    const matchesInFile: MatchNode[] = flatten(parentNode.matchLines);
     onSelect(selectedKeysValue, info);
-    dispatch(highlightFileMatches(options));
+
+    setCurrentMatch({
+      matchesInFile,
+      currentMatchIdx: matchesInFile.indexOf(info.node.matchItemArr[0] || 0),
+    });
   };
 
   useEffect(() => {
@@ -205,8 +213,20 @@ const SearchPane: React.FC<Props> = ({height}) => {
     setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
   };
 
+  const handleStep = (step: number) => {
+    if (currentMatch) {
+      // eslint-disable-next-line no-unsafe-optional-chaining
+      const nextIdx = currentMatch?.currentMatchIdx + step; // more matches in this file exists
+      if (currentMatch?.matchesInFile[nextIdx]) {
+        setCurrentMatch((prevState: any) => ({...prevState, currentMatchIdx: nextIdx}));
+      } else {
+        const nextFileIdx = searchTree.findIndex(node => node.filePath === selectedPath) + step;
+        dispatch(selectFile({filePath: searchTree[nextFileIdx].key}));
+      }
+    }
+  };
+
   const isReady = searchTree.length && !isFindingMatches;
-  // console.log('searchTree', searchTree);
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
@@ -327,8 +347,12 @@ const SearchPane: React.FC<Props> = ({height}) => {
                     <span> View in Editor</span>
                   </S.MatchText>
                   <S.ButtonContainer>
-                    <Button type="primary">Previous</Button>
-                    <Button type="primary">Next</Button>
+                    <Button type="primary" onClick={() => handleStep(-1)}>
+                      Previous
+                    </Button>
+                    <Button type="primary" onClick={() => handleStep(1)}>
+                      Next
+                    </Button>
                   </S.ButtonContainer>
                 </S.ResultContainer>
               )}

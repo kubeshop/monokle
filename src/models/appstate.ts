@@ -1,7 +1,7 @@
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
-import {FileEntry, MatchNode} from './fileentry';
+import {CurrentMatch, FileEntry} from './fileentry';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sresource';
@@ -140,7 +140,7 @@ interface AppState {
   /** the currently selected path */
   selectedPath?: string;
   /** the line number for the match in file */
-  matchOptions?: {currentMatchItem: MatchNode; matchLines: [][]} | null;
+  matchOptions?: CurrentMatch | null;
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */

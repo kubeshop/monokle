@@ -47,7 +47,7 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
         title: <StyledMatchLine lineMatches={lineMatches} />,
         isFolder: false,
         isLeaf: true,
-        matchItem: lineMatches[0],
+        matchItemArr: lineMatches,
       })) || [],
   }));
 };

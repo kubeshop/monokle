@@ -22,7 +22,7 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
-import {FileEntry, MatchNode} from '@models/fileentry';
+import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
@@ -443,10 +443,7 @@ export const mainSlice = createSlice({
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
-    highlightFileMatches: (
-      state: Draft<AppState>,
-      action: PayloadAction<{currentMatchItem: MatchNode; matchLines: [][]} | null>
-    ) => {
+    highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
       state.matchOptions = action.payload;
     },
     selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {

@@ -57,7 +57,7 @@ function getMatchLines(text: string, queryRegExp: RegExp) {
         const {textWithHighlights, indexStart, indexEnd} = decorateMatch(
           line,
           currQuery,
-          (acc.length && acc[acc.length - 1].indexEnd) || 0
+          (acc.length && acc[acc.length - 1].end) || 0
         );
         return [
           ...acc,
@@ -71,6 +71,7 @@ function getMatchLines(text: string, queryRegExp: RegExp) {
       }, []);
     })
     .filter(el => el);
+
   return fileLineData;
 }
 
