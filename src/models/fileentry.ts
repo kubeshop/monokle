@@ -12,6 +12,7 @@ export interface MatchNode {
 export interface CurrentMatch {
   matchesInFile: MatchNode[];
   currentMatchIdx: number;
+  replaceWith?: string;
 }
 
 interface FileEntry {

@@ -8,7 +8,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
-import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
+import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import {MonacoUiState} from '@models/ui';
 
@@ -16,7 +16,6 @@ export interface CodeIntelResponse {
   newDecorations: monaco.editor.IModelDeltaDecoration[];
   newDisposables: monaco.IDisposable[];
   newMarkers?: monaco.editor.IMarkerData[];
-  currentSelection?: MatchNode;
 }
 
 export interface ShouldApplyCodeIntelParams {

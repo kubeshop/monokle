@@ -267,6 +267,7 @@ export const ResultContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 25px 0;
 `;
 
 export const ButtonContainer = styled.div`

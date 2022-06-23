@@ -44,7 +44,6 @@ export const fileWithMatchesIntel: CodeIntelApply = {
     return {
       newDecorations,
       newDisposables,
-      currentSelection: matchesInFile && matchesInFile[currentMatchIdx],
     };
   },
 };

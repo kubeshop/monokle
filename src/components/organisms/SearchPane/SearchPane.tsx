@@ -36,7 +36,7 @@ type Props = {
 
 const SearchPane: React.FC<Props> = ({height}) => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
-  const [currentMatch, setCurrentMatch] = useState<CurrentMatch | null>(null);
+  const currentMatch = useAppSelector(state => state.main.matchOptions);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const [searchQuery, updateSearchQuery] = useState<string>('');
   const [replaceQuery, updateReplaceQuery] = useState<string>('');
@@ -91,9 +91,9 @@ const SearchPane: React.FC<Props> = ({height}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, searchTree, selectedPath]);
 
-  useEffect(() => {
-    dispatch(highlightFileMatches(currentMatch));
-  }, [currentMatch, dispatch]);
+  const setCurrentMatch = (options: any) => {
+    dispatch(highlightFileMatches(options));
+  };
 
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
@@ -218,12 +218,16 @@ const SearchPane: React.FC<Props> = ({height}) => {
       // eslint-disable-next-line no-unsafe-optional-chaining
       const nextIdx = currentMatch?.currentMatchIdx + step; // more matches in this file exists
       if (currentMatch?.matchesInFile[nextIdx]) {
-        setCurrentMatch((prevState: any) => ({...prevState, currentMatchIdx: nextIdx}));
-      } else {
-        const nextFileIdx = searchTree.findIndex(node => node.filePath === selectedPath) + step;
-        dispatch(selectFile({filePath: searchTree[nextFileIdx].key}));
+        return setCurrentMatch({...currentMatch, currentMatchIdx: nextIdx});
       }
     }
+    const nextFileIdx = searchTree.findIndex(node => node.filePath === selectedPath) + step;
+    dispatch(selectFile({filePath: searchTree[nextFileIdx].key}));
+  };
+
+  const replaceCurrentSelection = () => {
+    if (replaceQuery === searchQuery) return;
+    setCurrentMatch({...currentMatch, replaceWith: replaceQuery});
   };
 
   const isReady = searchTree.length && !isFindingMatches;
@@ -255,7 +259,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
               </S.SearchBox>
             </S.Form>
             <S.RootFolderText>
-              {isReady && (
+              {Boolean(isReady) && (
                 <S.MatchText id="search-count">
                   <p>
                     {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
@@ -355,6 +359,14 @@ const SearchPane: React.FC<Props> = ({height}) => {
                     </Button>
                   </S.ButtonContainer>
                 </S.ResultContainer>
+              )}
+              {replaceQuery && (
+                <S.ButtonContainer>
+                  <Button type="primary" onClick={replaceCurrentSelection}>
+                    Replace Selected
+                  </Button>
+                  <Button type="primary">Replace All</Button>
+                </S.ButtonContainer>
               )}
             </S.RootFolderText>
             {isFindingMatches && <S.Skeleton active />}
