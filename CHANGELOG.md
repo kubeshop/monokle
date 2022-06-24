@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/kubeshop/monokle/compare/v1.8.1-nightly-2022-06-24.0...v1.8.1) (2022-06-24)
+
+
+### Features
+
+* show release notes only for the next big release ([b359b59](https://github.com/kubeshop/monokle/commit/b359b5952f3aa84b10a2823d4f771b55dd5a4489))
+* update about monokle modal text ([1756a9c](https://github.com/kubeshop/monokle/commit/1756a9c0e1501176e8056118ba8c010f85626ef5))
+
 ## [1.8.0](https://github.com/kubeshop/monokle/compare/v1.7.6-nightly-2022-06-03.0...v1.8.0) (2022-06-03)
 
 
