@@ -236,17 +236,25 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('file-explorer'));
   });
 
-  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    if (!isInClusterMode) {
-      dispatch(setLeftMenuSelection('kustomize-pane'));
-    }
-  });
+  useHotkeys(
+    hotkeys.OPEN_KUSTOMIZATION_TAB.key,
+    () => {
+      if (!isInClusterMode) {
+        dispatch(setLeftMenuSelection('kustomize-pane'));
+      }
+    },
+    [isInClusterMode]
+  );
 
-  useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    if (!isInClusterMode) {
-      dispatch(setLeftMenuSelection('helm-pane'));
-    }
-  });
+  useHotkeys(
+    hotkeys.OPEN_HELM_TAB.key,
+    () => {
+      if (!isInClusterMode) {
+        dispatch(setLeftMenuSelection('helm-pane'));
+      }
+    },
+    [isInClusterMode]
+  );
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
     dispatch(setLeftMenuSelection('validation-pane'));

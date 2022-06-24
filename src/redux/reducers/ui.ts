@@ -19,6 +19,7 @@ import {
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
@@ -302,6 +303,11 @@ export const uiSlice = createSlice({
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
+      })
+      .addCase(previewCluster.pending, state => {
+        if (state.leftMenu.selection === 'kustomize-pane' || state.leftMenu.selection === 'helm-pane') {
+          state.leftMenu.selection = 'file-explorer';
+        }
       });
   },
 });
