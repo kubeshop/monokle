@@ -39,7 +39,7 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
         </Col>
       </Row>
 
-      <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 40px)`}}>
+      <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 45px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.ContentDiv>
 
