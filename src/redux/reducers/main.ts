@@ -49,7 +49,7 @@ import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResou
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
@@ -92,6 +92,10 @@ export type UpdateMultipleResourcesPayload = {
 export type UpdateFileEntryPayload = {
   path: string;
   content: string;
+};
+
+export type UpdateFilesEntryPayload = {
+  pathes: {relativePath: string; absolutePath: string}[];
 };
 
 export type SetPreviewDataPayload = {
@@ -743,6 +747,9 @@ export const mainSlice = createSlice({
     updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
       state.validationIntegration = action.payload;
     },
+    updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.searchHistory = [...state.searchHistory, action.payload];
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1153,6 +1160,9 @@ export const mainSlice = createSlice({
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(updateFileEntries.fulfilled, (state, action) => {
+      return action.payload;
+    });
 
     builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
       return action.payload;
@@ -1327,6 +1337,7 @@ export const {
   updateResourceFilter,
   updateValidationIntegration,
   highlightFileMatches,
+  updateSearchHistory,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

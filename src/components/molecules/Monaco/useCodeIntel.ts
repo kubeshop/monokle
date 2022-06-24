@@ -3,6 +3,7 @@ import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
 
+import {AppDispatch} from '@models/appdispatch';
 import {
   FileMapType,
   HelmChartMapType,
@@ -43,6 +44,28 @@ interface CodeIntelProps {
   helmValuesMap?: HelmValuesMapType;
   helmTemplatesMap?: HelmTemplatesMapType;
   matchOptions?: CurrentMatch | null;
+}
+
+function replaceInFile(matchOptions: CurrentMatch, editor: monaco.editor.IStandaloneCodeEditor, dispatch: AppDispatch) {
+  if (matchOptions?.replaceWith) {
+    const currentMatch = matchOptions.matchesInFile[matchOptions.currentMatchIdx];
+    const newMatchesInFile = matchOptions.matchesInFile.filter((_, idx) => idx !== matchOptions.currentMatchIdx);
+
+    const range = new monaco.Range(
+      currentMatch.lineNumber,
+      currentMatch.start,
+      currentMatch.lineNumber,
+      currentMatch.end
+    );
+
+    editor.executeEdits('', [{range, text: matchOptions?.replaceWith}]);
+
+    if (newMatchesInFile.length) {
+      dispatch(highlightFileMatches({matchesInFile: newMatchesInFile, currentMatchIdx: 0}));
+    } else {
+      dispatch(highlightFileMatches(null));
+    }
+  }
 }
 
 function useCodeIntel(props: CodeIntelProps) {
@@ -140,25 +163,7 @@ function useCodeIntel(props: CodeIntelProps) {
           }
 
           if (matchOptions?.replaceWith) {
-            const currentMatch = matchOptions.matchesInFile[matchOptions.currentMatchIdx];
-            const newMatchesInFile = matchOptions.matchesInFile.filter(
-              (_, idx) => idx !== matchOptions.currentMatchIdx
-            );
-
-            const range = new monaco.Range(
-              currentMatch.lineNumber,
-              currentMatch.start,
-              currentMatch.lineNumber,
-              currentMatch.end
-            );
-
-            editor.executeEdits('', [{range, text: matchOptions?.replaceWith}]);
-
-            if (newMatchesInFile.length) {
-              dispatch(highlightFileMatches({matchesInFile: newMatchesInFile, currentMatchIdx: 0}));
-            } else {
-              dispatch(highlightFileMatches(null));
-            }
+            replaceInFile(matchOptions, editor, dispatch);
           }
 
           if (matchOptions?.matchesInFile) {

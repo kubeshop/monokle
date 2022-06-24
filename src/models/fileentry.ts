@@ -7,6 +7,7 @@ export interface MatchNode {
   lineNumber: number;
   start: number;
   end: number;
+  currentMatchNumber: number;
 }
 
 export interface CurrentMatch {

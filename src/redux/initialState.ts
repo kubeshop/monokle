@@ -61,6 +61,7 @@ const initialAppState: AppState = {
   imagesList: [],
   validationIntegration: undefined,
   autosaving: {},
+  searchHistory: electronStore.get('appConfig.recentSearch') || [],
 };
 
 const initialAppConfigState: AppConfig = {

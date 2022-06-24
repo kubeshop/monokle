@@ -169,7 +169,8 @@ export const TreeContainer = styled.div`
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
   margin-top: 10px;
 
-  .ant-tree-treenode-switcher-open.ant-tree-treenode-leaf-last {
+  /* hide root node */
+  .ant-tree-treenode:first-of-type {
     display: none;
   }
 

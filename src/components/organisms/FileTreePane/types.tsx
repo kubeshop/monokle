@@ -27,7 +27,7 @@ export interface TreeItemProps {
   onPreview: (relativePath: string) => void;
   isExcluded?: boolean;
   isSupported?: boolean;
-  isFolder?: Boolean;
+  isFolder?: boolean;
 }
 
 export interface MatchLine {

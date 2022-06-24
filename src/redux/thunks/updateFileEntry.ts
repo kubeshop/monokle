@@ -9,7 +9,7 @@ import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {RootState} from '@models/rootstate';
 
-import {UpdateFileEntryPayload} from '@redux/reducers/main';
+import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
@@ -114,6 +114,30 @@ export const updateFileEntry = createAsyncThunk(
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
+    return nextMainState;
+  }
+);
+
+export const updateFileEntries = createAsyncThunk(
+  'main/updateFileEntries',
+  async (payload: UpdateFilesEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+    let error: any;
+
+    const nextMainState: any = createNextState(state.main, mainState => {
+      try {
+        payload.pathes.forEach(ps => {
+          const fileEntry = mainState.fileMap[ps.relativePath];
+          const content = fs.readFileSync(ps.absolutePath, 'utf8');
+          fileEntry.text = content;
+          const newFileMap = {...mainState.fileMap, fileEntry};
+        });
+      } catch (e: any) {
+        const {message, stack} = e || {};
+        error = {message, stack};
+        log.error(e);
+      }
+    });
 
     return nextMainState;
   }

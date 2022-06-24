@@ -220,17 +220,13 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <PaneTooltip show={!leftActive || !(leftMenuSelection === 'search')} title="Advanced Search" placement="right">
         <MenuButton
-          isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
+          isSelected={checkIsTabSelected('search')}
           isActive={isActive}
           onClick={() => setLeftActiveMenu('search')}
           disabled={!activeProject}
           icon={<Icon name="search" style={{opacity: leftMenuSelection === 'search' ? '1' : '0.5'}} />}
         >
-          <MenuIcon
-            className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
-            active={isActive}
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'search'}
-          />
+          <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
         </MenuButton>
       </PaneTooltip>
     </S.Container>

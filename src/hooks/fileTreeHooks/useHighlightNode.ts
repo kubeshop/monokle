@@ -1,5 +1,7 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useUpdateEffect} from 'react-use';
+
+import {TreeNodeProps} from 'antd';
 
 import path from 'path';
 
@@ -12,7 +14,7 @@ import {TreeNode} from '@components/organisms/FileTreePane/types';
 
 import {uniqueArr} from '@utils/index';
 
-export const useHighlightNode = (tree: any, treeRef: any, expandedFolders: any) => {
+export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, expandedFolders: React.Key[]) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -42,31 +44,34 @@ export const useHighlightNode = (tree: any, treeRef: any, expandedFolders: any) 
     }
   }, [tree]);
 
-  function highlightFilePath(filePath: string) {
-    const paths = filePath.split(path.sep);
-    const keys: Array<React.Key> = [ROOT_FILE_ENTRY];
+  const highlightFilePath = useCallback(
+    (filePath: string) => {
+      const paths = filePath.split(path.sep);
+      const keys: Array<React.Key> = [ROOT_FILE_ENTRY];
 
-    for (let c = 1; c < paths.length; c += 1) {
-      keys.push(paths.slice(0, c + 1).join(path.sep));
-    }
-
-    let node: TreeNode | undefined = tree || undefined;
-    for (let c = 1; c < keys.length && node; c += 1) {
-      node = node.children.find((i: any) => i.key === keys[c]);
-    }
-
-    if (node) {
-      node.highlight = true;
-      treeRef?.current?.scrollTo({key: node.key});
-
-      if (highlightNode) {
-        highlightNode.highlight = false;
+      for (let c = 1; c < paths.length; c += 1) {
+        keys.push(paths.slice(0, c + 1).join(path.sep));
       }
-    }
 
-    setHighlightNode(node);
-    dispatch(setExpandedFolders(uniqueArr([...expandedFolders, ...Array.from(keys)])));
-  }
+      let node: TreeNode | undefined = tree || undefined;
+      for (let c = 1; c < keys.length && node; c += 1) {
+        node = node.children.find((i: any) => i.key === keys[c]);
+      }
+
+      if (node) {
+        node.highlight = true;
+        treeRef?.current?.scrollTo({key: node.key});
+
+        if (highlightNode) {
+          highlightNode.highlight = false;
+        }
+      }
+
+      setHighlightNode(node);
+      dispatch(setExpandedFolders(uniqueArr([...expandedFolders, ...Array.from(keys)])));
+    },
+    [dispatch, expandedFolders, highlightNode, tree, treeRef]
+  );
 
   return highlightFilePath;
 };

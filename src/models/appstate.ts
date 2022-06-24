@@ -199,6 +199,7 @@ interface AppState {
       stack: string;
     };
   };
+  searchHistory: string[];
 }
 
 export interface KubernetesObject {

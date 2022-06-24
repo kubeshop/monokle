@@ -1,9 +1,9 @@
-import React, {Key, useEffect, useRef, useState} from 'react';
+import React, {Key, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Input, Tabs} from 'antd';
+import {Button, Input, Modal, Tabs} from 'antd';
 
-import {DownOutlined} from '@ant-design/icons';
+import {DownOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {flatten} from 'lodash';
 
@@ -12,19 +12,27 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightFileMatches, selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
-import {openRenameEntityModal, setExpandedSearchedFiles, openCreateFileFolderModal} from '@redux/reducers/ui';
+import {
+  highlightFileMatches,
+  selectFile,
+  setSelectingFile,
+  updateResourceFilter,
+  updateSearchHistory,
+} from '@redux/reducers/main';
+import {openCreateFileFolderModal, openRenameEntityModal, setExpandedSearchedFiles} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 
 import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
 
 import electronStore from '@utils/electronStore';
-import {MatchParamProps, filterFilesByQuery, getRegexp} from '@utils/getRegexp';
+import {MatchParamProps, filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
+import {replaceInFiles} from '@utils/replaceInFiles';
 
 import TreeItem from '../FileTreePane/TreeItem';
-import {FilterTreeNode} from '../FileTreePane/types';
+import {FilterTreeNode, TreeNode} from '../FileTreePane/types';
 import {createFilteredNode} from './CreateFilteredNode';
 import RecentSearch from './RecentSearch';
 
@@ -32,6 +40,19 @@ import * as S from './styled';
 
 type Props = {
   height: number;
+};
+
+const decorate = (arr: FilterTreeNode[]) => {
+  return {
+    key: 'filter',
+    isExcluded: true,
+    isSupported: false,
+    isLeaf: false,
+    title: <></>,
+    highlight: false,
+    isFolder: true,
+    children: arr,
+  } as TreeNode;
 };
 
 const SearchPane: React.FC<Props> = ({height}) => {
@@ -57,6 +78,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const recentSearch = useAppSelector(state => state.main.searchHistory);
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const onSelect = useFileSelect();
@@ -69,7 +91,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
   const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);
   const {TabPane} = Tabs;
 
-  const highlightFilePath = useHighlightNode(searchTree, treeRef, expandedFiles);
+  const highlightFilePath = useHighlightNode(decorate(searchTree), treeRef, expandedFiles);
 
   const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
@@ -131,23 +153,10 @@ const SearchPane: React.FC<Props> = ({height}) => {
   };
 
   const saveQueryHistory = (query: string) => {
-    const recentSearch = electronStore.get('appConfig.recentSearch') || [];
     if (!recentSearch.includes(query)) {
+      dispatch(updateSearchHistory(query));
       electronStore.set('appConfig.recentSearch', [...recentSearch, query]);
     }
-  };
-
-  const decorate = (arr: any) => {
-    return {
-      key: 'filter',
-      isExcluded: true,
-      isSupported: true,
-      isLeaf: false,
-      title: <></>,
-      highlight: false,
-      isFolder: true,
-      children: arr,
-    };
   };
 
   const findMatches = (query: string) => {
@@ -163,10 +172,10 @@ const SearchPane: React.FC<Props> = ({height}) => {
     const queryRegExp = getRegexp(query, queryMatchParam);
 
     const filteredFileMap: FileEntry[] = Object.values(fileMap)
-      .map(file => filterFilesByQuery(file, queryRegExp, searchCounter))
-      .filter(v => Boolean(v)); // filter not supported files
+      .map((file: FileEntry) => filterFilesByQuery(file, queryRegExp, searchCounter))
+      .filter(notEmpty);
 
-    const treeData = createFilteredNode(filteredFileMap);
+    const treeData: FilterTreeNode[] = createFilteredNode(filteredFileMap);
 
     setSearchTree(treeData);
     saveQueryHistory(query);
@@ -230,7 +239,39 @@ const SearchPane: React.FC<Props> = ({height}) => {
     setCurrentMatch({...currentMatch, replaceWith: replaceQuery});
   };
 
+  const replaceAll = () => {
+    if (replaceQuery === searchQuery) return;
+    const title = `Are you sure you want to replace all matches?`;
+
+    Modal.confirm({
+      title,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        const queryRegExp = getRegexp(searchQuery, queryMatchParam);
+        const files = searchTree.map(file => {
+          return getAbsoluteFilePath(file.filePath, fileMap);
+        });
+        replaceInFiles(files, queryRegExp, replaceQuery, dispatch);
+      },
+      onCancel() {
+        () => {};
+      },
+    });
+  };
+
   const isReady = searchTree.length && !isFindingMatches;
+  const currentMatchNode = currentMatch?.matchesInFile[currentMatch?.currentMatchIdx];
+
+  const isNextEnabled = useMemo(() => {
+    if (currentMatchNode) {
+      return Number(currentMatchNode?.currentMatchNumber) < searchCounter.current.totalMatchCount;
+    }
+    const isInMatchFiles = searchTree.findIndex(node => node.filePath === selectedPath);
+    if (isInMatchFiles === -1) {
+      return true;
+    }
+  }, [currentMatchNode, searchTree, selectedPath]);
+  const isPrevEnabled = Number(currentMatchNode?.currentMatchNumber) > 1;
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
@@ -266,18 +307,20 @@ const SearchPane: React.FC<Props> = ({height}) => {
                   </p>
                 </S.MatchText>
               )}
-              {!searchTree.length && !isFindingMatches && (
+              {!searchQuery && (
                 <RecentSearch
+                  recentSearch={recentSearch}
                   handleClick={query => {
                     updateSearchQuery(query);
                     findMatches(query);
                   }}
                 />
               )}
+              {searchQuery && !searchTree.length && !isFindingMatches && 'No matches found'}
             </S.RootFolderText>
             {isFindingMatches && <S.Skeleton active />}
 
-            {isReady && (
+            {isReady ? (
               <S.TreeDirectoryTree
                 height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
                 onSelect={onNodeSelect}
@@ -301,7 +344,8 @@ const SearchPane: React.FC<Props> = ({height}) => {
                     {...event}
                   />
                 )}
-                autoExpandParent={false}
+                autoExpandParent
+                defaultExpandAll
                 selectedKeys={[selectedPath || '-']}
                 filterTreeNode={node => {
                   // @ts-ignore
@@ -311,7 +355,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
                 switcherIcon={<DownOutlined />}
                 icon={<></>}
               />
-            )}
+            ) : null}
           </S.TreeContainer>
         </TabPane>
 
@@ -344,28 +388,34 @@ const SearchPane: React.FC<Props> = ({height}) => {
               </S.SearchBox>
             </S.Form>
             <S.RootFolderText>
-              {isReady && (
+              {isReady ? (
                 <S.ResultContainer>
                   <S.MatchText id="search-count-replace">
-                    <p>1 of {searchCounter.current.totalMatchCount}</p>
+                    <p>
+                      {currentMatchNode?.currentMatchNumber || 0} of {searchCounter.current.totalMatchCount}
+                    </p>
                     <span> View in Editor</span>
                   </S.MatchText>
                   <S.ButtonContainer>
-                    <Button type="primary" onClick={() => handleStep(-1)}>
+                    <Button type="primary" onClick={() => handleStep(-1)} disabled={!isPrevEnabled}>
                       Previous
                     </Button>
-                    <Button type="primary" onClick={() => handleStep(1)}>
+                    <Button type="primary" onClick={() => handleStep(1)} disabled={!isNextEnabled}>
                       Next
                     </Button>
                   </S.ButtonContainer>
                 </S.ResultContainer>
+              ) : (
+                'No matches found'
               )}
               {replaceQuery && (
                 <S.ButtonContainer>
-                  <Button type="primary" onClick={replaceCurrentSelection}>
+                  <Button type="primary" onClick={replaceCurrentSelection} disabled={!currentMatchNode}>
                     Replace Selected
                   </Button>
-                  <Button type="primary">Replace All</Button>
+                  <Button type="primary" onClick={replaceAll}>
+                    Replace All
+                  </Button>
                 </S.ButtonContainer>
               )}
             </S.RootFolderText>

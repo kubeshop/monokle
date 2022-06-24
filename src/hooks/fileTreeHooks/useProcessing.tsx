@@ -8,7 +8,7 @@ import {scanExcludesSelector} from '@redux/selectors';
 
 export const useProcessing = (onOkHandler: () => void) => {
   const scanExcludes = useAppSelector(scanExcludesSelector);
-  const configState = useAppSelector(state => state.config);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const dispatch = useAppDispatch();
 
   const openConfirmModal = () => {
@@ -26,7 +26,7 @@ export const useProcessing = (onOkHandler: () => void) => {
     dispatch(
       updateProjectConfig({
         config: {
-          ...configState.projectConfig,
+          ...projectConfig,
           scanExcludes: [...scanExcludes, relativePath],
         },
         fromConfigFile: false,
@@ -39,7 +39,7 @@ export const useProcessing = (onOkHandler: () => void) => {
     dispatch(
       updateProjectConfig({
         config: {
-          ...configState.projectConfig,
+          ...projectConfig,
           scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
         },
         fromConfigFile: false,

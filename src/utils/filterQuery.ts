@@ -1,4 +1,4 @@
-import {FileEntry} from '@models/fileentry';
+import {FileEntry, MatchNode} from '@models/fileentry';
 
 export type MatchParamProps = {
   matchCase: boolean;
@@ -6,9 +6,11 @@ export type MatchParamProps = {
   regExp: boolean;
 };
 
+/* based on matching params we change the way we find matches in file */
 export function getRegexp(query: string, params: MatchParamProps): RegExp {
   let matchParams = 'gi'; // global, case insensitive by default
   if (params.matchCase) {
+    // @param matchCase: respect the casing if true
     matchParams = 'g';
   }
   if (!params.regExp) {
@@ -18,22 +20,22 @@ export function getRegexp(query: string, params: MatchParamProps): RegExp {
   let queryRegExp = new RegExp(query, matchParams);
 
   if (params.matchWholeWord) {
+    // @param matchWholeWord: find a match only if it is a standalone word, not a substring
     queryRegExp = new RegExp(`\\b${query}\\b`, matchParams);
   }
   if (params.regExp) {
+    // if the query is a regular expression
     queryRegExp = new RegExp(query, matchParams);
   }
 
   return queryRegExp;
 }
 
-type Props = {
-  textWithHighlights: string;
-  indexStart: number;
-  indexEnd: number;
-};
-
-function decorateMatch(text: string, query: string, fromIndex = 0): Props {
+function decorateMatch(
+  text: string,
+  query: string,
+  fromIndex = 0
+): Omit<MatchNode, 'lineNumber' | 'currentMatchNumber'> {
   const textToSearch = text.slice(fromIndex);
 
   const queryIdx = textToSearch.slice(0).indexOf(query);
@@ -42,10 +44,10 @@ function decorateMatch(text: string, query: string, fromIndex = 0): Props {
     queryIdx + query.length
   )}</em>${textToSearch.slice(queryIdx + query.length)}`;
 
-  return {textWithHighlights, indexStart: fromIndex + queryIdx, indexEnd: fromIndex + queryIdx + query.length};
+  return {textWithHighlights, start: fromIndex + queryIdx, end: fromIndex + queryIdx + query.length};
 }
 
-function getMatchLines(text: string, queryRegExp: RegExp) {
+function getMatchLines(text: string, queryRegExp: RegExp, searchCounterRef: any) {
   const lineArr = text.split('\n');
 
   const fileLineData = lineArr
@@ -53,19 +55,21 @@ function getMatchLines(text: string, queryRegExp: RegExp) {
       const matchesInLine = line.match(queryRegExp);
       if (!matchesInLine) return null;
 
-      return matchesInLine?.reduce((acc: any, currQuery) => {
-        const {textWithHighlights, indexStart, indexEnd} = decorateMatch(
+      return matchesInLine?.reduce((acc: any, currQuery, matchIdx) => {
+        const {textWithHighlights, start, end} = decorateMatch(
           line,
           currQuery,
           (acc.length && acc[acc.length - 1].end) || 0
         );
+        searchCounterRef.current.totalMatchCount += matchIdx + 1;
         return [
           ...acc,
           {
             textWithHighlights,
             lineNumber: index + 1,
-            start: indexStart + 1,
-            end: indexEnd + 1,
+            start: start + 1,
+            end: end + 1,
+            currentMatchNumber: searchCounterRef.current.totalMatchCount,
           },
         ];
       }, []);
@@ -75,28 +79,30 @@ function getMatchLines(text: string, queryRegExp: RegExp) {
   return fileLineData;
 }
 
-export const filterFilesByQuery = (node: FileEntry, queryRegExp: RegExp, searchCounterRef: any) => {
+export const filterFilesByQuery = (node: FileEntry, queryRegExp: RegExp, searchCounterRef: any): FileEntry | null => {
   if (node.text && node.isSupported && !node.isExcluded) {
     const matches = node.text.match(queryRegExp);
     const matchCount = matches?.length;
     if (matchCount) {
-      const matchLines = getMatchLines(node.text, queryRegExp);
+      const matchLines = getMatchLines(node.text, queryRegExp, searchCounterRef);
 
       searchCounterRef.current = {
+        ...searchCounterRef.current,
         filesCount: searchCounterRef.current.filesCount + 1,
-        totalMatchCount: searchCounterRef.current.totalMatchCount + matchCount,
       };
 
       return {
         ...node,
-        matches,
         matchCount,
         matchLines,
       };
     }
-
-    return null as unknown as FileEntry;
+    return null;
   }
 
-  return null as unknown as FileEntry;
+  return null;
 };
+
+export function notEmpty<FileEntry>(value: FileEntry | null | undefined): value is FileEntry {
+  return value !== null && value !== undefined;
+}

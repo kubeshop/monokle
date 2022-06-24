@@ -150,6 +150,7 @@
     "redux": "4.2.0",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.1",
+    "replace-in-file": "6.3.5",
     "reselect": "4.1.6",
     "runtypes": "6.5.1",
     "semver": "7.3.7",
