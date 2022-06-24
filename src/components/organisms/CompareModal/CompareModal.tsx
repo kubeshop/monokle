@@ -9,7 +9,6 @@ import {useAppSelector} from '@redux/hooks';
 import {CompareActionBar} from './CompareActionBar';
 import * as S from './CompareModal.styled';
 import {CompareModalComparing} from './CompareModalComparing';
-import {CompareModalFooter} from './CompareModalFooter';
 import {CompareModalSelecting} from './CompareModalSelecting';
 import {InspectionActionBar} from './InspectionActionBar';
 import {ResourceSetSelector} from './ResourceSetSelector';
@@ -27,14 +26,7 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
-    <Modal
-      title="Comparing resources"
-      visible={visible}
-      onCancel={onClose}
-      onOk={onClose}
-      footer={<CompareModalFooter onClose={onClose} />}
-      {...sizeProps}
-    >
+    <Modal footer={null} title="Comparing resources" visible={visible} onCancel={onClose} onOk={onClose} {...sizeProps}>
       {!isInspecting ? <CompareActionBar /> : <InspectionActionBar />}
 
       <Row ref={containerRef}>
@@ -47,7 +39,7 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
         </Col>
       </Row>
 
-      <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 66px)`}}>
+      <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 40px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.ContentDiv>
 
@@ -76,7 +68,7 @@ type ModalSizeProps = {
 function useModalSize(): ModalSizeProps {
   const windowSize = useWindowSize();
   const modalHeaderHeight = 55;
-  const percentage = 0.85;
+  const percentage = 0.9;
 
   return {
     width: windowSize.width * percentage,

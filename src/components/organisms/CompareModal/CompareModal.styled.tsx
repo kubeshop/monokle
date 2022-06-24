@@ -10,6 +10,6 @@ export const ContentDiv = styled.div`
 `;
 
 export const ActionsRow = styled(Row)`
-  height: 66px;
+  margin-top: 15px;
   align-items: center;
 `;
