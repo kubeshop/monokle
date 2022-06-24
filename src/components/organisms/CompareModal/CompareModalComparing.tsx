@@ -46,6 +46,6 @@ export const CompareModalComparing: React.FC = () => {
 };
 
 const DiffRow = styled(Row)`
-  height: calc(100% - 20px);
+  height: calc(100% - 10px);
   overflow: auto;
 `;
