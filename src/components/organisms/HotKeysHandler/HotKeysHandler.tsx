@@ -18,6 +18,7 @@ import {
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
+  isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -42,6 +43,7 @@ const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -235,11 +237,15 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('kustomize-pane'));
+    if (!isInClusterMode) {
+      dispatch(setLeftMenuSelection('kustomize-pane'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    dispatch(setLeftMenuSelection('helm-pane'));
+    if (!isInClusterMode) {
+      dispatch(setLeftMenuSelection('helm-pane'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {

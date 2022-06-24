@@ -15,7 +15,7 @@ import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
-import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
+import {activeProjectSelector, isInClusterModeSelector, kustomizationsSelector} from '@redux/selectors';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
@@ -41,7 +41,9 @@ const PaneManagerLeftMenu: React.FC = () => {
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kustomizations = useAppSelector(kustomizationsSelector);
+
   const isActive = Boolean(activeProject) && leftActive;
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
@@ -82,6 +84,8 @@ const PaneManagerLeftMenu: React.FC = () => {
     setHasSeenHelmCharts(false);
   }, [rootFileEntry]);
 
+  console.log(isInClusterMode);
+
   return (
     <S.Container id="LeftToolbar" isLeftActive={isActive}>
       <PaneTooltip
@@ -107,7 +111,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       </PaneTooltip>
 
       <PaneTooltip
-        show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
+        show={(!leftActive || !(leftMenuSelection === 'kustomize-pane')) && !isInClusterMode}
         title={<KustomizeTabTooltip />}
         placement="right"
       >
@@ -117,7 +121,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           isActive={isActive}
           onClick={() => setLeftActiveMenu('kustomize-pane')}
           sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
-          disabled={!activeProject}
+          disabled={!activeProject || isInClusterMode}
         >
           <S.Badge
             count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
@@ -136,7 +140,7 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'helm-pane')}
+          show={(!leftActive || !(leftMenuSelection === 'helm-pane')) && !isInClusterMode}
           title={<HelmTabTooltip />}
           placement="right"
         >
@@ -146,7 +150,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             isActive={isActive}
             onClick={() => setLeftActiveMenu('helm-pane')}
             sectionNames={[HELM_CHART_SECTION_NAME]}
-            disabled={!activeProject}
+            disabled={!activeProject || isInClusterMode}
           >
             <S.Badge
               count={!hasSeenHelmCharts && helmCharts.length ? helmCharts.length : 0}
