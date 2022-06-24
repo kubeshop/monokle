@@ -1,9 +1,17 @@
-import {Button, Modal, Typography} from 'antd';
+import {useEffect, useState} from 'react';
+
+import {Button, Divider, Modal, Typography} from 'antd';
+
+import path from 'path';
+import semver from 'semver';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeAboutModal} from '@redux/reducers/ui';
+import {loadResource} from '@redux/services';
 
 import {useAppVersion} from '@hooks/useAppVersion';
+
+import {fetchAppVersion} from '@utils/appVersion';
 
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
@@ -13,18 +21,42 @@ import * as S from './AboutMonokle.styled';
 
 const {Text} = Typography;
 
-const INCLUDED_DEPENDENCIES = ['react', 'electron'];
+const INCLUDED_DEPENDENCIES = ['react', 'electron', 'antd', 'monaco-editor', 'monaco-yaml'];
 const allDeps = {...packageJson.devDependencies, ...packageJson.dependencies};
 const filteredDependencies = Object.entries(allDeps).filter(([name]) => INCLUDED_DEPENDENCIES.includes(name));
+
+type About = {
+  title: string;
+  features: string[];
+  when: string;
+};
 
 const AboutModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
+  const [about, setAbout] = useState<About>();
 
   const handleClose = () => {
     dispatch(closeAboutModal());
   };
+
+  useEffect(() => {
+    fetchAppVersion().then(version => {
+      const parsedVersion = semver.parse(version);
+      if (!parsedVersion) {
+        return;
+      }
+      const releaseVersion = `${parsedVersion.major}.${parsedVersion.minor}`;
+      const rawVersionInfo = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.json`));
+      if (!rawVersionInfo) {
+        return;
+      }
+      const versionInfo = JSON.parse(rawVersionInfo);
+      const {about: aboutInfo} = versionInfo || {};
+      setAbout(aboutInfo);
+    });
+  }, []);
 
   return (
     <Modal
@@ -50,20 +82,20 @@ const AboutModal = () => {
             <img src={MonokleAbout} />
             <S.StyledTextContainer>
               <Text>Version: {appVersion}</Text>
-              <Text>Launched in: June 2022</Text>
+              <Text>Released in {about?.when}</Text>
+              <Divider style={{margin: '8px 0'}} />
               <Text>
-                {/* TODO: get the below text from the releaseNotes folder */}
-                In this release, we bring you:
+                {about?.title}
                 <ul>
-                  <li>Compare Anything (literally)</li>
-                  <li>New Images panel</li>
-                  <li>Overall improvements</li>
+                  {about?.features.map(feat => (
+                    <li key={feat}>{feat}</li>
+                  ))}
                 </ul>
-                Other useful info:
+                Packages:
                 <ul>
                   {filteredDependencies.map(([name, version]) => (
                     <li key={name}>
-                      {name} version: {version}
+                      {name}: {version}
                     </li>
                   ))}
                 </ul>
