@@ -196,7 +196,12 @@ const App = () => {
   useEffect(() => {
     fetchAppVersion().then(version => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
-      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
+
+      // check if the current version is the next big release version for showing the modal with release notes
+      if (
+        !semver.valid(lastSeenReleaseNotesVersion) ||
+        semver.satisfies(version, `>=${semver.inc(lastSeenReleaseNotesVersion, 'minor')}`)
+      ) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }

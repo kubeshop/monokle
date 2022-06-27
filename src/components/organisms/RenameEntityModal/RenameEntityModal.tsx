@@ -107,14 +107,19 @@ const RenameEntityModal: React.FC = () => {
             ({getFieldValue}) => ({
               validator: () => {
                 return new Promise((resolve: (value?: any) => void, reject) => {
-                  const newEntityNameValue: string = getFieldValue('newEntityName').toLowerCase();
+                  const newEntityNameValue: string = getFieldValue('newEntityName');
 
                   // If the input is empty - it is not valid
                   if (!newEntityNameValue) {
                     reject(new Error("This field can't be empty"));
                   }
 
-                  // If the old name and the new name are equal - it is valid
+                  // If the old name and the new name are equal - it is not valid
+                  if (newEntityNameValue === uiState.entityName) {
+                    reject(new Error("Name can't be the same as the current one"));
+                  }
+
+                  // If the old name and the new name are differ by case - it is valid
                   if (newEntityNameValue.toLowerCase() === uiState.entityName.toLowerCase()) {
                     resolve();
                   }
