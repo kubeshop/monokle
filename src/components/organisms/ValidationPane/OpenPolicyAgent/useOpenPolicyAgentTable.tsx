@@ -1,7 +1,6 @@
 import {shell} from 'electron';
 
 import {useCallback, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
@@ -10,7 +9,7 @@ import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constant
 
 import {IconNames} from '@models/icons';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
 import {Icon} from '@components/atoms';
@@ -21,7 +20,7 @@ import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 
 export function useOpenPolicyAgentTable(width: number) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const handleToggle = useCallback(
