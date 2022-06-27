@@ -46,9 +46,17 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   recentProjectsPaneWidth: 450,
 };
 
-export const PREDEFINED_K8S_VERSION = '1.23.3';
+export const PREDEFINED_K8S_VERSION = '1.24.2';
 
 export const K8S_VERSIONS = [
+  '1.24.2',
+  '1.24.1',
+  '1.24.0',
+  '1.23.8',
+  '1.23.7',
+  '1.23.6',
+  '1.23.5',
+  '1.23.4',
   '1.23.3',
   '1.23.2',
   '1.23.1',
