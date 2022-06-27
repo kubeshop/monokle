@@ -5,6 +5,8 @@ import {Checkbox} from 'antd';
 
 import {groupBy} from 'lodash';
 
+import navSectionNames from '@constants/navSectionNames';
+
 import {ResourceSetData} from '@redux/compare';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -32,9 +34,34 @@ type Props = {
 export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.resources, r => r.kind);
+
+    const sortedGroups = Object.entries(groups).sort((a, b) => {
+      const kindA = a[0];
+      const kindB = b[0];
+
+      const kindHandlerA = getResourceKindHandler(kindA);
+      const kindHandlerB = getResourceKindHandler(kindB);
+
+      if (!kindHandlerA || !kindHandlerB) {
+        return 0;
+      }
+
+      const sectionsOrdering = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
+
+      const kindAIndex = sectionsOrdering.indexOf(kindHandlerA.navigatorPath[1]);
+      const kindBIndex = sectionsOrdering.indexOf(kindHandlerB.navigatorPath[1]);
+
+      // if sections are the same, order kinds alphabetically
+      if (!(kindAIndex - kindBIndex)) {
+        return kindA.localeCompare(kindB);
+      }
+
+      return kindAIndex - kindBIndex;
+    });
+
     const result: Array<HeaderItem | ResourceItem> = [];
 
-    for (const [kind, resources] of Object.entries(groups)) {
+    for (const [kind, resources] of sortedGroups) {
       result.push({type: 'header', kind, count: resources.length});
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
@@ -48,11 +75,11 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
   return (
     <S.ResourceListDiv>
-      {rows.map(row => {
+      {rows.map((row, index) => {
         if (row.type === 'header') {
           const {kind, count: resourceCount} = row;
           return (
-            <S.HeaderDiv $showCheckbox={showCheckbox} key={kind}>
+            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
               <S.Header>
                 {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
