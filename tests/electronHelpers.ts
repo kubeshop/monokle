@@ -61,6 +61,7 @@ export async function startApp(): Promise<StartAppResponse> {
 
   await appWindow.screenshot({
     path: getRecordingPath(appInfo.platform, 'before-modals.png'),
+    timeout: 45000,
   });
 
   await closeNotification(appWindow, 20000);
