@@ -125,6 +125,8 @@ interface AppState {
   currentSelectionHistoryIndex?: number;
   /** a list of previously selected resources of paths */
   selectionHistory: SelectionHistoryEntry[];
+  /** the previous list of previously selected resources of paths */
+  previousSelectionHistory: SelectionHistoryEntry[];
   /** the id of the currently selected resource */
   selectedResourceId?: string;
   /** a list of checked resources for multi-resource actions */

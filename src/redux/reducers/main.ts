@@ -460,6 +460,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      state.previousSelectionHistory = state.selectionHistory;
       clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
@@ -753,11 +754,14 @@ export const mainSlice = createSlice({
         state.selectedPreviewConfigurationId = undefined;
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -774,11 +778,14 @@ export const mainSlice = createSlice({
           selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
+        state.previousSelectionHistory = [];
       })
       .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -792,11 +799,14 @@ export const mainSlice = createSlice({
         state.selectedImage = undefined;
         state.selectedPath = undefined;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(runPreviewConfiguration.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -815,11 +825,14 @@ export const mainSlice = createSlice({
           resource.isSelected = false;
           resource.isHighlighted = false;
         });
+        state.previousSelectionHistory = [];
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
