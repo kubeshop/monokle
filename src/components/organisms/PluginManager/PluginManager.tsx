@@ -6,7 +6,7 @@ import {Button, Skeleton, Tooltip, Typography} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_TEMPLATES_PLUGIN_URL, PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -45,7 +45,7 @@ const PluginManagerDrawer: React.FC = () => {
   };
 
   const openHelpUrl = () => {
-    const repositoryUrl = `https://github.com/kubeshop/monokle/blob/main/docs/plugins.md`;
+    const repositoryUrl = PLUGINS_HELP_URL;
     shell.openExternal(repositoryUrl);
   };
 

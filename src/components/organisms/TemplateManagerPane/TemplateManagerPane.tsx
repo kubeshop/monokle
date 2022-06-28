@@ -6,7 +6,7 @@ import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_PANE_TITLE_HEIGHT, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -80,7 +80,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
   const openHelpUrl = () => {
-    const repositoryUrl = `https://github.com/kubeshop/monokle/blob/main/docs/templates.md`;
+    const repositoryUrl = TEMPLATES_HELP_URL;
     shell.openExternal(repositoryUrl);
   };
 
