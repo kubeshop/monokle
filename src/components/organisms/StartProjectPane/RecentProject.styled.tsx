@@ -6,11 +6,11 @@ import Colors from '@styles/Colors';
 
 export const ActionsContainer = styled.div`
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 8px;
+  right: 8px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 `;
 
 export const Container = styled.div<{activeproject: boolean}>`
@@ -20,8 +20,16 @@ export const Container = styled.div<{activeproject: boolean}>`
   position: relative;
   padding: 0.5rem 1rem;
 
+  & .anticon-delete {
+    display: none;
+  }
+
   :hover {
     background: ${Colors.grey2000};
+
+    & .anticon-delete {
+      display: inline-block;
+    }
   }
 `;
 
