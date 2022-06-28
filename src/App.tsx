@@ -196,15 +196,29 @@ const App = () => {
     fetchAppVersion().then(version => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
 
+      const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
+
       // check if the current version is the next big release version for showing the modal with release notes
-      if (
-        !semver.valid(lastSeenReleaseNotesVersion) ||
-        semver.satisfies(version, `>=${semver.inc(lastSeenReleaseNotesVersion, 'minor')}`)
-      ) {
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+      // if middle release, show silent notification
+      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
+        dispatch(
+          setAlert({
+            title: 'A new version of Monokle has been installed!',
+            message: '',
+            type: AlertEnum.Success,
+            silent: true,
+          })
+        );
+
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      }
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {
