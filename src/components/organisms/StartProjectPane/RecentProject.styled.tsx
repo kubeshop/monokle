@@ -1,6 +1,17 @@
+import {DeleteOutlined as RawDeleteOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
+
+export const ActionsContainer = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
 
 export const Container = styled.div<{activeproject: boolean}>`
   border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
@@ -9,16 +20,21 @@ export const Container = styled.div<{activeproject: boolean}>`
   position: relative;
   padding: 0.5rem 1rem;
 
-  :hover {
-    background: ${Colors.grey2000};
+  & .anticon-delete {
+    display: none;
   }
 
-  .anticon-pushpin {
-    position: absolute;
-    right: 0.3rem;
-    top: 0.3rem;
-    padding: 0.3rem;
+  :hover {
+    background: ${Colors.grey2000};
+
+    & .anticon-delete {
+      display: inline-block;
+    }
   }
+`;
+
+export const DeleteOutlined = styled(RawDeleteOutlined)`
+  color: ${Colors.red7};
 `;
 
 export const Name = styled.div`

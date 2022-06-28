@@ -9,7 +9,6 @@ import Column from 'antd/lib/table/Column';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
-import {DateTime} from 'luxon';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {
@@ -25,19 +24,20 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
+import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 import WalkThrough from '@components/molecules/WalkThrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {getRelativeDate} from '@utils';
+
 import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -130,13 +130,6 @@ const ProjectSelection = () => {
     if (!deleteModalVisible.current.visible) {
       setIsDropdownMenuVisible(visible);
     }
-  };
-
-  const getRelativeDate = (isoDate: string | undefined) => {
-    if (isoDate) {
-      return DateTime.fromISO(isoDate).toRelative();
-    }
-    return '';
   };
 
   const projectMenu = () => {
