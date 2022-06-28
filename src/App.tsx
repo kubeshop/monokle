@@ -213,9 +213,9 @@ const App = () => {
         dispatch(setDeleteProject(project));
         dispatch(
           setAlert({
-            title: 'Project deleted',
-            message: `Project ${project.name} has been deleted since the root folder no longer exist`,
-            type: AlertEnum.Info,
+            title: 'Project removed',
+            message: `We removed project ${project.name} from Monokle because its root folder no longer exists`,
+            type: AlertEnum.Warning,
           })
         );
       }
