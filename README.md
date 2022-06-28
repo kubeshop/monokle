@@ -41,7 +41,7 @@
 
 ## Core Features
 
-- ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
+- ⚡ Quickly get a high-level view of your manifests, their contained resources, and relationships
 - ✅ Validate resources using OPA policy rules
 - 🖊️ Easily edit resources without having to learn or look up yaml syntax
 - 🔨 Refactor resources with maintained integrity of names and references
@@ -107,4 +107,4 @@ Don't hesitate to provide any feedback you might have to help us prioritize and 
 ## Getting involved
 
 - Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn).
-- Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing).
+- Read about how to contribute [to our Documentation](https://kubeshop.github.io/monokle/contributing).
