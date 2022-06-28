@@ -11,6 +11,7 @@ import {
   DEFAULT_PLUGINS,
   DEFAULT_TEMPLATES_PLUGIN_URL,
   DEPENDENCIES_HELP_URL,
+  NEW_VERSION_CHECK_INTERVAL,
 } from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
@@ -190,6 +191,10 @@ export const createWindow = (givenPath?: string) => {
     );
 
     await checkNewVersion(dispatch, true);
+    setInterval(async () => {
+      await checkNewVersion(dispatch, true);
+    }, NEW_VERSION_CHECK_INTERVAL);
+
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));
 

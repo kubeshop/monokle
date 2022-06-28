@@ -1,7 +1,6 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
@@ -19,7 +18,7 @@ import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
@@ -77,7 +76,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
 const App = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
@@ -197,15 +196,29 @@ const App = () => {
     fetchAppVersion().then(version => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
 
+      const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
+
       // check if the current version is the next big release version for showing the modal with release notes
-      if (
-        !semver.valid(lastSeenReleaseNotesVersion) ||
-        semver.satisfies(version, `>=${semver.inc(lastSeenReleaseNotesVersion, 'minor')}`)
-      ) {
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+      // if middle release, show silent notification
+      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
+        dispatch(
+          setAlert({
+            title: 'A new version of Monokle has been installed!',
+            message: '',
+            type: AlertEnum.Success,
+            silent: true,
+          })
+        );
+
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      }
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {

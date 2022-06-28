@@ -46,9 +46,17 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   recentProjectsPaneWidth: 450,
 };
 
-export const PREDEFINED_K8S_VERSION = '1.23.3';
+export const PREDEFINED_K8S_VERSION = '1.24.2';
 
 export const K8S_VERSIONS = [
+  '1.24.2',
+  '1.24.1',
+  '1.24.0',
+  '1.23.8',
+  '1.23.7',
+  '1.23.6',
+  '1.23.5',
+  '1.23.4',
   '1.23.3',
   '1.23.2',
   '1.23.1',
@@ -177,3 +185,4 @@ export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
 export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
+export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;

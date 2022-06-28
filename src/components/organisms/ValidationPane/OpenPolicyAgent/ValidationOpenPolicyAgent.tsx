@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 import {useMeasure} from 'react-use';
 
+import {useAppDispatch} from '@redux/hooks';
 import {reprocessAllResources, toggleAllRules} from '@redux/reducers/main';
 
 import {Button} from '@src/App.styled';
@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const ValidationOpenPolicyAgent: React.FC<IProps> = ({height}) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [descriptionRef, {height: descriptionHeight}] = useMeasure<HTMLDivElement>();
 
