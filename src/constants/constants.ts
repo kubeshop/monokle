@@ -26,7 +26,7 @@ export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
 export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
-export const VALIDATION_HIDING_LABELS_WIDTH = 420;
+export const VALIDATION_HIDING_LABELS_WIDTH = 450;
 export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
 export const DEFAULT_PLUGINS = [
   {
@@ -177,3 +177,4 @@ export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
 export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
+export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;

@@ -20,6 +20,7 @@ For further details on working with Monokle, read the [Feature Overview](feature
 
 Check out the following blog-posts with Monokle-related content:
 
+- 1.8.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-8-0-release) - June 6, 2022
 - 1.7.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-7-0-release) - May 2, 2022
 - 1.6.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-6-0-release) - Mar 21, 2022
 - 1.5.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79) - Feb 7, 2022

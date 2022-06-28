@@ -733,6 +733,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: content.apiVersion,
             content,
             text,
+            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
           };
 
           if (
@@ -778,6 +779,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
+            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
