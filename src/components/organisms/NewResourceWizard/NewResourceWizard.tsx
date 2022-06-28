@@ -36,10 +36,6 @@ const SELECT_OPTION_NONE = '<none>';
 
 const {Option, OptGroup} = Select;
 
-const fetchFullFileName = (filename: string, suffix?: string) => {
-  return `${filename}${suffix || ''}.yaml`;
-};
-
 const generateFullFileName = (
   resourceName: K8sResource['name'],
   resourceKind: K8sResource['kind'],
@@ -51,7 +47,7 @@ const generateFullFileName = (
   const name = resourceName;
   const nameKind = includeKind ? `-${resourceKind.toLowerCase()}` : '';
   const nameSuffix = suffix ? ` (${suffix})` : '';
-  const fullFileName = fetchFullFileName(`${name}${nameKind}${nameSuffix}`);
+  const fullFileName = `${name}${nameKind}${nameSuffix}.yaml`;
   let foundFile: fs.Dirent | FileEntry | undefined;
 
   if (selectedFolder === ROOT_FILE_ENTRY) {
@@ -130,9 +126,13 @@ const NewResourceWizard = () => {
     [registeredKindHandlers, resourceMap]
   );
 
+  const getDirPath = (resourcePath: K8sResource['filePath']) => {
+    return resourcePath.substring(0, resourcePath.lastIndexOf(path.sep));
+  };
+
   const generateExportFileName = async () => {
     if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
-      const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
+      const currentFolder = selectedFolder.split(fileMap[ROOT_FILE_ENTRY].filePath).pop();
 
       if (currentFolder) {
         setSelectedFolder(currentFolder.slice(1));
@@ -145,11 +145,12 @@ const NewResourceWizard = () => {
     let selectedFolderResources;
     if (selectedFolder === ROOT_FILE_ENTRY) {
       selectedFolderResources = Object.values(resourceMap).filter(
-        resource => resource.filePath.split('/').length === 2
+        resource => resource.filePath.split(path.sep).length === 2
       );
     } else {
       selectedFolderResources = Object.values(resourceMap).filter(
-        resource => resource.filePath.split('/').length > 2 && resource.filePath.startsWith(`/${selectedFolder}/`)
+        resource =>
+          resource.filePath.split(path.sep).length > 2 && getDirPath(resource.filePath).endsWith(selectedFolder)
       );
     }
     const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
@@ -323,6 +324,10 @@ const NewResourceWizard = () => {
       if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
         form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
       }
+    }
+
+    if (savingDestination === 'saveToFolder') {
+      generateExportFileName();
     }
   };
 
@@ -609,7 +614,7 @@ const NewResourceWizard = () => {
           )}
         </SaveDestinationWrapper>
 
-        {savingDestination === 'saveToFolder' && (
+        {savingDestination === 'saveToFolder' && form.getFieldValue('name') && form.getFieldValue('kind') && (
           <div style={{marginTop: '16px'}}>
             <FileCategoryLabel>File to be created:</FileCategoryLabel>
             <FileNameLabel>{exportFileName}</FileNameLabel>
