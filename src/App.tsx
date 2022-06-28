@@ -204,17 +204,17 @@ const App = () => {
         setShowReleaseNotes(true);
       }
       // if middle release, show silent notification
-      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} || <${nextMajorReleaseVersion}`)) {
+      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
         dispatch(
           setAlert({
-            title: 'Monokle was updated',
-            message: 'Check it out next time you open it, or',
+            title: 'A new version of Monokle has been installed!',
+            message: '',
             type: AlertEnum.Success,
             silent: true,
           })
         );
 
-        // electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
       }
     });
 
