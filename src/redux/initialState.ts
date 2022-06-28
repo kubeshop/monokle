@@ -17,6 +17,7 @@ const initialAppState: AppState = {
   isRehydrating: false,
   wasRehydrated: false,
   selectionHistory: [],
+  previousSelectionHistory: [],
   resourceMap: {},
   resourceFilter: {
     labels: {},
