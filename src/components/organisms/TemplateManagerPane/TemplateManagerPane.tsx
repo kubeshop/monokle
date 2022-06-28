@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Button, Tooltip} from 'antd';
@@ -77,6 +79,10 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
+  const openHelpUrl = () => {
+    const repositoryUrl = `https://github.com/kubeshop/monokle/blob/main/docs/templates.md`;
+    shell.openExternal(repositoryUrl);
+  };
 
   useEffect(() => {
     if (!searchedValue) {
@@ -109,6 +115,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
               size="small"
               icon={<ReloadOutlined />}
             />
+            <S.QuestionCircleOutlined onClick={openHelpUrl} />
           </Tooltip>
         }
       />

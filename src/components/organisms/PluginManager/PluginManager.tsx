@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import {useCallback, useMemo, useState} from 'react';
 
 import {Button, Skeleton, Tooltip, Typography} from 'antd';
@@ -42,10 +44,16 @@ const PluginManagerDrawer: React.FC = () => {
     setInstallModalVisible(false);
   };
 
+  const openHelpUrl = () => {
+    const repositoryUrl = `https://github.com/kubeshop/monokle/blob/main/docs/plugins.md`;
+    shell.openExternal(repositoryUrl);
+  };
+
   return (
     <>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
+        <S.QuestionCircleOutlined onClick={openHelpUrl} />
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerDrawerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
@@ -53,9 +61,7 @@ const PluginManagerDrawer: React.FC = () => {
             type="link"
             size="small"
             icon={<ReloadOutlined />}
-          >
-            Update
-          </Button>
+          />
         </Tooltip>
         <Button
           onClick={onClickInstallPlugin}
