@@ -35,6 +35,7 @@ import * as S from './ClusterSelection.styled';
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
@@ -240,6 +241,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       <>
         {isKubeConfigPathValid && activeProject && (
           <S.Button
+            className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
             disabled={isPreviewLoading && isAccessLoading}
             onClick={loadOrReloadPreview}
             isInPreviewMode={!isPreviewLoading && isInPreviewMode}
