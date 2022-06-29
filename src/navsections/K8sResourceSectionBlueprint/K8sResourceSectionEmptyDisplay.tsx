@@ -7,7 +7,7 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 
 import Colors from '@styles/Colors';
@@ -41,6 +41,15 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClick = (itemToHighlight: string) => {
     dispatch(highlightItem(itemToHighlight));
+
+    setTimeout(() => {
+      if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
+        dispatch(setLeftMenuSelection('templates-pane'));
+      } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
+        dispatch(openNewResourceWizard());
+      }
+    }, 1000);
+
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
