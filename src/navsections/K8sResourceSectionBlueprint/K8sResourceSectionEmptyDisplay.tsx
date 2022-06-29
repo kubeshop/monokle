@@ -7,8 +7,9 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
+import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
 
@@ -30,9 +31,10 @@ const StyledLink = styled.div`
 `;
 
 function K8sResourceSectionEmptyDisplay() {
-  const activeResources = useAppSelector(activeResourcesSelector);
   const dispatch = useAppDispatch();
+  const activeResources = useAppSelector(activeResourcesSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
   function resetFilters() {
     const emptyFilter: ResourceFilterType = {annotations: {}, labels: {}};
@@ -41,6 +43,17 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClick = (itemToHighlight: string) => {
     dispatch(highlightItem(itemToHighlight));
+
+    setTimeout(() => {
+      if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
+        dispatch(setLeftMenuSelection('templates-pane'));
+      } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
+        dispatch(openNewResourceWizard());
+      } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
+        startPreview(kubeConfigContext, 'cluster', dispatch);
+      }
+    }, 1000);
+
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
