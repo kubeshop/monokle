@@ -120,6 +120,9 @@ const parseFields = (definition: any, firstCall = false) => {
       if (key === 'namespace') {
         schemaUiDefinition[key]['ui:widget'] = 'namespaceSelection';
       }
+      if (key === 'image') {
+        schemaUiDefinition[key]['ui:widget'] = 'imageSelection';
+      }
     }
   });
 
