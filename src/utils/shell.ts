@@ -39,7 +39,7 @@ export function openUniqueObjectNameTopic() {
 }
 
 export function openNamespaceTopic() {
-  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/');
+  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces');
 }
 
 export function openExternalResourceKindDocumentation(resourceKindDocLink?: string) {
