@@ -105,7 +105,7 @@
     "@types/analytics-node": "3.1.9",
     "ajv": "6.12.6",
     "analytics-node": "6.0.0",
-    "antd": "4.20.7",
+    "antd": "4.21.0",
     "asar": "3.1.0",
     "async": "3.2.3",
     "chokidar": "3.5.3",
