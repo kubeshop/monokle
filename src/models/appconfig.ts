@@ -62,6 +62,7 @@ export type KubeConfigContext = {
   name: string;
   user: string | null;
   namespace: string | null;
+  namespaces: Array<string>;
 };
 
 export type KubeConfig = {

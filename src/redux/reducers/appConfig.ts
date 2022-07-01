@@ -413,6 +413,30 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
+    addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<{context: string; namespace: string}>) => {
+      console.log(action.payload);
+      let namespaces: Array<string> | undefined = state.kubeConfig?.contexts?.find(
+        c => c.name === action.payload.context
+      )?.namespaces;
+      if (state.kubeConfig && state.kubeConfig.contexts) {
+        const context = state.kubeConfig.contexts.find(c => c.name === action.payload.context);
+        if (context) {
+          context.namespaces = namespaces ? [...namespaces, action.payload.namespace] : [action.payload.namespace];
+        }
+      }
+    },
+    removeNamespaceFromContext: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{context: string; namespace: string}>
+    ) => {
+      const index: number | undefined = state.kubeConfig?.contexts
+        ?.find(c => c.name === action.payload.context)
+        ?.namespaces.indexOf(action.payload.namespace);
+
+      if (index && index > -1) {
+        state.kubeConfig?.contexts?.find(c => c.name === action.payload.context)?.namespaces.splice(index, 1);
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -451,6 +475,8 @@ export const {
   setAccessLoading,
   updateTelemetry,
   toggleProjectPin,
+  addNamespaceToContext,
+  removeNamespaceFromContext,
 } = configSlice.actions;
 export default configSlice.reducer;
 

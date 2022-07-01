@@ -9,7 +9,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setAccessLoading, updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/appConfig';
+import {setAccessLoading, updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
 import electronStore from '@utils/electronStore';
 import {addNamespace, getContextsWithRemovedNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
@@ -53,7 +53,7 @@ export const loadContexts = async (
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
-          isPathValid: kc.contexts.length > 0,
+          isPathValid: kc.clusters.length > 0,
         };
 
         const removedNamespaces = getContextsWithRemovedNamespace();
@@ -73,13 +73,13 @@ export const loadContexts = async (
           });
         });
 
-        dispatch(updateProjectKubeConfig(kubeConfig));
+        // dispatch(updateProjectKubeConfig(kubeConfig));
         try {
           if (isRendererThread()) {
             dispatch(setAccessLoading(true));
             const namespaces = getNamespaces(selectedContext?.name as string).map(ctx => ctx.namespaceName);
             const clusterAccess = await getKubeAccess(namespaces, kc.currentContext);
-            dispatch(updateProjectKubeAccess(clusterAccess));
+            // dispatch(updateProjectKubeAccess(clusterAccess));
           }
         } catch (e) {
           showError(dispatch, {

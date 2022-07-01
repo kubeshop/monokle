@@ -11,7 +11,7 @@ import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCurrentContext, updateProjectKubeAccess} from '@redux/reducers/appConfig';
+import {setCurrentContext} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
 import FilePatternList from '@molecules/FilePatternList';
@@ -89,7 +89,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     if (clusterName === kubeConfigContext) {
       getKubeAccess(localCluster.namespaces, kubeConfigContext)
         .then(currentClusterAccess => {
-          dispatch(updateProjectKubeAccess(currentClusterAccess));
+          // dispatch(updateProjectKubeAccess(currentClusterAccess));
         })
         .catch(() => {
           dispatch(
