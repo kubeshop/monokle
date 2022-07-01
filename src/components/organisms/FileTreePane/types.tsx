@@ -1,5 +1,7 @@
 import {Dispatch, SetStateAction} from 'react';
 
+import {DataNode} from 'antd/lib/tree';
+
 import {DeleteEntityCallback} from '@utils/files';
 
 export interface ProcessingEntity {
@@ -8,7 +10,7 @@ export interface ProcessingEntity {
 }
 
 export interface TreeItemProps {
-  title: React.ReactNode;
+  title: React.ReactNode | ((data: DataNode) => React.ReactNode);
   treeKey: string;
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;

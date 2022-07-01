@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {optionalExplicitNamespaceMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
 const EndpointsHandler: ResourceKindHandler = {
   kind: 'Endpoints',
   apiVersionMatcher: '**',
@@ -35,6 +37,19 @@ const EndpointsHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'Service',
+      },
+      type: 'name',
+    },
+    {
+      source: {
+        pathParts: ['targetRef', 'name'],
+        siblingMatchers: {
+          namespace: optionalExplicitNamespaceMatcher,
+          kind: targetKindMatcher,
+        },
+      },
+      target: {
+        kind: '$.*',
       },
       type: 'name',
     },
