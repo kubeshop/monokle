@@ -1,4 +1,4 @@
-import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
@@ -26,7 +26,7 @@ export const compareSlice = createSlice({
   initialState,
   reducers: {
     compareToggled: (
-      state,
+      state: Draft<CompareState>,
       action: PayloadAction<{
         value: boolean | undefined;
         initialView?: ComparisonView;
@@ -47,18 +47,19 @@ export const compareSlice = createSlice({
 
       trackEvent('COMPARE_OPENED', {from: action.payload.from});
     },
-    operationUpdated: (state, action: PayloadAction<{operation: CompareOperation}>) => {
+    operationUpdated: (state: Draft<CompareState>, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
       resetComparison(state);
     },
-    searchUpdated: (state, action: PayloadAction<{search: string | undefined}>) => {
+    searchUpdated: (state: Draft<CompareState>, action: PayloadAction<{search: string | undefined}>) => {
       state.current.search = action.payload.search;
     },
-    namespaceUpdated: (state, action: PayloadAction<{namespace: string | undefined}>) => {
+    namespaceUpdated: (state: Draft<CompareState>, action: PayloadAction<{namespace: string | undefined}>) => {
       state.current.view.namespace = action.payload.namespace;
     },
-    filterUpdated: (state, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
+    filterUpdated: (state: Draft<CompareState>, action: PayloadAction<{filter: CompareFilter | undefined}>) => {
       const newFilter = action.payload.filter;
+
       const isEmpty = !newFilter || Object.keys(newFilter).length === 0;
 
       if (isEmpty) {
@@ -67,7 +68,10 @@ export const compareSlice = createSlice({
         state.current.view.filter = action.payload.filter;
       }
     },
-    resourceSetSelected: (state, action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>) => {
+    resourceSetSelected: (
+      state: Draft<CompareState>,
+      action: PayloadAction<{side: CompareSide; value: PartialResourceSet}>
+    ) => {
       const {side, value} = action.payload;
       resetComparison(state);
       if (side === 'left') {
@@ -78,7 +82,7 @@ export const compareSlice = createSlice({
         state.current.right = undefined;
       }
     },
-    resourceSetCleared: (state, action: PayloadAction<{side: CompareSide | 'both'}>) => {
+    resourceSetCleared: (state: Draft<CompareState>, action: PayloadAction<{side: CompareSide | 'both'}>) => {
       const side = action.payload.side;
       resetComparison(state);
 
@@ -91,19 +95,19 @@ export const compareSlice = createSlice({
         state.current.right = undefined;
       }
     },
-    resourceSetRefreshed: (state, action: PayloadAction<{side: CompareSide}>) => {
+    resourceSetRefreshed: (state: Draft<CompareState>, action: PayloadAction<{side: CompareSide}>) => {
       const {side} = action.payload;
       resetComparison(state);
       state.current[side] = undefined;
     },
-    comparisonInspecting: (state, action: PayloadAction<ComparisonInspection>) => {
+    comparisonInspecting: (state: Draft<CompareState>, action: PayloadAction<ComparisonInspection>) => {
       trackEvent('COMPARE_INSPECTED', {type: state.current.inspect?.type});
       state.current.inspect = action.payload;
     },
-    comparisonInspected: state => {
+    comparisonInspected: (state: Draft<CompareState>) => {
       state.current.inspect = undefined;
     },
-    comparisonToggled: (state, action: PayloadAction<{id: string}>) => {
+    comparisonToggled: (state: Draft<CompareState>, action: PayloadAction<{id: string}>) => {
       const {id} = action.payload;
 
       const index = state.current.selection.findIndex(comparison => comparison === id);
@@ -113,7 +117,7 @@ export const compareSlice = createSlice({
         state.current.selection.splice(index, 1);
       }
     },
-    comparisonAllToggled: state => {
+    comparisonAllToggled: (state: Draft<CompareState>) => {
       const isAllSelected = selectIsAllComparisonSelected(state);
       if (isAllSelected) {
         state.current.selection = [];
@@ -121,7 +125,7 @@ export const compareSlice = createSlice({
         state.current.selection = state.current.comparison?.comparisons.map(c => c.id) ?? [];
       }
     },
-    resourceSetFetchPending: (state, action: PayloadAction<{side: CompareSide}>) => {
+    resourceSetFetchPending: (state: Draft<CompareState>, action: PayloadAction<{side: CompareSide}>) => {
       const {side} = action.payload;
 
       state.current[side] = {
@@ -130,7 +134,10 @@ export const compareSlice = createSlice({
         resources: [],
       };
     },
-    resourceSetFetched: (state, action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>) => {
+    resourceSetFetched: (
+      state: Draft<CompareState>,
+      action: PayloadAction<{side: CompareSide; resources: K8sResource[]}>
+    ) => {
       const {side, resources} = action.payload;
       state.current[side] = {
         error: false,
@@ -147,7 +154,10 @@ export const compareSlice = createSlice({
         };
       }
     },
-    resourceSetFetchFailed: (state, action: PayloadAction<{side: CompareSide; reason: string}>) => {
+    resourceSetFetchFailed: (
+      state: Draft<CompareState>,
+      action: PayloadAction<{side: CompareSide; reason: string}>
+    ) => {
       const {side, reason} = action.payload;
       log.debug('[compare] resource set fetch failed', reason);
 
@@ -157,7 +167,7 @@ export const compareSlice = createSlice({
         resources: [],
       };
     },
-    resourceSetCompared: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+    resourceSetCompared: (state: Draft<CompareState>, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
       trackEvent('COMPARE_COMPARED', {
         left: state.current.view.leftSet?.type,
         right: state.current.view.rightSet?.type,
@@ -169,13 +179,13 @@ export const compareSlice = createSlice({
         comparisons: action.payload.comparisons,
       };
     },
-    resourceSetFilterPending: state => {
+    resourceSetFilterPending: (state: Draft<CompareState>) => {
       state.current.filtering = {
         pending: true,
         comparisons: [],
       };
     },
-    resourceSetFiltered: (state, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
+    resourceSetFiltered: (state: Draft<CompareState>, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
       state.current.filtering = {
         pending: false,
         comparisons: action.payload.comparisons,
