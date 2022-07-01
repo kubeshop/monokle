@@ -414,13 +414,12 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
     addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<{context: string; namespace: string}>) => {
-      console.log(action.payload);
       let namespaces: Array<string> | undefined = state.kubeConfig?.contexts?.find(
         c => c.name === action.payload.context
       )?.namespaces;
       if (state.kubeConfig && state.kubeConfig.contexts) {
         const context = state.kubeConfig.contexts.find(c => c.name === action.payload.context);
-        if (context) {
+        if (context && !namespaces?.includes(action.payload.namespace)) {
           context.namespaces = namespaces ? [...namespaces, action.payload.namespace] : [action.payload.namespace];
         }
       }

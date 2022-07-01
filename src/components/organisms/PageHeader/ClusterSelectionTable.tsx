@@ -48,7 +48,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
         ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
         : undefined;
       return {
-        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
+        namespaces: kubeConfigContexts.find(c => c.name === context.name)?.namespaces || [],
         name: context.name,
         hasFullAccess,
         editable: true,

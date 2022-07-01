@@ -185,9 +185,9 @@ export const kubeConfigContextSelector = createSelector(
 export const kubeConfigContextsSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.contexts) {
-      return config.projectConfig?.kubeConfig?.contexts;
-    }
+    // if (config.projectConfig?.kubeConfig?.contexts) {
+    //   return config.projectConfig?.kubeConfig?.contexts;
+    // }
     if (config.kubeConfig.contexts) {
       return config.kubeConfig.contexts;
     }
