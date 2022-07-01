@@ -22,5 +22,3 @@ exports.default = async function customSign(configuration) {
   const command = `AzureSignTool sign -kvu ${KVU} -kvi ${AZURE_CREDENTIALS.clientId} -kvs ${AZURE_CREDENTIALS.clientSecret} -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} -tr ${TR} -v ${configuration.path}`;
   await signTask(command);
 };
-
-export default customSign;
