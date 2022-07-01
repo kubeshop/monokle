@@ -1,6 +1,6 @@
 import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 import {useMeasure, useWindowSize} from 'react-use';
 
 import {Button, Select, Skeleton, Switch} from 'antd';
@@ -274,7 +274,7 @@ const ClusterResourceDiffModal = () => {
           maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
           axis="x"
           resizeHandles={['w', 'e']}
-          handle={(h: any, ref: LegacyRef<HTMLSpanElement>) => (
+          handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
             <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
           )}
         >

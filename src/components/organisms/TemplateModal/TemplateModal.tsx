@@ -1,7 +1,7 @@
 import {shell} from 'electron';
 
 import React, {LegacyRef, useCallback, useMemo, useState} from 'react';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
 import {Button, Skeleton, Steps, Tag} from 'antd';
@@ -177,7 +177,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         maxConstraints={[window.innerWidth - 64, containerHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
-        handle={(h: any, ref: LegacyRef<HTMLSpanElement>) => (
+        handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
           <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
         )}
       >
