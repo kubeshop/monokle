@@ -139,7 +139,7 @@ const App = () => {
   );
 
   const onExecutedFrom = useCallback(
-    (_, data) => {
+    (_: any, data: any) => {
       const targetPath = data?.path?.startsWith('.') ? path.resolve(data.path) : data.path;
       if (targetPath) {
         const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === targetPath);

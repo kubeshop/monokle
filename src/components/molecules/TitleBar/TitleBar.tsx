@@ -13,6 +13,7 @@ interface IProps {
   title: string;
   leftButtons?: React.ReactNode;
   closable?: boolean;
+  children?: React.ReactNode;
 }
 
 const TitleBar: React.FC<IProps> = props => {
