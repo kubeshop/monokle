@@ -15,7 +15,7 @@ import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors';
 
-import {KeyValueInput} from '@components/atoms';
+import {KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 

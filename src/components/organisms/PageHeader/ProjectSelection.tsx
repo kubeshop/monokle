@@ -26,7 +26,8 @@ import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducer
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
+
 import WalkThrough from '@components/molecules/WalkThrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';

@@ -22,7 +22,8 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
+
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';

@@ -28,7 +28,8 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
+
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useWindowSize} from '@utils/hooks';
