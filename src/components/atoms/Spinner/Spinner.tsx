@@ -1,14 +1,6 @@
 import {Spin} from 'antd';
 
-import styled from 'styled-components';
-
-const SpinnerWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: inherit;
-`;
+import * as S from './Spinner.styled';
 
 interface SpinnerProps {
   isSpinning?: boolean;
@@ -19,9 +11,9 @@ const Spinner: React.FC<SpinnerProps> = props => {
   const {isSpinning = true, size = 'small'} = props;
 
   return (
-    <SpinnerWrapper>
+    <S.SpinnerWrapper>
       <Spin spinning={isSpinning} size={size} />
-    </SpinnerWrapper>
+    </S.SpinnerWrapper>
   );
 };
 
