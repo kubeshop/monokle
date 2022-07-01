@@ -11,7 +11,7 @@ import {useAppDispatch} from '@redux/hooks';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
-export const CompareButton: React.FC = ({children}) => {
+export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();
 
   const onClickClusterComparison = () => {

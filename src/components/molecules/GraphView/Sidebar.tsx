@@ -80,7 +80,7 @@ const Sidebar = (reactFlow: any) => {
   const fit = () => zoomPanHelper.fitView();
 
   const handleZoom = useCallback(
-    ratio => () => {
+    (ratio: any) => () => {
       const zoomLevel = store.getState().transform[2];
       new Tween({zoom: zoomLevel})
         .to({zoom: zoomLevel * ratio}, TRANSITION_TIME)

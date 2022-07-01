@@ -1,5 +1,5 @@
 import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 
 import {Button, Modal, Skeleton, message} from 'antd';
 
@@ -357,7 +357,7 @@ function ClusterDiffModal() {
         maxConstraints={[windowSize.width - 64, resizableBoxHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
-        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+        handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
           <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
         )}
       >
