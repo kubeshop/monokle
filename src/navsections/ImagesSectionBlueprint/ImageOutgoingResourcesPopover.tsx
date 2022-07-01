@@ -20,7 +20,7 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const refs = useMemo(() => {
-    return resourcesIds.reduce((currentRefs, id) => {
+    return resourcesIds.reduce((currentRefs: {[key: string]: ResourceRef[]}, id) => {
       const resource = resourceMap[id];
       const resourceRefs = resource.refs;
 
@@ -35,7 +35,7 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
       }
 
       return currentRefs;
-    }, {} as {[key: string]: ResourceRef[]});
+    }, {});
   }, [resourceMap, resourcesIds]);
 
   const handleOnResourceClick = (resource: K8sResource, ref: ResourceRef) => {
