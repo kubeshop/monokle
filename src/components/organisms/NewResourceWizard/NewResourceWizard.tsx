@@ -126,10 +126,6 @@ const NewResourceWizard = () => {
     [registeredKindHandlers, resourceMap]
   );
 
-  const getDirPath = (resourcePath: K8sResource['filePath']) => {
-    return resourcePath.substring(0, resourcePath.lastIndexOf(path.sep));
-  };
-
   const generateExportFileName = async () => {
     if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
       const currentFolder = selectedFolder.split(fileMap[ROOT_FILE_ENTRY].filePath).pop();
@@ -150,7 +146,7 @@ const NewResourceWizard = () => {
     } else {
       selectedFolderResources = Object.values(resourceMap).filter(
         resource =>
-          resource.filePath.split(path.sep).length > 2 && getDirPath(resource.filePath).endsWith(selectedFolder)
+          resource.filePath.split(path.sep).length > 2 && path.dirname(resource.filePath).endsWith(selectedFolder)
       );
     }
     const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
