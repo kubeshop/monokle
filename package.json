@@ -107,7 +107,7 @@
     "analytics-node": "6.0.0",
     "antd": "4.20.7",
     "asar": "3.1.0",
-    "async": "3.2.3",
+    "async": "3.2.4",
     "chokidar": "3.5.3",
     "dagre": "0.8.5",
     "electron-devtools-installer": "3.2.0",
