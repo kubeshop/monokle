@@ -1,12 +1,15 @@
 const {exec} = require('child_process');
+const log = require('loglevel');
 
 const KVU = 'https://monokle-signing.vault.azure.net';
 const TR = 'http://timestamp.digicert.com';
 
 const signTask = commandToRun =>
   new Promise((resolve, reject) => {
-    exec(commandToRun, {stdio: 'pipe'}, error => {
+    exec(commandToRun, {stdio: 'pipe'}, (error, stdout, stderr) => {
+      log.error(stderr);
       if (error) {
+        log.error(error);
         reject(error);
       } else {
         resolve();
