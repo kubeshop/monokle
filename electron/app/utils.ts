@@ -116,7 +116,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
   };
 
   if (!disableTracking) {
-    console.log('New Session.');
+    log.info('New Session.');
     fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
     segmentClient?.track({
       event: 'APP_SESSION',
@@ -125,7 +125,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
   }
 
   if (!storedDeviceID) {
-    console.log('New Installation.');
+    log.info('New Installation.');
     if (NUCLEUS_SH_APP_ID) {
       Nucleus.track(APP_INSTALLED, {appVersion});
     }
