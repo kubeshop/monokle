@@ -13,6 +13,7 @@ import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {parseAllYamlDocuments} from '@utils/yaml';
 
+import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -54,6 +55,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   DaemonSetHandler,
   DeploymentHandler,
   EndpointsHandler,
+  EndpointSliceHandler,
   IngressHandler,
   JobHandler,
   NetworkPolicyHandler,
