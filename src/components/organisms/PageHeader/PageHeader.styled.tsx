@@ -1,4 +1,4 @@
-import {Button as RawButton, Divider as RawDivider} from 'antd';
+import {Layout, Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {
   BellOutlined as RawBellOutlined,
@@ -10,7 +10,6 @@ import {
 
 import styled from 'styled-components';
 
-import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
 
 import {AppBorders} from '@styles/Borders';
@@ -81,7 +80,7 @@ export const ExitButton = styled.span`
   }
 `;
 
-export const Header = styled(RawHeader.default)`
+export const Header = styled(Layout.Header)`
   width: 100%;
   line-height: 30px;
   background: ${PanelColors.headerBar};
@@ -89,6 +88,8 @@ export const Header = styled(RawHeader.default)`
   min-height: 48px;
   z-index: 1;
   height: 30px;
+  padding: 0;
+  margin: 0;
 `;
 
 export const Logo = styled.img`

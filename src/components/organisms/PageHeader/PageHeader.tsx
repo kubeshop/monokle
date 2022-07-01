@@ -135,7 +135,7 @@ const PageHeader = () => {
     <S.PageHeaderContainer ref={pageHeaderRef}>
       {isInPreviewMode && <S.PreviewRow noborder="true" previewType={previewType} />}
 
-      <S.Header noborder="true">
+      <S.Header>
         <S.Row noborder="true">
           <div style={{display: 'flex', alignItems: 'center'}}>
             <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
