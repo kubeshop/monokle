@@ -543,7 +543,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
             ref={treeRef}
             expandedKeys={expandedFolders}
             onExpand={onExpand}
-            titleRender={event => (
+            titleRender={(event: any) => (
               <TreeItem
                 treeKey={String(event.key)}
                 title={event.title}
