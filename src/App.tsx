@@ -5,6 +5,7 @@ import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
 
+import fs from 'fs';
 import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -20,7 +21,7 @@ import {Size} from '@models/window';
 import {compareToggled} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {
@@ -215,6 +216,20 @@ const App = () => {
         );
 
         electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      }
+    });
+
+    // check if current projects root folder still exists, otherwise delete it
+    projects.forEach(project => {
+      if (!fs.existsSync(project.rootFolder)) {
+        dispatch(setDeleteProject(project));
+        dispatch(
+          setAlert({
+            title: 'Project removed',
+            message: `We removed project ${project.name} from Monokle because its root folder no longer exists`,
+            type: AlertEnum.Warning,
+          })
+        );
       }
     });
 

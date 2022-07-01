@@ -178,22 +178,21 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 }
 
 .animated-highlight {
-  background-color: #d89614;
+  background-color: #d89614 !important;
   position: relative;
-  width: 30px;
-  height: 30px;
   border-radius: 100%;
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .animated-highlight::after {
   position: absolute;
-  height: 30px;
-  width: 30px;
   background: #594214bb;
-  content: ' ';
+  content: '';
   top: 0;
   left: 0;
-  /* z-index: -1; */
+  right: 0;
+  bottom: 0;
   border-radius: 100%;
   animation: highlight 1s infinite;
 }

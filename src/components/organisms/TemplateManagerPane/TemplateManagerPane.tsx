@@ -1,10 +1,12 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_PANE_TITLE_HEIGHT, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -77,6 +79,10 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
+  const openHelpUrl = () => {
+    const repositoryUrl = TEMPLATES_HELP_URL;
+    shell.openExternal(repositoryUrl);
+  };
 
   useEffect(() => {
     if (!searchedValue) {
@@ -109,6 +115,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
               size="small"
               icon={<ReloadOutlined />}
             />
+            <S.QuestionCircleOutlined onClick={openHelpUrl} />
           </Tooltip>
         }
       />
