@@ -11,11 +11,29 @@ import {addNamespaceToContext, removeNamespaceFromContext, updateProjectKubeConf
 import {watchFunctions} from '@utils/helpers';
 
 let watcher: FSWatcher;
+let clusterNamespacesWatchInterval: number | null = null;
+let k8sClusterWatchInterval: number | null = null;
+let tempKubeConfigPath: string;
 
 export async function monitorKubeConfig(filePath: string, dispatch: (action: AnyAction) => void) {
   if (watcher) {
     watcher.close();
   }
+
+  if (tempKubeConfigPath !== filePath) {
+    tempKubeConfigPath = filePath;
+    if (clusterNamespacesWatchInterval) {
+      clearInterval(clusterNamespacesWatchInterval);
+      clusterNamespacesWatchInterval = null;
+    }
+    if (k8sClusterWatchInterval) {
+      clearInterval(k8sClusterWatchInterval);
+      k8sClusterWatchInterval = null;
+    }
+  }
+
+  watchK8sClusters(filePath, dispatch);
+  watchAllClusterNamespaces(filePath, dispatch);
 
   try {
     const stats = await fs.promises.stat(filePath);
@@ -93,8 +111,6 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
     });
 }
 
-let k8sClusterWatchInterval: number | null = null;
-
 export function watchK8sClusters(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
   if (k8sClusterWatchInterval) {
     return;
@@ -105,8 +121,6 @@ export function watchK8sClusters(kubeConfigPath: string, dispatch: (action: AnyA
     dispatch(updateProjectKubeConfig(kubeConfig));
   }, 5000);
 }
-
-let clusterNamespacesWatchInterval: number | null = null;
 
 export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
   if (clusterNamespacesWatchInterval) {

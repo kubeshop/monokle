@@ -42,7 +42,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
 
   useEffect(() => {
     const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
-      const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
       const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
       const hasFullAccess = clusterSpecificAccess.length
         ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
