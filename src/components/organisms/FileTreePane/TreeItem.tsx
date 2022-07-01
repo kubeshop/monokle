@@ -281,7 +281,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
           <S.TitleWrapper>
-            <S.TreeTitleText>{title}</S.TreeTitleText>
+            <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (
               <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
             )}
