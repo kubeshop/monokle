@@ -39,8 +39,7 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
       writeFileSync(absolutePath, ``, 'utf-8');
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
+    log.error(error);
   }
 };
 

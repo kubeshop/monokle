@@ -6,6 +6,7 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
+import log from 'loglevel';
 import path from 'path';
 
 import {
@@ -248,8 +249,7 @@ export const Settings = ({
         k8sVersion: selectedK8SVersion,
       });
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error(error.message);
+      log.error(error.message);
     }
   };
 
