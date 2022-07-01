@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const {exec} = require('child_process');
 
 const KVU = 'https://monokle-signing.vault.azure.net';
@@ -16,8 +17,10 @@ const signTask = commandToRun =>
     });
   });
 
-exports.default = async function (configuration) {
+const customSign = async configuration => {
   const AZURE_CREDENTIALS = JSON.parse(process.env.AZURE_CREDENTIALS);
   const command = `AzureSignTool sign -kvu ${KVU} -kvi ${AZURE_CREDENTIALS.clientId} -kvs ${AZURE_CREDENTIALS.clientSecret} -kvc monokle-signing -kvt ${AZURE_CREDENTIALS.tenantId} -tr ${TR} -v ${configuration.path}`;
   await signTask(command);
 };
+
+export default customSign;

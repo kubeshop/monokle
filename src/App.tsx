@@ -326,7 +326,7 @@ const App = () => {
 
   useDebounce(
     () => {
-      loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
+      loadContexts(kubeConfigPath, dispatch);
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
     [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]

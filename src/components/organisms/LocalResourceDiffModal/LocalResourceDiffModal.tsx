@@ -303,7 +303,6 @@ const DiffModal = () => {
   }, [
     kubeConfigContext,
     dispatch,
-    projectConfig.kubeConfig?.path,
     resourceMap,
     resourceFilter.namespace,
     targetResource,
@@ -311,6 +310,7 @@ const DiffModal = () => {
     configState,
     namespaces,
     clusterAccess,
+    kubeConfigPath,
   ]);
 
   useEffect(() => {
