@@ -7,22 +7,16 @@ import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {
-  addNamespaceToContext,
-  removeNamespaceFromContext,
-  setKubeConfig,
-  updateProjectKubeConfig,
-} from '@redux/reducers/appConfig';
+import {setKubeConfig} from '@redux/reducers/appConfig';
 import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
 import electronStore from '@utils/electronStore';
-import {watchFunctions} from '@utils/helpers';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
   if (process.env.KUBECONFIG) {
     const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
-      dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0], dispatch)));
+      dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
       monitorKubeConfig(envKubeconfigParts[0], dispatch);
 
       dispatch(
@@ -33,7 +27,7 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
         })
       );
     } else {
-      dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG, dispatch)));
+      dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
       monitorKubeConfig(process.env.KUBECONFIG, dispatch);
     }
     return;
@@ -41,24 +35,23 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
-    dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig, dispatch)));
+    dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));
     monitorKubeConfig(storedKubeconfig, dispatch);
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
-  dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig, dispatch)));
+  dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig)));
   monitorKubeConfig(possibleKubeconfig, dispatch);
 }
 
 export default initKubeconfig;
 
-export const getKubeConfigContext = (configPath: string, dispatch: (action: AnyAction) => void): KubeConfig => {
+export const getKubeConfigContext = (configPath: string): KubeConfig => {
   try {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(configPath);
-    watchK8sClusters(configPath, dispatch);
-    watchAllClusterNamespaces(configPath, dispatch);
+
     return {
       path: configPath,
       currentContext: kc.getCurrentContext(),
@@ -73,86 +66,3 @@ export const getKubeConfigContext = (configPath: string, dispatch: (action: AnyA
     };
   }
 };
-
-const kubeConfigList: {[key: string]: any} = {};
-
-export function watchK8sNamespaces(
-  kubeConfigPath: string,
-  contexts: Array<k8s.Context>,
-  dispatch: (action: AnyAction) => void
-) {
-  Object.keys(kubeConfigList).forEach((key: string) => {
-    if (kubeConfigList[key]) {
-      kubeConfigList[key].req.abort();
-      delete kubeConfigList[key];
-    }
-  });
-
-  contexts.forEach(context => {
-    if (!kubeConfigList[context.name]) {
-      kubeConfigList[context.name] = {};
-      watchNamespaces(kubeConfigPath, context.name, dispatch);
-    }
-  });
-}
-
-export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (action: AnyAction) => void) {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(kubeConfigPath);
-  kc.setCurrentContext(key);
-  kubeConfigList[key].watcher = new k8s.Watch(kc);
-  kubeConfigList[key].watcher
-    .watch(
-      '/api/v1/namespaces',
-      {allowWatchBookmarks: true},
-      (type: string, apiObj: any) => {
-        if (type === 'ADDED') {
-          dispatch(addNamespaceToContext({namespace: apiObj.metadata.name, context: key}));
-        } else if (type === 'DELETED') {
-          dispatch(removeNamespaceFromContext({namespace: apiObj.metadata.name, context: key}));
-        }
-      },
-      () => {
-        if (kubeConfigList[key]) {
-          kubeConfigList[key].req.abort();
-          delete kubeConfigList[key];
-        }
-      }
-    )
-    .then((req: any) => {
-      kubeConfigList[key].req = req;
-    });
-}
-
-let k8sClusterWatchInterval: number | null = null;
-
-export function watchK8sClusters(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
-  if (k8sClusterWatchInterval) {
-    return;
-  }
-
-  k8sClusterWatchInterval = watchFunctions(() => {
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(kubeConfigPath);
-    const kubeConfig: KubeConfig = {
-      contexts: kc.contexts as KubeConfigContext[],
-      currentContext: kc.currentContext,
-      isPathValid: kc.clusters.length > 0,
-    };
-    dispatch(updateProjectKubeConfig(kubeConfig));
-  }, 5000);
-}
-
-let clusterNamespacesWatchInterval: number | null = null;
-
-export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
-  if (clusterNamespacesWatchInterval) {
-    return;
-  }
-
-  clusterNamespacesWatchInterval = watchFunctions(() => {
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(kubeConfigPath);
-    watchK8sNamespaces(kubeConfigPath, kc.contexts, dispatch);
-  }, 60 * 60 * 1000);
-}
