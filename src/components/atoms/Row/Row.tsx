@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 export type RowProps = AntRowProps & {
   noborder?: React.ReactNode;
-  elementheight?: React.ReactNode;
+  elementheight?: string;
 };
 
 const Row = styled((props: RowProps) => <AntRow {...props} />)`

@@ -8,6 +8,7 @@ interface IProps {
   visible: boolean;
   onClose: () => void;
   extra?: ReactNode;
+  children: ReactNode;
 }
 
 const LazyDrawer: React.FC<IProps> = props => {

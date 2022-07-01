@@ -15,7 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openClusterDiff} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-const ClusterCompareButton: React.FC = ({children}) => {
+const ClusterCompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);

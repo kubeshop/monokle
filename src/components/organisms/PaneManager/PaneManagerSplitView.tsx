@@ -1,5 +1,4 @@
 import React, {Suspense, useCallback} from 'react';
-import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
@@ -11,6 +10,8 @@ import {ActionsPane, NavigatorPane} from '@organisms';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import * as S from './PaneManagerSplitView.styled';
+// eslint-disable-next-line import/no-relative-packages
+import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
@@ -28,7 +29,7 @@ const PaneManagerSplitView: React.FC = () => {
   const {height, width} = useMainPaneDimensions();
 
   const handleResize = useCallback(
-    elements => {
+    (elements: any) => {
       const updates = elements.reduce((obj: any, el: any) => {
         if (!['leftPane', 'navPane'].includes(el.props.id)) return obj;
         obj[el.props['id']] = el.props['flex'];

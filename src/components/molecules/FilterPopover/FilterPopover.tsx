@@ -76,7 +76,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
   );
 
   const handleAddLabelFilter = useCallback(
-    ([key, value]) => {
+    ([key, value]: any) => {
       const newLabels = {...filter?.labels, [key]: value};
       const newFilter: Filter = {...filter, labels: newLabels};
       handleChange(newFilter);
@@ -97,7 +97,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
   );
 
   const handleUpdateLabelFilter = useCallback(
-    ([key, value]) => {
+    ([key, value]: any) => {
       const newLabels = {...filter?.labels, [key]: value};
       const newFilter: Filter = {...filter, labels: newLabels};
       handleChange(newFilter);
@@ -106,7 +106,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
   );
 
   const handleAddAnnotationFilter = useCallback(
-    ([key, value]) => {
+    ([key, value]: any) => {
       const newAnnotations = {...filter?.annotations, [key]: value};
       const newFilter: Filter = {...filter, annotations: newAnnotations};
       handleChange(newFilter);
@@ -127,7 +127,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
   );
 
   const handleUpdateAnnotationFilter = useCallback(
-    ([key, value]) => {
+    ([key, value]: any) => {
       const newAnnotations = {...filter?.annotations, [key]: value};
       const newFilter: Filter = {...filter, annotations: newAnnotations};
       handleChange(newFilter);
