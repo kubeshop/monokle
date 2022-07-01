@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Typography} from 'antd';
 
 import styled from 'styled-components';
@@ -8,9 +6,7 @@ import {FontColors} from '@styles/Colors';
 
 const {Text} = Typography;
 
-export type MonoSectionPaneProps = {};
-
-const MonoPaneTitle = styled((props: MonoSectionPaneProps) => <Text {...props} />)`
+const MonoPaneTitle = styled(Text)`
   &.ant-typography {
     white-space: nowrap;
     display: flex;
