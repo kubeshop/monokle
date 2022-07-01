@@ -19,9 +19,13 @@ interface RefMapper {
         sourceResource: K8sResource,
         targetResource: K8sResource,
         value: string,
-        siblingValues: Record<string, string>
+        siblingValues: Record<string, string>,
+        properties?: any
       ) => boolean
     >;
+
+    // optional matcher configuration properties that will be passed to each correspondingly named matcher
+    matcherProperties?: Record<string, any>;
 
     // optionally checks for an 'optional' sibling to validate ref
     isOptional?: boolean;

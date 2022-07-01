@@ -12,7 +12,13 @@
         "matchers": [
           "kindMatcher",
           "groupMatcher"
-        ]
+        ],
+        "matcherProperties":
+        {
+          "groupMatcher": {
+            "defaultGroup": "cert-manager.io"
+          }
+        }
       },
       "type": "name",
       "target": {
