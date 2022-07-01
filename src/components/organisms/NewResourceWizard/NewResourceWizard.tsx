@@ -73,6 +73,7 @@ const NewResourceWizard = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
@@ -126,6 +127,8 @@ const NewResourceWizard = () => {
     [registeredKindHandlers, resourceMap]
   );
 
+  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
+
   const generateExportFileName = async () => {
     if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
       const currentFolder = selectedFolder.split(fileMap[ROOT_FILE_ENTRY].filePath).pop();
@@ -146,7 +149,7 @@ const NewResourceWizard = () => {
     } else {
       selectedFolderResources = Object.values(resourceMap).filter(
         resource =>
-          resource.filePath.split(path.sep).length > 2 && path.dirname(resource.filePath).endsWith(selectedFolder)
+          resource.filePath.split(path.sep).length > 2 && getDirname(resource.filePath).endsWith(selectedFolder)
       );
     }
     const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
