@@ -10,7 +10,6 @@ import {
 
 import styled from 'styled-components';
 
-import {Col} from '@components/atoms';
 import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
 
@@ -115,11 +114,6 @@ export const PageHeaderContainer = styled.div``;
 
 export const ResourceSpan = styled.span`
   font-weight: 700;
-`;
-
-export const SettingsCol = styled(Col)`
-  display: flex;
-  align-items: center;
 `;
 
 export const HeaderContent = styled.div`

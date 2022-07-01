@@ -179,29 +179,29 @@ const PageHeader = () => {
 
           <div style={{display: 'flex', alignItems: 'center'}}>
             <ClusterSelection previewResource={previewResource} />
-            <S.SettingsCol>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-                <Badge count={unseenNotificationsCount} size="small">
-                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
-                </Badge>
-              </Tooltip>
-              <Dropdown
-                visible={isHelpMenuOpen}
-                onVisibleChange={() => {
-                  setIsHelpMenuOpen(!isHelpMenuOpen);
-                }}
-                overlay={
-                  <HelpMenu
-                    onMenuClose={() => {
-                      setIsHelpMenuOpen(false);
-                    }}
-                  />
-                }
-                placement="bottomLeft"
-              >
-                <S.EllipsisOutlined />
-              </Dropdown>
-            </S.SettingsCol>
+
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
+              <Badge count={unseenNotificationsCount} size="small">
+                <S.BellOutlined onClick={toggleNotificationsDrawer} />
+              </Badge>
+            </Tooltip>
+
+            <Dropdown
+              visible={isHelpMenuOpen}
+              onVisibleChange={() => {
+                setIsHelpMenuOpen(!isHelpMenuOpen);
+              }}
+              overlay={
+                <HelpMenu
+                  onMenuClose={() => {
+                    setIsHelpMenuOpen(false);
+                  }}
+                />
+              }
+              placement="bottomLeft"
+            >
+              <S.EllipsisOutlined />
+            </Dropdown>
           </div>
         </S.Row>
       </S.Header>
