@@ -10,6 +10,7 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
+import {getRefRange} from '@utils/refs';
 import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
@@ -28,18 +29,6 @@ const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
       return resourceMap[ref.target.resourceId]?.kind;
     }
   }
-};
-
-const getRefRange = (ref: ResourceRef) => {
-  if (!ref.position) {
-    return undefined;
-  }
-  return {
-    startLineNumber: ref.position.line,
-    endLineNumber: ref.position.line,
-    startColumn: ref.position.column,
-    endColumn: ref.position.column + ref.position.length,
-  };
 };
 
 const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sResource; resourceRefs: ResourceRef[]}) => {
