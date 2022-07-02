@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import {monaco} from 'react-monaco-editor';
 
+import {JsonObject} from 'type-fest';
+
 import {K8sResource} from '@models/k8sresource';
 
 interface SymbolMatcher {
@@ -12,20 +14,21 @@ interface RefMapper {
   source: {
     pathParts: string[];
 
-    // sibling matchers that will be used to validate this ref
+    // sibling matchers that will be used to validate this ref, maps the name of a sibling property to
+    // a function that validates if the corresponding property value is a valid match
     siblingMatchers?: Record<
-      string,
+      string, // name of the property to match, for example 'kind'
       (
         sourceResource: K8sResource,
         targetResource: K8sResource,
-        value: string,
-        siblingValues: Record<string, string>,
-        properties?: any
-      ) => boolean
+        value: string, // the actual value of the property to be matched
+        siblingValues: Record<string, string>, // a map of all sibling property values
+        properties?: JsonObject // optional configuration properties passed to matcher (see below)
+      ) => boolean // function that controls if the specified value
     >;
 
     // optional matcher configuration properties that will be passed to each correspondingly named matcher
-    matcherProperties?: Record<string, any>;
+    matcherProperties?: Record<string, JsonObject>;
 
     // optionally checks for an 'optional' sibling to validate ref
     isOptional?: boolean;
