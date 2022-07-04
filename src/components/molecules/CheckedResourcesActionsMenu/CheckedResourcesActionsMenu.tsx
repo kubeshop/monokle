@@ -34,6 +34,31 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
+  const onClickDelete = useCallback(() => {
+    const resourcesToDelete = checkedResourceIds
+      .map(resource => resourceMap[resource])
+      .filter((r): r is K8sResource => r !== undefined);
+
+    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
+  }, [checkedResourceIds, dispatch, resourceMap]);
+
+  const onClickUncheckAll = useCallback(() => {
+    dispatch(uncheckAllResourceIds());
+  }, [dispatch]);
+
+  const onClickSaveToFileFolder = useCallback(() => {
+    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
+  }, [checkedResourceIds, dispatch]);
+
+  const onClickDeployChecked = () => {
+    setIsApplyModalVisible(true);
+  };
+
+  const onClickApplyCheckedResources = (namespace?: {name: string; new: boolean}) => {
+    dispatch(applyCheckedResources(namespace));
+    setIsApplyModalVisible(false);
+  };
+
   const areOnlyUnsavedResourcesChecked = useMemo(
     () =>
       checkedResourceIds
@@ -52,53 +77,39 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     [checkedResources, kubeConfigContext]
   );
 
-  const onClickDelete = useCallback(() => {
-    const resourcesToDelete = checkedResourceIds
-      .map(resource => resourceMap[resource])
-      .filter((r): r is K8sResource => r !== undefined);
-
-    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
-  }, [checkedResourceIds, dispatch, resourceMap]);
-
-  const onClickDeployChecked = () => {
-    setIsApplyModalVisible(true);
-  };
-
-  const onClickApplyCheckedResources = (namespace?: {name: string; new: boolean}) => {
-    dispatch(applyCheckedResources(namespace));
-    setIsApplyModalVisible(false);
-  };
-
-  const onClickUncheckAll = () => {
-    dispatch(uncheckAllResourceIds());
-  };
-
-  const onClickSaveToFileFolder = () => {
-    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
-  };
-
-  const menuItems = [
-    {
-      key: 'selected_resources',
-      label: `${checkedResourceIds.length} Selected`,
-      disabled: true,
-    },
-    ...(!isInPreviewMode || isInClusterMode
-      ? [
-          {
-            key: 'delete',
-            label: 'Delete',
-            style: {color: Colors.red7},
-            onClick: onClickDelete,
-          },
-        ]
-      : []),
-    ...(!isInClusterMode ? [{key: 'deploy', label: 'Deploy', onClick: onClickDeployChecked}] : []),
-    ...(isInPreviewMode || areOnlyUnsavedResourcesChecked
-      ? [{key: 'save_to_file_folder', label: 'Save to file/folder', onClick: onClickSaveToFileFolder}]
-      : []),
-    {key: 'deselect', label: <CloseOutlined />, style: {marginLeft: 'auto'}, onClick: onClickUncheckAll},
-  ];
+  const menuItems = useMemo(
+    () => [
+      {
+        key: 'selected_resources',
+        label: `${checkedResourceIds.length} Selected`,
+        disabled: true,
+      },
+      ...(!isInPreviewMode || isInClusterMode
+        ? [
+            {
+              key: 'delete',
+              label: 'Delete',
+              style: {color: Colors.red7},
+              onClick: onClickDelete,
+            },
+          ]
+        : []),
+      ...(!isInClusterMode ? [{key: 'deploy', label: 'Deploy', onClick: onClickDeployChecked}] : []),
+      ...(isInPreviewMode || areOnlyUnsavedResourcesChecked
+        ? [{key: 'save_to_file_folder', label: 'Save to file/folder', onClick: onClickSaveToFileFolder}]
+        : []),
+      {key: 'deselect', label: <CloseOutlined />, style: {marginLeft: 'auto'}, onClick: onClickUncheckAll},
+    ],
+    [
+      areOnlyUnsavedResourcesChecked,
+      checkedResourceIds.length,
+      isInClusterMode,
+      isInPreviewMode,
+      onClickDelete,
+      onClickSaveToFileFolder,
+      onClickUncheckAll,
+    ]
+  );
 
   return (
     <>
