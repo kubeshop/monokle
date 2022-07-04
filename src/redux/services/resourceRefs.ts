@@ -430,12 +430,21 @@ function shouldCreateSatisfiedRef(
     // first collect all sibling values so we can pass them to each matcher
     const siblingValues = getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode);
 
-    // now query each sibling matcher with all found sibling values
+    // now query each sibling matcher with all found sibling values and optional matcherProperties
     if (
       Object.keys(outgoingRefMapper.source.siblingMatchers).some(key => {
         // @ts-ignore
         const matcher = outgoingRefMapper.source.siblingMatchers[key];
-        return matcher && !matcher(sourceResource, targetResource, siblingValues[key], siblingValues);
+        return (
+          matcher &&
+          !matcher(
+            sourceResource,
+            targetResource,
+            siblingValues[key],
+            siblingValues,
+            outgoingRefMapper.source.matcherProperties ? outgoingRefMapper.source.matcherProperties[key] : undefined
+          )
+        );
       })
     ) {
       return false;
