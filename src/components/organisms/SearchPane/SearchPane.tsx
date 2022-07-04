@@ -38,10 +38,6 @@ import RecentSearch from './RecentSearch';
 
 import * as S from './styled';
 
-type Props = {
-  height: number;
-};
-
 const decorate = (arr: FilterTreeNode[]) => {
   return {
     key: 'filter',
@@ -55,7 +51,7 @@ const decorate = (arr: FilterTreeNode[]) => {
   } as TreeNode;
 };
 
-const SearchPane: React.FC<Props> = ({height}) => {
+const SearchPane: React.FC<{height: number}> = ({height}) => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
   const currentMatch = useAppSelector(state => state.main.matchOptions);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
@@ -328,7 +324,7 @@ const SearchPane: React.FC<Props> = ({height}) => {
                 ref={treeRef}
                 expandedKeys={expandedFiles}
                 onExpand={onExpand}
-                titleRender={event => (
+                titleRender={(event: any) => (
                   <TreeItem
                     treeKey={String(event.key)}
                     title={event.title}
