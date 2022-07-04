@@ -41,7 +41,7 @@ function SectionRenderer(props: SectionRendererProps) {
   const {virtualItems, scrollToIndex, totalSize} = useVirtual({
     size: rows?.length || 0,
     parentRef,
-    estimateSize: React.useCallback(i => rows[i].height + rows[i].marginBottom, [rows]),
+    estimateSize: React.useCallback((i: number) => rows[i].height + rows[i].marginBottom, [rows]),
     overscan: 5,
   });
 

@@ -22,7 +22,7 @@ export type ItemRendererProps = {
   options?: ItemRendererOptions;
 };
 
-const WrapperPlacehoder: React.FC<{style: React.CSSProperties}> = props => {
+const WrapperPlacehoder: React.FC<{style: React.CSSProperties; children: React.ReactNode}> = props => {
   const {children, style} = props;
   return <div style={style}>{children}</div>;
 };

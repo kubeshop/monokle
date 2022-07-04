@@ -123,7 +123,7 @@ const NavPane: React.FC<Props> = ({height}) => {
 
         {isResourceFiltersOpen && <ReflexSplitter />}
 
-        <ReflexElement id="navigator-sections-container" minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
+        <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
           <SectionRenderer height={height - 40} sectionBlueprint={K8sResourceSectionBlueprint} />
         </ReflexElement>
       </ReflexContainer>
