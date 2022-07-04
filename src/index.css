@@ -178,22 +178,21 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 }
 
 .animated-highlight {
-  background-color: #d89614;
+  background-color: #d89614 !important;
   position: relative;
-  width: 30px;
-  height: 30px;
   border-radius: 100%;
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .animated-highlight::after {
   position: absolute;
-  height: 30px;
-  width: 30px;
   background: #594214bb;
-  content: ' ';
+  content: '';
   top: 0;
   left: 0;
-  /* z-index: -1; */
+  right: 0;
+  bottom: 0;
   border-radius: 100%;
   animation: highlight 1s infinite;
 }
@@ -235,8 +234,12 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   font-size: 12px;
 }
 
-.table-column-actions {
+.table-column-actions .edit-span-btn {
   display: none;
+}
+
+.ant-tooltip {
+  max-width: 300px;
 }
 
 .ant-table-header {
@@ -279,8 +282,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions {
-  display: flex;
+.ant-table-body .ant-table-row:hover .table-column-actions .edit-span-btn {
+  display: block;
 }
 
 .ant-table-body .ant-table-row:hover {
@@ -368,4 +371,14 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 ::-webkit-scrollbar-thumb:hover {
   background: #242424;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
+  display: block;
 }

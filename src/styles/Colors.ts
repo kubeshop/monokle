@@ -1,5 +1,6 @@
 enum Colors {
   // Greys
+  grey4000 = '#1F1F1F',
   grey3000 = '#191F21',
   grey2000 = '#081A20',
   grey1000 = '#141414',
@@ -20,6 +21,7 @@ enum Colors {
   grey5b = '#434343', // gray, gray 5 as in Figma - FIXME!
   greyXY = '#31393c80', // Missing color - FIXME!
   grey4 = '#303030', // gray, gray 4
+  grey3b = '#293235',
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1
 
@@ -31,6 +33,7 @@ enum Colors {
 
   yellowWarning = '#ffe17f',
   yellowWarningCompliment = '#FFF3CA',
+  yellow5 = '#F3CC62',
   yellow6 = '#D8BD14',
   yellow7 = '#E8D639',
   yellow8 = '#F3EA62',
@@ -39,19 +42,23 @@ enum Colors {
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
   red7 = '#E84749', // Dust Red
+  red6 = '#D32029',
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
   blackPure = '#000000',
   blackPearl = '#111d2c',
+  black9 = '#0C0D0E',
 
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',
+  cyan5 = '#138585',
   volcano = '#F3956A',
   lightSeaGreen = '#13a8a8',
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
   blue10 = '#B7E3FA',
+  geekblue4 = '#203175',
 
   green7 = '#6ABE39', // Polar Green
 

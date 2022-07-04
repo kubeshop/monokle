@@ -1,12 +1,18 @@
-import React, {FC, useState} from 'react';
+import {useState} from 'react';
 
+import {Modal} from 'antd';
 import Tooltip from 'antd/lib/tooltip';
 
-import {PushpinFilled, PushpinOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, PushpinFilled, PushpinOutlined} from '@ant-design/icons';
 
-import {DateTime} from 'luxon';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {Project} from '@models/appconfig';
+
+import {useAppDispatch} from '@redux/hooks';
+import {setDeleteProject} from '@redux/reducers/appConfig';
+
+import {getRelativeDate} from '@utils';
 
 import * as S from './RecentProject.styled';
 
@@ -17,14 +23,9 @@ type RecentProjectProps = {
   onPinChange?: (isPinned: boolean) => void;
 };
 
-const getRelativeDate = (isoDate: string | undefined) => {
-  if (isoDate) {
-    return DateTime.fromISO(isoDate).toRelative();
-  }
-  return '';
-};
+const RecentProject: React.FC<RecentProjectProps> = ({project, isActive, onProjectItemClick, onPinChange}) => {
+  const dispatch = useAppDispatch();
 
-const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItemClick, onPinChange}) => {
   const [isTooltipMessageVisible, setIsTooltipMessageVisible] = useState(false);
 
   const handleOnProjectItemClick = () => {
@@ -33,7 +34,26 @@ const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItem
     }
   };
 
-  const handleOnPinChange = (e: any) => {
+  const handleOnDelete = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.stopPropagation();
+
+    const title = `Do you want to remove ${project.name}?`;
+
+    Modal.confirm({
+      title,
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      zIndex: 9999,
+      onOk() {
+        return new Promise(resolve => {
+          dispatch(setDeleteProject(project));
+          resolve({});
+        });
+      },
+    });
+  };
+
+  const handleOnPinChange = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsTooltipMessageVisible(false);
@@ -47,20 +67,25 @@ const RecentProject: FC<RecentProjectProps> = ({project, isActive, onProjectItem
 
   return (
     <S.Container key={project.rootFolder} activeproject={isActive} onClick={handleOnProjectItemClick}>
-      <Tooltip
-        visible={isTooltipMessageVisible}
-        onVisibleChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
-        title={project.isPinned ? 'Unpin this project from the top' : 'Pin this project to the top'}
-      >
-        {project.isPinned ? (
-          <PushpinFilled onClick={handleOnPinChange} />
-        ) : (
-          <PushpinOutlined onClick={handleOnPinChange} />
-        )}
-      </Tooltip>
+      <S.ActionsContainer>
+        <S.DeleteOutlined onClick={handleOnDelete} />
+
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          visible={isTooltipMessageVisible}
+          onVisibleChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
+          title={project.isPinned ? 'Unpin this project from the top' : 'Pin this project to the top'}
+        >
+          {project.isPinned ? (
+            <PushpinFilled onClick={handleOnPinChange} />
+          ) : (
+            <PushpinOutlined onClick={handleOnPinChange} />
+          )}
+        </Tooltip>
+      </S.ActionsContainer>
 
       <S.Name>{project.name}</S.Name>
-      <Tooltip title={project.rootFolder} placement="bottom">
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={project.rootFolder} placement="bottom">
         <S.Path>{project.rootFolder}</S.Path>
       </Tooltip>
       <S.LastOpened>

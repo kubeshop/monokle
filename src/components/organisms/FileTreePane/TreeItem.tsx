@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Menu, Modal, Tooltip} from 'antd';
@@ -8,16 +9,18 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
-import {Spinner} from '@components/atoms';
-import Dots from '@components/atoms/Dots';
+import {Dots, Spinner} from '@atoms';
+
 import ContextMenu from '@components/molecules/ContextMenu';
 
+import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
@@ -46,11 +49,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
   const {
     setProcessingEntity,
+    onDuplicate,
     onDelete,
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
-    onCreateFolder,
+    onCreateFileFolder,
     onCreateResource,
     onFilterByFileOrFolder,
     onPreview,
@@ -71,6 +75,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   }, [treeKey, selectedPath]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
+  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
 
   const isRoot = treeKey === ROOT_FILE_ENTRY;
   const root = fileMap[ROOT_FILE_ENTRY];
@@ -84,6 +89,23 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   };
 
   const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
+
+  useHotkeys(
+    defineHotkey(hotkeys.DELETE_RESOURCE.key),
+    () => {
+      if (treeKey === selectedPath) {
+        deleteEntityWizard(
+          {entityAbsolutePath: absolutePath},
+          () => {
+            setProcessingEntity({processingEntityID: selectedPath, processingType: 'delete'});
+            deleteEntity(absolutePath, onDelete);
+          },
+          () => {}
+        );
+      }
+    },
+    [selectedPath]
+  );
 
   const canPreview = useCallback(
     (entryPath: string): boolean => {
@@ -125,7 +147,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             disabled: isInPreviewMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
+              onCreateFileFolder(absolutePath, 'folder');
+            },
+          },
+          {
+            key: 'create_file',
+            label: 'New File',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onCreateFileFolder(absolutePath, 'file');
             },
           },
         ]
@@ -199,6 +230,15 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       ? [
           {key: 'divider-3', type: 'divider'},
           {
+            key: 'duplicate_entity',
+            label: 'Duplicate',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onDuplicate(absolutePath, getBasename(absolutePath), getDirname(absolutePath));
+            },
+          },
+          {
             key: 'rename_entity',
             label: 'Rename',
             disabled: isInPreviewMode,
@@ -241,7 +281,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
           <S.TitleWrapper>
-            <S.TreeTitleText>{title}</S.TreeTitleText>
+            <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (
               <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
             )}

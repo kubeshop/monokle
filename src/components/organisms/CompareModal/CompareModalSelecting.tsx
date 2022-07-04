@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {Col, Row} from 'antd';
 
+import {CompareSide, resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {CompareSide, resourceSetRefreshed} from '@redux/reducers/compare';
 
 import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
 import CompareSingleFigure from '@assets/figures/compareSingle.svg';

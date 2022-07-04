@@ -1,6 +1,6 @@
 import {Input, Select} from 'antd';
 
-import {ANY_VALUE} from './constants';
+import {ANY_VALUE} from '@constants/form';
 
 type ValueInputProps = {
   value?: string;

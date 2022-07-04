@@ -36,6 +36,7 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {
   FormEditor,
   HelmChartModalConfirmWithNamespaceSelect,
+  ImageDetails,
   ModalConfirmWithNamespaceSelect,
   Monaco,
   PreviewConfigurationDetails,
@@ -76,6 +77,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
@@ -100,7 +102,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
 
     const distance = extraButtonEl.left - tabsListEl.right;
 
-    if (isButtonShrinked && distance > 280) {
+    if (isButtonShrinked && distance > 330) {
       setButtonShrinkedState(false);
     }
 
@@ -280,7 +282,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   }, [selectedPath, fileMap]);
 
   return (
-    <S.ActionsPaneMainContainer ref={actionsPaneRef}>
+    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane">
       <ActionsPaneHeader
         selectedResource={selectedResource}
         applySelection={applySelection}
@@ -289,7 +291,11 @@ const ActionsPane: React.FC<Props> = ({height}) => {
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         <ReflexElement flex={1.0}>
-          {!selectedPreviewConfigurationId ? (
+          {selectedPreviewConfigurationId ? (
+            <PreviewConfigurationDetails />
+          ) : selectedImage ? (
+            <ImageDetails />
+          ) : (
             <S.Tabs
               defaultActiveKey="source"
               activeKey={activeTabKey}
@@ -383,8 +389,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                 </TabPane>
               )}
             </S.Tabs>
-          ) : (
-            <PreviewConfigurationDetails />
           )}
         </ReflexElement>
       </ReflexContainer>

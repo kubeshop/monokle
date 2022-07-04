@@ -15,7 +15,6 @@ import {
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
-  toggleValidationDrawer,
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
@@ -177,9 +176,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER.key,
     () => {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
+      startPreview(kubeConfigContext, 'cluster', dispatch);
     },
-    [kubeConfigPath]
+    [kubeConfigContext]
   );
 
   useHotkeys(
@@ -244,7 +243,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
-    dispatch(toggleValidationDrawer());
+    dispatch(setLeftMenuSelection('validation-pane'));
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {

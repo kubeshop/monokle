@@ -1,11 +1,11 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
 
+import fs from 'fs';
 import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -18,10 +18,10 @@ import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
-import {useAppSelector} from '@redux/hooks';
+import {compareToggled} from '@redux/compare';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
-import {compareToggled} from '@redux/reducers/compare';
+import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {
@@ -37,7 +37,8 @@ import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 import UpdateNotice from '@organisms/UpdateNotice';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
+
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -58,25 +59,26 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
-const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'));
+const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
-const KeyboardShortcuts = React.lazy(() => import('@components/organisms/KeyboardShortcuts'));
+const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManager = React.lazy(() => import('@components/organisms/PluginManager'));
-const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
-const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
+const PluginManager = React.lazy(() => import('@organisms/PluginManager'));
+const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@components/organisms/CompareModal'));
+const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
 const App = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
@@ -85,8 +87,9 @@ const App = () => {
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
-  const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
+  const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
+  const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
@@ -137,7 +140,7 @@ const App = () => {
   );
 
   const onExecutedFrom = useCallback(
-    (_, data) => {
+    (_: any, data: any) => {
       const targetPath = data?.path?.startsWith('.') ? path.resolve(data.path) : data.path;
       if (targetPath) {
         const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === targetPath);
@@ -194,11 +197,44 @@ const App = () => {
   useEffect(() => {
     fetchAppVersion().then(version => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
-      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
+
+      const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
+
+      // check if the current version is the next big release version for showing the modal with release notes
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+      // if middle release, show silent notification
+      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
+        dispatch(
+          setAlert({
+            title: 'A new version of Monokle has been installed!',
+            message: '',
+            type: AlertEnum.Success,
+            silent: true,
+          })
+        );
+
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      }
     });
+
+    // check if current projects root folder still exists, otherwise delete it
+    projects.forEach(project => {
+      if (!fs.existsSync(project.rootFolder)) {
+        dispatch(setDeleteProject(project));
+        dispatch(
+          setAlert({
+            title: 'Project removed',
+            message: `We removed project ${project.name} from Monokle because its root folder no longer exists`,
+            type: AlertEnum.Warning,
+          })
+        );
+      }
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {
@@ -290,7 +326,7 @@ const App = () => {
 
   useDebounce(
     () => {
-      loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
+      loadContexts(kubeConfigPath, dispatch);
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
     [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]
@@ -397,8 +433,9 @@ const App = () => {
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
-          {isCreateFolderModalVisible && <CreateFolderModal />}
+          {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
+          {isFiltersPresetModalVisible && <FiltersPresetModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}

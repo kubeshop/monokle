@@ -1,4 +1,6 @@
-import {cloneDeep} from 'lodash';
+import {KubernetesObject} from '@kubernetes/client-node';
+
+import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
@@ -7,14 +9,17 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import {ResourceSet} from '@redux/reducers/compare';
-import {currentConfigSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {applyResource} from '@redux/thunks/applyResource';
+import {ResourceSet} from '@redux/compare';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
-import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
+import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
+import {execute} from '@utils/commands';
+import {createKubectlApplyCommand} from '@utils/commands/kubectl';
 import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 type Type = ResourceSet['type'];
 
@@ -39,7 +44,7 @@ export function doTransferResource(
 ): Promise<K8sResource> {
   switch (options.to) {
     case 'cluster':
-      return deployResourceToCluster(source, target, options, state, dispatch);
+      return deployResourceToCluster(source, target, options, state);
     case 'local':
       return extractResourceToLocal(source, target, dispatch);
     default:
@@ -51,43 +56,50 @@ async function deployResourceToCluster(
   source: K8sResource,
   target: K8sResource | undefined,
   options: TransferOptions,
-  state: RootState,
-  dispatch: AppDispatch
+  state: RootState
 ) {
-  const resourceId = source.id;
-  const resourceMap = state.main.resourceMap;
-  const fileMap = state.main.fileMap;
-  const projectConfig = currentConfigSelector(state);
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
   const namespace = source.namespace ?? options.namespace ?? 'default';
   const kubeClient = createKubeClient(kubeConfigPath, currentContext);
   const hasNamespace = await getNamespace(kubeClient, namespace);
 
-  if (!hasNamespace) {
-    await createNamespace(kubeClient, namespace);
-  }
-
-  await applyResource(
-    resourceId,
-    resourceMap,
-    fileMap,
-    dispatch,
-    projectConfig,
-    currentContext,
-    {name: namespace, new: !hasNamespace},
-    {
-      isClusterPreview: false,
-      shouldPerformDiff: false,
-      isInClusterDiff: false,
-      quiet: true,
+  try {
+    if (!hasNamespace) {
+      await createNamespace(kubeClient, namespace);
     }
-  );
+
+    const cmd = createKubectlApplyCommand(
+      {
+        context: currentContext,
+        namespace,
+        input: jsonToYaml(source.content),
+      },
+      {
+        KUBECONFIG: kubeConfigPath,
+      }
+    );
+
+    await execute(cmd);
+  } catch (err) {
+    if (!hasNamespace) {
+      // Best-effort attempt to revert the newly created namespace.
+      await removeNamespaceFromCluster(namespace, kubeConfigPath, currentContext).catch(noop);
+    }
+    throw err;
+  }
 
   // Remark: Cluster adds defaults so copying the source's content
   // is too naive. Instead fetch remotely and fallback to copy if failed.
-  const clusterContent = await getResourceFromCluster(source, kubeConfigPath, currentContext);
-  const updatedContent = clusterContent ?? source.content;
+  let updatedContent: KubernetesObject;
+  try {
+    const sourceCopy = structuredClone(source);
+    sourceCopy.namespace = namespace;
+    const clusterContent = await getResourceFromCluster(sourceCopy, kubeConfigPath, currentContext);
+    updatedContent = clusterContent ?? source.content;
+  } catch {
+    updatedContent = source.content;
+  }
 
   const id = target?.id ?? uuid();
   const resource = createResource(updatedContent, {
@@ -129,6 +141,7 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     filePath: `${UNSAVED_PREFIX}${id}`,
     isHighlighted: false,
     isSelected: false,
+    isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };
 }

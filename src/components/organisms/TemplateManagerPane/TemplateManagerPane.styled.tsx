@@ -1,5 +1,7 @@
 import {Input, Skeleton as RawSkeleton} from 'antd';
 
+import {QuestionCircleOutlined as RawQuestionCircleOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -39,4 +41,11 @@ export const TemplatesContainer = styled.div<{$height?: number}>`
 
 export const Skeleton = styled(RawSkeleton)`
   padding: 8px;
+`;
+
+export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
+  cursor: pointer;
+  margin-top: 5px;
+  padding-left: 4px;
+  color: ${Colors.blue6};
 `;

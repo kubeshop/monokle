@@ -7,13 +7,13 @@ import {PlusOutlined} from '@ant-design/icons';
 import isDeepEqual from 'fast-deep-equal/es6/react';
 import {v4 as uuidv4} from 'uuid';
 
+import {ANY_VALUE} from '@constants/form';
+
 import {openUrlInExternalBrowser} from '@utils/shell';
 
 import KeyValueEntryRenderer from './KeyValueEntryRenderer';
-import {ANY_VALUE} from './constants';
+import * as S from './KeyValueInput.styled';
 import {KeyValueData, KeyValueEntry} from './types';
-
-import * as S from './styled';
 
 type KeyValueInputProps = {
   disabled?: boolean;
@@ -70,7 +70,7 @@ function createEntriesFromParentKeyValueData(
   return newEntries;
 }
 
-function KeyValueInput(props: KeyValueInputProps) {
+const KeyValueInput: React.FC<KeyValueInputProps> = props => {
   const {
     disabled = false,
     label,
@@ -85,14 +85,6 @@ function KeyValueInput(props: KeyValueInputProps) {
   const [entries, setEntries] = useState<KeyValueEntry[]>(
     createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey)
   );
-
-  useEffect(() => {
-    if (!isDeepEqual(parentKeyValueData, currentKeyValueData)) {
-      setCurrentKeyValueData(parentKeyValueData);
-      const newEntries = createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey);
-      setEntries(newEntries);
-    }
-  }, [parentKeyValueData, currentKeyValueData, availableValuesByKey]);
 
   const updateKeyValue = (newEntries: KeyValueEntry[]) => {
     const newKeyValueData = makeKeyValueDataFromEntries(newEntries);
@@ -158,6 +150,14 @@ function KeyValueInput(props: KeyValueInputProps) {
     [availableValuesByKey]
   );
 
+  useEffect(() => {
+    if (!isDeepEqual(parentKeyValueData, currentKeyValueData)) {
+      setCurrentKeyValueData(parentKeyValueData);
+      const newEntries = createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey);
+      setEntries(newEntries);
+    }
+  }, [parentKeyValueData, currentKeyValueData, availableValuesByKey]);
+
   return (
     <S.Container>
       <S.TitleContainer>
@@ -185,6 +185,6 @@ function KeyValueInput(props: KeyValueInputProps) {
       </Button>
     </S.Container>
   );
-}
+};
 
 export default KeyValueInput;

@@ -24,9 +24,11 @@ import {
 import {FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
+import {ValidationIntegration} from '@models/integrations';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
+import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -67,7 +69,6 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {transferResource} from './compare';
 import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
@@ -211,6 +212,10 @@ export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
 
     const nextMainState = createNextState(state.main, mainState => {
       mainState.resourceMap[resource.id] = resource;
+      clearResourceSelections(mainState.resourceMap);
+      resource.isSelected = true;
+      resource.isHighlighted = true;
+      mainState.selectedResourceId = resource.id;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
       processResources(
@@ -379,6 +384,12 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
+    setAutosavingError: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      state.autosaving.error = action.payload;
+    },
+    setAutosavingStatus: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.autosaving.status = action.payload;
+    },
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -455,6 +466,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      state.previousSelectionHistory = state.selectionHistory;
       clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
@@ -462,6 +474,7 @@ export const mainSlice = createSlice({
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
       state.checkedResourceIds = [];
+      state.selectedImage = undefined;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -649,6 +662,7 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedImage = undefined;
     },
     toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       const enable = action.payload;
@@ -702,7 +716,6 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedPath = undefined;
-      state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
@@ -710,6 +723,20 @@ export const mainSlice = createSlice({
     },
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
+    },
+    deleteFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      delete state.filtersPresets[action.payload];
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.resourceFilter = state.filtersPresets[action.payload];
+    },
+    saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.filtersPresets[action.payload] = state.resourceFilter;
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
+      state.validationIntegration = action.payload;
     },
   },
   extraReducers: builder => {
@@ -733,11 +760,14 @@ export const mainSlice = createSlice({
         state.selectedPreviewConfigurationId = undefined;
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -748,16 +778,20 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
           selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
+        state.previousSelectionHistory = [];
       })
       .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -768,13 +802,17 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.selectedPath = undefined;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(runPreviewConfiguration.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -788,15 +826,19 @@ export const mainSlice = createSlice({
         state.selectedValuesFileId = undefined;
         state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
+        state.selectedImage = undefined;
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
           resource.isHighlighted = false;
         });
+        state.previousSelectionHistory = [];
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -833,6 +875,7 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
+      state.selectedImage = undefined;
       state.selectedValuesFileId = undefined;
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
@@ -911,6 +954,10 @@ export const mainSlice = createSlice({
         if (resource) {
           resource.filePath = relativeFilePath;
           resource.range = resourcePayload.resourceRange;
+
+          if (state.selectedPath === relativeFilePath) {
+            resource.isHighlighted = true;
+          }
         }
       });
     });
@@ -1233,12 +1280,15 @@ export const {
   clearSelected,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
+  deleteFilterPreset,
   editorHasReloadedSelectedPath,
   extendResourceFilter,
+  loadFilterPreset,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
   reloadClusterDiff,
   resetResourceFilter,
+  saveFilterPreset,
   seenNotifications,
   selectFile,
   selectHelmValuesFile,
@@ -1248,6 +1298,8 @@ export const {
   selectPreviewConfiguration,
   setAppRehydrating,
   setApplyingResource,
+  setAutosavingError,
+  setAutosavingStatus,
   selectClusterDiffMatch,
   setClusterDiffRefreshDiffResource,
   setDiffResourceInClusterDiff,
@@ -1267,6 +1319,7 @@ export const {
   unselectAllClusterDiffMatches,
   unselectClusterDiffMatch,
   updateResourceFilter,
+  updateValidationIntegration,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

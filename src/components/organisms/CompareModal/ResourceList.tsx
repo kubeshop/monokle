@@ -5,7 +5,11 @@ import {Checkbox} from 'antd';
 
 import {groupBy} from 'lodash';
 
-import {ResourceSetData} from '@redux/reducers/compare';
+import navSectionNames from '@constants/navSectionNames';
+
+import {ResourceSetData} from '@redux/compare';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './ResourceList.styled';
 
@@ -18,7 +22,7 @@ type HeaderItem = {
 type ResourceItem = {
   type: 'resource';
   id: string;
-  namespace: string;
+  namespace?: string;
   name: string;
 };
 
@@ -30,13 +34,39 @@ type Props = {
 export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.resources, r => r.kind);
+
+    const sortedGroups = Object.entries(groups).sort((a, b) => {
+      const kindA = a[0];
+      const kindB = b[0];
+
+      const kindHandlerA = getResourceKindHandler(kindA);
+      const kindHandlerB = getResourceKindHandler(kindB);
+
+      if (!kindHandlerA || !kindHandlerB) {
+        return 0;
+      }
+
+      const sectionsOrdering = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
+
+      const kindAIndex = sectionsOrdering.indexOf(kindHandlerA.navigatorPath[1]);
+      const kindBIndex = sectionsOrdering.indexOf(kindHandlerB.navigatorPath[1]);
+
+      // if sections are the same, order kinds alphabetically
+      if (!(kindAIndex - kindBIndex)) {
+        return kindA.localeCompare(kindB);
+      }
+
+      return kindAIndex - kindBIndex;
+    });
+
     const result: Array<HeaderItem | ResourceItem> = [];
 
-    for (const [kind, resources] of Object.entries(groups)) {
+    for (const [kind, resources] of sortedGroups) {
       result.push({type: 'header', kind, count: resources.length});
+      const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
-        result.push({type: 'resource', id, name, namespace: namespace ?? 'default'});
+        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace ?? 'default' : undefined});
       }
     }
 
@@ -45,11 +75,11 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
   return (
     <S.ResourceListDiv>
-      {rows.map(row => {
+      {rows.map((row, index) => {
         if (row.type === 'header') {
           const {kind, count: resourceCount} = row;
           return (
-            <S.HeaderDiv $showCheckbox={showCheckbox} key={kind}>
+            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
               <S.Header>
                 {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
@@ -61,7 +91,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         return (
           <S.ResourceDiv key={id}>
             {showCheckbox ? <Checkbox style={{marginRight: 16}} disabled /> : null}
-            <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+            {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
             <S.ResourceName>{name}</S.ResourceName>
           </S.ResourceDiv>
         );

@@ -17,6 +17,7 @@ const initialAppState: AppState = {
   isRehydrating: false,
   wasRehydrated: false,
   selectionHistory: [],
+  previousSelectionHistory: [],
   resourceMap: {},
   resourceFilter: {
     labels: {},
@@ -55,7 +56,10 @@ const initialAppState: AppState = {
     isOpen: false,
   },
   deviceID: electronStore.get('main.deviceID'),
+  filtersPresets: electronStore.get('main.filtersPresets') || {},
   imagesList: [],
+  validationIntegration: undefined,
+  autosaving: {},
 };
 
 const initialAppConfigState: AppConfig = {
@@ -137,9 +141,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: false,
   },
-  createFolderModal: {
+  createFileFolderModal: {
     isOpen: false,
     rootDir: '',
+    type: 'folder',
   },
   createProjectModal: {
     isOpen: false,
@@ -164,7 +169,6 @@ const initialUiState: UiState = {
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     expandedFolders: [],
-    isValidationDrawerVisible: false,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

@@ -1,4 +1,4 @@
-import {Menu, Button as RawButton, Divider as RawDivider, Input as RawInput, Table as RawTable} from 'antd';
+import {Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
 import {
   DeleteOutlined as RawDeleteOutlined,
@@ -12,23 +12,12 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const BackToProjectButton = styled(RawButton)`
-  margin-right: 0px !important;
-  padding: 0px;
-  font-size: 12px;
-  color: ${Colors.blue6};
-`;
-
 export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
-  margin-right: 0px !important;
+  margin-right: 0px;
   padding: 0px;
-  color: ${Colors.whitePure};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 10px;
-  line-height: 20px;
+  width: 172px;
 
   :hover,
   :focus {
@@ -44,13 +33,12 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   }
 `;
 
-export const Divider = styled(RawDivider)`
-  border-color: ${Colors.grey3};
-  height: 1em;
-`;
-
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
+  position: absolute !important;
+  right: 8px !important;
+  color: ${Colors.whitePure};
+  font-size: 10px !important;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -79,21 +67,51 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${Colors.grey5};
+  border: none;
   border-radius: 4px;
-  margin-right: 10px;
-  padding: 0px 10px;
+  width: 180px;
+  background: ${Colors.grey3b};
+  padding: 2px 4px;
 `;
 
-export const ProjectMenu = styled(Menu)`
+export const ProjectMenu = styled.div`
   background-color: ${Colors.grey1000};
+  margin: 10px 0;
 `;
 
-export const ProjectName = styled.span`
+export const ProjectLabel = styled.div`
   max-width: 200px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: ${Colors.grey7};
+  width: 56px;
+  text-align: left;
+  padding-left: 8px;
+`;
+
+export const ProjectName = styled.div`
+  max-width: 6rem;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: ${Colors.whitePure};
+  font-weight: 600;
+  font-size: 12px;
+  text-align: left;
+
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
+
+  &:disabled {
+    color: inherit !important;
+  }
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`
@@ -125,4 +143,8 @@ export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;
+
+  & .ant-table-container .ant-table-body {
+    overflow-y: auto !important;
+  }
 `;

@@ -8,10 +8,15 @@ import {ComparisonInspection} from './ComparisonInspection';
 import {ComparisonList} from './ComparisonList';
 
 export const CompareModalComparing: React.FC = () => {
-  const {comparison} = useAppSelector(state => state.compare.current);
+  const isComparing = useAppSelector(
+    state =>
+      !state.compare.current.comparison ||
+      state.compare.current.comparison?.loading ||
+      state.compare.current.filtering?.pending
+  );
   const inspecting = useAppSelector(state => state.compare.current.inspect);
 
-  if (!comparison || comparison.loading) {
+  if (isComparing) {
     return (
       <Row>
         <Col span={24}>
@@ -41,6 +46,6 @@ export const CompareModalComparing: React.FC = () => {
 };
 
 const DiffRow = styled(Row)`
-  height: calc(100% - 100px);
+  height: calc(100% - 10px);
   overflow: auto;
 `;

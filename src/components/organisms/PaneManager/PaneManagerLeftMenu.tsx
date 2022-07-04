@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
@@ -14,7 +14,7 @@ import {
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, toggleLeftMenu, toggleValidationDrawer} from '@redux/reducers/ui';
+import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import WalkThrough from '@components/molecules/WalkThrough';
@@ -38,12 +38,11 @@ const PaneManagerLeftMenu: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const leftDrawerVisible = useAppSelector(state => state.ui.leftMenu.isValidationDrawerVisible);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
-  const isActive = Boolean(activeProject) && (leftActive || leftDrawerVisible);
+  const isActive = Boolean(activeProject) && leftActive;
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -52,13 +51,6 @@ const PaneManagerLeftMenu: React.FC = () => {
   const rootFileEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
 
   const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
-    if (leftDrawerVisible) {
-      dispatch(toggleValidationDrawer(false));
-      dispatch(setLeftMenuSelection(selectedMenu));
-      if (!leftActive) dispatch(toggleLeftMenu());
-      return;
-    }
-
     if (leftMenuSelection === selectedMenu) {
       dispatch(toggleLeftMenu());
     } else {
@@ -70,6 +62,11 @@ const PaneManagerLeftMenu: React.FC = () => {
       }
     }
   };
+
+  const checkIsTabSelected = useCallback(
+    (selection: LeftMenuSelectionType) => Boolean(activeProject) && leftMenuSelection === selection,
+    [activeProject, leftMenuSelection]
+  );
 
   useEffect(() => {
     if (leftActive && leftMenuSelection === 'kustomize-pane') {
@@ -89,12 +86,12 @@ const PaneManagerLeftMenu: React.FC = () => {
     <S.Container id="LeftToolbar" isLeftActive={isActive}>
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'file-explorer')}
-        title={FileExplorerTabTooltip}
+        title={<FileExplorerTabTooltip />}
         placement="right"
       >
         <MenuButton
           id="file-explorer"
-          isSelected={!leftDrawerVisible && leftMenuSelection === 'file-explorer'}
+          isSelected={checkIsTabSelected('file-explorer')}
           isActive={isActive}
           shouldWatchSelectedPath
           onClick={() => setLeftActiveMenu('file-explorer')}
@@ -104,19 +101,19 @@ const PaneManagerLeftMenu: React.FC = () => {
             style={{marginLeft: 4}}
             icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
             active={isActive}
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'file-explorer'}
+            isSelected={checkIsTabSelected('file-explorer')}
           />
         </MenuButton>
       </PaneTooltip>
 
       <PaneTooltip
         show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
-        title={KustomizeTabTooltip}
+        title={<KustomizeTabTooltip />}
         placement="right"
       >
         <MenuButton
           id="kustomize-pane"
-          isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'kustomize-pane'}
+          isSelected={checkIsTabSelected('kustomize-pane')}
           isActive={isActive}
           onClick={() => setLeftActiveMenu('kustomize-pane')}
           sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
@@ -130,8 +127,8 @@ const PaneManagerLeftMenu: React.FC = () => {
           >
             <MenuIcon
               iconName="kustomize"
-              active={Boolean(activeProject) && !leftDrawerVisible && leftActive}
-              isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'kustomize-pane'}
+              active={Boolean(activeProject) && leftActive}
+              isSelected={checkIsTabSelected('kustomize-pane')}
             />
           </S.Badge>
         </MenuButton>
@@ -140,12 +137,12 @@ const PaneManagerLeftMenu: React.FC = () => {
       <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'helm-pane')}
-          title={HelmTabTooltip}
+          title={<HelmTabTooltip />}
           placement="right"
         >
           <MenuButton
             id="helm-pane"
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'helm-pane'}
+            isSelected={checkIsTabSelected('helm-pane')}
             isActive={isActive}
             onClick={() => setLeftActiveMenu('helm-pane')}
             sectionNames={[HELM_CHART_SECTION_NAME]}
@@ -157,31 +154,29 @@ const PaneManagerLeftMenu: React.FC = () => {
               size="default"
               dot
             >
-              <MenuIcon
-                iconName="helm"
-                active={isActive}
-                isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'helm-pane'}
-              />
+              <MenuIcon iconName="helm" active={isActive} isSelected={checkIsTabSelected('helm-pane')} />
             </S.Badge>
           </MenuButton>
         </PaneTooltip>
       </WalkThrough>
 
       <FeatureFlag name="ImagesPane">
-        <PaneTooltip show={!leftActive || !(leftMenuSelection === 'images-pane')} title="View Images" placement="right">
-          <MenuButton
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
-            isActive={isActive}
-            onClick={() => setLeftActiveMenu('images-pane')}
-            disabled={!activeProject}
+        <WalkThrough placement="leftTop" collection="release" step="images">
+          <PaneTooltip
+            show={!leftActive || !(leftMenuSelection === 'images-pane')}
+            title="View Images"
+            placement="right"
           >
-            <MenuIcon
-              iconName="images"
-              active={isActive}
-              isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'images-pane'}
-            />
-          </MenuButton>
-        </PaneTooltip>
+            <MenuButton
+              isSelected={checkIsTabSelected('images-pane')}
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('images-pane')}
+              disabled={!activeProject}
+            >
+              <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
+            </MenuButton>
+          </PaneTooltip>
+        </WalkThrough>
       </FeatureFlag>
 
       <PaneTooltip
@@ -190,7 +185,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
-          isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'templates-pane'}
+          isSelected={checkIsTabSelected('templates-pane')}
           isActive={isActive}
           onClick={() => setLeftActiveMenu('templates-pane')}
           disabled={!activeProject}
@@ -200,23 +195,26 @@ const PaneManagerLeftMenu: React.FC = () => {
             style={highlightedItems.browseTemplates ? {fontSize: '20px', marginLeft: '2px'} : {}}
             icon={FormatPainterOutlined}
             active={isActive}
-            isSelected={Boolean(activeProject) && !leftDrawerVisible && leftMenuSelection === 'templates-pane'}
+            isSelected={checkIsTabSelected('templates-pane')}
           />
         </MenuButton>
       </PaneTooltip>
 
-      <WalkThrough placement="rightTop" step="validation" collection="release">
-        <PaneTooltip show={!leftDrawerVisible} title={ValidationTabTooltip} placement="right">
-          <MenuButton
-            isSelected={leftDrawerVisible}
-            isActive={isActive}
-            onClick={() => dispatch(toggleValidationDrawer())}
-            disabled={!activeProject}
-          >
-            <MenuIcon iconName="validation" active={isActive} isSelected={leftDrawerVisible} />
-          </MenuButton>
-        </PaneTooltip>
-      </WalkThrough>
+      <PaneTooltip
+        show={!leftActive || !(leftMenuSelection === 'validation-pane')}
+        title={<ValidationTabTooltip />}
+        placement="right"
+      >
+        <MenuButton
+          id="validation"
+          isSelected={checkIsTabSelected('validation-pane')}
+          isActive={isActive}
+          onClick={() => setLeftActiveMenu('validation-pane')}
+          disabled={!activeProject}
+        >
+          <MenuIcon iconName="validation" active={isActive} isSelected={checkIsTabSelected('validation-pane')} />
+        </MenuButton>
+      </PaneTooltip>
     </S.Container>
   );
 };

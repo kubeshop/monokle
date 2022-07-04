@@ -133,7 +133,6 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], disp
           alertMessage += `${alertMessage && ' | '}${resource.name}\n`;
         });
         dispatch(removeResources(resourceIdsToRemove));
-        dispatch(uncheckAllResourceIds());
 
         dispatch(setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: alertMessage}));
         resolve({});

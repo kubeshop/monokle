@@ -8,13 +8,14 @@ export const ResourceListDiv = styled.div`
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  overflow: scroll;
+  overflow: auto;
 `;
 
-export const HeaderDiv = styled.div<{$showCheckbox: boolean}>`
+export const HeaderDiv = styled.div<{$index: number; $showCheckbox: boolean}>`
   height: 28px;
   margin-left: ${props => (props.$showCheckbox ? '32px' : 0)};
   font-size: 16px;
+  margin-top: ${props => (props.$index ? '20px' : 0)};
 `;
 
 export const Header = styled.h1`

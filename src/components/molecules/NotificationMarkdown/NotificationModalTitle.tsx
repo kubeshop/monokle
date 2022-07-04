@@ -6,7 +6,9 @@ import {CopyOutlined, SaveOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {TOOLTIP_DELAY} from '@constants/constants';
+
+import {FileExplorer} from '@atoms';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -57,11 +59,11 @@ const NotificationModalTitle: React.FC<IProps> = props => {
     <S.NotificationModalTitle>
       {title}
 
-      <Tooltip title={isCopied ? 'Copied!' : 'Copy'}>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCopied ? 'Copied!' : 'Copy'}>
         <CopyOutlined onClick={onCopyToClipboard} />
       </Tooltip>
 
-      <Tooltip title="Save to file">
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Save to file">
         <SaveOutlined onClick={openFileExplorer} />
         <FileExplorer {...fileExplorerProps} />
       </Tooltip>

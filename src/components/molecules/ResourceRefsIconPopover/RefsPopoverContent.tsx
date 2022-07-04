@@ -10,6 +10,7 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
+import {getRefRange} from '@utils/refs';
 import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
@@ -28,18 +29,6 @@ const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
       return resourceMap[ref.target.resourceId]?.kind;
     }
   }
-};
-
-const getRefRange = (ref: ResourceRef) => {
-  if (!ref.position) {
-    return undefined;
-  }
-  return {
-    startLineNumber: ref.position.line,
-    endLineNumber: ref.position.line,
-    startColumn: ref.position.column,
-    endColumn: ref.position.column + ref.position.length,
-  };
 };
 
 const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sResource; resourceRefs: ResourceRef[]}) => {
@@ -145,14 +134,20 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
 
   const onLinkClick = (ref: ResourceRef) => {
     trackEvent(FOLLOW_LINK, {type: ref.type});
+
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
         selectResource(resource.id);
       }
+
       const refRange = getRefRange(ref);
+
       if (refRange) {
-        makeMonacoSelection('resource', resource.id, refRange);
+        setImmediate(() => {
+          makeMonacoSelection('resource', resource.id, refRange);
+        });
       }
+
       return;
     }
 
@@ -164,15 +159,19 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (!targetResource) {
         return;
       }
+
       if (selectedResourceId !== targetResource.id) {
         selectResource(targetResource.id);
       }
+
       const targetOutgoingRef = targetResource.refs?.find(
         r => r.type === ResourceRefType.Outgoing && r.target?.type === 'resource' && r.target.resourceId === resource.id
       );
+
       if (!targetOutgoingRef) {
         return;
       }
+
       const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
       if (targetOutgoingRefRange) {
         makeMonacoSelection('resource', targetResource.id, targetOutgoingRefRange);

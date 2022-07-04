@@ -1,0 +1,8 @@
+{
+    "name": "react-reflex-fork",
+    "version": "4.0.9",
+    "description": "Flex layout component for advanced React web applications",
+    "main": "../../../../../node_modules/react-reflex/dist/commonjs/index.js",
+    "module": "../../../../../node_modules/react-reflex/dist/es/index.js",
+    "types": "./types.d.ts"
+}

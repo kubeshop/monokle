@@ -1,6 +1,6 @@
 import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
 import {Button, Select, Skeleton, Switch} from 'antd';
@@ -22,12 +22,14 @@ import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextSelector,
+  kubeConfigPathSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
+
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useWindowSize} from '@utils/hooks';
@@ -50,6 +52,7 @@ const DiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -210,7 +213,7 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(configState);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {
@@ -300,7 +303,6 @@ const DiffModal = () => {
   }, [
     kubeConfigContext,
     dispatch,
-    projectConfig.kubeConfig?.path,
     resourceMap,
     resourceFilter.namespace,
     targetResource,
@@ -308,6 +310,7 @@ const DiffModal = () => {
     configState,
     namespaces,
     clusterAccess,
+    kubeConfigPath,
   ]);
 
   useEffect(() => {
@@ -356,7 +359,7 @@ const DiffModal = () => {
           maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
           axis="x"
           resizeHandles={['w', 'e']}
-          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
             <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
           )}
         >

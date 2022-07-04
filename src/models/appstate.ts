@@ -3,6 +3,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {ImageType} from './image';
+import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sresource';
 import {Policy} from './policy';
 
@@ -43,6 +44,10 @@ type HelmValuesMapType = {
 type PreviewLoaderType = {
   isLoading: boolean;
   targetId?: string;
+};
+
+type FiltersPresetsType = {
+  [name: string]: ResourceFilterType;
 };
 
 type ResourceDiffType = {
@@ -120,6 +125,8 @@ interface AppState {
   currentSelectionHistoryIndex?: number;
   /** a list of previously selected resources of paths */
   selectionHistory: SelectionHistoryEntry[];
+  /** the previous list of previously selected resources of paths */
+  previousSelectionHistory: SelectionHistoryEntry[];
   /** the id of the currently selected resource */
   selectedResourceId?: string;
   /** a list of checked resources for multi-resource actions */
@@ -174,7 +181,16 @@ interface AppState {
   deviceID: string;
   selectedImage?: ImageType | null;
   imagesSearchedValue?: string;
+  filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
+  validationIntegration: ValidationIntegration | undefined;
+  autosaving: {
+    status?: boolean;
+    error?: {
+      message: string;
+      stack: string;
+    };
+  };
 }
 
 export interface KubernetesObject {
@@ -194,6 +210,7 @@ export type {
   AppState,
   ResourceMapType,
   ResourceFilterType,
+  FiltersPresetsType,
   FileMapType,
   ImagesListType,
   HelmChartMapType,

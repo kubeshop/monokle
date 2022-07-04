@@ -24,7 +24,7 @@ import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isUnsavedResource} from '@redux/services/resource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -244,7 +244,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         type: AlertEnum.Success,
         title: `${savingDestination === 'saveToFolder' ? 'Saved' : 'Added'} ${
           resourcesIds.length - writeAppendErrors
-        } resources succesfully`,
+        } resources successfully`,
         message: '',
       })
     );

@@ -1,5 +1,6 @@
 import log from 'loglevel';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
@@ -10,7 +11,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {runCommandInMainThread} from '@utils/command';
+import {runCommandInMainThread} from '@utils/commands';
 import {APPLY_HELM_CHART, trackEvent} from '@utils/telemetry';
 
 /**
@@ -48,6 +49,7 @@ function applyHelmChartToCluster(
   }
 
   return runCommandInMainThread({
+    commandId: uuid(),
     cmd: 'helm',
     args,
     env: {

@@ -2,7 +2,6 @@ import {useCallback} from 'react';
 
 import {Button, Checkbox, Col} from 'antd';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   CompareSide,
   comparisonInspecting,
@@ -10,7 +9,8 @@ import {
   selectComparisonListItems,
   selectIsComparisonSelected,
   transferResource,
-} from '@redux/reducers/compare';
+} from '@redux/compare';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from './ComparisonList.styled';
 import {ComparisonItemProps, HeaderItemProps} from './types';

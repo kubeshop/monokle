@@ -8,12 +8,12 @@ import {withTheme} from '@rjsf/core';
 
 import fs from 'fs';
 import log from 'loglevel';
-import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
@@ -23,6 +23,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
+import * as S from './FormEditor.styled';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
@@ -31,100 +32,56 @@ const Form = withTheme(AntDTheme);
  * Load schemas every time for now - should be cached in the future...
  */
 
-const FormContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  padding: 20px 15px 0px 15px;
-  margin: 0px;
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  .ant-input[disabled] {
-    color: grey;
-  }
-
-  .ant-checkbox-disabled + span {
-    color: grey;
-  }
-
-  .ant-form-item-label {
-    font-weight: bold;
-    padding-top: 10px;
-    padding-bottom: 0px;
-  }
-
-  .ant-form-item-explain {
-    color: lightgrey;
-    font-size: 12px;
-    margin-top: 5px;
-  }
-
-  .object-property-expand {
-    background: black;
-    color: #177ddc;
-    width: 120px;
-    margin-left: 50px;
-  }
-
-  .array-item-add {
-    background: black;
-    color: #177ddc;
-    width: 120px;
-    margin-left: 50px;
-  }
-
-  .array-item-remove {
-    background: black;
-    color: #177ddc;
-    width: 120px;
-    margin-left: 50px;
-    margin-top: 42px;
-  }
-
-  .array-item-move-up {
-    background: black;
-    color: #177ddc;
-    width: 120px;
-    margin-left: 50px;
-  }
-
-  .array-item-move-down {
-    background: black;
-    color: #177ddc;
-    width: 120px;
-    margin-left: 50px;
-  }
-
-  .ant-btn-dangerous {
-    background: black;
-    color: #177ddc;
-    margin-left: 50px;
-  }
-
-  .field-object {
-    margin-top: -10px;
-  }
-  .field-string {
-    margin-bottom: -10px;
-  }
-`;
-
 const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const {formSchema, formUiSchema} = props;
-  const selectedResource = useSelector(selectedResourceSelector);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const settings = useSelector(settingsSelector);
-  const [schema, setSchema] = useState<any>({});
-  const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
   const previewType = useAppSelector(state => state.main.previewType);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResource = useAppSelector(selectedResourceSelector);
+  const settings = useSelector(settingsSelector);
+
+  const [formData, setFormData] = useState<any>();
+  const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
+  const [schema, setSchema] = useState<any>({});
+
+  const changed = useMemo(() => {
+    if (!formData) {
+      return false;
+    }
+
+    let formString = stringify(formData);
+
+    if (selectedResource) {
+      const content = mergeManifests(selectedResource.text, formString);
+      return content.trim() !== selectedResource.text.trim();
+    }
+
+    if (selectedPath) {
+      const filePath = getAbsoluteFilePath(selectedPath, fileMap);
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const content = mergeManifests(fileContent, formString);
+      return content.trim() !== fileContent.trim();
+    }
+
+    return false;
+  }, [fileMap, formData, selectedPath, selectedResource]);
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
   };
+
+  useEffect(() => {
+    if (!formData) {
+      return;
+    }
+
+    if (changed && !autosavingStatus) {
+      dispatch(setAutosavingStatus(true));
+    }
+  }, [autosavingStatus, changed, dispatch, formData]);
 
   useDebounce(
     () => {
@@ -137,6 +94,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         setIsResourceUpdated(isChanged);
         if (isChanged) {
           dispatch(updateResource({resourceId: selectedResource.id, text: content}));
+        } else {
+          dispatch(setAutosavingStatus(false));
         }
       } else if (selectedPath) {
         try {
@@ -148,8 +107,14 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
           if (isChanged) {
             fs.writeFileSync(filePath, content);
           }
-        } catch (e) {
+        } catch (e: any) {
+          const {message, stack} = e;
+
+          dispatch(setAutosavingError({message, stack}));
+
           log.error(`Failed to update file [${selectedPath}]`, e);
+        } finally {
+          dispatch(setAutosavingStatus(false));
         }
       }
     },
@@ -207,7 +172,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   }
 
   return (
-    <FormContainer>
+    <S.FormContainer>
       <Form
         schema={schema}
         uiSchema={formUiSchema}
@@ -219,7 +184,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
       >
         <div />
       </Form>
-    </FormContainer>
+    </S.FormContainer>
   );
 };
 

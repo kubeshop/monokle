@@ -1,3 +1,5 @@
+import {QuestionCircleOutlined as RawQuestionCircleOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -16,4 +18,11 @@ export const ButtonsContainer = styled.div`
   margin-top: 8px;
   display: flex;
   justify-content: flex-end;
+`;
+
+export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
+  cursor: pointer;
+  margin-top: 5px;
+  padding-right: 5px;
+  color: ${Colors.blue6};
 `;

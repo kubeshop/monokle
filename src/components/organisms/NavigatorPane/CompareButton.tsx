@@ -6,10 +6,12 @@ import {SwapOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
-import {compareToggled} from '@redux/reducers/compare';
 
-export const CompareButton: React.FC = ({children}) => {
+import WalkThrough from '@components/molecules/WalkThrough';
+
+export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();
 
   const onClickClusterComparison = () => {
@@ -17,17 +19,19 @@ export const CompareButton: React.FC = ({children}) => {
   };
 
   return (
-    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Compare resources" placement="bottom">
-      <Button
-        onClick={onClickClusterComparison}
-        icon={<SwapOutlined />}
-        type="primary"
-        ghost
-        size="small"
-        style={{marginLeft: 8}}
-      >
-        {children}
-      </Button>
-    </Tooltip>
+    <WalkThrough collection="release" step="compare">
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Compare resources" placement="bottom">
+        <Button
+          onClick={onClickClusterComparison}
+          icon={<SwapOutlined />}
+          type="primary"
+          ghost
+          size="small"
+          style={{marginLeft: 8}}
+        >
+          {children}
+        </Button>
+      </Tooltip>
+    </WalkThrough>
   );
 };

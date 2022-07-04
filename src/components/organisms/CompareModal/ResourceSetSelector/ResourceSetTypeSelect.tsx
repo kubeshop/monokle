@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {Select} from 'antd';
 
+import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/reducers/compare';
 
 type Props = {
   side: 'left' | 'right';
@@ -21,7 +21,12 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   );
 
   return (
-    <Select onChange={handleSelectType} placeholder="Choose…" value={resourceSet?.type} style={{width: 180}}>
+    <Select
+      onChange={handleSelectType}
+      placeholder="Choose…"
+      value={resourceSet?.type === 'helm-custom' ? 'helm' : resourceSet?.type}
+      style={{width: 180}}
+    >
       <Select.Option value="local">Local</Select.Option>
       <Select.Option value="cluster">Cluster</Select.Option>
       <Select.Option value="helm">Helm Preview</Select.Option>

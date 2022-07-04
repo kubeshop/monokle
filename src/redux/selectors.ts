@@ -3,13 +3,16 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig, ProjectConfig} from '@models/appconfig';
+import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@models/appconfig';
+import {AppState} from '@models/appstate';
+import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -95,6 +98,16 @@ export const helmValuesSelector = createSelector(
   helmValuesMap => helmValuesMap
 );
 
+export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile | undefined => {
+  if (!id) return undefined;
+  return state.helmValuesMap[id];
+};
+
+export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConfiguration | undefined => {
+  if (!id) return undefined;
+  return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
+};
+
 export const isInPreviewModeSelector = (state: RootState) =>
   Boolean(state.main.previewResourceId) ||
   Boolean(state.main.previewValuesFileId) ||
@@ -102,12 +115,10 @@ export const isInPreviewModeSelector = (state: RootState) =>
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
-  ({main, config}) => {
-    const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
-    if (kubeConfigPath) {
-      return Boolean(main.previewResourceId && main.previewResourceId.endsWith(kubeConfigPath));
-    }
-    return false;
+  state => {
+    const kubeConfig = selectCurrentKubeConfig(state);
+    const previewId = state.main.previewResourceId;
+    return kubeConfig && isDefined(previewId) && previewId === kubeConfig.currentContext;
   }
 );
 
@@ -225,6 +236,10 @@ export const kubeConfigPathValidSelector = createSelector(
     return false;
   }
 );
+
+export const selectCurrentKubeConfig = (state: RootState) => {
+  return state.config.projectConfig?.kubeConfig ?? state.config.kubeConfig;
+};
 
 export const registeredKindHandlersSelector = createSelector(
   (state: RootState) => state.main.registeredKindHandlers,

@@ -1,10 +1,12 @@
+import {shell} from 'electron';
+
 import {useCallback, useMemo, useState} from 'react';
 
 import {Button, Skeleton, Tooltip, Typography} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
+import {DEFAULT_TEMPLATES_PLUGIN_URL, PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -42,20 +44,24 @@ const PluginManagerDrawer: React.FC = () => {
     setInstallModalVisible(false);
   };
 
+  const openHelpUrl = () => {
+    const repositoryUrl = PLUGINS_HELP_URL;
+    shell.openExternal(repositoryUrl);
+  };
+
   return (
     <>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
-        <Tooltip title={PluginManagerDrawerReloadTooltip} placement="bottom">
+        <S.QuestionCircleOutlined onClick={openHelpUrl} />
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerDrawerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}
             type="link"
             size="small"
             icon={<ReloadOutlined />}
-          >
-            Update
-          </Button>
+          />
         </Tooltip>
         <Button
           onClick={onClickInstallPlugin}

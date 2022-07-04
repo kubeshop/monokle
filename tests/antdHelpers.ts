@@ -1,9 +1,10 @@
+import log from 'loglevel';
 import {Locator, Page} from 'playwright';
 
 export async function isDrawerVisible(drawer: Locator) {
   const elm = await drawer.elementHandle();
   if (!elm) {
-    console.log('failed to get drawer element handle');
+    log.error('failed to get drawer element handle');
     return false;
   }
 
@@ -12,7 +13,7 @@ export async function isDrawerVisible(drawer: Locator) {
 }
 
 export async function waitForDrawerToShow(page: Page, title: string, timeout?: number) {
-  console.log(`waiting for drawer ${title} to show`);
+  log.info(`waiting for drawer ${title} to show`);
   const drawer = page.locator(
     `//div[contains(@class,'ant-drawer') and contains(@class,'ant-drawer-open')]//div[contains(@class,'ant-drawer-title') and contains(text(),'${title}')]`
   );
@@ -20,12 +21,12 @@ export async function waitForDrawerToShow(page: Page, title: string, timeout?: n
     await drawer.elementHandle({timeout});
     return drawer;
   } catch (e: any) {
-    console.log(`drawer ${title} did not show within ${timeout}ms`, e);
+    log.error(`drawer ${title} did not show within ${timeout}ms`, e);
   }
 }
 
 export async function waitForDrawerToHide(page: Page, title: string, timeout?: number) {
-  console.log(`waiting for drawer ${title} to hide`);
+  log.info(`waiting for drawer ${title} to hide`);
   const drawer = page.locator(
     `//div[contains(@class,'ant-drawer') and not(contains(@class,'ant-drawer-open'))]//div[contains(@class,'ant-drawer-title') and contains(text(),'${title}')]`
   );
@@ -33,7 +34,7 @@ export async function waitForDrawerToHide(page: Page, title: string, timeout?: n
     await drawer.elementHandle({timeout});
     return drawer;
   } catch (e: any) {
-    console.log(`drawer ${title} did not hide within ${timeout}ms`, e);
+    log.error(`drawer ${title} did not hide within ${timeout}ms`, e);
   }
 }
 
@@ -55,7 +56,7 @@ export async function findDrawer(page: Page, title: string) {
 export async function findModal(page: Page, title: string) {
   const modals = page.locator(`//div[contains(@class,'ant-modal-root')]`);
   const count = await modals.count();
-  console.log(`found ${count} modals`);
+  log.info(`found ${count} modals`);
 
   for (let c = 0; c < count; c += 1) {
     const modal = modals.nth(c);
@@ -70,28 +71,37 @@ export async function findModal(page: Page, title: string) {
 }
 
 export async function waitForModalToShow(page: Page, title: string, timeout?: number) {
-  console.log(`waiting for modal ${title}`);
+  log.info(`waiting for modal ${title}`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and descendant::span[contains(@id, '${title}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and //div[@class='ant-modal-title']//text()='${title}']`
   );
   try {
-    const elm = await modal.elementHandle({timeout});
+    await modal.elementHandle({timeout});
     return modal;
   } catch (e: any) {
-    console.log(`modal ${title} did not show within ${timeout}ms`, e.name);
+    log.error(`modal ${title} did not show within ${timeout}ms`, e.name);
   }
 }
 
+export async function closeModal(modal: Locator) {
+  const closeIcon = modal.locator(`//span[contains(@class,'ant-modal-close-icon')]`);
+  if (closeIcon) {
+    closeIcon.click();
+    return true;
+  }
+  return false;
+}
+
 export async function waitForModalToHide(page: Page, id: string, timeout?: number) {
-  console.log(`waiting for modal ${id} to hide`);
+  log.info(`waiting for modal ${id} to hide`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none;') and descendant::span[contains(@id, '${id}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none') and //div[@class='ant-modal-title']//text()='${id}']`
   );
   try {
-    const elm = await modal.elementHandle({timeout});
+    await modal.elementHandle({timeout});
     return modal;
   } catch (e: any) {
-    console.log(`modal ${id} did not hide within ${timeout}ms`, e);
+    log.error(`modal ${id} did not hide within ${timeout}ms`, e);
   }
 }
 
@@ -112,4 +122,53 @@ export async function isInvisible(leftsection: Locator) {
 
   const style = await leftsection.getAttribute('style');
   return style && style.includes('display: none;');
+}
+
+export async function findDropdown(page: Page) {
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown')]`);
+  return dropdown;
+}
+
+export async function waitForDropdownToShow(page: Page, timeout: number) {
+  log.info(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and not(contains(@style,'display: none'))]`);
+  try {
+    await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    log.error(`dropdown  did not show within ${timeout}ms`, e.name);
+  }
+}
+
+export async function waitForDropdownToHide(page: Page, timeout: number) {
+  log.info(`waiting for dropdown`);
+  const dropdown = page.locator(`//div[contains(@class,'ant-dropdown') and contains(@style,'display: none')]`);
+  try {
+    await dropdown.elementHandle({timeout});
+    return dropdown;
+  } catch (e: any) {
+    log.error(`dropdown did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeWalktrough(page: Page, timeout: number) {
+  log.info(`closing walkthrough`);
+  const walkthrough = page.locator(`#close-walkthrough >> visible=true`);
+  try {
+    await walkthrough.elementHandle({timeout});
+    walkthrough.click();
+  } catch (e: any) {
+    log.error(`walkthrough did not hide within ${timeout}ms`, e.name);
+  }
+}
+
+export async function closeNotification(page: Page, timeout: number) {
+  log.info(`closing notification`);
+  const notification = page.locator(`.ant-notification-notice .ant-notification-notice-close-icon >> visible=true`);
+  try {
+    await notification.elementHandle({timeout});
+    notification.click();
+  } catch (e: any) {
+    log.error(`notification did not hide within ${timeout}ms`, e.name);
+  }
 }

@@ -1,5 +1,6 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
+import {useWindowSize} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
 
@@ -7,17 +8,16 @@ import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
-import {ClusterModeTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
+import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   currentClusterAccessSelector,
-  isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -28,6 +28,7 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
 import {defineHotkey} from '@utils/defineHotkey';
+import {sleep} from '@utils/sleep';
 
 import * as S from './ClusterSelection.styled';
 
@@ -36,7 +37,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const activeProject = useAppSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -46,6 +46,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const previewType = useAppSelector(state => state.main.previewType);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const size: Size = useWindowSize();
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -68,21 +73,17 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   };
 
   const connectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigContext) {
       stopPreview(dispatch);
     }
-    if (kubeConfigPath) {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
-    }
+    startPreview(kubeConfigContext, 'cluster', dispatch);
   };
 
   const reconnectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigContext) {
       stopPreview(dispatch);
     }
-    if (kubeConfigPath) {
-      restartPreview(kubeConfigPath, 'cluster', dispatch);
-    }
+    restartPreview(kubeConfigContext, 'cluster', dispatch);
   };
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
@@ -90,7 +91,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   });
 
   const handleLoadCluster = () => {
-    if (isClusterActionDisabled && Boolean(previewType === 'cluster' && previewLoader.isLoading)) {
+    if (isClusterActionDisabled && Boolean(previewType === 'cluster' && isPreviewLoading)) {
       return;
     }
 
@@ -98,37 +99,29 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       dispatch(toggleStartProjectPane());
     }
 
-    if (isInClusterMode) {
+    if (isInPreviewMode && previewType === 'cluster') {
       reconnectToCluster();
     } else {
       connectToCluster();
     }
   };
 
+  const onClickExit = () => {
+    stopPreview(dispatch);
+  };
+
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!kubeConfigPath) || !isKubeConfigPathValid);
   }, [kubeConfigPath, isKubeConfigPathValid]);
 
-  const createClusterObjectsLabel = useCallback(() => {
-    let content: any;
-    let className = '';
-    if (isInClusterMode) {
-      content = 'Reload';
-    } else if (previewType === 'cluster' && previewLoader.isLoading) {
-      content = <LoadingOutlined />;
-    } else {
-      content = 'Load';
-      className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
+  const {icon, tooltip} = useMemo(() => {
+    if (!isKubeConfigPathValid) {
+      return {
+        icon: <S.ClusterOutlined />,
+        tooltip: '',
+      };
     }
 
-    return (
-      <S.ClusterActionText className={className} $highlighted={highlightedItems.connectToCluster}>
-        {content}
-      </S.ClusterActionText>
-    );
-  }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
-
-  const {icon, tooltip} = useMemo(() => {
     if (isAccessLoading) {
       return {
         icon: <LoadingOutlined />,
@@ -139,16 +132,53 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     const hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
     if (hasFullAccess) {
       return {
-        icon: <S.CheckCircleOutlined />,
-        tooltip: 'You have full access to this cluster',
+        icon: (
+          <S.CheckCircleOutlined
+            isKubeConfigPathValid={isKubeConfigPathValid}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            previewType={previewType}
+          />
+        ),
+        tooltip: 'Configured with full access.',
       };
     }
 
     return {
       icon: <S.ExclamationCircleOutlinedWarning />,
-      tooltip: 'You do not have full access to this cluster',
+      tooltip: 'Configured with restricted access.',
     };
-  }, [clusterAccess, isAccessLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clusterAccess, isAccessLoading, isKubeConfigPathValid, isPreviewLoading, isInPreviewMode]);
+
+  useEffect(() => {
+    if (!(isPreviewLoading && previewLoader.isLoading)) {
+      setIsPreviewLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewLoader.isLoading]);
+
+  const loadOrReloadPreview = async () => {
+    setIsPreviewLoading(true);
+    await sleep(500);
+
+    if (!isInPreviewMode) {
+      handleLoadCluster();
+      return;
+    }
+
+    if (previewType === 'cluster') {
+      handleLoadCluster();
+    }
+    if (previewType === 'helm' && selectedValuesFileId) {
+      restartPreview(selectedValuesFileId, 'helm', dispatch);
+    }
+    if (previewType === 'kustomization' && previewResourceId) {
+      restartPreview(previewResourceId, 'kustomization', dispatch);
+    }
+    if (previewType === 'helm-preview-config' && previewConfigurationId) {
+      startPreview(previewConfigurationId, 'helm-preview-config', dispatch);
+    }
+  };
 
   if (!isClusterSelectorVisible) {
     return null;
@@ -157,54 +187,81 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   return (
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
-        <S.ClusterStatus>
-          {isKubeConfigPathValid && (
-            <>
-              <S.ClusterOutlined />
-              <Dropdown
-                overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
-                overlayClassName="cluster-dropdown-item"
-                placement="bottom"
-                arrow
-                trigger={['click']}
-                disabled={previewLoader.isLoading || isInClusterMode}
-                visible={isClusterDropdownOpen}
-                onVisibleChange={setIsClusterDropdownOpen}
-              >
-                <S.ClusterButton type="link" ref={dropdownButtonRef}>
-                  <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
-                  <S.DownOutlined />
-                </S.ClusterButton>
-              </Dropdown>
-            </>
+        <>
+          {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
+            <S.PreviewMode previewType={previewType}>
+              {previewType === 'cluster' && <span>CLUSTER MODE</span>}
+              {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
+              {previewType === 'helm' && <span>HELM PREVIEW</span>}
+              {previewType === 'helm-preview-config' && <span>HELM CONFIG PREVIEW</span>}
+            </S.PreviewMode>
           )}
-          <S.ClusterStatusText connected={isKubeConfigPathValid}>
+
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 946}>
             {isKubeConfigPathValid && (
+              <>
+                <S.ClusterOutlined />
+                <Dropdown
+                  overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
+                  overlayClassName="cluster-dropdown-item"
+                  placement="bottomLeft"
+                  arrow
+                  trigger={['click']}
+                  disabled={isPreviewLoading || isInPreviewMode}
+                  visible={isClusterDropdownOpen}
+                  onVisibleChange={setIsClusterDropdownOpen}
+                >
+                  <S.ClusterButton type="link" ref={dropdownButtonRef} size="small">
+                    <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
+                    <S.DownOutlined />
+                  </S.ClusterButton>
+                </Dropdown>
+              </>
+            )}
+
+            <S.ClusterStatusText
+              isKubeConfigPathValid={isKubeConfigPathValid}
+              isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+              previewType={previewType}
+            >
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
                 <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
               </Tooltip>
-            )}
-            <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
-          </S.ClusterStatusText>
+              {!isKubeConfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
+            </S.ClusterStatusText>
 
-          {isKubeConfigPathValid ? (
-            <>
-              <S.Divider type="vertical" />
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
-                <S.Button type="link" disabled={isAccessLoading} onClick={handleLoadCluster}>
-                  {createClusterObjectsLabel()}
-                </S.Button>
-              </Tooltip>
-            </>
-          ) : (
-            <>
+            {!isKubeConfigPathValid && (
               <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
                 Configure
               </S.ClusterActionButton>
-            </>
-          )}
-        </S.ClusterStatus>
+            )}
+          </S.ClusterStatus>
+        </>
       )}
+      <>
+        {isKubeConfigPathValid && activeProject && (
+          <S.Button
+            className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
+            disabled={isPreviewLoading && isAccessLoading}
+            onClick={loadOrReloadPreview}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            previewType={previewType}
+            loading={isPreviewLoading}
+            size="small"
+          >
+            {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
+          </S.Button>
+        )}
+        {!isPreviewLoading && isInPreviewMode && (
+          <S.ExitButton
+            onClick={onClickExit}
+            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            previewType={previewType}
+          >
+            Exit
+          </S.ExitButton>
+        )}
+      </>
     </S.ClusterContainer>
   );
 };

@@ -136,6 +136,15 @@ export const uiSlice = createSlice({
         imageId: action.payload,
       };
     },
+    closeFiltersPresetModal: (state: Draft<UiState>) => {
+      state.filtersPresetModal = undefined;
+    },
+    openFiltersPresetModal: (state: Draft<UiState>, action: PayloadAction<'load' | 'save'>) => {
+      state.filtersPresetModal = {
+        isOpen: true,
+        type: action.payload,
+      };
+    },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
@@ -148,16 +157,19 @@ export const uiSlice = createSlice({
         resourcesIds: [],
       };
     },
-    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.createFolderModal = {
-        isOpen: true,
-        rootDir: action.payload,
-      };
+    openCreateFileFolderModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<{rootDir: string; type: 'file' | 'folder'}>
+    ) => {
+      const {rootDir, type} = action.payload;
+
+      state.createFileFolderModal = {isOpen: true, rootDir, type};
     },
-    closeCreateFolderModal: (state: Draft<UiState>) => {
-      state.createFolderModal = {
+    closeCreateFileFolderModal: (state: Draft<UiState>) => {
+      state.createFileFolderModal = {
         isOpen: false,
         rootDir: '',
+        type: 'folder',
       };
     },
     openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
@@ -177,13 +189,6 @@ export const uiSlice = createSlice({
     },
     toggleStartProjectPane: (state: Draft<UiState>) => {
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
-    },
-    toggleValidationDrawer: (state: Draft<UiState>, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload !== undefined) {
-        state.leftMenu.isValidationDrawerVisible = action.payload;
-      } else {
-        state.leftMenu.isValidationDrawerVisible = !state.leftMenu.isValidationDrawerVisible;
-      }
     },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
@@ -305,8 +310,9 @@ export const {
   cancelWalkThrough,
   closeAboutModal,
   closeClusterDiff,
-  closeCreateFolderModal,
+  closeCreateFileFolderModal,
   closeCreateProjectModal,
+  closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
   closeNewResourceWizard,
@@ -322,8 +328,9 @@ export const {
   highlightItem,
   openAboutModal,
   openClusterDiff,
-  openCreateFolderModal,
+  openCreateFileFolderModal,
   openCreateProjectModal,
+  openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
   openNewResourceWizard,
@@ -350,7 +357,6 @@ export const {
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
-  toggleValidationDrawer,
   zoomIn,
   zoomOut,
 } = uiSlice.actions;

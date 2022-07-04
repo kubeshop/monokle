@@ -5,7 +5,7 @@ import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -14,7 +14,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
-import {MonoPaneTitle} from '@components/atoms';
+import {MonoPaneTitle} from '@atoms';
+
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
@@ -27,6 +28,7 @@ import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlue
 import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
+import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 type Props = {
@@ -75,11 +77,11 @@ const NavPane: React.FC<Props> = ({height}) => {
         <S.TitleBar>
           <MonoPaneTitle>
             <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay />
+              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
             </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
-            <Tooltip title={NewResourceTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
               <S.PlusButton
                 id="create-resource-button"
                 $disabled={!isFolderOpen || isInPreviewMode}
@@ -93,8 +95,8 @@ const NavPane: React.FC<Props> = ({height}) => {
               />
             </Tooltip>
 
-            <Tooltip title={QuickFilterTooltip}>
-              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
                 <Button
                   disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
                   type="link"
@@ -102,8 +104,8 @@ const NavPane: React.FC<Props> = ({height}) => {
                   icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
                   onClick={resourceFilterButtonHandler}
                 />
-              </Badge>
-            </Tooltip>
+              </Tooltip>
+            </Badge>
 
             <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
               <CompareButton />
@@ -114,7 +116,7 @@ const NavPane: React.FC<Props> = ({height}) => {
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         {isResourceFiltersOpen && (
-          <ReflexElement flex={0.4} minSize={100}>
+          <ReflexElement style={{background: Colors.black9}} flex={0.4} minSize={100}>
             <ResourceFilter />
           </ReflexElement>
         )}

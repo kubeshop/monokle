@@ -13,6 +13,10 @@ export const Table = styled(props => <RawTable {...props} />)`
   tbody {
     vertical-align: top;
   }
+
+  & .ant-table-container .ant-table-body {
+    overflow-y: auto !important;
+  }
 `;
 
 export const ClusterAccessContainer = styled.span`

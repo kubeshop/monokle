@@ -49,6 +49,10 @@ export type EventMap = {
   VALIDATION_PANE_OPENED: {id: string};
   OPA_ENABLED: {all: boolean};
   OPA_DISABLED: {all: boolean};
+  COMPARE_OPENED: {from?: string};
+  COMPARE_COMPARED: {left?: string; right?: string; operation: string};
+  COMPARE_INSPECTED: {type?: string};
+  COMPARE_TRANSFERED: {from?: string; to?: string; count: number};
 };
 
 export const CREATE_EMPTY_PROJECT = 'CREATE_EMPTY_PROJECT';
@@ -73,3 +77,4 @@ export const UPDATE_APPLICATION = 'UPDATE_APPLICATION';
 export const APPLY_FILE = 'APPLY_FILE';
 export const APPLY_HELM_CHART = 'APPLY_HELM_CHART';
 export const RUN_PREVIEW_CONFIGURATION = 'RUN_PREVIEW_CONFIGURATION';
+export const DISABLED_TELEMETRY = 'DISABLED_TELEMETRY';
