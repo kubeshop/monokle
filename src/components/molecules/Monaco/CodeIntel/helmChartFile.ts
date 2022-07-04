@@ -124,12 +124,11 @@ export const helmFileCodeIntel: CodeIntelApply = {
         return;
       }
 
-      const linkDisposable = createLinkProvider(
-        helmFileValue.range,
-        'We cannot find the value in the helm values file',
-        () => {}
-      );
-      newDisposables.push(linkDisposable);
+      const hoverDisposable = createHoverProvider(helmFileValue.range, [
+        createMarkdownString('We cannot find the value in the helm values file'),
+      ]);
+
+      newDisposables.push(hoverDisposable);
     });
 
     return {newDisposables, newDecorations};
