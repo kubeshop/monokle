@@ -101,9 +101,7 @@ export const helmFileCodeIntel: CodeIntelApply = {
         });
 
         const hasMultipleLinks = keyPathsInFile.length > 1;
-        const text = hasMultipleLinks
-          ? `Found this value in ${keyPathsInFile.length} helm value files`
-          : `Found this value in ${keyPathsInFile[0].filePath}`;
+        const text = hasMultipleLinks ? `Found this value in ${keyPathsInFile.length} helm value files` : ``;
         if (!hasMultipleLinks) {
           const linkDisposable = createLinkProvider(helmFileValue.range, 'Open file', () => {
             goToValuesFile({
