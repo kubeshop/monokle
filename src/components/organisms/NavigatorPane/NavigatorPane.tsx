@@ -25,7 +25,6 @@ import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 
-import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -107,7 +106,7 @@ const NavPane: React.FC<Props> = ({height}) => {
               </Tooltip>
             </Badge>
 
-            <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
+            <FeatureFlag name="CompareEverything">
               <CompareButton />
             </FeatureFlag>
           </S.TitleBarRightButtons>

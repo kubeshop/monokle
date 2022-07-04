@@ -79,14 +79,9 @@ const StyledTag = styled(Tag)`
   font-weight: 600;
 `;
 
-const ResourceDiff = (props: {
-  localResource: K8sResource;
-  clusterResourceText: string;
-  isInClusterDiff?: boolean;
-  onApply?: () => void;
-}) => {
+const ResourceDiff = (props: {localResource: K8sResource; clusterResourceText: string; onApply?: () => void}) => {
   const dispatch = useAppDispatch();
-  const {localResource, clusterResourceText, isInClusterDiff, onApply} = props;
+  const {localResource, clusterResourceText, onApply} = props;
 
   const windowSize = useWindowSize();
 
@@ -169,7 +164,6 @@ const ResourceDiff = (props: {
     applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
       isClusterPreview: previewType === 'cluster',
       shouldPerformDiff: true,
-      isInClusterDiff,
     });
     setIsApplyModalVisible(false);
   };

@@ -10,13 +10,6 @@ export const AddExclusionPatternTooltip = 'Add pattern for files/folders to excl
 export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
 export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
-export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
-export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
-export const ClusterDiffDisabledInClusterPreviewTooltip =
-  'Cluster Compare is disabled while previewing Cluster resources';
-export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
-export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
-export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const CollapseTreeTooltip = 'Collapse all folders';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DocumentationTooltip = 'Open Monokle Documentation Website';

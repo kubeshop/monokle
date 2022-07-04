@@ -43,12 +43,6 @@ export const uiSlice = createSlice({
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
     },
-    openClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = true;
-    },
-    closeClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = false;
-    },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
@@ -309,7 +303,6 @@ export const uiSlice = createSlice({
 export const {
   cancelWalkThrough,
   closeAboutModal,
-  closeClusterDiff,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
   closeFiltersPresetModal,
@@ -327,7 +320,6 @@ export const {
   handleWalkThroughStep,
   highlightItem,
   openAboutModal,
-  openClusterDiff,
   openCreateFileFolderModal,
   openCreateProjectModal,
   openFiltersPresetModal,

@@ -68,7 +68,6 @@ export type UiState = {
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;
   isSettingsOpen: boolean;
-  isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
   newResourceWizard: {

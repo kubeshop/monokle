@@ -11,12 +11,7 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
-import {
-  addResource,
-  openResourceDiffModal,
-  setApplyingResource,
-  setClusterDiffRefreshDiffResource,
-} from '@redux/reducers/main';
+import {addResource, openResourceDiffModal, setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
@@ -88,7 +83,6 @@ export async function applyResource(
   namespace?: {name: string; new: boolean},
   options?: {
     isClusterPreview?: boolean;
-    isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
     quiet?: boolean;
   }
@@ -136,11 +130,7 @@ export async function applyResource(
               }
             });
           } else if (options?.shouldPerformDiff) {
-            if (options?.isInClusterDiff) {
-              dispatch(setClusterDiffRefreshDiffResource(true));
-            } else {
-              dispatch(openResourceDiffModal(resource.id));
-            }
+            dispatch(openResourceDiffModal(resource.id));
           }
 
           if (namespace && namespace.new) {

@@ -5,13 +5,12 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
-  ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
@@ -32,11 +31,9 @@ import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
@@ -44,7 +41,6 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {removeResources} from '@redux/thunks/removeResources';
-import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -53,7 +49,6 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
-import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -69,7 +64,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
+import {setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -362,7 +357,7 @@ export function getActiveResourceMap(state: AppState) {
 export function getLocalResourceMap(state: AppState) {
   let localResourceMap: ResourceMapType = {};
   Object.values(state.resourceMap)
-    .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+    .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX))
     .forEach(r => {
       localResourceMap[r.id] = r;
     });
@@ -472,7 +467,6 @@ export const mainSlice = createSlice({
       state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
-      state.clusterDiff.shouldReload = true;
       state.checkedResourceIds = [];
       state.selectedImage = undefined;
     },
@@ -550,33 +544,6 @@ export const mainSlice = createSlice({
       });
       state.resourceFilter = newFilter;
     },
-    setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
-      state.clusterDiff.diffResourceId = action.payload;
-    },
-    setClusterDiffRefreshDiffResource: (state: Draft<AppState>, action: PayloadAction<boolean | undefined>) => {
-      state.clusterDiff.refreshDiffResource = action.payload;
-    },
-    selectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const matchId = action.payload;
-      if (!state.clusterDiff.selectedMatches.includes(matchId)) {
-        state.clusterDiff.selectedMatches.push(matchId);
-      }
-    },
-    selectMultipleClusterDiffMatches: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
-      state.clusterDiff.selectedMatches = action.payload;
-    },
-    unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const matchId = action.payload;
-      if (state.clusterDiff.selectedMatches.includes(matchId)) {
-        state.clusterDiff.selectedMatches = state.clusterDiff.selectedMatches.filter(m => m !== matchId);
-      }
-    },
-    unselectAllClusterDiffMatches: (state: Draft<AppState>) => {
-      state.clusterDiff.selectedMatches = [];
-    },
-    reloadClusterDiff: (state: Draft<AppState>) => {
-      state.clusterDiff.shouldReload = true;
-    },
     setSelectionHistory: (
       state: Draft<AppState>,
       action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: SelectionHistoryEntry[]}>
@@ -614,10 +581,6 @@ export const mainSlice = createSlice({
     },
     closeResourceDiffModal: (state: Draft<AppState>) => {
       state.resourceDiff.targetResourceId = undefined;
-    },
-    toggleClusterOnlyResourcesInClusterDiff: (state: Draft<AppState>) => {
-      state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
-      state.clusterDiff.selectedMatches = [];
     },
     addMultipleKindHandlers: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
       action.payload.forEach(kind => {
@@ -758,7 +721,6 @@ export const mainSlice = createSlice({
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
         state.selectedPreviewConfigurationId = undefined;
-        state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
         state.previousSelectionHistory = [];
       })
@@ -893,15 +855,6 @@ export const mainSlice = createSlice({
       };
       state.isSelectingFile = false;
       state.isApplyingResource = false;
-      state.clusterDiff = {
-        hasLoaded: false,
-        hasFailed: false,
-        hideClusterOnlyResources: true,
-        clusterToLocalResourcesMatches: [],
-        diffResourceId: undefined,
-        refreshDiffResource: undefined,
-        selectedMatches: [],
-      };
       resetSelectionHistory(state);
     });
 
@@ -961,168 +914,6 @@ export const mainSlice = createSlice({
         }
       });
     });
-
-    builder
-      .addCase(loadClusterDiff.pending, state => {
-        state.clusterDiff.hasLoaded = false;
-        state.clusterDiff.diffResourceId = undefined;
-        state.clusterDiff.refreshDiffResource = undefined;
-        state.clusterDiff.shouldReload = undefined;
-        state.clusterDiff.selectedMatches = [];
-      })
-      .addCase(loadClusterDiff.rejected, state => {
-        state.clusterDiff.hasLoaded = true;
-        state.clusterDiff.hasFailed = true;
-        state.clusterDiff.diffResourceId = undefined;
-        state.clusterDiff.refreshDiffResource = undefined;
-        state.clusterDiff.shouldReload = undefined;
-        state.clusterDiff.selectedMatches = [];
-      })
-      .addCase(loadClusterDiff.fulfilled, (state, action) => {
-        const clusterResourceMap = action.payload.resourceMap;
-        if (!clusterResourceMap) {
-          return;
-        }
-
-        const isInPreviewMode =
-          Boolean(state.previewResourceId) ||
-          Boolean(state.previewValuesFileId) ||
-          Boolean(state.previewConfigurationId);
-
-        // get the local resources from state.resourceMap
-        let localResources: K8sResource[] = [];
-        localResources = Object.values(state.resourceMap).filter(
-          resource =>
-            !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-            !resource.name.startsWith('Patch:') &&
-            !isKustomizationResource(resource)
-        );
-
-        // if we are in preview mode, localResources must contain only the preview resources
-        if (isInPreviewMode) {
-          localResources = localResources.filter(resource => resource.filePath.startsWith(PREVIEW_PREFIX));
-        }
-
-        // this groups local resources by {name}{kind}{namespace}
-        const groupedLocalResources = groupResourcesByIdentifier(
-          localResources,
-          makeResourceNameKindNamespaceIdentifier
-        );
-
-        // remove previous cluster diff resources
-        Object.values(state.resourceMap)
-          .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-          .forEach(r => deleteResource(r, state.resourceMap));
-        // add resources from cluster diff to the resource map
-        Object.values(clusterResourceMap).forEach(r => {
-          // add prefix to the resource id to avoid replacing local resources that might have the same id
-          // this happens only if the local resource has it's metadata.uid defined
-          const clusterResourceId = `${CLUSTER_DIFF_PREFIX}${r.id}`;
-          r.id = clusterResourceId;
-          state.resourceMap[clusterResourceId] = r;
-        });
-
-        const clusterResources = Object.values(clusterResourceMap);
-        // this groups cluster resources by {name}{kind}{namespace}
-        // it's purpose is to allow us to find matches in the groupedLocalResources Record using the identifier
-        const groupedClusterResources = groupResourcesByIdentifier(
-          clusterResources,
-          makeResourceNameKindNamespaceIdentifier
-        );
-
-        let clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
-        // this keeps track of local resources that have already been matched
-        const localResourceIdsAlreadyMatched: string[] = [];
-
-        Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
-          // the value should always be an array of length 1 so we take the first entry
-          const currentClusterResource = value[0];
-          const matchingLocalResources = groupedLocalResources[identifier];
-          if (!matchingLocalResources || matchingLocalResources.length === 0) {
-            // if there are no matching resources, we create a cluster only match
-            clusterToLocalResourcesMatches.push({
-              id: identifier,
-              clusterResourceId: currentClusterResource.id,
-              resourceName: currentClusterResource.name,
-              resourceKind: currentClusterResource.kind,
-              resourceNamespace: currentClusterResource.namespace || 'default',
-            });
-          } else {
-            const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
-            clusterToLocalResourcesMatches.push({
-              id: identifier,
-              localResourceIds: matchingLocalResourceIds,
-              clusterResourceId: currentClusterResource.id,
-              resourceName: currentClusterResource.name,
-              resourceKind: currentClusterResource.kind,
-              resourceNamespace: currentClusterResource.namespace || 'default',
-            });
-            localResourceIdsAlreadyMatched.push(...matchingLocalResourceIds);
-          }
-        });
-
-        // optionally filter out all the cluster only matches
-        if (state.clusterDiff.hideClusterOnlyResources) {
-          clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
-        }
-
-        // remove deduplicates if there are any
-        const localResourceIdentifiersNotMatched = [
-          ...new Set(
-            localResources
-              .filter(r => !localResourceIdsAlreadyMatched.includes(r.id))
-              .map(r => makeResourceNameKindNamespaceIdentifier(r))
-          ),
-        ];
-
-        // create local only matches
-        localResourceIdentifiersNotMatched.forEach(identifier => {
-          const currentLocalResources = groupedLocalResources[identifier];
-          if (!currentLocalResources || currentLocalResources.length === 0) {
-            return;
-          }
-          clusterToLocalResourcesMatches.push({
-            id: identifier,
-            localResourceIds: currentLocalResources.map(r => r.id),
-            resourceName: currentLocalResources[0].name,
-            resourceKind: currentLocalResources[0].kind,
-            resourceNamespace: currentLocalResources[0].namespace || 'default',
-          });
-        });
-
-        state.clusterDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
-        state.clusterDiff.hasLoaded = true;
-        state.clusterDiff.hasFailed = false;
-        state.clusterDiff.diffResourceId = undefined;
-        state.clusterDiff.refreshDiffResource = undefined;
-        state.clusterDiff.shouldReload = undefined;
-        state.clusterDiff.selectedMatches = [];
-      });
-
-    builder.addCase(closeClusterDiff.type, state => {
-      // remove previous cluster diff resources
-      Object.values(state.resourceMap)
-        .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-        .forEach(r => deleteResource(r, state.resourceMap));
-      state.clusterDiff.clusterToLocalResourcesMatches = [];
-      state.clusterDiff.hasLoaded = false;
-      state.clusterDiff.hasFailed = false;
-      state.clusterDiff.diffResourceId = undefined;
-      state.clusterDiff.refreshDiffResource = undefined;
-      state.clusterDiff.shouldReload = undefined;
-      state.clusterDiff.selectedMatches = [];
-    });
-
-    builder
-      .addCase(replaceSelectedResourceMatches.pending, state => {
-        state.clusterDiff.hasLoaded = false;
-      })
-      .addCase(replaceSelectedResourceMatches.fulfilled, state => {
-        state.clusterDiff.hasLoaded = true;
-      })
-      .addCase(replaceSelectedResourceMatches.rejected, state => {
-        state.clusterDiff.hasLoaded = true;
-      });
 
     builder.addCase(multiplePathsChanged.fulfilled, (state, action) => {
       return action.payload;
@@ -1286,7 +1077,6 @@ export const {
   loadFilterPreset,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
-  reloadClusterDiff,
   resetResourceFilter,
   saveFilterPreset,
   seenNotifications,
@@ -1294,15 +1084,11 @@ export const {
   selectHelmValuesFile,
   selectImage,
   selectK8sResource,
-  selectMultipleClusterDiffMatches,
   selectPreviewConfiguration,
   setAppRehydrating,
   setApplyingResource,
   setAutosavingError,
   setAutosavingStatus,
-  selectClusterDiffMatch,
-  setClusterDiffRefreshDiffResource,
-  setDiffResourceInClusterDiff,
   setFiltersToBeChanged,
   setImagesList,
   setImagesSearchedValue,
@@ -1311,13 +1097,10 @@ export const {
   startPreviewLoader,
   stopPreviewLoader,
   toggleAllRules,
-  toggleClusterOnlyResourcesInClusterDiff,
   toggleRule,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
   uncheckResourceId,
-  unselectAllClusterDiffMatches,
-  unselectClusterDiffMatch,
   updateResourceFilter,
   updateValidationIntegration,
 } = mainSlice.actions;

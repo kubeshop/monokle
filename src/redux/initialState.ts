@@ -38,13 +38,6 @@ const initialAppState: AppState = {
       false
     ),
   },
-  clusterDiff: {
-    clusterToLocalResourcesMatches: [],
-    hasLoaded: false,
-    hasFailed: false,
-    hideClusterOnlyResources: true,
-    selectedMatches: [],
-  },
   policies: {
     plugins: [],
   },
@@ -132,7 +125,6 @@ const initialUiState: UiState = {
   isSettingsOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
-  isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {

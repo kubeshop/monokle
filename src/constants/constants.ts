@@ -1,7 +1,6 @@
 import {PaneConfiguration} from '@models/ui';
 
 export const PREVIEW_PREFIX = 'preview://';
-export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
 export const YAML_DOCUMENT_DELIMITER = '---';
 export const YAML_DOCUMENT_DELIMITER_NEW_LINE = '---\n';

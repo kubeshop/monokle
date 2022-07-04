@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -40,7 +40,6 @@ export const activeResourcesSelector = (state: RootState) => {
     r =>
       ((previewResourceId === undefined && previewValuesFileId === undefined && previewConfigurationId === undefined) ||
         r.filePath.startsWith(PREVIEW_PREFIX)) &&
-      !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
       !r.name.startsWith('Patch:')
   );
 };
