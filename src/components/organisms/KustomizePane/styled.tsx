@@ -8,9 +8,7 @@ export const KustomizePaneContainer = styled.div`
 
 export const List = styled.div`
   height: 100%;
-  list-style-type: none;
   padding: 0;
-  padding-bottom: 20px;
   overflow-y: auto;
   margin: 0;
 `;
