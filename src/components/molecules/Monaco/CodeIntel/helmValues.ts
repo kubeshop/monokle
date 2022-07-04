@@ -3,12 +3,7 @@ import {monaco} from 'react-monaco-editor';
 import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {getHelmValueFile, goToFileAndHighlightCode} from '@molecules/Monaco/CodeIntel/util';
 import {InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
-import {
-  createCommandMarkdownLink,
-  createHoverProvider,
-  createInlineDecoration,
-  createMarkdownString,
-} from '@molecules/Monaco/editorHelpers';
+import {createCommandMarkdownLink, createHoverProvider, createInlineDecoration} from '@molecules/Monaco/editorHelpers';
 
 interface HelmMatches {
   locationInValueFile: monaco.Range;
@@ -91,19 +86,15 @@ export const helmValueCodeIntel: CodeIntelApply = {
               filePath: use.filePath,
             });
           },
-          'Go to '
+          'Found in: ',
+          ` at Ln ${use.range.startLineNumber}`
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
         newDisposables.push(commandDisposable);
       });
 
-      const fileName = `file${placeUsed.uses.length === 1 ? '' : 's'}`;
-      const hoverCommandMarkdownLinkList = [
-        createMarkdownString(`Found this value in ${placeUsed.uses.length} ${fileName}`),
-        ...commandMarkdownLinkList,
-      ];
       if (commandMarkdownLinkList.length) {
-        const hoverDisposable = createHoverProvider(placeUsed.locationInValueFile, hoverCommandMarkdownLinkList);
+        const hoverDisposable = createHoverProvider(placeUsed.locationInValueFile, commandMarkdownLinkList);
         newDisposables.push(hoverDisposable);
       }
     });
