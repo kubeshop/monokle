@@ -94,7 +94,7 @@ export const helmFileCodeIntel: CodeIntelApply = {
                 setEditorSelection,
               });
             },
-            `Value: ${value}\n\nGo to `
+            `Value: ${value}\n\nFound in: `
           );
           commandMarkdownLinkList.push(commandMarkdownLink);
           newDisposables.push(commandDisposable);
