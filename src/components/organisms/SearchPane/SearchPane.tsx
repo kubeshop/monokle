@@ -64,9 +64,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     matchWholeWord: false,
     regExp: false,
   });
-
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
@@ -385,22 +383,25 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
             </S.Form>
             <S.RootFolderText>
               {isReady ? (
-                <S.ResultContainer>
-                  <S.MatchText id="search-count-replace">
-                    <p>
-                      {currentMatchNode?.currentMatchNumber || 0} of {searchCounter.current.totalMatchCount}
-                    </p>
-                    <span> View in Editor</span>
-                  </S.MatchText>
-                  <S.ButtonContainer>
-                    <Button type="primary" onClick={() => handleStep(-1)} disabled={!isPrevEnabled}>
-                      Previous
-                    </Button>
-                    <Button type="primary" onClick={() => handleStep(1)} disabled={!isNextEnabled}>
-                      Next
-                    </Button>
-                  </S.ButtonContainer>
-                </S.ResultContainer>
+                <>
+                  <div>{selectedPath}</div>
+                  <S.ResultContainer>
+                    <S.MatchText id="search-count-replace">
+                      <p>
+                        {currentMatchNode?.currentMatchNumber || 0} of {searchCounter.current.totalMatchCount}
+                      </p>
+                      <span> View in Editor</span>
+                    </S.MatchText>
+                    <S.ButtonContainer>
+                      <Button type="primary" onClick={() => handleStep(-1)} disabled={!isPrevEnabled}>
+                        Previous
+                      </Button>
+                      <Button type="primary" onClick={() => handleStep(1)} disabled={!isNextEnabled}>
+                        Next
+                      </Button>
+                    </S.ButtonContainer>
+                  </S.ResultContainer>
+                </>
               ) : (
                 'No matches found'
               )}
