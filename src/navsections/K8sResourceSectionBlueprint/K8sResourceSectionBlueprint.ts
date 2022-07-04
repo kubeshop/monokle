@@ -66,7 +66,9 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
-      isCheckVisibleOnHover: true,
+      checkbox: {
+        isVisibleOnHover: true,
+      },
     },
   };
   return subsection;
@@ -142,13 +144,15 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
-    emptyDisplay: {
+    empty: {
       component: K8sResourceSectionEmptyDisplay,
     },
-    nameContext: {
+    contextMenu: {
       component: K8sResourceSectionNameSuffix,
     },
-    isCheckVisibleOnHover: true,
+    checkbox: {
+      isVisibleOnHover: true,
+    },
   },
 };
 

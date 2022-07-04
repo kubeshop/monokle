@@ -73,11 +73,13 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
-    emptyDisplay: {
+    empty: {
       component: KustomizationSectionEmptyDisplay,
     },
-    beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
-    counterDisplayMode: 'items',
+    row: {
+      initializationText: 'Get started by browsing a folder in the File Explorer.',
+    },
+    counter: {type: 'items'},
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,
@@ -99,9 +101,8 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
-      // contextMenuWrapper: {component: KustomizationContextMenuWrapper, options: {isVisibleOnHover: false}},
-      contextMenu: {component: KustomizationContextMenu, options: {isVisibleOnHover: true}},
-      quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
+      contextMenu: {component: KustomizationContextMenu, isVisibleOnHover: true},
+      quickAction: {component: KustomizationQuickAction, isVisibleOnHover: true},
     },
   },
 };

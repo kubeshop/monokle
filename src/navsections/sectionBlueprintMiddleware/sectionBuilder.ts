@@ -40,7 +40,7 @@ export const buildSectionInstance = (props: BuildSectionInstanceProps) => {
     isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
     isVisible:
       Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
-      (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && isSectionEmpty) ||
+      (sectionBlueprint && sectionBlueprint.customization?.empty?.component && isSectionEmpty) ||
       (isSectionInitialized &&
         Boolean(
           sectionBuilder?.isVisible ? sectionBuilder.isVisible(sectionScope, rawItems) : visibleItemIds.length > 0

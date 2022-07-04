@@ -7,44 +7,43 @@ import {RootState} from '@models/rootstate';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
-  options?: ItemCustomComponentOptions;
   children?: ReactNode;
 };
 
 export type ItemCustomComponent = React.ComponentType<ItemCustomComponentProps>;
 
-export type ItemCustomComponentOptions = {
-  isVisibleOnHover: boolean;
-};
-
 export interface ItemCustomization {
   prefix?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
   suffix?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
   quickAction?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
-  contextMenuWrapper?: {
-    component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
-  };
+  // contextMenuWrapper?: {
+  //   component: ItemCustomComponent;
+  //   isVisibleOnHover?: boolean;
+  // };
   contextMenu?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
-  nameDisplay?: {
-    component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+  row?: {
+    component?: ItemCustomComponent;
+    isVisibleOnHover?: boolean;
+    disableHoverStyle?: boolean;
   };
-  disableHoverStyle?: boolean;
-  isCheckVisibleOnHover?: boolean;
-  lastItemMarginBottom?: number;
+  checkbox?: {
+    isVisibleOnHover?: boolean;
+  };
+  // disableHoverStyle?: boolean;
+  // isCheckVisibleOnHover?: boolean;
+  // lastItemMarginBottom?: number; TODO: is this still needed?
 }
 
 export type SectionCustomComponentProps = {
@@ -55,33 +54,36 @@ export type SectionCustomComponentProps = {
 export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
 
 export interface SectionCustomization {
-  nameDisplay?: {
-    component: SectionCustomComponent;
+  row?: {
+    component?: SectionCustomComponent;
+    disableHoverStyle?: boolean;
+    initializationText?: string;
   };
-  nameSuffix?: {
-    component: SectionCustomComponent;
-    options?: {
-      isVisibleOnHover: boolean;
-    };
+  suffix?: {
+    component?: SectionCustomComponent;
+    isVisibleOnHover?: boolean;
   };
-  emptyDisplay?: {
-    component: SectionCustomComponent;
+  empty?: {
+    component?: SectionCustomComponent;
   };
-  nameContext?: {
-    component: SectionCustomComponent;
+  contextMenu?: {
+    component?: SectionCustomComponent;
   };
-  nameCounter?: {
-    component: SectionCustomComponent;
+  counter?: {
+    /** If no value is provided, default value will be "descendants". */
+    type?: 'descendants' | 'items' | 'subsections' | 'none';
+    component?: SectionCustomComponent;
   };
-  namePrefix?: {
-    component: SectionCustomComponent;
+  prefix?: {
+    component?: SectionCustomComponent;
   };
-  beforeInitializationText?: string;
-  /** If no value is provided, default value will be "descendants". */
-  counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
+  checkbox?: {
+    isVisibleOnHover?: boolean;
+  };
+  // beforeInitializationText?: string;
   // TODO: can we remove disableHoverStyle? maybe allow a custom `style` object? or probably a method that receives the old style and creates the new one?
-  disableHoverStyle?: boolean;
-  isCheckVisibleOnHover?: boolean;
+  // disableHoverStyle?: boolean;
+  // isCheckVisibleOnHover?: boolean;
 }
 
 export interface RowBuilder<InstanceType, PropsType = undefined> {

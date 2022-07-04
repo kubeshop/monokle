@@ -2,34 +2,41 @@ import {useMemo} from 'react';
 
 import {ItemCustomization} from '@models/navigator';
 
-export function useItemCustomization(customization: ItemCustomization = {}) {
-  const Prefix = useMemo(
-    () => ({Component: customization.prefix?.component, options: customization.prefix?.options}),
-    [customization.prefix]
-  );
-  const Suffix = useMemo(
-    () => ({Component: customization.suffix?.component, options: customization.suffix?.options}),
-    [customization.suffix]
-  );
-  const QuickAction = useMemo(
-    () => ({Component: customization.quickAction?.component, options: customization.quickAction?.options}),
-    [customization.quickAction]
-  );
-  const ContextMenuWrapper = useMemo(
+export function useItemCustomization(customization: ItemCustomization = {}, isHovered: boolean) {
+  const customPrefix = useMemo(
     () => ({
-      Component: customization.contextMenuWrapper?.component,
-      options: customization.contextMenuWrapper?.options,
+      Component: customization.prefix?.component,
+      isVisible: customization.prefix?.isVisibleOnHover ? isHovered : true,
     }),
-    [customization.contextMenuWrapper]
+    [customization.prefix, isHovered]
   );
-  const ContextMenu = useMemo(
-    () => ({Component: customization.contextMenu?.component, options: customization.contextMenu?.options}),
-    [customization.contextMenu]
+  const customSuffix = useMemo(
+    () => ({
+      Component: customization.suffix?.component,
+      isVisible: customization.suffix?.isVisibleOnHover ? isHovered : true,
+    }),
+    [customization.suffix, isHovered]
   );
-  const NameDisplay = useMemo(
-    () => ({Component: customization.nameDisplay?.component, options: customization.nameDisplay?.options}),
-    [customization.nameDisplay]
+  const customQuickAction = useMemo(
+    () => ({
+      Component: customization.quickAction?.component,
+      isVisible: customization.quickAction?.isVisibleOnHover ? isHovered : true,
+    }),
+    [customization.quickAction, isHovered]
+  );
+  const customContextMenu = useMemo(
+    () => ({
+      Component: customization.contextMenu?.component,
+      isVisible: customization.contextMenu?.isVisibleOnHover ? isHovered : true,
+    }),
+    [customization.contextMenu, isHovered]
+  );
+  const customRow = useMemo(
+    () => ({
+      Component: customization.row?.component,
+    }),
+    [customization.row]
   );
 
-  return {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay};
+  return {customPrefix, customSuffix, customQuickAction, customContextMenu, customRow};
 }

@@ -3,27 +3,26 @@ import {useMemo} from 'react';
 import {SectionCustomization} from '@models/navigator';
 
 export function useSectionCustomization(customization: SectionCustomization = {}) {
-  const NameDisplay = useMemo(() => ({Component: customization.nameDisplay?.component}), [customization.nameDisplay]);
-  const NamePrefix = useMemo(
+  const customRow = useMemo(() => ({Component: customization.row?.component}), [customization.row]);
+  const customPrefix = useMemo(
     () => ({
-      Component: customization.namePrefix?.component,
+      Component: customization.prefix?.component,
     }),
-    [customization.namePrefix]
+    [customization.prefix?.component]
   );
-  const NameSuffix = useMemo(
+  const customSuffix = useMemo(
     () => ({
-      Component: customization.nameSuffix?.component,
-      options: customization.nameSuffix?.options,
+      Component: customization.suffix?.component,
     }),
-    [customization.nameSuffix]
+    [customization.suffix]
   );
-  const EmptyDisplay = useMemo(
-    () => ({Component: customization.emptyDisplay?.component}),
-    [customization.emptyDisplay]
+  const customEmpty = useMemo(() => ({Component: customization.empty?.component}), [customization.empty]);
+  const customContextMenu = useMemo(
+    () => ({Component: customization.contextMenu?.component}),
+    [customization.contextMenu]
   );
-  const NameContext = useMemo(() => ({Component: customization.nameContext?.component}), [customization.nameContext]);
 
-  const NameCounter = useMemo(() => ({Component: customization.nameCounter?.component}), [customization.nameCounter]);
+  const customCounter = useMemo(() => ({Component: customization.counter?.component}), [customization.counter]);
 
-  return {NameDisplay, EmptyDisplay, NamePrefix, NameSuffix, NameContext, NameCounter};
+  return {customRow, customPrefix, customSuffix, customEmpty, customContextMenu, customCounter};
 }

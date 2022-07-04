@@ -55,8 +55,8 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
     fontSize: 16,
   },
   customization: {
-    counterDisplayMode: 'subsections',
-    emptyDisplay: {
+    counter: {type: 'subsections'},
+    empty: {
       component: RootHelmChartsSectionEmptyDisplay,
     },
   },

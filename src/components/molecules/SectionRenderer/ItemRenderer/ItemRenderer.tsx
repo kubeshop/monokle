@@ -10,25 +10,12 @@ import {useItemCustomization} from './useItemCustomization';
 
 import * as S from './styled';
 
-export type ItemRendererOptions = {
-  disablePrefix?: boolean;
-  disableSuffix?: boolean;
-  disableQuickAction?: boolean;
-  disableContextMenu?: boolean;
-};
-
 export type ItemRendererProps = {
   itemRow: NavigatorItemRow;
-  options?: ItemRendererOptions;
-};
-
-const WrapperPlacehoder: React.FC<{style: React.CSSProperties; children: React.ReactNode}> = props => {
-  const {children, style} = props;
-  return <div style={style}>{children}</div>;
 };
 
 function ItemRenderer(props: ItemRendererProps) {
-  const {itemRow, options} = props;
+  const {itemRow} = props;
   const itemId = itemRow.id;
   const sectionId = itemRow.sectionId;
 
@@ -45,8 +32,9 @@ function ItemRenderer(props: ItemRendererProps) {
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay} = useItemCustomization(
-    itemBlueprint?.customization
+  const {customPrefix, customSuffix, customQuickAction, customContextMenu, customRow} = useItemCustomization(
+    itemBlueprint?.customization,
+    isHovered
   );
 
   const onClick = useCallback(() => {
@@ -61,31 +49,22 @@ function ItemRenderer(props: ItemRendererProps) {
     }
   }, [instanceHandler, itemInstance, dispatch]);
 
-  const Wrapper = useMemo(
-    () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : WrapperPlacehoder),
-    [ContextMenuWrapper.Component]
-  );
-
   return (
-    <Wrapper
-      style={{width: '100%', marginBottom: itemRow.marginBottom, height: itemRow.height}}
-      itemInstance={itemInstance}
-      options={ContextMenuWrapper.options}
-    >
+    <div style={{width: '100%', marginBottom: itemRow.marginBottom, height: itemRow.height}}>
       <S.ItemContainer
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         $isSelected={itemInstance.isSelected}
         $isHighlighted={itemInstance.isHighlighted}
-        $disableHoverStyle={Boolean(itemBlueprint?.customization?.disableHoverStyle)}
+        $disableHoverStyle={Boolean(itemBlueprint?.customization?.row?.disableHoverStyle)}
         $isHovered={isHovered}
         $hasOnClick={Boolean(instanceHandler?.onClick)}
         $indentation={itemRow.indentation}
         $isSectionCheckable={isSectionCheckable}
-        $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+        $hasCustomRow={Boolean(customRow.Component)}
       >
         {itemInstance.isCheckable &&
-          (itemBlueprint?.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
+          (itemBlueprint?.customization?.checkbox?.isVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
             <span>
               <S.Checkbox
                 checked={itemInstance.isChecked}
@@ -95,14 +74,14 @@ function ItemRenderer(props: ItemRendererProps) {
             </span>
           )}
 
-        {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+        {customPrefix.Component && customPrefix.isVisible && (
           <S.PrefixContainer>
-            <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
+            <customPrefix.Component itemInstance={itemInstance} />
           </S.PrefixContainer>
         )}
 
-        {NameDisplay.Component ? (
-          <NameDisplay.Component itemInstance={itemInstance} />
+        {customRow.Component ? (
+          <customRow.Component itemInstance={itemInstance} />
         ) : (
           <S.ItemName
             $isSelected={itemInstance.isSelected}
@@ -116,30 +95,26 @@ function ItemRenderer(props: ItemRendererProps) {
           </S.ItemName>
         )}
 
-        {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
+        {customSuffix.Component && customSuffix.isVisible && (
           <S.SuffixContainer>
-            <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
+            <customSuffix.Component itemInstance={itemInstance} />
           </S.SuffixContainer>
         )}
 
         <S.BlankSpace onClick={onClick} />
 
-        {QuickAction.Component &&
-          !options?.disableQuickAction &&
-          (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
-            <S.QuickActionContainer>
-              <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
-            </S.QuickActionContainer>
-          )}
-        {ContextMenu.Component &&
-          !options?.disableContextMenu &&
-          (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
-            <S.ContextMenuContainer>
-              <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
-            </S.ContextMenuContainer>
-          )}
+        {customQuickAction.Component && customQuickAction.isVisible && (
+          <S.QuickActionContainer>
+            <customQuickAction.Component itemInstance={itemInstance} />
+          </S.QuickActionContainer>
+        )}
+        {customContextMenu.Component && customContextMenu.isVisible && (
+          <S.ContextMenuContainer>
+            <customContextMenu.Component itemInstance={itemInstance} />
+          </S.ContextMenuContainer>
+        )}
       </S.ItemContainer>
-    </Wrapper>
+    </div>
   );
 }
 

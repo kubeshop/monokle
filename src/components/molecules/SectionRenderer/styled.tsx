@@ -5,10 +5,10 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
-  $hasCustomNameDisplay: boolean;
+  $hasCustomRow: boolean;
   $indentation: number;
-  isHovered?: boolean;
-  isCheckable?: boolean;
+  $isHovered?: boolean;
+  $isCheckable?: boolean;
 };
 
 export const NameContainer = styled.span<NameContainerProps>`
@@ -16,21 +16,21 @@ export const NameContainer = styled.span<NameContainerProps>`
   align-items: center;
   width: 100%;
   ${props => {
-    const defaultIndentation = props.isCheckable ? 24 : 0;
+    const defaultIndentation = props.$isCheckable ? 24 : 0;
     return `padding-left: ${defaultIndentation + props.$indentation}px;`;
   }}
-  ${props => !props.isHovered && 'padding-right: 30px;'}
-  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
+  ${props => !props.$isHovered && 'padding-right: 30px;'}
+  ${props => props.$hasCustomRow && 'padding: 0;'}
 `;
 
 type SectionContainerProps = {
-  isSelected?: boolean;
-  isHighlighted?: boolean;
-  isHovered?: boolean;
-  isInitialized?: boolean;
-  disableHoverStyle?: boolean;
-  isSectionCheckable?: boolean;
-  hasCustomNameDisplay?: boolean;
+  $isSelected?: boolean;
+  $isHighlighted?: boolean;
+  $isHovered?: boolean;
+  $isInitialized?: boolean;
+  $disableHoverStyle?: boolean;
+  $isSectionCheckable?: boolean;
+  $hasCustomRow?: boolean;
   $marginBottom?: number;
 };
 
@@ -42,25 +42,25 @@ export const SectionContainer = styled.li<SectionContainerProps>`
   width: 100%;
   user-select: none;
   ${props =>
-    (!props.isSectionCheckable && !props.hasCustomNameDisplay) || !props.isInitialized ? 'padding-left: 16px;' : ''}
+    (!props.$isSectionCheckable && !props.$hasCustomRow) || !props.$isInitialized ? 'padding-left: 16px;' : ''}
   ${props => `margin-bottom: ${props.$marginBottom || 0}px;`}
     ${props => {
-    if (props.disableHoverStyle) {
+    if (props.$disableHoverStyle) {
       return;
     }
-    if (!props.isSelected && props.isHighlighted) {
-      if (props.isHovered) {
+    if (!props.$isSelected && props.$isHighlighted) {
+      if (props.$isHovered) {
         return `background: ${Colors.highlightGradientHover};`;
       }
       return `background: ${Colors.highlightGradient};`;
     }
-    if (props.isSelected) {
-      if (props.isHovered) {
+    if (props.$isSelected) {
+      if (props.$isHovered) {
         return `background: ${Colors.selectionGradientHover};`;
       }
       return `background: ${Colors.selectionGradient};`;
     }
-    if (props.isHovered) {
+    if (props.$isHovered) {
       return `background: ${Colors.blackPearl};`;
     }
   }};
@@ -142,6 +142,7 @@ export const CheckboxPlaceholder = styled.span`
   width: 24px;
 `;
 
-export const NameDisplayContainer = styled.span`
+// TODO: do we need this?
+export const CustomContextMenuContainer = styled.span`
   margin-left: 26px;
 `;

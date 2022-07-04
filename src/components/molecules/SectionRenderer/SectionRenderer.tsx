@@ -5,7 +5,7 @@ import {NavigatorRow, SectionBlueprint, SectionInstance} from '@models/navigator
 
 import {useAppSelector} from '@redux/hooks';
 
-import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
+import ItemRenderer from './ItemRenderer';
 import SectionHeader from './SectionHeader';
 import {useSectionCustomization} from './useSectionCustomization';
 
@@ -14,7 +14,6 @@ import * as S from './styled';
 type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
   parentIndentation?: number;
-  itemRendererOptions?: ItemRendererOptions;
   height: number;
 };
 
@@ -29,7 +28,7 @@ function SectionRenderer(props: SectionRendererProps) {
     state => state.navigator.sectionInstanceMap[sectionId]
   );
 
-  const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
+  const {customEmpty} = useSectionCustomization(sectionBlueprint.customization);
 
   const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
   const rowIndexToScroll = useAppSelector(
@@ -59,10 +58,10 @@ function SectionRenderer(props: SectionRendererProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowIndexToScroll, virtualItems, lastScrollIndex]);
 
-  if (!rootSectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
+  if (!rootSectionInstance?.isInitialized && sectionBlueprint.customization?.row?.initializationText) {
     return (
       <S.BeforeInitializationContainer>
-        <p>{sectionBlueprint.customization.beforeInitializationText}</p>
+        <p>{sectionBlueprint.customization.row.initializationText}</p>
       </S.BeforeInitializationContainer>
     );
   }
@@ -76,10 +75,10 @@ function SectionRenderer(props: SectionRendererProps) {
   }
 
   if (rootSectionInstance?.isEmpty) {
-    if (EmptyDisplay && EmptyDisplay.Component) {
+    if (customEmpty?.Component) {
       return (
         <S.EmptyDisplayContainer>
-          <EmptyDisplay.Component sectionInstance={rootSectionInstance} />
+          <customEmpty.Component sectionInstance={rootSectionInstance} />
         </S.EmptyDisplayContainer>
       );
     }

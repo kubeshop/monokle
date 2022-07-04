@@ -12,7 +12,7 @@ type ItemContainerProps = {
   $hasOnClick: boolean;
   $indentation: number;
   $isSectionCheckable: boolean;
-  $hasCustomNameDisplay: boolean;
+  $hasCustomRow: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -47,7 +47,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
     }
   }};
   ${props => !props.$isHovered && 'padding-right: 46px;'}
-  ${props => props.$hasCustomNameDisplay && 'padding-right: 0px;'}
+  ${props => props.$hasCustomRow && 'padding-right: 0px;'}
 `;
 
 type ItemNameProps = {

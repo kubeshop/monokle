@@ -104,12 +104,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       customization: {
         quickAction: {
           component: PreviewConfigurationQuickAction,
-          options: {isVisibleOnHover: true},
+          isVisibleOnHover: true,
         },
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
     rowBuilder: {
@@ -118,19 +117,13 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       marginBottom: instance => (instance.isCollapsed || instance.isEmpty || !instance.visibleItemIds?.length ? 12 : 0),
     },
     customization: {
-      counterDisplayMode: 'items',
-      // nameWeight: 400,
-      // nameSize: 14,
-      // nameColor: Colors.grey9,
-      namePrefix: {
+      counter: {type: 'items'},
+      prefix: {
         component: CollapseSectionPrefix,
       },
-      // sectionMarginBottom: 12,
-      nameSuffix: {
+      suffix: {
         component: PreviewConfigurationNameSuffix,
-        options: {
-          isVisibleOnHover: true,
-        },
+        isVisibleOnHover: true,
       },
     },
   };
@@ -167,9 +160,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       fontSize: 14,
     },
     customization: {
-      counterDisplayMode: 'items',
-      // nameColor: Colors.grey9,
-      namePrefix: {
+      counter: {type: 'items'},
+      prefix: {
         component: CollapseSectionPrefix,
       },
     },
@@ -202,7 +194,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
   };
@@ -246,9 +237,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       fontSize: 14,
     },
     customization: {
-      counterDisplayMode: 'items',
-      // nameColor: Colors.grey9,
-      namePrefix: {
+      counter: {
+        type: 'items',
+      },
+      prefix: {
         component: CollapseSectionPrefix,
       },
     },
@@ -282,12 +274,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       customization: {
         quickAction: {
           component: HelmChartQuickAction,
-          options: {isVisibleOnHover: true},
+          isVisibleOnHover: true,
         },
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
   };
@@ -357,7 +348,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         prefix: {component: ItemPrefix},
-        lastItemMarginBottom: 0,
       },
     },
     rowBuilder: {
@@ -365,8 +355,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       fontSize: 14,
     },
     customization: {
-      counterDisplayMode: 'none',
-      // nameColor: Colors.grey9,
+      counter: {
+        type: 'none',
+      },
     },
   };
 

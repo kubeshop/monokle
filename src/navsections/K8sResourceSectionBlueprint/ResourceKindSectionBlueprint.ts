@@ -89,16 +89,16 @@ export function makeResourceKindNavSection(
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
-      nameSuffix: {
+      suffix: {
         component: ResourceKindSectionNameSuffix,
-        options: {
-          isVisibleOnHover: true,
-        },
+        isVisibleOnHover: true,
       },
-      nameCounter: {
+      counter: {
         component: ResourceKindSectionNameCounter,
       },
-      isCheckVisibleOnHover: true,
+      checkbox: {
+        isVisibleOnHover: true,
+      },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
@@ -136,8 +136,10 @@ export function makeResourceKindNavSection(
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
         // contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
-        contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
-        isCheckVisibleOnHover: true,
+        contextMenu: {component: ResourceKindContextMenu, isVisibleOnHover: true},
+        checkbox: {
+          isVisibleOnHover: true,
+        },
       },
     },
   };
