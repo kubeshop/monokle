@@ -2,7 +2,7 @@ import {Menu} from 'antd';
 
 import styled from 'styled-components';
 
-import {Icon as RawIcon} from '@components/atoms';
+import {Icon as RawIcon} from '@atoms';
 
 import Colors from '@styles/Colors';
 

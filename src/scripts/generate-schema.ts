@@ -1,4 +1,5 @@
 import fs from 'fs';
+import log from 'loglevel';
 import path from 'path';
 
 const k8Path = `${__dirname}${path.sep}..${path.sep}..${path.sep}resources${path.sep}schemas${path.sep}k8sschemas.json`;
@@ -36,7 +37,7 @@ export const generateSchema = (kind: string) => {
   fs.writeFileSync(`${schemaDir}${path.sep}${schemaFilename}`, JSON.stringify(schemaDefinition, null, 2));
   fs.writeFileSync(`${schemaDir}${path.sep}${schemaUiFilename}`, JSON.stringify(schemaUIDefinition, null, 2));
 
-  console.log(`Created ${schemaFilename} and ${schemaUiFilename} in schema dir`);
+  log.info(`Created ${schemaFilename} and ${schemaUiFilename} in schema dir`);
 };
 
 const getKeyFromRef = (keyDefinition: any) => {

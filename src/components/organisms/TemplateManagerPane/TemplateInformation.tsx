@@ -11,7 +11,7 @@ import {AnyTemplate} from '@models/template';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {handleFavoriteTemplate} from '@redux/reducers/appConfig';
 
-import {Icon, ImageIcon} from '@components/atoms';
+import {Icon, ImageIcon} from '@atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
 
