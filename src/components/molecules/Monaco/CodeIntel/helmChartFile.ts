@@ -125,7 +125,7 @@ export const helmFileCodeIntel: CodeIntelApply = {
       }
 
       const hoverDisposable = createHoverProvider(helmFileValue.range, [
-        createMarkdownString('We cannot find the value in the helm values file'),
+        createMarkdownString('This value was not found in any helm values file.'),
       ]);
 
       newDisposables.push(hoverDisposable);
