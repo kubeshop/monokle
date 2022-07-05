@@ -2,9 +2,10 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
+// TODO: why is this import needed? without it the application breaks and React never mounts
+import '@redux/reducers/ui';
 
-import * as compareListeners from './compare/listeners';
+import {compareListener, filterListener, resourceFetchListener} from './compare/listeners';
 import {compareSlice} from './compare/slice';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
@@ -30,10 +31,10 @@ if (process.env.NODE_ENV === `development`) {
 export const resetStore = createAction('app/reset');
 
 combineListeners([
-  compareListeners.resourceFetchListener('left'),
-  compareListeners.resourceFetchListener('right'),
-  compareListeners.compareListener,
-  compareListeners.filterListener,
+  resourceFetchListener('left'),
+  resourceFetchListener('right'),
+  compareListener,
+  filterListener,
   resourceMapChangedListener,
   imageSelectedListener,
 ]);
@@ -62,11 +63,7 @@ const rootReducer: typeof appReducer = (state, action) => {
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware()
-      .prepend(listenerMiddleware.middleware)
-      .concat(middlewares)
-      .concat(sectionBlueprintMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().prepend(listenerMiddleware.middleware).concat(middlewares),
 });
 
 export default store;
