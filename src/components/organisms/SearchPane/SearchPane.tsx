@@ -94,9 +94,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
         const filePath = resource.filePath;
         highlightFilePath(filePath);
       }
-    }
-
-    if (!selectedPath && searchTree.length) {
+    } else if (!selectedPath && searchTree.length) {
       dispatch(selectFile({filePath: searchTree[0].filePath}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
