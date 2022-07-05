@@ -14,6 +14,7 @@ import {
   ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
+  HelmTemplatesMapType,
   HelmValuesMapType,
   ImagesListType,
   PreviewType,
@@ -77,6 +78,7 @@ export type SetRootFolderPayload = {
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
+  helmTemplatesMap: HelmTemplatesMapType;
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
@@ -872,6 +874,7 @@ export const mainSlice = createSlice({
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
+      state.helmTemplatesMap = action.payload.helmTemplatesMap;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;

@@ -40,13 +40,23 @@ export const helmValueCodeIntel: CodeIntelApply = {
         ),
         uses: [],
       };
-      helmChart.templateFilePaths.forEach(templateFilePath => {
-        templateFilePath.values.forEach(value => {
+
+      const helmTemplatesMap = params.helmTemplatesMap || {};
+
+      helmChart.templateIds.forEach(id => {
+        const helmTemplate = helmTemplatesMap[id];
+
+        if (!helmTemplate) {
+          return;
+        }
+
+        helmTemplate.values.forEach(value => {
           if (helmValue.keyPath !== value.value) {
             return;
           }
+
           placeUsed.uses.push({
-            filePath: templateFilePath.filePath,
+            filePath: helmTemplate.filePath,
             range: new monaco.Range(
               value.range.startLineNumber,
               value.range.startColumn,

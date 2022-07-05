@@ -9,9 +9,15 @@ import {LineCounter, Scalar, parse} from 'yaml';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
-import {HelmChart, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
+import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
 
 import {
   createFileEntry,
@@ -145,16 +151,29 @@ export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileM
   fileEntry.isSupported = true;
 }
 
-export function createHelmFile(fileEntry: FileEntry, helmChart: HelmChart, fileMap: FileMapType) {
+export function createHelmTemplate(
+  fileEntry: FileEntry,
+  helmChart: HelmChart,
+  fileMap: FileMapType,
+  helmTemplatesMap: HelmTemplatesMapType
+) {
   const filePath = getAbsoluteFilePath(fileEntry.filePath, fileMap);
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const valueRanges = getHelmValueRanges(fileContent);
 
-  helmChart.templateFilePaths.push({
+  const helmTemplate: HelmTemplate = {
     id: uuidv4(),
     filePath: fileEntry.filePath,
+    name: path.basename(fileEntry.filePath),
+    helmChartId: helmChart.id,
     values: valueRanges,
-  });
+  };
+
+  console.log('Helm template: ', helmTemplate);
+
+  helmTemplatesMap[helmTemplate.id] = helmTemplate;
+  helmChart.templateIds.push(helmTemplate.id);
+  fileEntry.isSupported = true;
 }
 
 /**
@@ -170,6 +189,7 @@ export function processHelmChartFolder(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
   depth: number
 ) {
   const result: string[] = [];
@@ -205,6 +225,7 @@ export function processHelmChartFolder(
             fileMap,
             helmChartMap,
             helmValuesMap,
+            helmTemplatesMap,
             depth + 1,
             helmChart
           );
@@ -219,7 +240,7 @@ export function processHelmChartFolder(
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       } else if (isHelmTemplateFile(fileEntry.filePath)) {
-        createHelmFile(fileEntry, helmChart, fileMap);
+        createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
 
       result.push(fileEntry.name);
@@ -253,7 +274,7 @@ export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helm
     filePath: fileEntry.filePath,
     name: getHelmChartName(absolutePath),
     valueFileIds: [],
-    templateFilePaths: [],
+    templateIds: [],
   };
 
   fileEntry.isSupported = true;

@@ -6,6 +6,7 @@ import {debounce} from 'lodash';
 import {
   FileMapType,
   HelmChartMapType,
+  HelmTemplatesMapType,
   HelmValuesMapType,
   ImagesListType,
   ResourceFilterType,
@@ -38,6 +39,7 @@ interface CodeIntelProps {
   selectedPath?: string;
   helmChartMap?: HelmChartMapType;
   helmValuesMap?: HelmValuesMapType;
+  helmTemplatesMap?: HelmTemplatesMapType;
 }
 
 function useCodeIntel(props: CodeIntelProps) {
@@ -57,6 +59,7 @@ function useCodeIntel(props: CodeIntelProps) {
     selectedPath,
     helmChartMap,
     helmValuesMap,
+    helmTemplatesMap,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -92,6 +95,7 @@ function useCodeIntel(props: CodeIntelProps) {
           currentFile,
           helmChartMap,
           helmValuesMap,
+          helmTemplatesMap,
           selectFilePath,
           code,
           setEditorSelection: ({selection}) => {
