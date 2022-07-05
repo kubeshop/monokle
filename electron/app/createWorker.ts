@@ -44,10 +44,10 @@ function initServer() {
   }
 }
 
-export const addLocalServerContent = (path: string, schema: string) => {
+export const addLocalServerContent = (path: string, content: string) => {
   if (!server) {
     initServer();
   }
 
-  localContent[path] = schema;
+  localContent[path] = content;
 };
