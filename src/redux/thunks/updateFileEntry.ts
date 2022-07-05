@@ -94,7 +94,7 @@ export const updateFileEntry = createAsyncThunk(
               }
             );
 
-            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap);
+            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
           }
         }
 

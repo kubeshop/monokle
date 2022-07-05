@@ -178,11 +178,14 @@ export function createHelmTemplate(
  * Reprocess a helm value file/template after updating its content
  */
 
-export function reprocessHelm(filePath: string, fileMap: FileMapType, helmTemplatesMap: HelmTemplatesMapType) {
+export function reprocessHelm(
+  filePath: string,
+  fileMap: FileMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
+  helmValuesMap: HelmValuesMapType
+) {
   const absoluteFilePath = getAbsoluteFilePath(filePath, fileMap);
   const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
-
-  console.log('File Content: ', fileContent);
 
   if (isHelmTemplateFile(filePath)) {
     const valueRanges = getHelmValueRanges(fileContent);
@@ -195,7 +198,34 @@ export function reprocessHelm(filePath: string, fileMap: FileMapType, helmTempla
 
     helmTemplatesMap[helmTemplate.id].values = valueRanges;
   } else if (isHelmValuesFile(filePath)) {
-    console.log('Value file');
+    const lineCounter = new LineCounter();
+    const documents = parseAllYamlDocuments(fileContent, lineCounter);
+
+    const helmValueFile = Object.values(helmValuesMap).find(helmValue => helmValue.filePath === filePath);
+
+    if (!helmValueFile) {
+      log.error(`Couldn't find helm value file with path ${filePath}`);
+      return;
+    }
+
+    const values: HelmValueMatch[] = [];
+    documents.forEach(doc => {
+      const helmObject = doc.toJS();
+      getObjectKeys(helmObject).forEach(keyPath => {
+        const scalar = getYamlScalar(doc.contents, keyPath);
+        if (!scalar) {
+          return;
+        }
+        const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+        values.push({
+          value: get(helmObject, keyPath),
+          keyPath: `.Values.${keyPath}`,
+          linePosition: nodeWrapper.getNodePosition(),
+        });
+      });
+    });
+
+    helmValuesMap[helmValueFile.id].values = values;
   }
 }
 

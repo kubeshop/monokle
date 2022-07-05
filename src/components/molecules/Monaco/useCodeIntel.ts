@@ -146,7 +146,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList, helmTemplatesMap]);
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList, helmTemplatesMap, helmValuesMap]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

@@ -56,8 +56,6 @@ export const helmFileCodeIntel: CodeIntelApply = {
     const newDisposables: monaco.IDisposable[] = [];
     const helmValueRanges = getHelmValueRanges(code);
 
-    console.log('Helm Templates MaP: ', helmTemplatesMap);
-
     if (
       !helmValueRanges.length ||
       !helmValuesMap ||
