@@ -38,7 +38,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {TitleBar} from '@molecules';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
 
 import {duplicateEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';

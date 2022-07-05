@@ -2,7 +2,7 @@ import {Button as AntdButton} from 'antd';
 
 import styled from 'styled-components';
 
-import {Icon as BaseIcon} from '@components/atoms';
+import {Icon as BaseIcon} from '@atoms';
 
 import Colors from '@styles/Colors';
 

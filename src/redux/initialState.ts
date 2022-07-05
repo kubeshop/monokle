@@ -26,6 +26,7 @@ const initialAppState: AppState = {
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
+  helmTemplatesMap: {},
   previewLoader: {
     isLoading: false,
   },

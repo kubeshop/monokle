@@ -1,4 +1,4 @@
-import {HelmChart, HelmValuesFile} from '@models/helm';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
@@ -39,6 +39,10 @@ type HelmChartMapType = {
  */
 type HelmValuesMapType = {
   [id: string]: HelmValuesFile;
+};
+
+type HelmTemplatesMapType = {
+  [id: string]: HelmTemplate;
 };
 
 type PreviewLoaderType = {
@@ -117,6 +121,8 @@ interface AppState {
   helmChartMap: HelmChartMapType;
   /** maps values ids to helm values files */
   helmValuesMap: HelmValuesMapType;
+  /** maps values ids to helm templates */
+  helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
   /** if we are currently in the process of selecting a file - used for one-time UI updates */
@@ -215,6 +221,7 @@ export type {
   ImagesListType,
   HelmChartMapType,
   HelmValuesMapType,
+  HelmTemplatesMapType,
   PreviewLoaderType,
   SelectionHistoryEntry,
   PreviewType,

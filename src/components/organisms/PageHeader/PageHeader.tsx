@@ -133,77 +133,75 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && <S.PreviewRow noborder="true" previewType={previewType} />}
+      {isInPreviewMode && <S.PreviewRow $previewType={previewType} />}
 
-      <S.Header noborder="true">
-        <S.Row noborder="true">
-          <div style={{display: 'flex', alignItems: 'center'}}>
-            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+      <S.Header>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
-            {activeProject && (
-              <>
-                <S.Divider type="vertical" style={{marginRight: '1rem'}} />
-                <ProjectSelection />
-                <CreateProject />
-              </>
-            )}
-            {isStartProjectPaneVisible && activeProject && (
-              <>
-                <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
-                <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-                  Back to Project
-                </S.BackToProjectButton>
-              </>
-            )}
+          {activeProject && (
+            <>
+              <S.Divider type="vertical" style={{marginRight: '1rem'}} />
+              <ProjectSelection />
+              <CreateProject />
+            </>
+          )}
+          {isStartProjectPaneVisible && activeProject && (
+            <>
+              <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
+              <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
+                Back to Project
+              </S.BackToProjectButton>
+            </>
+          )}
 
-            {showAutosaving && (
-              <S.AutosavingContainer>
-                {autosavingStatus ? (
-                  <>
-                    <ReloadOutlined spin />
-                    Saving...
-                  </>
-                ) : autosavingError ? (
-                  <S.AutosavingErrorContainer>
-                    Your changes could not be saved
-                    <Button type="link" onClick={createGitHubIssue}>
-                      Report
-                    </Button>
-                  </S.AutosavingErrorContainer>
-                ) : (
-                  autosavingStatus === false && 'Saved'
-                )}
-              </S.AutosavingContainer>
-            )}
-          </div>
+          {showAutosaving && (
+            <S.AutosavingContainer>
+              {autosavingStatus ? (
+                <>
+                  <ReloadOutlined spin />
+                  Saving...
+                </>
+              ) : autosavingError ? (
+                <S.AutosavingErrorContainer>
+                  Your changes could not be saved
+                  <Button type="link" onClick={createGitHubIssue}>
+                    Report
+                  </Button>
+                </S.AutosavingErrorContainer>
+              ) : (
+                autosavingStatus === false && 'Saved'
+              )}
+            </S.AutosavingContainer>
+          )}
+        </div>
 
-          <div style={{display: 'flex', alignItems: 'center'}}>
-            <ClusterSelection previewResource={previewResource} />
-            <S.SettingsCol>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-                <Badge count={unseenNotificationsCount} size="small">
-                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
-                </Badge>
-              </Tooltip>
-              <Dropdown
-                visible={isHelpMenuOpen}
-                onVisibleChange={() => {
-                  setIsHelpMenuOpen(!isHelpMenuOpen);
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <ClusterSelection previewResource={previewResource} />
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
+            <Badge count={unseenNotificationsCount} size="small">
+              <S.BellOutlined onClick={toggleNotificationsDrawer} />
+            </Badge>
+          </Tooltip>
+
+          <Dropdown
+            visible={isHelpMenuOpen}
+            onVisibleChange={() => {
+              setIsHelpMenuOpen(!isHelpMenuOpen);
+            }}
+            overlay={
+              <HelpMenu
+                onMenuClose={() => {
+                  setIsHelpMenuOpen(false);
                 }}
-                overlay={
-                  <HelpMenu
-                    onMenuClose={() => {
-                      setIsHelpMenuOpen(false);
-                    }}
-                  />
-                }
-                placement="bottomLeft"
-              >
-                <S.EllipsisOutlined />
-              </Dropdown>
-            </S.SettingsCol>
-          </div>
-        </S.Row>
+              />
+            }
+            placement="bottomLeft"
+          >
+            <S.EllipsisOutlined />
+          </Dropdown>
+        </div>
       </S.Header>
     </S.PageHeaderContainer>
   );

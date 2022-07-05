@@ -43,19 +43,43 @@ export const helmFileCodeIntel: CodeIntelApply = {
   shouldApply: params => {
     return Boolean(params?.currentFile?.helmChartId);
   },
-  codeIntel: async ({code, currentFile, helmChartMap, helmValuesMap, selectFilePath, setEditorSelection}) => {
+  codeIntel: async ({
+    code,
+    currentFile,
+    helmChartMap,
+    helmValuesMap,
+    helmTemplatesMap,
+    selectFilePath,
+    setEditorSelection,
+  }) => {
     const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
     const newDisposables: monaco.IDisposable[] = [];
     const helmValueRanges = getHelmValueRanges(code);
 
-    if (!helmValueRanges.length || !helmValuesMap || !helmChartMap || !currentFile || !currentFile.helmChartId) {
+    if (
+      !helmValueRanges.length ||
+      !helmValuesMap ||
+      !helmChartMap ||
+      !helmTemplatesMap ||
+      !currentFile ||
+      !currentFile.helmChartId
+    ) {
       return {newDisposables, newDecorations};
     }
 
-    const helmFile = helmChartMap[currentFile.helmChartId].templateFilePaths.find(
-      templateFile => templateFile.filePath === currentFile.filePath
+    const currentHelmChart = helmChartMap[currentFile.helmChartId];
+
+    const helmTemplateId = currentHelmChart.templateIds.find(
+      id => helmTemplatesMap[id].filePath === currentFile.filePath
     );
-    if (!helmFile) {
+
+    if (!helmTemplateId) {
+      return {newDisposables, newDecorations};
+    }
+
+    const helmTemplate = helmTemplatesMap[helmTemplateId];
+
+    if (!helmTemplate) {
       return {newDisposables, newDecorations};
     }
 
@@ -65,7 +89,7 @@ export const helmFileCodeIntel: CodeIntelApply = {
         return helmValuesMap[valueFileId].values.map(v => ({...v, filePath: helmValuesMap[valueFileId].filePath}));
       })
     );
-    helmFile.values.forEach(helmFileValue => {
+    helmTemplate.values.forEach(helmFileValue => {
       const keyPathsInFile = helmValues.filter(helmValue => helmValue.keyPath === helmFileValue.value);
 
       const canFindKeyInValuesFile = Boolean(keyPathsInFile.length);
@@ -94,16 +118,15 @@ export const helmFileCodeIntel: CodeIntelApply = {
                 setEditorSelection,
               });
             },
-            `Value: ${value}\n\nGo to `
+            `Value: ${value}\n\nFound in: `,
+            ` at Ln ${keyPathInFile.linePosition.line}`
           );
           commandMarkdownLinkList.push(commandMarkdownLink);
           newDisposables.push(commandDisposable);
         });
 
         const hasMultipleLinks = keyPathsInFile.length > 1;
-        const text = hasMultipleLinks
-          ? `Found this value in ${keyPathsInFile.length} helm value files`
-          : `Found this value in ${keyPathsInFile[0].filePath}`;
+        const text = hasMultipleLinks ? `Found this value in ${keyPathsInFile.length} helm value files` : ``;
         if (!hasMultipleLinks) {
           const linkDisposable = createLinkProvider(helmFileValue.range, 'Open file', () => {
             goToValuesFile({
@@ -124,12 +147,11 @@ export const helmFileCodeIntel: CodeIntelApply = {
         return;
       }
 
-      const linkDisposable = createLinkProvider(
-        helmFileValue.range,
-        'We cannot find the value in the helm values file',
-        () => {}
-      );
-      newDisposables.push(linkDisposable);
+      const hoverDisposable = createHoverProvider(helmFileValue.range, [
+        createMarkdownString('This value was not found in any helm values file.'),
+      ]);
+
+      newDisposables.push(hoverDisposable);
     });
 
     return {newDisposables, newDecorations};

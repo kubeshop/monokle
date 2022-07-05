@@ -1,18 +1,6 @@
-import {Button} from 'antd';
+import {Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
-
-export const Container = styled.div`
-  max-height: 800px;
-  overflow-y: auto;
-`;
-
-export const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-export const TitleLabel = styled.span``;
 
 export const KeyValueContainer = styled.div`
   display: grid;
@@ -29,6 +17,6 @@ export const KeyValueRemoveButtonContainer = styled.div`
   align-items: center;
 `;
 
-export const StyledRemoveButton = styled(Button)`
+export const RemoveButton = styled(RawButton)`
   min-width: 24px;
 `;

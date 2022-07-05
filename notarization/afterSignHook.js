@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
+const log = require('loglevel');
 var electron_notarize = require('electron-notarize');
 
 module.exports = async function (params) {
@@ -11,7 +12,7 @@ module.exports = async function (params) {
   if (!process.env.NOTARIZE || process.platform !== 'darwin') {
     return;
   }
-  console.log('afterSign hook triggered', params);
+  log.info('afterSign hook triggered', params);
 
   const package = require(path.join(process.cwd(), './package.json'));
 
@@ -27,7 +28,7 @@ module.exports = async function (params) {
     throw new Error(`Cannot find application at: ${appPath}`);
   }
 
-  console.log(`Notarizing ${appId} found at ${appPath}`);
+  log.info(`Notarizing ${appId} found at ${appPath}`);
 
   try {
     await electron_notarize.notarize({
@@ -37,8 +38,8 @@ module.exports = async function (params) {
       appleIdPassword: process.env.APPLE_ID_PASSWORD,
     });
   } catch (error) {
-    console.error(error);
+    log.error(error);
   }
 
-  console.log(`Done notarizing ${appId}`);
+  log.info(`Done notarizing ${appId}`);
 };

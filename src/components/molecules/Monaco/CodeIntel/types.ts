@@ -1,6 +1,13 @@
 import {monaco} from 'react-monaco-editor';
 
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceFilterType,
+  ResourceMapType,
+} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import {MonacoUiState} from '@models/ui';
@@ -22,6 +29,7 @@ export interface CodeIntelParams {
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
   helmChartMap?: HelmChartMapType;
+  helmTemplatesMap?: HelmTemplatesMapType;
   selectFilePath: (filePath: string) => void;
   code?: string;
   fileMap: FileMapType;

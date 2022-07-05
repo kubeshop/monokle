@@ -73,6 +73,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
@@ -170,6 +171,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectedPath,
     helmValuesMap,
     helmChartMap,
+    helmTemplatesMap,
   });
 
   const {registerStaticActions} = useEditorKeybindings(

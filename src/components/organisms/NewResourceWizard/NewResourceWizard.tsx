@@ -6,11 +6,14 @@ import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
+import fs from 'fs';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
+import {FileMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
@@ -27,11 +30,41 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
+import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
 
 const {Option, OptGroup} = Select;
+
+const generateFullFileName = (
+  resourceName: K8sResource['name'],
+  resourceKind: K8sResource['kind'],
+  selectedFolder: string,
+  fileMap: FileMapType,
+  suffix: number,
+  includeKind?: boolean
+): string => {
+  const name = resourceName;
+  const nameKind = includeKind ? `-${resourceKind.toLowerCase()}` : '';
+  const nameSuffix = suffix ? ` (${suffix})` : '';
+  const fullFileName = `${name}${nameKind}${nameSuffix}.yaml`;
+  let foundFile: fs.Dirent | FileEntry | undefined;
+
+  if (selectedFolder === ROOT_FILE_ENTRY) {
+    foundFile = fileMap[`${path.sep}${fullFileName}`];
+  } else {
+    foundFile = fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`];
+  }
+
+  if (foundFile) {
+    if (includeKind) {
+      return generateFullFileName(resourceName, resourceKind, selectedFolder, fileMap, suffix ? suffix + 1 : 2, true);
+    }
+    return generateFullFileName(resourceName, resourceKind, selectedFolder, fileMap, suffix ? suffix + 1 : 0, true);
+  }
+
+  return fullFileName;
+};
 
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
@@ -40,6 +73,7 @@ const NewResourceWizard = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
@@ -50,6 +84,7 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const [exportFileName, setExportFileName] = useState<string | undefined>('');
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -91,6 +126,44 @@ const NewResourceWizard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [registeredKindHandlers, resourceMap]
   );
+
+  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
+
+  const generateExportFileName = async () => {
+    if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
+      const currentFolder = selectedFolder.split(fileMap[ROOT_FILE_ENTRY].filePath).pop();
+
+      if (currentFolder) {
+        setSelectedFolder(currentFolder.slice(1));
+      } else {
+        setSelectedFolder(ROOT_FILE_ENTRY);
+      }
+      return;
+    }
+
+    let selectedFolderResources;
+    if (selectedFolder === ROOT_FILE_ENTRY) {
+      selectedFolderResources = Object.values(resourceMap).filter(
+        resource => resource.filePath.split(path.sep).length === 2
+      );
+    } else {
+      selectedFolderResources = Object.values(resourceMap).filter(
+        resource =>
+          resource.filePath.split(path.sep).length > 2 && getDirname(resource.filePath).endsWith(selectedFolder)
+      );
+    }
+    const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
+
+    let fullFileName = generateFullFileName(
+      form.getFieldValue('name'),
+      form.getFieldValue('kind'),
+      selectedFolder,
+      fileMap,
+      0,
+      hasNameClash
+    );
+    setExportFileName(fullFileName);
+  };
 
   const [resourceKindOptions, setResourceKindOptions] =
     useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
@@ -147,6 +220,15 @@ const NewResourceWizard = () => {
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
   }, [defaultInput, defaultValues, isFolderOpen]);
 
+  useEffect(() => {
+    if (savingDestination !== 'saveToFolder') {
+      return;
+    }
+
+    generateExportFileName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFolder, savingDestination]);
+
   const closeWizard = () => {
     setSubmitDisabled(true);
     setResourceKindOptions(kindsByApiVersion);
@@ -162,7 +244,7 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const onFormValuesChange = (data: any) => {
+  const onFormValuesChange = async (data: any) => {
     let shouldFilterResources = false;
 
     if (data.kind && data.kind !== lastKindRef.current) {
@@ -241,6 +323,10 @@ const NewResourceWizard = () => {
       if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
         form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
       }
+    }
+
+    if (savingDestination === 'saveToFolder') {
+      generateExportFileName();
     }
   };
 
@@ -526,6 +612,13 @@ const NewResourceWizard = () => {
             </StyledSelect>
           )}
         </SaveDestinationWrapper>
+
+        {savingDestination === 'saveToFolder' && form.getFieldValue('name') && form.getFieldValue('kind') && (
+          <div style={{marginTop: '16px'}}>
+            <FileCategoryLabel>File to be created:</FileCategoryLabel>
+            <FileNameLabel>{exportFileName}</FileNameLabel>
+          </div>
+        )}
       </Form>
     </Modal>
   );

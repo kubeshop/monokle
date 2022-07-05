@@ -1,7 +1,13 @@
 import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 
 import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
@@ -29,8 +35,9 @@ export function readManifests(rootFolder: string) {
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
+  const helmTemplatesMap: HelmTemplatesMapType = {};
 
-  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap);
   return {resourceMap, fileMap, files, helmChartMap, helmValuesMap};
 }
 

@@ -32,11 +32,7 @@ const showError = (dispatch: (action: AnyAction) => void, alert: AlertType) => {
   dispatch(setAlert(alert));
 };
 
-export const loadContexts = async (
-  configPath: string,
-  dispatch: (action: AnyAction) => void,
-  currentContext?: string
-) => {
+export const loadContexts = async (configPath: string, dispatch: (action: AnyAction) => void) => {
   try {
     const stats = await fs.promises.stat(configPath);
 

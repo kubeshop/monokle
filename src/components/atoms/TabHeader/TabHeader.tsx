@@ -1,23 +1,18 @@
 import React from 'react';
 
-import styled from 'styled-components';
+import * as S from './TabHeader.styled';
 
 interface TabHeaderProps {
   icon: React.ReactNode;
   children: React.ReactNode;
 }
 
-const StyledWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const TabHeader = ({children, icon}: TabHeaderProps): JSX.Element => {
   return (
-    <StyledWrapper>
+    <S.Wrapper>
       {icon}
       {children}
-    </StyledWrapper>
+    </S.Wrapper>
   );
 };
 

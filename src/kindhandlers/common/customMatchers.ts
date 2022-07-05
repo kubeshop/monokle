@@ -41,9 +41,19 @@ export function targetKindMatcher(sourceResource: K8sResource, targetResource: K
 }
 
 /**
- * Matcher the ensures that the target resource has the specified apiGroup
+ * Matcher the ensures that the target resource has the specified apiGroup - uses an optional defaultGroup configuration
+ * property if no group is found
  */
 
-export function targetGroupMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
+export function targetGroupMatcher(
+  sourceResource: K8sResource,
+  targetResource: K8sResource,
+  value: string,
+  siblingValues: any,
+  properties?: any
+) {
+  if (!value && properties && properties['defaultGroup']) {
+    value = properties['defaultGroup'];
+  }
   return targetResource.version.startsWith(`${value}/`);
 }

@@ -8,7 +8,7 @@ import fs from 'fs';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 import {useFileExplorer} from '@hooks/useFileExplorer';
