@@ -14,6 +14,18 @@ import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+function setLocalSchemaContent(name: string, resourceSchema: any) {
+  if (name.startsWith('/')) {
+    name = name.substring(1);
+  }
+  const schemaPath = `/schemas/${name}.json`;
+  ipcRenderer.send('add-local-server-content', {
+    path: schemaPath,
+    content: JSON.stringify(resourceSchema || {}, null, 2),
+  });
+  return `http://localhost:51038${schemaPath}`;
+}
+
 function useResourceYamlSchema(
   yaml: typeof languages.yaml,
   userDataDir: string,
@@ -45,17 +57,23 @@ function useResourceYamlSchema(
     }
 
     if (yaml) {
-      const standalone = resource?.kind === 'CustomResourceDefinition' ? '' : '-standalone';
-      let schemaUri = `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${k8sVersion}${standalone}/${resource?.kind.toLowerCase()}.json`;
+      let schemaUri = '';
 
-      // if this is a custom resource then host the schema using the local server
-      if (resourceKindHandler && resourceKindHandler.isCustom) {
-        const schemaPath = `/schemas/${resource?.kind.toLowerCase()}.json`;
-        ipcRenderer.send('add-local-server-content', {
-          path: schemaPath,
-          content: JSON.stringify(resourceSchema, null, 2),
-        });
-        schemaUri = `http://localhost:51038${schemaPath}`;
+      if (resource) {
+        // if this is a custom resource then host the schema using the local server
+        if (resourceKindHandler && resourceKindHandler.isCustom) {
+          schemaUri = setLocalSchemaContent(resourceKindHandler.kind.toLowerCase(), resourceSchema);
+        } else {
+          // use public GitHub repo containing all schemas
+          const standalone = resource?.kind === 'CustomResourceDefinition' ? '' : '-standalone';
+          schemaUri = `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${k8sVersion}${standalone}/${resource?.kind.toLowerCase()}.json`;
+        }
+      }
+      // for file-based schemas
+      else if (resourceSchema && selectedPath) {
+        schemaUri = setLocalSchemaContent(selectedPath, resourceSchema);
+      } else {
+        schemaUri = setLocalSchemaContent('empty', {});
       }
 
       yaml.yamlDefaults.setDiagnosticsOptions({
