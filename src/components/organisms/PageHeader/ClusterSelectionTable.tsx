@@ -11,13 +11,12 @@ import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCurrentContext} from '@redux/reducers/appConfig';
+import {setCurrentContext, updateClusterNamespaces} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
 import FilePatternList from '@molecules/FilePatternList';
 
 import {runCommandInMainThread} from '@utils/commands';
-import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
 
@@ -36,18 +35,19 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
   const dispatch = useAppDispatch();
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
-  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
+  const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
 
   const [localClusters, setLocalClusters] = useState<ClusterTableRow[]>([]);
 
   useEffect(() => {
     const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
+      const contextNamespaces = clusterAccess.filter(appNs => appNs.context === context.name);
       const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
       const hasFullAccess = clusterSpecificAccess.length
         ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
         : undefined;
       return {
-        namespaces: kubeConfigContexts.find(c => c.name === context.name)?.namespaces || [],
+        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespace),
         name: context.name,
         hasFullAccess,
         editable: true,
@@ -72,33 +72,33 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
       return;
     }
 
-    const otherClusterNamespaces = getNamespaces().filter(appNs => appNs.clusterName !== clusterName);
+    const otherClusterNamespaces = clusterAccess.filter(appNs => appNs.context !== clusterName);
     const existingClusterNamespaces = localCluster.namespaces.map(ns => ({
-      namespaceName: ns,
-      clusterName,
+      namespace: ns,
+      cluster: clusterName,
     }));
 
     const defaultNamespace = kubeConfigContexts.find(ctx => ctx.name === clusterName)?.namespace;
     if (defaultNamespace && !localCluster.namespaces.includes(defaultNamespace)) {
-      addContextWithRemovedNamespace(clusterName);
+      // addContextWithRemovedNamespace(clusterName);
     }
 
-    addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
+    // addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
 
     if (clusterName === kubeConfigContext) {
-      getKubeAccess(localCluster.namespaces, kubeConfigContext)
-        .then(currentClusterAccess => {
-          // dispatch(updateProjectKubeAccess(currentClusterAccess));
-        })
-        .catch(() => {
-          dispatch(
-            setAlert({
-              title: 'Cluster access failed',
-              message: "Couldn't get cluster access for namespaces",
-              type: AlertEnum.Warning,
-            })
-          );
-        });
+      // getKubeAccess(localCluster.namespaces, kubeConfigContext)
+      //   .then(currentClusterAccess => {
+      //     // dispatch(updateProjectKubeAccess(currentClusterAccess));
+      //   })
+      //   .catch(() => {
+      //     dispatch(
+      //       setAlert({
+      //         title: 'Cluster access failed',
+      //         message: "Couldn't get cluster access for namespaces",
+      //         type: AlertEnum.Warning,
+      //       })
+      //     );
+      //   });
     }
 
     setEditingKey('');
@@ -111,7 +111,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
       return (
         <FilePatternList
           value={cluster.namespaces}
-          onChange={ns => onNamespacesChange(cluster.name, ns)}
+          onChange={ns => onNamespacesChange(ns.map(n => ({namespace: n, cluster: cluster.name})))}
           tooltip="Add new namespace"
           showButtonLabel="Add namespace"
         />
@@ -137,22 +137,22 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     return hasFullAccess ? 'Full Access' : 'Restricted Access';
   };
 
-  const onNamespacesChange = (clusterName: string, namespaces: string[]) => {
-    const localClusterIndex = localClusters.findIndex(c => c.name === clusterName);
-    const localCluster = localClusters[localClusterIndex];
-    if (!localCluster) {
-      return;
-    }
-
-    const otherClusters = localClusters.filter(lc => lc.name !== clusterName);
-    const editedCluster = {
-      name: clusterName,
-      namespaces,
-      hasFullAccess: localCluster.hasFullAccess,
-      editable: false,
-    };
-    otherClusters.splice(localClusterIndex, 0, editedCluster);
-    setLocalClusters(otherClusters);
+  const onNamespacesChange = (values: {namespace: string; cluster: string}[]) => {
+    dispatch(updateClusterNamespaces(values));
+    // const localClusterIndex = localClusters.findIndex(c => c.name === clusterName);
+    // const localCluster = localClusters[localClusterIndex];
+    // if (!localCluster) {
+    //   return;
+    // }
+    // const otherClusters = localClusters.filter(lc => lc.name !== clusterName);
+    // const editedCluster = {
+    //   name: clusterName,
+    //   namespaces,
+    //   hasFullAccess: localCluster.hasFullAccess,
+    //   editable: false,
+    // };
+    // otherClusters.splice(localClusterIndex, 0, editedCluster);
+    // setLocalClusters(otherClusters);
   };
 
   const handleClusterChange = (clusterName: string) => {

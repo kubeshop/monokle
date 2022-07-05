@@ -185,9 +185,6 @@ export const kubeConfigContextSelector = createSelector(
 export const kubeConfigContextsSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    // if (config.projectConfig?.kubeConfig?.contexts) {
-    //   return config.projectConfig?.kubeConfig?.contexts;
-    // }
     if (config.kubeConfig.contexts) {
       return config.kubeConfig.contexts;
     }
@@ -207,7 +204,7 @@ export const currentClusterAccessSelector = createSelector(
       return [];
     }
 
-    return config.projectConfig.clusterAccess?.filter(ca => ca.context === currentContext) || [];
+    return config.clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
 );
 
