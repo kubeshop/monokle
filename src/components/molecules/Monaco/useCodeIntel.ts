@@ -28,6 +28,7 @@ import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
   editor: monaco.editor.IStandaloneCodeEditor | null;
+  isDirty: boolean;
   selectedResource: K8sResource | undefined;
   code: string | undefined;
   resourceMap: ResourceMapType;
@@ -87,6 +88,7 @@ function useCodeIntel(props: CodeIntelProps) {
     helmValuesMap,
     helmTemplatesMap,
     matchOptions,
+    isDirty,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -166,7 +168,7 @@ function useCodeIntel(props: CodeIntelProps) {
             replaceInFile(matchOptions, editor, dispatch);
           }
 
-          if (matchOptions?.matchesInFile) {
+          if (matchOptions?.matchesInFile && !isDirty) {
             const currentMatch = matchOptions.matchesInFile[matchOptions.currentMatchIdx];
             editor.setPosition({lineNumber: currentMatch.lineNumber, column: 1});
             editor.revealLine(currentMatch.lineNumber);
@@ -188,7 +190,17 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, isEditorMounted, selectedResource, resourceMap, editor, imagesList, helmTemplatesMap, helmValuesMap, matchOptions]);
+  }, [
+    code,
+    isEditorMounted,
+    selectedResource,
+    resourceMap,
+    editor,
+    imagesList,
+    helmTemplatesMap,
+    helmValuesMap,
+    matchOptions,
+  ]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

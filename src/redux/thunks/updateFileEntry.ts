@@ -40,9 +40,9 @@ export const updateFileEntry = createAsyncThunk(
         const filePath = path.join(rootFolder, payload.path);
 
         if (getFileStats(filePath)?.isDirectory() === false) {
-          fs.writeFileSync(filePath, payload.content);
+          fs.writeFileSync(filePath, payload.text);
           fileEntry.timestamp = getFileTimestamp(filePath);
-          fileEntry.text = payload.content;
+          fileEntry.text = payload.text;
 
           if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
             try {
@@ -52,7 +52,7 @@ export const updateFileEntry = createAsyncThunk(
               if (!helmChart) {
                 throw new Error(`Couldn't find the helm chart for path: ${fileEntry.filePath}`);
               }
-              const fileContent = parse(payload.content);
+              const fileContent = parse(payload.text);
               if (typeof fileContent?.name !== 'string') {
                 throw new Error(`Couldn't get the name property of the helm chart at path: ${fileEntry.filePath}`);
               }
@@ -67,7 +67,7 @@ export const updateFileEntry = createAsyncThunk(
               deleteResource(r, mainState.resourceMap);
             });
 
-            const extractedResources = extractK8sResources(payload.content, filePath.substring(rootFolder.length));
+            const extractedResources = extractK8sResources(payload.text, filePath.substring(rootFolder.length));
 
             let resourceIds: string[] = [];
 

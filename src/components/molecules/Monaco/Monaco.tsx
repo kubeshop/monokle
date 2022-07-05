@@ -174,6 +174,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     helmChartMap,
     helmTemplatesMap,
     matchOptions,
+    isDirty,
   });
 
   const {registerStaticActions} = useEditorKeybindings(

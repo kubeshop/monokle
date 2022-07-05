@@ -92,7 +92,7 @@ export type UpdateMultipleResourcesPayload = {
 
 export type UpdateFileEntryPayload = {
   path: string;
-  content: string;
+  text: string;
 };
 
 export type UpdateFilesEntryPayload = {

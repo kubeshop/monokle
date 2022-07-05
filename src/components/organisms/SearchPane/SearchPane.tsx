@@ -9,7 +9,6 @@ import {flatten} from 'lodash';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {MatchParamProps} from '@models/appstate';
 import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,7 +16,6 @@ import {
   highlightFileMatches,
   selectFile,
   setSelectingFile,
-  toggleMatchParams,
   updateReplaceQuery,
   updateResourceFilter,
   updateSearchHistory,
@@ -37,6 +35,7 @@ import {replaceInFiles} from '@utils/replaceInFiles';
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode, TreeNode} from '../FileTreePane/types';
 import {createFilteredNode} from './CreateFilteredNode';
+import QueryMatchParams from './QueryMatchParams';
 import RecentSearch from './RecentSearch';
 
 import * as S from './styled';
@@ -209,11 +208,6 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     dispatch(updateReplaceQuery(e.target.value));
   };
 
-  const toggleMatchParam = (param: keyof MatchParamProps) => {
-    setFindingMatches(true);
-    dispatch(toggleMatchParams(param));
-  };
-
   const handleStep = (step: number) => {
     if (currentMatch) {
       // eslint-disable-next-line no-unsafe-optional-chaining
@@ -276,21 +270,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
             <S.Form>
               <S.SearchBox>
                 <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
-                <S.StyledButton
-                  $isItemSelected={queryMatchParams.matchCase}
-                  onClick={() => toggleMatchParam('matchCase')}
-                >
-                  Aa
-                </S.StyledButton>
-                <S.StyledButton
-                  $isItemSelected={queryMatchParams.matchWholeWord}
-                  onClick={() => toggleMatchParam('matchWholeWord')}
-                >
-                  [
-                </S.StyledButton>
-                <S.StyledButton $isItemSelected={queryMatchParams.regExp} onClick={() => toggleMatchParam('regExp')}>
-                  .*
-                </S.StyledButton>
+                <QueryMatchParams setFindingMatches={setFindingMatches} />
               </S.SearchBox>
             </S.Form>
             <S.RootFolderText>
@@ -359,21 +339,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
               <S.Label>Find:</S.Label>
               <S.SearchBox>
                 <Input value={searchQuery} onChange={handleSearchQueryChange} />
-                <S.StyledButton
-                  $isItemSelected={queryMatchParams.matchCase}
-                  onClick={() => toggleMatchParam('matchCase')}
-                >
-                  Aa
-                </S.StyledButton>
-                <S.StyledButton
-                  $isItemSelected={queryMatchParams.matchWholeWord}
-                  onClick={() => toggleMatchParam('matchWholeWord')}
-                >
-                  [
-                </S.StyledButton>
-                <S.StyledButton $isItemSelected={queryMatchParams.regExp} onClick={() => toggleMatchParam('regExp')}>
-                  .*
-                </S.StyledButton>
+                <QueryMatchParams setFindingMatches={setFindingMatches} />
               </S.SearchBox>
 
               <S.Label>Replace:</S.Label>
