@@ -12,6 +12,7 @@ import {RootState} from '@models/rootstate';
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
+import {reprocessHelm} from '@redux/services/helm';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
@@ -92,6 +93,8 @@ export const updateFileEntry = createAsyncThunk(
                 policyPlugins: [],
               }
             );
+
+            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap);
           }
         }
 

@@ -33,6 +33,7 @@ function useDebouncedCodeSave(
     if (selectedPath && !selectedResourceId) {
       try {
         dispatch(updateFileEntry({path: selectedPath, content: value}));
+
         setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);

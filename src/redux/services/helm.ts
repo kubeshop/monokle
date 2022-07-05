@@ -169,11 +169,34 @@ export function createHelmTemplate(
     values: valueRanges,
   };
 
-  console.log('Helm template: ', helmTemplate);
-
   helmTemplatesMap[helmTemplate.id] = helmTemplate;
   helmChart.templateIds.push(helmTemplate.id);
   fileEntry.isSupported = true;
+}
+
+/**
+ * Reprocess a helm value file/template after updating its content
+ */
+
+export function reprocessHelm(filePath: string, fileMap: FileMapType, helmTemplatesMap: HelmTemplatesMapType) {
+  const absoluteFilePath = getAbsoluteFilePath(filePath, fileMap);
+  const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
+
+  console.log('File Content: ', fileContent);
+
+  if (isHelmTemplateFile(filePath)) {
+    const valueRanges = getHelmValueRanges(fileContent);
+    const helmTemplate = Object.values(helmTemplatesMap).find(helmT => helmT.filePath === filePath);
+
+    if (!helmTemplate) {
+      log.error(`Couldn't find helm template with path ${filePath}`);
+      return;
+    }
+
+    helmTemplatesMap[helmTemplate.id].values = valueRanges;
+  } else if (isHelmValuesFile(filePath)) {
+    console.log('Value file');
+  }
 }
 
 /**
