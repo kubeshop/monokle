@@ -12,7 +12,7 @@ import {RootState} from '@models/rootstate';
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {reprocessHelm} from '@redux/services/helm';
+import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
@@ -94,7 +94,9 @@ export const updateFileEntry = createAsyncThunk(
               }
             );
 
-            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
+            if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
+              reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
+            }
           }
         }
 
