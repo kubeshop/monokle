@@ -1,10 +1,5 @@
+import {MatchParamProps} from '@models/appstate';
 import {FileEntry, MatchNode} from '@models/fileentry';
-
-export type MatchParamProps = {
-  matchCase: boolean;
-  matchWholeWord: boolean;
-  regExp: boolean;
-};
 
 /* based on matching params we change the way we find matches in file */
 export function getRegexp(query: string, params: MatchParamProps): RegExp {

@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import {replaceInFile} from 'replace-in-file';
 
 import {AppDispatch} from '@models/appdispatch';
@@ -13,9 +14,7 @@ export async function replaceInFiles(files: string[], query: RegExp, replaceQuer
   };
   try {
     const results = await replaceInFile(options);
-    console.log('Replacement results:', results);
     const pathes = results.map(result => {
-      // const content = fs.readFileSync(result.file, 'utf8');
       return {
         relativePath: getRelativeFilePath(result.file),
         absolutePath: result.file,
@@ -23,6 +22,6 @@ export async function replaceInFiles(files: string[], query: RegExp, replaceQuer
     });
     dispatch(updateFileEntries({pathes}));
   } catch (error) {
-    console.error('Error occurred:', error);
+    log.error('Error occurred:', error);
   }
 }

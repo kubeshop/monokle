@@ -100,6 +100,12 @@ type ClusterToLocalResourcesMatch = {
   localResourceIds?: string[];
 };
 
+export type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -140,7 +146,13 @@ interface AppState {
   /** the currently selected path */
   selectedPath?: string;
   /** the line number for the match in file */
-  matchOptions?: CurrentMatch | null;
+  search: {
+    searchQuery: string;
+    replaceQuery: string;
+    queryMatchParams: MatchParamProps;
+    currentMatch: CurrentMatch | null;
+    searchHistory: string[];
+  };
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */
@@ -199,7 +211,6 @@ interface AppState {
       stack: string;
     };
   };
-  searchHistory: string[];
 }
 
 export interface KubernetesObject {

@@ -1,4 +1,4 @@
-import React, {Key, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Button, Input, Modal, Tabs} from 'antd';
@@ -9,6 +9,7 @@ import {flatten} from 'lodash';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
+import {MatchParamProps} from '@models/appstate';
 import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -16,8 +17,11 @@ import {
   highlightFileMatches,
   selectFile,
   setSelectingFile,
+  toggleMatchParams,
+  updateReplaceQuery,
   updateResourceFilter,
   updateSearchHistory,
+  updateSearchQuery,
 } from '@redux/reducers/main';
 import {openCreateFileFolderModal, openRenameEntityModal, setExpandedSearchedFiles} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -27,8 +31,7 @@ import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
 
-import electronStore from '@utils/electronStore';
-import {MatchParamProps, filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
+import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
 
 import TreeItem from '../FileTreePane/TreeItem';
@@ -53,17 +56,10 @@ const decorate = (arr: FilterTreeNode[]) => {
 
 const SearchPane: React.FC<{height: number}> = ({height}) => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
-  const currentMatch = useAppSelector(state => state.main.matchOptions);
+  const {currentMatch, searchQuery, replaceQuery, queryMatchParams} = useAppSelector(state => state.main.search);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
-  const [searchQuery, updateSearchQuery] = useState<string>('');
-  const [replaceQuery, updateReplaceQuery] = useState<string>('');
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
-  const [queryMatchParam, setQueryMatchParam] = useState<MatchParamProps>({
-    matchCase: false,
-    matchWholeWord: false,
-    regExp: false,
-  });
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -72,7 +68,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const recentSearch = useAppSelector(state => state.main.searchHistory);
+  const recentSearch = useAppSelector(state => state.main.search.searchHistory);
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const onSelect = useFileSelect();
@@ -107,9 +103,12 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, searchTree, selectedPath]);
 
-  const setCurrentMatch = (options: any) => {
-    dispatch(highlightFileMatches(options));
-  };
+  const setCurrentMatch = useCallback(
+    (options: CurrentMatch | null) => {
+      dispatch(highlightFileMatches(options));
+    },
+    [dispatch]
+  );
 
   const onRename = (absolutePathToEntity: string, osPlatform: string) => {
     dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
@@ -136,7 +135,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
       // file doesn't contain any matches
       setCurrentMatch(null);
     }
-  }, [dispatch, searchTree, selectedPath]);
+  }, [dispatch, searchTree, selectedPath, setCurrentMatch]);
 
   const onExpand = (newExpandedFiles: Key[]) => {
     dispatch(setExpandedSearchedFiles(newExpandedFiles));
@@ -149,7 +148,6 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const saveQueryHistory = (query: string) => {
     if (!recentSearch.includes(query)) {
       dispatch(updateSearchHistory(query));
-      electronStore.set('appConfig.recentSearch', [...recentSearch, query]);
     }
   };
 
@@ -163,7 +161,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
       return;
     }
 
-    const queryRegExp = getRegexp(query, queryMatchParam);
+    const queryRegExp = getRegexp(query, queryMatchParams);
 
     const filteredFileMap: FileEntry[] = Object.values(fileMap)
       .map((file: FileEntry) => filterFilesByQuery(file, queryRegExp, searchCounter))
@@ -195,11 +193,11 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   useEffect(() => {
     findMatches(searchQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryMatchParam, fileMap]);
+  }, [queryMatchParams, fileMap]);
 
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
     setFindingMatches(true);
-    updateSearchQuery(e.target.value);
+    dispatch(updateSearchQuery(e.target.value));
 
     debounceHandler.current && clearTimeout(debounceHandler.current);
     debounceHandler.current = setTimeout(() => {
@@ -208,12 +206,12 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   };
 
   const handleReplaceQuery = (e: {target: HTMLInputElement}) => {
-    updateReplaceQuery(e.target.value);
+    dispatch(updateReplaceQuery(e.target.value));
   };
 
   const toggleMatchParam = (param: keyof MatchParamProps) => {
     setFindingMatches(true);
-    setQueryMatchParam(prevState => ({...prevState, [param]: !prevState[param]}));
+    dispatch(toggleMatchParams(param));
   };
 
   const handleStep = (step: number) => {
@@ -230,7 +228,9 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
 
   const replaceCurrentSelection = () => {
     if (replaceQuery === searchQuery) return;
-    setCurrentMatch({...currentMatch, replaceWith: replaceQuery});
+    if (currentMatch) {
+      setCurrentMatch({...currentMatch, replaceWith: replaceQuery});
+    }
   };
 
   const replaceAll = () => {
@@ -241,7 +241,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
       title,
       icon: <ExclamationCircleOutlined />,
       onOk() {
-        const queryRegExp = getRegexp(searchQuery, queryMatchParam);
+        const queryRegExp = getRegexp(searchQuery, queryMatchParams);
         const files = searchTree.map(file => {
           return getAbsoluteFilePath(file.filePath, fileMap);
         });
@@ -277,18 +277,18 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
               <S.SearchBox>
                 <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
                 <S.StyledButton
-                  $isItemSelected={queryMatchParam.matchCase}
+                  $isItemSelected={queryMatchParams.matchCase}
                   onClick={() => toggleMatchParam('matchCase')}
                 >
                   Aa
                 </S.StyledButton>
                 <S.StyledButton
-                  $isItemSelected={queryMatchParam.matchWholeWord}
+                  $isItemSelected={queryMatchParams.matchWholeWord}
                   onClick={() => toggleMatchParam('matchWholeWord')}
                 >
                   [
                 </S.StyledButton>
-                <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+                <S.StyledButton $isItemSelected={queryMatchParams.regExp} onClick={() => toggleMatchParam('regExp')}>
                   .*
                 </S.StyledButton>
               </S.SearchBox>
@@ -305,7 +305,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
                 <RecentSearch
                   recentSearch={recentSearch}
                   handleClick={query => {
-                    updateSearchQuery(query);
+                    dispatch(updateSearchQuery(query));
                     findMatches(query);
                   }}
                 />
@@ -360,18 +360,18 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
               <S.SearchBox>
                 <Input value={searchQuery} onChange={handleSearchQueryChange} />
                 <S.StyledButton
-                  $isItemSelected={queryMatchParam.matchCase}
+                  $isItemSelected={queryMatchParams.matchCase}
                   onClick={() => toggleMatchParam('matchCase')}
                 >
                   Aa
                 </S.StyledButton>
                 <S.StyledButton
-                  $isItemSelected={queryMatchParam.matchWholeWord}
+                  $isItemSelected={queryMatchParams.matchWholeWord}
                   onClick={() => toggleMatchParam('matchWholeWord')}
                 >
                   [
                 </S.StyledButton>
-                <S.StyledButton $isItemSelected={queryMatchParam.regExp} onClick={() => toggleMatchParam('regExp')}>
+                <S.StyledButton $isItemSelected={queryMatchParams.regExp} onClick={() => toggleMatchParam('regExp')}>
                   .*
                 </S.StyledButton>
               </S.SearchBox>

@@ -122,21 +122,14 @@ export const updateFileEntries = createAsyncThunk(
   'main/updateFileEntries',
   async (payload: UpdateFilesEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
-    let error: any;
 
     const nextMainState: any = createNextState(state.main, mainState => {
-      try {
-        payload.pathes.forEach(ps => {
-          const fileEntry = mainState.fileMap[ps.relativePath];
-          const content = fs.readFileSync(ps.absolutePath, 'utf8');
-          fileEntry.text = content;
-          const newFileMap = {...mainState.fileMap, fileEntry};
-        });
-      } catch (e: any) {
-        const {message, stack} = e || {};
-        error = {message, stack};
-        log.error(e);
-      }
+      payload.pathes.forEach(ps => {
+        const fileEntry = mainState.fileMap[ps.relativePath];
+        const content = fs.readFileSync(ps.absolutePath, 'utf8');
+        fileEntry.text = content;
+        return {...mainState.fileMap, fileEntry};
+      });
     });
 
     return nextMainState;

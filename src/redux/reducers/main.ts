@@ -17,6 +17,7 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ImagesListType,
+  MatchParamProps,
   PreviewType,
   ResourceFilterType,
   ResourceMapType,
@@ -447,8 +448,21 @@ export const mainSlice = createSlice({
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
+    updateSearchQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.searchQuery = action.payload;
+    },
+    updateReplaceQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.replaceQuery = action.payload;
+    },
+    toggleMatchParams: (state: Draft<AppState>, action: PayloadAction<keyof MatchParamProps>) => {
+      const param = action.payload;
+      state.search.queryMatchParams = {
+        ...state.search.queryMatchParams,
+        [param]: !state.search.queryMatchParams[param],
+      };
+    },
     highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
-      state.matchOptions = action.payload;
+      state.search.currentMatch = action.payload;
     },
     selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.selectedPreviewConfigurationId = action.payload;
@@ -748,7 +762,12 @@ export const mainSlice = createSlice({
       state.validationIntegration = action.payload;
     },
     updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.searchHistory = [...state.searchHistory, action.payload];
+      let newSearchHistory: string[] = [...state.search.searchHistory];
+      if (state.search.searchHistory.length >= 5) {
+        newSearchHistory.shift();
+      }
+      electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
+      state.search.searchHistory = [...newSearchHistory, action.payload];
     },
   },
   extraReducers: builder => {
@@ -1338,6 +1357,9 @@ export const {
   updateValidationIntegration,
   highlightFileMatches,
   updateSearchHistory,
+  updateSearchQuery,
+  updateReplaceQuery,
+  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
