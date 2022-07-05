@@ -117,25 +117,8 @@ const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
 export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileMap}: CreateHelmValuesFileParams) {
   const filePath = getAbsoluteFilePath(fileEntry.filePath, fileMap);
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  const lineCounter = new LineCounter();
-  const documents = parseAllYamlDocuments(fileContent, lineCounter);
 
-  const values: HelmValueMatch[] = [];
-  documents.forEach(doc => {
-    const helmObject = doc.toJS();
-    getObjectKeys(helmObject).forEach(keyPath => {
-      const scalar = getYamlScalar(doc.contents, keyPath);
-      if (!scalar) {
-        return;
-      }
-      const nodeWrapper = new NodeWrapper(scalar, lineCounter);
-      values.push({
-        value: get(helmObject, keyPath),
-        keyPath: `.Values.${keyPath}`,
-        linePosition: nodeWrapper.getNodePosition(),
-      });
-    });
-  });
+  const values = getHelmValueFileValues(fileContent);
 
   const helmValues: HelmValuesFile = {
     id: uuidv4(),
@@ -198,9 +181,6 @@ export function reprocessHelm(
 
     helmTemplatesMap[helmTemplate.id].values = valueRanges;
   } else if (isHelmValuesFile(filePath)) {
-    const lineCounter = new LineCounter();
-    const documents = parseAllYamlDocuments(fileContent, lineCounter);
-
     const helmValueFile = Object.values(helmValuesMap).find(helmValue => helmValue.filePath === filePath);
 
     if (!helmValueFile) {
@@ -208,24 +188,7 @@ export function reprocessHelm(
       return;
     }
 
-    const values: HelmValueMatch[] = [];
-    documents.forEach(doc => {
-      const helmObject = doc.toJS();
-      getObjectKeys(helmObject).forEach(keyPath => {
-        const scalar = getYamlScalar(doc.contents, keyPath);
-        if (!scalar) {
-          return;
-        }
-        const nodeWrapper = new NodeWrapper(scalar, lineCounter);
-        values.push({
-          value: get(helmObject, keyPath),
-          keyPath: `.Values.${keyPath}`,
-          linePosition: nodeWrapper.getNodePosition(),
-        });
-      });
-    });
-
-    helmValuesMap[helmValueFile.id].values = values;
+    helmValuesMap[helmValueFile.id].values = getHelmValueFileValues(fileContent);
   }
 }
 
@@ -368,6 +331,30 @@ export const getObjectKeys = (obj: any, prefix = ''): string[] =>
     }
     return [...res, prefix + el];
   }, []);
+
+export const getHelmValueFileValues = (fileContent: string) => {
+  const lineCounter = new LineCounter();
+  const documents = parseAllYamlDocuments(fileContent, lineCounter);
+  const values: HelmValueMatch[] = [];
+
+  documents.forEach(doc => {
+    const helmObject = doc.toJS();
+    getObjectKeys(helmObject).forEach(keyPath => {
+      const scalar = getYamlScalar(doc.contents, keyPath);
+      if (!scalar) {
+        return;
+      }
+      const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+      values.push({
+        value: get(helmObject, keyPath),
+        keyPath: `.Values.${keyPath}`,
+        linePosition: nodeWrapper.getNodePosition(),
+      });
+    });
+  });
+
+  return values;
+};
 
 export const getHelmValueRanges = (code: string | undefined): RangeAndValue[] => {
   const ranges: RangeAndValue[] = [];
