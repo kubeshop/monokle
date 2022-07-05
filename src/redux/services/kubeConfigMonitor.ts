@@ -1,5 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {webContents} from 'electron';
+
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs';
 import {AnyAction} from 'redux';
@@ -29,12 +31,20 @@ export async function monitorKubeConfig(filePath: string, dispatch: (action: Any
     tempKubeConfigPath = filePath;
     if (clusterNamespacesWatchInterval) {
       clearInterval(clusterNamespacesWatchInterval);
-      clusterNamespacesWatchInterval = null;
     }
+    clusterNamespacesWatchInterval = null;
   }
 
   readAndNotifyKubeConfig(filePath, dispatch);
   watchAllClusterNamespaces(filePath, dispatch);
+
+  webContents.getFocusedWebContents().on('did-finish-load', () => {
+    if (clusterNamespacesWatchInterval) {
+      clearInterval(clusterNamespacesWatchInterval);
+    }
+    clusterNamespacesWatchInterval = null;
+    watchAllClusterNamespaces(filePath, dispatch);
+  });
 
   try {
     const stats = await fs.promises.stat(filePath);
@@ -62,7 +72,7 @@ export async function monitorKubeConfig(filePath: string, dispatch: (action: Any
   }
 }
 
-const kubeConfigList: {[key: string]: any} = {};
+let kubeConfigList: {[key: string]: any} = {};
 
 export function watchK8sNamespaces(
   kubeConfigPath: string,
@@ -125,6 +135,8 @@ export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (act
   if (clusterNamespacesWatchInterval) {
     return;
   }
+
+  kubeConfigList = {};
 
   clusterNamespacesWatchInterval = watchFunctions(() => {
     try {
