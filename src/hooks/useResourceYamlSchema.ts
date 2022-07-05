@@ -45,7 +45,8 @@ function useResourceYamlSchema(
     }
 
     if (yaml) {
-      let schemaUri = `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${k8sVersion}/${resource?.kind.toLowerCase()}.json`;
+      const standalone = resource?.kind === 'CustomResourceDefinition' ? '' : '-standalone';
+      let schemaUri = `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${k8sVersion}${standalone}/${resource?.kind.toLowerCase()}.json`;
 
       // if this is a custom resource then host the schema using the local server
       if (resourceKindHandler && resourceKindHandler.isCustom) {
