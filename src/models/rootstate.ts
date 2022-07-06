@@ -1,4 +1,4 @@
-import {CompareState} from '@redux/compare';
+import {CompareState} from '@redux/compare/state';
 
 import {AlertState} from './alert';
 import {AppConfig} from './appconfig';

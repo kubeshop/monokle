@@ -24,9 +24,7 @@ import {FeatureFlag} from '@utils/features';
 import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -108,7 +106,7 @@ const NavPane: React.FC<Props> = ({height}) => {
               </Tooltip>
             </Badge>
 
-            <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
+            <FeatureFlag name="CompareEverything">
               <CompareButton />
             </FeatureFlag>
           </S.TitleBarRightButtons>
@@ -125,10 +123,7 @@ const NavPane: React.FC<Props> = ({height}) => {
         {isResourceFiltersOpen && <ReflexSplitter />}
 
         <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
-          <S.List id="navigator-sections-container">
-            <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
-            <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
-          </S.List>
+          <SectionRenderer height={height - 40} sectionBlueprint={K8sResourceSectionBlueprint} />
         </ReflexElement>
       </ReflexContainer>
     </S.NavigatorPaneContainer>

@@ -5,10 +5,10 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
-  $hasCustomNameDisplay: boolean;
+  $hasCustomRow: boolean;
   $indentation: number;
-  isHovered?: boolean;
-  isCheckable?: boolean;
+  $isHovered?: boolean;
+  $isCheckable?: boolean;
 };
 
 export const NameContainer = styled.span<NameContainerProps>`
@@ -16,25 +16,22 @@ export const NameContainer = styled.span<NameContainerProps>`
   align-items: center;
   width: 100%;
   ${props => {
-    const defaultIndentation = props.isCheckable ? 24 : 0;
+    const defaultIndentation = props.$isCheckable ? 24 : 0;
     return `padding-left: ${defaultIndentation + props.$indentation}px;`;
   }}
-  ${props => !props.isHovered && 'padding-right: 30px;'}
-  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
+  ${props => !props.$isHovered && 'padding-right: 30px;'}
+  ${props => props.$hasCustomRow && 'padding: 0;'}
 `;
 
 type SectionContainerProps = {
-  isSelected?: boolean;
-  isHighlighted?: boolean;
-  isHovered?: boolean;
-  isLastSection?: boolean;
-  isCollapsed?: boolean;
-  hasChildSections?: boolean;
-  isVisible?: boolean;
-  isInitialized?: boolean;
-  disableHoverStyle?: boolean;
-  isSectionCheckable?: boolean;
-  hasCustomNameDisplay?: boolean;
+  $isSelected?: boolean;
+  $isHighlighted?: boolean;
+  $isHovered?: boolean;
+  $isInitialized?: boolean;
+  $disableHoverStyle?: boolean;
+  $isSectionCheckable?: boolean;
+  $hasCustomRow?: boolean;
+  $marginBottom?: number;
 };
 
 export const SectionContainer = styled.li<SectionContainerProps>`
@@ -45,35 +42,25 @@ export const SectionContainer = styled.li<SectionContainerProps>`
   width: 100%;
   user-select: none;
   ${props =>
-    (!props.isSectionCheckable && !props.hasCustomNameDisplay) || !props.isInitialized ? 'padding-left: 16px;' : ''}
-  ${props => {
-    if (props.isVisible === false) {
-      return 'visibility: hidden; height: 0;';
-    }
-    return 'visibility: visible;';
-  }}
-  ${props => {
-    if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasChildSections) {
-      return `margin-bottom: 16px;`;
-    }
-  }}
+    (!props.$isSectionCheckable && !props.$hasCustomRow) || !props.$isInitialized ? 'padding-left: 16px;' : ''}
+  ${props => `margin-bottom: ${props.$marginBottom || 0}px;`}
     ${props => {
-    if (props.disableHoverStyle) {
+    if (props.$disableHoverStyle) {
       return;
     }
-    if (!props.isSelected && props.isHighlighted) {
-      if (props.isHovered) {
+    if (!props.$isSelected && props.$isHighlighted) {
+      if (props.$isHovered) {
         return `background: ${Colors.highlightGradientHover};`;
       }
       return `background: ${Colors.highlightGradient};`;
     }
-    if (props.isSelected) {
-      if (props.isHovered) {
+    if (props.$isSelected) {
+      if (props.$isHovered) {
         return `background: ${Colors.selectionGradientHover};`;
       }
       return `background: ${Colors.selectionGradient};`;
     }
-    if (props.isHovered) {
+    if (props.$isHovered) {
       return `background: ${Colors.blackPearl};`;
     }
   }};
@@ -83,28 +70,19 @@ type NameProps = {
   $isSelected?: boolean;
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
-  $level: number;
   $nameColor?: string;
-  $nameSize?: number;
+  $fontSize: number;
   $nameWeight?: number;
-  $nameVerticalPadding?: number;
-  $nameHorizontalPadding?: number;
 };
 
 export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  ${props =>
-    `padding: ${props.$nameVerticalPadding !== undefined ? props.$nameVerticalPadding : 0}px ${
-      props.$nameHorizontalPadding !== undefined ? props.$nameHorizontalPadding : 5
-    }px;`}
   cursor: pointer;
+  padding: 0 5px;
   ${props => {
-    if (props.$nameSize) {
-      return `font-size: ${props.$nameSize}px;`;
-    }
-    return `font-size: ${24 - 4 * props.$level}px;`;
+    return `font-size: ${props.$fontSize}px;`;
   }}
   ${props => {
     if (props.$isSelected) {
@@ -121,12 +99,6 @@ export const Name = styled.span<NameProps>`
     return props.$nameColor ? `color: ${props.$nameColor};` : `color: ${Colors.whitePure};`;
   }}
   ${props => props.$nameWeight && `font-weight: ${props.$nameWeight};`}
-`;
-
-export const EmptyGroupText = styled.p`
-  margin-left: 26px;
-  margin-bottom: 12px;
-  font-size: 12px;
 `;
 
 export const Collapsible = styled.span`
@@ -146,30 +118,31 @@ export const Counter = styled.span<{selected: boolean}>`
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
 `;
 
-export const EmptyDisplayContainer = styled.div<{level: number}>`
+export const EmptyDisplayContainer = styled.div`
   margin-left: 16px;
 `;
 
-export const BeforeInitializationContainer = styled.div<{level: number}>`
+export const BeforeInitializationContainer = styled.div`
   padding-top: 16px;
   margin-left: 16px;
 `;
 
-export const BlankSpace = styled.span<{level?: number}>`
+export const BlankSpace = styled.span<{$height: number}>`
   flex-grow: 1;
   height: 32px;
   cursor: pointer;
-  ${props => props.level && `height: ${32 - props.level * 8}px;`}
+  ${props => `height: ${props.$height}px;`}
 `;
 
-export const Checkbox = styled(RawCheckbox)<{$level: number}>`
+export const Checkbox = styled(RawCheckbox)`
   margin-left: -16px;
 `;
 
-export const CheckboxPlaceholder = styled.span<{$level: number}>`
+export const CheckboxPlaceholder = styled.span`
   width: 24px;
 `;
 
-export const NameDisplayContainer = styled.span`
+// TODO: do we need this?
+export const CustomContextMenuContainer = styled.span`
   margin-left: 26px;
 `;

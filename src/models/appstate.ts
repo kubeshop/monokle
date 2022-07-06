@@ -91,15 +91,6 @@ type ResourceRefsProcessingOptions = {
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
 };
 
-type ClusterToLocalResourcesMatch = {
-  id: string;
-  resourceKind: string;
-  resourceName: string;
-  resourceNamespace: string;
-  clusterResourceId?: string;
-  localResourceIds?: string[];
-};
-
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -160,16 +151,6 @@ interface AppState {
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  clusterDiff: {
-    hasLoaded: boolean;
-    hasFailed: boolean;
-    shouldReload?: boolean;
-    hideClusterOnlyResources: boolean;
-    clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
-    diffResourceId?: string;
-    refreshDiffResource?: boolean;
-    selectedMatches: string[];
-  };
   policies: {
     plugins: Policy[];
   };
@@ -226,5 +207,4 @@ export type {
   SelectionHistoryEntry,
   PreviewType,
   ResourceRefsProcessingOptions,
-  ClusterToLocalResourcesMatch,
 };

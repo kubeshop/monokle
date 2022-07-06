@@ -6,7 +6,6 @@ import {v4 as uuidv4} from 'uuid';
 import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
 import {
-  CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
   KUSTOMIZATION_API_VERSION,
   KUSTOMIZATION_FILE_NAME,
@@ -270,9 +269,6 @@ export function linkResources(
 export function getNamespaces(resourceMap: ResourceMapType) {
   const namespaces: string[] = [];
   Object.values(resourceMap).forEach(e => {
-    if (e.filePath.startsWith(CLUSTER_DIFF_PREFIX)) {
-      return;
-    }
     if (e.namespace && !namespaces.includes(e.namespace)) {
       namespaces.push(e.namespace);
     }

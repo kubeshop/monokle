@@ -41,7 +41,6 @@ const filterImagesBySearchedValue = (searchedValue: string, name: string) => {
 const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
   name: 'Images',
   id: IMAGES_SECTION_NAME,
-  containerElementId: 'images-section-container',
   rootSectionId: IMAGES_SECTION_NAME,
   getScope: state => ({
     resourceMap: state.main.resourceMap,
@@ -60,11 +59,13 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     isVisible: () => true,
   },
   customization: {
-    emptyDisplay: {component: ImagesSectionEmptyDisplay},
-    nameDisplay: {component: ImagesSectionNameDisplay},
-    beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
-    counterDisplayMode: 'items',
-    disableHoverStyle: true,
+    empty: {component: ImagesSectionEmptyDisplay},
+    row: {
+      component: ImagesSectionNameDisplay,
+      initializationText: 'Get started by browsing a folder in the File Explorer.',
+      disableHoverStyle: true,
+    },
+    counter: {type: 'items'},
   },
   itemBlueprint: {
     getName: rawItem => `${rawItem.name}:${rawItem.tag}`,
@@ -110,7 +111,7 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     customization: {
       quickAction: {
         component: ImagesQuickAction,
-        options: {isVisibleOnHover: true},
+        isVisibleOnHover: true,
       },
       suffix: {
         component: ImagesSectionNameSuffix,

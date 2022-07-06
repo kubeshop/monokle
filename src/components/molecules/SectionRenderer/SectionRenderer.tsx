@@ -1,13 +1,11 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
+import {useVirtual} from 'react-virtual';
 
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {NavigatorRow, SectionBlueprint, SectionInstance} from '@models/navigator';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
+import {useAppSelector} from '@redux/hooks';
 
-import navSectionMap from '@src/navsections/sectionBlueprintMap';
-
-import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
+import ItemRenderer from './ItemRenderer';
 import SectionHeader from './SectionHeader';
 import {useSectionCustomization} from './useSectionCustomization';
 
@@ -15,268 +13,114 @@ import * as S from './styled';
 
 type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
-  level: number;
-  isLastSection: boolean;
   parentIndentation?: number;
-  itemRendererOptions?: ItemRendererOptions;
+  height: number;
 };
 
 function SectionRenderer(props: SectionRendererProps) {
-  const {sectionBlueprint, level, isLastSection, itemRendererOptions, parentIndentation} = props;
+  const {sectionBlueprint, height} = props;
 
-  const {itemBlueprint, id: sectionId} = sectionBlueprint;
+  const {id: sectionId} = sectionBlueprint;
 
-  const sectionInstance: SectionInstance | undefined = useAppSelector(
+  const [lastScrollIndex, setLastScrollIndex] = useState<number>(-1);
+
+  const rootSectionInstance: SectionInstance | undefined = useAppSelector(
     state => state.navigator.sectionInstanceMap[sectionId]
   );
 
-  const registeredSectionIds = useAppSelector(state => state.navigator.registeredSectionBlueprintIds);
-  const childSectionIds = useMemo(() => {
-    return sectionBlueprint.childSectionIds?.filter(id => registeredSectionIds.includes(id));
-  }, [sectionBlueprint.childSectionIds, registeredSectionIds]);
+  const {customEmpty} = useSectionCustomization(sectionBlueprint.customization);
 
-  const childSections = useMemo(() => {
-    return childSectionIds
-      ?.map(id => navSectionMap.getById(id))
-      .filter((s): s is SectionBlueprint<any, any> => s !== undefined);
-  }, [childSectionIds]);
-
-  const dispatch = useAppDispatch();
-
-  const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
-
-  const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
-
-  const sectionIndentation = useMemo(() => {
-    const indentation = sectionBlueprint.customization?.indentation;
-    if (!parentIndentation && !indentation) {
-      return undefined;
-    }
-    if (parentIndentation && !indentation) {
-      return parentIndentation;
-    }
-    if (!parentIndentation && indentation) {
-      return indentation;
-    }
-    if (parentIndentation && indentation) {
-      return parentIndentation + indentation;
-    }
-    return undefined;
-  }, [parentIndentation, sectionBlueprint.customization?.indentation]);
-
-  const isCollapsedMode = useMemo(() => {
-    if (!sectionInstance?.id) {
-      return 'expanded';
-    }
-    const visibleDescendantSectionIds = sectionInstance?.visibleDescendantSectionIds;
-    if (visibleDescendantSectionIds) {
-      if (
-        collapsedSectionIds.includes(sectionInstance.id) &&
-        visibleDescendantSectionIds.every(s => collapsedSectionIds.includes(s))
-      ) {
-        return 'collapsed';
-      }
-      if (
-        !collapsedSectionIds.includes(sectionInstance.id) &&
-        visibleDescendantSectionIds.every(s => !collapsedSectionIds.includes(s))
-      ) {
-        return 'expanded';
-      }
-      return 'mixed';
-    }
-    if (collapsedSectionIds.includes(sectionInstance.id)) {
-      return 'collapsed';
-    }
-    return 'expanded';
-  }, [collapsedSectionIds, sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds]);
-
-  const isCollapsed = useMemo(() => {
-    return isCollapsedMode === 'collapsed';
-  }, [isCollapsedMode]);
-
-  const expandSection = useCallback(() => {
-    if (!sectionInstance?.id) {
-      return;
-    }
-    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
-      dispatch(expandSectionIds([sectionInstance.id]));
-    } else {
-      dispatch(expandSectionIds([sectionInstance.id, ...sectionInstance.visibleDescendantSectionIds]));
-    }
-  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
-
-  const collapseSection = useCallback(() => {
-    if (!sectionInstance?.id) {
-      return;
-    }
-    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
-      dispatch(collapseSectionIds([sectionInstance?.id]));
-    } else {
-      dispatch(collapseSectionIds([sectionInstance?.id, ...sectionInstance.visibleDescendantSectionIds]));
-    }
-  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
-
-  useEffect(() => {
-    if (sectionInstance?.shouldExpand) {
-      expandSection();
-    }
-  }, [sectionInstance?.shouldExpand, expandSection]);
-
-  const groupInstanceById: Record<string, ItemGroupInstance> = useMemo(() => {
-    return sectionInstance?.groups
-      .map<[string, ItemGroupInstance]>(g => [g.id, g])
-      .reduce<Record<string, ItemGroupInstance>>((acc, [k, v]) => {
-        acc[k] = v;
-        return acc;
-      }, {});
-  }, [sectionInstance?.groups]);
-
-  const lastVisibleChildSectionId = useMemo(() => {
-    if (!sectionInstance?.visibleChildSectionIds) {
-      return undefined;
-    }
-    return sectionInstance.visibleChildSectionIds
-      ? sectionInstance.visibleChildSectionIds[sectionInstance.visibleChildSectionIds.length - 1]
-      : undefined;
-  }, [sectionInstance?.visibleChildSectionIds]);
-
-  const isLastVisibleItemId = useCallback(
-    (itemId: string) => {
-      if (!sectionInstance?.visibleItemIds) {
-        return false;
-      }
-      const lastVisibleItemId = sectionInstance.visibleItemIds[sectionInstance.visibleItemIds.length - 1];
-      return itemId === lastVisibleItemId;
-    },
-    [sectionInstance?.visibleItemIds]
+  const rows: NavigatorRow[] | undefined = useAppSelector(state => state.navigator.rowsByRootSectionId[sectionId]);
+  const rowIndexToScroll = useAppSelector(
+    state => state.navigator.rowIndexToScrollByRootSectionId[sectionBlueprint.id]
   );
 
-  const isLastVisibleItemIdInGroup = useCallback(
-    (groupId: string, itemId: string) => {
-      const groupInstance = groupInstanceById[groupId];
-      if (!groupInstance) {
-        return false;
-      }
-      const lastVisibleItemIdInGroup = groupInstance.visibleItemIds[groupInstance.visibleItemIds.length - 1];
-      return itemId === lastVisibleItemIdInGroup;
-    },
-    [groupInstanceById]
-  );
+  const parentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-  if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
+  const {virtualItems, scrollToIndex, totalSize} = useVirtual({
+    size: rows?.length || 0,
+    parentRef,
+    estimateSize: React.useCallback((i: number) => rows[i].height + rows[i].marginBottom, [rows]),
+    overscan: 5,
+  });
+
+  useLayoutEffect(() => {
+    if (
+      rowIndexToScroll &&
+      rowIndexToScroll !== lastScrollIndex &&
+      !virtualItems.some(item => item.index === rowIndexToScroll)
+    ) {
+      scrollToIndex(rowIndexToScroll, {align: 'center'});
+    }
+    // we need to set the last index that we scrolled to so we don't end up scrolling to the row unintentionally
+    setLastScrollIndex(rowIndexToScroll || -1);
+    // disabled the below eslint rule because it was causing too many re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowIndexToScroll, virtualItems, lastScrollIndex]);
+
+  if (!rootSectionInstance?.isInitialized && sectionBlueprint.customization?.row?.initializationText) {
     return (
-      <S.BeforeInitializationContainer level={level}>
-        <p>{sectionBlueprint.customization.beforeInitializationText}</p>
+      <S.BeforeInitializationContainer>
+        <p>{sectionBlueprint.customization.row.initializationText}</p>
       </S.BeforeInitializationContainer>
     );
   }
 
-  if (!sectionInstance?.isVisible) {
+  if (!rootSectionInstance?.isVisible) {
     return null;
   }
 
-  if (sectionInstance?.isLoading) {
+  if (rootSectionInstance?.isLoading) {
     return <S.Skeleton />;
   }
 
-  if (sectionInstance?.isEmpty) {
-    if (EmptyDisplay && EmptyDisplay.Component) {
+  if (rootSectionInstance?.isEmpty) {
+    if (customEmpty?.Component) {
       return (
-        <S.EmptyDisplayContainer level={level}>
-          <EmptyDisplay.Component sectionInstance={sectionInstance} />
+        <S.EmptyDisplayContainer>
+          <customEmpty.Component sectionInstance={rootSectionInstance} />
         </S.EmptyDisplayContainer>
       );
     }
     return (
-      <S.EmptyDisplayContainer level={level}>
-        <h1>{sectionInstance.name}</h1>
+      <S.EmptyDisplayContainer>
+        <h1>{rootSectionInstance.name}</h1>
         <p>Section is empty.</p>
       </S.EmptyDisplayContainer>
     );
   }
 
   return (
-    <>
-      <SectionHeader
-        name={sectionInstance.name}
-        sectionInstance={sectionInstance}
-        sectionBlueprint={sectionBlueprint}
-        isCollapsed={isCollapsed}
-        isLastSection={isLastSection}
-        level={level}
-        expandSection={expandSection}
-        collapseSection={collapseSection}
-        indentation={sectionIndentation || 0}
-      />
-      {sectionInstance &&
-        sectionInstance.isVisible &&
-        !isCollapsed &&
-        itemBlueprint &&
-        sectionInstance.groups.length === 0 &&
-        sectionInstance.visibleItemIds.map(itemId => (
-          <ItemRenderer
-            key={itemId}
-            itemId={itemId}
-            blueprint={itemBlueprint}
-            level={level + 1}
-            isLastItem={isLastVisibleItemId(itemId)}
-            isSectionCheckable={Boolean(sectionInstance.checkable)}
-            sectionContainerElementId={sectionBlueprint.containerElementId}
-            options={itemRendererOptions}
-            indentation={sectionIndentation || 0}
-          />
-        ))}
-      {sectionInstance?.isVisible &&
-        !isCollapsed &&
-        itemBlueprint &&
-        groupInstanceById &&
-        sectionInstance.visibleGroupIds.map(groupId => {
-          const group = groupInstanceById[groupId];
+    <div style={{height: `${height}px`, overflow: 'auto'}} ref={parentRef}>
+      <div
+        style={{
+          height: `${totalSize}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {virtualItems.map(virtualRow => {
+          const row = rows[virtualRow.index];
           return (
-            <React.Fragment key={group.id}>
-              <S.SectionContainer style={{color: 'red'}}>
-                <S.Name $level={level + 1}>
-                  {group.name}
-                  <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
-                </S.Name>
-              </S.SectionContainer>
-              {group.visibleItemIds.length ? (
-                group.visibleItemIds.map(itemId => (
-                  <ItemRenderer
-                    key={itemId}
-                    itemId={itemId}
-                    blueprint={itemBlueprint}
-                    level={level + 2}
-                    isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
-                    isSectionCheckable={Boolean(sectionInstance.checkable)}
-                    sectionContainerElementId={sectionBlueprint.containerElementId}
-                    options={itemRendererOptions}
-                    indentation={sectionIndentation || 0}
-                  />
-                ))
-              ) : (
-                <S.EmptyGroupText>
-                  {sectionBlueprint.customization?.emptyGroupText || 'No items in this group.'}
-                </S.EmptyGroupText>
-              )}
-            </React.Fragment>
+            <div
+              key={virtualRow.index}
+              ref={virtualRow.measureRef}
+              style={{
+                // this has to be defined inline because of the virtualization
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              {row.type === 'section' ? <SectionHeader sectionRow={row} /> : <ItemRenderer itemRow={row} />}
+            </div>
           );
         })}
-      {childSections &&
-        childSections.map(child => (
-          <SectionRenderer
-            key={child.name}
-            sectionBlueprint={child}
-            level={level + 1}
-            isLastSection={child.id === lastVisibleChildSectionId}
-            parentIndentation={sectionIndentation}
-          />
-        ))}
-      {sectionBlueprint.customization?.sectionMarginBottom !== undefined && (
-        <div style={{marginBottom: sectionBlueprint.customization.sectionMarginBottom}} />
-      )}
-    </>
+      </div>
+    </div>
   );
 }
 
-export default React.memo(SectionRenderer);
+export default SectionRenderer;

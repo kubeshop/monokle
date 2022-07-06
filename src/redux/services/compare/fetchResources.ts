@@ -6,7 +6,6 @@ import invariant from 'tiny-invariant';
 import {v4 as uuid} from 'uuid';
 
 import {
-  CLUSTER_DIFF_PREFIX,
   ERROR_MSG_FALLBACK,
   PREVIEW_PREFIX,
   ROOT_FILE_ENTRY,
@@ -64,7 +63,6 @@ function fetchLocalResources(state: RootState): K8sResource[] {
   return Object.values(state.main.resourceMap).filter(
     resource =>
       !resource.filePath.startsWith(PREVIEW_PREFIX) &&
-      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
       !resource.name.startsWith('Patch:') &&
       !isKustomizationResource(resource)
   );
@@ -88,7 +86,7 @@ async function fetchResourcesFromCluster(state: RootState, options: ClusterResou
     }
 
     const allYaml = fulfilledResults.map(r => (r as any).value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-    return extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
+    return extractK8sResources(allYaml, String(kc.currentContext));
   } catch (err) {
     log.debug('fetch resources from cluster failed', err);
     throw err;

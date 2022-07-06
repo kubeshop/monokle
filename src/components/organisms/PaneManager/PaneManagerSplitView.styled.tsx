@@ -11,5 +11,6 @@ export const SplitViewContainer = styled.div`
 export const LeftPane = styled.div`
   position: relative;
   min-height: 100%;
+  height: 100%;
   background: ${PanelColors.toolBar};
 `;

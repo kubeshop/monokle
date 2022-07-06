@@ -20,7 +20,6 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
-import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSectionNameCounter from './ResourceKindSectionNameCounter';
 import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
@@ -41,7 +40,12 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
-    containerElementId: 'navigator-sections-container',
+    rowBuilder: {
+      height: 26,
+      fontSize: 16,
+      marginBottom: instance =>
+        instance.isCollapsed || instance.isEmpty || !instance.visibleItemIds?.length ? (instance.isLast ? 16 : 8) : 0,
+    },
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
@@ -85,20 +89,24 @@ export function makeResourceKindNavSection(
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
-      nameSuffix: {
+      suffix: {
         component: ResourceKindSectionNameSuffix,
-        options: {
-          isVisibleOnHover: true,
-        },
+        isVisibleOnHover: true,
       },
-      nameCounter: {
+      counter: {
         component: ResourceKindSectionNameCounter,
       },
-      isCheckVisibleOnHover: true,
+      checkbox: {
+        isVisibleOnHover: true,
+      },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
+      rowBuilder: {
+        height: 23,
+        marginBottom: (instance, props) => (instance.isLast ? (props?.sectionInstance?.isLast ? 16 : 8) : 0),
+      },
       builder: {
         isSelected: rawItem => rawItem.isSelected,
         isHighlighted: rawItem => rawItem.isHighlighted,
@@ -127,9 +135,11 @@ export function makeResourceKindNavSection(
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
-        contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
-        contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
-        isCheckVisibleOnHover: true,
+        // contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
+        contextMenu: {component: ResourceKindContextMenu, isVisibleOnHover: true},
+        checkbox: {
+          isVisibleOnHover: true,
+        },
       },
     },
   };

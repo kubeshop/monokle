@@ -9,7 +9,6 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
-import ResourceKindContextMenuWrapper from '../K8sResourceSectionBlueprint/ResourceKindContextMenuWrapper';
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
 import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffix';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -26,7 +25,6 @@ export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
 const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownResourceScopeType> = {
   name: UNKNOWN_RESOURCE_SECTION_NAME,
   id: UNKNOWN_RESOURCE_SECTION_NAME,
-  containerElementId: 'navigator-sections-container',
   rootSectionId: UNKNOWN_RESOURCE_SECTION_NAME,
   getScope: state => {
     return {
@@ -37,28 +35,14 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     };
   },
   builder: {
-    getRawItems: scope => scope.unknownResources,
-    getGroups: scope => {
-      const unknownResourcesByKind: Record<string, K8sResource[]> = scope.unknownResources.reduce<
-        Record<string, K8sResource[]>
-      >((acc, resource) => {
-        if (acc[resource.kind]) {
-          acc[resource.kind].push(resource);
-        } else {
-          acc[resource.kind] = [resource];
+    // TODO: subsections with the unknown kinds should be created
+    getRawItems: scope =>
+      scope.unknownResources.sort((a, b) => {
+        if (a.kind !== b.kind) {
+          return a.kind.localeCompare(b.kind);
         }
-        return acc;
-      }, {});
-      return Object.entries(unknownResourcesByKind)
-        .map(([resourceKind, resources]) => {
-          return {
-            id: resourceKind,
-            name: resourceKind,
-            itemIds: resources.map(r => r.id),
-          };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
-    },
+        return a.name.localeCompare(b.name);
+      }),
     isVisible: (_, rawItems) => {
       return rawItems.length > 0;
     },
@@ -84,8 +68,8 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       },
     },
     customization: {
-      contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
-      contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
+      // contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
+      contextMenu: {component: ResourceKindContextMenu, isVisibleOnHover: true},
       prefix: {component: ResourceKindPrefix},
       suffix: {component: ResourceKindSuffix},
     },

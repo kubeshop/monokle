@@ -1,4 +1,3 @@
-export {default as ClusterDiff} from './ClusterDiff';
 export {default as FilePatternList} from './FilePatternList';
 export {default as FormEditor} from './FormEditor';
 export {default as GraphView} from './GraphView';

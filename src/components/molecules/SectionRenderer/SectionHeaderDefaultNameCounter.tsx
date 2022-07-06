@@ -14,15 +14,15 @@ function SectionHeaderDefaultNameCounter({sectionInstance, onClick}: SectionCust
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
 
   const resourceCount = useMemo(() => {
-    const counterDisplayMode = sectionBlueprint?.customization?.counterDisplayMode;
+    const counterType = sectionBlueprint?.customization?.counter?.type;
 
-    if (!counterDisplayMode || counterDisplayMode === 'descendants') {
+    if (!counterType || counterType === 'descendants') {
       return sectionInstance?.visibleDescendantItemIds?.length || 0;
     }
-    if (counterDisplayMode === 'items') {
+    if (counterType === 'items') {
       return sectionInstance?.visibleItemIds.length;
     }
-    if (counterDisplayMode === 'subsections') {
+    if (counterType === 'subsections') {
       return sectionInstance?.visibleChildSectionIds?.length || 0;
     }
     return undefined;

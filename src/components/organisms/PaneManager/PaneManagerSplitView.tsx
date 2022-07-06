@@ -73,7 +73,7 @@ const PaneManagerSplitView: React.FC = () => {
           <NavigatorPane height={height} />
         </ReflexElement>
 
-        {/* react-reflex does not work as intended when you use propagate 
+        {/* react-reflex does not work as intended when you use propagate
             without multiple splitters so set is dynamically. */}
         <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 

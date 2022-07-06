@@ -63,7 +63,6 @@ export const Settings = ({
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
-  const uiState = useAppSelector(state => state.ui);
   const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
@@ -76,7 +75,7 @@ export const Settings = ({
   );
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
-  const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+  const isEditingDisabled = isInClusterMode;
   const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const [selectedK8SVersion, setSelectedK8SVersion] = useState<string>(String(config?.k8sVersion));

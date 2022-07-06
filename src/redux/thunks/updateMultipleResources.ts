@@ -39,11 +39,6 @@ export const updateMultipleResources = createAsyncThunk(
           mainState.fileMap,
           mainState.resourceRefsProcessingOptions
         );
-
-        // relaod cluster diff if that's where we are
-        if (state.ui.isClusterDiffVisible) {
-          mainState.clusterDiff.shouldReload = true;
-        }
       } catch (e) {
         log.error(e);
         return original(mainState);

@@ -1,3 +1,5 @@
+import {Tag} from 'antd';
+
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
@@ -11,12 +13,15 @@ const Prefix = (props: ItemCustomComponentProps) => {
     return null;
   }
   return (
-    <ResourceRefsIconPopover
-      isSelected={itemInstance.isSelected}
-      isDisabled={itemInstance.isDisabled}
-      resource={resource}
-      type="incoming"
-    />
+    <>
+      <ResourceRefsIconPopover
+        isSelected={itemInstance.isSelected}
+        isDisabled={itemInstance.isDisabled}
+        resource={resource}
+        type="incoming"
+      />
+      <Tag>{resource.kind}</Tag>
+    </>
   );
 };
 

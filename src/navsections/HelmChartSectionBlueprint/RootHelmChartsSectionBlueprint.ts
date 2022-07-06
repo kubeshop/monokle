@@ -21,7 +21,6 @@ export type RootHelmChartsScopeType = {
 const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmChartsScopeType> = {
   name: HELM_CHART_SECTION_NAME,
   id: HELM_CHART_SECTION_NAME,
-  containerElementId: 'helm-sections-container',
   rootSectionId: HELM_CHART_SECTION_NAME,
   childSectionIds: [],
   getScope: state => {
@@ -52,12 +51,14 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
     },
     shouldBeVisibleBeforeInitialized: true,
   },
+  rowBuilder: {
+    fontSize: 16,
+  },
   customization: {
-    counterDisplayMode: 'subsections',
-    emptyDisplay: {
+    counter: {type: 'subsections'},
+    empty: {
       component: RootHelmChartsSectionEmptyDisplay,
     },
-    nameSize: 16,
   },
 };
 

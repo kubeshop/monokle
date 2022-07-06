@@ -9,8 +9,6 @@ import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@red
 
 import {isDefined} from '@utils/filter';
 
-import Colors from '@styles/Colors';
-
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
@@ -54,7 +52,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   > = {
     name: 'Preview Configurations',
     id: `${helmChart.id}-configurations`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       return {
@@ -81,6 +78,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getInstanceId: rawItem => rawItem.id,
       getName: rawItem => rawItem.name,
+      rowBuilder: {
+        indentation: 12,
+        height: 23,
+        marginBottom: instance => (instance.isLast ? 12 : 0),
+      },
       builder: {
         getMeta: () => {
           return {
@@ -102,30 +104,26 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       customization: {
         quickAction: {
           component: PreviewConfigurationQuickAction,
-          options: {isVisibleOnHover: true},
+          isVisibleOnHover: true,
         },
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
-    customization: {
-      counterDisplayMode: 'items',
+    rowBuilder: {
       indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
-      namePrefix: {
+      fontSize: 14,
+      marginBottom: instance => (instance.isCollapsed || instance.isEmpty || !instance.visibleItemIds?.length ? 12 : 0),
+    },
+    customization: {
+      counter: {type: 'items'},
+      prefix: {
         component: CollapseSectionPrefix,
       },
-      sectionMarginBottom: 12,
-      nameSuffix: {
+      suffix: {
         component: PreviewConfigurationNameSuffix,
-        options: {
-          isVisibleOnHover: true,
-        },
+        isVisibleOnHover: true,
       },
     },
   };
@@ -133,7 +131,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const templateFilesSectionBlueprint: SectionBlueprint<HelmTemplate, TemplatesScopeType> = {
     name: 'Templates',
     id: `${helmChart.id}-templates`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       return {
@@ -159,20 +156,23 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         return scope.isFolderOpen && rawItems.length === 0;
       },
     },
-    customization: {
-      counterDisplayMode: 'items',
+    rowBuilder: {
       indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
-      namePrefix: {
+      fontSize: 14,
+    },
+    customization: {
+      counter: {type: 'items'},
+      prefix: {
         component: CollapseSectionPrefix,
       },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.filePath,
+      rowBuilder: {
+        indentation: 12,
+        height: 23,
+      },
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -195,7 +195,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
   };
@@ -203,7 +202,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const valuesFilesSectionBlueprint: SectionBlueprint<HelmValuesFile, ValuesFilesScopeType> = {
     name: 'Values Files',
     id: `${helmChart.id}-values`,
-    containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
@@ -235,20 +233,25 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         return scope.isFolderOpen && rawItems.length === 0;
       },
     },
-    customization: {
-      counterDisplayMode: 'items',
+    rowBuilder: {
       indentation: 10,
-      nameWeight: 400,
-      nameSize: 14,
-      nameColor: Colors.grey9,
-      nameHorizontalPadding: 0,
-      namePrefix: {
+      fontSize: 14,
+    },
+    customization: {
+      counter: {
+        type: 'items',
+      },
+      prefix: {
         component: CollapseSectionPrefix,
       },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
+      rowBuilder: {
+        indentation: 12,
+        height: 23,
+      },
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -272,12 +275,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       customization: {
         quickAction: {
           component: HelmChartQuickAction,
-          options: {isVisibleOnHover: true},
+          isVisibleOnHover: true,
         },
         prefix: {
           component: ItemPrefix,
         },
-        lastItemMarginBottom: 0,
       },
     },
   };
@@ -285,7 +287,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   const helmChartSectionBlueprint: SectionBlueprint<HelmChart, HelmChartScopeType> = {
     id: helmChart.id,
     name: helmChart.name,
-    containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     childSectionIds: [
       valuesFilesSectionBlueprint.id,
@@ -322,6 +323,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     itemBlueprint: {
       getName: () => 'Chart.yaml',
       getInstanceId: chart => chart.id,
+      rowBuilder: {
+        indentation: 0,
+        height: 23,
+      },
       builder: {
         getMeta: chart => ({
           filePath: chart.filePath,
@@ -344,15 +349,16 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         prefix: {component: ItemPrefix},
-        lastItemMarginBottom: 0,
       },
     },
-    customization: {
-      counterDisplayMode: 'none',
+    rowBuilder: {
       indentation: 0,
-      nameWeight: 600,
-      nameSize: 14,
-      nameColor: Colors.grey9,
+      fontSize: 14,
+    },
+    customization: {
+      counter: {
+        type: 'none',
+      },
     },
   };
 

@@ -2,49 +2,48 @@ import React, {ReactNode} from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
+// import {AppDispatch} from '@models/appdispatch';
+// import {RootState} from '@models/rootstate';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
-  options?: ItemCustomComponentOptions;
   children?: ReactNode;
 };
 
 export type ItemCustomComponent = React.ComponentType<ItemCustomComponentProps>;
 
-export type ItemCustomComponentOptions = {
-  isVisibleOnHover: boolean;
-};
-
 export interface ItemCustomization {
   prefix?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
   suffix?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
   quickAction?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
-  contextMenuWrapper?: {
-    component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
-  };
+  // contextMenuWrapper?: {
+  //   component: ItemCustomComponent;
+  //   isVisibleOnHover?: boolean;
+  // };
   contextMenu?: {
     component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+    isVisibleOnHover?: boolean;
   };
-  nameDisplay?: {
-    component: ItemCustomComponent;
-    options?: ItemCustomComponentOptions;
+  row?: {
+    component?: ItemCustomComponent;
+    isVisibleOnHover?: boolean;
+    disableHoverStyle?: boolean;
   };
-  disableHoverStyle?: boolean;
-  isCheckVisibleOnHover?: boolean;
-  lastItemMarginBottom?: number;
+  checkbox?: {
+    isVisibleOnHover?: boolean;
+  };
+  // disableHoverStyle?: boolean;
+  // isCheckVisibleOnHover?: boolean;
+  // lastItemMarginBottom?: number; TODO: is this still needed?
 }
 
 export type SectionCustomComponentProps = {
@@ -55,49 +54,53 @@ export type SectionCustomComponentProps = {
 export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
 
 export interface SectionCustomization {
-  nameDisplay?: {
-    component: SectionCustomComponent;
+  row?: {
+    component?: SectionCustomComponent;
+    disableHoverStyle?: boolean;
+    initializationText?: string;
   };
-  nameSuffix?: {
-    component: SectionCustomComponent;
-    options?: {
-      isVisibleOnHover: boolean;
-    };
+  suffix?: {
+    component?: SectionCustomComponent;
+    isVisibleOnHover?: boolean;
   };
-  emptyDisplay?: {
-    component: SectionCustomComponent;
+  empty?: {
+    component?: SectionCustomComponent;
   };
-  nameContext?: {
-    component: SectionCustomComponent;
+  contextMenu?: {
+    component?: SectionCustomComponent;
   };
-  nameCounter?: {
-    component: SectionCustomComponent;
+  counter?: {
+    /** If no value is provided, default value will be "descendants". */
+    type?: 'descendants' | 'items' | 'subsections' | 'none';
+    component?: SectionCustomComponent;
   };
-  namePrefix?: {
-    component: SectionCustomComponent;
+  prefix?: {
+    component?: SectionCustomComponent;
   };
+  checkbox?: {
+    isVisibleOnHover?: boolean;
+  };
+  // beforeInitializationText?: string;
+  // TODO: can we remove disableHoverStyle? maybe allow a custom `style` object? or probably a method that receives the old style and creates the new one?
+  // disableHoverStyle?: boolean;
+  // isCheckVisibleOnHover?: boolean;
+}
 
-  beforeInitializationText?: string;
-  /** If no value is provided, default value will be "descendants" */
-  counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
-  disableHoverStyle?: boolean;
-  emptyGroupText?: string;
-  emptyVisibleItemsText?: string;
-  /** Number of pixels to indent this section, by default all sections/susections are aligned */
-  indentation?: number;
-  isCheckVisibleOnHover?: boolean;
-  nameColor?: string;
-  nameHorizontalPadding?: number;
-  nameSize?: number;
-  nameVerticalPadding?: number;
-  nameWeight?: number;
-  sectionMarginBottom?: number;
-  showHeader?: boolean;
+export interface RowBuilder<InstanceType, PropsType = undefined> {
+  /** If not specified, the default value will be 25. */
+  height?: number | ((instance: InstanceType, props?: PropsType) => number);
+  /** If not specified, the default value will be rowHeight * 0.75 */
+  fontSize?: number | ((instance: InstanceType, props?: PropsType) => number);
+  /** If not specified, the default value will be 0. */
+  indentation?: number | ((instance: InstanceType, props?: PropsType) => number);
+  /** If not specified, the default value will be 0. */
+  marginBottom?: number | ((instance: InstanceType, props?: PropsType) => number);
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
+  rowBuilder?: RowBuilder<ItemInstance, {sectionInstance: SectionInstance}>;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;
@@ -109,29 +112,22 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
-    onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
-    onCheck?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
+    onClick?: (itemInstance: ItemInstance, dispatch: any) => void;
+    onCheck?: (itemInstance: ItemInstance, dispatch: any) => void;
   };
   customization?: ItemCustomization;
-}
-
-export interface ItemGroupBlueprint {
-  id: string;
-  name: string;
-  itemIds: string[];
 }
 
 export interface SectionBlueprint<RawItemType, ScopeType = any> {
   id: string;
   name: string;
-  getScope: (state: RootState) => ScopeType;
-  containerElementId: string;
+  getScope: (state: any) => ScopeType;
+  rowBuilder?: RowBuilder<SectionInstance>;
   rootSectionId: string;
   childSectionIds?: string[];
   builder?: {
     transformName?: (originalName: string, scope: ScopeType) => string;
     getRawItems?: (scope: ScopeType) => RawItemType[];
-    getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
     getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
@@ -148,10 +144,6 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
 }
 
-export interface ItemGroupInstance extends ItemGroupBlueprint {
-  visibleItemIds: string[];
-}
-
 export interface ItemInstance {
   id: string;
   sectionId: string;
@@ -164,7 +156,7 @@ export interface ItemInstance {
   isDisabled: boolean;
   isCheckable: boolean;
   isChecked: boolean;
-  shouldScrollIntoView?: boolean;
+  isLast: boolean;
   meta?: any;
 }
 
@@ -173,30 +165,57 @@ export interface SectionInstance {
   name: string;
   rootSectionId: string;
   itemIds: string[];
-  groups: ItemGroupInstance[];
   visibleItemIds: string[];
-  visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
-  visibleDescendantSectionIds?: string[];
   visibleDescendantItemIds?: string[];
+  visibleDescendantSectionIds?: string[];
+  isCollapsed: boolean;
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
+  isLast: boolean;
   checkable?: {
     value: 'unchecked' | 'partial' | 'checked';
     checkItemsAction: AnyAction;
     uncheckItemsAction: AnyAction;
   };
-  shouldExpand: boolean;
   meta?: any;
 }
+
+export type NavigatorSectionRow = {
+  type: 'section';
+  id: string;
+  level: number; // TODO: is the level needed?
+  fontSize: number;
+  indentation: number;
+  height: number;
+  marginBottom: number;
+};
+
+export type NavigatorItemRow = {
+  type: 'item';
+  id: string;
+  sectionId: string;
+  level: number;
+  fontSize: number;
+  indentation: number;
+  height: number;
+  marginBottom: number;
+};
+
+/**
+ * This model represents the virtualized rows that will be rendered using react-virtual
+ */
+export type NavigatorRow = NavigatorSectionRow | NavigatorItemRow;
 
 export interface NavigatorInstanceState {
   sectionInstanceMap: Record<string, SectionInstance>;
   itemInstanceMap: Record<string, ItemInstance>;
+  rowsByRootSectionId: Record<string, NavigatorRow[]>;
+  rowIndexToScrollByRootSectionId: Record<string, number | undefined>;
 }
 
 export interface NavigatorState extends NavigatorInstanceState {

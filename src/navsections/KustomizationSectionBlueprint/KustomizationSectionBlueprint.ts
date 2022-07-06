@@ -7,10 +7,8 @@ import {SectionBlueprint} from '@models/navigator';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationContextMenu from './KustomizationContextMenu';
-import KustomizationContextMenuWrapper from './KustomizationContextMenuWrapper';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay';
@@ -33,8 +31,11 @@ export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
-  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
-  containerElementId: 'kustomize-sections-container',
+  rootSectionId: KUSTOMIZATION_SECTION_NAME,
+  rowBuilder: {
+    height: 25,
+    fontSize: 20,
+  },
   getScope: state => {
     const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {
@@ -72,15 +73,20 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
-    emptyDisplay: {
+    empty: {
       component: KustomizationSectionEmptyDisplay,
     },
-    beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
-    counterDisplayMode: 'items',
+    row: {
+      initializationText: 'Get started by browsing a folder in the File Explorer.',
+    },
+    counter: {type: 'items'},
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
+    rowBuilder: {
+      height: 23,
+    },
     builder: {
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,
@@ -95,9 +101,8 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
-      contextMenuWrapper: {component: KustomizationContextMenuWrapper, options: {isVisibleOnHover: false}},
-      contextMenu: {component: KustomizationContextMenu, options: {isVisibleOnHover: true}},
-      quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
+      contextMenu: {component: KustomizationContextMenu, isVisibleOnHover: true},
+      quickAction: {component: KustomizationQuickAction, isVisibleOnHover: true},
     },
   },
 };

@@ -12,7 +12,7 @@ export type ScrollContainerRef = {
 };
 
 const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId}: ScrollIntoViewProps, ref) => {
-  const containerRef = React.useRef<HTMLLIElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   React.useImperativeHandle(ref, () => {
     return {
       scrollIntoView: () => {
@@ -39,9 +39,9 @@ const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId
   });
 
   return (
-    <li style={{width: '100%'}} id={id} ref={containerRef}>
+    <div style={{width: '100%'}} id={id} ref={containerRef}>
       {children}
-    </li>
+    </div>
   );
 });
 

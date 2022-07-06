@@ -66,7 +66,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -345,7 +344,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                 {isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : activeTabKey === 'source' ? (
-                  !isClusterDiffVisible &&
                   (selectedResourceId || selectedPath || selectedValuesFileId) && (
                     <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                   )
