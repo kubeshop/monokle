@@ -282,11 +282,13 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions .cluster-actions-container {
+.ant-table-body .ant-table-row:hover .table-column-actions .cluster-actions-container,
+.table-row-changing-cluster-color .cluster-actions-container {
   display: flex;
 }
 
-.ant-table-body .ant-table-row:hover {
+.ant-table-body .ant-table-row:hover,
+.table-row-changing-cluster-color {
   background: #111d2c;
 }
 
@@ -302,6 +304,15 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 .cluster-dropdown-item li:hover {
   background: #111d2c;
+}
+
+.cluster-color-popover {
+  width: 130px;
+}
+
+.cluster-color-popover .ant-popover-title {
+  min-width: auto;
+  padding: 10px 16px 12px;
 }
 
 .ant-notification.ant-notification-topRight {

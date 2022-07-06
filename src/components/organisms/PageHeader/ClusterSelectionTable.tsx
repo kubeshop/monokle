@@ -1,6 +1,6 @@
 import {FC, useCallback, useEffect, useState} from 'react';
 
-import {Button, Form, Tooltip} from 'antd';
+import {Button, Form, Popover, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {v4 as uuid} from 'uuid';
@@ -18,6 +18,8 @@ import FilePatternList from '@molecules/FilePatternList';
 
 import {runCommandInMainThread} from '@utils/commands';
 import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+
+import {BackgroundColors} from '@styles/Colors';
 
 import * as S from './ClusterSelectionTable.styled';
 
@@ -38,6 +40,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
 
+  const [changeClusterColor, setChangeClusterColor] = useState('');
   const [editingKey, setEditingKey] = useState('');
   const [localClusters, setLocalClusters] = useState<ClusterTableRow[]>([]);
 
@@ -52,8 +55,20 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   }, []);
   const isEditing = useCallback((record: ClusterTableRow) => record.name === editingKey, [editingKey]);
   const rowClassName = useCallback(
-    (cluster: ClusterTableRow) => (kubeConfigContext === cluster.name ? 'table-active-row' : ''),
-    [kubeConfigContext]
+    (cluster: ClusterTableRow) => {
+      let className = '';
+
+      if (kubeConfigContext === cluster.name) {
+        className += 'table-active-row ';
+      }
+
+      if (changeClusterColor === cluster.name) {
+        className += 'table-row-changing-cluster-color';
+      }
+
+      return className.trim();
+    },
+    [changeClusterColor, kubeConfigContext]
   );
 
   const edit = (record: Partial<ClusterTableRow>) => {
@@ -228,7 +243,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
           dataIndex="clusterActions"
           ellipsis
           width={75}
-          render={(_: any, record: ClusterTableRow) => {
+          render={(value: any, record: ClusterTableRow) => {
             if (isEditing(record)) {
               return (
                 <Button onClick={() => save(record.name)} type="default">
@@ -246,7 +261,35 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }}
                 />
 
-                <S.ClusterColor />
+                <Popover
+                  overlayClassName="cluster-color-popover"
+                  placement="bottom"
+                  title={
+                    <>
+                      <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
+                      <S.DefaultColorContainer>
+                        <S.ClusterColor $color={BackgroundColors.clusterModeBackground} $selected $size="big" />
+                        <span>Default</span>
+                      </S.DefaultColorContainer>
+                    </>
+                  }
+                  trigger="click"
+                  zIndex={1500}
+                  onVisibleChange={visible => {
+                    if (!visible) {
+                      setChangeClusterColor('');
+                    }
+                  }}
+                >
+                  <S.ClusterColor
+                    $color={BackgroundColors.clusterModeBackground}
+                    $selected
+                    $size="small"
+                    onClick={() => {
+                      setChangeClusterColor(record.name);
+                    }}
+                  />
+                </Popover>
               </S.ActionsContainer>
             );
           }}

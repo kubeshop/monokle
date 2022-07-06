@@ -208,7 +208,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                   arrow
                   trigger={['click']}
                   disabled={isPreviewLoading || isInPreviewMode}
-                  visible
+                  visible={isClusterDropdownOpen}
                   onVisibleChange={setIsClusterDropdownOpen}
                 >
                   <S.ClusterButton type="link" ref={dropdownButtonRef} size="small">

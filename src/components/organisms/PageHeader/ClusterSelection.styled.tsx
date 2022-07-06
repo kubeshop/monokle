@@ -34,7 +34,7 @@ export const getPreviewTheme = (
   let color = fallBackColor;
 
   if (previewType === 'cluster') {
-    color = rgbaRatio ? rgba(Colors.volcano, rgbaRatio) : Colors.volcano;
+    color = rgbaRatio ? rgba(Colors.volcano8, rgbaRatio) : Colors.volcano8;
   }
   if (previewType === 'helm') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.yellow5;

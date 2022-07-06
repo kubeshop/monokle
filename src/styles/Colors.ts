@@ -39,6 +39,9 @@ enum Colors {
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
 
+  volcano7 = '#E87040',
+  volcano8 = '#F3956A',
+
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
   red7 = '#E84749', // Dust Red
@@ -53,7 +56,6 @@ enum Colors {
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',
   cyan5 = '#138585',
-  volcano = '#F3956A',
   lightSeaGreen = '#13a8a8',
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
@@ -81,7 +83,7 @@ export enum BackgroundColors {
   lightThemeBackground = Colors.whitePure,
   darkThemeBackground = Colors.blackPure,
   previewModeBackground = Colors.cyan,
-  clusterModeBackground = Colors.volcano,
+  clusterModeBackground = Colors.volcano8,
 }
 
 export enum FontColors {
