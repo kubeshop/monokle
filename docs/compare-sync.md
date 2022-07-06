@@ -25,7 +25,7 @@ Here are some of the scenarios where Compare & Sync can help you:
 
 To use Compare & Sync follow these steps:
 
-- Browse to a folder containing manifests / kustomizations / Helm charts.
+- Browse to a folder containing manifests/Kustomizations/Helm charts.
 - Press the **Compare & Sync** button at the top of the Resource Navigator:
 
 ![Compare & Sync](img/cluster-compare-button-1.6.0.png)
