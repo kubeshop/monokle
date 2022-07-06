@@ -21,7 +21,7 @@ Here are some of the scenarios where Compare & Sync can help you:
 5. Compare the output of a Helm Chart using two different values files.
 6. Compare the output of two different Helm Charts.
 7. Compare the output of a Helm Chart to the output of a Kustomization
-8. Compare two Kustomization outputs
+8. Compare two Kustomization outputs.
 
 To use Compare & Sync follow these steps:
 
