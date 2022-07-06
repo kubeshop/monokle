@@ -227,26 +227,27 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
           key="clusterActions"
           dataIndex="clusterActions"
           ellipsis
-          width={70}
+          width={75}
           render={(_: any, record: ClusterTableRow) => {
-            const editing = isEditing(record);
-            if (editing) {
+            if (isEditing(record)) {
               return (
                 <Button onClick={() => save(record.name)} type="default">
                   Done
                 </Button>
               );
             }
+
             return (
-              <span
-                className="edit-span-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  edit(record);
-                }}
-              >
-                <S.EditOutlined />
-              </span>
+              <S.ActionsContainer className="cluster-actions-container">
+                <S.EditOutlined
+                  onClick={e => {
+                    e.stopPropagation();
+                    edit(record);
+                  }}
+                />
+
+                <S.ClusterColor />
+              </S.ActionsContainer>
             );
           }}
         />
