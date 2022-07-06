@@ -106,7 +106,7 @@ Clicking on a template will select it and open it in the Editor.
 When you hover over a value referenced from a Values file, the popup that appears will display the following information:
 - The path to the values file where the reference is from.
 - The referenced value, so you don't have to switch to the Values file.
-- A link to quickly navigate to the location of that value
+- A link to quickly navigate to the location of that value.
 
 ![Helm Templates](img/helm-templates-1-8-0.png)
 
