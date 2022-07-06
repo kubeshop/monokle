@@ -6,7 +6,7 @@ Each set of resources can be one of the following:
 - Resources from your local manifest files.
 - Resources from a cluster.
 - Resources from the [Preview](helm.md) of a Helm Chart.
-- Resources from the [Preview](kustomize.md) of a Kustomization
+- Resources from the [Preview](kustomize.md) of a Kustomization.
 
 Here are some of the scenarios where Compare & Sync can help you:
 1. Compare local resources to the resources in your cluster AND:
