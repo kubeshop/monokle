@@ -154,12 +154,6 @@ export const MatchLine = styled.div`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-
-  em {
-    background: ${Colors.yellow11};
-    color: ${Colors.green10};
-    font-style: normal;
-  }
 `;
 
 export const TreeContainer = styled.div`
@@ -167,6 +161,11 @@ export const TreeContainer = styled.div`
 `;
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
+  .match-higlight {
+    background: ${Colors.yellow11};
+    color: ${Colors.green10};
+    font-style: normal;
+  }
   margin-top: 10px;
 
   /* hide root node */

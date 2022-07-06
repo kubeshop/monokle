@@ -1,5 +1,5 @@
 import {MatchParamProps} from '@models/appstate';
-import {FileEntry, MatchNode} from '@models/fileentry';
+import {FileEntry} from '@models/fileentry';
 
 /* based on matching params we change the way we find matches in file */
 export function getRegexp(query: string, params: MatchParamProps): RegExp {
@@ -26,20 +26,10 @@ export function getRegexp(query: string, params: MatchParamProps): RegExp {
   return queryRegExp;
 }
 
-function decorateMatch(
-  text: string,
-  query: string,
-  fromIndex = 0
-): Omit<MatchNode, 'lineNumber' | 'currentMatchNumber'> {
+function getMatchIndexes(text: string, query: string, fromIndex = 0): {start: number; end: number} {
   const textToSearch = text.slice(fromIndex);
-
   const queryIdx = textToSearch.slice(0).indexOf(query);
-  const textWithHighlights = `${textToSearch.slice(0, queryIdx)}<em>${textToSearch.slice(
-    queryIdx,
-    queryIdx + query.length
-  )}</em>${textToSearch.slice(queryIdx + query.length)}`;
-
-  return {textWithHighlights, start: fromIndex + queryIdx, end: fromIndex + queryIdx + query.length};
+  return {start: fromIndex + queryIdx, end: fromIndex + queryIdx + query.length};
 }
 
 function getMatchLines(text: string, queryRegExp: RegExp, searchCounterRef: any) {
@@ -47,20 +37,18 @@ function getMatchLines(text: string, queryRegExp: RegExp, searchCounterRef: any)
 
   const fileLineData = lineArr
     .map((line: string, index: number) => {
-      const matchesInLine = line.match(queryRegExp);
+      const matchesInLine: RegExpMatchArray | null = line.match(queryRegExp);
+
       if (!matchesInLine) return null;
 
       return matchesInLine?.reduce((acc: any, currQuery, matchIdx) => {
-        const {textWithHighlights, start, end} = decorateMatch(
-          line,
-          currQuery,
-          (acc.length && acc[acc.length - 1].end) || 0
-        );
+        const {start, end} = getMatchIndexes(line, currQuery, (acc.length && acc[acc.length - 1].end) || 0);
         searchCounterRef.current.totalMatchCount += matchIdx + 1;
         return [
           ...acc,
           {
-            textWithHighlights,
+            matchesInLine: [currQuery],
+            wholeLine: line,
             lineNumber: index + 1,
             start: start + 1,
             end: end + 1,

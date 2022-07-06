@@ -3,11 +3,12 @@
  */
 
 export interface MatchNode {
-  textWithHighlights: string;
   lineNumber: number;
   start: number;
   end: number;
   currentMatchNumber: number;
+  wholeLine: string;
+  matchesInLine: string[];
 }
 
 export interface CurrentMatch {
