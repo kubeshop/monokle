@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 
 import {Button, Form, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
@@ -21,7 +21,7 @@ import {addContextWithRemovedNamespace, addNamespaces, getKubeAccess, getNamespa
 
 import * as S from './ClusterSelectionTable.styled';
 
-interface CLusterSelectionTableProps {
+interface ClusterSelectionTableProps {
   setIsClusterDropdownOpen: (isOpen: boolean) => void;
 }
 
@@ -32,35 +32,26 @@ interface ClusterTableRow {
   editable: boolean;
 }
 
-export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
+export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
   const dispatch = useAppDispatch();
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
-  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
 
+  const [editingKey, setEditingKey] = useState('');
   const [localClusters, setLocalClusters] = useState<ClusterTableRow[]>([]);
 
-  useEffect(() => {
-    const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
-      const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
-      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
-      const hasFullAccess = clusterSpecificAccess.length
-        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
-        : undefined;
-      return {
-        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
-        name: context.name,
-        hasFullAccess,
-        editable: true,
-      };
-    });
-
-    setLocalClusters(clusterTableRows);
-  }, [kubeConfigContexts, clusterAccess]);
-
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
-  const isEditing = (record: ClusterTableRow) => record.name === editingKey;
+
+  const clusterAccessRender = useCallback((hasFullAccess?: boolean) => {
+    if (hasFullAccess === undefined) {
+      return 'Unknown';
+    }
+
+    return hasFullAccess ? 'Full Access' : 'Restricted Access';
+  }, []);
+
+  const isEditing = useCallback((record: ClusterTableRow) => record.name === editingKey, [editingKey]);
 
   const edit = (record: Partial<ClusterTableRow>) => {
     form.setFieldsValue({name: '', namespaces: [], hasFullAccess: false, ...record});
@@ -130,14 +121,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     );
   };
 
-  const clusterAccessRender = (hasFullAccess?: boolean) => {
-    if (hasFullAccess === undefined) {
-      return 'Unknown';
-    }
-
-    return hasFullAccess ? 'Full Access' : 'Restricted Access';
-  };
-
   const onNamespacesChange = (clusterName: string, namespaces: string[]) => {
     const localClusterIndex = localClusters.findIndex(c => c.name === clusterName);
     const localCluster = localClusters[localClusterIndex];
@@ -158,6 +141,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
 
   const handleClusterChange = (clusterName: string) => {
     setIsClusterDropdownOpen(false);
+
     if (clusterName === kubeConfigContext) {
       return;
     }
@@ -180,6 +164,24 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
       }
     });
   };
+
+  useEffect(() => {
+    const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
+      const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
+      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
+      const hasFullAccess = clusterSpecificAccess.length
+        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
+        : undefined;
+      return {
+        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
+        name: context.name,
+        hasFullAccess,
+        editable: true,
+      };
+    });
+
+    setLocalClusters(clusterTableRows);
+  }, [kubeConfigContexts, clusterAccess]);
 
   return (
     <Form form={form} component={false}>
