@@ -2,6 +2,7 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
+import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
@@ -31,10 +32,19 @@ export const StartProjectContainer = styled.div`
 `;
 
 export const StartProjectItem = styled.div`
+  width: 33%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  padding: 2rem 1rem;
+  cursor: pointer;
+  background: ${Colors.grey10};
+
+  &:hover {
+    background: ${Colors.blue7};
+    transition: background ${AnimationDurations.base};
+  }
 `;
 
 export const StartProjectItemLogo = styled.img`
