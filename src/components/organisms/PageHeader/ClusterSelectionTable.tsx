@@ -8,10 +8,11 @@ import {v4 as uuid} from 'uuid';
 import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {ClusterColors} from '@models/cluster';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCurrentContext, updateProjectKubeAccess} from '@redux/reducers/appConfig';
+import {setCurrentContext, setKubeConfigContextColor, updateProjectKubeAccess} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
 import FilePatternList from '@molecules/FilePatternList';
@@ -32,6 +33,7 @@ interface ClusterTableRow {
   namespaces: string[];
   hasFullAccess?: boolean;
   editable: boolean;
+  color?: ClusterColors;
 }
 
 export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
@@ -39,6 +41,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
+  console.log(kubeConfigContexts);
 
   const [changeClusterColor, setChangeClusterColor] = useState('');
   const [editingKey, setEditingKey] = useState('');
@@ -183,6 +186,30 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     });
   };
 
+  const updateClusterColor = (name: string, color: ClusterColors) => {
+    dispatch(setKubeConfigContextColor({name, color}));
+  };
+
+  const isColorSelected = useCallback(
+    (name: string, color: ClusterColors) => {
+      const currentCluster = localClusters.find(cl => cl.name === name);
+
+      if (!currentCluster) {
+        return false;
+      }
+
+      if (
+        (!currentCluster.color && color === BackgroundColors.clusterModeBackground) ||
+        currentCluster.color === color
+      ) {
+        return true;
+      }
+
+      return false;
+    },
+    [localClusters]
+  );
+
   useEffect(() => {
     const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
       const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
@@ -190,16 +217,20 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
       const hasFullAccess = clusterSpecificAccess.length
         ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
         : undefined;
+
       return {
         namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
         name: context.name,
         hasFullAccess,
         editable: true,
+        color: context.color,
       };
     });
 
     setLocalClusters(clusterTableRows);
   }, [kubeConfigContexts, clusterAccess]);
+
+  console.log(localClusters);
 
   return (
     <Form form={form} component={false}>
@@ -265,7 +296,13 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   content={
                     <S.ClusterColorsContainer>
                       {CLUSTER_AVAILABLE_COLORS.map(color => (
-                        <S.ClusterColor key={color} $color={color} $size="big" />
+                        <S.ClusterColor
+                          key={color}
+                          $color={color}
+                          $selected={isColorSelected(record.name, color)}
+                          $size="big"
+                          onClick={() => updateClusterColor(record.name, color)}
+                        />
                       ))}
                     </S.ClusterColorsContainer>
                   }
@@ -275,8 +312,12 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                     <>
                       <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
                       <S.DefaultColorContainer>
-                        {/* Todo: only if context selected color is undefined or is the same */}
-                        <S.ClusterColor $color={BackgroundColors.clusterModeBackground} $selected $size="big" />
+                        <S.ClusterColor
+                          $color={BackgroundColors.clusterModeBackground}
+                          $selected={isColorSelected(record.name, BackgroundColors.clusterModeBackground)}
+                          $size="big"
+                          onClick={() => updateClusterColor(record.name, BackgroundColors.clusterModeBackground)}
+                        />
                         <span>Default</span>
                       </S.DefaultColorContainer>
                     </>

@@ -4,7 +4,9 @@ import {EditOutlined as RawEditOutlined} from '@ant-design/icons/lib/icons';
 
 import styled from 'styled-components';
 
-import Colors, {BackgroundColors} from '@styles/Colors';
+import {ClusterColors} from '@models/cluster';
+
+import Colors from '@styles/Colors';
 
 export const ActionsContainer = styled.div`
   display: flex;
@@ -17,7 +19,7 @@ export const ClusterAccessContainer = styled.span`
 `;
 
 export const ClusterColor = styled.div<{
-  $color: string | BackgroundColors;
+  $color: ClusterColors;
   $selected?: boolean;
   $size: 'small' | 'big';
 }>`

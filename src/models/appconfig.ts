@@ -1,5 +1,7 @@
 import {KustomizeCommandType} from '@models/kustomize';
 
+import {ClusterColors} from './cluster';
+
 export enum Themes {
   Dark = 'dark',
   Light = 'light',
@@ -62,6 +64,7 @@ export type KubeConfigContext = {
   name: string;
   user: string | null;
   namespace: string | null;
+  color?: ClusterColors;
 };
 
 export type KubeConfig = {
