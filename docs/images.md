@@ -22,4 +22,4 @@ Clicking on it will open a modal which allows you to enter a new tag for that im
 
 ![Image Replace Tag](img/images-panel-replace-1-8-0.png)
 
-After clicking on "Done", the tag will be replaced to the newly specified value across all your resources.
+After clicking "Done", the tag will be replaced with the newly specified value across all your resources.
