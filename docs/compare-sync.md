@@ -15,7 +15,7 @@ Here are some of the scenarios where Compare & Sync can help you:
 2. Compare resources between two clusters AND:
   - Deploy resources from one cluster to another.
 3. Compare resources between a Helm Chart or Kustomization preview to a cluster AND:
-  - Deploy the output of the helm chart to the cluster
+  - Deploy the output of the Helm chart to the cluster.
 4. Compare resources between a Helm Chart or Kustomization preview to your local resources AND:
   - Extract resources from the preview to your local files
 5. Compare the output of a Helm Chart using two different values files
