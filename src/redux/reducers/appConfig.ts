@@ -9,7 +9,7 @@ import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {
   AppConfig,
-  ClusterAccessWithContext,
+  ClusterAccess,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -21,7 +21,6 @@ import {
 } from '@models/appconfig';
 import {UiState} from '@models/ui';
 
-import {currentKubeContext} from '@redux/selectors';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -33,6 +32,7 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
+import {getKubeAccess} from '@utils/kubeclient';
 import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import initialState from '../initialState';
@@ -85,6 +85,22 @@ export const setOpenProject = createAsyncThunk(
 export const setLoadingProject = createAsyncThunk('config/loadingProject', async (loading: boolean, thunkAPI: any) => {
   thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
 });
+
+export const updateClusterNamespaces = createAsyncThunk(
+  'config/updateClusterNamespaces',
+  async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
+    thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
+    let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
+    accesses = accesses.filter(a => a.context !== values[0].cluster);
+
+    const results: ClusterAccess[] = await Promise.all(
+      values.map(value => getKubeAccess(value.namespace, value.cluster))
+    );
+
+    thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
+    thunkAPI.dispatch(configSlice.actions.setAccessLoading(false));
+  }
+);
 
 type UpdateProjectConfigPayload = {config: ProjectConfig | null; fromConfigFile: boolean};
 
@@ -150,14 +166,9 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
-      if (state.projectConfig) {
-        state.projectConfig.isAccessLoading = true;
-      }
     },
     setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      if (state.projectConfig) {
-        state.projectConfig.isAccessLoading = action.payload;
-      }
+      state.isAccessLoading = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
@@ -255,34 +266,6 @@ export const configSlice = createSlice({
       if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
         writeProjectConfigFile(state);
       }
-    },
-    updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccessWithContext[]>) => {
-      if (!state.selectedProjectRootFolder) {
-        return;
-      }
-
-      if (!state.projectConfig) {
-        state.projectConfig = {};
-      }
-
-      state.projectConfig.isAccessLoading = false;
-
-      let updateForContext: string;
-      if (!action.payload.length) {
-        updateForContext = currentKubeContext(state);
-      } else {
-        // check that update is just for one cluster
-        updateForContext = action.payload[0].context;
-        const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
-        if (!isUpdatingOneContext) {
-          return;
-        }
-      }
-
-      const otherClusterAccesses =
-        state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
-
-      state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -413,6 +396,30 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
+    addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
+      const access = state.clusterAccess.find(
+        c => c.context === action.payload.context && c.namespace === action.payload.namespace
+      );
+      if (!access) {
+        state.clusterAccess.push(action.payload);
+      }
+      state.isAccessLoading = false;
+    },
+    removeNamespaceFromContext: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{context: string; namespace: string}>
+    ) => {
+      const index = state.clusterAccess.findIndex(
+        c => c.context === action.payload.context && c.namespace === action.payload.namespace
+      );
+      if (index && index > -1) {
+        state.clusterAccess.splice(index, 1);
+      }
+      state.isAccessLoading = false;
+    },
+    updateClusterAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
+      state.clusterAccess = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -443,7 +450,6 @@ export const {
   changeCurrentProjectName,
   changeProjectsRootPath,
   updateApplicationSettings,
-  updateProjectKubeAccess,
   updateK8sVersion,
   handleFavoriteTemplate,
   toggleEventTracking,
@@ -451,6 +457,8 @@ export const {
   setAccessLoading,
   updateTelemetry,
   toggleProjectPin,
+  addNamespaceToContext,
+  removeNamespaceFromContext,
 } = configSlice.actions;
 export default configSlice.reducer;
 

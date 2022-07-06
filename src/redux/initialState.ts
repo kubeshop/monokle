@@ -106,6 +106,8 @@ const initialAppConfigState: AppConfig = {
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
   disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
+  clusterAccess: [],
+  isAccessLoading: false,
 };
 
 const initialAlertState: AlertState = {};
