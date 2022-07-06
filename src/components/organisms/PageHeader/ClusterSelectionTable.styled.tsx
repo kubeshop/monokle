@@ -28,12 +28,18 @@ export const ClusterColor = styled.div<{
     background-color: ${$color};
     width: ${$size === 'big' ? '24' : '18'}px;
     height: ${$size === 'big' ? '24' : '18'}px;
-    border: ${$size === 'big' ? '2' : '1'}px solid ${$selected ? Colors.blue6 : Colors.grey6};
+    border: ${$size === 'big' && $selected ? '2' : '1'}px solid ${$selected ? Colors.blue6 : Colors.grey6};
   `}
 
   &:hover {
     border-color: ${Colors.blue6};
   }
+`;
+
+export const ClusterColorsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 `;
 
 export const DefaultColorContainer = styled.div`

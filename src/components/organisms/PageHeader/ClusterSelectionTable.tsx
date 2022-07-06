@@ -5,7 +5,7 @@ import Column from 'antd/lib/table/Column';
 
 import {v4 as uuid} from 'uuid';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
 
@@ -262,12 +262,20 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                 />
 
                 <Popover
+                  content={
+                    <S.ClusterColorsContainer>
+                      {CLUSTER_AVAILABLE_COLORS.map(color => (
+                        <S.ClusterColor key={color} $color={color} $size="big" />
+                      ))}
+                    </S.ClusterColorsContainer>
+                  }
                   overlayClassName="cluster-color-popover"
                   placement="bottom"
                   title={
                     <>
                       <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
                       <S.DefaultColorContainer>
+                        {/* Todo: only if context selected color is undefined or is the same */}
                         <S.ClusterColor $color={BackgroundColors.clusterModeBackground} $selected $size="big" />
                         <span>Default</span>
                       </S.DefaultColorContainer>
