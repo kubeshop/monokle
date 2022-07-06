@@ -18,7 +18,7 @@ Hovering over an image will show the "Replace" action:
 
 ![Image Replace Hover](img/images-panel-hover-1-8-0.png)
 
-Clicking on it will open a modal which allow you to enter a new tag for that image:
+Clicking on it will open a modal which allows you to enter a new tag for that image:
 
 ![Image Replace Tag](img/images-panel-replace-1-8-0.png)
 
