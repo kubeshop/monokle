@@ -12,7 +12,7 @@ The list of images will changed based on the Mode you're in:
 
 Clicking on an Image will select it and will open an Image Details panel on top of the Editor.
 
-In the panel, you will find basic information about the image and you can browse the tags.
+In the panel, you will find basic information about the image and browse the image's tags.
 
 Hovering over an image will show the "Replace" action:
 
