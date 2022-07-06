@@ -8,7 +8,8 @@ import {ClusterAccess, KubePermissions} from '@models/appconfig';
 
 import {getMainProcessEnv} from '@utils/env';
 
-import {CommandOptions, CommandResult, runCommandInMainThread} from './commands';
+import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
+import {isRendererThread} from './thread';
 
 export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();
@@ -103,31 +104,21 @@ function parseCanI(stdout: string): {permissions: KubePermissions[]; hasFullAcce
   };
 }
 
-export async function getKubeAccessFromMain(namespace: string, currentContext: string): Promise<ClusterAccess> {
-  const result = await runCommandOnMain({
-    commandId: uuid(),
-    cmd: 'kubectl',
-    args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
-  });
-  const hasErrors = result.exitCode !== 0;
-  if (hasErrors) {
-    const errors = result.stderr;
-    log.error(`get cluster access errors ${errors}`);
-    throw new Error("Couldn't get cluster access for namespaces");
+export const getKubeAccess = async (namespace: string, currentContext: string): Promise<ClusterAccess> => {
+  let result;
+  if (isRendererThread()) {
+    result = await runCommandInMainThread({
+      commandId: uuid(),
+      cmd: 'kubectl',
+      args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
+    });
+  } else {
+    result = await runCommandPromise({
+      commandId: uuid(),
+      cmd: 'kubectl',
+      args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
+    });
   }
-  return {
-    ...parseCanI(result.stdout as string),
-    context: currentContext,
-    namespace,
-  };
-}
-
-export async function getKubeAccessFromRenderer(namespace: string, currentContext: string): Promise<ClusterAccess> {
-  const result = await runCommandInMainThread({
-    commandId: uuid(),
-    cmd: 'kubectl',
-    args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
-  });
 
   const hasErrors = result.exitCode !== 0;
   if (hasErrors) {
@@ -135,12 +126,16 @@ export async function getKubeAccessFromRenderer(namespace: string, currentContex
     log.error(`get cluster access errors ${errors}`);
     throw new Error("Couldn't get cluster access for namespaces");
   }
+  const stdout = result.stdout;
+  if (typeof stdout !== 'string') {
+    throw new Error("Couldn't get cluster access for namespaces");
+  }
   return {
     ...parseCanI(result.stdout as string),
     context: currentContext,
     namespace,
   };
-}
+};
 
 export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
   if (!clusterAccess) {
@@ -158,7 +153,7 @@ export function hasAccessToResource(resourceName: string, verb: string, clusterA
   return Boolean(resourceAccess);
 }
 
-export const runCommandOnMain = (options: CommandOptions): Promise<CommandResult> =>
+export const runCommandPromise = (options: CommandOptions): Promise<CommandResult> =>
   new Promise(res => {
     const result: CommandResult = {
       commandId: options.commandId,

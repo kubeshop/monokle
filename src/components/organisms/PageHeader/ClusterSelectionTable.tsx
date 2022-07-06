@@ -71,36 +71,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     if (!localCluster) {
       return;
     }
-
-    const otherClusterNamespaces = clusterAccess.filter(appNs => appNs.context !== clusterName);
-    const existingClusterNamespaces = localCluster.namespaces.map(ns => ({
-      namespace: ns,
-      cluster: clusterName,
-    }));
-
-    const defaultNamespace = kubeConfigContexts.find(ctx => ctx.name === clusterName)?.namespace;
-    if (defaultNamespace && !localCluster.namespaces.includes(defaultNamespace)) {
-      // addContextWithRemovedNamespace(clusterName);
-    }
-
-    // addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
-
-    if (clusterName === kubeConfigContext) {
-      // getKubeAccess(localCluster.namespaces, kubeConfigContext)
-      //   .then(currentClusterAccess => {
-      //     // dispatch(updateProjectKubeAccess(currentClusterAccess));
-      //   })
-      //   .catch(() => {
-      //     dispatch(
-      //       setAlert({
-      //         title: 'Cluster access failed',
-      //         message: "Couldn't get cluster access for namespaces",
-      //         type: AlertEnum.Warning,
-      //       })
-      //     );
-      //   });
-    }
-
     setEditingKey('');
   };
 
@@ -139,20 +109,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
 
   const onNamespacesChange = (values: {namespace: string; cluster: string}[]) => {
     dispatch(updateClusterNamespaces(values));
-    // const localClusterIndex = localClusters.findIndex(c => c.name === clusterName);
-    // const localCluster = localClusters[localClusterIndex];
-    // if (!localCluster) {
-    //   return;
-    // }
-    // const otherClusters = localClusters.filter(lc => lc.name !== clusterName);
-    // const editedCluster = {
-    //   name: clusterName,
-    //   namespaces,
-    //   hasFullAccess: localCluster.hasFullAccess,
-    //   editable: false,
-    // };
-    // otherClusters.splice(localClusterIndex, 0, editedCluster);
-    // setLocalClusters(otherClusters);
   };
 
   const handleClusterChange = (clusterName: string) => {

@@ -16,29 +16,23 @@ import {
 } from '@redux/reducers/appConfig';
 
 import {watchFunctions} from '@utils/helpers';
-import {getKubeAccessFromMain} from '@utils/kubeclient';
+import {getKubeAccess} from '@utils/kubeclient';
 
 let watcher: FSWatcher;
 let clusterNamespacesWatchInterval: number | null = null;
-let tempKubeConfigPath: string;
+
+let kubeConfigList: Record<string, {watcher: k8s.Watch | undefined; req: any}> = {};
 
 export async function monitorKubeConfig(filePath: string, dispatch: (action: AnyAction) => void) {
   if (watcher) {
     watcher.close();
   }
 
-  if (tempKubeConfigPath !== filePath) {
-    tempKubeConfigPath = filePath;
-    if (clusterNamespacesWatchInterval) {
-      clearInterval(clusterNamespacesWatchInterval);
-    }
-    clusterNamespacesWatchInterval = null;
-  }
-
   readAndNotifyKubeConfig(filePath, dispatch);
   watchAllClusterNamespaces(filePath, dispatch);
 
   webContents.getFocusedWebContents().on('did-finish-load', () => {
+    readAndNotifyKubeConfig(filePath, dispatch);
     if (clusterNamespacesWatchInterval) {
       clearInterval(clusterNamespacesWatchInterval);
     }
@@ -72,8 +66,6 @@ export async function monitorKubeConfig(filePath: string, dispatch: (action: Any
   }
 }
 
-let kubeConfigList: {[key: string]: any} = {};
-
 export function watchK8sNamespaces(
   kubeConfigPath: string,
   contexts: Array<k8s.Context>,
@@ -88,7 +80,10 @@ export function watchK8sNamespaces(
 
   contexts.forEach(context => {
     if (!kubeConfigList[context.name]) {
-      kubeConfigList[context.name] = {};
+      kubeConfigList[context.name] = {
+        watcher: undefined,
+        req: undefined,
+      };
       watchNamespaces(kubeConfigPath, context.name, dispatch);
     }
   });
@@ -100,12 +95,12 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
   kc.setCurrentContext(key);
   kubeConfigList[key].watcher = new k8s.Watch(kc);
   kubeConfigList[key].watcher
-    .watch(
+    ?.watch(
       '/api/v1/namespaces',
       {allowWatchBookmarks: true},
       (type: string, apiObj: any) => {
         if (type === 'ADDED') {
-          getKubeAccessFromMain(apiObj.metadata.name, key).then(value => {
+          getKubeAccess(apiObj.metadata.name, key).then(value => {
             dispatch(setAccessLoading(true));
             dispatch(addNamespaceToContext(value));
           });
@@ -145,7 +140,7 @@ export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (act
       watchK8sNamespaces(kubeConfigPath, kc.contexts, dispatch);
     } catch (error) {
       Object.keys(kubeConfigList).forEach((key: string) => {
-        if (kubeConfigList[key]) {
+        if (kubeConfigList && kubeConfigList[key] && kubeConfigList[key].req) {
           kubeConfigList[key].req.abort();
           delete kubeConfigList[key];
         }

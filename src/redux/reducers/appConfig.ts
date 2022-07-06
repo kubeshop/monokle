@@ -32,7 +32,7 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
-import {getKubeAccessFromRenderer} from '@utils/kubeclient';
+import {getKubeAccess} from '@utils/kubeclient';
 import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import initialState from '../initialState';
@@ -93,13 +93,9 @@ export const updateClusterNamespaces = createAsyncThunk(
     let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
     accesses = accesses.filter(a => a.context !== values[0].cluster);
 
-    const results: ClusterAccess[] = [];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const value of values) {
-      // eslint-disable-next-line no-await-in-loop
-      results.push(await getKubeAccessFromRenderer(value.namespace, value.cluster));
-    }
+    const results: ClusterAccess[] = await Promise.all(
+      values.map(value => getKubeAccess(value.namespace, value.cluster))
+    );
 
     thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
     thunkAPI.dispatch(configSlice.actions.setAccessLoading(false));
@@ -271,34 +267,6 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
-    // updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccessWithContext[]>) => {
-    //   if (!state.selectedProjectRootFolder) {
-    //     return;
-    //   }
-
-    //   if (!state.projectConfig) {
-    //     state.projectConfig = {};
-    //   }
-
-    //   state.projectConfig.isAccessLoading = false;
-
-    //   let updateForContext: string;
-    //   if (!action.payload.length) {
-    //     updateForContext = currentKubeContext(state);
-    //   } else {
-    //     // check that update is just for one cluster
-    //     updateForContext = action.payload[0].context;
-    //     const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
-    //     if (!isUpdatingOneContext) {
-    //       return;
-    //     }
-    //   }
-
-    //   const otherClusterAccesses =
-    //     state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
-
-    //   state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
-    // },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
         return;
