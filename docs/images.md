@@ -4,7 +4,7 @@ Monokle has a dedicated Images panel which can be accessed from the left menu:
 
 ![Images Panel](img/images-panel-1-8-0.png)
 
-This panel will show the list of all images that were found in the Navigator.
+This panel will show the list of all images that are found in the Navigator.
 The list of images will changed based on the Mode you're in:
 - Local mode
 - Preview mode (Helm or Kustomize)
