@@ -50,8 +50,11 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
 
     return hasFullAccess ? 'Full Access' : 'Restricted Access';
   }, []);
-
   const isEditing = useCallback((record: ClusterTableRow) => record.name === editingKey, [editingKey]);
+  const rowClassName = useCallback(
+    (cluster: ClusterTableRow) => (kubeConfigContext === cluster.name ? 'table-active-row' : ''),
+    [kubeConfigContext]
+  );
 
   const edit = (record: Partial<ClusterTableRow>) => {
     form.setFieldsValue({name: '', namespaces: [], hasFullAccess: false, ...record});
@@ -192,17 +195,10 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
         pagination={false}
         scroll={{y: 300}}
         rowKey="name"
-        className="asdasdasd"
-        rowClassName={(cluster: ClusterTableRow) => {
-          if (kubeConfigContext === cluster.name) {
-            return 'table-active-row';
-          }
-
-          return '';
-        }}
+        rowClassName={(cluster: ClusterTableRow) => rowClassName(cluster)}
       >
         <Column
-          className="table-column-name cluster-table-column-name"
+          className="table-column-name"
           title="Cluster name"
           dataIndex="name"
           key="name"
@@ -211,7 +207,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
           onCell={(cluster: ClusterTableRow) => ({onClick: () => handleClusterChange(cluster.name)})}
         />
         <Column
-          className="cluster-table-column-namespaces"
           title="Namespaces"
           dataIndex="namespaces"
           key="namespaces"
@@ -220,7 +215,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
           width={200}
         />
         <Column
-          className="cluster-table-column-access"
           title="Access"
           dataIndex="hasFullAccess"
           key="hasFullAccess"
