@@ -103,7 +103,7 @@ you to quickly assess the impact of any changes on the generated files, instead 
 Each Helm Chart from the Helm pane has a subsection which displays all templates of that chart.
 Clicking on a template will select it and open it in the Editor.
 
-When you hover a value referenced from a Values file, the popup that appears will display the following information:
+When you hover over a value referenced from a Values file, the popup that appears will display the following information:
 - The path to the values file where the reference is from
 - The refereced value so you don't have to switch to the Values file
 - A link to quickly navigate to the location of that value
