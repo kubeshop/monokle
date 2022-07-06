@@ -21,6 +21,7 @@ import {getKubeAccess} from '@utils/kubeclient';
 let watcher: FSWatcher;
 let clusterNamespacesWatchInterval: number | null = null;
 
+// Contains all namespace watchers and its requests by cluster name as Object key
 let kubeConfigList: Record<string, {watcher: k8s.Watch | undefined; req: any}> = {};
 
 export async function monitorKubeConfig(filePath: string, dispatch: (action: AnyAction) => void) {
