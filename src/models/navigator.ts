@@ -2,8 +2,8 @@ import React, {ReactNode} from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
+// import {AppDispatch} from '@models/appdispatch';
+// import {RootState} from '@models/rootstate';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
@@ -112,8 +112,8 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
-    onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
-    onCheck?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
+    onClick?: (itemInstance: ItemInstance, dispatch: any) => void;
+    onCheck?: (itemInstance: ItemInstance, dispatch: any) => void;
   };
   customization?: ItemCustomization;
 }
@@ -121,7 +121,7 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
 export interface SectionBlueprint<RawItemType, ScopeType = any> {
   id: string;
   name: string;
-  getScope: (state: RootState) => ScopeType;
+  getScope: (state: any) => ScopeType;
   rowBuilder?: RowBuilder<SectionInstance>;
   rootSectionId: string;
   childSectionIds?: string[];

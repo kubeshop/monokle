@@ -3,8 +3,7 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 import {createLogger} from 'redux-logger';
 
 // TODO: why is this import needed? without it the application breaks and React never mounts
-import '@redux/reducers/ui';
-
+// import '@redux/reducers/ui';
 import {compareListener, filterListener, resourceFetchListener} from './compare/listeners';
 import {compareSlice} from './compare/slice';
 import {combineListeners, listenerMiddleware} from './listeners/base';
