@@ -3,7 +3,7 @@
 The Compare & Sync functionality allows you to compare and synchronize two sets of resources.
 
 Each set of resources can be one of the following:
-- Resources from your local manifest files
+- Resources from your local manifest files.
 - Resources from a cluster
 - Resources from the [Preview](helm.md) of a Helm Chart
 - Resources from the [Preview](kustomize.md) of a Kustomization
