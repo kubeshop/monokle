@@ -11,6 +11,7 @@ import {
   DiffTooltip,
   EditPreviewConfigurationTooltip,
   InstallValuesFileTooltip,
+  KubeConfigNoValid,
   RunPreviewConfigurationTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
@@ -240,7 +241,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Tooltip>
         )}
 
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
+          placement="bottomLeft"
+        >
           <Button
             loading={Boolean(applyingResource)}
             type="primary"
@@ -254,7 +259,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Button>
         </Tooltip>
 
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
+          placement="bottomLeft"
+        >
           <S.DiffButton
             size="small"
             type="primary"
