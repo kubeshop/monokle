@@ -10,7 +10,7 @@ Each set of resources can be one of the following:
 
 Here are some of the scenarios where Compare & Sync can help you:
 1. Compare local resources to the resources in your cluster AND:
-  - Deploy local resources to the cluster
+  - Deploy local resources to the cluster.
   - Extract cluster resources to local
 2. Compare resources between two clusters AND:
   - Deploy resources from one cluster to another
