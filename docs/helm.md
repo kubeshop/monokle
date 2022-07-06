@@ -89,7 +89,7 @@ Monokle is now in **Preview Mode** (as indicated by the header at the top):
 ## **Editing of Values Files**
 
 If you're editing Helm Values files, Monokle will highlight all properties that have been referenced by any templates.
-The list of paths to template files is shown when hovering the highlighted value.
+The list of paths to template files is shown when hovering over the highlighted value.
 
 ![Helm Values References](img/helm-values-reference-1-8-0.png)
 
