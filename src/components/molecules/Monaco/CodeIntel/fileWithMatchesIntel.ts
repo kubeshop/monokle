@@ -8,9 +8,7 @@ import {createInlineDecoration} from '@molecules/Monaco/editorHelpers';
 
 export const fileWithMatchesIntel: CodeIntelApply = {
   name: 'fileMatches',
-  shouldApply: () => {
-    return true; // TODO: add a condition
-  },
+  shouldApply: params => Boolean(params.isSearchActive),
   codeIntel: async params => {
     const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
     const newDisposables: monaco.IDisposable[] = [];

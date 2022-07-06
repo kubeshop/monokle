@@ -23,6 +23,7 @@ export interface ShouldApplyCodeIntelParams {
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
   matchOptions?: CurrentMatch | null;
+  isSearchActive?: boolean;
 }
 
 export interface CodeIntelParams {

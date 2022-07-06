@@ -16,7 +16,7 @@ import {
 import {CurrentMatch} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightFileMatches} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
@@ -96,6 +96,7 @@ function useCodeIntel(props: CodeIntelProps) {
   const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const currentFile = Object.values(fileMap).find(file => selectedPath === file.filePath);
   const dispatch = useAppDispatch();
+  const isSearchActive = useAppSelector(state => Boolean(state.main.search.searchQuery));
 
   const clearCodeIntel = () => {
     if (editor) {
@@ -116,6 +117,7 @@ function useCodeIntel(props: CodeIntelProps) {
       currentFile,
       selectedResource,
       matchOptions,
+      isSearchActive,
     };
 
     const codeIntelForFile = codeIntels.find(ci => ci.shouldApply(shouldApplyParams));
