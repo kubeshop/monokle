@@ -37,8 +37,6 @@ import {CommandOptions} from '@utils/commands';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
 
-import {addLocalServerContent} from '@root/electron/app/createWorker';
-
 import autoUpdater from '../autoUpdater';
 import {
   checkNewVersion,
@@ -263,11 +261,5 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
     dispatchToAllWindows(changeCurrentProjectName(payload.newName));
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
-  }
-});
-
-ipcMain.on('add-local-server-content', (event, args: any) => {
-  if (args.path && args.content) {
-    addLocalServerContent(args.path, args.content);
   }
 });

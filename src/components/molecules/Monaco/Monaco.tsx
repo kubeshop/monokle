@@ -213,6 +213,22 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
     setEditorMounted(true);
+
+    // add custom opener for schema links in hover popups
+    let contribution: any = e.getContribution('editor.linkDetector');
+    if (contribution?.openerService) {
+      contribution.openerService.registerOpener({
+        open: (resource: string) => {
+          let isSchemaRequest = resource.startsWith('schema://');
+          if (isSchemaRequest) {
+            // we should open a popup with the schema here - the actual schema can be retrieved from
+            // the diagnosticsOptions.schemas array
+            console.log('opening schema', resource, yaml.yamlDefaults.diagnosticsOptions.schemas);
+          }
+          return Promise.resolve(isSchemaRequest);
+        },
+      });
+    }
   };
 
   const onChange = (newValue: any) => {

@@ -7,8 +7,6 @@ import * as path from 'path';
 
 import {logToFile} from '@utils/logToFile';
 
-import {createWorker} from '@root/electron/app/createWorker';
-
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';
 
@@ -32,7 +30,6 @@ export const openApplication = async (givenPath?: string) => {
 
   ElectronStore.initRenderer();
   const win = createWindow(givenPath);
-  createWorker();
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
@@ -45,7 +42,6 @@ export const openApplication = async (givenPath?: string) => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow(givenPath);
-      createWorker();
     }
   });
 
