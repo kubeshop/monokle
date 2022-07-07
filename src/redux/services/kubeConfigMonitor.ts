@@ -26,28 +26,22 @@ let clusterNamespacesWatchInterval: number | null = null;
 let kubeConfigList: Record<string, {watcher: k8s.Watch | undefined; req: any}> = {};
 
 export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, filePath?: string) {
-  console.log('PATH', tempFilePath, filePath);
   if (tempFilePath === filePath) {
     return;
   }
   tempFilePath = filePath;
 
-  if (watcher) {
-    watcher.close();
-  }
-
   if (!filePath) {
     return;
   }
 
-  reinitializeWatchers(filePath, dispatch);
-
-  webContents.getFocusedWebContents()?.on('did-finish-load', () => {
-    reinitializeWatchers(filePath, dispatch);
-  });
+  if (watcher) {
+    watcher.close();
+  }
 
   try {
     const stats = await fs.promises.stat(filePath);
+    console.log('IS_FILE', stats.isFile());
     if (stats.isFile()) {
       watcher = watch(filePath, {
         persistent: true,
@@ -67,8 +61,14 @@ export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, f
         watchAllClusterNamespaces(filePath, dispatch);
       });
     }
-  } catch (e) {
+    reinitializeWatchers(filePath, dispatch);
+
+    webContents.getFocusedWebContents()?.on('did-finish-load', () => {
+      reinitializeWatchers(filePath, dispatch);
+    });
+  } catch (e: any) {
     //
+    console.log('ERROR', e.message);
   }
 }
 
