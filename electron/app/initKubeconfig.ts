@@ -11,14 +11,11 @@ import {setKubeConfig} from '@redux/reducers/appConfig';
 
 import electronStore from '@utils/electronStore';
 
-import {monitorKubeConfig} from './kubeConfigMonitor';
-
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
   if (process.env.KUBECONFIG) {
     const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
       dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
-      monitorKubeConfig(envKubeconfigParts[0], dispatch);
 
       dispatch(
         setAlert({
@@ -29,7 +26,6 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
       );
     } else {
       dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
-      monitorKubeConfig(process.env.KUBECONFIG, dispatch);
     }
     return;
   }
@@ -37,13 +33,11 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));
-    monitorKubeConfig(storedKubeconfig, dispatch);
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
   dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig)));
-  monitorKubeConfig(possibleKubeconfig, dispatch);
 }
 
 export default initKubeconfig;
