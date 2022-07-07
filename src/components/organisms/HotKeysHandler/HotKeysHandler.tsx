@@ -21,6 +21,7 @@ import {
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -46,6 +47,7 @@ const HotKeysHandler = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -154,9 +156,10 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.APPLY_SELECTION.key,
     () => {
+      if (!isKubeConfigPathValid) return;
       applySelection();
     },
-    [applySelection]
+    [applySelection, isKubeConfigPathValid]
   );
 
   const diffSelectedResource = useCallback(() => {
@@ -168,9 +171,10 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.DIFF_RESOURCE.key,
     () => {
+      if (!isKubeConfigPathValid) return;
       diffSelectedResource();
     },
-    [diffSelectedResource]
+    [diffSelectedResource, isKubeConfigPathValid]
   );
 
   useHotkeys(

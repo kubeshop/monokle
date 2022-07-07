@@ -5,6 +5,8 @@ import hotkeys from '@constants/hotkeys';
 
 import {NewVersionCode, Project} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
+import {useAppSelector} from '@redux/hooks';
+
 
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
 import {
@@ -20,7 +22,7 @@ import {
   zoomIn,
   zoomOut,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {defineHotkey} from '@utils/defineHotkey';
@@ -186,6 +188,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 };
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
@@ -231,6 +234,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         accelerator: hotkeys.APPLY_SELECTION.key,
         enabled: Boolean(state.main.selectedResourceId),
         click: () => {
+          if(!isKubeConfigPathValid)return;
           dispatch(setMonacoEditor({apply: true}));
         },
       },
@@ -239,6 +243,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         accelerator: hotkeys.DIFF_RESOURCE.key,
         enabled: Boolean(state.main.selectedResourceId),
         click: () => {
+          if(!isKubeConfigPathValid)return;
           if (!state.main.selectedResourceId) {
             return;
           }
