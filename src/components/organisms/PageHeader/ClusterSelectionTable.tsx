@@ -143,6 +143,8 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
 
   const updateClusterColor = (name: string, color: ClusterColors) => {
     dispatch(setKubeConfigContextColor({name, color}));
+    setChangeClusterColor('');
+    dispatch(setAlert({type: AlertEnum.Success, title: `${name} accent color was changed successfully`, message: ''}));
   };
 
   const isColorSelected = useCallback(
@@ -261,6 +263,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }
                   overlayClassName="cluster-color-popover"
                   placement="bottom"
+                  visible={changeClusterColor === record.name}
                   title={
                     <>
                       <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
