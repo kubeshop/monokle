@@ -1,4 +1,4 @@
-import {Modal, Tag} from 'antd';
+import {Modal} from 'antd';
 
 import styled from 'styled-components';
 
@@ -10,11 +10,12 @@ export const StyledModal = styled(Modal)`
   }
   .ant-modal-header {
     background-color: ${Colors.grey1000};
-    border-bottom: 1px solid ${Colors.grey900};
+    border: none;
   }
   .ant-modal-body {
     background-color: ${Colors.grey1000};
-    padding: 0px;
+    padding-top: 0px;
+    overflow-x: hidden;
   }
   .ant-modal-footer {
     background-color: ${Colors.grey1000};
@@ -39,6 +40,12 @@ export const StyledModal = styled(Modal)`
   & .custom-modal-handle-w {
     left: -5px;
   }
+`;
+
+export const ActionButtonsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 30px;
 `;
 
 export const ButtonContainer = styled.div`
@@ -66,13 +73,15 @@ export const MonacoDiffContainer = styled.div<{height: string; width: string}>`
 `;
 
 export const NamespaceSelectContainer = styled.div`
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 50px;
 `;
 
 export const SwitchContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  padding-right: 50px;
 `;
 
 export const StyledSwitchLabel = styled.span`
@@ -80,21 +89,24 @@ export const StyledSwitchLabel = styled.span`
   cursor: pointer;
 `;
 
-export const StyledTag = styled(Tag)`
-  padding: 5px 10px;
+export const StyledTag = styled.div`
+  display: flex;
+  gap: 10px;
+  padding: 15px 10px;
   font-size: 14px;
-  font-weight: 600;
+  color: ${Colors.grey9};
+  background-color: #31393c;
 `;
 
 export const TagsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 12px;
-  padding-bottom: 5px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
 `;
 
 export const TitleContainer = styled.div`
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: space-between;
 `;

@@ -10,7 +10,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import {stringify} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
-import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
+import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
@@ -266,6 +266,10 @@ const ClusterResourceDiffModal = () => {
                     </Select.Option>
                   ))}
               </Select>
+              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                <Switch checked={shouldDiffIgnorePaths} />
+                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              </S.SwitchContainer>
             </S.FileSelectContainer>
           </S.TitleContainer>
         }
@@ -290,7 +294,14 @@ const ClusterResourceDiffModal = () => {
             </div>
           ) : (
             <>
-              <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+              <S.TagsContainer>
+                <S.StyledTag>
+                  Cluster{' '}
+                  <ClusterName $kubeConfigContextColor={kubeConfigContextColor}>{kubeConfigContext}</ClusterName>
+                </S.StyledTag>
+                <S.StyledTag>Local</S.StyledTag>
+              </S.TagsContainer>
+              <S.MonacoDiffContainer width="100%" height="calc(100% - 80px)" ref={containerRef}>
                 <MonacoDiffEditor
                   width={containerWidth}
                   height={containerHeight}
@@ -302,8 +313,7 @@ const ClusterResourceDiffModal = () => {
                 />
               </S.MonacoDiffContainer>
 
-              <S.TagsContainer>
-                <S.StyledTag>Cluster</S.StyledTag>
+              <S.ActionButtonsContainer>
                 <Button disabled={!areResourcesDifferent} ghost type="primary" onClick={handleReplace}>
                   Replace local resource with cluster resource <ArrowRightOutlined />
                 </Button>
@@ -315,15 +325,7 @@ const ClusterResourceDiffModal = () => {
                 >
                   <ArrowLeftOutlined /> Deploy local resource to cluster
                 </Button>
-                <S.StyledTag>Local</S.StyledTag>
-              </S.TagsContainer>
-
-              <S.SwitchContainer>
-                <div onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-                  <Switch checked={shouldDiffIgnorePaths} />
-                  <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
-                </div>
-              </S.SwitchContainer>
+              </S.ActionButtonsContainer>
             </>
           )}
         </ResizableBox>

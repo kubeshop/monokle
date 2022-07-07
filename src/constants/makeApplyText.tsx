@@ -4,12 +4,13 @@ import {ClusterColors} from '@models/cluster';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-const ClusterName = styled.div<{$kubeConfigContextColor?: ClusterColors}>`
+export const ClusterName = styled.div<{$kubeConfigContextColor?: ClusterColors}>`
   display: inline;
   border-radius: 4px;
-  color: ${Colors.blackPure};
+  color: ${Colors.grey1};
+  font-weight: 600;
   margin: 0 5px;
-  padding: 0 2px;
+  padding: 0 4px;
 
   ${({$kubeConfigContextColor}) => `
     background-color: ${$kubeConfigContextColor || BackgroundColors.clusterModeBackground};
