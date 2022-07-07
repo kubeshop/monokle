@@ -108,6 +108,7 @@ const initialAppConfigState: AppConfig = {
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
   clusterAccess: [],
   isAccessLoading: false,
+  kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
 };
 
 const initialAlertState: AlertState = {};

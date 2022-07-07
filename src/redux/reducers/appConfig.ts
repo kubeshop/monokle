@@ -392,15 +392,10 @@ export const configSlice = createSlice({
       state: Draft<AppConfig>,
       action: PayloadAction<{color: ClusterColors; name: string}>
     ) => {
-      if (!state.kubeConfig.contexts) {
-        return;
-      }
-
       const {color, name} = action.payload;
 
-      state.kubeConfig.contexts = state.kubeConfig.contexts.map(context =>
-        context.name === name ? {...context, color} : context
-      );
+      state.kubeConfigContextsColors[name] = color;
+      electronStore.set('appConfig.kubeConfigContextsColors', state.kubeConfigContextsColors);
     },
     updateTelemetry: (
       state: Draft<AppConfig>,
@@ -459,10 +454,12 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
 };
 
 export const {
+  addNamespaceToContext,
   changeCurrentProjectName,
   changeProjectsRootPath,
   createProject,
   handleFavoriteTemplate,
+  removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
   setCurrentContext,

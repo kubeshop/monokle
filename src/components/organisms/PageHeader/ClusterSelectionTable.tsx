@@ -40,6 +40,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
+  const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
 
   const [changeClusterColor, setChangeClusterColor] = useState('');
   const [editingKey, setEditingKey] = useState('');
@@ -177,11 +178,12 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
         name: context.name,
         hasFullAccess,
         editable: true,
+        color: kubeConfigContextsColors[context.name],
       };
     });
 
     setLocalClusters(clusterTableRows);
-  }, [kubeConfigContexts, clusterAccess]);
+  }, [kubeConfigContexts, clusterAccess, kubeConfigContextsColors]);
 
   return (
     <Form form={form} component={false}>
@@ -282,7 +284,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }}
                 >
                   <S.ClusterColor
-                    $color={BackgroundColors.clusterModeBackground}
+                    $color={kubeConfigContextsColors[record.name] || BackgroundColors.clusterModeBackground}
                     $selected
                     $size="small"
                     onClick={() => {

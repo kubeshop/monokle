@@ -61,7 +61,6 @@ export type KubeConfigContext = {
   name: string;
   user: string | null;
   namespace: string | null;
-  color?: ClusterColors;
 };
 
 export type KubeConfig = {
@@ -144,6 +143,9 @@ interface AppConfig {
   disableErrorReporting: boolean;
   clusterAccess: Array<ClusterAccess>;
   isAccessLoading?: boolean;
+  kubeConfigContextsColors: {
+    [name: string]: ClusterColors;
+  };
 }
 
 export type {AppConfig};
