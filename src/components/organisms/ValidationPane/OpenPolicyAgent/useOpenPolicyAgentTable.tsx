@@ -12,7 +12,7 @@ import {IconNames} from '@models/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 
-import {Icon} from '@components/atoms';
+import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 

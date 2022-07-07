@@ -10,7 +10,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {Icon} from '@components/atoms';
+import {Icon} from '@atoms';
 
 import * as S from './OPAValidationStatus.styled';
 

@@ -1,8 +1,10 @@
+import {Drawer as RawDrawer} from 'antd';
+
 import styled from 'styled-components';
 
-import Drawer from '@atoms/Drawer';
+export const Drawer = styled(RawDrawer)`
+  z-index: 100;
 
-export const StyledDrawer = styled(Drawer)`
   & .ant-drawer-body {
     overflow-y: auto;
     overflow-x: hidden;

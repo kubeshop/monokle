@@ -40,7 +40,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const isAccessLoading = useAppSelector(state => state.config.projectConfig?.isAccessLoading);
+  const isAccessLoading = useAppSelector(state => state.config?.isAccessLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);

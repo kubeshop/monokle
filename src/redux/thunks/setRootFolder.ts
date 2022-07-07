@@ -2,7 +2,13 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
@@ -36,6 +42,7 @@ export const setRootFolder = createAsyncThunk<
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
+  const helmTemplatesMap: HelmTemplatesMapType = {};
 
   if (!rootFolder) {
     return {
@@ -44,6 +51,7 @@ export const setRootFolder = createAsyncThunk<
       resourceMap,
       helmChartMap,
       helmValuesMap,
+      helmTemplatesMap,
     };
   }
 
@@ -59,7 +67,9 @@ export const setRootFolder = createAsyncThunk<
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
-      resolve(readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+      resolve(
+        readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap)
+      );
     });
   });
   const files = await readFilesPromise;
@@ -93,6 +103,7 @@ export const setRootFolder = createAsyncThunk<
     resourceMap,
     helmChartMap,
     helmValuesMap,
+    helmTemplatesMap,
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,

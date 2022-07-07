@@ -6,10 +6,9 @@ import {MinusOutlined} from '@ant-design/icons';
 
 import Colors from '@styles/Colors';
 
+import * as S from './KeyValueEntryRenderer.styled';
 import ValueInput from './ValueInput';
 import {KeyValueEntry} from './types';
-
-import * as S from './styled';
 
 type KeyValueEntryRendererProps = {
   entry: KeyValueEntry;
@@ -46,7 +45,7 @@ const KeyValueEntryRenderer: React.FC<KeyValueEntryRendererProps> = props => {
         )}
       </S.KeyValueContainer>
 
-      <S.StyledRemoveButton
+      <S.RemoveButton
         disabled={disabled}
         onClick={() => onEntryRemove(entry.id)}
         color={Colors.redError}

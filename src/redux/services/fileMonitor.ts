@@ -1,4 +1,5 @@
 import {FSWatcher, watch} from 'chokidar';
+import log from 'loglevel';
 
 import {AppDispatch} from '@models/appdispatch';
 
@@ -63,7 +64,5 @@ export function monitorRootFolder(folder: string, dispatch: AppDispatch) {
       }, 1000)
     );
 
-  watcher
-    /* eslint-disable no-console */
-    .on('error', error => console.log(`Watcher error: ${error}`));
+  watcher.on('error', error => log.error(`Watcher error: ${error}`));
 }

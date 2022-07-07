@@ -1,41 +1,28 @@
-import styled from 'styled-components';
+import {useMemo} from 'react';
 
 import Colors from '@styles/Colors';
 
-const DotsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  height: inherit;
-`;
-
-const Dot = styled.div`
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: ${props => props.color};
-
-  &:not(:last-child) {
-    margin-right: 2px;
-  }
-`;
+import * as S from './Dots.styled';
 
 interface DotsProps {
-  dotNumber?: number;
   color?: Colors;
+  dotNumber?: number;
 }
 
 const Dots: React.FC<DotsProps> = props => {
-  const {dotNumber = 3, color = Colors.blue6} = props;
+  const {color = Colors.blue6, dotNumber = 3} = props;
 
-  const dots = Array.from({length: dotNumber}).map((_, index) => {
-    const key = `dot_${index}`;
+  const dots = useMemo(
+    () =>
+      Array.from({length: dotNumber}).map((_, index) => {
+        const key = `dot_${index}`;
 
-    return <Dot key={key} color={color} />;
-  });
+        return <S.Dot key={key} $color={color} />;
+      }),
+    [color, dotNumber]
+  );
 
-  return <DotsContainer>{dots}</DotsContainer>;
+  return <S.DotsContainer>{dots}</S.DotsContainer>;
 };
 
 export default Dots;

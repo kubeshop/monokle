@@ -6,7 +6,14 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
-import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  AppState,
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
@@ -14,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {
   HelmChartEventEmitter,
   createHelmChart,
-  createHelmFile,
+  createHelmTemplate,
   createHelmValuesFile,
   findContainingHelmCharts,
   getHelmChartFromFileEntry,
@@ -158,6 +165,7 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
   depth: number = 1,
   helmChart?: HelmChart
 ) {
@@ -183,6 +191,7 @@ export function readFiles(
         fileMap,
         helmChartMap,
         helmValuesMap,
+        helmTemplatesMap,
         depth
       )
     );
@@ -192,7 +201,7 @@ export function readFiles(
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
-        createHelmFile(fileEntry, helmChart, fileMap);
+        createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
       if (fileIsExcluded(fileEntry, projectConfig)) {
         fileEntry.isExcluded = true;
@@ -208,6 +217,7 @@ export function readFiles(
             fileMap,
             helmChartMap,
             helmValuesMap,
+            helmTemplatesMap,
             depth + 1,
             helmChart
           );
@@ -598,7 +608,8 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       state.resourceMap,
       state.fileMap,
       state.helmChartMap,
-      state.helmValuesMap
+      state.helmValuesMap,
+      state.helmTemplatesMap
     );
     return folderEntry;
   }

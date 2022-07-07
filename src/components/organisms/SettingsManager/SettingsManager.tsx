@@ -31,7 +31,7 @@ import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 

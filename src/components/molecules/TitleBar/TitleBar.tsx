@@ -5,7 +5,7 @@ import {Button} from 'antd';
 import {useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu} from '@redux/reducers/ui';
 
-import {MonoPaneTitle} from '@components/atoms';
+import {MonoPaneTitle} from '@atoms';
 
 import * as S from './styled';
 

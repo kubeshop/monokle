@@ -16,7 +16,7 @@ import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 
-import {KeyValueInput} from '@components/atoms';
+import {KeyValueInput} from '@atoms';
 
 import ValuesFilesList from './ValuesFilesList';
 

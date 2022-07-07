@@ -8,9 +8,10 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setKubeConfig} from '@redux/reducers/appConfig';
-import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
 import electronStore from '@utils/electronStore';
+
+import {monitorKubeConfig} from './kubeConfigMonitor';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
   if (process.env.KUBECONFIG) {
@@ -51,6 +52,7 @@ export const getKubeConfigContext = (configPath: string): KubeConfig => {
   try {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(configPath);
+
     return {
       path: configPath,
       currentContext: kc.getCurrentContext(),
