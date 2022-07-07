@@ -1,6 +1,6 @@
 import {shell} from 'electron';
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Badge, Button, Dropdown, Tooltip} from 'antd';
@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -30,28 +30,21 @@ import ProjectSelection from './ProjectSelection';
 const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
-
-  const kubeConfigContextColor = useMemo(
-    () => kubeConfigContextsColors[kubeConfigContext],
-    [kubeConfigContext, kubeConfigContextsColors]
-  );
 
   let timeoutRef = useRef<any>(null);
-
-  const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [showAutosaving, setShowAutosaving] = useState(false);

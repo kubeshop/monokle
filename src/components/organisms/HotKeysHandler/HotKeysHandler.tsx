@@ -19,6 +19,7 @@ import {
 import {
   currentConfigSelector,
   isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
@@ -44,6 +45,7 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
 
@@ -147,9 +149,9 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
-  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext, kubeConfigContextColor]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION.key,

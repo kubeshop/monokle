@@ -21,6 +21,7 @@ import {
   currentClusterAccessSelector,
   currentConfigSelector,
   isInClusterModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
@@ -52,6 +53,7 @@ const DiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -105,13 +107,13 @@ const DiffModal = () => {
     }
 
     if (applyModalType === ModalTypes.toLocal) {
-      return makeReplaceResourceText(targetResource.name, kubeConfigContext);
+      return makeReplaceResourceText(targetResource.name, kubeConfigContext, kubeConfigContextColor);
     }
 
     return isKustomizationResource(targetResource)
-      ? makeApplyKustomizationText(targetResource.name, kubeConfigContext)
-      : makeApplyResourceText(targetResource.name, kubeConfigContext);
-  }, [targetResource, kubeConfigContext, applyModalType]);
+      ? makeApplyKustomizationText(targetResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(targetResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [targetResource, kubeConfigContext, applyModalType, kubeConfigContextColor]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (targetResource?.id) {

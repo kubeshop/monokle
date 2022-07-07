@@ -17,7 +17,12 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
-import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -41,6 +46,7 @@ const ClusterResourceDiffModal = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -103,9 +109,9 @@ const ClusterResourceDiffModal = () => {
     const resource = resourceMap[selectedMatchingResourceId];
 
     return isKustomizationResource(resource)
-      ? makeApplyKustomizationText(resource.name, kubeConfigContext)
-      : makeApplyResourceText(resource.name, kubeConfigContext);
-  }, [kubeConfigContext, selectedMatchingResourceId, resourceMap]);
+      ? makeApplyKustomizationText(resource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(resource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [selectedMatchingResourceId, resourceMap, kubeConfigContext, kubeConfigContextColor]);
 
   const matchingLocalResources = useMemo(() => {
     if (!isDiffModalVisible || !targetResource) {

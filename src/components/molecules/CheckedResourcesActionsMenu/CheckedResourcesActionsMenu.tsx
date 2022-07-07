@@ -14,7 +14,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -31,6 +36,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -48,8 +54,8 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   }, [checkedResourceIds, resourceMap]);
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext),
-    [checkedResources, kubeConfigContext]
+    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext, kubeConfigContextColor),
+    [checkedResources.length, kubeConfigContext, kubeConfigContextColor]
   );
 
   const onClickDelete = useCallback(() => {

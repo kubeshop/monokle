@@ -19,6 +19,7 @@ import {
   activeProjectSelector,
   currentClusterAccessSelector,
   isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
@@ -42,7 +43,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAccessLoading = useAppSelector(state => state.config?.isAccessLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
@@ -52,11 +53,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const size: Size = useWindowSize();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-
-  const kubeConfigContextColor = useMemo(
-    () => kubeConfigContextsColors[kubeConfigContext],
-    [kubeConfigContext, kubeConfigContextsColors]
-  );
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
