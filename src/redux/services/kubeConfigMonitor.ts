@@ -19,26 +19,31 @@ import {watchFunctions} from '@utils/helpers';
 import {getKubeAccess} from '@utils/kubeclient';
 
 let watcher: FSWatcher;
+let tempFilePath: string | undefined;
 let clusterNamespacesWatchInterval: number | null = null;
 
 // Contains all namespace watchers and its requests by cluster name as Object key
 let kubeConfigList: Record<string, {watcher: k8s.Watch | undefined; req: any}> = {};
 
-export async function monitorKubeConfig(filePath: string, dispatch: (action: AnyAction) => void) {
+export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, filePath?: string) {
+  console.log('PATH', tempFilePath, filePath);
+  if (tempFilePath === filePath) {
+    return;
+  }
+  tempFilePath = filePath;
+
   if (watcher) {
     watcher.close();
   }
 
-  readAndNotifyKubeConfig(filePath, dispatch);
-  watchAllClusterNamespaces(filePath, dispatch);
+  if (!filePath) {
+    return;
+  }
 
-  webContents.getFocusedWebContents().on('did-finish-load', () => {
-    readAndNotifyKubeConfig(filePath, dispatch);
-    if (clusterNamespacesWatchInterval) {
-      clearInterval(clusterNamespacesWatchInterval);
-    }
-    clusterNamespacesWatchInterval = null;
-    watchAllClusterNamespaces(filePath, dispatch);
+  reinitializeWatchers(filePath, dispatch);
+
+  webContents.getFocusedWebContents()?.on('did-finish-load', () => {
+    reinitializeWatchers(filePath, dispatch);
   });
 
   try {
@@ -66,6 +71,15 @@ export async function monitorKubeConfig(filePath: string, dispatch: (action: Any
     //
   }
 }
+
+export const reinitializeWatchers = (filePath: string, dispatch: (action: AnyAction) => void) => {
+  readAndNotifyKubeConfig(filePath, dispatch);
+  if (clusterNamespacesWatchInterval) {
+    clearInterval(clusterNamespacesWatchInterval);
+  }
+  clusterNamespacesWatchInterval = null;
+  watchAllClusterNamespaces(filePath, dispatch);
+};
 
 export function watchK8sNamespaces(
   kubeConfigPath: string,
