@@ -39,6 +39,14 @@ export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, f
     watcher.close();
   }
 
+  reinitializeWatchers(filePath, dispatch);
+
+  if (webContents && webContents.getFocusedWebContents()) {
+    webContents.getFocusedWebContents().on('did-finish-load', () => {
+      reinitializeWatchers(filePath, dispatch);
+    });
+  }
+
   try {
     const stats = await fs.promises.stat(filePath);
     if (stats.isFile()) {
@@ -60,11 +68,6 @@ export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, f
         watchAllClusterNamespaces(filePath, dispatch);
       });
     }
-    reinitializeWatchers(filePath, dispatch);
-
-    webContents.getFocusedWebContents()?.on('did-finish-load', () => {
-      reinitializeWatchers(filePath, dispatch);
-    });
   } catch (e: any) {
     //
     console.log('ERROR', e.message);
