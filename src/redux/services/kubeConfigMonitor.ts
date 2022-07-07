@@ -4,6 +4,7 @@ import {webContents} from 'electron';
 
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs';
+import log from 'loglevel';
 import {AnyAction} from 'redux';
 
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
@@ -69,8 +70,7 @@ export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, f
       });
     }
   } catch (e: any) {
-    //
-    console.log('ERROR', e.message);
+    log.error('monitorKubeConfigError', e.message);
   }
 }
 
