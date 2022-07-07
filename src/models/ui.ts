@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 export enum HighlightItems {
@@ -55,7 +57,8 @@ export type LeftMenuSelectionType =
   | 'kustomize-pane'
   | 'templates-pane'
   | 'images-pane'
-  | 'validation-pane';
+  | 'validation-pane'
+  | 'search';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -112,6 +115,8 @@ export type UiState = {
     selection: LeftMenuSelectionType;
     isActive: boolean;
     expandedFolders: React.Key[];
+    expandedSearchedFiles: React.Key[];
+    isValidationDrawerVisible: boolean;
   };
   quickSearchActionsPopup: {
     isOpen: boolean;

@@ -84,6 +84,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const settings = useAppSelector(settingsSelector);
@@ -172,6 +173,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     helmValuesMap,
     helmChartMap,
     helmTemplatesMap,
+    matchOptions,
+    isDirty,
   });
 
   const {registerStaticActions} = useEditorKeybindings(

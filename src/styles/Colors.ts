@@ -17,7 +17,6 @@ enum Colors {
   grey8 = '#ACACAC', // gray, gray 8
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
   grey6 = '#5A5A5A', // gray, gray 6
-  grey5 = '#5A5A5A', // gray, gray 5
   grey5b = '#434343', // gray, gray 5 as in Figma - FIXME!
   greyXY = '#31393c80', // Missing color - FIXME!
   grey4 = '#303030', // gray, gray 4
@@ -38,6 +37,7 @@ enum Colors {
   yellow7 = '#E8D639',
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
+  yellow11 = '#C9E75D',
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
@@ -61,6 +61,8 @@ enum Colors {
   geekblue4 = '#203175',
 
   green7 = '#6ABE39', // Polar Green
+  green8 = '#6F9412',
+  green10 = '#3E4F13', // Dark Green
 
   highlightGreen = '#33BCB7',
 

@@ -1,7 +1,7 @@
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
-import {FileEntry} from './fileentry';
+import {CurrentMatch, FileEntry} from './fileentry';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sresource';
@@ -100,6 +100,12 @@ type ClusterToLocalResourcesMatch = {
   localResourceIds?: string[];
 };
 
+export type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -139,6 +145,14 @@ interface AppState {
   checkedResourceIds: string[];
   /** the currently selected path */
   selectedPath?: string;
+  /** the line number for the match in file */
+  search: {
+    searchQuery: string;
+    replaceQuery: string;
+    queryMatchParams: MatchParamProps;
+    currentMatch: CurrentMatch | null;
+    searchHistory: string[];
+  };
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */

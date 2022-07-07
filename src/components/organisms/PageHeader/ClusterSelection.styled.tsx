@@ -163,6 +163,7 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   border-radius: ${props => (props.isHalfBordered ? '0 4px 4px 0' : '4px')};
   padding: 0 1rem;
   background: ${Colors.grey3b};
+  border: 1px solid ${Colors.grey6};
 `;
 
 export const ClusterStatusText = styled.span<{

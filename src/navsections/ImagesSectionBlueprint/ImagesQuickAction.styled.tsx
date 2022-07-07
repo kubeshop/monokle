@@ -7,6 +7,6 @@ export const ReplaceSpan = styled.span<{$isDisabled: boolean; $isSelected: boole
   font-size: 12px;
   margin: 0 15px 0 5px;
   color: ${({$isDisabled, $isSelected}) =>
-    $isSelected ? Colors.blackPure : $isDisabled ? Colors.grey5 : Colors.blue6};
+    $isSelected ? Colors.blackPure : $isDisabled ? Colors.grey6 : Colors.blue6};
   cursor: ${({$isDisabled}) => ($isDisabled ? 'not-allowed' : 'pointer')};
 `;

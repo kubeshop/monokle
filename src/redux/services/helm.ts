@@ -226,7 +226,7 @@ export function processHelmChartFolder(
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id});
 
-      if (fileIsExcluded(fileEntry, projectConfig)) {
+      if (fileIsExcluded(fileEntry.filePath, projectConfig)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
@@ -253,7 +253,7 @@ export function processHelmChartFolder(
           helmValuesMap,
           fileMap,
         });
-      } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
+      } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry.filePath, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       } else if (isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);

@@ -8,7 +8,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
+import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import {MonacoUiState} from '@models/ui';
 
@@ -22,6 +22,8 @@ export interface ShouldApplyCodeIntelParams {
   selectedResource?: K8sResource;
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
+  matchOptions?: CurrentMatch | null;
+  isSearchActive?: boolean;
 }
 
 export interface CodeIntelParams {
@@ -41,6 +43,7 @@ export interface CodeIntelParams {
   selectImageHandler: (imageId: string) => void;
   resourceMap: ResourceMapType;
   model: monaco.editor.IModel | null;
+  matchOptions?: CurrentMatch | null;
 }
 
 export interface CodeIntelApply {
