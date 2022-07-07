@@ -1,6 +1,6 @@
 import {shell} from 'electron';
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Badge, Button, Dropdown, Tooltip} from 'antd';
@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -41,6 +41,13 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
+
+  const kubeConfigContextColor = useMemo(
+    () => kubeConfigContextsColors[kubeConfigContext],
+    [kubeConfigContext, kubeConfigContextsColors]
+  );
 
   let timeoutRef = useRef<any>(null);
 
@@ -133,7 +140,7 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && <S.PreviewRow $previewType={previewType} />}
+      {isInPreviewMode && <S.PreviewRow $previewType={previewType} $kubeConfigContextColor={kubeConfigContextColor} />}
 
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
