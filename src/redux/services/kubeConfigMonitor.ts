@@ -41,7 +41,6 @@ export async function monitorKubeConfig(dispatch: (action: AnyAction) => void, f
 
   try {
     const stats = await fs.promises.stat(filePath);
-    console.log('IS_FILE', stats.isFile());
     if (stats.isFile()) {
       watcher = watch(filePath, {
         persistent: true,
