@@ -5,7 +5,6 @@ import hotkeys from '@constants/hotkeys';
 
 import {NewVersionCode, Project} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
-import {useAppSelector} from '@redux/hooks';
 
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
 import {
