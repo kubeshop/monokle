@@ -174,7 +174,10 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.DIFF_RESOURCE.key,
     () => {
-      if (!isKubeConfigPathValid) return;
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       diffSelectedResource();
     },
     [diffSelectedResource, isKubeConfigPathValid]
