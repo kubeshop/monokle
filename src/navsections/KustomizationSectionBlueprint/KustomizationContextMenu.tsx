@@ -19,9 +19,9 @@ import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import {useDelete, useDuplicate, useRename} from '@hooks/fileTreeHooks';
+import {useDuplicate, useRename} from '@hooks/fileTreeHooks';
 
-import {deleteEntity} from '@utils/files';
+import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
@@ -45,7 +45,6 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
 
   const {onDuplicate} = useDuplicate();
   const {onRename} = useRename();
-  const {onDelete, setProcessingEntity} = useDelete();
 
   const isResourceSelected = useMemo(() => itemInstance.id === selectedResourceId, [itemInstance, selectedResourceId]);
   const resource = useMemo(() => resourceMap[itemInstance.id], [itemInstance.id, resourceMap]);
@@ -78,6 +77,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       onClick: onClickShowFile,
     },
     {key: 'divider-1', type: 'divider'},
+
     {
       key: 'copy_full_path',
       label: 'Copy Path',
@@ -118,8 +118,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
           title: `Are you sure you want to delete "${basename}"?`,
           icon: <ExclamationCircleOutlined />,
           onOk() {
-            setProcessingEntity({processingEntityID: resource.filePath, processingType: 'delete'});
-            deleteEntity(absolutePath, onDelete);
+            deleteEntity(absolutePath, args => dispatchDeleteAlert(dispatch, args));
           },
         });
       },

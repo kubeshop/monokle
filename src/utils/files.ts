@@ -3,6 +3,11 @@ import {lstat} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
+import {AlertEnum} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
+
+import {setAlert} from '@redux/reducers/alert';
+
 export function doesPathExist(absolutePath: string) {
   try {
     fs.accessSync(absolutePath);
@@ -59,6 +64,28 @@ export async function deleteEntity(absolutePath: string, callback: (args: Delete
     return fs.rm(absolutePath, {recursive: true, force: true}, err => {
       callback({isDirectory, name, err});
     });
+  }
+}
+
+export function dispatchDeleteAlert(dispatch: AppDispatch, args: DeleteEntityCallback) {
+  const {isDirectory, name, err} = args;
+
+  if (err) {
+    dispatch(
+      setAlert({
+        title: 'Deleting failed',
+        message: `Something went wrong during deleting ${name} ${isDirectory ? 'directory' : 'file'}`,
+        type: AlertEnum.Error,
+      })
+    );
+  } else {
+    dispatch(
+      setAlert({
+        title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
+        message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+        type: AlertEnum.Success,
+      })
+    );
   }
 }
 
