@@ -7,6 +7,8 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import path from 'path';
 import styled from 'styled-components';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -19,7 +21,7 @@ import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import {useDuplicate, useRename} from '@hooks/fileTreeHooks';
+import {useCreate, useDuplicate, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
@@ -43,10 +45,12 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
+  const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
   const {onRename} = useRename();
 
   const isResourceSelected = useMemo(() => itemInstance.id === selectedResourceId, [itemInstance, selectedResourceId]);
+
   const resource = useMemo(() => resourceMap[itemInstance.id], [itemInstance.id, resourceMap]);
   const absolutePath = useMemo(() => getAbsoluteFilePath(resource.filePath, fileMap), [fileMap, resource.filePath]);
   const basename = useMemo(
@@ -57,7 +61,12 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
+  const isRoot = useMemo(() => resource.filePath === ROOT_FILE_ENTRY, [resource.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const target = useMemo(
+    () => (isRoot ? ROOT_FILE_ENTRY : resource.filePath.replace(path.sep, '')),
+    [isRoot, resource.filePath]
+  );
 
   const onClickShowFile = () => {
     if (!resource) {
@@ -77,7 +86,15 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       onClick: onClickShowFile,
     },
     {key: 'divider-1', type: 'divider'},
-
+    {
+      key: 'create_resource',
+      label: 'Add Resource',
+      disabled: isInPreviewMode,
+      onClick: () => {
+        onCreateResource({targetFile: target});
+      },
+    },
+    {key: 'divider-2', type: 'divider'},
     {
       key: 'copy_full_path',
       label: 'Copy Path',
@@ -92,7 +109,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
         navigator.clipboard.writeText(resource.filePath);
       },
     },
-    {key: 'divider-2', type: 'divider'},
+    {key: 'divider-3', type: 'divider'},
     {
       key: 'duplicate_entity',
       label: 'Duplicate',

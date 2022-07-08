@@ -70,21 +70,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const isFileSelected = useMemo(() => {
-    return treeKey === selectedPath;
-  }, [treeKey, selectedPath]);
+  const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
+  const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const root = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+  const target = useMemo(() => (isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '')), [isRoot, treeKey]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
   const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
 
-  const isRoot = treeKey === ROOT_FILE_ENTRY;
-  const root = fileMap[ROOT_FILE_ENTRY];
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
-
-  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
-
-  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
