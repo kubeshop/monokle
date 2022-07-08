@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Input, InputRef, Tooltip} from 'antd';
 
@@ -38,7 +38,7 @@ const FilePatternList = (props: FilePatternListProps) => {
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
   const filePatternInputRef = useRef<any>();
-  const isValueNotEmpty = value.length > 0;
+  const isValueNotEmpty = useMemo(() => value.length > 0, [value]);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
