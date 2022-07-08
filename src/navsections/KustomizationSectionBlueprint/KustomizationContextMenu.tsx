@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import {Menu, Modal} from 'antd';
 
@@ -16,12 +16,13 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import {useCreate, useDuplicate, useRename} from '@hooks/fileTreeHooks';
+import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
@@ -40,6 +41,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -47,6 +49,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
 
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
   const isResourceSelected = useMemo(() => itemInstance.id === selectedResourceId, [itemInstance, selectedResourceId]);
@@ -67,6 +70,19 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (isRoot ? ROOT_FILE_ENTRY : resource.filePath.replace(path.sep, '')),
     [isRoot, resource.filePath]
   );
+
+  const setFolder = useCallback(
+    (folder: string) => {
+      dispatch(setRootFolder(folder));
+    },
+    [dispatch]
+  );
+
+  const refreshFolder = useCallback(() => {
+    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
+  }, [fileMap, setFolder]);
+
+  const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const onClickShowFile = () => {
     if (!resource) {
@@ -96,6 +112,30 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     },
     {key: 'divider-2', type: 'divider'},
     {
+      key: 'filter_on_this_file',
+      label:
+        fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this file',
+      disabled: isInPreviewMode,
+      onClick: () => {
+        if (isRoot || (fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter)) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(resource.filePath);
+        }
+      },
+    },
+    {
+      key: 'add_to_files_exclude',
+      label: 'Add to Files: Exclude',
+      disabled: isInPreviewMode,
+      onClick: () => {
+        onExcludeFromProcessing(resource.filePath);
+      },
+    },
+    {key: 'divider-3', type: 'divider'},
+    {
       key: 'copy_full_path',
       label: 'Copy Path',
       onClick: () => {
@@ -109,7 +149,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
         navigator.clipboard.writeText(resource.filePath);
       },
     },
-    {key: 'divider-3', type: 'divider'},
+    {key: 'divider-4', type: 'divider'},
     {
       key: 'duplicate_entity',
       label: 'Duplicate',
@@ -140,7 +180,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
         });
       },
     },
-    {key: 'divider-4', type: 'divider'},
+    {key: 'divider-5', type: 'divider'},
     {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,
