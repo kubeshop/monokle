@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Input, InputRef, Tooltip} from 'antd';
 
@@ -34,11 +34,11 @@ const StyledButton = styled(Button)`
 
 const FilePatternList = (props: FilePatternListProps) => {
   const {value, onChange, tooltip, isSettingsOpened, showButtonLabel, showApplyButton, onApplyClick} = props;
-
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
   const filePatternInputRef = useRef<any>();
+  const isValueNotEmpty = useMemo(() => value.length > 0, [value]);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
@@ -89,17 +89,19 @@ const FilePatternList = (props: FilePatternListProps) => {
 
   return (
     <div>
-      <StyledUl>
-        {value.map(pattern => (
-          <FilePatternListItem
-            key={pattern}
-            pattern={pattern}
-            validateInput={isPatternUnique}
-            onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
-            onRemove={() => removePattern(pattern)}
-          />
-        ))}
-      </StyledUl>
+      {isValueNotEmpty && (
+        <StyledUl>
+          {value.map(pattern => (
+            <FilePatternListItem
+              key={pattern}
+              pattern={pattern}
+              validateInput={isPatternUnique}
+              onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
+              onRemove={() => removePattern(pattern)}
+            />
+          ))}
+        </StyledUl>
+      )}
       {isAddingPattern ? (
         <div ref={filePatternInputRef}>
           <Input
