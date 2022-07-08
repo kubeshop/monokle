@@ -1,26 +1,29 @@
-import React, {FC, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 
-import {Button, Form, Tooltip} from 'antd';
+import {Button, Form, Popover, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {v4 as uuid} from 'uuid';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {ClusterColors} from '@models/cluster';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCurrentContext, updateClusterNamespaces} from '@redux/reducers/appConfig';
+import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
 import FilePatternList from '@molecules/FilePatternList';
 
 import {runCommandInMainThread} from '@utils/commands';
 
+import {BackgroundColors} from '@styles/Colors';
+
 import * as S from './ClusterSelectionTable.styled';
 
-interface CLusterSelectionTableProps {
+interface ClusterSelectionTableProps {
   setIsClusterDropdownOpen: (isOpen: boolean) => void;
 }
 
@@ -29,37 +32,46 @@ interface ClusterTableRow {
   namespaces: string[];
   hasFullAccess?: boolean;
   editable: boolean;
+  color?: ClusterColors;
 }
 
-export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
+export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
   const dispatch = useAppDispatch();
+  const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
-  const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
+  const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
 
+  const [changeClusterColor, setChangeClusterColor] = useState('');
+  const [editingKey, setEditingKey] = useState('');
   const [localClusters, setLocalClusters] = useState<ClusterTableRow[]>([]);
 
-  useEffect(() => {
-    const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
-      const contextNamespaces = clusterAccess.filter(appNs => appNs.context === context.name);
-      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
-      const hasFullAccess = clusterSpecificAccess.length
-        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
-        : undefined;
-      return {
-        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespace),
-        name: context.name,
-        hasFullAccess,
-        editable: true,
-      };
-    });
-
-    setLocalClusters(clusterTableRows);
-  }, [kubeConfigContexts, clusterAccess]);
-
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
-  const isEditing = (record: ClusterTableRow) => record.name === editingKey;
+
+  const clusterAccessRender = useCallback((hasFullAccess?: boolean) => {
+    if (hasFullAccess === undefined) {
+      return 'Unknown';
+    }
+
+    return hasFullAccess ? 'Full Access' : 'Restricted Access';
+  }, []);
+  const isEditing = useCallback((record: ClusterTableRow) => record.name === editingKey, [editingKey]);
+  const rowClassName = useCallback(
+    (cluster: ClusterTableRow) => {
+      let className = '';
+
+      if (kubeConfigContext === cluster.name) {
+        className += 'table-active-row ';
+      }
+
+      if (changeClusterColor === cluster.name) {
+        className += 'table-row-changing-cluster-color';
+      }
+
+      return className.trim();
+    },
+    [changeClusterColor, kubeConfigContext]
+  );
 
   const edit = (record: Partial<ClusterTableRow>) => {
     form.setFieldsValue({name: '', namespaces: [], hasFullAccess: false, ...record});
@@ -99,20 +111,13 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     );
   };
 
-  const clusterAccessRender = (hasFullAccess?: boolean) => {
-    if (hasFullAccess === undefined) {
-      return 'Unknown';
-    }
-
-    return hasFullAccess ? 'Full Access' : 'Restricted Access';
-  };
-
   const onNamespacesChange = (values: {namespace: string; cluster: string}[]) => {
     dispatch(updateClusterNamespaces(values));
   };
 
   const handleClusterChange = (clusterName: string) => {
     setIsClusterDropdownOpen(false);
+
     if (clusterName === kubeConfigContext) {
       return;
     }
@@ -136,6 +141,52 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     });
   };
 
+  const updateClusterColor = (name: string, color: ClusterColors) => {
+    dispatch(setKubeConfigContextColor({name, color}));
+    setChangeClusterColor('');
+    dispatch(setAlert({type: AlertEnum.Success, title: `${name} accent color was changed successfully`, message: ''}));
+  };
+
+  const isColorSelected = useCallback(
+    (name: string, color: ClusterColors) => {
+      const currentCluster = localClusters.find(cl => cl.name === name);
+
+      if (!currentCluster) {
+        return false;
+      }
+
+      if (
+        (!currentCluster.color && color === BackgroundColors.clusterModeBackground) ||
+        currentCluster.color === color
+      ) {
+        return true;
+      }
+
+      return false;
+    },
+    [localClusters]
+  );
+
+  useEffect(() => {
+    const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
+      const contextNamespaces = clusterAccess.filter(appNs => appNs.context === context.name);
+      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
+      const hasFullAccess = clusterSpecificAccess.length
+        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
+        : undefined;
+
+      return {
+        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespace),
+        name: context.name,
+        hasFullAccess,
+        editable: true,
+        color: kubeConfigContextsColors[context.name],
+      };
+    });
+
+    setLocalClusters(clusterTableRows);
+  }, [kubeConfigContexts, clusterAccess, kubeConfigContextsColors]);
+
   return (
     <Form form={form} component={false}>
       <S.Table
@@ -145,17 +196,10 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
         pagination={false}
         scroll={{y: 300}}
         rowKey="name"
-        className="asdasdasd"
-        rowClassName={(cluster: ClusterTableRow) => {
-          if (kubeConfigContext === cluster.name) {
-            return 'table-active-row';
-          }
-
-          return '';
-        }}
+        rowClassName={(cluster: ClusterTableRow) => rowClassName(cluster)}
       >
         <Column
-          className="table-column-name cluster-table-column-name"
+          className="table-column-name"
           title="Cluster name"
           dataIndex="name"
           key="name"
@@ -164,7 +208,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           onCell={(cluster: ClusterTableRow) => ({onClick: () => handleClusterChange(cluster.name)})}
         />
         <Column
-          className="cluster-table-column-namespaces"
           title="Namespaces"
           dataIndex="namespaces"
           key="namespaces"
@@ -173,7 +216,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           width={200}
         />
         <Column
-          className="cluster-table-column-access"
           title="Access"
           dataIndex="hasFullAccess"
           key="hasFullAccess"
@@ -186,26 +228,74 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           key="clusterActions"
           dataIndex="clusterActions"
           ellipsis
-          width={70}
-          render={(_: any, record: ClusterTableRow) => {
-            const editing = isEditing(record);
-            if (editing) {
+          width={75}
+          render={(value: any, record: ClusterTableRow) => {
+            if (isEditing(record)) {
               return (
                 <Button onClick={() => save(record.name)} type="default">
                   Done
                 </Button>
               );
             }
+
             return (
-              <span
-                className="edit-span-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  edit(record);
-                }}
-              >
-                <S.EditOutlined />
-              </span>
+              <S.ActionsContainer className="cluster-actions-container">
+                <S.EditOutlined
+                  onClick={e => {
+                    e.stopPropagation();
+                    edit(record);
+                  }}
+                />
+
+                <Popover
+                  content={
+                    <S.ClusterColorsContainer>
+                      {CLUSTER_AVAILABLE_COLORS.map(color => (
+                        <S.ClusterColor
+                          key={color}
+                          $color={color}
+                          $selected={isColorSelected(record.name, color)}
+                          $size="big"
+                          onClick={() => updateClusterColor(record.name, color)}
+                        />
+                      ))}
+                    </S.ClusterColorsContainer>
+                  }
+                  overlayClassName="cluster-color-popover"
+                  placement="bottom"
+                  visible={changeClusterColor === record.name}
+                  title={
+                    <>
+                      <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
+                      <S.DefaultColorContainer>
+                        <S.ClusterColor
+                          $color={BackgroundColors.clusterModeBackground}
+                          $selected={isColorSelected(record.name, BackgroundColors.clusterModeBackground)}
+                          $size="big"
+                          onClick={() => updateClusterColor(record.name, BackgroundColors.clusterModeBackground)}
+                        />
+                        <span>Default</span>
+                      </S.DefaultColorContainer>
+                    </>
+                  }
+                  trigger="click"
+                  zIndex={1500}
+                  onVisibleChange={visible => {
+                    if (!visible) {
+                      setChangeClusterColor('');
+                    }
+                  }}
+                >
+                  <S.ClusterColor
+                    $color={kubeConfigContextsColors[record.name] || BackgroundColors.clusterModeBackground}
+                    $selected
+                    $size="small"
+                    onClick={() => {
+                      setChangeClusterColor(record.name);
+                    }}
+                  />
+                </Popover>
+              </S.ActionsContainer>
             );
           }}
         />

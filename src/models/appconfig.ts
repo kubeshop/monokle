@@ -1,5 +1,7 @@
 import {KustomizeCommandType} from '@models/kustomize';
 
+import {ClusterColors} from './cluster';
+
 export enum Themes {
   Dark = 'dark',
   Light = 'light',
@@ -141,6 +143,9 @@ interface AppConfig {
   disableErrorReporting: boolean;
   clusterAccess: Array<ClusterAccess>;
   isAccessLoading?: boolean;
+  kubeConfigContextsColors: {
+    [name: string]: ClusterColors;
+  };
 }
 
 export type {AppConfig};

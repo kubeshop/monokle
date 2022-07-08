@@ -19,6 +19,7 @@ import {
   TextSizes,
   Themes,
 } from '@models/appconfig';
+import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
 import {
@@ -387,6 +388,15 @@ export const configSlice = createSlice({
       }
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
+    setKubeConfigContextColor: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{color: ClusterColors; name: string}>
+    ) => {
+      const {color, name} = action.payload;
+
+      state.kubeConfigContextsColors[name] = color;
+      electronStore.set('appConfig.kubeConfigContextsColors', state.kubeConfigContextsColors);
+    },
     updateTelemetry: (
       state: Draft<AppConfig>,
       action: PayloadAction<{disableErrorReporting: boolean; disableEventTracking: boolean}>
@@ -429,39 +439,6 @@ export const configSlice = createSlice({
   },
 });
 
-export const {
-  setFilterObjects,
-  setAutoZoom,
-  setCurrentContext,
-  updateFolderReadsMaxDepth,
-  updateLanguage,
-  updateNewVersion,
-  updateFileIncludes,
-  updateLoadLastProjectOnStartup,
-  updateScanExcludes,
-  updateTextSize,
-  updateTheme,
-  setKubeConfig,
-  updateProjectConfig,
-  updateProjectKubeConfig,
-  updateClusterSelectorVisibilty,
-  setUserDirs,
-  createProject,
-  changeCurrentProjectName,
-  changeProjectsRootPath,
-  updateApplicationSettings,
-  updateK8sVersion,
-  handleFavoriteTemplate,
-  toggleEventTracking,
-  toggleErrorReporting,
-  setAccessLoading,
-  updateTelemetry,
-  toggleProjectPin,
-  addNamespaceToContext,
-  removeNamespaceFromContext,
-} = configSlice.actions;
-export default configSlice.reducer;
-
 export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boolean) => {
   if (projects.length === 0) {
     return [];
@@ -475,3 +452,37 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
   const [lastOpened, ...rest] = sortedProjects;
   return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
 };
+
+export const {
+  addNamespaceToContext,
+  changeCurrentProjectName,
+  changeProjectsRootPath,
+  createProject,
+  handleFavoriteTemplate,
+  removeNamespaceFromContext,
+  setAccessLoading,
+  setAutoZoom,
+  setCurrentContext,
+  setFilterObjects,
+  setKubeConfig,
+  setKubeConfigContextColor,
+  setUserDirs,
+  toggleErrorReporting,
+  toggleEventTracking,
+  toggleProjectPin,
+  updateApplicationSettings,
+  updateClusterSelectorVisibilty,
+  updateFileIncludes,
+  updateFolderReadsMaxDepth,
+  updateLanguage,
+  updateLoadLastProjectOnStartup,
+  updateK8sVersion,
+  updateNewVersion,
+  updateProjectConfig,
+  updateProjectKubeConfig,
+  updateScanExcludes,
+  updateTelemetry,
+  updateTextSize,
+  updateTheme,
+} = configSlice.actions;
+export default configSlice.reducer;

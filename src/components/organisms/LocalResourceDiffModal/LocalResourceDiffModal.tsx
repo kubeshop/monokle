@@ -10,7 +10,12 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import {flatten} from 'lodash';
 import {stringify} from 'yaml';
 
-import {makeApplyKustomizationText, makeApplyResourceText, makeReplaceResourceText} from '@constants/makeApplyText';
+import {
+  ClusterName,
+  makeApplyKustomizationText,
+  makeApplyResourceText,
+  makeReplaceResourceText,
+} from '@constants/makeApplyText';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
@@ -21,6 +26,7 @@ import {
   currentClusterAccessSelector,
   currentConfigSelector,
   isInClusterModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
@@ -52,6 +58,7 @@ const DiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -105,13 +112,13 @@ const DiffModal = () => {
     }
 
     if (applyModalType === ModalTypes.toLocal) {
-      return makeReplaceResourceText(targetResource.name, kubeConfigContext);
+      return makeReplaceResourceText(targetResource.name, kubeConfigContext, kubeConfigContextColor);
     }
 
     return isKustomizationResource(targetResource)
-      ? makeApplyKustomizationText(targetResource.name, kubeConfigContext)
-      : makeApplyResourceText(targetResource.name, kubeConfigContext);
-  }, [targetResource, kubeConfigContext, applyModalType]);
+      ? makeApplyKustomizationText(targetResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(targetResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [targetResource, kubeConfigContext, applyModalType, kubeConfigContextColor]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (targetResource?.id) {
@@ -326,23 +333,30 @@ const DiffModal = () => {
           <S.TitleContainer>
             Resource Diff on ${targetResource ? targetResource.name : ''}
             <S.NamespaceSelectContainer>
-              Namespace:
-              <Select
-                value={
-                  matchingResourcesById && selectedMatchingResourceId
-                    ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
-                    : defaultNamespace
-                }
-                defaultValue={defaultNamespace}
-                onChange={ns => onNamespaceSelectHandler(ns)}
-                style={{width: '300px', marginLeft: '16px'}}
-              >
-                {namespaces?.map(ns => (
-                  <Select.Option key={ns} value={ns}>
-                    {ns}
-                  </Select.Option>
-                ))}
-              </Select>
+              <div>
+                Namespace:
+                <Select
+                  value={
+                    matchingResourcesById && selectedMatchingResourceId
+                      ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
+                      : defaultNamespace
+                  }
+                  defaultValue={defaultNamespace}
+                  onChange={ns => onNamespaceSelectHandler(ns)}
+                  style={{width: '300px', marginLeft: '16px'}}
+                >
+                  {namespaces?.map(ns => (
+                    <Select.Option key={ns} value={ns}>
+                      {ns}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </div>
+
+              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                <Switch checked={shouldDiffIgnorePaths} />
+                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              </S.SwitchContainer>
             </S.NamespaceSelectContainer>
           </S.TitleContainer>
         }
@@ -369,7 +383,14 @@ const DiffModal = () => {
             </div>
           ) : (
             <>
-              <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+              <S.TagsContainer>
+                <S.StyledTag>Local</S.StyledTag>
+                <S.StyledTag>
+                  Cluster{' '}
+                  <ClusterName $kubeConfigContextColor={kubeConfigContextColor}>{kubeConfigContext}</ClusterName>
+                </S.StyledTag>
+              </S.TagsContainer>
+              <S.MonacoDiffContainer width="100%" height="calc(100% - 150px)" ref={containerRef}>
                 <MonacoDiffEditor
                   width={containerWidth}
                   height={containerHeight}
@@ -381,8 +402,7 @@ const DiffModal = () => {
                 />
               </S.MonacoDiffContainer>
 
-              <S.TagsContainer>
-                <S.StyledTag>Local</S.StyledTag>
+              <S.ActionButtonsContainer>
                 <Button
                   type="primary"
                   ghost
@@ -400,14 +420,8 @@ const DiffModal = () => {
                 >
                   <ArrowLeftOutlined /> Replace local resource with cluster resource
                 </Button>
-                <S.StyledTag>Cluster</S.StyledTag>
-              </S.TagsContainer>
-              <S.SwitchContainer>
-                <div onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-                  <Switch checked={shouldDiffIgnorePaths} />
-                  <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
-                </div>
-              </S.SwitchContainer>
+              </S.ActionButtonsContainer>
+
               <S.ButtonContainer>
                 <Button onClick={handleRefresh}>Refresh</Button>
                 <Button onClick={onCloseHandler} style={{marginLeft: 12}}>

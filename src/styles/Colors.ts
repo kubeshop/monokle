@@ -39,10 +39,16 @@ enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
 
+  volcano7 = '#E87040',
+  volcano8 = '#F3956A',
+
+  magenta7 = '#E0529C',
+  magenta8 = '#F37FB7',
+
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
-  red7 = '#E84749', // Dust Red
   red6 = '#D32029',
+  red7 = '#E84749', // Dust Red
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
@@ -50,16 +56,22 @@ enum Colors {
   blackPearl = '#111d2c',
   black9 = '#0C0D0E',
 
+  lime8 = '#C9E75D',
+
+  purple8 = '#AB7AE0',
+
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',
   cyan5 = '#138585',
-  volcano = '#F3956A',
   lightSeaGreen = '#13a8a8',
+
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
+  blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
 
+  green6 = '#49AA19',
   green7 = '#6ABE39', // Polar Green
   green8 = '#6F9412',
   green10 = '#3E4F13', // Dark Green
@@ -83,7 +95,7 @@ export enum BackgroundColors {
   lightThemeBackground = Colors.whitePure,
   darkThemeBackground = Colors.blackPure,
   previewModeBackground = Colors.cyan,
-  clusterModeBackground = Colors.volcano,
+  clusterModeBackground = Colors.volcano8,
 }
 
 export enum FontColors {

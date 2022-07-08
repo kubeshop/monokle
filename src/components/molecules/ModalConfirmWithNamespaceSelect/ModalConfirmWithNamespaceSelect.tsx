@@ -19,7 +19,7 @@ import * as S from './ModalConfirmWithNamespaceSelect.styled';
 interface IProps {
   isVisible: boolean;
   resources?: K8sResource[];
-  title: string;
+  title: string | JSX.Element;
   onOk: (namespace?: {name: string; new: boolean}) => void;
   onCancel: () => void;
 }
