@@ -188,7 +188,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 };
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
-  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
+  const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
   const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
