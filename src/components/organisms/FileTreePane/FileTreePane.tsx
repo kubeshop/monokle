@@ -15,7 +15,7 @@ import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolde
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
-import {openRenameEntityModal, setExpandedFolders, openCreateFileFolderModal} from '@redux/reducers/ui';
+import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -23,7 +23,16 @@ import {TitleBar} from '@molecules';
 
 import {Icon} from '@atoms';
 
-import {useCreate, useDelete, useFileSelect, useHighlightNode, usePreview, useProcessing, useDuplicate} from '@hooks/fileTreeHooks';
+import {
+  useCreate,
+  useDelete,
+  useDuplicate,
+  useFileSelect,
+  useHighlightNode,
+  usePreview,
+  useProcessing,
+  useRename,
+} from '@hooks/fileTreeHooks';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -51,11 +60,12 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const onFileSelect = useFileSelect();
-  const onPreview = usePreview();
+  const {onFileSelect} = useFileSelect();
+  const {onPreview} = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
+  const {onRename} = useRename();
 
   const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
@@ -133,10 +143,6 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, tree]);
-
-  const onRename = (absolutePathToEntity: string, osPlatform: string) => {
-    dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
-  };
 
   useEffect(() => {
     if (isSelectingFile) {

@@ -31,5 +31,5 @@ export const usePreview = () => {
     [dispatch, fileMap, helmValuesMap, resourceMap]
   );
 
-  return onPreview;
+  return {onPreview};
 };
