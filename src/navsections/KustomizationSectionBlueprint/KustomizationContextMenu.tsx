@@ -22,6 +22,7 @@ import ContextMenu from '@components/molecules/ContextMenu';
 import {useDelete, useDuplicate, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity} from '@utils/files';
+import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
 
@@ -57,6 +58,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   const onClickShowFile = () => {
     if (!resource) {
@@ -76,6 +78,21 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       onClick: onClickShowFile,
     },
     {key: 'divider-1', type: 'divider'},
+    {
+      key: 'copy_full_path',
+      label: 'Copy Path',
+      onClick: () => {
+        navigator.clipboard.writeText(absolutePath);
+      },
+    },
+    {
+      key: 'copy_relative_path',
+      label: 'Copy Relative Path',
+      onClick: () => {
+        navigator.clipboard.writeText(resource.filePath);
+      },
+    },
+    {key: 'divider-2', type: 'divider'},
     {
       key: 'duplicate_entity',
       label: 'Duplicate',
@@ -105,6 +122,14 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
             deleteEntity(absolutePath, onDelete);
           },
         });
+      },
+    },
+    {key: 'divider-4', type: 'divider'},
+    {
+      key: 'reveal_in_finder',
+      label: `Reveal in ${platformFileManagerName}`,
+      onClick: () => {
+        showItemInFolder(absolutePath);
       },
     },
   ];

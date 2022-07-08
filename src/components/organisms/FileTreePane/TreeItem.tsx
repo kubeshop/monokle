@@ -84,11 +84,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
 
-  const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'Finder',
-  };
-
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -268,7 +264,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     {key: 'divider-4', type: 'divider'},
     {
       key: 'reveal_in_finder',
-      label: `  Reveal in ${platformFilemanagerName}`,
+      label: `Reveal in ${platformFileManagerName}`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         showItemInFolder(absolutePath);
