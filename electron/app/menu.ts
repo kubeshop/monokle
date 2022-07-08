@@ -233,7 +233,6 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         accelerator: hotkeys.APPLY_SELECTION.key,
         enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
         click: () => {
-          if(!isKubeConfigPathValid)return;
           dispatch(setMonacoEditor({apply: true}));
         },
       },
