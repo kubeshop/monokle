@@ -243,7 +243,6 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         accelerator: hotkeys.DIFF_RESOURCE.key,
         enabled: Boolean(state.main.selectedResourceId),
         click: () => {
-          if(!isKubeConfigPathValid)return;
           if (!state.main.selectedResourceId) {
             return;
           }
