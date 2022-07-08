@@ -156,7 +156,10 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.APPLY_SELECTION.key,
     () => {
-      if (!isKubeConfigPathValid) return;
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       applySelection();
     },
     [applySelection, isKubeConfigPathValid]
