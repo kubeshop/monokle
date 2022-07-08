@@ -51,7 +51,7 @@ export const SearchProjectTooltip = 'Search for project by name or path';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
 export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
 export const TemplatesTabTooltip = `View Templates`;
-
+export const KubeConfigNoValid = 'Your kubeconfig is not valid !';
 export const ApplyFileTooltip = () => (
   <HotkeyLabel text="Deploy this file to your selected cluster" name="APPLY_SELECTION" />
 );

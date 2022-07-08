@@ -11,6 +11,7 @@ import {
   DiffTooltip,
   EditPreviewConfigurationTooltip,
   InstallValuesFileTooltip,
+  KubeConfigNoValid,
   RunPreviewConfigurationTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
@@ -20,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
@@ -52,6 +53,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const selectedPreviewConfiguration = useAppSelector(state => {
     if (!selectedPreviewConfigurationId) {
@@ -115,6 +117,9 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }, [selectedPath]);
 
   const isDeployButtonDisabled = useMemo(() => {
+    if (!isKubeConfigPathValid) {
+      return true;
+    }
     return (
       (!selectedResourceId && !selectedPath) ||
       (selectedPath && selectedPath.endsWith(HELM_CHART_ENTRY_FILE)) ||
@@ -123,9 +128,12 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         !isKustomizationResource(selectedResource) &&
         (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
     );
-  }, [selectedResource, knownResourceKinds, selectedResourceId, selectedPath]);
+  }, [selectedResource, knownResourceKinds, selectedResourceId, selectedPath, isKubeConfigPathValid]);
 
   const isDiffButtonDisabled = useMemo(() => {
+    if (!isKubeConfigPathValid) {
+      return true;
+    }
     if (!selectedResource) {
       return true;
     }
@@ -136,7 +144,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
       return true;
     }
     return false;
-  }, [selectedResource, knownResourceKinds]);
+  }, [selectedResource, knownResourceKinds, isKubeConfigPathValid]);
 
   const isLeftArrowEnabled = useMemo(
     () =>
@@ -233,7 +241,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Tooltip>
         )}
 
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
+          placement="bottomLeft"
+        >
           <Button
             loading={Boolean(applyingResource)}
             type="primary"
@@ -247,7 +259,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Button>
         </Tooltip>
 
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
+          placement="bottomLeft"
+        >
           <S.DiffButton
             size="small"
             type="primary"

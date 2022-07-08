@@ -20,7 +20,7 @@ import {
   zoomIn,
   zoomOut,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {defineHotkey} from '@utils/defineHotkey';
@@ -186,6 +186,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 };
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+  const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
   const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
@@ -229,7 +230,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION.key,
-        enabled: Boolean(state.main.selectedResourceId),
+        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
         click: () => {
           dispatch(setMonacoEditor({apply: true}));
         },
@@ -237,7 +238,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Diff',
         accelerator: hotkeys.DIFF_RESOURCE.key,
-        enabled: Boolean(state.main.selectedResourceId),
+        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
         click: () => {
           if (!state.main.selectedResourceId) {
             return;
