@@ -29,6 +29,7 @@ function useDebouncedCodeSave(
     } else {
       return;
     }
+
     // is a file and no resource selected?
     if (selectedPath && !selectedResourceId) {
       try {

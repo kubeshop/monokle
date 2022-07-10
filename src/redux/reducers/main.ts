@@ -607,8 +607,8 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
     },
-    editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
-      state.shouldEditorReloadSelectedPath = false;
+    editorHasReloadedSelectedPath: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.shouldEditorReloadSelectedPath = action.payload;
     },
     checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (!state.checkedResourceIds.includes(action.payload)) {
