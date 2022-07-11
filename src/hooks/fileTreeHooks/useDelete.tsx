@@ -1,11 +1,10 @@
 import {useState} from 'react';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
 
 import {ProcessingEntity} from '@components/organisms/FileTreePane/types';
+
+import {dispatchDeleteAlert} from '@utils/files';
 
 export const useDelete = () => {
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
@@ -16,25 +15,7 @@ export const useDelete = () => {
   const dispatch = useAppDispatch();
 
   const onDelete = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
-    const {isDirectory, name, err} = args;
-
-    if (err) {
-      dispatch(
-        setAlert({
-          title: 'Deleting failed',
-          message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
-          type: AlertEnum.Error,
-        })
-      );
-    } else {
-      dispatch(
-        setAlert({
-          title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
-          message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
-          type: AlertEnum.Success,
-        })
-      );
-    }
+    dispatchDeleteAlert(dispatch, args);
 
     /**
      * Deleting is performed immediately.

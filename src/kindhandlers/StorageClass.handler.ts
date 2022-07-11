@@ -17,7 +17,7 @@ const StorageClassHandler: ResourceKindHandler = {
     const storageV1Api = kubeconfig.makeApiClient(k8s.StorageV1Api);
     return storageV1Api.readStorageClass(resource.name, 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const storageV1Api = kubeconfig.makeApiClient(k8s.StorageV1Api);
     const response = await storageV1Api.listStorageClass();
     return response.body.items;

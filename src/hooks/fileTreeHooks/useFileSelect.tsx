@@ -14,7 +14,7 @@ export const useFileSelect = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
 
-  return function onSelect(selectedKeysValue: React.Key[], info: any) {
+  const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
 
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(nodeKey), fileInclude))) {
@@ -31,4 +31,6 @@ export const useFileSelect = () => {
       dispatch(selectFile({filePath: nodeKey}));
     }
   };
+
+  return {onFileSelect};
 };

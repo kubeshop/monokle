@@ -14,8 +14,8 @@ import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@consta
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
-import {openRenameEntityModal, setExpandedFolders, openCreateFileFolderModal} from '@redux/reducers/ui';
+import {setSelectingFile} from '@redux/reducers/main';
+import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -23,7 +23,17 @@ import {TitleBar} from '@molecules';
 
 import {Icon} from '@atoms';
 
-import {useCreate, useDelete, useFileSelect, useHighlightNode, usePreview, useProcessing, useDuplicate} from '@hooks/fileTreeHooks';
+import {
+  useCreate,
+  useDelete,
+  useDuplicate,
+  useFileSelect,
+  useFilterByFileOrFolder,
+  useHighlightNode,
+  usePreview,
+  useProcessing,
+  useRename,
+} from '@hooks/fileTreeHooks';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -47,15 +57,16 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const onFileSelect = useFileSelect();
-  const onPreview = usePreview();
+  const {onFileSelect} = useFileSelect();
+  const {onPreview} = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+  const {onRename} = useRename();
 
   const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
@@ -134,10 +145,6 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, tree]);
 
-  const onRename = (absolutePathToEntity: string, osPlatform: string) => {
-    dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
-  };
-
   useEffect(() => {
     if (isSelectingFile) {
       dispatch(setSelectingFile(false));
@@ -198,10 +205,6 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
   const onToggleTree = () => {
     dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
-  };
-
-  const onFilterByFileOrFolder = (relativePath: string | undefined) => {
-    dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
   return (

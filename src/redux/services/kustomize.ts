@@ -52,7 +52,7 @@ export function isKustomizationPatch(r: K8sResource | undefined) {
  */
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (fileEntry.name.toLowerCase() === KUSTOMIZATION_FILE_NAME) {
+  if (fileEntry?.name.toLowerCase() === KUSTOMIZATION_FILE_NAME) {
     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
