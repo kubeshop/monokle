@@ -182,7 +182,13 @@ export const keysToUpdateStateBulk = (
   const keys: string[] = [];
 
   Object.keys(serializedIncomingConfig).forEach((key: string) => {
-    if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+    if (
+      _.isArray(serializedState[key]) &&
+      _.isArray(serializedIncomingConfig[key]) &&
+      !_.isEqual(_.sortBy(serializedState[key]), _.sortBy(serializedIncomingConfig[key]))
+    ) {
+      keys.push(key);
+    } else if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
       keys.push(key);
     }
   });

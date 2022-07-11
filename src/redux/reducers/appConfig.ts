@@ -247,8 +247,8 @@ export const configSlice = createSlice({
       }
 
       const kubeConfig = state.projectConfig?.kubeConfig;
-      const serializedIncomingConfig = flatten<any, any>(action.payload);
-      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
+      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
       const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
       keys.forEach(key => {
@@ -283,8 +283,8 @@ export const configSlice = createSlice({
       }
 
       const projectConfig = state.projectConfig;
-      const serializedIncomingConfig = flatten<any, any>(action.payload.config);
-      const serializedState = flatten<any, any>(state.projectConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload.config, {safe: true});
+      const serializedState = flatten<any, any>(state.projectConfig, {safe: true});
 
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
       if (action.payload.fromConfigFile) {
@@ -352,8 +352,8 @@ export const configSlice = createSlice({
         state.settings = {};
       }
 
-      const serializedIncomingSettings = flatten<any, any>(action.payload);
-      const serializedState = flatten<any, any>(state.settings);
+      const serializedIncomingSettings = flatten<any, any>(action.payload, {safe: true});
+      const serializedState = flatten<any, any>(state.settings, {safe: true});
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingSettings);
 
       keys.forEach(key => {
