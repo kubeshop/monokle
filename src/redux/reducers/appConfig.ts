@@ -300,7 +300,6 @@ export const configSlice = createSlice({
 
       const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
 
-      console.log('keys', keys);
 
       keys.forEach(key => {
         if (projectConfig) {
