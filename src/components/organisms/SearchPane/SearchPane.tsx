@@ -70,8 +70,8 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const recentSearch = useAppSelector(state => state.main.search.searchHistory);
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const onSelect = useFileSelect();
-  const onPreview = usePreview();
+  const {onFileSelect} = useFileSelect();
+  const {onPreview} = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
   const {onCreateResource} = useCreate();
@@ -179,7 +179,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     }
 
     const matchesInFile: MatchNode[] = flatten(parentNode.matchLines);
-    onSelect(selectedKeysValue, info);
+    onFileSelect(selectedKeysValue, info);
 
     setCurrentMatch({
       matchesInFile,

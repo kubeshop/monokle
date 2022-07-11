@@ -12,6 +12,8 @@ import {isDefined} from '@utils/filter';
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
+import HelmChartContextMenu from './HelmChartContextMenu';
+import HelmChartContextMenuWrapper from './HelmChartContextMenuWrapper';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
@@ -172,7 +174,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
-      getInstanceId: rawItem => rawItem.filePath,
+      getInstanceId: rawItem => rawItem.id,
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -192,6 +194,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {
           component: ItemPrefix,
         },
@@ -270,6 +274,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         quickAction: {
           component: HelmChartQuickAction,
           options: {isVisibleOnHover: true},
@@ -343,6 +349,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
       },
