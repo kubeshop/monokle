@@ -68,6 +68,7 @@ interface CreateFileEntryArgs {
   text?: string;
 }
 
+// TODO: Maybe text shouldn't be optional
 export function createFileEntry({fileEntryPath, fileMap, helmChartId, text}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
@@ -578,7 +579,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap});
+  const fileText = fs.readFileSync(absolutePath, 'utf8');
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, text: fileText});
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
@@ -595,6 +597,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   // seems to be a regular manifest file
   else {
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
+
     if (resourcesFromFile.length > 0) {
       reprocessResources(
         getK8sVersion(projectConfig),
