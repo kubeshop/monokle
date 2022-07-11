@@ -173,7 +173,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
           : `Filter on this ${isFolder ? 'folder' : 'file'}`,
-      disabled: isInPreviewMode || (!isFolder && (isExcluded || !isSupported)),
+      disabled:
+        isInPreviewMode ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
+        isHelmChartFile(relativePath) ||
+        isHelmValuesFile(relativePath) ||
+        (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
 
@@ -189,7 +194,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'add_to_files_exclude',
             label: `${isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
-            disabled: isInPreviewMode || (!isFolder && !isSupported && !isExcluded),
+            disabled:
+              isInPreviewMode ||
+              isHelmChartFile(relativePath) ||
+              isHelmValuesFile(relativePath) ||
+              (!isFolder && !isSupported && !isExcluded),
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               if (isExcluded) {

@@ -117,7 +117,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
         fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
           : 'Filter on this file',
-      disabled: isInPreviewMode,
+      disabled: true,
       onClick: () => {
         if (isRoot || (fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter)) {
           onFilterByFileOrFolder(undefined);
