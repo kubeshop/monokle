@@ -21,7 +21,7 @@ const StartProjectPage = () => {
 
   const START_PROJECT_OPTIONS = [
     {
-      itemId: 'start-from-template',
+      itemId: 'select-existing-folder',
       itemLogo: SelectFolder,
       itemTitle: 'Select a folder with K8s resources',
       itemDescription: 'Already have a local folder with ready-to-check Kubernetes resources? Bring it on!',
@@ -35,7 +35,7 @@ const StartProjectPage = () => {
       itemAction: () => handleCreateProject(false),
     },
     {
-      itemId: 'select-existing-folder',
+      itemId: 'start-from-template',
       itemLogo: CreateFromTemplate,
       itemTitle: 'Start from a template',
       itemDescription: 'Create basic jobs, pods, roles, services and other resources through ready-to-go templates.',
