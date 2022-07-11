@@ -34,7 +34,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 import {getKubeAccess} from '@utils/kubeclient';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -298,14 +297,9 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
-      const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
-
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-          if (cloneProjectConfig && !_.isEmpty(cloneProjectConfig)) {
-            trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
-          }
         }
       });
 
@@ -360,7 +354,6 @@ export const configSlice = createSlice({
         const projectSettings = state.settings;
         if (projectSettings) {
           _.set(projectSettings, key, serializedIncomingSettings[key]);
-          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: key});
         }
       });
 

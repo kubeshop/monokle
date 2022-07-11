@@ -36,7 +36,6 @@ export type EventMap = {
   ADD_NEW_RESOURCE: {resourceKind: string};
   APP_INSTALLED: {appVersion: string};
   CHANGES_BY_FORM_EDITOR: {resourceKind?: string};
-  CHANGES_BY_SETTINGS_PANEL: {type: string; settingKey: string};
   APPLY: {kind: string} & Record<string, any>;
   DIFF: undefined;
   CLUSTER_COMPARE: {numberOfResourcesBeingCompared: number} | {fail: string};
@@ -67,7 +66,6 @@ export const OPEN_EXISTING_PROJECT = 'OPEN_EXISTING_PROJECT';
 export const ADD_NEW_RESOURCE = 'ADD_NEW_RESOURCE';
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const CHANGES_BY_FORM_EDITOR = 'CHANGES_BY_FORM_EDITOR';
-export const CHANGES_BY_SETTINGS_PANEL = 'CHANGES_BY_SETTINGS_PANEL';
 export const APPLY = 'APPLY';
 export const DIFF = 'DIFF';
 export const CLUSTER_COMPARE = 'CLUSTER_COMPARE';
