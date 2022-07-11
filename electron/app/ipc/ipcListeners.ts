@@ -35,7 +35,9 @@ import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorer
 
 import {CommandOptions} from '@utils/commands';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
-import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
+
+import {getSegmentClient} from '@shared/segment';
+import {UPDATE_APPLICATION, trackEvent} from '@shared/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -46,7 +48,6 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
-import {getSegmentClient} from '../segment';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,

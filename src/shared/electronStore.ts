@@ -1,4 +1,4 @@
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {PREDEFINED_K8S_VERSION} from './constants';
 
 const ElectronStore = require('electron-store');
 

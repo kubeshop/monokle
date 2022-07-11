@@ -6,7 +6,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
@@ -36,9 +36,11 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
+
+import {PREDEFINED_K8S_VERSION} from '@shared/constants';
+import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@shared/telemetry';
 
 import {Settings} from './Settings';
 

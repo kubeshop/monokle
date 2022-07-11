@@ -41,13 +41,14 @@ import {StepEnum} from '@components/molecules/WalkThrough/types';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {fetchAppVersion} from '@utils/appVersion';
-import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
+
+import electronStore from '@shared/electronStore';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

@@ -2,7 +2,7 @@ import {app, shell} from 'electron';
 
 import * as os from 'os';
 
-import {WINDOW_HELP_LINK, trackEvent} from './telemetry';
+import {WINDOW_HELP_LINK, trackEvent} from '@shared/telemetry';
 
 export function showItemInFolder(fullPath: string) {
   shell.showItemInFolder(fullPath);

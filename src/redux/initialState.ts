@@ -1,6 +1,6 @@
 import os from 'os';
 
-import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
@@ -11,7 +11,8 @@ import {NavigatorState} from '@models/navigator';
 import {PaneConfiguration, UiState} from '@models/ui';
 import {UiCoachState} from '@models/uiCoach';
 
-import electronStore from '@utils/electronStore';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants';
+import electronStore from '@shared/electronStore';
 
 const initialAppState: AppState = {
   isRehydrating: false,

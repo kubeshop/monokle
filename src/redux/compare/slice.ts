@@ -5,7 +5,7 @@ import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@shared/telemetry';
 
 import {selectIsAllComparisonSelected} from './selectors';
 import {

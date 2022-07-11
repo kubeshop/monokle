@@ -10,7 +10,8 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
-import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
+
+import {DO_HELM_PREVIEW, trackEvent} from '@shared/telemetry';
 
 export const previewHelmValuesFile = createAsyncThunk<
   SetPreviewDataPayload,

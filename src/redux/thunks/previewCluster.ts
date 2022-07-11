@@ -20,9 +20,10 @@ import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
-import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+
+import {CLUSTER_VIEW, trackEvent} from '@shared/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(

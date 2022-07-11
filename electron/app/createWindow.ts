@@ -23,10 +23,11 @@ import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} fro
 import {setAppRehydrating} from '@redux/reducers/main';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
-import utilsElectronStore from '@utils/electronStore';
 import {StartupFlags} from '@utils/startupFlag';
-import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
+import utilsElectronStore from '@shared/electronStore';
+import {disableSegment, enableSegment, getSegmentClient} from '@shared/segment';
+import {DISABLED_TELEMETRY} from '@shared/telemetry';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -39,7 +40,6 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
-import {disableSegment, enableSegment, getSegmentClient} from './segment';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';

@@ -5,11 +5,13 @@ import {sep} from 'path';
 import {AnyAction} from 'redux';
 import invariant from 'tiny-invariant';
 
-import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {K8S_VERSIONS} from '@constants/constants';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+
+import {PREDEFINED_K8S_VERSION} from '@shared/constants';
 
 import {monitorKubeConfig} from './kubeConfigMonitor';
 

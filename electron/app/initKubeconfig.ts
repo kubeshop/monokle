@@ -9,7 +9,7 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 import {setAlert} from '@redux/reducers/alert';
 import {setKubeConfig} from '@redux/reducers/appConfig';
 
-import electronStore from '@utils/electronStore';
+import electronStore from '@shared/electronStore';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
   if (process.env.KUBECONFIG) {

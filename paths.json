@@ -2,6 +2,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "paths": {
+      "@shared/*": ["src/shared/*"],
       "@components/*": ["src/components/*"],
       "@components": ["src/components/"],
       "@constants/*": ["src/constants/*"],

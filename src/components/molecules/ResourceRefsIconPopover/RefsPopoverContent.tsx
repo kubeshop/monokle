@@ -11,7 +11,8 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+
+import {FOLLOW_LINK, trackEvent} from '@shared/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';

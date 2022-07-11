@@ -20,8 +20,9 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@shared/telemetry';
 
 import * as S from './FormEditor.styled';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';

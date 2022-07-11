@@ -12,17 +12,15 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
 import {AnyExtension} from '@models/extension';
 
 import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
-import electronStore from '@utils/electronStore';
-import {APP_INSTALLED} from '@utils/telemetry';
-
-import {getSegmentClient} from './segment';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants';
+import electronStore from '@shared/electronStore';
+import {getSegmentClient} from '@shared/segment';
+import {APP_INSTALLED} from '@shared/telemetry';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 

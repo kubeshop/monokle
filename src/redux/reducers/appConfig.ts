@@ -5,8 +5,6 @@ import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
 import {
   AppConfig,
   ClusterAccess,
@@ -32,9 +30,11 @@ import {
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import electronStore from '@utils/electronStore';
 import {getKubeAccess} from '@utils/kubeclient';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
+
+import {PREDEFINED_K8S_VERSION} from '@shared/constants';
+import electronStore from '@shared/electronStore';
+import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@shared/telemetry';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';

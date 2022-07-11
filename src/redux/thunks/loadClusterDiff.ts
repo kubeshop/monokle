@@ -14,7 +14,8 @@ import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
 
 import {createKubeClient} from '@utils/kubeclient';
-import {CLUSTER_COMPARE, trackEvent} from '@utils/telemetry';
+
+import {CLUSTER_COMPARE, trackEvent} from '@shared/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 

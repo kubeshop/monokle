@@ -22,13 +22,14 @@ import Icon from '@atoms/Icon';
 import WalkThrough from '@components/molecules/WalkThrough';
 
 import {FeatureFlag} from '@utils/features';
-import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
 import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
 import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
+
+import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@shared/telemetry';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

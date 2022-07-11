@@ -7,7 +7,7 @@ import {ValidationIntegration} from '@models/integrations';
 import {useAppDispatch} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 
-import {trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@shared/telemetry';
 
 import * as S from './ValidationCard.styled';
 

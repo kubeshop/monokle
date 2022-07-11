@@ -16,7 +16,8 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 
 import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
-import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
+
+import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@shared/telemetry';
 
 /**
  * Thunk to preview a Helm Chart

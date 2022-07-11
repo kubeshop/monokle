@@ -17,7 +17,7 @@ import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template'
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
-import electronStore from '@utils/electronStore';
+import electronStore from '@shared/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';

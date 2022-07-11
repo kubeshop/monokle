@@ -21,7 +21,8 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
-import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
+
+import {OPEN_EXISTING_PROJECT, trackEvent} from '@shared/telemetry';
 
 /**
  * Thunk to set the specified root folder

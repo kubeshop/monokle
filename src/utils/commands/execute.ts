@@ -5,7 +5,8 @@ import log from 'loglevel';
 import {ERROR_MSG_FALLBACK} from '@constants/constants';
 
 import {isDefined} from '@utils/filter';
-import {ensureRendererThread} from '@utils/thread';
+
+import {ensureRendererThread} from '@shared/thread';
 
 export type CommandOptions = {
   commandId: string;

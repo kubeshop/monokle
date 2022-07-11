@@ -11,7 +11,8 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
-import {ADD_NEW_RESOURCE, trackEvent} from '@utils/telemetry';
+
+import {ADD_NEW_RESOURCE, trackEvent} from '@shared/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 

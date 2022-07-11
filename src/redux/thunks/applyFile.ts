@@ -11,7 +11,8 @@ import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {errorAlert} from '@utils/alert';
-import {APPLY_FILE, trackEvent} from '@utils/telemetry';
+
+import {APPLY_FILE, trackEvent} from '@shared/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource

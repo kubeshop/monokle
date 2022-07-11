@@ -8,8 +8,9 @@ import {ClusterAccess, KubePermissions} from '@models/appconfig';
 
 import {getMainProcessEnv} from '@utils/env';
 
+import {isRendererThread} from '@shared/thread';
+
 import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
-import {isRendererThread} from './thread';
 
 export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();

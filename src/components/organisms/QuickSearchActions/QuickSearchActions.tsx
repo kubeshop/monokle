@@ -17,9 +17,10 @@ import {knownResourceKindsSelector} from '@redux/selectors';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
-import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
+
+import {QUICK_SEARCH, trackEvent} from '@shared/telemetry';
 
 import LabelMapper from './LabelMapper';
 

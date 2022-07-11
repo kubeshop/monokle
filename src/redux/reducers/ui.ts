@@ -25,7 +25,7 @@ import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 import {WalkThroughCollection} from '@components/molecules/WalkThrough/types';
 
-import electronStore from '@utils/electronStore';
+import electronStore from '@shared/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',

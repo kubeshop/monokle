@@ -1,12 +1,14 @@
 import Analytics from 'analytics-node';
 import log from 'loglevel';
 
-import electronStore from '@utils/electronStore';
-import {isRendererThread} from '@utils/thread';
+import electronStore from './electronStore';
+import {ensureMainThread} from './thread';
 
 let client: Analytics | undefined;
 
 const disableTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
+
+ensureMainThread();
 
 export const getSegmentClient = () => client;
 
@@ -21,6 +23,6 @@ export const disableSegment = () => {
   client = undefined;
 };
 
-if (!isRendererThread() && !disableTracking) {
+if (!disableTracking) {
   enableSegment();
 }

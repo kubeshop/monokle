@@ -12,7 +12,8 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 import {CommandOptions, CommandResult} from '@utils/commands';
-import {ensureMainThread} from '@utils/thread';
+
+import {ensureMainThread} from '@shared/thread';
 
 import autoUpdater from './autoUpdater';
 

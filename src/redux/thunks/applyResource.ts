@@ -26,7 +26,8 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
-import {APPLY, trackEvent} from '@utils/telemetry';
+
+import {APPLY, trackEvent} from '@shared/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource
