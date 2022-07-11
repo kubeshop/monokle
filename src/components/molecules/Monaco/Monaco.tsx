@@ -280,7 +280,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       setCode(newCode);
       setOrgCode(newCode);
       setDirty(false);
-      dispatch(editorHasReloadedSelectedPath());
+      dispatch(editorHasReloadedSelectedPath(false));
     } else {
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }

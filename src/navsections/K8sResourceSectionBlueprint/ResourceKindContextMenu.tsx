@@ -15,6 +15,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -54,6 +55,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     onOk() {
       return new Promise(resolve => {
         dispatch(removeResources([resource.id]));
+        dispatch(editorHasReloadedSelectedPath(true));
         resolve({});
       });
     },
