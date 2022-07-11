@@ -2,6 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import Nucleus from 'nucleus-nodejs';
 
+import {getSegmentClient} from './segment';
 import {isRendererThread} from './thread';
 
 export const trackEvent = <TEvent extends Event>(
@@ -12,6 +13,11 @@ export const trackEvent = <TEvent extends Event>(
     ipcRenderer.send('track-event', {eventName, payload});
   } else {
     Nucleus.track(eventName, payload as any);
+    const segmentClient = getSegmentClient();
+    segmentClient?.track({
+      event: eventName,
+      properties: payload,
+    });
   }
 };
 export const trackError = (error: any) => {
@@ -19,6 +25,11 @@ export const trackError = (error: any) => {
     ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
   } else {
     Nucleus.track('Error', error);
+    const segmentClient = getSegmentClient();
+    segmentClient?.track({
+      event: 'Error',
+      properties: error,
+    });
   }
 };
 
@@ -36,7 +47,6 @@ export type EventMap = {
   ADD_NEW_RESOURCE: {resourceKind: string};
   APP_INSTALLED: {appVersion: string};
   CHANGES_BY_FORM_EDITOR: {resourceKind?: string};
-  CHANGES_BY_SETTINGS_PANEL: {type: string; settingKey: string};
   APPLY: {kind: string} & Record<string, any>;
   DIFF: undefined;
   CLUSTER_COMPARE: {numberOfResourcesBeingCompared: number} | {fail: string};
@@ -67,7 +77,6 @@ export const OPEN_EXISTING_PROJECT = 'OPEN_EXISTING_PROJECT';
 export const ADD_NEW_RESOURCE = 'ADD_NEW_RESOURCE';
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const CHANGES_BY_FORM_EDITOR = 'CHANGES_BY_FORM_EDITOR';
-export const CHANGES_BY_SETTINGS_PANEL = 'CHANGES_BY_SETTINGS_PANEL';
 export const APPLY = 'APPLY';
 export const DIFF = 'DIFF';
 export const CLUSTER_COMPARE = 'CLUSTER_COMPARE';
