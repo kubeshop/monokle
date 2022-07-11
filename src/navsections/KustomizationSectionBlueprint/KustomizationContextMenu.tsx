@@ -71,17 +71,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     [isRoot, resource.filePath]
   );
 
-  const setFolder = useCallback(
-    (folder: string) => {
-      dispatch(setRootFolder(folder));
-    },
-    [dispatch]
-  );
-
-  const refreshFolder = useCallback(() => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
-  }, [fileMap, setFolder]);
-
+  const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const onClickShowFile = () => {

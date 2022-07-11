@@ -12,6 +12,7 @@ import {isDefined} from '@utils/filter';
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
+import HelmChartContextMenu from './HelmChartContextMenu';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
@@ -270,6 +271,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
         quickAction: {
           component: HelmChartQuickAction,
           options: {isVisibleOnHover: true},
