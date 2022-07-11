@@ -300,7 +300,6 @@ export const configSlice = createSlice({
 
       const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
 
-
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
