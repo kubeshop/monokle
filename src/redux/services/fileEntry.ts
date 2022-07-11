@@ -671,8 +671,6 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
     // reprocess since the added fileEntry might be included by a kustomization
     reprocessKustomizations(state.resourceMap, state.fileMap);
 
-    console.log('File Enetry: ', fileEntry);
-
     return fileEntry;
   }
   log.warn(`Failed to find folder entry for ${absolutePath}, ignoring..`);
