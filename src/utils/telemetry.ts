@@ -2,6 +2,8 @@ import {ipcRenderer} from 'electron';
 
 import Nucleus from 'nucleus-nodejs';
 
+import {getSegmentClient} from '@root/electron/app/segment';
+
 import {isRendererThread} from './thread';
 
 export const trackEvent = <TEvent extends Event>(
@@ -12,6 +14,11 @@ export const trackEvent = <TEvent extends Event>(
     ipcRenderer.send('track-event', {eventName, payload});
   } else {
     Nucleus.track(eventName, payload as any);
+    const segmentClient = getSegmentClient();
+    segmentClient?.track({
+      event: eventName,
+      properties: payload,
+    });
   }
 };
 export const trackError = (error: any) => {
@@ -19,6 +26,11 @@ export const trackError = (error: any) => {
     ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
   } else {
     Nucleus.track('Error', error);
+    const segmentClient = getSegmentClient();
+    segmentClient?.track({
+      event: 'Error',
+      properties: error,
+    });
   }
 };
 
