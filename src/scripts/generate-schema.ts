@@ -121,6 +121,9 @@ const parseFields = (definition: any, firstCall = false) => {
       if (key === 'namespace') {
         schemaUiDefinition[key]['ui:widget'] = 'namespaceSelection';
       }
+      if (key.toLowerCase().endsWith('image')) {
+        schemaUiDefinition[key]['ui:widget'] = 'imageSelection';
+      }
     }
   });
 
