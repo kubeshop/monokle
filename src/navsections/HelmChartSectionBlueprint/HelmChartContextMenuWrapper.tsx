@@ -15,6 +15,7 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {isHelmChartFile} from '@redux/services/helm';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import ContextMenu from '@molecules/ContextMenu';
@@ -30,6 +31,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
@@ -42,11 +44,14 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
-  const helmValueItem = useMemo(() => helmValuesMap[itemInstance.id], [helmValuesMap, itemInstance.id]);
-  const absolutePath = useMemo(
-    () => getAbsoluteFilePath(helmValueItem.filePath, fileMap),
-    [fileMap, helmValueItem.filePath]
+  const helmItem = useMemo(
+    () =>
+      itemInstance.meta.filePath && isHelmChartFile(itemInstance.meta.filePath)
+        ? helmChartMap[itemInstance.id]
+        : helmValuesMap[itemInstance.id],
+    [helmChartMap, helmValuesMap, itemInstance.id, itemInstance.meta.filePath]
   );
+  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem.filePath]);
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]
@@ -55,11 +60,11 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
-  const isRoot = useMemo(() => helmValueItem.filePath === ROOT_FILE_ENTRY, [helmValueItem.filePath]);
+  const isRoot = useMemo(() => helmItem.filePath === ROOT_FILE_ENTRY, [helmItem.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const target = useMemo(
-    () => (isRoot ? ROOT_FILE_ENTRY : helmValueItem.filePath.replace(path.sep, '')),
-    [helmValueItem.filePath, isRoot]
+    () => (isRoot ? ROOT_FILE_ENTRY : helmItem.filePath.replace(path.sep, '')),
+    [helmItem.filePath, isRoot]
   );
 
   const menuItems = useMemo(
@@ -69,13 +74,13 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
         label: 'Go to file',
         disabled: isInPreviewMode,
         onClick: () => {
-          if (!helmValueItem) {
+          if (!helmItem) {
             return;
           }
 
           dispatch(setLeftMenuSelection('file-explorer'));
           dispatch(setSelectingFile(true));
-          dispatch(selectFile({filePath: helmValueItem.filePath}));
+          dispatch(selectFile({filePath: helmItem.filePath}));
         },
       },
       {key: 'divider-1', type: 'divider'},
@@ -91,15 +96,15 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       {
         key: 'filter_on_this_file',
         label:
-          fileOrFolderContainedInFilter && helmValueItem.filePath === fileOrFolderContainedInFilter
+          fileOrFolderContainedInFilter && helmItem.filePath === fileOrFolderContainedInFilter
             ? 'Remove from filter'
             : 'Filter on this file',
         disabled: true,
         onClick: () => {
-          if (isRoot || (fileOrFolderContainedInFilter && helmValueItem.filePath === fileOrFolderContainedInFilter)) {
+          if (isRoot || (fileOrFolderContainedInFilter && helmItem.filePath === fileOrFolderContainedInFilter)) {
             onFilterByFileOrFolder(undefined);
           } else {
-            onFilterByFileOrFolder(helmValueItem.filePath);
+            onFilterByFileOrFolder(helmItem.filePath);
           }
         },
       },
@@ -108,7 +113,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
         label: 'Add to Files: Exclude',
         disabled: true,
         onClick: () => {
-          onExcludeFromProcessing(helmValueItem.filePath);
+          onExcludeFromProcessing(helmItem.filePath);
         },
       },
       {key: 'divider-3', type: 'divider'},
@@ -123,7 +128,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
         key: 'copy_relative_path',
         label: 'Copy Relative Path',
         onClick: () => {
-          navigator.clipboard.writeText(helmValueItem.filePath);
+          navigator.clipboard.writeText(helmItem.filePath);
         },
       },
       {key: 'divider-4', type: 'divider'},
@@ -172,7 +177,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       dirname,
       dispatch,
       fileOrFolderContainedInFilter,
-      helmValueItem,
+      helmItem,
       isInPreviewMode,
       isRoot,
       onCreateResource,

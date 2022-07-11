@@ -175,9 +175,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           : `Filter on this ${isFolder ? 'folder' : 'file'}`,
       disabled:
         isInPreviewMode ||
-        isKustomizationFile(fileMap[relativePath], resourceMap) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
