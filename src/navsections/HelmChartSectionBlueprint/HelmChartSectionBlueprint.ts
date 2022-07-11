@@ -174,7 +174,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
-      getInstanceId: rawItem => rawItem.filePath,
+      getInstanceId: rawItem => rawItem.id,
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -194,6 +194,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {
           component: ItemPrefix,
         },

@@ -13,7 +13,7 @@ import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {getHelmValuesFile, isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {Dots, Spinner} from '@atoms';
@@ -160,6 +160,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         isInPreviewMode ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
@@ -177,6 +178,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         isInPreviewMode ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
         isKustomizationFile(fileMap[relativePath], resourceMap) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
@@ -198,6 +200,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               isInPreviewMode ||
               isHelmChartFile(relativePath) ||
               isHelmValuesFile(relativePath) ||
+              isHelmTemplateFile(relativePath) ||
               (!isFolder && !isSupported && !isExcluded),
             onClick: (e: any) => {
               e.domEvent.stopPropagation();

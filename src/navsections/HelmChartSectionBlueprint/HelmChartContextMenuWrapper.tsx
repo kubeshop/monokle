@@ -15,7 +15,6 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
-import {isHelmChartFile} from '@redux/services/helm';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import ContextMenu from '@molecules/ContextMenu';
@@ -32,6 +31,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
@@ -45,11 +45,8 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const helmItem = useMemo(
-    () =>
-      itemInstance.meta.filePath && isHelmChartFile(itemInstance.meta.filePath)
-        ? helmChartMap[itemInstance.id]
-        : helmValuesMap[itemInstance.id],
-    [helmChartMap, helmValuesMap, itemInstance.id, itemInstance.meta.filePath]
+    () => helmValuesMap[itemInstance.id] || helmChartMap[itemInstance.id] || helmTemplatesMap[itemInstance.id],
+    [helmChartMap, helmTemplatesMap, helmValuesMap, itemInstance.id]
   );
   const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem.filePath]);
   const basename = useMemo(
