@@ -8,12 +8,12 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
 import {fixPath} from '@utils/path';
+import '@utils/segment';
 
 import terminal from '@root/cli/terminal';
 
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
-import './segment';
 import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from './utils';
 
 const isDev = process.env.NODE_ENV === 'development';

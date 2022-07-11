@@ -2,8 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import Nucleus from 'nucleus-nodejs';
 
-import {getSegmentClient} from '@root/electron/app/segment';
-
+import {getSegmentClient} from './segment';
 import {isRendererThread} from './thread';
 
 export const trackEvent = <TEvent extends Event>(
