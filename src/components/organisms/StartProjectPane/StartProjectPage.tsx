@@ -23,21 +23,24 @@ const StartProjectPage = () => {
     {
       itemId: 'select-existing-folder',
       itemLogo: SelectFolder,
-      itemTitle: 'Select a folder with K8s resources',
+      itemTitle: 'Select a folder ',
+      itemSemiTitle: 'with K8s resources',
       itemDescription: 'Already have a local folder with ready-to-check Kubernetes resources? Bring it on!',
       itemAction: handleOpenFolderExplorer,
     },
     {
       itemId: 'create-empty-project',
       itemLogo: CreateScratch,
-      itemTitle: 'Create a project from scratch',
+      itemTitle: 'Create a project',
+      itemSemiTitle: 'from scratch',
       itemDescription: 'Create an empty project and new resources from scratch. We’ll help you along the way.',
       itemAction: () => handleCreateProject(false),
     },
     {
       itemId: 'start-from-template',
       itemLogo: CreateFromTemplate,
-      itemTitle: 'Start from a template',
+      itemTitle: 'Start from',
+      itemSemiTitle: 'a template',
       itemDescription: 'Create basic jobs, pods, roles, services and other resources through ready-to-go templates.',
       itemAction: () => handleCreateProject(true),
     },
@@ -51,12 +54,15 @@ const StartProjectPage = () => {
 
       <S.StartProjectContainer>
         {START_PROJECT_OPTIONS.map(item => {
-          const {itemId, itemLogo, itemTitle, itemDescription, itemAction} = item;
+          const {itemId, itemLogo, itemTitle, itemSemiTitle, itemDescription, itemAction} = item;
 
           return (
             <S.StartProjectItem id={itemId} onClick={itemAction}>
               <S.StartProjectItemLogo src={itemLogo} />
-              <S.StartProjectItemTitle>{itemTitle}</S.StartProjectItemTitle>
+              <S.StartProjectItemTitle>
+                {itemTitle}
+                <S.StartProjectItemSemiTitle>{`\b ${itemSemiTitle}`}</S.StartProjectItemSemiTitle>
+              </S.StartProjectItemTitle>
               <S.StartProjectItemDescription>{itemDescription}</S.StartProjectItemDescription>
             </S.StartProjectItem>
           );
