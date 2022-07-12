@@ -2,6 +2,7 @@ import {Button as RawButton} from 'antd';
 
 import {
   ApiOutlined as RawApiOutlined,
+  CommentOutlined as RawCommentOutlined,
   QuestionCircleOutlined as RawQuestionCircleOutlined,
   SettingOutlined as RawSettingOutlined,
 } from '@ant-design/icons';
@@ -9,6 +10,20 @@ import {
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
+
+export const ApiOutlined = styled(RawApiOutlined)`
+  font-size: 14px;
+  cursor: pointer;
+`;
+
+export const CommentOutlined = styled(RawCommentOutlined)`
+  font-size: 14px;
+  cursor: pointer;
+`;
+
+export const HelpLink = styled(RawButton)`
+  color: ${Colors.grey9};
+`;
 
 export const MenuContainer = styled.div`
   background-color: ${Colors.grey4000};
@@ -33,13 +48,6 @@ export const MenuItem = styled.div`
   }
 `;
 
-export const MenuItemIcon = styled.span`
-  width: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 export const MenuItemLabel = styled.span`
   display: flex;
   justify-content: center;
@@ -54,23 +62,22 @@ export const MenuItemLinks = styled.div`
   padding-left: 40px;
   padding-bottom: 0.5rem;
   margin-top: -0.5rem;
+  border-bottom: 1px solid ${Colors.grey5b};
 `;
 
-export const HelpLink = styled(RawButton)`
-  color: ${Colors.grey9};
-`;
-
-export const SettingsOutlined = styled(RawSettingOutlined)`
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-export const ApiOutlined = styled(RawApiOutlined)`
-  font-size: 14px;
-  cursor: pointer;
+export const MenuItemIcon = styled.span`
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
   cursor: pointer;
   font-size: 14px;
+`;
+
+export const SettingsOutlined = styled(RawSettingOutlined)`
+  font-size: 14px;
+  cursor: pointer;
 `;

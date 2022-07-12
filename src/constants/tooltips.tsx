@@ -25,6 +25,7 @@ export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality
 export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const ExpandTreeTooltip = 'Expand all folders';
+export const FeedbackTooltip = 'Give Feedback';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
