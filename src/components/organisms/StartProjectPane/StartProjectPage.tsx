@@ -61,7 +61,7 @@ const StartProjectPage = () => {
               <S.StartProjectItemLogo src={itemLogo} />
               <S.StartProjectItemTitle>
                 {itemTitle}
-                <S.StartProjectItemSemiTitle>{`\b ${itemSemiTitle}`}</S.StartProjectItemSemiTitle>
+                <S.StartProjectItemSemiTitle>{itemSemiTitle}</S.StartProjectItemSemiTitle>
               </S.StartProjectItemTitle>
               <S.StartProjectItemDescription>{itemDescription}</S.StartProjectItemDescription>
             </S.StartProjectItem>

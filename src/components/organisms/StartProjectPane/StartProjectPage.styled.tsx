@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
-import {Device} from '@styles/Device';
 
 export const Container = styled.div`
   display: flex;
@@ -61,10 +60,6 @@ export const StartProjectItemTitle = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
-
-  @media ${Device.laptopM} {
-    flex-direction: row;
-  }
 `;
 
 export const StartProjectItemSemiTitle = styled.span`
