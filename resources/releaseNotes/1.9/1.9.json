@@ -4,6 +4,6 @@
   "about": {
     "when": "July 2022",
     "title": "In this release, we bring you:",
-    "features": ["Search & Replace", "Color Code Cluster Environments", "Improved OPA visualisation"]
+    "features": ["Find & Replace", "Color Code Cluster Environments", "UI/UX improvements"]
   }
 }
