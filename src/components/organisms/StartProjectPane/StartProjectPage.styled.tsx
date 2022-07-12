@@ -59,9 +59,11 @@ export const StartProjectItemTitle = styled.div`
   color: ${Colors.whitePure};
   font-weight: 600;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 
-  @media ${Device.laptop} {
-    display: flex;
+  @media ${Device.laptopM} {
+    flex-direction: row;
   }
 `;
 
