@@ -4,6 +4,8 @@ import {ItemInstance} from '@models/navigator';
 
 import {Icon} from '@atoms';
 
+import Colors from '@styles/Colors';
+
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
 import * as S from './ImagesSectionNameSuffix.styled';
 
@@ -28,7 +30,7 @@ const ImagesSectionNameSuffix: React.FC<IProps> = props => {
         content={<ImageOutgoingResourcesPopover resourcesIds={resourcesIds} />}
         placement="rightTop"
       >
-        <Icon name="outgoingRefs" />
+        <Icon name="outgoingRefs" color={isSelected ? Colors.blackPure : Colors.blue10} />
       </Popover>
     </S.Container>
   );
