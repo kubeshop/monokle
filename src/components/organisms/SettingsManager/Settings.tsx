@@ -5,6 +5,8 @@ import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} f
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
+import {ReloadOutlined} from '@ant-design/icons';
+
 import _ from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -75,6 +77,8 @@ export const Settings = ({
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
   );
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
+  const [currentKubeConfigInValue, setCurrentKubeConfigInValue] = useState(config?.kubeConfig?.path);
+  const [spinBrowse, setspinBrowse] = useState(true);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
   const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
@@ -92,11 +96,14 @@ export const Settings = ({
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
+    setspinBrowse(false);
   }, [config?.kubeConfig]);
 
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
+    setCurrentKubeConfigInValue(currentKubeConfig);
+    setspinBrowse(true);
   }, [config]);
 
   useEffect(() => {
@@ -216,6 +223,7 @@ export const Settings = ({
       return;
     }
     setCurrentKubeConfig(e.target.value);
+    setspinBrowse(false);
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -225,6 +233,7 @@ export const Settings = ({
       if (file.path) {
         const selectedFilePath = file.path;
         setCurrentKubeConfig(selectedFilePath);
+        setspinBrowse(false);
       }
     }
   };
@@ -341,15 +350,18 @@ export const Settings = ({
           <Input
             ref={inputRef}
             onClick={() => focusInput()}
-            value={currentKubeConfig}
+            value={currentKubeConfigInValue}
             onChange={onUpdateKubeconfig}
             disabled={isEditingDisabled}
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
-            Browse
-          </S.Button>
+          {spinBrowse && (
+            <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
+              Browse
+            </S.Button>
+          )}
+          {!spinBrowse && <ReloadOutlined style={{padding: '1em'}} spin />}
         </Tooltip>
         <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </S.Div>
