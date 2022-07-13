@@ -142,6 +142,11 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+backspace, command+backspace',
     category: 'tool',
   },
+  SEARCH_FILES: {
+    name: 'Search Files',
+    key: 'ctrl+shift+f, command+shift+f',
+    category: 'tool',
+  },
 });
 
 function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {

@@ -282,6 +282,10 @@ const HotKeysHandler = () => {
     [uiState.isStartProjectPaneVisible]
   );
 
+  useHotkeys(hotkeys.SEARCH_FILES.key, () => {
+    dispatch(setLeftMenuSelection('search'));
+  });
+
   return (
     <>
       <FileExplorer {...fileExplorerProps} />
