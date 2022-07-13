@@ -1,10 +1,12 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
+import log from 'loglevel';
 import path from 'path';
 
 import {
@@ -67,7 +69,7 @@ export const Settings = ({
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
-  const [inputRef, focusInput] = useFocus<Input>();
+  const [inputRef, focusInput] = useFocus<InputRef>();
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
@@ -129,10 +131,17 @@ export const Settings = ({
     }
   };
 
-  const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
+  const onChangeHideExcludedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
     setLocalConfig({
       ...localConfig,
       settings: {...localConfig?.settings, hideExcludedFilesInFileExplorer: e.target.checked},
+    });
+  };
+
+  const onChangeHideUnsupportedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, hideUnsupportedFilesInFileExplorer: e.target.checked},
     });
   };
 
@@ -240,8 +249,7 @@ export const Settings = ({
         k8sVersion: selectedK8SVersion,
       });
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error(error.message);
+      log.error(error.message);
     }
   };
 
@@ -286,7 +294,7 @@ export const Settings = ({
       <S.Div>
         <S.Span>Kubernetes Version</S.Span>
         <div>
-          <Tooltip title={TOOLTIP_K8S_SELECTION}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TOOLTIP_K8S_SELECTION}>
             <Select
               value={selectedK8SVersion}
               onChange={handleK8SVersionChange}
@@ -329,7 +337,7 @@ export const Settings = ({
             />
           )}
         </S.Heading>
-        <Tooltip title={KubeconfigPathTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
           <Input
             ref={inputRef}
             onClick={() => focusInput()}
@@ -379,9 +387,19 @@ export const Settings = ({
           Hide excluded files
         </Checkbox>
       </S.Div>
+
+      <S.Div>
+        <Checkbox
+          checked={Boolean(localConfig?.settings?.hideUnsupportedFilesInFileExplorer)}
+          onChange={onChangeHideUnsupportedFilesInFileExplorer}
+        >
+          Hide unsupported files
+        </Checkbox>
+      </S.Div>
+
       <S.Div>
         <S.Span>Helm Preview Mode</S.Span>
-        <Tooltip title={HelmPreviewModeTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={HelmPreviewModeTooltip}>
           <Select value={localConfig?.settings?.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
@@ -390,7 +408,7 @@ export const Settings = ({
       </S.Div>
       <S.Div>
         <S.Span>Kustomize Command</S.Span>
-        <Tooltip title={KustomizeCommandTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KustomizeCommandTooltip}>
           <Select value={localConfig?.settings?.kustomizeCommand} onChange={onChangeKustomizeCommand}>
             <Select.Option value="kubectl">Use kubectl</Select.Option>
             <Select.Option value="kustomize">Use kustomize</Select.Option>
@@ -398,7 +416,7 @@ export const Settings = ({
         </Tooltip>
       </S.Div>
       <S.Div>
-        <Tooltip title={EnableHelmWithKustomizeTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EnableHelmWithKustomizeTooltip}>
           <Checkbox checked={localConfig?.settings?.enableHelmWithKustomize} onChange={onChangeEnableHelmWithKustomize}>
             Enable Helm-related features when invoking Kustomize
           </Checkbox>
@@ -424,14 +442,17 @@ export const Settings = ({
       <S.Div>
         <S.Span>Form Editor</S.Span>
         <S.Div>
-          <Tooltip title="Automatically create default objects and values defined in the schema">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title="Automatically create default objects and values defined in the schema"
+          >
             <Checkbox checked={localConfig?.settings?.createDefaultObjects} onChange={onChangeCreateDefaultObjects}>
               Create default objects
             </Checkbox>
           </Tooltip>
         </S.Div>
         <S.Div>
-          <Tooltip title="Automatically set default values defined in the schema">
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Automatically set default values defined in the schema">
             <Checkbox
               checked={localConfig?.settings?.setDefaultPrimitiveValues}
               onChange={onChangeSetDefaultPrimitiveValues}
@@ -447,29 +468,6 @@ export const Settings = ({
           Allow editing resources
         </Checkbox>
       </S.Div>
-      {/* <StyledDiv>
-        <StyledSpan>Theme</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
-          <Radio.Button value={Themes.Dark}>Dark</Radio.Button>
-          <Radio.Button value={Themes.Light}>Light</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Text Size</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.textSize}>
-          <Radio.Button value={TextSizes.Large}>Large</Radio.Button>
-          <Radio.Button value={TextSizes.Medium}>Medium</Radio.Button>
-          <Radio.Button value={TextSizes.Small}>Small</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Language</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.language}>
-          <Space direction="vertical">
-            <Radio value={Languages.English}>English</Radio>
-          </Space>
-        </Radio.Group>
-      </StyledDiv> */}
     </>
   );
 };

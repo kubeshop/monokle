@@ -8,6 +8,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
 
+import * as S from './styled';
+
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -70,7 +72,7 @@ export function ResourceSelection(props: any) {
   }, [resourceMap, options.resourceKinds]);
 
   return (
-    <Select
+    <S.SelectStyled
       value={selectValue}
       showSearch
       onSearch={(e: string) => setInputValue(e)}
@@ -89,6 +91,6 @@ export function ResourceSelection(props: any) {
           {name}
         </Option>
       ))}
-    </Select>
+    </S.SelectStyled>
   );
 }

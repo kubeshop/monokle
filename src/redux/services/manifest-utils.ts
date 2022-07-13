@@ -1,7 +1,7 @@
 import log from 'loglevel';
 import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
 
-import {PossibleResource} from '@models/appstate';
+import {KubernetesObject} from '@models/appstate';
 
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -86,7 +86,7 @@ export function mergeManifests(template: string, values: string) {
   // cleanup
   visit(templateDoc, {
     Pair(key, node) {
-      if ((isMap(node.value) || isSeq(node.value)) && node.value.items.length === 0) {
+      if ((isMap(node.value) || isSeq(node.value)) && typeof node.value.items === 'undefined') {
         return visit.REMOVE;
       }
     },
@@ -177,7 +177,7 @@ export function traverseDocument(
 export function extractObjectsFromYaml(yamlText: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(yamlText, lineCounter);
-  const result: PossibleResource[] = [];
+  const result: KubernetesObject[] = [];
   if (documents) {
     let docIndex = 0;
     documents.forEach(doc => {

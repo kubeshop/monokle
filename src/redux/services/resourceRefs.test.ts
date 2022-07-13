@@ -17,14 +17,14 @@ test('array-optional-resource-refs', () => {
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(4);
+  expect(deployment.refs?.length).toBe(5);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(2);
 
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: true});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(3);
+  expect(deployment.refs?.length).toBe(4);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 });
@@ -40,7 +40,7 @@ test('namespaced-resource-refs', () => {
   processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: true});
 
   // @ts-ignore
-  expect(deployment.refs?.length).toBe(2);
+  expect(deployment.refs?.length).toBe(3);
   // @ts-ignore
   expect(deployment.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 
@@ -133,4 +133,23 @@ test('pair-refs', () => {
   expect(service.refs?.length).toBe(1);
   // @ts-ignore
   expect(isOutgoingRef(service.refs[0].type)).toBe(true);
+});
+
+test('configurable-group-matcher', async () => {
+  await awaitKindHandlersLoading;
+
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/issuerRefs'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(2);
+
+  const certificateRequest = findResourceByName(resourceMap, 'testkube-operator-serving-cert-fbtng');
+  expect(certificateRequest).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(certificateRequest.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isOutgoingRef(certificateRequest.refs[0].type)).toBe(true);
 });

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
@@ -11,6 +11,8 @@ import {useAppSelector} from '@redux/hooks';
 import {selectedResourceSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
+
+import * as S from './styled';
 
 const Option = Select.Option;
 
@@ -70,7 +72,7 @@ export const NamespaceSelection = (params: any) => {
   }, [resourceMap, clusterNamespaces]);
 
   return (
-    <Select
+    <S.SelectStyled
       value={selectValue}
       showSearch
       optionFilterProp="children"
@@ -81,7 +83,7 @@ export const NamespaceSelection = (params: any) => {
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`create '${inputValue}'`}
+          {`Create '${inputValue}'`}
         </Option>
       )}
       {namespaces.map(namespace => (
@@ -89,6 +91,6 @@ export const NamespaceSelection = (params: any) => {
           {namespace}
         </Option>
       ))}
-    </Select>
+    </S.SelectStyled>
   );
 };

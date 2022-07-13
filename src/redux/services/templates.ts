@@ -9,7 +9,7 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
-import {PossibleResource, isPossibleResource} from '@models/appstate';
+import {KubernetesObject, isKubernetesObject} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
@@ -131,7 +131,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     }
   );
 
-  let objects: PossibleResource[] = [];
+  let objects: KubernetesObject[] = [];
 
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
@@ -140,7 +140,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     });
 
   const inputs = objects
-    .filter(obj => isPossibleResource(obj))
+    .filter(obj => isKubernetesObject(obj))
     .map(obj => ({
       name: obj.metadata.name,
       namespace: obj.metadata.namespace,

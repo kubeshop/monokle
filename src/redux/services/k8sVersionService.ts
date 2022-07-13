@@ -1,4 +1,5 @@
 import {existsSync, writeFile} from 'fs';
+import log from 'loglevel';
 import fetch from 'node-fetch';
 import util from 'util';
 
@@ -12,8 +13,7 @@ export const downloadSchema = async (url: string, path: string) => {
       await writeFileAsync(path, body, {encoding: 'utf-8'});
     }
   } catch (error: any) {
-    // eslint-disable-next-line no-console
-    console.log(error.message);
+    log.error(error.message);
   }
 };
 

@@ -6,7 +6,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
@@ -31,20 +31,17 @@ import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
 import {Settings} from './Settings';
 
 import * as S from './styled';
-
-const {Panel} = S.Collapse;
 
 const SettingsManager: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -59,22 +56,22 @@ const SettingsManager: React.FC = () => {
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
-  const [activePanels, setActivePanels] = useState<SettingsPanel[]>([
-    activeSettingsPanel || SettingsPanel.ActiveProjectSettings,
-  ]);
+  const [activeTab, setActiveTab] = useState<string>(
+    activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
+  );
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, SettingsPanel.ActiveProjectSettings]));
+      setActiveTab(SettingsPanel.ActiveProjectSettings);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
 
-  const handlePaneCollapse = (value: any) => {
-    setActivePanels(_.uniq([...value]));
+  const handlePaneCollapse = (value: string) => {
+    setActiveTab(value);
   };
 
   const changeProjectConfig = (config: ProjectConfig) => {
@@ -92,44 +89,35 @@ const SettingsManager: React.FC = () => {
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'kubeConfig'});
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'folderReadsMaxDepth'});
     }
     if (!_.isEqual(config?.k8sVersion, appConfig.k8sVersion)) {
       dispatch(updateK8sVersion(config?.k8sVersion || PREDEFINED_K8S_VERSION));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'k8sVersion'});
     }
     if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
       dispatch(updateScanExcludes(config?.scanExcludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'scanExcludes'});
     }
     if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
       dispatch(updateFileIncludes(config?.fileIncludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'fileIncludes'});
     }
   };
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'loadLastFolderOnStartup'});
   };
 
   const handleChangeClusterSelectorVisibilty = (e: any) => {
     dispatch(updateClusterSelectorVisibilty(e.target.checked));
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'changeClusterSelectorVisibilty'});
   };
 
   const handleToggleEventTracking = () => {
     dispatch(toggleEventTracking());
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'toggleEventTracking'});
   };
 
   const handleToggleErrorReporting = () => {
     dispatch(toggleErrorReporting());
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'toggleErrorReporting'});
   };
 
   const onProjectNameChange = (projectName: string) => {
@@ -157,7 +145,6 @@ const SettingsManager: React.FC = () => {
     () => {
       if (currentProjectsRootPath && currentProjectsRootPath !== projectsRootPath) {
         dispatch(changeProjectsRootPath(currentProjectsRootPath));
-        trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'currentProjectsRootPath'});
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
@@ -166,8 +153,27 @@ const SettingsManager: React.FC = () => {
 
   return (
     <>
-      <S.Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
-        <Panel header="Global Settings" key={SettingsPanel.GlobalSettings}>
+      <S.Tabs
+        activeKey={activeTab}
+        onChange={handlePaneCollapse}
+        renderTabBar={(props: any, DefaultTabBar: any) => <DefaultTabBar {...props} style={{padding: '0 1rem'}} />}
+      >
+        {activeProject && (
+          <S.StyledTabPane tab="Active project" key={SettingsPanel.ActiveProjectSettings}>
+            <Settings
+              config={mergedConfig}
+              onConfigChange={changeProjectConfig}
+              showProjectName
+              projectName={activeProject.name}
+              onProjectNameChange={onProjectNameChange}
+              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+            />
+          </S.StyledTabPane>
+        )}
+        <S.StyledTabPane tab="Default project" key={SettingsPanel.DefaultProjectSettings}>
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
+        </S.StyledTabPane>
+        <S.StyledTabPane tab="Global" key={SettingsPanel.GlobalSettings}>
           <Form
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
@@ -202,7 +208,7 @@ const SettingsManager: React.FC = () => {
           </Form>
           <S.Div>
             <S.Span>On Startup</S.Span>
-            <Tooltip title={AutoLoadLastProjectTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
               <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
                 Automatically load last project
               </Checkbox>
@@ -235,23 +241,8 @@ const SettingsManager: React.FC = () => {
               </Checkbox>
             </S.Div>
           </S.Div>
-        </Panel>
-        <Panel header="Default Project Settings" key={SettingsPanel.DefaultProjectSettings}>
-          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
-        </Panel>
-        {activeProject && (
-          <Panel header="Active Project Settings" key={SettingsPanel.ActiveProjectSettings}>
-            <Settings
-              config={mergedConfig}
-              onConfigChange={changeProjectConfig}
-              showProjectName
-              projectName={activeProject.name}
-              onProjectNameChange={onProjectNameChange}
-              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
-            />
-          </Panel>
-        )}
-      </S.Collapse>
+        </S.StyledTabPane>
+      </S.Tabs>
       <FileExplorer {...fileExplorerProps} />
     </>
   );

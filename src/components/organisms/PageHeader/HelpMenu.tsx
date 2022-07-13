@@ -1,51 +1,34 @@
+import {shell} from 'electron';
+
 import {useMemo} from 'react';
 
-import {Col, Dropdown, Menu, Row} from 'antd';
-
-import {
-  FileSearchOutlined,
-  FireOutlined,
-  GithubOutlined,
-  MessageOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import {Tooltip} from 'antd';
 
 import semver from 'semver';
-import styled from 'styled-components';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch} from '@redux/hooks';
-import {cancelWalkThrough, handleWalkThroughStep, openReleaseNotesDrawer} from '@redux/reducers/ui';
+import {openPluginsDrawer} from '@redux/reducers/extension';
+import {
+  cancelWalkThrough,
+  handleWalkThroughStep,
+  openAboutModal,
+  openKeyboardShortcutsModal,
+  openReleaseNotesDrawer,
+  toggleSettings,
+} from '@redux/reducers/ui';
 
-import {Icon} from '@components/atoms';
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
-import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
+import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 
-import DiscordLogo from '@assets/DiscordLogo.svg';
+import * as S from './HelpMenu.styled';
 
-import Colors, {FontColors} from '@styles/Colors';
-
-const IconContainerSpan = styled.span`
-  width: 18px;
-  height: 18px;
-  color: ${FontColors.elementSelectTitle};
-  font-size: 18px;
-  cursor: pointer;
-`;
-
-const StyledQuestionCircleOutlined = styled(QuestionCircleOutlined)`
-  cursor: pointer;
-  font-size: 20px;
-  color: ${FontColors.elementSelectTitle};
-`;
-
-const MenuItem = styled(Menu.Item)`
-  padding-right: 12px;
-`;
-
-const HelpMenu = () => {
+export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
   const dispatch = useAppDispatch();
   const appVersion = useAppVersion();
 
@@ -61,93 +44,148 @@ const HelpMenu = () => {
     dispatch(openReleaseNotesDrawer());
   };
 
-  const menu = (
-    <Menu inlineIndent={25} style={{width: '200px'}}>
-      <MenuItem onClick={openDocumentation} key="documentation">
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <FileSearchOutlined />
-            </IconContainerSpan>
-          </Col>
+  const openKeyboardShortcuts = () => {
+    dispatch(openKeyboardShortcutsModal());
+  };
 
-          <Col span={19}>Documentation</Col>
-        </Row>
-      </MenuItem>
+  const toggleSettingsDrawer = () => {
+    dispatch(toggleSettings());
+  };
 
-      <MenuItem onClick={onClickReleaseNotes} key="releasenotes">
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <FireOutlined />
-            </IconContainerSpan>
-          </Col>
+  const showPluginsDrawer = () => {
+    dispatch(openPluginsDrawer());
+  };
 
-          <Col span={19}>New in {parsedAppVersion || 'this version'}</Col>
-        </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys">
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <Icon name="shortcuts" color={Colors.blue6} />
-            </IconContainerSpan>
-          </Col>
-
-          <Col span={19}>Keyboard Shortcuts</Col>
-        </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openGitHub} key="github">
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <GithubOutlined />
-            </IconContainerSpan>
-          </Col>
-
-          <Col span={19}>GitHub</Col>
-        </Row>
-      </MenuItem>
-
-      <MenuItem onClick={openDiscord} key="discord">
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <img src={DiscordLogo} style={{height: '18px', width: '18px'}} />
-            </IconContainerSpan>
-          </Col>
-
-          <Col span={19}>Discord</Col>
-        </Row>
-      </MenuItem>
-
-      <MenuItem
-        onClick={() => {
-          dispatch(cancelWalkThrough('novice'));
-          dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
-        }}
-        key="replay"
-      >
-        <Row align="middle">
-          <Col span={5}>
-            <IconContainerSpan>
-              <MessageOutlined style={{transform: 'rotate(180deg)'}} />
-            </IconContainerSpan>
-          </Col>
-
-          <Col span={19}>Re-play Quick Guide</Col>
-        </Row>
-      </MenuItem>
-    </Menu>
-  );
+  const handleMenuClose = () => {
+    if (onMenuClose) {
+      onMenuClose();
+    }
+  };
 
   return (
-    <Dropdown key="more" overlay={menu}>
-      <StyledQuestionCircleOutlined />
-    </Dropdown>
+    <S.MenuContainer>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            toggleSettingsDrawer();
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.SettingsOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Settings</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            showPluginsDrawer();
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.ApiOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+
+      <S.MenuItem style={{borderBottom: 'none'}}>
+        <S.MenuItemIcon>
+          <S.QuestionCircleOutlined />
+        </S.MenuItemIcon>
+        <S.MenuItemLabel>Help</S.MenuItemLabel>
+      </S.MenuItem>
+
+      <S.MenuItemLinks>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openKeyboardShortcuts();
+            handleMenuClose();
+          }}
+        >
+          Keyboard Shortcuts
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDocumentation();
+            handleMenuClose();
+          }}
+        >
+          Documentation
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            onClickReleaseNotes();
+            handleMenuClose();
+          }}
+        >
+          New in {parsedAppVersion || 'this version'}
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(cancelWalkThrough('novice'));
+            dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+            handleMenuClose();
+          }}
+        >
+          Re-play Quick Guide
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openGitHub();
+            handleMenuClose();
+          }}
+        >
+          Github
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            openDiscord();
+            handleMenuClose();
+          }}
+        >
+          Discord
+        </S.HelpLink>
+        <S.HelpLink
+          type="link"
+          size="small"
+          onClick={() => {
+            dispatch(openAboutModal());
+            handleMenuClose();
+          }}
+        >
+          About Monokle
+        </S.HelpLink>
+      </S.MenuItemLinks>
+
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FeedbackTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            shell.openExternal('https://49x902y6r6t.typeform.com/to/vkFBEYYt');
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.CommentOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Feedback</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
+    </S.MenuContainer>
   );
 };
-
-export default HelpMenu;

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 export enum HighlightItems {
@@ -49,7 +51,14 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
+export type LeftMenuSelectionType =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'templates-pane'
+  | 'images-pane'
+  | 'validation-pane'
+  | 'search';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -60,6 +69,7 @@ export type LayoutSizeType = {
 export type UiState = {
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
+  isKeyboardShortcutsModalOpen: boolean;
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;
@@ -68,9 +78,10 @@ export type UiState = {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
   };
-  createFolderModal: {
+  createFileFolderModal: {
     isOpen: boolean;
     rootDir: string;
+    type: 'file' | 'folder';
   };
   createProjectModal: {
     isOpen: boolean;
@@ -79,6 +90,14 @@ export type UiState = {
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;
+  };
+  replaceImageModal?: {
+    isOpen: boolean;
+    imageId: string;
+  };
+  filtersPresetModal?: {
+    isOpen: boolean;
+    type: 'load' | 'save';
   };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
@@ -96,6 +115,7 @@ export type UiState = {
     selection: LeftMenuSelectionType;
     isActive: boolean;
     expandedFolders: React.Key[];
+    expandedSearchedFiles: React.Key[];
     isValidationDrawerVisible: boolean;
   };
   quickSearchActionsPopup: {

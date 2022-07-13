@@ -1,5 +1,5 @@
 import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 
 import {Button, Modal, Skeleton, message} from 'antd';
 
@@ -14,7 +14,12 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
 import {closeClusterDiff} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {
+  isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+} from '@redux/selectors';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {replaceSelectedMatchesWithConfirm} from '@redux/support/replaceSelectedMatchesWithConfirm';
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
@@ -22,7 +27,8 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
+
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
@@ -44,7 +50,9 @@ const SkeletonContainer = styled.div`
 const StyledModal = styled(Modal)<{previewing: boolean}>`
   & .ant-modal-body {
     padding: 8px;
+    overflow-x: hidden;
   }
+
   ${props =>
     props.previewing &&
     `
@@ -100,6 +108,7 @@ function ClusterDiffModal() {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const matches = useAppSelector(state => state.main.clusterDiff.clusterToLocalResourcesMatches);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -132,8 +141,8 @@ function ClusterDiffModal() {
   const windowSize = useWindowSize();
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(selectedMatches.length, kubeConfigContext),
-    [selectedMatches, kubeConfigContext]
+    () => makeApplyMultipleResourcesText(selectedMatches.length, kubeConfigContext, kubeConfigContextColor),
+    [selectedMatches, kubeConfigContext, kubeConfigContextColor]
   );
 
   const selectedResources = useMemo(
@@ -355,7 +364,7 @@ function ClusterDiffModal() {
         maxConstraints={[windowSize.width - 64, resizableBoxHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
-        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+        handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
           <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
         )}
       >

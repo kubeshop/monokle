@@ -9,7 +9,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 
-import {currentKubeContext} from '@redux/selectors';
+import {currentKubeContext, kubeConfigPathSelector} from '@redux/selectors';
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
 
@@ -38,9 +38,10 @@ export const loadClusterDiff = createAsyncThunk<
     return;
   }
   try {
+    const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = currentKubeContext(state.config);
-    const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(state.config);
+    const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
+    const kc = createKubeClient(kubeConfigPath, currentContext);
     try {
       const res = clusterAccess.length
         ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))

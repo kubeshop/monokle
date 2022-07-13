@@ -15,9 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openClusterDiff} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import WalkThrough from '@components/molecules/WalkThrough';
-
-const ClusterCompareButton: React.FC = ({children}) => {
+const ClusterCompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -28,31 +26,29 @@ const ClusterCompareButton: React.FC = ({children}) => {
   };
 
   return (
-    <WalkThrough placement="leftTop" step="cluster" collection="novice">
-      <Tooltip
-        mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
-        title={
-          !isFolderOpen
-            ? ClusterDiffDisabledTooltip
-            : isInClusterMode
-            ? ClusterDiffDisabledInClusterPreviewTooltip
-            : ClusterDiffTooltip
-        }
-        placement="bottom"
+    <Tooltip
+      mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
+      title={
+        !isFolderOpen
+          ? ClusterDiffDisabledTooltip
+          : isInClusterMode
+          ? ClusterDiffDisabledInClusterPreviewTooltip
+          : ClusterDiffTooltip
+      }
+      placement="bottom"
+    >
+      <Button
+        onClick={onClickClusterComparison}
+        icon={<SwapOutlined />}
+        type="primary"
+        ghost
+        size="small"
+        style={{marginLeft: 8}}
+        disabled={!isFolderOpen || isInClusterMode}
       >
-        <Button
-          onClick={onClickClusterComparison}
-          icon={<SwapOutlined />}
-          type="primary"
-          ghost
-          size="small"
-          style={{marginLeft: 8}}
-          disabled={!isFolderOpen || isInClusterMode}
-        >
-          {children}
-        </Button>
-      </Tooltip>
-    </WalkThrough>
+        {children}
+      </Button>
+    </Tooltip>
   );
 };
 

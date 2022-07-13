@@ -2,6 +2,18 @@ import {Checkbox, Input, Select} from 'antd';
 
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
+export const FileCategoryLabel = styled.div`
+  color: ${Colors.grey7};
+  margin-bottom: 6px;
+  margin-top: 16px;
+`;
+
+export const FileNameLabel = styled.div`
+  color: ${Colors.greenOkay};
+`;
+
 export const StyledCheckbox = styled(Checkbox)`
   .ant-checkbox + span {
     white-space: nowrap;

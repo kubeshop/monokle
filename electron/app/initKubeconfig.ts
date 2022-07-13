@@ -8,7 +8,6 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setKubeConfig} from '@redux/reducers/appConfig';
-import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
 import electronStore from '@utils/electronStore';
 
@@ -17,7 +16,6 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
     const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
       dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
-      monitorKubeConfig(envKubeconfigParts[0], dispatch);
 
       dispatch(
         setAlert({
@@ -28,7 +26,6 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
       );
     } else {
       dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
-      monitorKubeConfig(process.env.KUBECONFIG, dispatch);
     }
     return;
   }
@@ -36,13 +33,11 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));
-    monitorKubeConfig(storedKubeconfig, dispatch);
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
   dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig)));
-  monitorKubeConfig(possibleKubeconfig, dispatch);
 }
 
 export default initKubeconfig;
@@ -51,6 +46,7 @@ export const getKubeConfigContext = (configPath: string): KubeConfig => {
   try {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(configPath);
+
     return {
       path: configPath,
       currentContext: kc.getCurrentContext(),
@@ -61,6 +57,7 @@ export const getKubeConfigContext = (configPath: string): KubeConfig => {
     return {
       path: configPath,
       isPathValid: false,
+      contexts: [],
     };
   }
 };

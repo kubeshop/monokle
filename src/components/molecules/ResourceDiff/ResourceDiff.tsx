@@ -16,12 +16,12 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import Icon from '@components/atoms/Icon';
+import {Icon} from '@atoms';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
@@ -95,6 +95,7 @@ const ResourceDiff = (props: {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const projectConfig = useAppSelector(currentConfigSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
@@ -117,9 +118,9 @@ const ResourceDiff = (props: {
   const confirmModalTitle = useMemo(
     () =>
       isKustomizationResource(localResource)
-        ? makeApplyKustomizationText(localResource.name, kubeConfigContext)
-        : makeApplyResourceText(localResource.name, kubeConfigContext),
-    [localResource, kubeConfigContext]
+        ? makeApplyKustomizationText(localResource.name, kubeConfigContext, kubeConfigContextColor)
+        : makeApplyResourceText(localResource.name, kubeConfigContext, kubeConfigContextColor),
+    [localResource, kubeConfigContext, kubeConfigContextColor]
   );
 
   const localResourceText = useMemo(() => {
@@ -155,7 +156,7 @@ const ResourceDiff = (props: {
     dispatch(
       updateResource({
         resourceId: localResource.id,
-        content: cleanClusterResourceText,
+        text: cleanClusterResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })
     );

@@ -13,6 +13,11 @@ import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {parseAllYamlDocuments} from '@utils/yaml';
 
+import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
+import HorizontalPodAutoscalerHandler from '@src/kindhandlers/HorizontalPodAutoscaler.handler';
+import LimitRangeHandler from '@src/kindhandlers/LimitRange.handler';
+import ResourceQuotaHandler from '@src/kindhandlers/ResourceQuota.handler';
+import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -54,6 +59,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   DaemonSetHandler,
   DeploymentHandler,
   EndpointsHandler,
+  EndpointSliceHandler,
   IngressHandler,
   JobHandler,
   NetworkPolicyHandler,
@@ -70,6 +76,10 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
+  StorageClassHandler,
+  ResourceQuotaHandler,
+  LimitRangeHandler,
+  HorizontalPodAutoscalerHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

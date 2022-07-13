@@ -124,6 +124,27 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    closeReplaceImageModal: (state: Draft<UiState>) => {
+      state.replaceImageModal = {
+        isOpen: false,
+        imageId: '',
+      };
+    },
+    openReplaceImageModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.replaceImageModal = {
+        isOpen: true,
+        imageId: action.payload,
+      };
+    },
+    closeFiltersPresetModal: (state: Draft<UiState>) => {
+      state.filtersPresetModal = undefined;
+    },
+    openFiltersPresetModal: (state: Draft<UiState>, action: PayloadAction<'load' | 'save'>) => {
+      state.filtersPresetModal = {
+        isOpen: true,
+        type: action.payload,
+      };
+    },
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
@@ -136,16 +157,19 @@ export const uiSlice = createSlice({
         resourcesIds: [],
       };
     },
-    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.createFolderModal = {
-        isOpen: true,
-        rootDir: action.payload,
-      };
+    openCreateFileFolderModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<{rootDir: string; type: 'file' | 'folder'}>
+    ) => {
+      const {rootDir, type} = action.payload;
+
+      state.createFileFolderModal = {isOpen: true, rootDir, type};
     },
-    closeCreateFolderModal: (state: Draft<UiState>) => {
-      state.createFolderModal = {
+    closeCreateFileFolderModal: (state: Draft<UiState>) => {
+      state.createFileFolderModal = {
         isOpen: false,
         rootDir: '',
+        type: 'folder',
       };
     },
     openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
@@ -166,13 +190,6 @@ export const uiSlice = createSlice({
     toggleStartProjectPane: (state: Draft<UiState>) => {
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
-    toggleValidationDrawer: (state: Draft<UiState>, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload !== undefined) {
-        state.leftMenu.isValidationDrawerVisible = action.payload;
-      } else {
-        state.leftMenu.isValidationDrawerVisible = !state.leftMenu.isValidationDrawerVisible;
-      }
-    },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
       if (expandedSections.length > 0) {
@@ -189,6 +206,9 @@ export const uiSlice = createSlice({
     },
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
+    },
+    setExpandedSearchedFiles: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
+      state.leftMenu.expandedSearchedFiles = action.payload;
     },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
@@ -231,6 +251,12 @@ export const uiSlice = createSlice({
     },
     openReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = true;
+    },
+    openKeyboardShortcutsModal: (state: Draft<UiState>) => {
+      state.isKeyboardShortcutsModalOpen = true;
+    },
+    closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
+      state.isKeyboardShortcutsModalOpen = false;
     },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
@@ -284,52 +310,58 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  toggleResourceFilters,
-  toggleSettings,
-  openClusterDiff,
+  cancelWalkThrough,
+  closeAboutModal,
   closeClusterDiff,
-  toggleLeftMenu,
-  toggleRightMenu,
-  toggleNotifications,
-  setLeftMenuSelection,
-  setRightMenuSelection,
-  openNewResourceWizard,
+  closeCreateFileFolderModal,
+  closeCreateProjectModal,
+  closeFiltersPresetModal,
+  closeFolderExplorer,
+  closeKeyboardShortcutsModal,
   closeNewResourceWizard,
-  openRenameResourceModal,
+  closeQuickSearchActionsPopup,
+  closeReleaseNotesDrawer,
+  closeRenameEntityModal,
   closeRenameResourceModal,
+  closeReplaceImageModal,
+  closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
+  handleWalkThroughStep,
+  highlightItem,
+  openAboutModal,
+  openClusterDiff,
+  openCreateFileFolderModal,
+  openCreateProjectModal,
+  openFiltersPresetModal,
   openFolderExplorer,
-  closeFolderExplorer,
+  openKeyboardShortcutsModal,
+  openNewResourceWizard,
+  openQuickSearchActionsPopup,
+  openReleaseNotesDrawer,
+  openRenameEntityModal,
+  openRenameResourceModal,
+  openReplaceImageModal,
+  openSaveResourcesToFileFolderModal,
+  resetLayout,
+  setActiveSettingsPanel,
+  setExpandedFolders,
+  setExpandedSearchedFiles,
+  setLayoutSize,
+  setLeftMenuIsActive,
+  setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
-  toggleStartProjectPane,
-  toggleValidationDrawer,
   setRightMenuIsActive,
-  setLeftMenuIsActive,
-  openRenameEntityModal,
-  closeRenameEntityModal,
-  openCreateFolderModal,
-  closeCreateFolderModal,
-  openCreateProjectModal,
-  closeCreateProjectModal,
+  setRightMenuSelection,
   toggleExpandActionsPaneFooter,
-  resetLayout,
-  setLayoutSize,
-  highlightItem,
-  openQuickSearchActionsPopup,
-  closeQuickSearchActionsPopup,
-  openSaveResourcesToFileFolderModal,
-  closeSaveResourcesToFileFolderModal,
+  toggleLeftMenu,
+  toggleNotifications,
+  toggleResourceFilters,
+  toggleRightMenu,
+  toggleSettings,
+  toggleStartProjectPane,
   zoomIn,
   zoomOut,
-  openReleaseNotesDrawer,
-  closeReleaseNotesDrawer,
-  setActiveSettingsPanel,
-  openAboutModal,
-  closeAboutModal,
-  setExpandedFolders,
-  cancelWalkThrough,
-  handleWalkThroughStep,
 } = uiSlice.actions;
 export default uiSlice.reducer;

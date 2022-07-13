@@ -2,7 +2,6 @@ import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
-import {ReloadFolderTooltip} from '@constants/tooltips';
 
 import {NewVersionCode, Project} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
@@ -12,6 +11,7 @@ import {
   openAboutModal,
   openCreateProjectModal,
   openFolderExplorer,
+  openKeyboardShortcutsModal,
   openNewResourceWizard,
   resetLayout,
   setMonacoEditor,
@@ -20,11 +20,11 @@ import {
   zoomIn,
   zoomOut,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {defineHotkey} from '@utils/defineHotkey';
 
-import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
+import {defineHotkey} from '@utils/defineHotkey';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
@@ -97,7 +97,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     submenu: [
       {
         label: 'New Monokle Window',
-        accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW),
+        accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW.key),
         click() {
           openApplication();
         },
@@ -105,8 +105,8 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Refresh Folder',
+        accelerator: defineHotkey(hotkeys.REFRESH_FOLDER.key),
         enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        toolTip: ReloadFolderTooltip,
         click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
@@ -186,6 +186,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 };
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+  const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
   const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
@@ -228,16 +229,16 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Apply',
-        accelerator: hotkeys.APPLY_SELECTION,
-        enabled: Boolean(state.main.selectedResourceId),
+        accelerator: hotkeys.APPLY_SELECTION.key,
+        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
         click: () => {
           dispatch(setMonacoEditor({apply: true}));
         },
       },
       {
         label: 'Diff',
-        accelerator: hotkeys.DIFF_RESOURCE,
-        enabled: Boolean(state.main.selectedResourceId),
+        accelerator: hotkeys.DIFF_RESOURCE.key,
+        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
         click: () => {
           if (!state.main.selectedResourceId) {
             return;
@@ -263,11 +264,11 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        role: 'forceReload',
       },
       {
         label: 'Previous Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
+        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK.key,
         enabled: Boolean(isPreviousResourceEnabled),
         click: () => {
           selectFromHistory(
@@ -276,13 +277,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },
       },
       {
         label: 'Next Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
+        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD.key,
         enabled: Boolean(isNextResourceEnabled),
         click: () => {
           selectFromHistory(
@@ -291,6 +293,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory,
             state.main.resourceMap,
             state.main.fileMap,
+            state.main.imagesList,
             dispatch
           );
         },
@@ -298,7 +301,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
-        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE),
+        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
           dispatch(toggleLeftMenu());
         },
@@ -315,14 +318,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Zoom in',
-        accelerator: defineHotkey(hotkeys.ZOOM_IN),
+        accelerator: defineHotkey(hotkeys.ZOOM_IN.key),
         click: () => {
           dispatch(zoomIn());
         },
       },
       {
         label: 'Zoom out',
-        accelerator: defineHotkey(hotkeys.ZOOM_OUT),
+        accelerator: defineHotkey(hotkeys.ZOOM_OUT.key),
         click: () => {
           dispatch(zoomOut());
         },
@@ -358,8 +361,13 @@ const helpMenu = (
       click: openDocumentation,
     },
     {
+      accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS.key),
       label: 'Keyboard Shortcuts',
-      click: openKeyboardShortcuts,
+      click: () => dispatch(openKeyboardShortcutsModal()),
+    },
+    {
+      label: 'Logs',
+      click: openLogs,
     },
     {type: 'separator'},
     {

@@ -1,17 +1,37 @@
+import {Badge as RawBadge} from 'antd';
+
 import styled from 'styled-components';
 
-import Colors, {FontColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
-export const Counter = styled.span<{selected: boolean}>`
-  margin-left: 8px;
-  font-size: 14px;
+export const Badge = styled(RawBadge)<{$type: 'error' | 'warning'}>`
+  padding-left: 6px;
   cursor: pointer;
-  ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
+
+  & .ant-badge-count {
+    ${({$type}) => `
+      background-color: ${$type === 'error' ? Colors.red7 : Colors.yellow8};
+    `}
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & .ant-scroll-number-only {
+      ${({$type}) => `
+        color: ${$type === 'error' ? Colors.whitePure : Colors.blackPure};
+      `}
+
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 `;
 
-export const WarningCountContainer = styled.span<{selected: boolean; $type: 'warning' | 'error'}>`
-  ${({selected, $type}) =>
-    `color: ${selected ? Colors.blackPure : $type === 'warning' ? Colors.yellowWarning : Colors.redError};`}
-  margin-left: 8px;
+export const Counter = styled.span`
+  padding: 0 4px 0 8px;
   cursor: pointer;
 `;

@@ -3,6 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import fs from 'fs';
 import {sortBy} from 'lodash';
 import path from 'path';
+import {v4 as uuid} from 'uuid';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -13,7 +14,7 @@ import {RootState} from '@models/rootstate';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
 
@@ -110,6 +111,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   );
 
   const commandOptions: CommandOptions = {
+    commandId: uuid(),
     cmd: 'helm',
     args: args.splice(1),
     env: {KUBECONFIG: kubeconfig},

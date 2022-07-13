@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeRenameEntityModal} from '@redux/reducers/ui';
 
-import {RenameEntityCallback, checkIfEntityExists, renameEntity} from '@utils/files';
+import {RenameEntityCallback, doesPathExist, renameEntity} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
@@ -107,14 +107,19 @@ const RenameEntityModal: React.FC = () => {
             ({getFieldValue}) => ({
               validator: () => {
                 return new Promise((resolve: (value?: any) => void, reject) => {
-                  const newEntityNameValue: string = getFieldValue('newEntityName').toLowerCase();
+                  const newEntityNameValue: string = getFieldValue('newEntityName');
 
                   // If the input is empty - it is not valid
                   if (!newEntityNameValue) {
                     reject(new Error("This field can't be empty"));
                   }
 
-                  // If the old name and the new name are equal - it is valid
+                  // If the old name and the new name are equal - it is not valid
+                  if (newEntityNameValue === uiState.entityName) {
+                    reject(new Error("Name can't be the same as the current one"));
+                  }
+
+                  // If the old name and the new name are differ by case - it is valid
                   if (newEntityNameValue.toLowerCase() === uiState.entityName.toLowerCase()) {
                     resolve();
                   }
@@ -126,9 +131,7 @@ const RenameEntityModal: React.FC = () => {
                   }
 
                   // If the new name equals to any name of any children on the same nesting level - it is not valid
-                  if (
-                    checkIfEntityExists(uiState.absolutePathToEntity.replace(uiState.entityName, newEntityNameValue))
-                  ) {
+                  if (doesPathExist(uiState.absolutePathToEntity.replace(uiState.entityName, newEntityNameValue))) {
                     reject(new Error('File or folder with this name already exists in this location'));
                   }
 

@@ -22,7 +22,12 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import {Policy} from '@models/policy';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {
+  isKustomizationFilePath,
+  isKustomizationPatch,
+  isKustomizationResource,
+  processKustomizations,
+} from '@redux/services/kustomize';
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
@@ -720,6 +725,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         }
 
         const content = doc.toJS();
+
         if (content && content.apiVersion && content.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
@@ -733,6 +739,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: content.apiVersion,
             content,
             text,
+            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
           };
 
           if (
@@ -767,7 +774,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (content && relativePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME) && documents.length === 1) {
+        else if (content && isKustomizationFilePath(relativePath) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
             filePath: relativePath,
@@ -778,6 +785,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
+            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter

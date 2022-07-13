@@ -20,9 +20,8 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
+import {getSegmentClient} from '@utils/segment';
 import {APP_INSTALLED} from '@utils/telemetry';
-
-import {getAmplitudeClient} from './amplitude';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
@@ -104,9 +103,8 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
 };
 
 export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersion: string) => {
-  const ID: string = electronStore.get('main.deviceID');
-
-  const amplitudeClient = getAmplitudeClient();
+  const storedDeviceID: string | undefined = electronStore.get('main.deviceID');
+  const segmentClient = getSegmentClient();
 
   const requestArgs = {
     method: 'post',
@@ -117,29 +115,32 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
   };
 
   if (!disableTracking) {
-    console.log('New Session.');
+    log.info('New Session.');
     fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
-    amplitudeClient?.logEvent({
-      event_type: 'APP_SESSION',
-      user_id: deviceID,
+    segmentClient?.track({
+      event: 'APP_SESSION',
+      userId: deviceID,
     });
   }
 
-  if (!ID) {
+  if (!storedDeviceID) {
+    log.info('New Installation.');
     if (NUCLEUS_SH_APP_ID) {
       Nucleus.track(APP_INSTALLED, {appVersion});
     }
     if (MONOKLE_INSTALLS_URL) {
-      console.log('New Installation.');
       fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
-      amplitudeClient?.logEvent({
-        event_type: APP_INSTALLED,
-        user_id: deviceID,
-        event_properties: {
-          appVersion,
-        },
-      });
     }
+    segmentClient?.identify({
+      userId: deviceID,
+    });
+    segmentClient?.track({
+      event: APP_INSTALLED,
+      userId: deviceID,
+      properties: {
+        appVersion,
+      },
+    });
     electronStore.set('main.deviceID', deviceID);
   }
 };

@@ -23,7 +23,7 @@ test('validate-resource', () => {
 
   expect(deployment?.validation).toBeDefined();
   expect(deployment?.validation?.errors).toBeDefined();
-  expect(deployment?.validation?.errors.length).toBe(5);
+  expect(deployment?.validation?.errors.length).toBe(4);
 
   // @ts-ignore
   for (let c = 0; c < deployment.validation.errors.length; c += 1) {

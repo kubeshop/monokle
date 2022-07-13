@@ -33,13 +33,20 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions} from '@utils/command';
+import {CommandOptions} from '@utils/commands';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
+import {getSegmentClient} from '@utils/segment';
 import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
 
-import {getAmplitudeClient} from '../amplitude';
 import autoUpdater from '../autoUpdater';
-import {checkNewVersion, interpolateTemplate, runCommand, saveFileDialog, selectFileDialog} from '../commands';
+import {
+  checkNewVersion,
+  forceLoad as forceReload,
+  interpolateTemplate,
+  runCommand,
+  saveFileDialog,
+  selectFileDialog,
+} from '../commands';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -62,12 +69,12 @@ const machineId = machineIdSync();
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
-  const amplitudeClient = getAmplitudeClient();
-  if (amplitudeClient) {
-    amplitudeClient.logEvent({
-      event_type: eventName,
-      user_id: machineId,
-      event_properties: payload,
+  const segmentClient = getSegmentClient();
+  if (segmentClient) {
+    segmentClient.track({
+      event: eventName,
+      userId: machineId,
+      properties: payload,
     });
   }
 });
@@ -238,6 +245,10 @@ ipcMain.on('quit-and-install', () => {
   trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+});
+
+ipcMain.on('force-reload', async (event: any) => {
+  forceReload(event);
 });
 
 ipcMain.on('confirm-action', (event: any, args) => {

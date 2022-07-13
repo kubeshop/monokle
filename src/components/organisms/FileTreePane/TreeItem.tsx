@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Menu, Modal, Tooltip} from 'antd';
@@ -8,16 +9,18 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {getHelmValuesFile, isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
-import {Spinner} from '@components/atoms';
-import Dots from '@components/atoms/Dots';
+import {Dots, Spinner} from '@atoms';
+
 import ContextMenu from '@components/molecules/ContextMenu';
 
+import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
@@ -43,14 +46,15 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
+  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
   const {
     setProcessingEntity,
+    onDuplicate,
     onDelete,
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
-    onCreateFolder,
+    onCreateFileFolder,
     onCreateResource,
     onFilterByFileOrFolder,
     onPreview,
@@ -66,24 +70,34 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const isFileSelected = useMemo(() => {
-    return treeKey === selectedPath;
-  }, [treeKey, selectedPath]);
+  const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
+  const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const root = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+  const target = useMemo(() => (isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '')), [isRoot, treeKey]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
+  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
 
-  const isRoot = treeKey === ROOT_FILE_ENTRY;
-  const root = fileMap[ROOT_FILE_ENTRY];
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
 
-  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
-
-  const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'Finder',
-  };
-
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
+  useHotkeys(
+    defineHotkey(hotkeys.DELETE_RESOURCE.key),
+    () => {
+      if (treeKey === selectedPath) {
+        deleteEntityWizard(
+          {entityAbsolutePath: absolutePath},
+          () => {
+            setProcessingEntity({processingEntityID: selectedPath, processingType: 'delete'});
+            deleteEntity(absolutePath, onDelete);
+          },
+          () => {}
+        );
+      }
+    },
+    [selectedPath]
+  );
 
   const canPreview = useCallback(
     (entryPath: string): boolean => {
@@ -102,125 +116,146 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     e.stopPropagation();
     canPreview(relativePath) && onPreview(relativePath);
   };
-  const menu = (
-    <Menu>
-      {canPreview(relativePath) && (
-        <>
-          <Menu.Item
-            onClick={e => {
+
+  const menuItems = [
+    ...(canPreview(relativePath)
+      ? [
+          {
+            key: 'preview',
+            label: 'Preview',
+            onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onPreview(relativePath);
-            }}
-            key="preview"
-          >
-            Preview
-          </Menu.Item>
-          <S.ContextMenuDivider />
-        </>
-      )}
-      {isFolder ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
+            },
+          },
+          {key: 'divider-preview', type: 'divider'},
+        ]
+      : []),
+    ...(isFolder
+      ? [
+          {
+            key: 'create_directory',
+            label: 'New Folder',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
               e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
-            }}
-            key="create_directory"
-          >
-            New Folder
-          </Menu.Item>
-        </>
-      ) : null}
-
-      <Menu.Item
-        disabled={
-          isInPreviewMode ||
-          isHelmChartFile(relativePath) ||
-          isHelmValuesFile(relativePath) ||
-          (!isFolder && (isExcluded || !isSupported))
-        }
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
-        }}
-        key="create_resource"
-      >
-        {isFolder ? 'New Resource' : 'Add Resource'}
-      </Menu.Item>
-      <S.ContextMenuDivider />
-      <Menu.Item
-        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
-            onFilterByFileOrFolder(undefined);
-          } else {
-            onFilterByFileOrFolder(relativePath);
-          }
-        }}
-      >
-        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
+              onCreateFileFolder(absolutePath, 'folder');
+            },
+          },
+          {
+            key: 'create_file',
+            label: 'New File',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onCreateFileFolder(absolutePath, 'file');
+            },
+          },
+        ]
+      : []),
+    {
+      key: 'create_resource',
+      label: isFolder ? 'New Resource' : 'Add Resource',
+      disabled:
+        isInPreviewMode ||
+        isHelmChartFile(relativePath) ||
+        isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
+        (!isFolder && (isExcluded || !isSupported)),
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
+      },
+    },
+    {key: 'divider-1', type: 'divider'},
+    {
+      key: `filter_on_this_${isFolder ? 'folder' : 'file'}`,
+      label:
+        fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
-          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
-            onClick={e => {
+          : `Filter on this ${isFolder ? 'folder' : 'file'}`,
+      disabled:
+        isInPreviewMode ||
+        isHelmChartFile(relativePath) ||
+        isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
+        (!isFolder && (isExcluded || !isSupported)),
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+
+        if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(relativePath);
+        }
+      },
+    },
+    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey && onIncludeToProcessing && onExcludeFromProcessing
+      ? [
+          {
+            key: 'add_to_files_exclude',
+            label: `${isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
+            disabled:
+              isInPreviewMode ||
+              isHelmChartFile(relativePath) ||
+              isHelmValuesFile(relativePath) ||
+              isHelmTemplateFile(relativePath) ||
+              (!isFolder && !isSupported && !isExcluded),
+            onClick: (e: any) => {
               e.domEvent.stopPropagation();
               if (isExcluded) {
                 onIncludeToProcessing(relativePath);
               } else {
                 onExcludeFromProcessing(relativePath);
               }
-            }}
-            key="add_to_files_exclude"
-          >
-            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-          </Menu.Item>
-        </>
-      ) : null}
-      <S.ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          navigator.clipboard.writeText(absolutePath);
-        }}
-        key="copy_full_path"
-      >
-        Copy Path
-      </Menu.Item>
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          navigator.clipboard.writeText(relativePath);
-        }}
-        key="copy_relative_path"
-      >
-        Copy Relative Path
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <S.ContextMenuDivider />
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
+            },
+          },
+        ]
+      : []),
+    {key: 'divider-2', type: 'divider'},
+    {
+      key: 'copy_full_path',
+      label: 'Copy Path',
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        navigator.clipboard.writeText(absolutePath);
+      },
+    },
+    {
+      key: 'copy_relative_path',
+      label: 'Copy Relative Path',
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        navigator.clipboard.writeText(relativePath);
+      },
+    },
+    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey
+      ? [
+          {key: 'divider-3', type: 'divider'},
+          {
+            key: 'duplicate_entity',
+            label: 'Duplicate',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
+              e.domEvent.stopPropagation();
+              onDuplicate(absolutePath, getBasename(absolutePath), getDirname(absolutePath));
+            },
+          },
+          {
+            key: 'rename_entity',
+            label: 'Rename',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onRename(absolutePath, osPlatform);
-            }}
-            key="rename_entity"
-          >
-            Rename
-          </Menu.Item>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            key="delete_entity"
-            onClick={e => {
+            },
+          },
+          {
+            key: 'delete_entity',
+            label: 'Delete',
+            disabled: isInPreviewMode,
+            onClick: (e: any) => {
               e.domEvent.stopPropagation();
               deleteEntityWizard(
                 {entityAbsolutePath: absolutePath},
@@ -230,31 +265,32 @@ const TreeItem: React.FC<TreeItemProps> = props => {
                 },
                 () => {}
               );
-            }}
-          >
-            Delete
-          </Menu.Item>
-        </>
-      ) : null}
-      <S.ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          showItemInFolder(absolutePath);
-        }}
-        key="reveal_in_finder"
-      >
-        Reveal in {platformFilemanagerName}
-      </Menu.Item>
-    </Menu>
-  );
+            },
+          },
+        ]
+      : []),
+    {key: 'divider-4', type: 'divider'},
+    {
+      key: 'reveal_in_finder',
+      label: `Reveal in ${platformFileManagerName}`,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        showItemInFolder(absolutePath);
+      },
+    },
+  ];
 
   return (
-    <ContextMenu overlay={menu} triggerOnRightClick>
+    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
+        <Tooltip
+          overlayStyle={isMatchItem ? {display: 'none'} : {}}
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={absolutePath}
+          placement="bottom"
+        >
           <S.TitleWrapper>
-            <S.TreeTitleText>{title}</S.TreeTitleText>
+            <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (
               <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
             )}
@@ -278,13 +314,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
                 Preview
               </S.PreviewButton>
             )}
-            <ContextMenu overlay={menu}>
+            <ContextMenu overlay={<Menu items={menuItems} />}>
               <div
                 onClick={e => {
                   e.stopPropagation();
                 }}
               >
-                <Dots color={isFileSelected ? Colors.blackPure : undefined} />
+                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
               </div>
             </ContextMenu>
           </S.ActionsWrapper>

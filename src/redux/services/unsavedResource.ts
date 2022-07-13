@@ -10,6 +10,8 @@ import {addMultipleResources, addResource, selectK8sResource} from '@redux/reduc
 
 import {parseYamlDocument} from '@utils/yaml';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
 apiVersion: ${input.apiVersion ? input.apiVersion : 'v1'}
@@ -60,6 +62,7 @@ export function createUnsavedResource(
     namespace: input.namespace,
     text: newResourceText,
     content: newResourceContent,
+    isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
   };
   dispatch(addResource(newResource));
   dispatch(selectK8sResource({resourceId: newResource.id}));
@@ -107,6 +110,7 @@ export function createMultipleUnsavedResources(
     namespace: resourceMap[resourceId].input.namespace,
     text: resourceMap[resourceId].text,
     content: resourceMap[resourceId].content,
+    isClusterScoped: getResourceKindHandler(resourceMap[resourceId].input.kind)?.isNamespaced || false,
   }));
 
   dispatch(addMultipleResources(newResources));

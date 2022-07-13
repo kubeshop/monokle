@@ -3,7 +3,12 @@ import {lstat} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
-export function checkIfEntityExists(absolutePath: string) {
+import {AlertEnum} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
+
+import {setAlert} from '@redux/reducers/alert';
+
+export function doesPathExist(absolutePath: string) {
   try {
     fs.accessSync(absolutePath);
 
@@ -62,11 +67,80 @@ export async function deleteEntity(absolutePath: string, callback: (args: Delete
   }
 }
 
+export function dispatchDeleteAlert(dispatch: AppDispatch, args: DeleteEntityCallback) {
+  const {isDirectory, name, err} = args;
+
+  if (err) {
+    dispatch(
+      setAlert({
+        title: 'Deleting failed',
+        message: `Something went wrong during deleting ${name} ${isDirectory ? 'directory' : 'file'}`,
+        type: AlertEnum.Error,
+      })
+    );
+  } else {
+    dispatch(
+      setAlert({
+        title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
+        message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+        type: AlertEnum.Success,
+      })
+    );
+  }
+}
+
 export interface RenameEntityCallback {
   oldAbsolutePath: string;
   newName: string;
   isDirectory: boolean;
   err: NodeJS.ErrnoException | null;
+}
+
+export interface DuplicateEntityCallback {
+  duplicatedFileName: string;
+  err: NodeJS.ErrnoException | null;
+}
+
+/**
+ * Duplicates entity
+ *
+ * @param absolutePath
+ * Absolute path to your entity
+ * @param entityName
+ * Entity name
+ * @param dirName
+ * Directory name
+ * @param callback
+ * Function which is called whenever the entity was duplicated or not
+ */
+
+export function duplicateEntity(
+  absolutePath: string,
+  entityName: string,
+  dirName: string,
+  callback: (args: DuplicateEntityCallback) => any
+) {
+  if (path.isAbsolute(absolutePath)) {
+    const {name, ext} = path.parse(entityName);
+    let newName = `${name} (1)`;
+
+    let files = fs.readdirSync(dirName);
+    let i = 1;
+
+    while (i) {
+      if (files.includes(`${newName}${ext}`)) {
+        i += 1;
+        newName = `${name} (${i})`;
+      } else {
+        i = 0;
+        const duplicatedFileName = `${dirName}${path.sep}${newName}${ext}`;
+
+        fs.copyFile(absolutePath, duplicatedFileName, err => {
+          callback({duplicatedFileName, err});
+        });
+      }
+    }
+  }
 }
 
 /**
@@ -96,14 +170,18 @@ export async function renameEntity(
   }
 }
 
-export interface CreateFolderCallback {
+export interface CreateFileFolderCallback {
   rootDir: string;
-  folderName: string;
+  fileFolderName: string;
   err: NodeJS.ErrnoException | null;
 }
 
-export function createFolder(rootDir: string, folderName: string, callback: (args: CreateFolderCallback) => any) {
-  return fs.mkdir(`${rootDir}${path.sep}${folderName}`, err => callback({rootDir, folderName, err}));
+export function createFolder(rootDir: string, folderName: string, callback: (args: CreateFileFolderCallback) => any) {
+  return fs.mkdir(path.join(rootDir, folderName), err => callback({rootDir, fileFolderName: folderName, err}));
+}
+
+export function createFile(rootDir: string, fileName: string, callback: (args: CreateFileFolderCallback) => any) {
+  return fs.open(path.join(rootDir, fileName), 'wx', err => callback({rootDir, fileFolderName: fileName, err}));
 }
 
 export function hasValidExtension(file: string | undefined, extensions: string[]): boolean {

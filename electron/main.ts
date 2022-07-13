@@ -2,9 +2,6 @@
 /* eslint-disable import/order */
 import moduleAlias from 'module-alias';
 import additionalEnvironmentVariables from './env.json';
-import * as ElectronLog from 'electron-log';
-
-Object.assign(console, ElectronLog.functions);
 
 Object.keys(additionalEnvironmentVariables).forEach((key: string) => {
   // @ts-ignore

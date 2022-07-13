@@ -11,7 +11,7 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions, CommandResult} from '@utils/command';
+import {CommandOptions, CommandResult} from '@utils/commands';
 import {ensureMainThread} from '@utils/thread';
 
 import autoUpdater from './autoUpdater';
@@ -69,6 +69,11 @@ export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: File
     return dialog.showSaveDialogSync(browserWindow, dialogOptions);
   }
   return dialog.showSaveDialogSync(dialogOptions);
+};
+
+export const forceLoad = (event: Electron.IpcMainInvokeEvent) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+  browserWindow?.webContents.reloadIgnoringCache();
 };
 
 /**
@@ -133,7 +138,11 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
   ensureMainThread();
 
-  const result: CommandResult = {exitCode: null, signal: null};
+  const result: CommandResult = {
+    commandId: options.commandId,
+    exitCode: null,
+    signal: null,
+  };
 
   try {
     const child = spawn(options.cmd, options.args, {

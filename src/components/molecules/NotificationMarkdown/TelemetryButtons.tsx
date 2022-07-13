@@ -44,17 +44,17 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
   };
 
   if (disableEventTracking !== undefined || disableErrorReporting !== undefined) {
-    return <span>Your settings have been saved.</span>;
+    return <div>Your settings have been saved.</div>;
   }
 
   return (
-    <div>
-      <S.Button type="default" onClick={handleOk}>
+    <S.Content>
+      <S.Button type="default" onClick={handleOk} id="accept-telemetry">
         I&apos;m fine with it
       </S.Button>
       <S.Button type="text" onClick={handleNotOk}>
         I&apos;m not
       </S.Button>
-    </div>
+    </S.Content>
   );
 };

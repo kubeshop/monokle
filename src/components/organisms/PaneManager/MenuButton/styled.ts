@@ -45,7 +45,7 @@ export const StyledButton = styled(Button)<{$hasGradientBackground: boolean; $sh
   ${props => `
     &:hover {
       & .anticon {
-        color: ${props.$hasGradientBackground ? Colors.grey5 : Colors.grey8} !important;
+        color: ${props.$hasGradientBackground ? Colors.grey6 : Colors.grey8} !important;
       }
     }
   `}

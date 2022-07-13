@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  annotations:
+    meta.helm.sh/release-name: testkube
+    meta.helm.sh/release-namespace: testkube
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: testkube-operator-selfsigned-issuer
+  namespace: testkube

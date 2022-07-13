@@ -1,11 +1,10 @@
-import {Page} from 'playwright';
+import log from 'loglevel';
+import {Locator, Page} from 'playwright';
+
 import {expect, test} from '@playwright/test';
-import {
-  findDrawer,
-  waitForDrawerToHide,
-  waitForDrawerToShow,
-} from './antdHelpers';
-import {clickOnMonokleLogo, ElectronAppInfo, startApp} from './electronHelpers';
+
+import {findDrawer, findDropdown, waitForDrawerToHide, waitForDrawerToShow, waitForDropdownToShow} from './antdHelpers';
+import {ElectronAppInfo, clickOnMonokleLogo, startApp} from './electronHelpers';
 import {getRecordingPath, pause} from './utils';
 
 let appWindow: Page = {} as any;
@@ -23,7 +22,7 @@ test.beforeEach(async () => {
 
 test.afterEach(async () => {
   await pause(1000);
-  appWindow.on('console', console.log);
+  appWindow.on('console', log.info);
 });
 
 test('Validate title', async () => {
@@ -38,18 +37,15 @@ test('Validate footer', async () => {
 });
 
 test('Validate logo', async () => {
-  const img = appWindow.locator("#monokle-logo-header");
+  const img = appWindow.locator('#monokle-logo-header');
   expect(await img.count()).toBe(1);
 });
 
 test('Validate icons', async () => {
-  let span = appWindow.locator("span[aria-label='question-circle']");
+  let span = appWindow.locator("span[aria-label='bell']");
   expect(await span.count()).toBe(1);
 
-  span = appWindow.locator("span[aria-label='bell']");
-  expect(await span.count()).toBe(1);
-
-  span = appWindow.locator("span[aria-label='setting']");
+  span = appWindow.locator("span[aria-label='ellipsis']");
   expect(await span.count()).toBe(1);
 });
 
@@ -60,10 +56,15 @@ test('Validate ClusterContainer', async () => {
 
 test('Validate settings drawer', async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'before-settings-drawer.png')});
+  let dropdown: Locator | undefined = await findDropdown(appWindow);
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeFalsy();
 
-  await appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
+  await appWindow.click("span[aria-label='ellipsis']", {noWaitAfter: true, force: true});
+  dropdown = await waitForDropdownToShow(appWindow, 40000);
+  expect(dropdown).toBeTruthy();
+
+  await appWindow.click(".ant-dropdown span[aria-label='setting']", {noWaitAfter: true, force: true});
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'settings-drawer.png')});
   drawer = await waitForDrawerToShow(appWindow, 'Settings', 40000);
 

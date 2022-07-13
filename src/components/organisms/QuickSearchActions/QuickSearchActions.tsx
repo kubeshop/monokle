@@ -51,7 +51,7 @@ const StyledModal = styled(Modal)`
 
 const applyFilterWithConfirm = (
   option: string,
-  type: 'namespace' | 'kind',
+  type: 'namespace' | 'kinds',
   resourceFilter: ResourceFilterType,
   dispatch: AppDispatch
 ) => {
@@ -62,7 +62,12 @@ const applyFilterWithConfirm = (
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        dispatch(updateResourceFilter({...resourceFilter, [type]: option}));
+        dispatch(
+          updateResourceFilter({
+            ...resourceFilter,
+            [type]: type === 'kinds' ? [option] : option,
+          })
+        );
         dispatch(closeQuickSearchActionsPopup());
         resolve({});
       });
@@ -126,13 +131,18 @@ const QuickSearchActionsV3: React.FC = () => {
 
   const applyOption = useCallback(
     (type: string, option: string) => {
-      if (type === 'namespace' || type === 'kind') {
+      if (type === 'namespace' || type === 'kinds') {
         if (resourceFilter[type]) {
           if (resourceFilter[type] !== option) {
             applyFilterWithConfirm(option, type, resourceFilter, dispatch);
           }
         } else {
-          dispatch(updateResourceFilter({...resourceFilter, [type]: option}));
+          dispatch(
+            updateResourceFilter({
+              ...resourceFilter,
+              [type]: type === 'kinds' ? [option] : option,
+            })
+          );
           dispatch(closeQuickSearchActionsPopup());
         }
       } else if (type === 'resource') {
@@ -192,7 +202,7 @@ const QuickSearchActionsV3: React.FC = () => {
       if (kind.toLowerCase().includes(searchingValue.toLowerCase())) {
         const optionLabel = <span>{matchingCharactersLabel(kind, 'kind')}</span>;
 
-        filteredOpt.push({value: `kind:${kind}`, label: optionLabel});
+        filteredOpt.push({value: `kinds:${kind}`, label: optionLabel});
       }
 
       return filteredOpt;

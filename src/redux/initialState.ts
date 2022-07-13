@@ -17,6 +17,7 @@ const initialAppState: AppState = {
   isRehydrating: false,
   wasRehydrated: false,
   selectionHistory: [],
+  previousSelectionHistory: [],
   resourceMap: {},
   resourceFilter: {
     labels: {},
@@ -25,6 +26,7 @@ const initialAppState: AppState = {
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
+  helmTemplatesMap: {},
   previewLoader: {
     isLoading: false,
   },
@@ -55,6 +57,21 @@ const initialAppState: AppState = {
     isOpen: false,
   },
   deviceID: electronStore.get('main.deviceID'),
+  filtersPresets: electronStore.get('main.filtersPresets') || {},
+  imagesList: [],
+  validationIntegration: undefined,
+  autosaving: {},
+  search: {
+    searchQuery: '',
+    replaceQuery: '',
+    queryMatchParams: {
+      matchCase: false,
+      matchWholeWord: false,
+      regExp: false,
+    },
+    searchHistory: electronStore.get('appConfig.recentSearch') || [],
+    currentMatch: null,
+  },
 };
 
 const initialAppConfigState: AppConfig = {
@@ -67,6 +84,7 @@ const initialAppConfigState: AppConfig = {
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
+    hideUnsupportedFilesInFileExplorer: electronStore.get('appConfig.settings.hideUnsupportedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
     createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
@@ -99,6 +117,9 @@ const initialAppConfigState: AppConfig = {
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
   disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
+  clusterAccess: [],
+  isAccessLoading: false,
+  kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
 };
 
 const initialAlertState: AlertState = {};
@@ -125,6 +146,7 @@ const initialUiState: UiState = {
   isReleaseNotesDrawerOpen: false,
   isSettingsOpen: false,
   isAboutModalOpen: false,
+  isKeyboardShortcutsModalOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -134,9 +156,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: false,
   },
-  createFolderModal: {
+  createFileFolderModal: {
     isOpen: false,
     rootDir: '',
+    type: 'folder',
   },
   createProjectModal: {
     isOpen: false,
@@ -161,6 +184,7 @@ const initialUiState: UiState = {
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     expandedFolders: [],
+    expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
   },
   rightMenu: {

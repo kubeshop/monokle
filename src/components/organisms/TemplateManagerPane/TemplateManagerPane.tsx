@@ -1,10 +1,12 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -19,12 +21,17 @@ import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
 import * as S from './TemplateManagerPane.styled';
 
-const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
+const filterTemplateBySearchedValue = (searchedValue: string, name: string, author: string) => {
   let shouldBeFiltered = true;
   const splittedSearchedValue = searchedValue.split(' ');
+  const splittedName = name.split(' ');
+  const splittedAuthorName = author.split(' ');
 
   for (let i = 0; i < splittedSearchedValue.length; i += 1) {
-    if (!name.split(' ').find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))) {
+    if (
+      !splittedName.find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase())) &&
+      !splittedAuthorName.find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))
+    ) {
       shouldBeFiltered = false;
       break;
     }
@@ -72,6 +79,10 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
+  const openHelpUrl = () => {
+    const repositoryUrl = TEMPLATES_HELP_URL;
+    shell.openExternal(repositoryUrl);
+  };
 
   useEffect(() => {
     if (!searchedValue) {
@@ -81,7 +92,9 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
         Object.entries(templateMap)
           .filter(templateEntry => {
             const templateName = templateEntry[1].name;
-            return filterTemplateBySearchedValue(searchedValue, templateName);
+            const templateAuthor = templateEntry[1].author;
+
+            return filterTemplateBySearchedValue(searchedValue, templateName, templateAuthor);
           })
           .sort((a, b) => a[1].name.localeCompare(b[1].name))
       );
@@ -94,7 +107,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
         title="Templates"
         closable
         leftButtons={
-          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TemplateManagerPaneReloadTooltip} placement="bottom">
             <Button
               disabled={templates.length === 0}
               onClick={onClickReload}
@@ -102,6 +115,7 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
               size="small"
               icon={<ReloadOutlined />}
             />
+            <S.QuestionCircleOutlined onClick={openHelpUrl} />
           </Tooltip>
         }
       />

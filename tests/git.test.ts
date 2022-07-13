@@ -1,5 +1,7 @@
+/* eslint-disable no-await-in-loop */
 import {execSync} from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as path from 'path';
 import {Page} from 'playwright';
 import {ElectronApplication} from 'playwright-core';
@@ -43,7 +45,7 @@ test.beforeAll(async () => {
   startProjectPane = new StartProjectPane(appWindow);
   navigatorPane = new NavigatorPane(appWindow);
 
-  appWindow.on('console', console.log);
+  appWindow.on('console', log.info);
 
   execSync(`git clone ${repo}`, {
     cwd: `${clonePath}`,
@@ -55,11 +57,11 @@ const removeSomeFiles = 'f5518240cf7cac1f686c1bc9e4ca8099bfd7daa1';
 const removeMoreFiles = '28879f29f62c8357b5ca988e475db30e13c8300b';
 
 async function goToCommit(hash: string) {
-  console.log('*******************************************************');
+  log.info('*******************************************************');
   execSync(`git checkout ${hash}`, {
     cwd: `${projectPath}`,
   });
-  console.log('*******************************************************');
+  log.info('*******************************************************');
 
   await pause(5000);
 }
@@ -69,28 +71,28 @@ const testData = [
     hash: startCommit,
     fileExplorerCount: 54,
     kustomizeCount: 13,
-    helmCount: 12,
+    helmCount: 13,
     navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
     fileExplorerCount: 33,
     kustomizeCount: 6,
-    helmCount: 12,
+    helmCount: 13,
     navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
     fileExplorerCount: 16,
     kustomizeCount: 3,
-    helmCount: 12,
+    helmCount: 13,
     navigatorCount: 34,
   },
   {
     hash: startCommit,
     fileExplorerCount: 54,
     kustomizeCount: 13,
-    helmCount: 12,
+    helmCount: 13,
     navigatorCount: 54,
   },
 ];
@@ -104,11 +106,11 @@ test.only('all files should be loaded', async () => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const data of testData) {
-    console.log(`testing commit hash: ${data.hash}`);
+    log.info(`testing commit hash: ${data.hash}`);
     await goToCommit(data.hash);
     await pause(10000);
 
-    expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
+    expect(parseInt((await navigatorPane.resourcesCount.textContent()) || '', 10)).toEqual(data.navigatorCount);
 
     await mainWindow.showFileExplorerIfNotVisible();
 

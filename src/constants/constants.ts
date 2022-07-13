@@ -1,5 +1,7 @@
 import {PaneConfiguration} from '@models/ui';
 
+import Colors from '../styles/Colors';
+
 export const PREVIEW_PREFIX = 'preview://';
 export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
@@ -10,7 +12,7 @@ export const APP_MIN_WIDTH = 800;
 export const APP_MIN_HEIGHT = 600;
 export const TOOLTIP_DELAY = 1.0;
 export const TOOLTIP_K8S_SELECTION = 'Select which kubernetes schema version to use for validation';
-export const ERROR_MSG_FALLBACK = 'Looks like something unexpected went wrong.';
+export const ERROR_MSG_FALLBACK = 'Looks like something unexpected went wrong. Please try again later.';
 export const REF_PATH_SEPARATOR = '#';
 export const KUSTOMIZATION_FILE_NAME = 'kustomization.yaml';
 export const KUSTOMIZATION_KIND = 'Kustomization';
@@ -24,9 +26,12 @@ export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const DEFAULT_PANE_TITLE_HEIGHT = 40;
 export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
 export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
-export const MIN_SPLIT_VIEW_PANE_WIDTH = 300;
+export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
+export const VALIDATION_HIDING_LABELS_WIDTH = 450;
 export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
+export const TEMPLATES_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/templates.md';
+export const PLUGINS_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/plugins.md';
 export const DEFAULT_PLUGINS = [
   {
     owner: 'kubeshop',
@@ -36,6 +41,17 @@ export const DEFAULT_PLUGINS = [
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
+export const CLUSTER_AVAILABLE_COLORS = [
+  Colors.yellow10,
+  Colors.green6,
+  Colors.volcano7,
+  Colors.magenta8,
+  Colors.blue9,
+  Colors.lime8,
+  Colors.red7,
+  Colors.magenta7,
+  Colors.purple8,
+];
 
 export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
@@ -45,9 +61,17 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   recentProjectsPaneWidth: 450,
 };
 
-export const PREDEFINED_K8S_VERSION = '1.23.3';
+export const PREDEFINED_K8S_VERSION = '1.24.2';
 
 export const K8S_VERSIONS = [
+  '1.24.2',
+  '1.24.1',
+  '1.24.0',
+  '1.23.8',
+  '1.23.7',
+  '1.23.6',
+  '1.23.5',
+  '1.23.4',
   '1.23.3',
   '1.23.2',
   '1.23.1',
@@ -176,3 +200,4 @@ export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
 export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
+export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;

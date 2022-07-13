@@ -15,13 +15,14 @@ import {
   toggleRightMenu,
   toggleSettings,
   toggleStartProjectPane,
-  toggleValidationDrawer,
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
   isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -36,16 +37,19 @@ import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmW
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import featureJson from '@src/feature-flags.json';
+import {useFeatureFlags} from '@utils/features';
 
 const HotKeysHandler = () => {
+  const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -61,12 +65,12 @@ const HotKeysHandler = () => {
     }
   );
 
-  useHotkeys(hotkeys.SELECT_FOLDER, () => {
+  useHotkeys(hotkeys.SELECT_FOLDER.key, () => {
     openFileExplorer();
   });
 
   useHotkeys(
-    hotkeys.REFRESH_FOLDER,
+    hotkeys.REFRESH_FOLDER.key,
     () => {
       if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
         dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
@@ -75,7 +79,7 @@ const HotKeysHandler = () => {
     [mainState]
   );
 
-  useHotkeys(hotkeys.TOGGLE_SETTINGS, () => {
+  useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
     dispatch(toggleSettings());
   });
 
@@ -147,16 +151,20 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
-  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext, kubeConfigContextColor]);
 
   useHotkeys(
-    hotkeys.APPLY_SELECTION,
+    hotkeys.APPLY_SELECTION.key,
     () => {
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       applySelection();
     },
-    [applySelection]
+    [applySelection, isKubeConfigPathValid]
   );
 
   const diffSelectedResource = useCallback(() => {
@@ -166,23 +174,27 @@ const HotKeysHandler = () => {
   }, [mainState.selectedResourceId, dispatch]);
 
   useHotkeys(
-    hotkeys.DIFF_RESOURCE,
+    hotkeys.DIFF_RESOURCE.key,
     () => {
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       diffSelectedResource();
     },
-    [diffSelectedResource]
+    [diffSelectedResource, isKubeConfigPathValid]
   );
 
   useHotkeys(
-    hotkeys.PREVIEW_CLUSTER,
+    hotkeys.PREVIEW_CLUSTER.key,
     () => {
-      startPreview(kubeConfigPath, 'cluster', dispatch);
+      startPreview(kubeConfigContext, 'cluster', dispatch);
     },
-    [kubeConfigPath]
+    [kubeConfigContext]
   );
 
   useHotkeys(
-    hotkeys.EXIT_PREVIEW_MODE,
+    hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
       if (isInPreviewMode) {
         stopPreview(dispatch);
@@ -191,36 +203,37 @@ const HotKeysHandler = () => {
     [isInPreviewMode]
   );
 
-  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
-    if (featureJson.ShowRightMenu) {
-      dispatch(toggleRightMenu());
-    }
+  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
+    if (!ShowRightMenu) return;
+    dispatch(toggleRightMenu());
   });
 
-  useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK, () => {
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
     selectFromHistory(
       'left',
       mainState.currentSelectionHistoryIndex,
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });
 
-  useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD, () => {
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD.key, () => {
     selectFromHistory(
       'right',
       mainState.currentSelectionHistoryIndex,
       mainState.selectionHistory,
       mainState.resourceMap,
       mainState.fileMap,
+      mainState.imagesList,
       dispatch
     );
   });
 
   useHotkeys(
-    hotkeys.OPEN_NEW_RESOURCE_WIZARD,
+    hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
       if (!uiState.newResourceWizard.isOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
         dispatch(openNewResourceWizard());
@@ -229,28 +242,28 @@ const HotKeysHandler = () => {
     [mainState.fileMap[ROOT_FILE_ENTRY]]
   );
 
-  useHotkeys(hotkeys.OPEN_EXPLORER_TAB, () => {
+  useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
     dispatch(setLeftMenuSelection('file-explorer'));
   });
 
-  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB, () => {
+  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
     dispatch(setLeftMenuSelection('kustomize-pane'));
   });
 
-  useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
+  useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
     dispatch(setLeftMenuSelection('helm-pane'));
   });
 
-  useHotkeys(hotkeys.OPEN_VALIDATION_TAB, () => {
-    dispatch(toggleValidationDrawer());
+  useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
+    dispatch(setLeftMenuSelection('validation-pane'));
   });
 
-  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
+  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
     dispatch(resetResourceFilter());
   });
 
   useHotkeys(
-    hotkeys.OPEN_QUICK_SEARCH,
+    hotkeys.OPEN_QUICK_SEARCH.key,
     () => {
       if (!uiState.quickSearchActionsPopup.isOpen) {
         dispatch(openQuickSearchActionsPopup());
@@ -260,7 +273,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.OPEN_GETTING_STARTED_PAGE,
+    hotkeys.OPEN_GETTING_STARTED_PAGE.key,
     () => {
       if (!uiState.isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());

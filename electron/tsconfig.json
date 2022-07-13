@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2021",
     "module": "commonjs",
     "sourceMap": true,
     "strict": true,
@@ -8,7 +8,8 @@
     "rootDir": "../",
     "baseUrl": "../",
     "noEmitOnError": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "extends": "../paths.json"
 }

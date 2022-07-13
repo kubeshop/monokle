@@ -1,15 +1,17 @@
-import flatten from 'flat';
 import {readFileSync, writeFileSync} from 'fs';
-import _ from 'lodash';
+import _, {isArray, mergeWith} from 'lodash';
 import log from 'loglevel';
 import {sep} from 'path';
 import {AnyAction} from 'redux';
+import invariant from 'tiny-invariant';
 
 import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+
+import {monitorKubeConfig} from './kubeConfigMonitor';
 
 export interface SerializableObject {
   [name: string]: any;
@@ -39,8 +41,7 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
       writeFileSync(absolutePath, ``, 'utf-8');
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
+    log.error(error);
   }
 };
 
@@ -57,9 +58,11 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
     kustomizeCommand: state.projectConfig?.settings?.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig?.settings?.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.projectConfig?.settings?.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
     createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
     setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
+    allowEditInClusterMode: state.projectConfig?.settings?.allowEditInClusterMode,
   };
   applicationConfig.kubeConfig = {
     path: state.projectConfig?.kubeConfig?.path,
@@ -82,9 +85,11 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
+    hideUnsupportedFilesInFileExplorer: state.settings.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
     createDefaultObjects: state.settings.createDefaultObjects,
     setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
+    allowEditInClusterMode: state.settings.allowEditInClusterMode,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
@@ -117,12 +122,18 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
             ? settings.hideExcludedFilesInFileExplorer
             : undefined,
+          hideUnsupportedFilesInFileExplorer: _.isBoolean(settings.hideUnsupportedFilesInFileExplorer)
+            ? settings.hideUnsupportedFilesInFileExplorer
+            : undefined,
           enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
             ? settings.enableHelmWithKustomize
             : undefined,
           createDefaultObjects: _.isBoolean(settings.createDefaultObjects) ? settings.createDefaultObjects : undefined,
           setDefaultPrimitiveValues: _.isBoolean(settings.setDefaultPrimitiveValues)
             ? settings.setDefaultPrimitiveValues
+            : undefined,
+          allowEditInClusterMode: _.isBoolean(settings.allowEditInClusterMode)
+            ? settings.allowEditInClusterMode
             : undefined,
         }
       : undefined;
@@ -152,38 +163,16 @@ export const updateProjectSettings = (dispatch: (action: AnyAction) => void, pro
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
+    monitorKubeConfig(dispatch, projectConfig?.kubeConfig?.path);
+
     return;
   }
   dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
 };
 
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null): ProjectConfig => {
-  if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
-    throw Error('Base config must be set');
-  }
-
-  if (!config) {
-    return baseConfig;
-  }
-
-  const serializedBaseConfig: SerializableObject = flatten<any, any>(baseConfig);
-  const serializedConfig: SerializableObject = flatten<any, any>(config);
-
-  // override base properties
-  Object.keys(serializedBaseConfig).forEach((key: string) => {
-    if (!_.isUndefined(serializedConfig[key])) {
-      serializedBaseConfig[key] = serializedConfig[key];
-    }
-  });
-
-  // add missing base properties
-  Object.keys(serializedConfig).forEach((key: string) => {
-    if (_.isUndefined(serializedBaseConfig[key])) {
-      serializedBaseConfig[key] = serializedConfig[key];
-    }
-  });
-
-  return flatten.unflatten(serializedBaseConfig);
+  invariant(baseConfig && baseConfig.settings && baseConfig.kubeConfig, 'base config expected');
+  return mergeWith(baseConfig, config, (_a, b) => (isArray(b) ? b : undefined));
 };
 
 export const keysToUpdateStateBulk = (
@@ -193,7 +182,13 @@ export const keysToUpdateStateBulk = (
   const keys: string[] = [];
 
   Object.keys(serializedIncomingConfig).forEach((key: string) => {
-    if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+    if (
+      _.isArray(serializedState[key]) &&
+      _.isArray(serializedIncomingConfig[key]) &&
+      !_.isEqual(_.sortBy(serializedState[key]), _.sortBy(serializedIncomingConfig[key]))
+    ) {
+      keys.push(key);
+    } else if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
       keys.push(key);
     }
   });

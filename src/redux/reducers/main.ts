@@ -1,6 +1,6 @@
-// eslint-disable-next-line
 import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
+import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -14,17 +14,24 @@ import {
   ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
+  HelmTemplatesMapType,
   HelmValuesMapType,
+  ImagesListType,
+  MatchParamProps,
   PreviewType,
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
+import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
+import {ImageType} from '@models/image';
+import {ValidationIntegration} from '@models/integrations';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
+import {transferResource} from '@redux/compare';
+import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -43,8 +50,8 @@ import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResou
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {updateFileEntry} from '@redux/thunks/updateFileEntry';
-import {updateManyResources} from '@redux/thunks/updateManyResources';
+import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
@@ -62,9 +69,9 @@ import {
   recalculateResourceRanges,
   saveResource,
 } from '../services/resource';
-import {updateSelectionAndHighlights} from '../services/selection';
+import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff} from './ui';
+import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -72,26 +79,24 @@ export type SetRootFolderPayload = {
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
+  helmTemplatesMap: HelmTemplatesMapType;
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
 };
 
-export type UpdateResourcePayload = {
-  resourceId: string;
-  content: string;
-  preventSelectionAndHighlightsUpdate?: boolean;
-  isInClusterMode?: boolean;
-};
-
-export type UpdateManyResourcesPayload = {
+export type UpdateMultipleResourcesPayload = {
   resourceId: string;
   content: string;
 }[];
 
 export type UpdateFileEntryPayload = {
   path: string;
-  content: string;
+  text: string;
+};
+
+export type UpdateFilesEntryPayload = {
+  pathes: {relativePath: string; absolutePath: string}[];
 };
 
 export type SetPreviewDataPayload = {
@@ -112,22 +117,57 @@ export type StartPreviewLoaderPayload = {
   previewType: PreviewType;
 };
 
-function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
+function getImages(resourceMap: ResourceMapType) {
+  let images: ImagesListType = [];
+
+  Object.values(resourceMap).forEach(k8sResource => {
+    if (k8sResource.refs?.length) {
+      k8sResource.refs.forEach(ref => {
+        if (ref.type === 'outgoing' && ref.target?.type === 'image') {
+          const refName = ref.name;
+          const refTag = ref.target?.tag || 'latest';
+
+          const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
+
+          if (!foundImage) {
+            images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
+          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
+            foundImage.resourcesIds.push(k8sResource.id);
+          }
+        }
+      });
+    }
+  });
+
+  return images;
+}
+
+function updateSelectionHistory(type: 'resource' | 'path' | 'image', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
     return;
   }
+
   if (type === 'resource' && state.selectedResourceId) {
     state.selectionHistory.push({
       type,
       selectedResourceId: state.selectedResourceId,
     });
   }
+
   if (type === 'path' && state.selectedPath) {
     state.selectionHistory.push({
       type,
       selectedPath: state.selectedPath,
     });
   }
+
+  if (type === 'image' && state.selectedImage) {
+    state.selectionHistory.push({
+      type,
+      selectedImage: state.selectedImage,
+    });
+  }
+
   state.currentSelectionHistoryIndex = undefined;
 }
 
@@ -179,6 +219,10 @@ export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
 
     const nextMainState = createNextState(state.main, mainState => {
       mainState.resourceMap[resource.id] = resource;
+      clearResourceSelections(mainState.resourceMap);
+      resource.isSelected = true;
+      resource.isHighlighted = true;
+      mainState.selectedResourceId = resource.id;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
       processResources(
@@ -347,6 +391,12 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
+    setAutosavingError: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      state.autosaving.error = action.payload;
+    },
+    setAutosavingStatus: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.autosaving.status = action.payload;
+    },
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -385,7 +435,7 @@ export const mainSlice = createSlice({
       });
 
       state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
-      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      selectFilePath({filePath: state.helmValuesMap[valuesFileId].filePath, state});
       updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
@@ -394,15 +444,32 @@ export const mainSlice = createSlice({
     selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
       const filePath = action.payload.filePath;
       if (filePath.length > 0) {
-        selectFilePath(filePath, state);
+        selectFilePath({filePath, state});
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
+    },
+    updateSearchQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.searchQuery = action.payload;
+    },
+    updateReplaceQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.replaceQuery = action.payload;
+    },
+    toggleMatchParams: (state: Draft<AppState>, action: PayloadAction<keyof MatchParamProps>) => {
+      const param = action.payload;
+      state.search.queryMatchParams = {
+        ...state.search.queryMatchParams,
+        [param]: !state.search.queryMatchParams[param],
+      };
+    },
+    highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
+      state.search.currentMatch = action.payload;
     },
     selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.selectedPreviewConfigurationId = action.payload;
       state.selectedPath = undefined;
       state.selectedResourceId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedImage = undefined;
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
@@ -413,13 +480,16 @@ export const mainSlice = createSlice({
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
     },
-    clearPreview: (state: Draft<AppState>) => {
-      clearSelectedResourceOnPreviewExit(state);
+    clearPreview: (state: Draft<AppState>, action: PayloadAction<{type: 'restartPreview'}>) => {
+      if (action.payload.type !== 'restartPreview') {
+        clearSelectedResourceOnPreviewExit(state);
+      }
       setPreviewData({}, state);
       state.previewType = undefined;
       state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      state.previousSelectionHistory = state.selectionHistory;
       clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
@@ -427,6 +497,7 @@ export const mainSlice = createSlice({
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
       state.checkedResourceIds = [];
+      state.selectedImage = undefined;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -471,11 +542,11 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.namespace
           : state.resourceFilter.namespace,
-        kind: filter.kind
-          ? filter.kind === state.resourceFilter.kind
+        kinds: filter.kinds
+          ? filter.kinds === state.resourceFilter.kinds
             ? undefined
-            : filter.kind
-          : state.resourceFilter.kind,
+            : filter.kinds
+          : state.resourceFilter.kinds,
         fileOrFolderContainedIn: filter.fileOrFolderContainedIn
           ? filter.fileOrFolderContainedIn === state.resourceFilter.fileOrFolderContainedIn
             ? undefined
@@ -536,8 +607,8 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
     },
-    editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
-      state.shouldEditorReloadSelectedPath = false;
+    editorHasReloadedSelectedPath: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.shouldEditorReloadSelectedPath = action.payload;
     },
     checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (!state.checkedResourceIds.includes(action.payload)) {
@@ -614,6 +685,7 @@ export const mainSlice = createSlice({
       state.selectedResourceId = undefined;
       state.selectedPreviewConfigurationId = undefined;
       state.selectedValuesFileId = undefined;
+      state.selectedImage = undefined;
     },
     toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       const enable = action.payload;
@@ -623,8 +695,10 @@ export const mainSlice = createSlice({
       if (enable) {
         const allRuleIds = plugin.metadata.rules.map(r => r.id);
         plugin.config.enabledRules = allRuleIds;
+        trackEvent('OPA_ENABLED', {all: true});
       } else {
         plugin.config.enabledRules = [];
+        trackEvent('OPA_DISABLED', {all: true});
       }
 
       // persist latest configuration
@@ -643,14 +717,57 @@ export const mainSlice = createSlice({
       if (enable) {
         if (isEnabled) return;
         plugin.config.enabledRules.push(ruleId);
+        trackEvent('OPA_ENABLED', {all: false});
       } else {
         if (!isEnabled) return;
         plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
+        trackEvent('OPA_DISABLED', {all: false});
       }
 
       // persist latest configuration
       const allConfig = state.policies.plugins.map(p => p.config);
       electronStore.set('pluginConfig.policies', allConfig);
+    },
+    selectImage: (state: Draft<AppState>, action: PayloadAction<{image: ImageType; isVirtualSelection?: boolean}>) => {
+      state.selectedImage = action.payload.image;
+
+      clearResourceSelections(state.resourceMap);
+      action.payload.image.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
+
+      updateSelectionHistory('image', Boolean(action.payload.isVirtualSelection), state);
+
+      state.selectedResourceId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
+      state.selectedPath = undefined;
+      state.selectedValuesFileId = undefined;
+    },
+    setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.imagesSearchedValue = action.payload;
+    },
+    setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
+      state.imagesList = action.payload;
+    },
+    deleteFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      delete state.filtersPresets[action.payload];
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.resourceFilter = state.filtersPresets[action.payload];
+    },
+    saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.filtersPresets[action.payload] = state.resourceFilter;
+      electronStore.set('main.filtersPresets', state.filtersPresets);
+    },
+    updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
+      state.validationIntegration = action.payload;
+    },
+    updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let newSearchHistory: string[] = [...state.search.searchHistory];
+      if (state.search.searchHistory.length >= 5) {
+        newSearchHistory.shift();
+      }
+      electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
+      state.search.searchHistory = [...newSearchHistory, action.payload];
     },
   },
   extraReducers: builder => {
@@ -674,11 +791,14 @@ export const mainSlice = createSlice({
         state.selectedPreviewConfigurationId = undefined;
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -689,16 +809,20 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-          selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
+          selectFilePath({filePath: state.helmValuesMap[action.payload.previewResourceId].filePath, state});
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
+        state.previousSelectionHistory = [];
       })
       .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -709,13 +833,17 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
         state.selectedPath = undefined;
         state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
       })
       .addCase(runPreviewConfiguration.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -729,15 +857,19 @@ export const mainSlice = createSlice({
         state.selectedValuesFileId = undefined;
         state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
+        state.selectedImage = undefined;
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
           resource.isHighlighted = false;
         });
+        state.previousSelectionHistory = [];
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
       });
 
     builder
@@ -771,9 +903,11 @@ export const mainSlice = createSlice({
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
+      state.helmTemplatesMap = action.payload.helmTemplatesMap;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
+      state.selectedImage = undefined;
       state.selectedValuesFileId = undefined;
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
@@ -852,6 +986,10 @@ export const mainSlice = createSlice({
         if (resource) {
           resource.filePath = relativeFilePath;
           resource.range = resourcePayload.resourceRange;
+
+          if (state.selectedPath === relativeFilePath) {
+            resource.isHighlighted = true;
+          }
         }
       });
     });
@@ -1034,11 +1172,14 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(updateManyResources.fulfilled, (state, action) => {
+    builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
+      return action.payload;
+    });
+    builder.addCase(updateFileEntries.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -1065,7 +1206,21 @@ export const mainSlice = createSlice({
     builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(transferResource.fulfilled, (state, action) => {
+      const {side, delta} = action.payload;
 
+      // Warning: The compare feature has its own slice and does bookkeeping
+      // of its own resources. This reducer works because transfer only works
+      // for cluster and local which are also in main slice. Should we add
+      // transfer for other resource set types this will give unexpected behavior.
+      delta.forEach(comparison => {
+        if (side === 'left') {
+          state.resourceMap[comparison.left.id] = comparison.left;
+        } else {
+          state.resourceMap[comparison.right.id] = comparison.right;
+        }
+      });
+    });
     builder.addCase(loadPolicies.fulfilled, (state, action) => {
       state.policies = {
         plugins: action.payload,
@@ -1150,46 +1305,98 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
 }
 
 export const {
-  setAppRehydrating,
-  selectK8sResource,
-  selectFile,
-  setSelectingFile,
-  setApplyingResource,
-  selectHelmValuesFile,
+  addKindHandler,
+  addMultipleKindHandlers,
+  checkMultipleResourceIds,
+  checkResourceId,
+  clearNotifications,
   clearPreview,
   clearPreviewAndSelectionHistory,
+  clearSelected,
+  closePreviewConfigurationEditor,
+  closeResourceDiffModal,
+  deleteFilterPreset,
+  editorHasReloadedSelectedPath,
+  extendResourceFilter,
+  loadFilterPreset,
+  openPreviewConfigurationEditor,
+  openResourceDiffModal,
+  reloadClusterDiff,
+  resetResourceFilter,
+  saveFilterPreset,
+  seenNotifications,
+  selectFile,
+  selectHelmValuesFile,
+  selectImage,
+  selectK8sResource,
+  selectMultipleClusterDiffMatches,
+  selectPreviewConfiguration,
+  setAppRehydrating,
+  setApplyingResource,
+  setAutosavingError,
+  setAutosavingStatus,
+  selectClusterDiffMatch,
+  setClusterDiffRefreshDiffResource,
+  setDiffResourceInClusterDiff,
+  setFiltersToBeChanged,
+  setImagesList,
+  setImagesSearchedValue,
+  setSelectingFile,
+  setSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
-  updateResourceFilter,
-  extendResourceFilter,
-  setDiffResourceInClusterDiff,
-  setClusterDiffRefreshDiffResource,
-  selectClusterDiffMatch,
-  selectMultipleClusterDiffMatches,
-  unselectClusterDiffMatch,
-  unselectAllClusterDiffMatches,
-  reloadClusterDiff,
-  toggleClusterOnlyResourcesInClusterDiff,
-  setSelectionHistory,
-  editorHasReloadedSelectedPath,
-  checkResourceId,
-  uncheckAllResourceIds,
-  uncheckResourceId,
-  resetResourceFilter,
-  checkMultipleResourceIds,
-  uncheckMultipleResourceIds,
-  closeResourceDiffModal,
-  openResourceDiffModal,
-  setFiltersToBeChanged,
-  addMultipleKindHandlers,
-  addKindHandler,
-  seenNotifications,
-  clearNotifications,
-  openPreviewConfigurationEditor,
-  closePreviewConfigurationEditor,
-  selectPreviewConfiguration,
-  clearSelected,
   toggleAllRules,
+  toggleClusterOnlyResourcesInClusterDiff,
   toggleRule,
+  uncheckAllResourceIds,
+  uncheckMultipleResourceIds,
+  uncheckResourceId,
+  unselectAllClusterDiffMatches,
+  unselectClusterDiffMatch,
+  updateResourceFilter,
+  updateValidationIntegration,
+  highlightFileMatches,
+  updateSearchHistory,
+  updateSearchQuery,
+  updateReplaceQuery,
+  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
+
+/* * * * * * * * * * * * * *
+ * Listeners
+ * * * * * * * * * * * * * */
+export const resourceMapChangedListener: AppListenerFn = listen => {
+  listen({
+    predicate: (action, currentState, previousState) => {
+      return !isEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+    },
+
+    effect: async (_action, {dispatch, getState}) => {
+      const resourceMap = getActiveResourceMap(getState().main);
+      const imagesList = getState().main.imagesList;
+      const images = getImages(resourceMap);
+
+      if (!isEqual(images, imagesList)) {
+        dispatch(setImagesList(images));
+      }
+    },
+  });
+};
+
+export const imageSelectedListener: AppListenerFn = listen => {
+  listen({
+    type: selectImage.type,
+    effect: async (_action, {dispatch, getState}) => {
+      const leftMenu = getState().ui.leftMenu;
+
+      if (!leftMenu.isActive) {
+        dispatch(toggleLeftMenu());
+      }
+
+      if (leftMenu.selection !== 'images-pane') {
+        dispatch(setLeftMenuSelection('images-pane'));
+      }
+    },
+  });
+};

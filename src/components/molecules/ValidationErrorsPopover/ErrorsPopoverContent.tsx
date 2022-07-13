@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {Divider, Typography} from 'antd';
 
@@ -13,8 +13,6 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 const {Text} = Typography;
@@ -26,7 +24,6 @@ const Container = styled.div`
   width: 100%;
   max-height: 350px;
   overflow-y: auto;
-  ${GlobalScrollbarStyle}
 `;
 
 const PopoverTitle = styled(Text)`
@@ -102,7 +99,7 @@ const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
       <PopoverTitle>Validation Errors</PopoverTitle>
       <StyledDivider />
       {errors.map(error => (
-        <StyledRefDiv key={`${error.property}:${error.message}`}>
+        <StyledRefDiv key={`${error.property}:${error.message}-${error.errorPos?.line}:${error.errorPos?.column}`}>
           <ValidationErrorLink validationError={error} onClick={() => onLinkClick(error)} />
           {error.description && <StyledDescription>{error.description}</StyledDescription>}
         </StyledRefDiv>

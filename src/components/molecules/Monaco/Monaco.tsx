@@ -1,7 +1,6 @@
 /* eslint-disable import/order */
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useSelector} from 'react-redux';
 import {useMeasure} from 'react-use';
 
 import fs from 'fs';
@@ -25,7 +24,14 @@ import {ResourceRef} from '@models/k8sresource';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
+import {
+  editorHasReloadedSelectedPath,
+  extendResourceFilter,
+  selectFile,
+  selectImage,
+  selectK8sResource,
+  setAutosavingStatus,
+} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -66,20 +72,24 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const {diffSelectedResource, applySelection} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const imagesList = useAppSelector(state => state.main.imagesList);
+  const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const settings = useAppSelector(settingsSelector);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const settings = useSelector(settingsSelector);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
 
   const resourcesFromSelectedPath = useMemo(() => {
     if (!selectedPath) {
@@ -121,6 +131,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     dispatch(extendResourceFilter(filter));
   };
 
+  const selectImageHandler = (imageId: string) => {
+    const image = imagesList.find(im => im.id === imageId);
+
+    if (image) {
+      dispatch(selectImage({image}));
+    }
+  };
+
   const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
     if (outoingRef.target?.type === 'resource') {
       const input: NewResourceWizardInput = {
@@ -144,14 +162,19 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     code,
     resourceMap,
     fileMap,
+    imagesList,
     isEditorMounted,
     selectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
     filterResources,
+    selectImageHandler,
     selectedPath,
     helmValuesMap,
     helmChartMap,
+    helmTemplatesMap,
+    matchOptions,
+    isDirty,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
@@ -200,6 +223,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const onChange = (newValue: any) => {
     setDirty(orgCode !== newValue);
     setCode(newValue);
+
+    if (!autosavingStatus) {
+      dispatch(setAutosavingStatus(true));
+    }
 
     if (selectedResourceId) {
       // this will slow things down if document gets large - need to find a better solution...
@@ -253,7 +280,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       setCode(newCode);
       setOrgCode(newCode);
       setDirty(false);
-      dispatch(editorHasReloadedSelectedPath());
+      dispatch(editorHasReloadedSelectedPath(false));
     } else {
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }

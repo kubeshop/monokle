@@ -1,19 +1,25 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Input, Select} from 'antd';
+import {Button, Input, Select, Tooltip} from 'antd';
 
-import {mapValues} from 'lodash';
+import {ClearOutlined} from '@ant-design/icons';
+
+import {isEmpty, mapValues} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+import {ResetFiltersTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors';
 
-import {KeyValueInput} from '@components/atoms';
+import {KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
+
+import {useWindowSize} from '@utils/hooks';
 
 import * as S from './ResourceFilter.styled';
 
@@ -22,38 +28,18 @@ const ROOT_OPTIONS = '<root>';
 
 const {Option} = Select;
 
-const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
-  const keyValues: Record<string, string[]> = {};
-  Object.values(objectList).forEach(currentObject => {
-    const nestedObject = getNestedObject(currentObject);
-    if (nestedObject) {
-      Object.entries(nestedObject).forEach(([key, value]) => {
-        if (typeof value !== 'string') {
-          return;
-        }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
-          }
-        } else {
-          keyValues[key] = [value];
-        }
-      });
-    }
-  });
-  return keyValues;
-};
-
 const ResourceFilter = () => {
   const dispatch = useAppDispatch();
 
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
-  const [kind, setKind] = useState<string>();
+  const [kinds, setKinds] = useState<string[]>([]);
   const [name, setName] = useState<string>();
   const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
+
+  const {width: windowWidth} = useWindowSize();
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
@@ -63,6 +49,7 @@ const ResourceFilter = () => {
   );
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const isPaneWideEnough = useAppSelector(state => windowWidth * state.ui.paneConfiguration.navPane > 330);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
@@ -94,10 +81,21 @@ const ResourceFilter = () => {
     ));
   }, [fileMap]);
 
+  const isSavePresetDisabled = useMemo(
+    () =>
+      !name &&
+      !kinds.length &&
+      (!namespace || namespace === ALL_OPTIONS) &&
+      isEmpty(labels) &&
+      isEmpty(annotations) &&
+      (!fileOrFolderContainedIn || fileOrFolderContainedIn === ROOT_OPTIONS),
+    [annotations, fileOrFolderContainedIn, kinds.length, labels, name, namespace]
+  );
+
   const resetFilters = () => {
     setWasLocalUpdate(true);
     setName('');
-    setKind(ALL_OPTIONS);
+    setKinds([]);
     setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
@@ -118,13 +116,17 @@ const ResourceFilter = () => {
     setAnnotations(newAnnotations);
   };
 
-  const updateKind = (selectedKind: string) => {
+  const updateKinds = (selectedKinds: string[]) => {
     setWasLocalUpdate(true);
-    if (selectedKind === ALL_OPTIONS) {
-      setKind(undefined);
-    } else {
-      setKind(selectedKind);
+    if (selectedKinds.length > 1) {
+      if (!kinds.includes(ALL_OPTIONS) && selectedKinds.includes(ALL_OPTIONS)) {
+        setKinds([ALL_OPTIONS]);
+      } else {
+        setKinds(selectedKinds.filter(kind => kind !== ALL_OPTIONS));
+      }
+      return;
     }
+    setKinds(selectedKinds);
   };
 
   const updateNamespace = (selectedNamespace: string) => {
@@ -145,6 +147,14 @@ const ResourceFilter = () => {
     }
   };
 
+  const onClickLoadPreset = () => {
+    dispatch(openFiltersPresetModal('load'));
+  };
+
+  const onClickSavePreset = () => {
+    dispatch(openFiltersPresetModal('save'));
+  };
+
   useDebounce(
     () => {
       if (!wasLocalUpdate) {
@@ -153,7 +163,7 @@ const ResourceFilter = () => {
 
       const updatedFilter = {
         name,
-        kind: kind === ALL_OPTIONS ? undefined : kind,
+        kinds: kinds.includes(ALL_OPTIONS) ? undefined : kinds,
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
@@ -163,13 +173,13 @@ const ResourceFilter = () => {
       dispatch(updateResourceFilter(updatedFilter));
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [name, kind, namespace, labels, annotations, fileOrFolderContainedIn]
+    [name, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
   );
 
   useEffect(() => {
     if (!wasLocalUpdate) {
       setName(filtersMap.name);
-      setKind(filtersMap.kind);
+      setKinds(filtersMap.kinds || []);
       setNamespace(filtersMap.namespace);
       setLabels(filtersMap.labels);
       setAnnotations(filtersMap.annotations);
@@ -183,12 +193,30 @@ const ResourceFilter = () => {
 
   return (
     <S.Container>
-      <S.Title>
-        <S.TitleLabel>Filter resources by:</S.TitleLabel>
-        <S.TitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
-          Reset all
-        </S.TitleButton>
-      </S.Title>
+      <S.TitleContainer>
+        <S.TitleLabel>
+          FILTER <S.CaretUpOutlined onClick={() => dispatch(toggleResourceFilters())} />
+        </S.TitleLabel>
+
+        <S.TitleActions>
+          <S.PresetButton type="link" onClick={onClickLoadPreset}>
+            Load {isPaneWideEnough ? 'preset' : ''}
+          </S.PresetButton>
+          <S.PresetButton disabled={isSavePresetDisabled} type="link" onClick={onClickSavePreset}>
+            Save {isPaneWideEnough ? 'preset' : ''}
+          </S.PresetButton>
+
+          <Tooltip title={ResetFiltersTooltip}>
+            <Button
+              disabled={areFiltersDisabled}
+              icon={<ClearOutlined />}
+              size="small"
+              type="link"
+              onClick={resetFilters}
+            />
+          </Tooltip>
+        </S.TitleActions>
+      </S.TitleContainer>
 
       <S.Field>
         <S.FieldLabel>Name:</S.FieldLabel>
@@ -205,16 +233,15 @@ const ResourceFilter = () => {
       <S.Field>
         <S.FieldLabel>Kind:</S.FieldLabel>
         <Select
-          showSearch
           disabled={areFiltersDisabled}
-          defaultValue={ALL_OPTIONS}
-          value={kind || ALL_OPTIONS}
-          onChange={updateKind}
+          placeholder="Select one or multiple kinds"
+          showArrow
+          showSearch
+          mode="multiple"
           style={{width: '100%'}}
+          value={kinds || []}
+          onChange={updateKinds}
         >
-          <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
-            {ALL_OPTIONS}
-          </Option>
           {allResourceKinds.map(resourceKind => (
             <Option key={resourceKind} value={resourceKind}>
               {resourceKind}
@@ -271,19 +298,40 @@ const ResourceFilter = () => {
 
       <S.Field>
         <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
-        <Select
+        <S.SelectStyled
           defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
           showSearch
-          style={{width: '100%'}}
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
         >
           {fileOrFolderContainedInOptions}
-        </Select>
+        </S.SelectStyled>
       </S.Field>
     </S.Container>
   );
+};
+
+const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
+  const keyValues: Record<string, string[]> = {};
+  Object.values(objectList).forEach(currentObject => {
+    const nestedObject = getNestedObject(currentObject);
+    if (nestedObject) {
+      Object.entries(nestedObject).forEach(([key, value]) => {
+        if (typeof value !== 'string') {
+          return;
+        }
+        if (keyValues[key]) {
+          if (!keyValues[key].includes(value)) {
+            keyValues[key].push(value);
+          }
+        } else {
+          keyValues[key] = [value];
+        }
+      });
+    }
+  });
+  return keyValues;
 };
 
 export default ResourceFilter;

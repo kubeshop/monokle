@@ -15,18 +15,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.reflex-container > .reflex-element::-webkit-scrollbar {
-  width: 8px;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-track {
-  background: #141414;
-}
-
-.reflex-container > .reflex-element::-webkit-scrollbar-thumb {
-  background: #303030;
-}
-
 .reflex-container.vertical > .reflex-splitter {
   width: 2px;
   background-color: #262626;
@@ -65,18 +53,58 @@ code {
   transition: all 0.25s ease;
 }
 
-.monokleEditorUnsatisfiedRefGlyphClass {
-  background-image: url('./assets/MonokleWarning.svg');
+div.hover-row {
+  padding: 5px;
+}
+
+div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass,
+div.monokleEditorErrorRefGlyphClass.monokleEditorOutgoingImageRefGlyphClass,
+div.monokleEditorPolicyIssueGlyphClass.monokleEditorOutgoingImageRefGlyphClass {
+  margin-left: 24px;
+  background: #e84749;
+}
+
+div.monokleEditorPolicyIssueGlyphClass.monokleEditorOutgoingImageRefGlyphClass::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  background-image: url('./assets/OutgoingImageRefIcon.svg');
   background-repeat: no-repeat;
   background-size: cover;
-  max-height: 12px;
-  max-width: 14px;
-  margin-top: 2.5px;
-  margin-left: 12.5px;
+  height: 12px;
+  width: 12px;
+}
+
+div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  background-color: #f3ea62;
+  height: 10px;
+  width: 10px;
+  border-radius: 7px;
+}
+
+.monokleEditorErrorRefGlyphClass {
+  background: #e84749;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
+  margin-left: 15px;
+}
+
+.monokleEditorUnsatisfiedRefGlyphClass {
+  background: #f3ea62;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
+  margin-left: 15px;
 }
 
 .monokleEditorUnsatisfiedRefInlineClass {
-  color: #ad8b00 !important;
+  color: #f3ea62 !important;
   text-decoration: underline;
 }
 
@@ -99,6 +127,16 @@ code {
   margin-left: 15px;
 }
 
+.monokleEditorOutgoingImageRefGlyphClass {
+  background-image: url('./assets/OutgoingImageRefIcon.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-height: 12px;
+  max-width: 12px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
 .monokleEditorIncomingRefGlyphClass {
   background-image: url('./assets/IncomingRefsIcon.svg');
   background-repeat: no-repeat;
@@ -110,18 +148,27 @@ code {
 }
 
 .monokleEditorPolicyIssueGlyphClass {
-  background-image: url('./assets/ErrorIcon.svg');
-  background-repeat: no-repeat;
-  background-size: contain;
-  max-height: 10px;
-  max-width: 10px;
-  margin-top: 5px;
+  background-color: #e84749;
+  height: 10px !important;
+  width: 10px !important;
+  border-radius: 7px;
+  margin-top: 4px;
   margin-left: 15px;
 }
 
 .monokleEditorPolicyIssueInlineClass {
-  color: #e65a6d !important;
+  color: #e84749 !important;
   text-decoration: underline;
+}
+
+.monokleEditorMatchInlineClass {
+  background-color: #6F9412;
+  color: #0d0b0b !important;
+}
+
+.monokleEditorCurrentMatchInlineClass {
+  background-color: #C9E75D;
+  color: #0d0b0b !important;
 }
 
 .monokleEditorSatisfiedRefInlineClass {
@@ -141,22 +188,21 @@ code {
 }
 
 .animated-highlight {
-  background-color: #d89614;
+  background-color: #d89614 !important;
   position: relative;
-  width: 30px;
-  height: 30px;
   border-radius: 100%;
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .animated-highlight::after {
   position: absolute;
-  height: 30px;
-  width: 30px;
   background: #594214bb;
-  content: ' ';
+  content: '';
   top: 0;
   left: 0;
-  /* z-index: -1; */
+  right: 0;
+  bottom: 0;
   border-radius: 100%;
   animation: highlight 1s infinite;
 }
@@ -198,8 +244,12 @@ code {
   font-size: 12px;
 }
 
-.table-column-actions {
+.table-column-actions .cluster-actions-container {
   display: none;
+}
+
+.ant-tooltip {
+  max-width: 300px;
 }
 
 .ant-table-header {
@@ -229,18 +279,6 @@ code {
   background-color: transparent !important;
 }
 
-.ant-table-body::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.ant-table-body::-webkit-scrollbar-track {
-  background: #141414 !important;
-}
-
-.ant-table-body::-webkit-scrollbar-thumb {
-  background: #303030 !important;
-}
-
 .ant-table-body .ant-table-row .ant-table-cell {
   background-color: transparent !important;
   border-bottom: none !important;
@@ -254,11 +292,13 @@ code {
   cursor: pointer;
 }
 
-.ant-table-body .ant-table-row:hover .table-column-actions {
+.ant-table-body .ant-table-row:hover .table-column-actions .cluster-actions-container,
+.table-row-changing-cluster-color .cluster-actions-container {
   display: flex;
 }
 
-.ant-table-body .ant-table-row:hover {
+.ant-table-body .ant-table-row:hover,
+.table-row-changing-cluster-color {
   background: #111d2c;
 }
 
@@ -274,6 +314,15 @@ code {
 
 .cluster-dropdown-item li:hover {
   background: #111d2c;
+}
+
+.cluster-color-popover {
+  width: 130px;
+}
+
+.cluster-color-popover .ant-popover-title {
+  min-width: auto;
+  padding: 10px 16px 12px;
 }
 
 .ant-notification.ant-notification-topRight {
@@ -303,7 +352,7 @@ code {
 }
 
 .walkthrough .ant-popover-arrow-content {
-  background: #3840CD;
+  background: #3840cd;
   width: 20px;
   height: 20px;
 }
@@ -313,4 +362,44 @@ code {
   position: absolute;
   top: -22px;
   right: -22px;
+}
+
+.ant-modal-close-icon {
+  font-size: 14px !important;
+  color: #93989c;
+}
+.ant-modal-body {
+  position: relative;
+  overflow: auto;
+  background-color: #141414;
+}
+.ant-modal-footer {
+  padding-top: 20px;
+  background-color: #141414;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #303030;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #242424;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
+  display: block;
 }

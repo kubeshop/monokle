@@ -1,6 +1,6 @@
 import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
-import {ResizableBox} from 'react-resizable';
+import {ResizableBox, ResizeHandle} from 'react-resizable';
 import {useMeasure, useWindowSize} from 'react-use';
 
 import {Button, Select, Skeleton, Switch} from 'antd';
@@ -10,14 +10,19 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import {stringify} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
-import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
+import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
-import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -41,6 +46,7 @@ const ClusterResourceDiffModal = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -103,9 +109,9 @@ const ClusterResourceDiffModal = () => {
     const resource = resourceMap[selectedMatchingResourceId];
 
     return isKustomizationResource(resource)
-      ? makeApplyKustomizationText(resource.name, kubeConfigContext)
-      : makeApplyResourceText(resource.name, kubeConfigContext);
-  }, [kubeConfigContext, selectedMatchingResourceId, resourceMap]);
+      ? makeApplyKustomizationText(resource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(resource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [selectedMatchingResourceId, resourceMap, kubeConfigContext, kubeConfigContextColor]);
 
   const matchingLocalResources = useMemo(() => {
     if (!isDiffModalVisible || !targetResource) {
@@ -171,7 +177,7 @@ const ClusterResourceDiffModal = () => {
     dispatch(
       updateResource({
         resourceId: selectedMatchingResourceId,
-        content: cleanTargetResourceText,
+        text: cleanTargetResourceText,
         preventSelectionAndHighlightsUpdate: true,
         isInClusterMode: true,
       })
@@ -260,6 +266,10 @@ const ClusterResourceDiffModal = () => {
                     </Select.Option>
                   ))}
               </Select>
+              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                <Switch checked={shouldDiffIgnorePaths} />
+                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              </S.SwitchContainer>
             </S.FileSelectContainer>
           </S.TitleContainer>
         }
@@ -274,7 +284,7 @@ const ClusterResourceDiffModal = () => {
           maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
           axis="x"
           resizeHandles={['w', 'e']}
-          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          handle={(h: ResizeHandle, ref: LegacyRef<HTMLSpanElement>) => (
             <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
           )}
         >
@@ -284,7 +294,14 @@ const ClusterResourceDiffModal = () => {
             </div>
           ) : (
             <>
-              <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+              <S.TagsContainer>
+                <S.StyledTag>
+                  Cluster{' '}
+                  <ClusterName $kubeConfigContextColor={kubeConfigContextColor}>{kubeConfigContext}</ClusterName>
+                </S.StyledTag>
+                <S.StyledTag>Local</S.StyledTag>
+              </S.TagsContainer>
+              <S.MonacoDiffContainer width="100%" height="calc(100% - 80px)" ref={containerRef}>
                 <MonacoDiffEditor
                   width={containerWidth}
                   height={containerHeight}
@@ -296,8 +313,7 @@ const ClusterResourceDiffModal = () => {
                 />
               </S.MonacoDiffContainer>
 
-              <S.TagsContainer>
-                <S.StyledTag>Cluster</S.StyledTag>
+              <S.ActionButtonsContainer>
                 <Button disabled={!areResourcesDifferent} ghost type="primary" onClick={handleReplace}>
                   Replace local resource with cluster resource <ArrowRightOutlined />
                 </Button>
@@ -309,15 +325,7 @@ const ClusterResourceDiffModal = () => {
                 >
                   <ArrowLeftOutlined /> Deploy local resource to cluster
                 </Button>
-                <S.StyledTag>Local</S.StyledTag>
-              </S.TagsContainer>
-
-              <S.SwitchContainer>
-                <div onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-                  <Switch checked={shouldDiffIgnorePaths} />
-                  <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
-                </div>
-              </S.SwitchContainer>
+              </S.ActionButtonsContainer>
             </>
           )}
         </ResizableBox>

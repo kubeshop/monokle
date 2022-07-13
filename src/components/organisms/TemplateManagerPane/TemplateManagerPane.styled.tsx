@@ -1,8 +1,8 @@
 import {Input, Skeleton as RawSkeleton} from 'antd';
 
-import styled from 'styled-components';
+import {QuestionCircleOutlined as RawQuestionCircleOutlined} from '@ant-design/icons';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
+import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
@@ -37,9 +37,15 @@ export const TemplatesContainer = styled.div<{$height?: number}>`
   grid-row-gap: 25px;
   overflow-y: auto;
   padding: 0px 16px 10px 16px;
-  ${GlobalScrollbarStyle};
 `;
 
 export const Skeleton = styled(RawSkeleton)`
   padding: 8px;
+`;
+
+export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
+  cursor: pointer;
+  margin-top: 5px;
+  padding-left: 4px;
+  color: ${Colors.blue6};
 `;

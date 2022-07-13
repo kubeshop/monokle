@@ -20,12 +20,6 @@ export const walkThroughNoviceContent: WalkThroughContentProps['data'][] = [
       'Get alerts for syntax errors. Follow suggestions for a fix on the fly. Find links to other resources right there in the code. Use forms for quick code writing.',
   },
   {
-    step: 'cluster',
-    title: 'Diff local resources against a cluster',
-    content:
-      'Deploy your local resource to a cluster, or replace it with the cluster version. Diff both environments and perform changes in any of them on the fly.',
-  },
-  {
     step: 'kustomizeHelm',
     title: 'Validate Kustomize and Helm output',
     content:

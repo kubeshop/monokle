@@ -430,12 +430,21 @@ function shouldCreateSatisfiedRef(
     // first collect all sibling values so we can pass them to each matcher
     const siblingValues = getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode);
 
-    // now query each sibling matcher with all found sibling values
+    // now query each sibling matcher with all found sibling values and optional matcherProperties
     if (
       Object.keys(outgoingRefMapper.source.siblingMatchers).some(key => {
         // @ts-ignore
         const matcher = outgoingRefMapper.source.siblingMatchers[key];
-        return matcher && !matcher(sourceResource, targetResource, siblingValues[key], siblingValues);
+        return (
+          matcher &&
+          !matcher(
+            sourceResource,
+            targetResource,
+            siblingValues[key],
+            siblingValues,
+            outgoingRefMapper.source.matcherProperties ? outgoingRefMapper.source.matcherProperties[key] : undefined
+          )
+        );
       })
     ) {
       return false;
@@ -655,6 +664,34 @@ export function processRefs(
       const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
       if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
         resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+          if (outgoingRefMapper.type === 'image') {
+            const imageRefNodes = Object.entries(sourceRefNodes)
+              .filter(entry => entry[0].endsWith('image'))
+              .map(entry => entry[1])
+              .flat();
+            sourceResource.refs = sourceResource.refs || [];
+            imageRefNodes.forEach(imageRefNode => {
+              const scalarValue = imageRefNode.scalar.value as string | undefined;
+              const scalarValueParts = scalarValue?.split(':');
+              if (!scalarValueParts) {
+                return;
+              }
+              const [imageName, imageTag = 'latest'] = scalarValueParts;
+              const nodeWrapper = new NodeWrapper(imageRefNode.scalar, getLineCounter(sourceResource));
+              const imageResourceRef = {
+                type: ResourceRefType.Outgoing,
+                name: imageName,
+                target: {
+                  type: 'image' as const,
+                  tag: imageTag,
+                },
+                position: nodeWrapper.getNodePosition(),
+              };
+              sourceResource.refs?.push(imageResourceRef);
+            });
+            return;
+          }
+
           const targetResources = Object.keys(resourcesByKindMap)
             .filter(kind => refMapperMatchesKind(outgoingRefMapper, kind))
             .map(kind => resourcesByKindMap[kind])

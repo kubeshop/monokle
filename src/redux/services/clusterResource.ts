@@ -15,8 +15,8 @@ export const getClusterResourceText = async (localResource: K8sResource, kubecon
 
     const handleResource = (res: any) => {
       if (res.body) {
-        delete res.body.metadata?.managedFields;
-        return {clusterResourceText: stringify(res.body, {sortMapEntries: true})};
+        delete res.metadata?.managedFields;
+        return {clusterResourceText: stringify(res, {sortMapEntries: true})};
       }
 
       throw new Error(`Failed to get ${localResource.content.kind} from cluster`);

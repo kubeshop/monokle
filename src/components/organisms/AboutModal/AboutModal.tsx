@@ -1,81 +1,65 @@
-import {Button, Modal, Typography} from 'antd';
+import {useEffect, useState} from 'react';
 
-import styled from 'styled-components';
+import {Button, Divider, Modal, Typography} from 'antd';
+
+import path from 'path';
+import semver from 'semver';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeAboutModal} from '@redux/reducers/ui';
+import {loadResource} from '@redux/services';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
-import MonokleAbout from '@assets/MonokleAbout.svg';
+import {fetchAppVersion} from '@utils/appVersion';
 
-import Colors from '@styles/Colors';
+import MonokleAbout from '@assets/MonokleAbout.svg';
 
 import packageJson from '@root/package.json';
 
+import * as S from './AboutMonokle.styled';
+
 const {Text} = Typography;
 
-const INCLUDED_DEPENDENCIES = ['react', 'electron'];
+const INCLUDED_DEPENDENCIES = ['react', 'electron', 'antd', 'monaco-editor', 'monaco-yaml'];
 const allDeps = {...packageJson.devDependencies, ...packageJson.dependencies};
 const filteredDependencies = Object.entries(allDeps).filter(([name]) => INCLUDED_DEPENDENCIES.includes(name));
 
-const StyledModal = styled(Modal)`
-  .ant-modal-close-icon {
-    font-size: 14px !important;
-    color: ${Colors.grey700};
-  }
-  .ant-modal-body {
-    position: relative;
-    overflow: auto;
-    background-color: ${Colors.grey1};
-  }
-  .ant-modal-footer {
-    padding-top: 20px;
-    background-color: ${Colors.grey1000};
-  }
-`;
-
-const StyledContentContainerDiv = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-`;
-
-const StyledContentDiv = styled.div`
-  padding: 12px 24px;
-
-  img {
-    padding: 30px 0;
-  }
-`;
-
-const HeightFillDiv = styled.div`
-  display: block;
-  height: 440px;
-`;
-
-const StyledTextContainer = styled.div`
-  overflow: hidden;
-  .ant-typography {
-    display: block;
-  }
-`;
+type About = {
+  title: string;
+  features: string[];
+  when: string;
+};
 
 const AboutModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
+  const [about, setAbout] = useState<About>();
 
   const handleClose = () => {
     dispatch(closeAboutModal());
   };
 
+  useEffect(() => {
+    fetchAppVersion().then(version => {
+      const parsedVersion = semver.parse(version);
+      if (!parsedVersion) {
+        return;
+      }
+      const releaseVersion = `${parsedVersion.major}.${parsedVersion.minor}`;
+      const rawVersionInfo = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.json`));
+      if (!rawVersionInfo) {
+        return;
+      }
+      const versionInfo = JSON.parse(rawVersionInfo);
+      const {about: aboutInfo} = versionInfo || {};
+      setAbout(aboutInfo);
+    });
+  }, []);
+
   return (
-    <StyledModal
+    <Modal
       visible={aboutModalVisible}
       centered
       width={400}
@@ -92,35 +76,35 @@ const AboutModal = () => {
       }
     >
       <span id="WelcomeModal">
-        <HeightFillDiv />
-        <StyledContentContainerDiv>
-          <StyledContentDiv>
+        <S.HeightFillDiv />
+        <S.StyledContentContainerDiv>
+          <S.StyledContentDiv>
             <img src={MonokleAbout} />
-            <StyledTextContainer>
+            <S.StyledTextContainer>
               <Text>Version: {appVersion}</Text>
-              <Text>Launched in: May 2022</Text>
+              <Text>Released in {about?.when}</Text>
+              <Divider style={{margin: '8px 0'}} />
               <Text>
-                {/* TODO: get the below text from the releaseNotes folder */}
-                In this release, the focus was to:
+                {about?.title}
                 <ul>
-                  <li>Policy Validation by integrating OPA</li>
-                  <li>Improve Helm functionality</li>
-                  <li>Walkthrough tutorial</li>
+                  {about?.features.map(feat => (
+                    <li key={feat}>{feat}</li>
+                  ))}
                 </ul>
-                Other useful info:
+                Packages:
                 <ul>
                   {filteredDependencies.map(([name, version]) => (
                     <li key={name}>
-                      {name} version: {version}
+                      {name}: {version}
                     </li>
                   ))}
                 </ul>
               </Text>
-            </StyledTextContainer>
-          </StyledContentDiv>
-        </StyledContentContainerDiv>
+            </S.StyledTextContainer>
+          </S.StyledContentDiv>
+        </S.StyledContentContainerDiv>
       </span>
-    </StyledModal>
+    </Modal>
   );
 };
 

@@ -20,7 +20,7 @@ const ImageIcon = ({src = '', width, height, altText, fallback}: ImageProps) => 
     }
   }, [src]);
 
-  return <StyledImageIcon src={source || fallback} alt={altText} height={height} width={width} />;
+  return <StyledImageIcon src={source || fallback} alt={altText} $height={height} $width={width} />;
 };
 
 export default ImageIcon;

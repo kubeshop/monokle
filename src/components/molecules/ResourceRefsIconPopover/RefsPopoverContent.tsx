@@ -1,9 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {Divider, Typography} from 'antd';
-
-import styled from 'styled-components';
-
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
@@ -14,35 +10,11 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
+import {getRefRange} from '@utils/refs';
 import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
-
-const {Text} = Typography;
-
-const Container = styled.div`
-  margin: 0;
-  padding: 0 8px;
-  height: 100%;
-  width: 100%;
-  max-height: 350px;
-  overflow-y: auto;
-  ${GlobalScrollbarStyle}
-`;
-
-const PopoverTitle = styled(Text)`
-  font-weight: 500;
-`;
-
-const StyledDivider = styled(Divider)`
-  margin: 5px 0;
-`;
-
-const StyledRefDiv = styled.div`
-  display: block;
-  margin: 5px 0;
-`;
+import * as S from './RefsPopoverContent.styled';
 
 const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   if (ref.target?.type === 'file') {
@@ -57,18 +29,6 @@ const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
       return resourceMap[ref.target.resourceId]?.kind;
     }
   }
-};
-
-const getRefRange = (ref: ResourceRef) => {
-  if (!ref.position) {
-    return undefined;
-  }
-  return {
-    startLineNumber: ref.position.line,
-    endLineNumber: ref.position.line,
-    startColumn: ref.position.column,
-    endColumn: ref.position.column + ref.position.length,
-  };
 };
 
 const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sResource; resourceRefs: ResourceRef[]}) => {
@@ -135,6 +95,11 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
             key = ref.target.resourceKind ? `${ref.target.resourceKind}-${ref.name}-${positionString}` : ref.name;
           }
         }
+        if (ref.target?.type === 'image') {
+          const pos = ref.position;
+          const positionString = pos ? `${pos.line}-${pos.column}-${pos.length}` : '';
+          key = `${ref.name}:${ref.target?.tag}-${positionString}`;
+        }
         return {ref, key};
       });
   }, [resourceRefs, resourceMap]);
@@ -169,14 +134,20 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
 
   const onLinkClick = (ref: ResourceRef) => {
     trackEvent(FOLLOW_LINK, {type: ref.type});
+
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
         selectResource(resource.id);
       }
+
       const refRange = getRefRange(ref);
+
       if (refRange) {
-        makeMonacoSelection('resource', resource.id, refRange);
+        setImmediate(() => {
+          makeMonacoSelection('resource', resource.id, refRange);
+        });
       }
+
       return;
     }
 
@@ -188,15 +159,19 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (!targetResource) {
         return;
       }
+
       if (selectedResourceId !== targetResource.id) {
         selectResource(targetResource.id);
       }
+
       const targetOutgoingRef = targetResource.refs?.find(
         r => r.type === ResourceRefType.Outgoing && r.target?.type === 'resource' && r.target.resourceId === resource.id
       );
+
       if (!targetOutgoingRef) {
         return;
       }
+
       const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
       if (targetOutgoingRefRange) {
         makeMonacoSelection('resource', targetResource.id, targetOutgoingRefRange);
@@ -210,20 +185,22 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   };
 
   return (
-    <Container>
-      <PopoverTitle>{children}</PopoverTitle>
-      <StyledDivider />
+    <S.Container>
+      <S.PopoverTitle>{children}</S.PopoverTitle>
+
+      <S.Divider />
+
       {processedRefsWithKeys.map(({ref, key}) => (
-        <StyledRefDiv key={key}>
+        <S.RefDiv key={key}>
           <RefLink
             isDisabled={isRefLinkDisabled(ref)}
             resourceRef={ref}
             resourceMap={resourceMap}
             onClick={() => onLinkClick(ref)}
           />
-        </StyledRefDiv>
+        </S.RefDiv>
       ))}
-    </Container>
+    </S.Container>
   );
 };
 export default RefsPopoverContent;

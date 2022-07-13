@@ -17,11 +17,17 @@ const schema = {
       deviceID: {
         type: 'string',
       },
+      filtersPresets: {
+        type: 'object',
+      },
     },
   },
   appConfig: {
     type: 'object',
     properties: {
+      kubeConfigContextsColors: {
+        type: 'object',
+      },
       hasDeletedDefaultTemplatesPlugin: {
         type: 'boolean',
       },
@@ -65,6 +71,9 @@ const schema = {
             type: 'string',
           },
           hideExcludedFilesInFileExplorer: {
+            type: 'boolean',
+          },
+          hideUnsupportedFilesInFileExplorer: {
             type: 'boolean',
           },
           enableHelmWithKustomize: {
@@ -244,7 +253,11 @@ const schema = {
 };
 
 const defaults = {
+  main: {
+    filtersPresets: {},
+  },
   appConfig: {
+    kubeConfigContextsColors: {},
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],

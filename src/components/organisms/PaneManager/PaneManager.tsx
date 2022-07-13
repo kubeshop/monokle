@@ -3,11 +3,8 @@ import {useMemo} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {activeProjectSelector} from '@redux/selectors';
 
-import featureJson from '@src/feature-flags.json';
-
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
-import PaneManagerRightMenu from './PaneManagerRightMenu';
 import PaneManagerSplitView from './PaneManagerSplitView';
 
 import * as S from './styled';
@@ -23,13 +20,7 @@ const PaneManager: React.FC = () => {
       return '1fr';
     }
 
-    let gridTemplateColumns = 'max-content 1fr';
-
-    if (featureJson.ShowRightMenu) {
-      gridTemplateColumns += ' max-content';
-    }
-
-    return gridTemplateColumns;
+    return 'max-content 1fr';
   }, [activeProject, isStartProjectPaneVisible]);
 
   return (
@@ -46,8 +37,6 @@ const PaneManager: React.FC = () => {
       ) : (
         <StartProjectPage />
       )}
-
-      {featureJson.ShowRightMenu && <PaneManagerRightMenu />}
     </S.PaneManagerContainer>
   );
 };

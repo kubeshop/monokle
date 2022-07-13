@@ -1,4 +1,4 @@
-import {shell} from 'electron';
+import {app, shell} from 'electron';
 
 import * as os from 'os';
 
@@ -29,9 +29,9 @@ export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
-export function openKeyboardShortcuts() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'shortcuts'});
-  shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
+export function openLogs() {
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'logs'});
+  shell.showItemInFolder(app.getPath('logs'));
 }
 
 export function openUniqueObjectNameTopic() {
@@ -39,7 +39,7 @@ export function openUniqueObjectNameTopic() {
 }
 
 export function openNamespaceTopic() {
-  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#rfc-1035-label-names');
+  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces');
 }
 
 export function openExternalResourceKindDocumentation(resourceKindDocLink?: string) {
