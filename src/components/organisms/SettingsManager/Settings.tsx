@@ -33,6 +33,7 @@ import {ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
+import {closeKubeConfigBrowseSetting, openKubeConfigBrowseSetting} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -96,6 +97,7 @@ export const Settings = ({
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
+    dispatch(openKubeConfigBrowseSetting());
     setspinBrowse(false);
   }, [config?.kubeConfig]);
 
@@ -103,6 +105,7 @@ export const Settings = ({
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
     setCurrentKubeConfigInValue(currentKubeConfig);
+    dispatch(closeKubeConfigBrowseSetting());
     setspinBrowse(true);
   }, [config]);
 
@@ -223,6 +226,7 @@ export const Settings = ({
       return;
     }
     setCurrentKubeConfig(e.target.value);
+    dispatch(openKubeConfigBrowseSetting());
     setspinBrowse(false);
   };
 
@@ -233,6 +237,7 @@ export const Settings = ({
       if (file.path) {
         const selectedFilePath = file.path;
         setCurrentKubeConfig(selectedFilePath);
+        dispatch(openKubeConfigBrowseSetting());
         setspinBrowse(false);
       }
     }

@@ -222,6 +222,12 @@ export const uiSlice = createSlice({
     closeFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: false};
     },
+    closeKubeConfigBrowseSetting: (state: Draft<UiState>) => {
+      state.kubeConfigBrowseSetting = {isOpen: true};
+    },
+    openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
+      state.kubeConfigBrowseSetting = {isOpen: false};
+    },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
@@ -363,5 +369,7 @@ export const {
   toggleStartProjectPane,
   zoomIn,
   zoomOut,
+  openKubeConfigBrowseSetting,
+  closeKubeConfigBrowseSetting,
 } = uiSlice.actions;
 export default uiSlice.reducer;

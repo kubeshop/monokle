@@ -131,6 +131,9 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
+  kubeConfigBrowseSetting: {
+    isOpen: boolean;
+  };
   isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
