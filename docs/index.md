@@ -1,6 +1,6 @@
 # Monokle
 
-Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
+Welcome to Monokle - your friendly desktop UI for managing K8s manifests!
 
 Monokle helps you to:
 
