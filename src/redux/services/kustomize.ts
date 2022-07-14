@@ -57,7 +57,7 @@ export function isKustomizationFilePath(filePath: string) {
  */
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (isKustomizationFilePath(fileEntry?.filePath)) {
+  if (fileEntry?.filePath && isKustomizationFilePath(fileEntry.filePath)) {
     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
