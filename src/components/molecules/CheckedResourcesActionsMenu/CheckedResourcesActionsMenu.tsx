@@ -40,24 +40,6 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
-  const areOnlyUnsavedResourcesChecked = useMemo(
-    () =>
-      checkedResourceIds
-        .map(resourceId => resourceMap[resourceId])
-        .filter((resource): resource is K8sResource => resource !== undefined)
-        .every(isUnsavedResource),
-    [checkedResourceIds, resourceMap]
-  );
-
-  const checkedResources = useMemo(() => {
-    return checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined);
-  }, [checkedResourceIds, resourceMap]);
-
-  const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext, kubeConfigContextColor),
-    [checkedResources.length, kubeConfigContext, kubeConfigContextColor]
-  );
-
   const onClickDelete = useCallback(() => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
@@ -65,6 +47,14 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
     deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
   }, [checkedResourceIds, dispatch, resourceMap]);
+
+  const onClickUncheckAll = useCallback(() => {
+    dispatch(uncheckAllResourceIds());
+  }, [dispatch]);
+
+  const onClickSaveToFileFolder = useCallback(() => {
+    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
+  }, [checkedResourceIds, dispatch]);
 
   const onClickDeployChecked = () => {
     setIsApplyModalVisible(true);
@@ -75,36 +65,58 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     setIsApplyModalVisible(false);
   };
 
-  const onClickUncheckAll = () => {
-    dispatch(uncheckAllResourceIds());
-  };
+  const areOnlyUnsavedResourcesChecked = useMemo(
+    () =>
+      checkedResourceIds
+        .map(resourceId => resourceMap[resourceId])
+        .filter((resource): resource is K8sResource => resource !== undefined)
+        .every(isUnsavedResource),
+    [checkedResourceIds, resourceMap]
+  );
 
-  const onClickSaveToFileFolder = () => {
-    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
-  };
+  const checkedResources = useMemo(
+    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
+    [checkedResourceIds, resourceMap]
+  );
 
-  const menuItems = [
-    {
-      key: 'selected_resources',
-      label: `${checkedResourceIds.length} Selected`,
-      disabled: true,
-    },
-    ...(!isInPreviewMode || isInClusterMode
-      ? [
-          {
-            key: 'delete',
-            label: 'Delete',
-            style: {color: Colors.red7},
-            onClick: onClickDelete,
-          },
-        ]
-      : []),
-    ...(!isInClusterMode ? [{key: 'deploy', label: 'Deploy', onClick: onClickDeployChecked}] : []),
-    ...(isInPreviewMode || areOnlyUnsavedResourcesChecked
-      ? [{key: 'save_to_file_folder', label: 'Save to file/folder', onClick: onClickSaveToFileFolder}]
-      : []),
-    {key: 'deselect', label: <CloseOutlined />, style: {marginLeft: 'auto'}, onClick: onClickUncheckAll},
-  ];
+  const confirmModalTitle = useMemo(
+    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext, kubeConfigContextColor),
+    [checkedResources.length, kubeConfigContext, kubeConfigContextColor]
+  );
+
+  const menuItems = useMemo(
+    () => [
+      {
+        key: 'selected_resources',
+        label: `${checkedResourceIds.length} Selected`,
+        disabled: true,
+      },
+      ...(!isInPreviewMode || isInClusterMode
+        ? [
+            {
+              key: 'delete',
+              label: 'Delete',
+              style: {color: Colors.red7},
+              onClick: onClickDelete,
+            },
+          ]
+        : []),
+      ...(!isInClusterMode ? [{key: 'deploy', label: 'Deploy', onClick: onClickDeployChecked}] : []),
+      ...(isInPreviewMode || areOnlyUnsavedResourcesChecked
+        ? [{key: 'save_to_file_folder', label: 'Save to file/folder', onClick: onClickSaveToFileFolder}]
+        : []),
+      {key: 'deselect', label: <CloseOutlined />, style: {marginLeft: 'auto'}, onClick: onClickUncheckAll},
+    ],
+    [
+      areOnlyUnsavedResourcesChecked,
+      checkedResourceIds.length,
+      isInClusterMode,
+      isInPreviewMode,
+      onClickDelete,
+      onClickSaveToFileFolder,
+      onClickUncheckAll,
+    ]
+  );
 
   return (
     <>

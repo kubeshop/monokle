@@ -51,6 +51,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
         newFilter.labels[key] = filtersToBeChanged.labels[key];
       }
     });
+
     Object.keys(filtersToBeChanged.annotations).forEach(key => {
       if (newFilter.annotations[key] === filtersToBeChanged.annotations[key]) {
         delete newFilter.annotations[key];
