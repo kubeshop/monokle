@@ -11,6 +11,7 @@ import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
+  setActiveTab,
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
@@ -281,6 +282,16 @@ const HotKeysHandler = () => {
     },
     [uiState.isStartProjectPaneVisible]
   );
+
+  useHotkeys(hotkeys.FIND.key, () => {
+    dispatch(setLeftMenuSelection('search'));
+    dispatch(setActiveTab('search'));
+  });
+
+  useHotkeys(hotkeys.REPLACE.key, () => {
+    dispatch(setLeftMenuSelection('search'));
+    dispatch(setActiveTab('findReplace'));
+  });
 
   return (
     <>
