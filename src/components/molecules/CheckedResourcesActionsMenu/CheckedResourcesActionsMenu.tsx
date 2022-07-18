@@ -74,9 +74,10 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     [checkedResourceIds, resourceMap]
   );
 
-  const checkedResources = useMemo(() => {
-    return checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined);
-  }, [checkedResourceIds, resourceMap]);
+  const checkedResources = useMemo(
+    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
+    [checkedResourceIds, resourceMap]
+  );
 
   const confirmModalTitle = useMemo(
     () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext, kubeConfigContextColor),
