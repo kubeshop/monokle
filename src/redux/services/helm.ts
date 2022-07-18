@@ -9,9 +9,15 @@ import {LineCounter, Scalar, parse} from 'yaml';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
-import {HelmChart, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
+import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
 
 import {
   createFileEntry,
@@ -111,25 +117,8 @@ const getYamlScalar = (contents: any, keyPath: string): Scalar | undefined => {
 export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileMap}: CreateHelmValuesFileParams) {
   const filePath = getAbsoluteFilePath(fileEntry.filePath, fileMap);
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  const lineCounter = new LineCounter();
-  const documents = parseAllYamlDocuments(fileContent, lineCounter);
 
-  const values: HelmValueMatch[] = [];
-  documents.forEach(doc => {
-    const helmObject = doc.toJS();
-    getObjectKeys(helmObject).forEach(keyPath => {
-      const scalar = getYamlScalar(doc.contents, keyPath);
-      if (!scalar) {
-        return;
-      }
-      const nodeWrapper = new NodeWrapper(scalar, lineCounter);
-      values.push({
-        value: get(helmObject, keyPath),
-        keyPath: `.Values.${keyPath}`,
-        linePosition: nodeWrapper.getNodePosition(),
-      });
-    });
-  });
+  const values = getHelmValueFileValues(fileContent);
 
   const helmValues: HelmValuesFile = {
     id: uuidv4(),
@@ -145,16 +134,62 @@ export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileM
   fileEntry.isSupported = true;
 }
 
-export function createHelmFile(fileEntry: FileEntry, helmChart: HelmChart, fileMap: FileMapType) {
+export function createHelmTemplate(
+  fileEntry: FileEntry,
+  helmChart: HelmChart,
+  fileMap: FileMapType,
+  helmTemplatesMap: HelmTemplatesMapType
+) {
   const filePath = getAbsoluteFilePath(fileEntry.filePath, fileMap);
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const valueRanges = getHelmValueRanges(fileContent);
 
-  helmChart.templateFilePaths.push({
+  const helmTemplate: HelmTemplate = {
     id: uuidv4(),
     filePath: fileEntry.filePath,
+    name: path.basename(fileEntry.filePath),
+    helmChartId: helmChart.id,
     values: valueRanges,
-  });
+  };
+
+  helmTemplatesMap[helmTemplate.id] = helmTemplate;
+  helmChart.templateIds.push(helmTemplate.id);
+  fileEntry.isSupported = true;
+}
+
+/**
+ * Reprocess a helm value file/template after updating its content
+ */
+
+export function reprocessHelm(
+  filePath: string,
+  fileMap: FileMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
+  helmValuesMap: HelmValuesMapType
+) {
+  const absoluteFilePath = getAbsoluteFilePath(filePath, fileMap);
+  const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
+
+  if (isHelmTemplateFile(filePath)) {
+    const valueRanges = getHelmValueRanges(fileContent);
+    const helmTemplate = Object.values(helmTemplatesMap).find(helmT => helmT.filePath === filePath);
+
+    if (!helmTemplate) {
+      log.error(`Couldn't find helm template with path ${filePath}`);
+      return;
+    }
+
+    helmTemplatesMap[helmTemplate.id].values = valueRanges;
+  } else if (isHelmValuesFile(filePath)) {
+    const helmValueFile = Object.values(helmValuesMap).find(helmValue => helmValue.filePath === filePath);
+
+    if (!helmValueFile) {
+      log.error(`Couldn't find helm value file with path ${filePath}`);
+      return;
+    }
+
+    helmValuesMap[helmValueFile.id].values = getHelmValueFileValues(fileContent);
+  }
 }
 
 /**
@@ -170,6 +205,7 @@ export function processHelmChartFolder(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
   depth: number
 ) {
   const result: string[] = [];
@@ -190,7 +226,7 @@ export function processHelmChartFolder(
       const fileEntryPath = filePath.substring(rootFolder.length);
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id});
 
-      if (fileIsExcluded(fileEntry, projectConfig)) {
+      if (fileIsExcluded(fileEntry.filePath, projectConfig)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
@@ -205,6 +241,7 @@ export function processHelmChartFolder(
             fileMap,
             helmChartMap,
             helmValuesMap,
+            helmTemplatesMap,
             depth + 1,
             helmChart
           );
@@ -216,10 +253,10 @@ export function processHelmChartFolder(
           helmValuesMap,
           fileMap,
         });
-      } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
+      } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry.filePath, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       } else if (isHelmTemplateFile(fileEntry.filePath)) {
-        createHelmFile(fileEntry, helmChart, fileMap);
+        createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
 
       result.push(fileEntry.name);
@@ -253,7 +290,7 @@ export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helm
     filePath: fileEntry.filePath,
     name: getHelmChartName(absolutePath),
     valueFileIds: [],
-    templateFilePaths: [],
+    templateIds: [],
   };
 
   fileEntry.isSupported = true;
@@ -294,6 +331,30 @@ export const getObjectKeys = (obj: any, prefix = ''): string[] =>
     }
     return [...res, prefix + el];
   }, []);
+
+export const getHelmValueFileValues = (fileContent: string) => {
+  const lineCounter = new LineCounter();
+  const documents = parseAllYamlDocuments(fileContent, lineCounter);
+  const values: HelmValueMatch[] = [];
+
+  documents.forEach(doc => {
+    const helmObject = doc.toJS();
+    getObjectKeys(helmObject).forEach(keyPath => {
+      const scalar = getYamlScalar(doc.contents, keyPath);
+      if (!scalar) {
+        return;
+      }
+      const nodeWrapper = new NodeWrapper(scalar, lineCounter);
+      values.push({
+        value: get(helmObject, keyPath),
+        keyPath: `.Values.${keyPath}`,
+        linePosition: nodeWrapper.getNodePosition(),
+      });
+    });
+  });
+
+  return values;
+};
 
 export const getHelmValueRanges = (code: string | undefined): RangeAndValue[] => {
   const ranges: RangeAndValue[] = [];

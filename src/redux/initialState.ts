@@ -26,6 +26,7 @@ const initialAppState: AppState = {
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
+  helmTemplatesMap: {},
   previewLoader: {
     isLoading: false,
   },
@@ -60,6 +61,17 @@ const initialAppState: AppState = {
   imagesList: [],
   validationIntegration: undefined,
   autosaving: {},
+  search: {
+    searchQuery: '',
+    replaceQuery: '',
+    queryMatchParams: {
+      matchCase: false,
+      matchWholeWord: false,
+      regExp: false,
+    },
+    searchHistory: electronStore.get('appConfig.recentSearch') || [],
+    currentMatch: null,
+  },
 };
 
 const initialAppConfigState: AppConfig = {
@@ -105,6 +117,9 @@ const initialAppConfigState: AppConfig = {
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
   disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
+  clusterAccess: [],
+  isAccessLoading: false,
+  kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
 };
 
 const initialAlertState: AlertState = {};
@@ -169,6 +184,9 @@ const initialUiState: UiState = {
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     expandedFolders: [],
+    expandedSearchedFiles: ['filter'],
+    isValidationDrawerVisible: false,
+    activeTab: undefined,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

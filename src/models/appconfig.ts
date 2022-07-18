@@ -1,5 +1,7 @@
 import {KustomizeCommandType} from '@models/kustomize';
 
+import {ClusterColors} from './cluster';
+
 export enum Themes {
   Dark = 'dark',
   Light = 'light',
@@ -46,14 +48,11 @@ export type KubePermissions = {
   verbs: string[];
 };
 
-export type ClusterAccessWithContext = ClusterAccess & {
-  context: string;
-};
-
 export type ClusterAccess = {
   permissions: KubePermissions[];
   hasFullAccess: boolean;
   namespace: string;
+  context: string;
 };
 
 // Parsed from kubernetes config file
@@ -103,12 +102,10 @@ export type ProjectConfig = {
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
-  clusterAccess?: ClusterAccessWithContext[];
   k8sVersion?: string;
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
-  isAccessLoading?: boolean;
 };
 
 interface AppConfig {
@@ -144,6 +141,11 @@ interface AppConfig {
   favoriteTemplates: string[];
   disableEventTracking: boolean;
   disableErrorReporting: boolean;
+  clusterAccess: Array<ClusterAccess>;
+  isAccessLoading?: boolean;
+  kubeConfigContextsColors: {
+    [name: string]: ClusterColors;
+  };
 }
 
 export type {AppConfig};

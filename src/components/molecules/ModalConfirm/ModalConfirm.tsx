@@ -6,7 +6,7 @@ import * as S from './styled';
 
 interface IProps {
   isVisible: boolean;
-  text: string;
+  text: string | JSX.Element;
   onOk: () => void;
   onCancel: () => void;
 }

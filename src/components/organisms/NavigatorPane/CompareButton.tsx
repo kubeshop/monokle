@@ -13,7 +13,6 @@ import WalkThrough from '@components/molecules/WalkThrough';
 
 export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();
-
   const onClickClusterComparison = () => {
     dispatch(compareToggled({value: true}));
   };

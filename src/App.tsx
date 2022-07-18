@@ -1,7 +1,6 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -11,7 +10,6 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {AlertEnum, ExtraContentType} from '@models/alert';
@@ -31,8 +29,7 @@ import {
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 import UpdateNotice from '@organisms/UpdateNotice';
@@ -86,7 +83,6 @@ const App = () => {
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
@@ -106,12 +102,9 @@ const App = () => {
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-  const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
@@ -323,14 +316,6 @@ const App = () => {
       ipcRenderer.removeListener('set-main-process-env', onSetMainProcessEnv);
     };
   }, [onSetMainProcessEnv]);
-
-  useDebounce(
-    () => {
-      loadContexts(kubeConfigPath, dispatch);
-    },
-    DEFAULT_KUBECONFIG_DEBOUNCE,
-    [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]
-  );
 
   const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);
 

@@ -68,7 +68,6 @@ export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
   border: none;
-  border-radius: 4px;
   width: 180px;
   background: ${Colors.grey3b};
   padding: 2px 4px;

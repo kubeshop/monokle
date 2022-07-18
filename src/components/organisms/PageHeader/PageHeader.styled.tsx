@@ -5,6 +5,7 @@ import {BellOutlined as RawBellOutlined, EllipsisOutlined as RawEllipsisOutlined
 import styled from 'styled-components';
 
 import {PreviewType} from '@models/appstate';
+import {ClusterColors} from '@models/cluster';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {FontColors, PanelColors} from '@styles/Colors';
@@ -67,8 +68,8 @@ export const Logo = styled.img`
   margin-left: -15px;
 `;
 
-export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType}>`
-  background: ${props => getPreviewTheme(Colors.blackPure, props.$previewType, 0)};
+export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType; $kubeConfigContextColor?: ClusterColors}>`
+  background: ${props => getPreviewTheme(Colors.blackPure, props.$previewType, 0, true, props.$kubeConfigContextColor)};
   padding: 0;
   margin: 0;
   height: 8px;

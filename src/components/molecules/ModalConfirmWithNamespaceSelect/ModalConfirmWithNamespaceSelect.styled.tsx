@@ -24,6 +24,7 @@ export const NamespaceContainer = styled.div`
 export const TitleContainer = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 `;
 
 export const TitleIcon = styled(ExclamationCircleOutlined)`

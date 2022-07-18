@@ -17,6 +17,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
+import Icon from '@atoms/Icon';
+
 import WalkThrough from '@components/molecules/WalkThrough';
 
 import {FeatureFlag} from '@utils/features';
@@ -213,6 +215,18 @@ const PaneManagerLeftMenu: React.FC = () => {
           disabled={!activeProject}
         >
           <MenuIcon iconName="validation" active={isActive} isSelected={checkIsTabSelected('validation-pane')} />
+        </MenuButton>
+      </PaneTooltip>
+
+      <PaneTooltip show={!leftActive || !(leftMenuSelection === 'search')} title="Advanced Search" placement="right">
+        <MenuButton
+          isSelected={checkIsTabSelected('search')}
+          isActive={isActive}
+          onClick={() => setLeftActiveMenu('search')}
+          disabled={!activeProject}
+          icon={<Icon name="search" style={{opacity: leftMenuSelection === 'search' ? '1' : '0.5'}} />}
+        >
+          <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
         </MenuButton>
       </PaneTooltip>
     </S.Container>

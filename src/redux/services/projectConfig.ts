@@ -11,6 +11,8 @@ import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 
+import {monitorKubeConfig} from './kubeConfigMonitor';
+
 export interface SerializableObject {
   [name: string]: any;
 }
@@ -161,6 +163,8 @@ export const updateProjectSettings = (dispatch: (action: AnyAction) => void, pro
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
+    monitorKubeConfig(dispatch, projectConfig?.kubeConfig?.path);
+
     return;
   }
   dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
@@ -178,7 +182,13 @@ export const keysToUpdateStateBulk = (
   const keys: string[] = [];
 
   Object.keys(serializedIncomingConfig).forEach((key: string) => {
-    if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+    if (
+      _.isArray(serializedState[key]) &&
+      _.isArray(serializedIncomingConfig[key]) &&
+      !_.isEqual(_.sortBy(serializedState[key]), _.sortBy(serializedIncomingConfig[key]))
+    ) {
+      keys.push(key);
+    } else if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
       keys.push(key);
     }
   });

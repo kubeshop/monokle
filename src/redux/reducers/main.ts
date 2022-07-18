@@ -14,14 +14,16 @@ import {
   ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
+  HelmTemplatesMapType,
   HelmValuesMapType,
   ImagesListType,
+  MatchParamProps,
   PreviewType,
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
+import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
@@ -48,7 +50,7 @@ import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResou
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
@@ -77,6 +79,7 @@ export type SetRootFolderPayload = {
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
+  helmTemplatesMap: HelmTemplatesMapType;
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
@@ -89,7 +92,11 @@ export type UpdateMultipleResourcesPayload = {
 
 export type UpdateFileEntryPayload = {
   path: string;
-  content: string;
+  text: string;
+};
+
+export type UpdateFilesEntryPayload = {
+  pathes: {relativePath: string; absolutePath: string}[];
 };
 
 export type SetPreviewDataPayload = {
@@ -428,7 +435,7 @@ export const mainSlice = createSlice({
       });
 
       state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
-      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      selectFilePath({filePath: state.helmValuesMap[valuesFileId].filePath, state});
       updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
@@ -437,9 +444,25 @@ export const mainSlice = createSlice({
     selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
       const filePath = action.payload.filePath;
       if (filePath.length > 0) {
-        selectFilePath(filePath, state);
+        selectFilePath({filePath, state});
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
+    },
+    updateSearchQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.searchQuery = action.payload;
+    },
+    updateReplaceQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.search.replaceQuery = action.payload;
+    },
+    toggleMatchParams: (state: Draft<AppState>, action: PayloadAction<keyof MatchParamProps>) => {
+      const param = action.payload;
+      state.search.queryMatchParams = {
+        ...state.search.queryMatchParams,
+        [param]: !state.search.queryMatchParams[param],
+      };
+    },
+    highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
+      state.search.currentMatch = action.payload;
     },
     selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.selectedPreviewConfigurationId = action.payload;
@@ -584,8 +607,8 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
     },
-    editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
-      state.shouldEditorReloadSelectedPath = false;
+    editorHasReloadedSelectedPath: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.shouldEditorReloadSelectedPath = action.payload;
     },
     checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (!state.checkedResourceIds.includes(action.payload)) {
@@ -738,6 +761,14 @@ export const mainSlice = createSlice({
     updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
       state.validationIntegration = action.payload;
     },
+    updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let newSearchHistory: string[] = [...state.search.searchHistory];
+      if (state.search.searchHistory.length >= 5) {
+        newSearchHistory.shift();
+      }
+      electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
+      state.search.searchHistory = [...newSearchHistory, action.payload];
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -781,7 +812,7 @@ export const mainSlice = createSlice({
         state.selectedImage = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-          selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
+          selectFilePath({filePath: state.helmValuesMap[action.payload.previewResourceId].filePath, state});
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
         state.previousSelectionHistory = [];
@@ -872,6 +903,7 @@ export const mainSlice = createSlice({
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
+      state.helmTemplatesMap = action.payload.helmTemplatesMap;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
@@ -1147,6 +1179,9 @@ export const mainSlice = createSlice({
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
       return action.payload;
     });
+    builder.addCase(updateFileEntries.fulfilled, (state, action) => {
+      return action.payload;
+    });
 
     builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
       return action.payload;
@@ -1320,6 +1355,11 @@ export const {
   unselectClusterDiffMatch,
   updateResourceFilter,
   updateValidationIntegration,
+  highlightFileMatches,
+  updateSearchHistory,
+  updateSearchQuery,
+  updateReplaceQuery,
+  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

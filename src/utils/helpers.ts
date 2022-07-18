@@ -12,3 +12,8 @@ export const debounceWithPreviousArgs = (fn: Function, wait: number) => {
     }, wait);
   };
 };
+
+export const watchFunctions = (fn: Function, interval: number): number => {
+  fn();
+  return setInterval(fn, interval);
+};

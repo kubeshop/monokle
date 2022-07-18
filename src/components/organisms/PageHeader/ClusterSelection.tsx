@@ -19,6 +19,7 @@ import {
   activeProjectSelector,
   currentClusterAccessSelector,
   isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
@@ -40,8 +41,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const isAccessLoading = useAppSelector(state => state.config.projectConfig?.isAccessLoading);
+  const isAccessLoading = useAppSelector(state => state.config?.isAccessLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
@@ -134,9 +136,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       return {
         icon: (
           <S.CheckCircleOutlined
-            isKubeConfigPathValid={isKubeConfigPathValid}
-            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-            previewType={previewType}
+            $isKubeConfigPathValid={isKubeConfigPathValid}
+            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            $previewType={previewType}
+            $kubeConfigContextColor={kubeConfigContextColor}
           />
         ),
         tooltip: 'Configured with full access.',
@@ -189,7 +192,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       {activeProject && (
         <>
           {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
-            <S.PreviewMode previewType={previewType}>
+            <S.PreviewMode
+              $isInPreviewMode={isInPreviewMode}
+              $previewType={previewType}
+              $kubeConfigContextColor={kubeConfigContextColor}
+            >
               {previewType === 'cluster' && <span>CLUSTER MODE</span>}
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
               {previewType === 'helm' && <span>HELM PREVIEW</span>}
@@ -220,9 +227,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             )}
 
             <S.ClusterStatusText
-              isKubeConfigPathValid={isKubeConfigPathValid}
-              isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-              previewType={previewType}
+              $isKubeConfigPathValid={isKubeConfigPathValid}
+              $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+              $kubeConfigContextColor={kubeConfigContextColor}
+              $previewType={previewType}
             >
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
                 <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
@@ -244,10 +252,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
             disabled={isPreviewLoading && isAccessLoading}
             onClick={loadOrReloadPreview}
-            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-            previewType={previewType}
+            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            $previewType={previewType}
             loading={isPreviewLoading}
             size="small"
+            $kubeConfigContextColor={kubeConfigContextColor}
           >
             {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
           </S.Button>
@@ -255,8 +264,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         {!isPreviewLoading && isInPreviewMode && (
           <S.ExitButton
             onClick={onClickExit}
-            isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-            previewType={previewType}
+            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            $previewType={previewType}
+            $kubeConfigContextColor={kubeConfigContextColor}
           >
             Exit
           </S.ExitButton>

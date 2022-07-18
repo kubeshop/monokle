@@ -6,15 +6,15 @@
 
 Launch Monokle and, on the welcome screen, there are three options to start working with projects:
 
- - Select an exisiting folder.
- - Create an empty project.
+ - Select a folder with K8s resources.
+ - Create a project from scratch.
  - Start from a template.
  
 ![Welcome](img/new-user-start-screen.png)
 
 On subsequent start-ups, Monokle automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled:
 
-![Returning User Screen](img/returning-user-start-screen.png)
+![Returning User Screen](img/returning-user-start-screen-1.9.png)
 
 ## **Working with Projects**
 
@@ -22,7 +22,7 @@ Click **Select an existing folder** to add your project folder containing K8 res
 
 Monokle is laid out like many other desktop applications:
 
-![Monokle UI](img/monokle-ui-1.6.0.png)
+![Monokle UI](img/monokle-ui-1.9.png)
 
 Left to right:
 
@@ -35,28 +35,47 @@ Left to right:
 
 The top right contains the following buttons:
 
+- The currently configured cluster.
 - Show Latest Notifications
-- Open Plugins Manager
-- Open Settings (see below)
-- Help:
-    - **Documentation** -> opens the Monokle documentation in your system browser.
-    - **GitHub** -> opens the Monokle GitHub repo in your system browser.
-    - **Discord** -> Opens Discord to talk to us about your Monokle experience.
+- An ellipsis with the following selections:
+    - **Settings** -> See **Settings** section below.
+    - **Plugins Manager** -> See our [Plugins](plugins.md) documentation for details.
+    - **Help**
+      - **Keyboard Shortcuts** -> See [Monokle Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
+      - **Documentation** -> opens the Monokle documentation in your system browser.
+      - **New in (Latest Version)** -> See the most recent updates.
+      - **Replay Quick Guide** - Replay the Quick Guide pop ups for Monokle screen navigation.
+      - **GitHub** -> opens the Monokle GitHub repo in your system browser.
+      - **Discord** -> Opens Discord to talk to us about your Monokle experience.
+      - **About Monokle** -> Details about the current version of Monokle.
+  - **Feedback** -> Our feedback survey.
 
 ## **Settings**
 
-Clicking the Settings icon on the top right opens the settings:
+Clicking **Settings** in the ellipsis drop down on the top right opens the settings modal:
 
-![Monokle Settings](img/monokle-settings-1.6.0.gif)
-
-### **Global Settings** 
-  - **Projects Root Path**
-  - **On Startup**: 
-    - Automatically load last project.
-    - Show Cluster Selector.
-  - **Telemetry**:
-    - Disable Usage Data
-    - Disable Error Reports
+![Monokle Settings](img/monokle-settings-1.9.gif)
+   
+### **Active Project Settings**
+  - **Project Name**
+  - **Kubernetes Version**: Sets Kubernetes' schema version for validation.
+  - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
+  - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
+  - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
+  - **Helm Preview Mode**: Sets which Helm command to use for generating previews (see [Working with Helm Charts](helm.md)).
+    - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
+    - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
+  - **Kustomize Command**: Sets how to invoke kustomize when previewing and applying kustomization file.
+    - Use kubectl
+    - Use kustomize
+  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
+  - **Resource links processing**:
+    - Ignore optional unsatisfied links.
+  - **Form Editor**
+    - Create default objects
+    - Set default primitive values
+  - **Cluster Mode**
+    - Allow editing resources
 
 ### **Default Project Settings**  
   - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
@@ -71,21 +90,21 @@ Clicking the Settings icon on the top right opens the settings:
   - **Maximum folder-read recursion depth**: Configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
+  - **Form Editor**
+    - Create default objects
+    - Set default primitive values
+  - **Cluster Mode**
+    - Allow editing resources
     
-### **Active Project Settings**
-  - **Kubernetes Version**: Sets Kubernetes' schema version for validation.
-  - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
-  - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
-  - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
-  - **Helm Preview Mode**: Sets which Helm command to use for generating previews (see [Working with Helm Charts](helm.md)).
-    - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
-    - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
-  - **Kustomize Command**: Sets how to invoke kustomize when previewing and applying kustomization file.
-    - Use kubectl
-    - Use kustomize
-  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
-  - **Resource links processing**:
-    - Ignore optional unsatisfied links.
+
+### **Global Settings** 
+  - **Projects Root Path**
+  - **On Startup**: 
+    - Automatically load last project.
+    - Show Cluster Selector.
+  - **Telemetry**:
+    - Disable Usage Data
+    - Disable Error Reports
 
 ## **System Menu**
 
@@ -106,10 +125,6 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 **Action:** File > New Monokle Window
 
 ![Multiple Window](img/multiple-window-1.6.0.png)
-
-## **Keyboard Shortcuts**
-
-Please visit [Monokle Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
 
 ## **Auto-update**
 

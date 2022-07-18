@@ -20,9 +20,8 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
+import {getSegmentClient} from '@utils/segment';
 import {APP_INSTALLED} from '@utils/telemetry';
-
-import {getSegmentClient} from './segment';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 

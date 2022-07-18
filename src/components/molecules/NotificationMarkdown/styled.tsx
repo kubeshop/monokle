@@ -6,6 +6,10 @@ export const Button = styled(RawButton)`
   padding: 0 20px;
 `;
 
+export const Content = styled.div`
+  margin-top: 10px;
+`;
+
 export const NotificationMarkdownContainer = styled.div`
   & p {
     display: inline;

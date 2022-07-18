@@ -17,4 +17,5 @@ export type IconNames =
   | 'shortcuts'
   | 'yaml-syntax'
   | 'resource-links'
-  | 'k8s-schema';
+  | 'k8s-schema'
+  | 'search';

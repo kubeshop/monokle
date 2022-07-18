@@ -25,6 +25,9 @@ const schema = {
   appConfig: {
     type: 'object',
     properties: {
+      kubeConfigContextsColors: {
+        type: 'object',
+      },
       hasDeletedDefaultTemplatesPlugin: {
         type: 'boolean',
       },
@@ -254,6 +257,7 @@ const defaults = {
     filtersPresets: {},
   },
   appConfig: {
+    kubeConfigContextsColors: {},
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],

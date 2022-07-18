@@ -110,7 +110,7 @@ test.only('all files should be loaded', async () => {
     await goToCommit(data.hash);
     await pause(10000);
 
-    expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
+    expect(parseInt((await navigatorPane.resourcesCount.textContent()) || '', 10)).toEqual(data.navigatorCount);
 
     await mainWindow.showFileExplorerIfNotVisible();
 

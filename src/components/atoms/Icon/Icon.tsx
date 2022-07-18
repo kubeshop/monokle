@@ -18,6 +18,7 @@ import {
   OpenPolicyAgent,
   OutgoingRefs,
   ResourceLinks,
+  Search,
   SeverityHigh,
   SeverityLow,
   SeverityMedium,
@@ -56,6 +57,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'yaml-syntax': YAMLSyntax,
   'resource-links': ResourceLinks,
   'k8s-schema': K8sSchema,
+  search: Search,
 };
 
 const Icon: React.FC<IconProps> = props => {

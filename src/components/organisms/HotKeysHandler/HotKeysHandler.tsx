@@ -11,6 +11,7 @@ import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
+  setActiveTab,
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
@@ -19,8 +20,10 @@ import {
 import {
   currentConfigSelector,
   isInPreviewModeSelector,
+  kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -44,8 +47,10 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -147,16 +152,20 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
-  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext, kubeConfigContextColor]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION.key,
     () => {
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       applySelection();
     },
-    [applySelection]
+    [applySelection, isKubeConfigPathValid]
   );
 
   const diffSelectedResource = useCallback(() => {
@@ -168,9 +177,13 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.DIFF_RESOURCE.key,
     () => {
+      if (!isKubeConfigPathValid) {
+        return;
+      }
+
       diffSelectedResource();
     },
-    [diffSelectedResource]
+    [diffSelectedResource, isKubeConfigPathValid]
   );
 
   useHotkeys(
@@ -269,6 +282,16 @@ const HotKeysHandler = () => {
     },
     [uiState.isStartProjectPaneVisible]
   );
+
+  useHotkeys(hotkeys.FIND.key, () => {
+    dispatch(setLeftMenuSelection('search'));
+    dispatch(setActiveTab('search'));
+  });
+
+  useHotkeys(hotkeys.REPLACE.key, () => {
+    dispatch(setLeftMenuSelection('search'));
+    dispatch(setActiveTab('findReplace'));
+  });
 
   return (
     <>

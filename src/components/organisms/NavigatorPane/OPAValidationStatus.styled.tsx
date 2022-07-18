@@ -4,7 +4,7 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div<{$status: 'active' | 'inactive'}>`
   ${({$status}) => `
-    color: ${$status === 'active' ? Colors.grey8 : Colors.grey5};
+    color: ${$status === 'active' ? Colors.grey8 : Colors.grey6};
 `}
 
   display: flex;

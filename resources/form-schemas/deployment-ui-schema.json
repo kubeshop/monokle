@@ -34,7 +34,8 @@
               "ui:title": "Name"
             },
             "image": {
-              "ui:title": "Image"
+              "ui:title": "Image",
+              "ui:widget": "imageSelection"
             },
             "ports": {
               "ui:title": "Ports",

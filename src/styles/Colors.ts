@@ -17,7 +17,6 @@ enum Colors {
   grey8 = '#ACACAC', // gray, gray 8
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
   grey6 = '#5A5A5A', // gray, gray 6
-  grey5 = '#5A5A5A', // gray, gray 5
   grey5b = '#434343', // gray, gray 5 as in Figma - FIXME!
   greyXY = '#31393c80', // Missing color - FIXME!
   grey4 = '#303030', // gray, gray 4
@@ -38,11 +37,18 @@ enum Colors {
   yellow7 = '#E8D639',
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
+  yellow11 = '#C9E75D',
+
+  volcano7 = '#E87040',
+  volcano8 = '#F3956A',
+
+  magenta7 = '#E0529C',
+  magenta8 = '#F37FB7',
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
-  red7 = '#E84749', // Dust Red
   red6 = '#D32029',
+  red7 = '#E84749', // Dust Red
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
@@ -50,17 +56,25 @@ enum Colors {
   blackPearl = '#111d2c',
   black9 = '#0C0D0E',
 
+  lime8 = '#C9E75D',
+
+  purple8 = '#AB7AE0',
+
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',
   cyan5 = '#138585',
-  volcano = '#F3956A',
   lightSeaGreen = '#13a8a8',
+
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
+  blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
 
+  green6 = '#49AA19',
   green7 = '#6ABE39', // Polar Green
+  green8 = '#6F9412',
+  green10 = '#3E4F13', // Dark Green
 
   highlightGreen = '#33BCB7',
 
@@ -81,7 +95,7 @@ export enum BackgroundColors {
   lightThemeBackground = Colors.whitePure,
   darkThemeBackground = Colors.blackPure,
   previewModeBackground = Colors.cyan,
-  clusterModeBackground = Colors.volcano,
+  clusterModeBackground = Colors.volcano8,
 }
 
 export enum FontColors {

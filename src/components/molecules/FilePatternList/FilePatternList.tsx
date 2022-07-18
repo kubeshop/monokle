@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Input, InputRef, Tooltip} from 'antd';
 
@@ -23,11 +23,11 @@ type FilePatternListProps = {
 
 const FilePatternList: React.FC<FilePatternListProps> = props => {
   const {value, onChange, tooltip, isSettingsOpened, showButtonLabel, showApplyButton, onApplyClick} = props;
-
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
   const filePatternInputRef = useRef<any>();
+  const isValueNotEmpty = useMemo(() => value.length > 0, [value]);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
@@ -76,18 +76,19 @@ const FilePatternList: React.FC<FilePatternListProps> = props => {
 
   return (
     <div>
-      <S.FilePatternList>
-        {value.map(pattern => (
-          <FilePatternListItem
-            key={pattern}
-            pattern={pattern}
-            validateInput={isPatternUnique}
-            onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
-            onRemove={() => removePattern(pattern)}
-          />
-        ))}
-      </S.FilePatternList>
-
+      {isValueNotEmpty && (
+        <S.FilePatternList>
+          {value.map(pattern => (
+            <FilePatternListItem
+              key={pattern}
+              pattern={pattern}
+              validateInput={isPatternUnique}
+              onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
+              onRemove={() => removePattern(pattern)}
+            />
+          ))}
+        </S.FilePatternList>
+      )}
       {isAddingPattern ? (
         <div ref={filePatternInputRef}>
           <Input

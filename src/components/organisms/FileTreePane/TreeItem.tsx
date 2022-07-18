@@ -13,7 +13,7 @@ import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {getHelmValuesFile, isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {Dots, Spinner} from '@atoms';
@@ -46,7 +46,7 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
+  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -70,25 +70,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const isFileSelected = useMemo(() => {
-    return treeKey === selectedPath;
-  }, [treeKey, selectedPath]);
+  const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
+  const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const root = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+  const target = useMemo(() => (isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '')), [isRoot, treeKey]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
   const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
 
-  const isRoot = treeKey === ROOT_FILE_ENTRY;
-  const root = fileMap[ROOT_FILE_ENTRY];
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
-
-  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
-
-  const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'Finder',
-  };
-
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -168,6 +160,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         isInPreviewMode ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
@@ -181,7 +174,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
           : `Filter on this ${isFolder ? 'folder' : 'file'}`,
-      disabled: isInPreviewMode || (!isFolder && (isExcluded || !isSupported)),
+      disabled:
+        isInPreviewMode ||
+        isHelmChartFile(relativePath) ||
+        isHelmValuesFile(relativePath) ||
+        isHelmTemplateFile(relativePath) ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
+        (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
 
@@ -192,12 +191,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }
       },
     },
-    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey
+    ...(fileMap[ROOT_FILE_ENTRY].filePath !== treeKey && onIncludeToProcessing && onExcludeFromProcessing
       ? [
           {
             key: 'add_to_files_exclude',
             label: `${isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
-            disabled: isInPreviewMode || (!isFolder && !isSupported && !isExcluded),
+            disabled:
+              isInPreviewMode ||
+              isHelmChartFile(relativePath) ||
+              isHelmValuesFile(relativePath) ||
+              isHelmTemplateFile(relativePath) ||
+              (!isFolder && !isSupported && !isExcluded),
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               if (isExcluded) {
@@ -268,7 +272,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     {key: 'divider-4', type: 'divider'},
     {
       key: 'reveal_in_finder',
-      label: `  Reveal in ${platformFilemanagerName}`,
+      label: `Reveal in ${platformFileManagerName}`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         showItemInFolder(absolutePath);
@@ -279,7 +283,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={absolutePath} placement="bottom">
+        <Tooltip
+          overlayStyle={isMatchItem ? {display: 'none'} : {}}
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={absolutePath}
+          placement="bottom"
+        >
           <S.TitleWrapper>
             <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (
@@ -311,7 +320,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
                   e.stopPropagation();
                 }}
               >
-                <Dots color={isFileSelected ? Colors.blackPure : undefined} />
+                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
               </div>
             </ContextMenu>
           </S.ActionsWrapper>

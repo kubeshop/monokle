@@ -1,6 +1,6 @@
 # Monokle
 
-Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
+Welcome to Monokle - your friendly desktop UI for managing K8s manifests!
 
 Monokle helps you to:
 
@@ -20,6 +20,7 @@ For further details on working with Monokle, read the [Feature Overview](feature
 
 Check out the following blog-posts with Monokle-related content:
 
+- 1.9.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-9-0-release-notes) - July 12, 2022
 - 1.8.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-8-0-release) - June 6, 2022
 - 1.7.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-7-0-release) - May 2, 2022
 - 1.6.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-6-0-release) - Mar 21, 2022

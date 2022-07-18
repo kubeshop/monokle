@@ -1,5 +1,7 @@
 import {PaneConfiguration} from '@models/ui';
 
+import Colors from '../styles/Colors';
+
 export const PREVIEW_PREFIX = 'preview://';
 export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
@@ -39,6 +41,17 @@ export const DEFAULT_PLUGINS = [
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
+export const CLUSTER_AVAILABLE_COLORS = [
+  Colors.yellow10,
+  Colors.green6,
+  Colors.volcano7,
+  Colors.magenta8,
+  Colors.blue9,
+  Colors.lime8,
+  Colors.red7,
+  Colors.magenta7,
+  Colors.purple8,
+];
 
 export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
