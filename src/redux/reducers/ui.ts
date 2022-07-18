@@ -61,6 +61,9 @@ export const uiSlice = createSlice({
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
+    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.leftMenu.activeTab = action.payload;
+    },
     toggleRightMenu: (state: Draft<UiState>) => {
       state.rightMenu.isActive = !state.rightMenu.isActive;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
@@ -371,5 +374,6 @@ export const {
   zoomOut,
   openKubeConfigBrowseSetting,
   closeKubeConfigBrowseSetting,
+  setActiveTab,
 } = uiSlice.actions;
 export default uiSlice.reducer;

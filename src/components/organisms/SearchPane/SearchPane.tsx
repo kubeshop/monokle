@@ -68,6 +68,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const recentSearch = useAppSelector(state => state.main.search.searchHistory);
+  const activeTab = useAppSelector(state => state.ui.leftMenu.activeTab) || 'search';
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const {onFileSelect} = useFileSelect();
@@ -262,7 +263,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   return (
     <S.FileTreeContainer id="AdvancedSearch">
       <TitleBar title="Advanced Search" closable />
-      <S.Tabs>
+      <S.Tabs activeKey={activeTab}>
         <TabPane key="search" tab="Search">
           <S.TreeContainer>
             <S.Form>
@@ -331,7 +332,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
           </S.TreeContainer>
         </TabPane>
 
-        <TabPane key="FindReplace" tab="Find &#38; Replace">
+        <TabPane key="findReplace" tab="Find &#38; Replace">
           <S.TreeContainer>
             <S.Form>
               <S.Label>Find:</S.Label>
