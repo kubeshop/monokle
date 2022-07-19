@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Input, Select, Tooltip} from 'antd';
+import {Button, Select, Tooltip} from 'antd';
 
 import {ClearOutlined} from '@ant-design/icons';
 
@@ -21,6 +21,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
+import InputTags from '../InputTags';
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
@@ -220,14 +221,17 @@ const ResourceFilter = () => {
 
       <S.Field>
         <S.FieldLabel>Name:</S.FieldLabel>
-        <Input
+
+        <InputTags tags={['name1', 'name2', 'name3']} />
+
+        {/* <Input
           autoFocus
           disabled={areFiltersDisabled}
           placeholder="All or part of name..."
           defaultValue={name}
           value={name}
           onChange={e => updateName(e.target.value)}
-        />
+        /> */}
       </S.Field>
 
       <S.Field>
