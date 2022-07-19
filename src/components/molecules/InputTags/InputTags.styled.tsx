@@ -2,6 +2,17 @@ import {Input as RawInput, Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
+export const AddTagHelper = styled.span`
+  color: ${Colors.grey7};
+  font-size: 12px;
+  font-weight: 500;
+  position: absolute;
+  top: -25px;
+  right: 0px;
+`;
+
 export const Input = styled(RawInput)`
   padding: 0;
   padding-left: 3px;
@@ -24,6 +35,7 @@ export const InputTagsContainer = styled.div<{$disabled: boolean | undefined}>`
     }
   }}
 
+  position: relative;
   padding: 3px 4px;
   display: flex;
   gap: 4px;

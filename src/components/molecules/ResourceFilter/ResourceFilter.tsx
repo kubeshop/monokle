@@ -225,13 +225,12 @@ const ResourceFilter = () => {
       </S.TitleContainer>
 
       <S.Field>
-        <S.FieldLabel>
-          <span>Name(s):</span> <S.NamesHelper>Hit `Enter` to add name</S.NamesHelper>
-        </S.FieldLabel>
+        <S.FieldLabel>Name(s):</S.FieldLabel>
 
         <InputTags
           autoFocus
           disabled={areFiltersDisabled}
+          helperValue="name"
           placeholder="Enter name"
           tags={names}
           warningMessage="Name already exists!"

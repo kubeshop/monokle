@@ -10,12 +10,13 @@ interface IProps {
   onTagRemove: (tag: string) => void;
   autoFocus?: boolean;
   disabled?: boolean;
+  helperValue?: string;
   placeholder?: string;
   warningMessage?: string;
 }
 
 const InputTags: React.FC<IProps> = props => {
-  const {autoFocus, disabled, placeholder, tags, warningMessage} = props;
+  const {autoFocus, disabled, helperValue, placeholder, tags, warningMessage} = props;
   const {onTagAdd, onTagRemove} = props;
 
   const [inputValue, setInputValue] = useState('');
@@ -64,6 +65,8 @@ const InputTags: React.FC<IProps> = props => {
           onKeyUp={handleKeyUp}
         />
       </S.InputContainer>
+
+      {inputValue && <S.AddTagHelper>Hit `Enter` to add {helperValue || 'tag'}</S.AddTagHelper>}
     </S.InputTagsContainer>
   );
 };
