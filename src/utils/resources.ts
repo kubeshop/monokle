@@ -22,9 +22,8 @@ export function makeResourceNameKindNamespaceIdentifier(partialResource: {
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
     filters.names &&
-    filters.names.length
-    // filters.name.trim() !== '' &&
-    // resource.name.toLowerCase().indexOf(filters.name.toLowerCase()) === -1
+    filters.names.length &&
+    !filters.names.some(name => resource.name.toLowerCase().includes(name.toLowerCase()))
   ) {
     return false;
   }

@@ -28,9 +28,16 @@ export const Field = styled.div`
   margin-bottom: 10px;
 `;
 
-export const FieldLabel = styled.p`
+export const FieldLabel = styled.div`
   font-weight: 500;
   margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const NamesHelper = styled.span`
+  color: ${Colors.grey7};
+  font-size: 12px;
 `;
 
 export const PresetButton = styled(Button)`

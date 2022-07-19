@@ -225,7 +225,9 @@ const ResourceFilter = () => {
       </S.TitleContainer>
 
       <S.Field>
-        <S.FieldLabel>Name:</S.FieldLabel>
+        <S.FieldLabel>
+          <span>Name(s):</span> <S.NamesHelper>Hit `Enter` to add name</S.NamesHelper>
+        </S.FieldLabel>
 
         <InputTags
           autoFocus
