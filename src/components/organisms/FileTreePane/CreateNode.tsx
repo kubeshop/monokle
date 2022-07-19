@@ -55,6 +55,7 @@ export const createNode = (
     isExcluded: fileEntry.isExcluded,
     isSupported: fileEntry.isSupported,
     filePath: fileEntry.filePath,
+    extension: fileEntry.extension,
   };
 
   if (fileEntry.children) {

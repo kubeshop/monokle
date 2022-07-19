@@ -166,6 +166,13 @@ export const fileIncludesSelector = createSelector(
   }
 );
 
+export const supportedExtensionsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    return state.main.supportedExtensions;
+  }
+);
+
 export const kubeConfigContextColorSelector = createSelector(
   (state: RootState) => state.config,
   config => {

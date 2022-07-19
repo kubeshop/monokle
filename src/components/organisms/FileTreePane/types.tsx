@@ -42,6 +42,7 @@ export interface TreeNode {
   title: React.ReactNode;
   children: TreeNode[];
   highlight: boolean;
+  extension: string;
   isFolder?: boolean;
   text?: string;
   /**

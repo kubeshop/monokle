@@ -211,6 +211,7 @@ interface AppState {
       stack: string;
     };
   };
+  supportedExtensions: string[];
 }
 
 export interface KubernetesObject {

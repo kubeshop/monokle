@@ -212,9 +212,11 @@ export function processHelmChartFolder(
 
   // pre-emptively create helm chart file entry
   const helmChartFilePath = path.join(folder, HELM_CHART_ENTRY_FILE);
+
   const helmChartFileEntry = createFileEntry({
     fileEntryPath: helmChartFilePath.substring(rootFolder.length),
     fileMap,
+    extension: path.extname(helmChartFilePath),
   });
   const helmChart = createHelmChart(helmChartFileEntry, helmChartFilePath, helmChartMap);
   result.push(helmChartFileEntry.name);
@@ -223,8 +225,9 @@ export function processHelmChartFolder(
     .filter(file => !isHelmChartFile(file))
     .forEach(file => {
       const filePath = path.join(folder, file);
+      const extension = path.extname(filePath);
       const fileEntryPath = filePath.substring(rootFolder.length);
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id});
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id, extension});
 
       if (fileIsExcluded(fileEntry.filePath, projectConfig)) {
         fileEntry.isExcluded = true;

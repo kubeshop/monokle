@@ -72,6 +72,7 @@ const initialAppState: AppState = {
     searchHistory: electronStore.get('appConfig.recentSearch') || [],
     currentMatch: null,
   },
+  supportedExtensions: ['.txt', '.md', '.html', '.json'],
 };
 
 const initialAppConfigState: AppConfig = {
