@@ -14,7 +14,7 @@ export const InputContainer = styled.div<{$width: number}>`
   `}
 `;
 
-export const InputTagsContainer = styled.div<{$disabled: boolean}>`
+export const InputTagsContainer = styled.div<{$disabled: boolean | undefined}>`
   ${({$disabled}) => {
     if ($disabled) {
       return `

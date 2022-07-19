@@ -6,14 +6,18 @@ import * as S from './InputTags.styled';
 
 interface IProps {
   tags: string[];
-  onClose: (tag: string) => void;
+  onTagRemove: (tag: string) => void;
+  autoFocus?: boolean;
   disabled?: boolean;
+  placeholder?: string;
 }
 
-const InputTags: React.FC<IProps> = ({disabled = false, tags, onClose}) => {
+const InputTags: React.FC<IProps> = ({autoFocus, disabled, placeholder, tags, onTagRemove}) => {
   const [inputValue, setInputValue] = useState('');
 
   const inputRef = useRef<InputRef>(null);
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && e.preventDefault();
 
   return (
     <S.InputTagsContainer
@@ -23,7 +27,7 @@ const InputTags: React.FC<IProps> = ({disabled = false, tags, onClose}) => {
     >
       {tags.length
         ? tags.map(tag => (
-            <S.Tag closable={!disabled} key={tag} onClose={() => onClose(tag)}>
+            <S.Tag closable={!disabled} key={tag} onClose={() => onTagRemove(tag)}>
               {tag}
             </S.Tag>
           ))
@@ -31,12 +35,14 @@ const InputTags: React.FC<IProps> = ({disabled = false, tags, onClose}) => {
 
       <S.InputContainer $width={inputValue ? inputValue.length * 8 : 75}>
         <S.Input
+          autoFocus={autoFocus}
           disabled={disabled}
-          placeholder="Enter name"
+          placeholder={placeholder}
           bordered={false}
           ref={inputRef}
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
       </S.InputContainer>
     </S.InputTagsContainer>

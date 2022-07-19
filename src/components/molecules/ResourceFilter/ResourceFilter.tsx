@@ -227,7 +227,13 @@ const ResourceFilter = () => {
       <S.Field>
         <S.FieldLabel>Name:</S.FieldLabel>
 
-        <InputTags disabled={areFiltersDisabled} tags={names} onClose={tag => updateNames(tag, 'remove')} />
+        <InputTags
+          autoFocus
+          disabled={areFiltersDisabled}
+          placeholder="Enter name"
+          tags={names}
+          onTagRemove={tag => updateNames(tag, 'remove')}
+        />
 
         {/* <Input
           autoFocus
