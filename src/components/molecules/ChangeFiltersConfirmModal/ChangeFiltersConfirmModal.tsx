@@ -39,7 +39,11 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           ? undefined
           : filtersToBeChanged.fileOrFolderContainedIn
         : resourceFilter.fileOrFolderContainedIn,
-      name: resourceFilter.name,
+      names: filtersToBeChanged.names
+        ? filtersToBeChanged.names === resourceFilter.names
+          ? undefined
+          : filtersToBeChanged.names
+        : resourceFilter.names,
       labels: resourceFilter.labels,
       annotations: resourceFilter.annotations,
     };
@@ -67,7 +71,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     resourceFilter.fileOrFolderContainedIn,
     resourceFilter.kinds,
     resourceFilter.labels,
-    resourceFilter.name,
+    resourceFilter.names,
     resourceFilter.namespace,
   ]);
 

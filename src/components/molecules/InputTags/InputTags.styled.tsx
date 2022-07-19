@@ -5,7 +5,7 @@ import styled from 'styled-components';
 export const Input = styled(RawInput)`
   padding: 0;
   width: 100%;
-  min-width: 4.1px;
+  min-width: 75px;
 `;
 
 export const InputContainer = styled.div<{$width: number}>`
@@ -14,7 +14,15 @@ export const InputContainer = styled.div<{$width: number}>`
   `}
 `;
 
-export const InputTagsContainer = styled.div`
+export const InputTagsContainer = styled.div<{$disabled: boolean}>`
+  ${({$disabled}) => {
+    if ($disabled) {
+      return `
+        cursor: not-allowed !important;
+      `;
+    }
+  }}
+
   padding: 3px 4px;
   display: flex;
   gap: 4px;

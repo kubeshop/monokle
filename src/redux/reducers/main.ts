@@ -537,6 +537,11 @@ export const mainSlice = createSlice({
 
       // construct new filter
       let newFilter: ResourceFilterType = {
+        names: filter.names
+          ? filter.names === state.resourceFilter.names
+            ? undefined
+            : filter.names
+          : state.resourceFilter.names,
         namespace: filter.namespace
           ? filter.namespace === state.resourceFilter.namespace
             ? undefined
@@ -552,7 +557,6 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.fileOrFolderContainedIn
           : state.resourceFilter.fileOrFolderContainedIn,
-        name: state.resourceFilter.name,
         labels: state.resourceFilter.labels,
         annotations: state.resourceFilter.annotations,
       };
