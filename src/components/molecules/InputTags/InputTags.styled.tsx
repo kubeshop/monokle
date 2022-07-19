@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 export const Input = styled(RawInput)`
   padding: 0;
+  padding-left: 3px;
   width: 100%;
   min-width: 75px;
 `;

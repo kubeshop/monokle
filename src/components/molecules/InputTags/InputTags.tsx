@@ -1,23 +1,41 @@
 import {useRef, useState} from 'react';
 
-import {InputRef} from 'antd';
+import {InputRef, message} from 'antd';
 
 import * as S from './InputTags.styled';
 
 interface IProps {
   tags: string[];
+  onTagAdd: (tag: string) => void;
   onTagRemove: (tag: string) => void;
   autoFocus?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  warningMessage?: string;
 }
 
-const InputTags: React.FC<IProps> = ({autoFocus, disabled, placeholder, tags, onTagRemove}) => {
+const InputTags: React.FC<IProps> = props => {
+  const {autoFocus, disabled, placeholder, tags, warningMessage} = props;
+  const {onTagAdd, onTagRemove} = props;
+
   const [inputValue, setInputValue] = useState('');
 
   const inputRef = useRef<InputRef>(null);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && e.preventDefault();
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter' || !inputValue) {
+      return;
+    }
+
+    if (tags.includes(inputValue)) {
+      message.warn(warningMessage || 'Tag already exists!');
+      return;
+    }
+
+    onTagAdd(inputValue);
+    setInputValue('');
+  };
 
   return (
     <S.InputTagsContainer
@@ -43,6 +61,7 @@ const InputTags: React.FC<IProps> = ({autoFocus, disabled, placeholder, tags, on
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
+          onKeyUp={handleKeyUp}
         />
       </S.InputContainer>
     </S.InputTagsContainer>

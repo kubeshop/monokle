@@ -232,17 +232,10 @@ const ResourceFilter = () => {
           disabled={areFiltersDisabled}
           placeholder="Enter name"
           tags={names}
+          warningMessage="Name already exists!"
+          onTagAdd={tag => updateNames(tag, 'add')}
           onTagRemove={tag => updateNames(tag, 'remove')}
         />
-
-        {/* <Input
-          autoFocus
-          disabled={areFiltersDisabled}
-          placeholder="All or part of name..."
-          defaultValue={name}
-          value={name}
-          onChange={e => updateName(e.target.value)}
-        /> */}
       </S.Field>
 
       <S.Field>
