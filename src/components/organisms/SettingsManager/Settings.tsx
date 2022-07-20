@@ -355,12 +355,13 @@ export const Settings = ({
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          {isKubeConfigBrowseSettingsOpen && (
+          {isKubeConfigBrowseSettingsOpen ? (
             <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
               Browse
             </S.Button>
+          ) : (
+            <ReloadOutlined style={{padding: '1em'}} spin />
           )}
-          {!isKubeConfigBrowseSettingsOpen && <ReloadOutlined style={{padding: '1em'}} spin />}
         </Tooltip>
         <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </S.Div>
