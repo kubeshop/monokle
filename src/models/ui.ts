@@ -159,6 +159,6 @@ export type PaneConfiguration = {
   leftPane: number;
   navPane: number;
   rightPane: number;
-  actionsPaneFooterExpandedHeight: number;
+  bottomPaneHeight: number;
   recentProjectsPaneWidth: number;
 };

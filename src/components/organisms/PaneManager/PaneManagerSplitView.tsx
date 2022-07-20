@@ -13,6 +13,7 @@ import * as S from './PaneManagerSplitView.styled';
 // eslint-disable-next-line import/no-relative-packages
 import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
 
+const BottomPaneManager = React.lazy(() => import('@organisms/BottomPaneManager'));
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
@@ -23,6 +24,7 @@ const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
@@ -83,6 +85,12 @@ const PaneManagerSplitView: React.FC = () => {
           <ActionsPane height={height} />
         </ReflexElement>
       </ReflexContainer>
+
+      {bottomSelection && (
+        <Suspense fallback={null}>
+          <BottomPaneManager />
+        </Suspense>
+      )}
     </S.SplitViewContainer>
   );
 };

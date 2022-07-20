@@ -31,8 +31,7 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
-import UpdateNotice from '@organisms/UpdateNotice';
+import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 

@@ -1,5 +1,6 @@
 export {default as AboutModal} from './AboutModal';
 export {default as ActionsPane} from './ActionsPane';
+export {default as BottomPaneManager} from './BottomPaneManager';
 export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CreateFileFolderModal} from './CreateFileFolderModal';
@@ -28,5 +29,5 @@ export {default as ReplaceImageModal} from './ReplaceImageModal';
 export {default as SettingsManager} from './SettingsManager';
 export {default as TemplateManagerPane} from './TemplateManagerPane';
 export {default as TemplateModal} from './TemplateModal';
-export {default as UpdateModal} from './UpdateNotice';
+export {default as UpdateNotice} from './UpdateNotice';
 export {default as ValidationPane} from './ValidationPane';
