@@ -1,12 +1,10 @@
 import {useEffect, useState} from 'react';
 
-import {Button, Input, InputRef} from 'antd';
-
-import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
+import {InputRef} from 'antd';
 
 import {useFocus} from '@utils/hooks';
+
+import * as S from './FilePatternListItem.styled';
 
 type FilePatternListItemProps = {
   pattern: string;
@@ -14,25 +12,6 @@ type FilePatternListItemProps = {
   onChange: (oldPattern: string, newPattern: string) => void;
   onRemove: (pattern: string) => void;
 };
-
-const StyledEditOutlined = styled(EditOutlined)`
-  float: right;
-`;
-
-const StyledDeleteOutlined = styled(DeleteOutlined)`
-  margin-left: 5px;
-  float: right;
-`;
-
-const StyledButton = styled(Button)`
-  margin-top: 10px;
-  margin-right: 5px;
-  margin-bottom: 10px;
-`;
-
-const StyledInputPattern = styled(Input)`
-  margin-top: 5px;
-`;
 
 const FilePatternListItem = (props: FilePatternListItemProps) => {
   const {pattern, validateInput, onChange, onRemove} = props;
@@ -42,12 +21,6 @@ const FilePatternListItem = (props: FilePatternListItemProps) => {
   const [patternInput, setPatternInput] = useState<string>(pattern);
 
   const [inputRef, focusInput] = useFocus<InputRef>();
-
-  useEffect(() => {
-    if (isEditing) {
-      focusInput();
-    }
-  }, [isEditing, focusInput]);
 
   const updatePattern = () => {
     let isPatternInputValid = true;
@@ -76,19 +49,25 @@ const FilePatternListItem = (props: FilePatternListItemProps) => {
     onRemove(pattern);
   };
 
+  useEffect(() => {
+    if (isEditing) {
+      focusInput();
+    }
+  }, [isEditing, focusInput]);
+
   return (
     <li onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {isEditing ? (
         <>
-          <StyledInputPattern
+          <S.InputPattern
             ref={inputRef}
             value={patternInput}
             onChange={e => setPatternInput(e.target.value)}
             onPressEnter={updatePattern}
           />
           <div>
-            <StyledButton onClick={updatePattern}>OK</StyledButton>
-            <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+            <S.Button onClick={updatePattern}>OK</S.Button>
+            <S.Button onClick={onClickCancel}>Cancel</S.Button>
           </div>
         </>
       ) : (
@@ -96,8 +75,8 @@ const FilePatternListItem = (props: FilePatternListItemProps) => {
           <span>{pattern}</span>
           {isHovered && (
             <>
-              <StyledDeleteOutlined onClick={onClickRemove} />
-              <StyledEditOutlined onClick={onClickEdit} />
+              <S.DeleteOutlined onClick={onClickRemove} />
+              <S.EditOutlined onClick={onClickEdit} />
             </>
           )}
         </>

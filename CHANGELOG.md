@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.1](https://github.com/kubeshop/monokle/compare/v1.9.1-nightly-2022-07-14.0...v1.9.1) (2022-07-14)
+
+
+### Bug Fixes
+
+* add null checker for isKustomizationFile function ([da07417](https://github.com/kubeshop/monokle/commit/da07417b1e5c313f2b8abebee0563aaabdd2f06b))
+
 ## [1.9.0](https://github.com/kubeshop/monokle/compare/v1.8.2-nightly-2022-07-12.0...v1.9.0) (2022-07-12)
 
 
