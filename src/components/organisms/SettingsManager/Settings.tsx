@@ -96,14 +96,14 @@ export const Settings = ({
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
-    dispatch(openKubeConfigBrowseSetting());
+    dispatch(closeKubeConfigBrowseSetting());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
 
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
-    dispatch(closeKubeConfigBrowseSetting());
+    dispatch(openKubeConfigBrowseSetting());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
@@ -224,7 +224,7 @@ export const Settings = ({
       return;
     }
     setCurrentKubeConfig(e.target.value);
-    dispatch(openKubeConfigBrowseSetting());
+    dispatch(closeKubeConfigBrowseSetting());
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -234,7 +234,7 @@ export const Settings = ({
       if (file.path) {
         const selectedFilePath = file.path;
         setCurrentKubeConfig(selectedFilePath);
-        dispatch(openKubeConfigBrowseSetting());
+        dispatch(closeKubeConfigBrowseSetting());
       }
     }
   };

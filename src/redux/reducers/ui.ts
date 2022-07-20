@@ -226,10 +226,10 @@ export const uiSlice = createSlice({
       state.folderExplorer = {isOpen: false};
     },
     closeKubeConfigBrowseSetting: (state: Draft<UiState>) => {
-      state.kubeConfigBrowseSettings = {isOpen: true};
+      state.kubeConfigBrowseSettings = {isOpen: false};
     },
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
-      state.kubeConfigBrowseSettings = {isOpen: false};
+      state.kubeConfigBrowseSettings = {isOpen: true};
     },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
