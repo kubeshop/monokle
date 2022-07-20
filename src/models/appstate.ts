@@ -78,7 +78,7 @@ type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistor
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
 type ResourceFilterType = {
-  name?: string;
+  names?: string[];
   kinds?: string[];
   namespace?: string;
   labels: Record<string, string | null>;
