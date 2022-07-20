@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {Size} from '@models/window';
 
@@ -16,26 +16,14 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 }
 
 export function useMainPaneDimensions(): {height: number; width: number} {
-  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
-  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
 
-  const bottomPaneHeight = useMemo(() => {
-    if (bottomSelection) {
-      return paneConfiguration.bottomPaneHeight;
-    }
-
-    return 0;
-  }, [bottomSelection, paneConfiguration.bottomPaneHeight]);
-
-  const [height, setHeight] = useState<number>(
-    window.innerHeight - layoutSize.footer - layoutSize.header - bottomPaneHeight
-  );
+  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.footer - layoutSize.header);
   const [width, setWidth] = useState<number>(window.innerWidth - 50);
 
   useEffect(() => {
     const handleResize = () => {
-      setHeight(window.innerHeight - layoutSize.footer - layoutSize.header - bottomPaneHeight);
+      setHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
       setWidth(window.innerWidth - 50);
     };
 
@@ -43,7 +31,7 @@ export function useMainPaneDimensions(): {height: number; width: number} {
     handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener('resize', handleResize);
-  }, [bottomPaneHeight, layoutSize]);
+  }, [layoutSize]);
 
   return {height, width};
 }

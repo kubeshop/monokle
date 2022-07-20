@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -8,11 +8,10 @@ const TerminalPane = React.lazy(() => import('@organisms/TerminalPane'));
 
 const BottomPaneManager: React.FC = () => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
-  const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
 
   return (
-    <S.BottomPaneManagerContainer $height={bottomPaneHeight}>
-      {bottomSelection === 'terminal' && <TerminalPane />}
+    <S.BottomPaneManagerContainer>
+      <Suspense fallback={null}>{bottomSelection === 'terminal' && <TerminalPane />}</Suspense>
     </S.BottomPaneManagerContainer>
   );
 };

@@ -5,7 +5,7 @@ import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constant
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 
-import {ActionsPane, NavigatorPane} from '@organisms';
+import {ActionsPane, BottomPaneManager, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -13,7 +13,6 @@ import * as S from './PaneManagerSplitView.styled';
 // eslint-disable-next-line import/no-relative-packages
 import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
 
-const BottomPaneManager = React.lazy(() => import('@organisms/BottomPaneManager'));
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
@@ -45,53 +44,74 @@ const PaneManagerSplitView: React.FC = () => {
     [dispatch, layout]
   );
 
+  const handleBottomPaneResize = useCallback(
+    (elements: any) => {
+      const bottomPaneElement = elements.find((el: any) => el.props.id === 'bottomPane');
+
+      dispatch(setPaneConfiguration({...layout, bottomPaneHeight: bottomPaneElement.props.flex * height}));
+    },
+    [dispatch, height, layout]
+  );
+
   return (
-    <S.SplitViewContainer style={{width, height}}>
-      <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
-        {leftActiveMenu && (
-          <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
-            <S.LeftPane>
-              <Suspense fallback={<div />}>
-                {leftActiveMenu === 'file-explorer' && <FileTreePane height={height} />}
-                {leftActiveMenu === 'helm-pane' && <HelmPane />}
-                {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-                {leftActiveMenu === 'images-pane' && <ImagesPane />}
-                {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
-                {leftActiveMenu === 'validation-pane' && <ValidationPane height={height} />}
-                {leftActiveMenu === 'search' && <SearchPane height={height} />}
-              </Suspense>
-            </S.LeftPane>
-          </ReflexElement>
-        )}
+    <ReflexContainer
+      orientation="horizontal"
+      onStopResize={handleBottomPaneResize}
+      windowResizeAware
+      style={{height, width, position: 'relative'}}
+    >
+      <ReflexElement id="topPane">
+        <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
+          {leftActiveMenu && (
+            <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
+              <S.LeftPane>
+                <Suspense fallback={<div />}>
+                  {leftActiveMenu === 'file-explorer' && <FileTreePane height={height} />}
+                  {leftActiveMenu === 'helm-pane' && <HelmPane />}
+                  {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
+                  {leftActiveMenu === 'images-pane' && <ImagesPane />}
+                  {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={height} />}
+                  {leftActiveMenu === 'validation-pane' && <ValidationPane height={height} />}
+                  {leftActiveMenu === 'search' && <SearchPane height={height} />}
+                </Suspense>
+              </S.LeftPane>
+            </ReflexElement>
+          )}
 
-        {/* react-reflex does not work as intended when you
+          {/* react-reflex does not work as intended when you
             use fragments so keep this separate. */}
-        {leftActiveMenu && <ReflexSplitter propagate />}
+          {leftActiveMenu && <ReflexSplitter propagate />}
 
-        <ReflexElement
-          id="navPane"
-          minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
-          maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
-          flex={layout.navPane}
-        >
-          <NavigatorPane height={height} />
-        </ReflexElement>
+          <ReflexElement
+            id="navPane"
+            minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
+            maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
+            flex={layout.navPane}
+          >
+            <NavigatorPane height={height} />
+          </ReflexElement>
 
-        {/* react-reflex does not work as intended when you use propagate 
+          {/* react-reflex does not work as intended when you use propagate 
             without multiple splitters so set is dynamically. */}
-        <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
+          <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
-        <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <ActionsPane height={height} />
-        </ReflexElement>
-      </ReflexContainer>
+          <ReflexElement
+            id="editPane"
+            minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
+          >
+            <ActionsPane height={height} />
+          </ReflexElement>
+        </ReflexContainer>
+      </ReflexElement>
+
+      {bottomSelection && <ReflexSplitter />}
 
       {bottomSelection && (
-        <Suspense fallback={null}>
+        <ReflexElement id="bottomPane" minSize={150} maxSize={400} flex={layout.bottomPaneHeight / height}>
           <BottomPaneManager />
-        </Suspense>
+        </ReflexElement>
       )}
-    </S.SplitViewContainer>
+    </ReflexContainer>
   );
 };
 
