@@ -97,12 +97,14 @@ export const Settings = ({
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
     dispatch(openKubeConfigBrowseSetting());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
 
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
     dispatch(closeKubeConfigBrowseSetting());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
   useEffect(() => {
