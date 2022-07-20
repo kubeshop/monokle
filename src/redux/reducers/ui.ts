@@ -9,6 +9,7 @@ import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants'
 import {
   HighlightItems,
   LayoutSizeType,
+  LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
@@ -56,6 +57,10 @@ export const uiSlice = createSlice({
     setLeftMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
+    },
+    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+      state.leftMenu.bottomSelection = action.payload;
+      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
     },
     setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
@@ -351,6 +356,7 @@ export const {
   setExpandedFolders,
   setExpandedSearchedFiles,
   setLayoutSize,
+  setLeftBottomMenuSelection,
   setLeftMenuIsActive,
   setLeftMenuSelection,
   setMonacoEditor,

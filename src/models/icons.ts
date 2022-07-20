@@ -18,4 +18,5 @@ export type IconNames =
   | 'yaml-syntax'
   | 'resource-links'
   | 'k8s-schema'
-  | 'search';
+  | 'search'
+  | 'terminal';
