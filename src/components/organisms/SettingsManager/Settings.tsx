@@ -67,6 +67,7 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
+  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
@@ -78,8 +79,6 @@ export const Settings = ({
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
   );
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
-  const [currentKubeConfigInValue, setCurrentKubeConfigInValue] = useState(config?.kubeConfig?.path);
-  const [spinBrowse, setspinBrowse] = useState(true);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
   const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
@@ -98,15 +97,12 @@ export const Settings = ({
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
     dispatch(openKubeConfigBrowseSetting());
-    setspinBrowse(false);
   }, [config?.kubeConfig]);
 
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
-    setCurrentKubeConfigInValue(currentKubeConfig);
     dispatch(closeKubeConfigBrowseSetting());
-    setspinBrowse(true);
   }, [config]);
 
   useEffect(() => {
@@ -227,7 +223,6 @@ export const Settings = ({
     }
     setCurrentKubeConfig(e.target.value);
     dispatch(openKubeConfigBrowseSetting());
-    setspinBrowse(false);
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -238,7 +233,6 @@ export const Settings = ({
         const selectedFilePath = file.path;
         setCurrentKubeConfig(selectedFilePath);
         dispatch(openKubeConfigBrowseSetting());
-        setspinBrowse(false);
       }
     }
   };
@@ -355,18 +349,18 @@ export const Settings = ({
           <Input
             ref={inputRef}
             onClick={() => focusInput()}
-            value={currentKubeConfigInValue}
+            value={currentKubeConfig}
             onChange={onUpdateKubeconfig}
             disabled={isEditingDisabled}
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          {spinBrowse && (
+          {isKubeConfigBrowseSettingsOpen && (
             <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
               Browse
             </S.Button>
           )}
-          {!spinBrowse && <ReloadOutlined style={{padding: '1em'}} spin />}
+          {!isKubeConfigBrowseSettingsOpen && <ReloadOutlined style={{padding: '1em'}} spin />}
         </Tooltip>
         <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </S.Div>

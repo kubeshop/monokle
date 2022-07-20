@@ -88,7 +88,7 @@ const App = () => {
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
-  const isKubeConfigBrowseSettingOpen = useAppSelector(state => state.ui.kubeConfigBrowseSetting.isOpen);
+  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
@@ -346,7 +346,7 @@ const App = () => {
   };
 
   const settingsDrawerOnClose = () => {
-    if (isKubeConfigBrowseSettingOpen) {
+    if (isKubeConfigBrowseSettingsOpen) {
       dispatch(toggleSettings());
     }
   };

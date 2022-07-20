@@ -131,7 +131,7 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
-  kubeConfigBrowseSetting: {
+  kubeConfigBrowseSettings: {
     isOpen: boolean;
   };
   isActionsPaneFooterExpanded: boolean;
