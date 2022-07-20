@@ -8,7 +8,7 @@ The File Explorer shows all files parsed in the folder selected:
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
 file will be shown in the source editor to the right, allowing for direct editing of the file.
 
-![File Explorer Navigation](img/resource-navigation-2-1.6.0.png)
+![File Explorer Navigation](img/resource-navigation-2-1.9.png)
 
 In this screenshot:
 
@@ -18,7 +18,7 @@ In this screenshot:
 
 While in the File Explorer, the File Action drop down list is available by clicking the ellipsis to the right of the file name.
 
-![Explorer File Actions](img/explorer-file-actions-1.6.0.png)
+![Explorer File Actions](img/explorer-file-actions-1.9.png)
 
 In the File Actions pop up menu, the following actions are available:
 
@@ -27,22 +27,25 @@ In the File Actions pop up menu, the following actions are available:
 - Add to Files: Exclude
 - Copy Path
 - Copy Relative Path
+- Duplicate
 - Rename
 - Delete
 - Reveal in Finder
 
 The same functionality is available for Folders:
 
-![Explorer File Actions](img/explorer-folder-actions-1.6.0.png)
+![Explorer File Actions](img/explorer-folder-actions-1.9.png)
 
 In the Folder Actions pop up menu, the following actions are available:
 
 - New Folder
+- New File
 - New Resource
 - Filter on this folder
 - Add to Files: Exclude
 - Copy Path
 - Copy Relative Path
+- Duplicate
 - Rename
 - Delete
 - Reveal in Finder
