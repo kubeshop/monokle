@@ -97,6 +97,7 @@ export const Settings = ({
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
     dispatch(openKubeConfigBrowseSetting());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
 
   useEffect(() => {
