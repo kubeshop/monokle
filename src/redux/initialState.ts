@@ -191,6 +191,9 @@ const initialUiState: UiState = {
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
   },
+  kubeConfigBrowseSettings: {
+    isOpen: false,
+  },
   folderExplorer: {
     isOpen: false,
   },
