@@ -4,6 +4,8 @@ import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {isEqual} from 'lodash';
+
 import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -30,7 +32,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           : filtersToBeChanged.namespace
         : resourceFilter.namespace,
       kinds: filtersToBeChanged.kinds
-        ? filtersToBeChanged.kinds === resourceFilter.kinds
+        ? isEqual(filtersToBeChanged.kinds, resourceFilter.kinds)
           ? undefined
           : filtersToBeChanged.kinds
         : resourceFilter.kinds,
@@ -40,7 +42,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           : filtersToBeChanged.fileOrFolderContainedIn
         : resourceFilter.fileOrFolderContainedIn,
       names: filtersToBeChanged.names
-        ? filtersToBeChanged.names === resourceFilter.names
+        ? isEqual(filtersToBeChanged.names, resourceFilter.names)
           ? undefined
           : filtersToBeChanged.names
         : resourceFilter.names,

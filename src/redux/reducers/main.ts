@@ -538,7 +538,7 @@ export const mainSlice = createSlice({
       // construct new filter
       let newFilter: ResourceFilterType = {
         names: filter.names
-          ? filter.names === state.resourceFilter.names
+          ? isEqual(filter.names, state.resourceFilter.names)
             ? undefined
             : filter.names
           : state.resourceFilter.names,
@@ -548,7 +548,7 @@ export const mainSlice = createSlice({
             : filter.namespace
           : state.resourceFilter.namespace,
         kinds: filter.kinds
-          ? filter.kinds === state.resourceFilter.kinds
+          ? isEqual(filter.kinds, state.resourceFilter.kinds)
             ? undefined
             : filter.kinds
           : state.resourceFilter.kinds,
