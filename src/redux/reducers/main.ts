@@ -537,13 +537,18 @@ export const mainSlice = createSlice({
 
       // construct new filter
       let newFilter: ResourceFilterType = {
+        names: filter.names
+          ? isEqual(filter.names, state.resourceFilter.names)
+            ? undefined
+            : filter.names
+          : state.resourceFilter.names,
         namespace: filter.namespace
           ? filter.namespace === state.resourceFilter.namespace
             ? undefined
             : filter.namespace
           : state.resourceFilter.namespace,
         kinds: filter.kinds
-          ? filter.kinds === state.resourceFilter.kinds
+          ? isEqual(filter.kinds, state.resourceFilter.kinds)
             ? undefined
             : filter.kinds
           : state.resourceFilter.kinds,
@@ -552,7 +557,6 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.fileOrFolderContainedIn
           : state.resourceFilter.fileOrFolderContainedIn,
-        name: state.resourceFilter.name,
         labels: state.resourceFilter.labels,
         annotations: state.resourceFilter.annotations,
       };
