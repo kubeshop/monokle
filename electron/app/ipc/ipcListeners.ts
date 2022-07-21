@@ -1,9 +1,9 @@
-import {BrowserWindow, app, ipcMain} from 'electron';
+import {app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import pty from 'node-pty';
+import * as pty from 'node-pty';
 import Nucleus from 'nucleus-nodejs';
 import os from 'os';
 import * as path from 'path';
@@ -71,7 +71,7 @@ const machineId = machineIdSync();
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 // string is the webContentsId
-let ptyProcessMap: Record<string, any> = {};
+let ptyProcessMap: Record<string, pty.IPty> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
@@ -270,19 +270,30 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
   }
 });
 
-ipcMain.on('init-terminal', (event, args) => {
-  const {rootFolder, webContentsId} = args;
-  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+ipcMain.on('init-shell', (event, args) => {
+  const {rootFilePath, webContentsId} = args;
 
-  if (currentWebContents) {
+  try {
     const ptyProcess = pty.spawn(shell, [], {
       name: 'xterm-color',
-      rows: 30,
+      rows: 24,
       cols: 80,
-      cwd: rootFolder,
+      cwd: rootFilePath,
       env: process.env as Record<string, string>,
     });
 
     ptyProcessMap[webContentsId] = ptyProcess;
+  } catch (e) {
+    log.error('Pty process could not be created ', e);
+  }
+});
+
+ipcMain.on('resize-shell', (event, args) => {
+  const {webContentsId, cols, rows} = args;
+
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (ptyProcess) {
+    ptyProcess.resize(cols, rows);
   }
 });
