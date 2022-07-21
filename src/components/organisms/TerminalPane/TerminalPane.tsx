@@ -25,6 +25,7 @@ const TerminalPane: React.FC = () => {
   const webContentsId = useAppSelector(state => state.main.webContentsId);
 
   const [containerRef, {height, width}] = useMeasure<HTMLDivElement>();
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
@@ -67,7 +68,7 @@ const TerminalPane: React.FC = () => {
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
-      <S.TitleBar>
+      <S.TitleBar ref={titleBarRef}>
         <S.TitleLabel>
           <Icon name="terminal" />
           <MonoPaneTitle style={{paddingLeft: '10px'}}>Terminal</MonoPaneTitle>
@@ -76,7 +77,7 @@ const TerminalPane: React.FC = () => {
         <S.DownCircleFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
       </S.TitleBar>
 
-      <S.TerminalContainer ref={terminalContainerRef} />
+      <S.TerminalContainer ref={terminalContainerRef} $height={height - titleBarHeight} />
     </S.TerminalPaneContainer>
   );
 };

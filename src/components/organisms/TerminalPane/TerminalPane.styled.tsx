@@ -7,16 +7,22 @@ export const DownCircleFilled = styled(RawDownCircleFilled)`
   cursor: pointer;
 `;
 
-export const TerminalContainer = styled.div`
-  background-color: red;
+export const TerminalContainer = styled.div<{$height: number}>`
   width: 100%;
-  height: 100%;
+  height: ${({$height}) => $height}px;
+
+  & .xterm {
+    height: 100%;
+
+    & .xterm-viewport {
+      overflow-y: auto;
+    }
+  }
 `;
 
 export const TerminalPaneContainer = styled.div`
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
 `;
 
 export const TitleBar = styled.div`
