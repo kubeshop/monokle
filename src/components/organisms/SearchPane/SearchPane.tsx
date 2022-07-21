@@ -280,7 +280,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
                   </p>
                 </S.MatchText>
               )}
-              {!searchQuery && !isFindingMatches && (
+              {recentSearch.length !== 0 && !searchQuery && !isFindingMatches && (
                 <RecentSearch
                   recentSearch={recentSearch}
                   handleClick={query => {
