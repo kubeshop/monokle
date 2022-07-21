@@ -43,6 +43,7 @@ export interface TreeNode {
   children: TreeNode[];
   highlight: boolean;
   extension: string;
+  isTextExtension: boolean;
   isFolder?: boolean;
   text?: string;
   /**
