@@ -148,7 +148,7 @@ export const hotkeys = createHotkeys({
     category: 'tool',
   },
   REPLACE: {
-    name: 'Search Files',
+    name: 'Search and Replace Files',
     key: 'ctrl+shift+f, command+shift+f',
     category: 'tool',
   },

@@ -21,6 +21,7 @@ test('create-file-entry', () => {
   let e = createFileEntry({
     fileEntryPath: createSafePath('/a/very/long/path'),
     fileMap,
+    extension: '',
   });
 
   expect(e.isExcluded).toBeFalsy();

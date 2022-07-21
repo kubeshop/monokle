@@ -1,5 +1,7 @@
 import Highlighter from 'react-highlight-words';
 
+import textExtensions from 'text-extensions';
+
 import {FileEntry, MatchNode} from '@models/fileentry';
 
 import {FilterTreeNode} from '../FileTreePane/types';
@@ -18,6 +20,8 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
   );
 
   return filteredFileMap.map((item: FileEntry) => {
+    const fileExtension = item.extension.split('.').join('');
+    const isTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
     return {
       ...item,
       highlight: false,
@@ -27,6 +31,7 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
       isExcluded: item.isExcluded,
       filePath: item.filePath,
       key: item.filePath,
+      isTextExtension,
       title: <Title item={item} />,
       children:
         item.matchLines?.map((line: MatchNode[], idx: number) => ({
