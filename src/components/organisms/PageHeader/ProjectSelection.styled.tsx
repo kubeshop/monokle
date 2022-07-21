@@ -17,7 +17,7 @@ export const Button = styled(RawButton)`
   align-items: center;
   margin-right: 0px;
   padding: 0px;
-  width: 172px;
+  width: 100%;
 
   :hover,
   :focus {
@@ -31,6 +31,12 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   &:hover {
     opacity: 0.8;
   }
+`;
+
+export const ProjectContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export const DownOutlined = styled(RawDownOutlined)`
@@ -67,10 +73,10 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
-  border: none;
-  width: 180px;
+  width: 240px;
   background: ${Colors.grey3b};
   padding: 2px 4px;
+  border-radius: 4px;
 `;
 
 export const ProjectMenu = styled.div`
