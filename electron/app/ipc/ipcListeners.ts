@@ -1,9 +1,11 @@
-import {app, ipcMain} from 'electron';
+import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
+import pty from 'node-pty';
 import Nucleus from 'nucleus-nodejs';
+import os from 'os';
 import * as path from 'path';
 
 import {
@@ -66,6 +68,10 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
+const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+
+// string is the webContentsId
+let ptyProcessMap: Record<string, any> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
@@ -261,5 +267,22 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
     dispatchToAllWindows(changeCurrentProjectName(payload.newName));
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
+  }
+});
+
+ipcMain.on('init-terminal', (event, args) => {
+  const {rootFolder, webContentsId} = args;
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+
+  if (currentWebContents) {
+    const ptyProcess = pty.spawn(shell, [], {
+      name: 'xterm-color',
+      rows: 30,
+      cols: 80,
+      cwd: rootFolder,
+      env: process.env as Record<string, string>,
+    });
+
+    ptyProcessMap[webContentsId] = ptyProcess;
   }
 });

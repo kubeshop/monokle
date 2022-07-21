@@ -745,6 +745,9 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.selectedValuesFileId = undefined;
     },
+    setWebContentsId: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.webContentsId = action.payload;
+    },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
@@ -1347,6 +1350,7 @@ export const {
   setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
+  setWebContentsId,
   startPreviewLoader,
   stopPreviewLoader,
   toggleAllRules,
