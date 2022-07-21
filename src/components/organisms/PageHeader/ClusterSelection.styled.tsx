@@ -15,6 +15,7 @@ import {PreviewType} from '@models/appstate';
 import {ClusterColors} from '@models/cluster';
 
 import Colors from '@styles/Colors';
+import {Device} from '@styles/Device';
 
 interface RawButtonProps extends ButtonProps {
   $kubeConfigContextColor?: ClusterColors;
@@ -189,6 +190,10 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   padding: 0 1rem;
   background: ${Colors.grey3b};
   border: none;
+
+  @media ${Device.laptop} {
+    min-width: 340px;
+  }
 `;
 
 export const ClusterStatusText = styled.span<{
