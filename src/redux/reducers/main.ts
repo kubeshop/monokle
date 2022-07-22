@@ -1355,6 +1355,7 @@ export const {
   stopPreviewLoader,
   toggleAllRules,
   toggleClusterOnlyResourcesInClusterDiff,
+  toggleMatchParams,
   toggleRule,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
@@ -1367,7 +1368,6 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
-  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

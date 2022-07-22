@@ -18,7 +18,6 @@ import * as S from './TerminalPane.styled';
 
 const fitAddon = new FitAddon();
 const fitLazy = debounce(() => fitAddon.fit(), 250);
-let terminalData = '';
 
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -45,10 +44,6 @@ const TerminalPane: React.FC = () => {
     terminalRef.current.loadAddon(fitAddon);
 
     terminalRef.current.open(terminalContainerRef.current);
-
-    if (terminalData) {
-      terminalRef.current.write(terminalData);
-    }
 
     terminalRef.current.focus();
 

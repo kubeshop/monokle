@@ -273,12 +273,9 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 ipcMain.on('init-shell', (event, args) => {
   const {rootFilePath, webContentsId} = args;
 
-  console.log('Intializing...');
-
   const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
 
   if (ptyProcessMap[webContentsId]) {
-    console.log(ptyProcessMap[webContentsId]);
     return;
   }
 
