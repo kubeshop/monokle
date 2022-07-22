@@ -107,7 +107,13 @@ const PaneManagerSplitView: React.FC = () => {
       {bottomSelection && <ReflexSplitter />}
 
       {bottomSelection && (
-        <ReflexElement id="bottomPane" minSize={150} maxSize={400} flex={layout.bottomPaneHeight / height}>
+        <ReflexElement
+          id="bottomPane"
+          minSize={150}
+          maxSize={400}
+          flex={layout.bottomPaneHeight / height}
+          style={{overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto'}}
+        >
           <BottomPaneManager />
         </ReflexElement>
       )}
