@@ -6,7 +6,7 @@ import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compar
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kubeConfigPathValidSelector} from '@redux/selectors';
 
-import * as S from './ResourceSetTypeSelect.styled';
+import * as S from './ResourceSetSelectColor.styled';
 
 type Props = {
   side: 'left' | 'right';
