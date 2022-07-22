@@ -1,4 +1,4 @@
-import {app, ipcMain} from 'electron';
+import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
@@ -273,6 +273,15 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 ipcMain.on('init-shell', (event, args) => {
   const {rootFilePath, webContentsId} = args;
 
+  console.log('Intializing...');
+
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+
+  if (ptyProcessMap[webContentsId]) {
+    console.log(ptyProcessMap[webContentsId]);
+    return;
+  }
+
   try {
     const ptyProcess = pty.spawn(shell, [], {
       name: 'xterm-color',
@@ -283,6 +292,14 @@ ipcMain.on('init-shell', (event, args) => {
     });
 
     ptyProcessMap[webContentsId] = ptyProcess;
+
+    if (currentWebContents) {
+      ptyProcess.onData((incomingData: any) => {
+        currentWebContents.send('shell.incomingData', incomingData);
+      });
+    } else {
+      log.error('Web contents is not found');
+    }
   } catch (e) {
     log.error('Pty process could not be created ', e);
   }
@@ -296,4 +313,34 @@ ipcMain.on('resize-shell', (event, args) => {
   if (ptyProcess) {
     ptyProcess.resize(cols, rows);
   }
+});
+
+ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
+  const {data, webContentsId} = d;
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (ptyProcess) {
+    ptyProcess.write(data);
+  }
+});
+
+ipcMain.on('shell.ptyProcessKill', (event, data) => {
+  const {webContentsId} = data;
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (!ptyProcess) {
+    return;
+  }
+
+  if (process.platform === 'win32') {
+    try {
+      process.kill(ptyProcess.pid);
+    } catch (e) {
+      log.error(e);
+    }
+  } else {
+    ptyProcess.kill();
+  }
+
+  delete ptyProcessMap[webContentsId];
 });
