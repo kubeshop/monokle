@@ -117,7 +117,7 @@ export type UiState = {
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
     isValidationDrawerVisible: boolean;
-    activeTab?: string;
+    activeTab: string | null;
   };
   quickSearchActionsPopup: {
     isOpen: boolean;

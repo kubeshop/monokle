@@ -1,5 +1,7 @@
 import {Tooltip} from 'antd';
 
+import textExtensions from 'text-extensions';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -24,6 +26,8 @@ export const createNode = (
   const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
   const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
   const name = isRoot ? rootFolderName : fileEntry.name;
+  const fileExtension = fileEntry.extension.split('.').join('');
+  const isTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
 
   const node: TreeNode = {
     key,
@@ -34,7 +38,7 @@ export const createNode = (
             className={
               fileEntry.isExcluded
                 ? 'excluded-file-entry-name'
-                : (fileEntry.isSupported || fileEntry.children) &&
+                : (fileEntry.isSupported || fileEntry.children || isTextExtension) &&
                   (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true)
                 ? 'file-entry-name'
                 : 'not-supported-file-entry-name'
@@ -55,6 +59,8 @@ export const createNode = (
     isExcluded: fileEntry.isExcluded,
     isSupported: fileEntry.isSupported,
     filePath: fileEntry.filePath,
+    extension: fileEntry.extension,
+    isTextExtension,
   };
 
   if (fileEntry.children) {

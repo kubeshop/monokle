@@ -186,7 +186,7 @@ const initialUiState: UiState = {
     expandedFolders: [],
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
-    activeTab: undefined,
+    activeTab: null,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
