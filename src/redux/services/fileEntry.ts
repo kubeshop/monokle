@@ -66,10 +66,11 @@ interface CreateFileEntryArgs {
   fileMap: FileMapType;
   helmChartId?: string;
   text?: string;
+  extension: string;
 }
 
 // TODO: Maybe text shouldn't be optional
-export function createFileEntry({fileEntryPath, fileMap, helmChartId, text}: CreateFileEntryArgs) {
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, text, extension}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
@@ -77,6 +78,7 @@ export function createFileEntry({fileEntryPath, fileMap, helmChartId, text}: Cre
     isSupported: false,
     helmChartId,
     text,
+    extension,
   };
 
   const timestamp = getFileTimestamp(getAbsoluteFilePath(fileEntryPath, fileMap));
@@ -98,6 +100,7 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
     filePath: rootFolder,
     isExcluded: false,
     isSupported: false,
+    extension: path.extname(rootFolder),
   };
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
   return rootEntry;
@@ -212,7 +215,8 @@ export function readFiles(
         text = fs.readFileSync(path.join(filePath), 'utf8');
       }
 
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, text});
+      const extension = path.extname(fileEntryPath);
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, text});
 
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
@@ -580,7 +584,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
   const fileText = fs.readFileSync(absolutePath, 'utf8');
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, text: fileText});
+  const extension = path.extname(absolutePath);
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, text: fileText, extension});
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
@@ -624,6 +629,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
     const folderEntry = createFileEntry({
       fileEntryPath: absolutePath.substring(rootFolder.length),
       fileMap: state.fileMap,
+      extension: path.extname(absolutePath),
     });
     folderEntry.children = readFiles(
       absolutePath,

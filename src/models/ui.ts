@@ -119,7 +119,7 @@ export type UiState = {
     isActive: boolean;
     isValidationDrawerVisible: boolean;
     selection: LeftMenuSelectionType;
-    activeTab?: string;
+    activeTab: string | null;
   };
   quickSearchActionsPopup: {
     isOpen: boolean;

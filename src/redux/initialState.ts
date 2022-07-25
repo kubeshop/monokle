@@ -189,6 +189,7 @@ const initialUiState: UiState = {
     selection: uiLeftMenuSelection,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
+    activeTab: null,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

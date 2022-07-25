@@ -1,28 +1,21 @@
 import {useSelector} from 'react-redux';
 
-import micromatch from 'micromatch';
-import path from 'path';
-
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
 export const useFileSelect = () => {
-  const fileIncludes = useAppSelector(fileIncludesSelector);
-  const scanExcludes = useAppSelector(scanExcludesSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
 
   const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
+    const {isExcluded, isSupported, isTextExtension} = info.node;
+    if ((isExcluded || !isSupported) && !isTextExtension) {
+      return;
+    }
 
-    if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(nodeKey), fileInclude))) {
-      return;
-    }
-    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(nodeKey), scanExclude))) {
-      return;
-    }
     if (nodeKey) {
       if (isInPreviewMode) {
         stopPreview(dispatch);

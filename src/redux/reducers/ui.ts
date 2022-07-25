@@ -66,7 +66,7 @@ export const uiSlice = createSlice({
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
-    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
       state.leftMenu.activeTab = action.payload;
     },
     toggleRightMenu: (state: Draft<UiState>) => {

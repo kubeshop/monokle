@@ -22,6 +22,8 @@ interface FileEntry {
   name: string;
   /** the path of the file relative to the root folder - used as key in the fileMap */
   filePath: string;
+  /** file extension */
+  extension: string;
   /** if the file/folder is excluded from the navigator */
   isExcluded: boolean;
   /** if the file is found in global inclusion config ( config.fileIncludes ) */
