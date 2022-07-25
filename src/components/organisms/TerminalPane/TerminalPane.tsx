@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {debounce} from 'lodash';
@@ -16,42 +16,43 @@ import {Icon, MonoPaneTitle} from '@atoms';
 
 import * as S from './TerminalPane.styled';
 
+const terminal = new Terminal({cursorBlink: true, fontSize: 12});
 const fitAddon = new FitAddon();
-const fitLazy = debounce(() => fitAddon.fit(), 250);
+terminal.loadAddon(fitAddon);
 
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
+  const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const webContentsId = useAppSelector(state => state.main.webContentsId);
 
-  const [containerRef, {height, width}] = useMeasure<HTMLDivElement>();
+  const [containerRef, {height}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
-  const terminalRef = useRef<Terminal>();
 
   useEffect(() => {
+    console.log('Terminal Pane');
+
     if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
       return;
     }
 
-    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
-    terminalRef.current.loadAddon(fitAddon);
-    terminalRef.current.open(terminalContainerRef.current);
-    terminalRef.current.focus();
+    terminal.open(terminalContainerRef.current);
+    terminal.focus();
 
     const onIncomingData = (_: any, data: string | Uint8Array) => {
-      terminalRef.current?.write(data);
+      terminal.write(data);
     };
 
     ipcRenderer.on('shell.incomingData', onIncomingData);
 
-    terminalRef.current.onResize(({cols, rows}) => {
+    terminal.onResize(({cols, rows}) => {
       ipcRenderer.send('resize-shell', {cols, rows, webContentsId});
     });
 
-    terminalRef.current.onData(data => {
+    terminal.onData(data => {
       ipcRenderer.send('shell.ptyProcessWriteData', {data, webContentsId});
     });
 
@@ -79,9 +80,16 @@ const TerminalPane: React.FC = () => {
   }, [rootFilePath, webContentsId]);
 
   useEffect(() => {
-    fitLazy();
-    terminalRef.current?.focus();
-  }, [height, webContentsId, width]);
+    // if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
+    //   return;
+    // }
+
+    setTimeout(() => {
+      fitAddon.fit();
+    }, 250);
+
+    terminal.focus();
+  }, [bottomPaneHeight]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
@@ -99,4 +107,4 @@ const TerminalPane: React.FC = () => {
   );
 };
 
-export default TerminalPane;
+export default React.memo(TerminalPane);
