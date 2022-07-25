@@ -1,10 +1,10 @@
 import {ipcRenderer} from 'electron';
 
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {debounce} from 'lodash';
-import {ITerminalOptions, Terminal} from 'xterm';
+import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -19,8 +19,6 @@ import * as S from './TerminalPane.styled';
 const fitAddon = new FitAddon();
 const fitLazy = debounce(() => fitAddon.fit(), 250);
 
-let terminal;
-
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -33,23 +31,21 @@ const TerminalPane: React.FC = () => {
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
   const terminalRef = useRef<Terminal>();
 
-  const onIncomingData = useCallback((_: any, data: any) => {
-    terminalRef.current?.write(data);
-  }, []);
-
   useEffect(() => {
-    // if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
-    //   return;
-    // }
-
-    terminalRef.current = new TerminalInstance({cursorBlink: true, fontSize: 12});
-    terminalRef.current.loadAddon(fitAddon);
-
-    if (terminalContainerRef.current) {
-      terminalRef.current.open(terminalContainerRef.current);
+    if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
+      return;
     }
 
+    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
+    terminalRef.current.loadAddon(fitAddon);
+    terminalRef.current.open(terminalContainerRef.current);
     terminalRef.current.focus();
+
+    const onIncomingData = (_: any, data: string | Uint8Array) => {
+      terminalRef.current?.write(data);
+    };
+
+    ipcRenderer.on('shell.incomingData', onIncomingData);
 
     terminalRef.current.onResize(({cols, rows}) => {
       ipcRenderer.send('resize-shell', {cols, rows, webContentsId});
@@ -60,6 +56,10 @@ const TerminalPane: React.FC = () => {
     });
 
     fitAddon.fit();
+
+    return () => {
+      ipcRenderer.removeListener('shell.incomingData', onIncomingData);
+    };
 
     // return () => {
     //   onResizeHandler.dispose();
@@ -83,14 +83,6 @@ const TerminalPane: React.FC = () => {
     terminalRef.current?.focus();
   }, [height, webContentsId, width]);
 
-  useEffect(() => {
-    ipcRenderer.on('shell.incomingData', onIncomingData);
-
-    return () => {
-      ipcRenderer.removeListener('shell.incomingData', onIncomingData);
-    };
-  }, [onIncomingData]);
-
   return (
     <S.TerminalPaneContainer ref={containerRef}>
       <S.TitleBar ref={titleBarRef}>
@@ -108,16 +100,3 @@ const TerminalPane: React.FC = () => {
 };
 
 export default TerminalPane;
-
-export class TerminalInstance extends Terminal {
-  private static instance: Terminal;
-
-  constructor(options?: ITerminalOptions) {
-    super(options);
-    if (TerminalInstance.instance) {
-      // eslint-disable-next-line no-constructor-return
-      return TerminalInstance.instance;
-    }
-    TerminalInstance.instance = this;
-  }
-}
