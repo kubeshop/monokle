@@ -3,7 +3,6 @@ import {ipcRenderer} from 'electron';
 import React, {useEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
-import {debounce} from 'lodash';
 import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
@@ -33,8 +32,6 @@ const TerminalPane: React.FC = () => {
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
   useEffect(() => {
-    console.log('Terminal Pane');
-
     if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
       return;
     }
@@ -80,10 +77,6 @@ const TerminalPane: React.FC = () => {
   }, [rootFilePath, webContentsId]);
 
   useEffect(() => {
-    // if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
-    //   return;
-    // }
-
     setTimeout(() => {
       fitAddon.fit();
     }, 250);
