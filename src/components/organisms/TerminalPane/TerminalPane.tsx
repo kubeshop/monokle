@@ -22,6 +22,7 @@ terminal.loadAddon(fitAddon);
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const webContentsId = useAppSelector(state => state.main.webContentsId);
 
@@ -83,6 +84,14 @@ const TerminalPane: React.FC = () => {
 
     terminal.focus();
   }, [bottomPaneHeight]);
+
+  useEffect(() => {
+    if (bottomSelection !== 'terminal') {
+      return;
+    }
+
+    terminal.focus();
+  }, [bottomSelection]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
