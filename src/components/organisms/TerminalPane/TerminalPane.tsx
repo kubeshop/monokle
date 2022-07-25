@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {debounce} from 'lodash';
-import {Terminal} from 'xterm';
+import {ITerminalOptions, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -18,6 +18,8 @@ import * as S from './TerminalPane.styled';
 
 const fitAddon = new FitAddon();
 const fitLazy = debounce(() => fitAddon.fit(), 250);
+
+let terminal;
 
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -36,14 +38,16 @@ const TerminalPane: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
-      return;
-    }
+    // if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
+    //   return;
+    // }
 
-    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
+    terminalRef.current = new TerminalInstance({cursorBlink: true, fontSize: 12});
     terminalRef.current.loadAddon(fitAddon);
 
-    terminalRef.current.open(terminalContainerRef.current);
+    if (terminalContainerRef.current) {
+      terminalRef.current.open(terminalContainerRef.current);
+    }
 
     terminalRef.current.focus();
 
@@ -104,3 +108,16 @@ const TerminalPane: React.FC = () => {
 };
 
 export default TerminalPane;
+
+export class TerminalInstance extends Terminal {
+  private static instance: Terminal;
+
+  constructor(options?: ITerminalOptions) {
+    super(options);
+    if (TerminalInstance.instance) {
+      // eslint-disable-next-line no-constructor-return
+      return TerminalInstance.instance;
+    }
+    TerminalInstance.instance = this;
+  }
+}
