@@ -229,7 +229,7 @@ export const RecentSearchItem = styled.div`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-
+  width: max-content;
   &:hover {
     cursor: pointer;
     color: ${Colors.cyan7};

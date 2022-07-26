@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Input, Select, Tooltip} from 'antd';
+import {Button, Select, Tooltip} from 'antd';
 
 import {ClearOutlined} from '@ant-design/icons';
 
@@ -21,6 +21,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
+import InputTags from '../InputTags';
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
@@ -35,7 +36,7 @@ const ResourceFilter = () => {
   const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
   const [kinds, setKinds] = useState<string[]>([]);
-  const [name, setName] = useState<string>();
+  const [names, setNames] = useState<string[]>([]);
   const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
 
@@ -83,18 +84,18 @@ const ResourceFilter = () => {
 
   const isSavePresetDisabled = useMemo(
     () =>
-      !name &&
+      !names.length &&
       !kinds.length &&
       (!namespace || namespace === ALL_OPTIONS) &&
       isEmpty(labels) &&
       isEmpty(annotations) &&
       (!fileOrFolderContainedIn || fileOrFolderContainedIn === ROOT_OPTIONS),
-    [annotations, fileOrFolderContainedIn, kinds.length, labels, name, namespace]
+    [annotations, fileOrFolderContainedIn, kinds.length, labels, names, namespace]
   );
 
   const resetFilters = () => {
     setWasLocalUpdate(true);
-    setName('');
+    setNames([]);
     setKinds([]);
     setNamespace(ALL_OPTIONS);
     setLabels({});
@@ -102,9 +103,14 @@ const ResourceFilter = () => {
     setFileOrFolderContainedIn(ROOT_OPTIONS);
   };
 
-  const updateName = (newName: string) => {
+  const updateNames = (newName: string, type: 'add' | 'remove') => {
     setWasLocalUpdate(true);
-    setName(newName);
+
+    if (type === 'add') {
+      setNames([...names, newName]);
+    } else if (type === 'remove') {
+      setNames(names.filter(name => name !== newName));
+    }
   };
 
   const updateLabels = (newLabels: Record<string, string | null>) => {
@@ -162,7 +168,7 @@ const ResourceFilter = () => {
       }
 
       const updatedFilter = {
-        name,
+        names,
         kinds: kinds.includes(ALL_OPTIONS) ? undefined : kinds,
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
@@ -173,12 +179,12 @@ const ResourceFilter = () => {
       dispatch(updateResourceFilter(updatedFilter));
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [name, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
+    [names, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
   );
 
   useEffect(() => {
     if (!wasLocalUpdate) {
-      setName(filtersMap.name);
+      setNames(filtersMap.names || []);
       setKinds(filtersMap.kinds || []);
       setNamespace(filtersMap.namespace);
       setLabels(filtersMap.labels);
@@ -219,14 +225,17 @@ const ResourceFilter = () => {
       </S.TitleContainer>
 
       <S.Field>
-        <S.FieldLabel>Name:</S.FieldLabel>
-        <Input
+        <S.FieldLabel>Name(s):</S.FieldLabel>
+
+        <InputTags
           autoFocus
           disabled={areFiltersDisabled}
-          placeholder="All or part of name..."
-          defaultValue={name}
-          value={name}
-          onChange={e => updateName(e.target.value)}
+          helperValue="name"
+          placeholder="Enter name"
+          tags={names}
+          warningMessage="Name already exists!"
+          onTagAdd={tag => updateNames(tag, 'add')}
+          onTagRemove={tag => updateNames(tag, 'remove')}
         />
       </S.Field>
 

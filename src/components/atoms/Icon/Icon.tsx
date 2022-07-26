@@ -23,6 +23,7 @@ import {
   SeverityLow,
   SeverityMedium,
   Shortcuts,
+  Terminal,
   Validation,
   Warning,
   YAMLSyntax,
@@ -58,6 +59,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'resource-links': ResourceLinks,
   'k8s-schema': K8sSchema,
   search: Search,
+  terminal: Terminal,
 };
 
 const Icon: React.FC<IconProps> = props => {

@@ -1,3 +1,5 @@
+@import '~xterm/css/xterm.css';
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
@@ -162,12 +164,12 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 }
 
 .monokleEditorMatchInlineClass {
-  background-color: #6F9412;
+  background-color: #6f9412;
   color: #0d0b0b !important;
 }
 
 .monokleEditorCurrentMatchInlineClass {
-  background-color: #C9E75D;
+  background-color: #c9e75d;
   color: #0d0b0b !important;
 }
 

@@ -21,7 +21,12 @@ import {
   updateSearchHistory,
   updateSearchQuery,
 } from '@redux/reducers/main';
-import {openCreateFileFolderModal, openRenameEntityModal, setExpandedSearchedFiles} from '@redux/reducers/ui';
+import {
+  openCreateFileFolderModal,
+  openRenameEntityModal,
+  setActiveTab,
+  setExpandedSearchedFiles,
+} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 
@@ -193,6 +198,13 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryMatchParams, fileMap]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setActiveTab(null));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
     setFindingMatches(true);
     dispatch(updateSearchQuery(e.target.value));
@@ -260,10 +272,14 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   }, [currentMatchNode, searchTree, selectedPath]);
   const isPrevEnabled = Number(currentMatchNode?.currentMatchNumber) > 1;
 
+  const changeTab = (tabKey: string) => {
+    dispatch(setActiveTab(tabKey));
+  };
+
   return (
     <S.FileTreeContainer id="AdvancedSearch">
       <TitleBar title="Advanced Search" closable />
-      <S.Tabs activeKey={activeTab}>
+      <S.Tabs activeKey={activeTab} onChange={changeTab}>
         <TabPane key="search" tab="Search">
           <S.TreeContainer>
             <S.Form>
@@ -280,7 +296,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
                   </p>
                 </S.MatchText>
               )}
-              {!searchQuery && !isFindingMatches && (
+              {recentSearch.length && !searchQuery && !isFindingMatches && (
                 <RecentSearch
                   recentSearch={recentSearch}
                   handleClick={query => {

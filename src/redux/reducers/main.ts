@@ -537,13 +537,18 @@ export const mainSlice = createSlice({
 
       // construct new filter
       let newFilter: ResourceFilterType = {
+        names: filter.names
+          ? isEqual(filter.names, state.resourceFilter.names)
+            ? undefined
+            : filter.names
+          : state.resourceFilter.names,
         namespace: filter.namespace
           ? filter.namespace === state.resourceFilter.namespace
             ? undefined
             : filter.namespace
           : state.resourceFilter.namespace,
         kinds: filter.kinds
-          ? filter.kinds === state.resourceFilter.kinds
+          ? isEqual(filter.kinds, state.resourceFilter.kinds)
             ? undefined
             : filter.kinds
           : state.resourceFilter.kinds,
@@ -552,7 +557,6 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.fileOrFolderContainedIn
           : state.resourceFilter.fileOrFolderContainedIn,
-        name: state.resourceFilter.name,
         labels: state.resourceFilter.labels,
         annotations: state.resourceFilter.annotations,
       };
@@ -740,6 +744,9 @@ export const mainSlice = createSlice({
       state.selectedPreviewConfigurationId = undefined;
       state.selectedPath = undefined;
       state.selectedValuesFileId = undefined;
+    },
+    setWebContentsId: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.webContentsId = action.payload;
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
@@ -948,8 +955,9 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
+          const extension = path.extname(relativeFilePath);
           const newFileEntry: FileEntry = {
-            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap}),
+            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
             isSupported: true,
             timestamp: resourcePayload.fileTimestamp,
           };
@@ -1343,10 +1351,12 @@ export const {
   setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
+  setWebContentsId,
   startPreviewLoader,
   stopPreviewLoader,
   toggleAllRules,
   toggleClusterOnlyResourcesInClusterDiff,
+  toggleMatchParams,
   toggleRule,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
@@ -1359,7 +1369,6 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
-  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

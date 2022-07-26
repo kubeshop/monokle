@@ -1,3 +1,4 @@
+// import * as k8s from '@kubernetes/client-node';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -22,6 +23,7 @@ import {
 import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -31,9 +33,10 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
-import {getKubeAccess} from '@utils/kubeclient';
+import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -90,8 +93,26 @@ export const updateClusterNamespaces = createAsyncThunk(
   'config/updateClusterNamespaces',
   async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
     thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
+
     let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
+    const newNamespaces = values.filter(
+      v => accesses.findIndex(a => v.cluster === a.context && v.namespace === a.namespace) === -1
+    );
+    const removedNamespaces = accesses
+      .filter(a => values.findIndex(v => a.context === v.cluster) > -1)
+      .filter(a => values.findIndex(v => a.namespace === v.namespace) === -1);
     accesses = accesses.filter(a => a.context !== values[0].cluster);
+
+    newNamespaces.forEach(({namespace, cluster}) => {
+      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      const kubeClient = createKubeClient(kubeConfigPath, cluster);
+      createNamespace(kubeClient, namespace);
+    });
+
+    removedNamespaces.forEach(({namespace, context}) => {
+      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      removeNamespaceFromCluster(namespace, kubeConfigPath, context);
+    });
 
     const results: ClusterAccess[] = await Promise.all(
       values.map(value => getKubeAccess(value.namespace, value.cluster))
