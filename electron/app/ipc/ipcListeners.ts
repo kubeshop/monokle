@@ -270,7 +270,7 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
   }
 });
 
-ipcMain.on('init-shell', (event, args) => {
+ipcMain.on('shell.init', (event, args) => {
   const {rootFilePath, webContentsId} = args;
 
   const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
@@ -302,7 +302,7 @@ ipcMain.on('init-shell', (event, args) => {
   }
 });
 
-ipcMain.on('resize-shell', (event, args) => {
+ipcMain.on('shell.resize', (event, args) => {
   const {webContentsId, cols, rows} = args;
 
   const ptyProcess = ptyProcessMap[webContentsId];

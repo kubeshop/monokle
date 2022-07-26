@@ -72,7 +72,7 @@ const initialAppState: AppState = {
     searchHistory: electronStore.get('appConfig.recentSearch') || [],
     currentMatch: null,
   },
-  webContentsId: 1,
+  webContentsId: undefined,
 };
 
 const initialAppConfigState: AppConfig = {

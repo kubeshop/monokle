@@ -47,7 +47,7 @@ const TerminalPane: React.FC = () => {
     ipcRenderer.on('shell.incomingData', onIncomingData);
 
     terminal.onResize(({cols, rows}) => {
-      ipcRenderer.send('resize-shell', {cols, rows, webContentsId});
+      ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
     });
 
     terminal.onData(data => {
@@ -74,7 +74,7 @@ const TerminalPane: React.FC = () => {
       return;
     }
 
-    ipcRenderer.send('init-shell', {rootFilePath, webContentsId});
+    ipcRenderer.send('shell.init', {rootFilePath, webContentsId});
   }, [rootFilePath, webContentsId]);
 
   useEffect(() => {

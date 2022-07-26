@@ -211,7 +211,7 @@ interface AppState {
       stack: string;
     };
   };
-  webContentsId: number;
+  webContentsId?: number;
 }
 
 export interface KubernetesObject {
