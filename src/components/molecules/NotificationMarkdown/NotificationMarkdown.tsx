@@ -44,7 +44,11 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
   const handleSeeMore = () => {
     // @ts-ignore
     Modal[type]({
-      content: <S.NotificationModalContent>{message}</S.NotificationModalContent>,
+      content: (
+        <S.NotificationModalContent>
+          <ReactMarkdown>{message}</ReactMarkdown>
+        </S.NotificationModalContent>
+      ),
       title: (
         <Provider store={store}>
           <NotificationModalTitle message={message} title={title} />
