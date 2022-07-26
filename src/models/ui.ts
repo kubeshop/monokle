@@ -59,6 +59,7 @@ export type LeftMenuSelectionType =
   | 'images-pane'
   | 'validation-pane'
   | 'search';
+export type LeftMenuBottomSelectionType = 'terminal' | null;
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -112,11 +113,12 @@ export type UiState = {
   layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
-    selection: LeftMenuSelectionType;
-    isActive: boolean;
+    bottomSelection: LeftMenuBottomSelectionType | null;
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
+    isActive: boolean;
     isValidationDrawerVisible: boolean;
+    selection: LeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -160,6 +162,6 @@ export type PaneConfiguration = {
   leftPane: number;
   navPane: number;
   rightPane: number;
-  actionsPaneFooterExpandedHeight: number;
+  bottomPaneHeight: number;
   recentProjectsPaneWidth: number;
 };

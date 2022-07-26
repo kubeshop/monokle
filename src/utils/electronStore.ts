@@ -154,6 +154,9 @@ const schema = {
       leftMenu: {
         type: 'object',
         properties: {
+          bottomSelection: {
+            type: ['string', 'null'],
+          },
           selection: {
             type: 'string',
           },
@@ -280,6 +283,7 @@ const defaults = {
     isSettingsOpen: false,
     isNewResourceWizardOpen: false,
     leftMenu: {
+      bottomSelection: null,
       selection: 'file-explorer',
       isActive: true,
     },

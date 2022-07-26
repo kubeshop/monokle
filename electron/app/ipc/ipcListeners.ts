@@ -1,9 +1,11 @@
-import {app, ipcMain} from 'electron';
+import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
+import * as pty from 'node-pty';
 import Nucleus from 'nucleus-nodejs';
+import os from 'os';
 import * as path from 'path';
 
 import {
@@ -66,6 +68,10 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
+const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+
+// string is the webContentsId
+let ptyProcessMap: Record<string, pty.IPty> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
@@ -262,4 +268,80 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
   }
+});
+
+ipcMain.on('shell.init', (event, args) => {
+  const {rootFilePath, webContentsId} = args;
+
+  if (!webContentsId) {
+    return;
+  }
+
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+
+  if (ptyProcessMap[webContentsId]) {
+    return;
+  }
+
+  try {
+    const ptyProcess = pty.spawn(shell, [], {
+      name: 'xterm-color',
+      rows: 24,
+      cols: 80,
+      cwd: rootFilePath,
+      env: process.env as Record<string, string>,
+    });
+
+    ptyProcessMap[webContentsId] = ptyProcess;
+
+    if (currentWebContents) {
+      ptyProcess.onData((incomingData: any) => {
+        currentWebContents.send('shell.incomingData', incomingData);
+      });
+    } else {
+      log.error('Web contents is not found');
+    }
+  } catch (e) {
+    log.error('Pty process could not be created ', e);
+  }
+});
+
+ipcMain.on('shell.resize', (event, args) => {
+  const {webContentsId, cols, rows} = args;
+
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (ptyProcess) {
+    ptyProcess.resize(cols, rows);
+  }
+});
+
+ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
+  const {data, webContentsId} = d;
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (ptyProcess) {
+    ptyProcess.write(data);
+  }
+});
+
+ipcMain.on('shell.ptyProcessKill', (event, data) => {
+  const {webContentsId} = data;
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if (!ptyProcess) {
+    return;
+  }
+
+  if (process.platform === 'win32') {
+    try {
+      process.kill(ptyProcess.pid);
+    } catch (e) {
+      log.error(e);
+    }
+  } else {
+    ptyProcess.kill();
+  }
+
+  delete ptyProcessMap[webContentsId];
 });

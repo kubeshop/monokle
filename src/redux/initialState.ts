@@ -129,6 +129,7 @@ const initialLogsState: LogsState = {
 };
 
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
 let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfiguration');
 
@@ -180,12 +181,13 @@ const initialUiState: UiState = {
     absolutePathToEntity: '',
   },
   leftMenu: {
-    selection: uiLeftMenuSelection,
-    isActive:
-      !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
+    bottomSelection: uiLeftMenuBottomSelection,
     expandedFolders: [],
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
+    selection: uiLeftMenuSelection,
+    isActive:
+      !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     activeTab: null,
   },
   rightMenu: {
