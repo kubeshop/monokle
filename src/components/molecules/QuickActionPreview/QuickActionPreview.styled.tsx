@@ -6,6 +6,11 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const Container = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 export const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
 export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
@@ -23,11 +28,6 @@ export const ReloadSpan = styled.span<{isItemSelected: boolean}>`
   font-weight: 500;
   cursor: pointer;
   color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
-`;
-
-export const Container = styled.span`
-  display: flex;
-  align-items: center;
 `;
 
 export const Spin = styled(RawSpin)`

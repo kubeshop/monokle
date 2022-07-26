@@ -11,6 +11,8 @@ export {default as InputTags} from './InputTags';
 export {default as Monaco} from './Monaco';
 export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';
 export {default as PreviewDropdown} from './PreviewDropdown';
+export {default as QuickActionCompare} from './QuickActionCompare';
+export {default as QuickActionPreview} from './QuickActionPreview';
 export {default as ResourceDiff} from './ResourceDiff';
 export {default as ResourceFilter} from './ResourceFilter';
 export {default as ResourceFilterIconWithPopover} from './ResourceFilterIconWithPopover';
