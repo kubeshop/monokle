@@ -3,5 +3,6 @@
   "ShowRightMenu": false,
   "ActionsPaneFooter": false,
   "ImagesPane": true,
-  "CompareEverything": true
+  "CompareEverything": true,
+  "Terminal": true
 }

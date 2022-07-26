@@ -24,8 +24,6 @@ export const DEPENDENCIES_HELP_URL = 'https://kubeshop.github.io/monokle/getting
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const DEFAULT_PANE_TITLE_HEIGHT = 40;
-export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
-export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
@@ -57,7 +55,7 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
   navPane: 0.25,
   rightPane: 0,
-  actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+  bottomPaneHeight: 200,
   recentProjectsPaneWidth: 450,
 };
 
