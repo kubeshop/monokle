@@ -3,7 +3,6 @@ import {useMemo} from 'react';
 import {Breadcrumb, Typography} from 'antd';
 
 import {sortBy} from 'lodash';
-import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -14,27 +13,15 @@ import {kubeConfigContextSelector} from '@redux/selectors';
 
 import {buildHelmCommand} from '@utils/helm';
 
+import * as S from './PreviewConfigurationDetails.styled';
+
 const {Text} = Typography;
 
-const Container = styled.div`
-  padding: 12px;
-`;
-
 const PreviwConfigurationDetails: React.FC = () => {
-  const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
-  const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
-
   const currentContext = useAppSelector(kubeConfigContextSelector);
+  const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
   const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
-
-  const previewConfiguration = useMemo(
-    () =>
-      selectedPreviewConfigurationId && previewConfigurationMap
-        ? previewConfigurationMap[selectedPreviewConfigurationId]
-        : undefined,
-    [selectedPreviewConfigurationId, previewConfigurationMap]
-  );
-
+  const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const helmChart = useAppSelector(state => {
     if (!previewConfiguration) {
       return undefined;
@@ -43,6 +30,14 @@ const PreviwConfigurationDetails: React.FC = () => {
       chart => chart.filePath === previewConfiguration.helmChartFilePath
     );
   });
+
+  const previewConfiguration = useMemo(
+    () =>
+      selectedPreviewConfigurationId && previewConfigurationMap
+        ? previewConfigurationMap[selectedPreviewConfigurationId]
+        : undefined,
+    [selectedPreviewConfigurationId, previewConfigurationMap]
+  );
 
   const orderedValuesFilePaths = useMemo(
     () =>
@@ -74,14 +69,14 @@ const PreviwConfigurationDetails: React.FC = () => {
 
   if (!previewConfiguration || !helmChart) {
     return (
-      <Container>
+      <S.Container>
         <p>Something went wrong...</p>
-      </Container>
+      </S.Container>
     );
   }
 
   return (
-    <Container>
+    <S.Container>
       {helmChart && previewConfiguration && (
         <Breadcrumb style={{marginBottom: 12}}>
           <Breadcrumb.Item>{helmChart.name}</Breadcrumb.Item>
@@ -91,7 +86,7 @@ const PreviwConfigurationDetails: React.FC = () => {
       <Text code copyable>
         {builtCommand.join(' ')}
       </Text>
-    </Container>
+    </S.Container>
   );
 };
 
