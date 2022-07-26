@@ -33,7 +33,7 @@ const TerminalPane: React.FC = () => {
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
   useEffect(() => {
-    if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
+    if (!webContentsId || !terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
       return;
     }
 
@@ -67,10 +67,10 @@ const TerminalPane: React.FC = () => {
     // };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [webContentsId]);
 
   useEffect(() => {
-    if (!rootFilePath) {
+    if (!rootFilePath || !webContentsId) {
       return;
     }
 

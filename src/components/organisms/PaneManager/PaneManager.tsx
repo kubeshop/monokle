@@ -38,6 +38,10 @@ const PaneManager: React.FC = () => {
     (elements: any) => {
       const bottomPaneElement = elements.find((el: any) => el.props.id === 'bottomPane');
 
+      if (!bottomPaneElement) {
+        return;
+      }
+
       dispatch(setPaneConfiguration({...layout, bottomPaneHeight: bottomPaneElement.props.flex * height}));
     },
     [dispatch, height, layout]
