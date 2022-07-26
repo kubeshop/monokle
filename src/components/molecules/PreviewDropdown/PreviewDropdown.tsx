@@ -19,11 +19,11 @@ import * as S from './PreviewDropdown.styled';
 import PreviewMenu from './PreviewMenu';
 
 interface IProps {
-  buttonStyle?: React.CSSProperties;
+  btnStyle?: React.CSSProperties;
 }
 
 const PreviewDropdown: React.FC<IProps> = props => {
-  const {buttonStyle} = props;
+  const {btnStyle} = props;
 
   const dispatch = useAppDispatch();
   const previewHelmChart = useAppSelector(state =>
@@ -132,8 +132,8 @@ const PreviewDropdown: React.FC<IProps> = props => {
         ghost={!previewText}
         style={
           previewText
-            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, ...buttonStyle}
-            : buttonStyle
+            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, ...btnStyle}
+            : btnStyle
         }
       >
         <span>{previewText || 'Preview'}</span> <DownOutlined />
