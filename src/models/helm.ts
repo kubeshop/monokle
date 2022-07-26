@@ -11,6 +11,12 @@ interface HelmChart {
   templateIds: string[]; // ids of contained Helm templates
 }
 
+interface HelmChartMenuItem {
+  id: string;
+  name: string;
+  subItems: {id: string; name: string}[];
+}
+
 interface HelmValueMatch {
   keyPath: string;
   value: any;
@@ -48,4 +54,4 @@ interface HelmTemplate {
   helmChartId: string;
 }
 
-export type {HelmChart, HelmValuesFile, RangeAndValue, HelmValueMatch, HelmTemplate};
+export type {HelmChart, HelmChartMenuItem, HelmValuesFile, RangeAndValue, HelmValueMatch, HelmTemplate};

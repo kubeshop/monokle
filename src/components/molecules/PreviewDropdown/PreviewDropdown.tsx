@@ -1,12 +1,12 @@
 import React, {useCallback, useMemo} from 'react';
 import {shallowEqual} from 'react-redux';
 
-import {Button, Dropdown, Menu} from 'antd';
+import {Dropdown} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
-import {MenuClickEventHandler} from 'rc-menu/lib/interface';
-import styled from 'styled-components';
+import {HelmChartMenuItem} from '@models/helm';
+import {KustomizationMenuItem} from '@models/kustomize';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
@@ -15,73 +15,28 @@ import {startPreview} from '@redux/services/preview';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-const {SubMenu} = Menu;
+import * as S from './PreviewDropdown.styled';
+import PreviewMenu from './PreviewMenu';
 
-type HelmChartMenuItem = {
-  id: string;
-  name: string;
-  subItems: {id: string; name: string}[];
-};
+interface IProps {
+  buttonStyle?: React.CSSProperties;
+}
 
-type KustomizationMenuItem = {
-  id: string;
-  name: string;
-};
+const PreviewDropdown: React.FC<IProps> = props => {
+  const {buttonStyle} = props;
 
-const StyledButton = styled(Button)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const PreviewMenu = (props: {
-  helmCharts: HelmChartMenuItem[];
-  kustomizations: KustomizationMenuItem[];
-  onClick: MenuClickEventHandler;
-  previewKey?: string;
-}) => {
-  const {helmCharts, kustomizations, previewKey, onClick} = props;
-
-  return (
-    <Menu onClick={onClick} selectedKeys={previewKey ? [previewKey] : undefined}>
-      <SubMenu title="Helm Charts" key="helmcharts" disabled={helmCharts.length === 0}>
-        {helmCharts.map(helmChart => (
-          <Menu.ItemGroup title={helmChart.name} key={helmChart.id}>
-            {helmChart.subItems.map(valuesFile => (
-              <Menu.Item key={`valuesFile__${valuesFile.id}`}>{valuesFile.name}</Menu.Item>
-            ))}
-          </Menu.ItemGroup>
-        ))}
-      </SubMenu>
-      <SubMenu
-        title="Kustomizations"
-        style={{maxHeight: 250}}
-        key="kustomizations"
-        disabled={kustomizations.length === 0}
-      >
-        {kustomizations.map(kustomization => (
-          <Menu.Item key={`kustomization__${kustomization.id}`}>{kustomization.name}</Menu.Item>
-        ))}
-      </SubMenu>
-    </Menu>
-  );
-};
-
-const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
-  const {btnStyle} = props;
   const dispatch = useAppDispatch();
-
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const previewResource = useAppSelector(state =>
-    state.main.previewResourceId ? state.main.resourceMap[state.main.previewResourceId] : undefined
-  );
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
-  const previewValuesFile = useAppSelector(state =>
-    state.main.previewValuesFileId ? state.main.helmValuesMap[state.main.previewValuesFileId] : undefined
-  );
   const previewHelmChart = useAppSelector(state =>
     previewValuesFile ? state.main.helmChartMap[previewValuesFile.helmChartId] : undefined
   );
+  const previewResource = useAppSelector(state =>
+    state.main.previewResourceId ? state.main.resourceMap[state.main.previewResourceId] : undefined
+  );
+  const previewValuesFile = useAppSelector(state =>
+    state.main.previewValuesFileId ? state.main.helmValuesMap[state.main.previewValuesFileId] : undefined
+  );
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
 
   const helmCharts: HelmChartMenuItem[] = useAppSelector(state => {
     const helmValuesMap = state.main.helmValuesMap;
@@ -172,17 +127,17 @@ const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
         />
       }
     >
-      <StyledButton
+      <S.PreviewButton
         type={previewText ? 'default' : 'primary'}
         ghost={!previewText}
         style={
           previewText
-            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, ...btnStyle}
-            : btnStyle
+            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, ...buttonStyle}
+            : buttonStyle
         }
       >
         <span>{previewText || 'Preview'}</span> <DownOutlined />
-      </StyledButton>
+      </S.PreviewButton>
     </Dropdown>
   );
 };
