@@ -69,7 +69,7 @@ const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
-const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
+const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
@@ -430,7 +430,7 @@ const App = () => {
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isReplaceImageModalVisible && <ReplaceImageModal />}
-          {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
+          {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"

@@ -18,6 +18,7 @@ export {default as ResourceFilter} from './ResourceFilter';
 export {default as ResourceFilterIconWithPopover} from './ResourceFilterIconWithPopover';
 export {default as ResourceNamespaceFilter} from './ResourceNamespaceFilter';
 export {default as ResourceRefsIconPopover} from './ResourceRefsIconPopover';
+export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFolderModal';
 export {default as ScrollIntoView} from './ScrollIntoView';
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
