@@ -1,3 +1,5 @@
+import {useMemo} from 'react';
+
 import {Popover} from 'antd';
 
 import {K8sResource} from '@models/k8sresource';
@@ -10,9 +12,16 @@ import Colors from '@styles/Colors';
 
 import ErrorsPopoverContent from './ErrorsPopoverContent';
 
-const ResourceRefsIconPopover = (props: {resource: K8sResource; isDisabled: boolean; isSelected: boolean}) => {
+interface IProps {
+  isDisabled: boolean;
+  isSelected: boolean;
+  resource: K8sResource;
+}
+
+const ValidationErrorsPopover: React.FC<IProps> = props => {
   const {resource, isDisabled, isSelected} = props;
-  const errorCount = countResourceErrors([resource]);
+
+  const errorCount = useMemo(() => countResourceErrors([resource]), [resource]);
 
   if (isDisabled || errorCount === 0) {
     return null;
@@ -25,4 +34,4 @@ const ResourceRefsIconPopover = (props: {resource: K8sResource; isDisabled: bool
   );
 };
 
-export default ResourceRefsIconPopover;
+export default ValidationErrorsPopover;
