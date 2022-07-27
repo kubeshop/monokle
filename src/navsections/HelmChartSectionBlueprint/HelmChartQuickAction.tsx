@@ -15,8 +15,7 @@ import {selectHelmValuesFile} from '@redux/reducers/main';
 import {selectHelmConfig, selectHelmValues} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
-import {QuickActionCompare} from '@components/molecules/QuickActionCompare';
-import QuickActionPreview from '@components/molecules/QuickActionPreview';
+import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';

@@ -2,40 +2,9 @@ import {useCallback, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
-import Colors from '@styles/Colors';
-
-const ErrorMessageLabel = styled.div`
-  color: ${Colors.redError};
-  margin-top: 10px;
-`;
-
-const HeadlineLabel = styled.div`
-  margin-bottom: 16px;
-`;
-
-const NamespaceContainer = styled.div`
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  grid-column-gap: 10px;
-  align-items: center;
-  margin-top: 24px;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const TitleIcon = styled(ExclamationCircleOutlined)`
-  margin-right: 10px;
-  color: ${Colors.yellowWarning};
-`;
+import * as S from './HelmChartModalConfirmWithNamespaceSelect.styled';
 
 interface IProps {
   isVisible: boolean;
@@ -73,17 +42,17 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     <Modal
       centered
       title={
-        <TitleContainer>
-          <TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
+        <S.TitleContainer>
+          <S.TitleIcon />
           {title}
-        </TitleContainer>
+        </S.TitleContainer>
       }
       visible={isVisible}
       onCancel={onCancel}
       onOk={onClickOk}
     >
       <>
-        <HeadlineLabel>Select namespace:</HeadlineLabel>
+        <S.HeadlineLabel>Select namespace:</S.HeadlineLabel>
         <Radio.Group
           key={selectedOption}
           onChange={e => {
@@ -99,7 +68,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         </Radio.Group>
 
         {selectedOption === 'existing' ? (
-          <NamespaceContainer>
+          <S.NamespaceContainer>
             <span>Namespace:</span>
             <Select
               value={selectedNamespace}
@@ -115,10 +84,10 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                   </Select.Option>
                 ))}
             </Select>
-          </NamespaceContainer>
+          </S.NamespaceContainer>
         ) : selectedOption === 'create' ? (
           <>
-            <NamespaceContainer>
+            <S.NamespaceContainer>
               <span>Namespace name:</span>
               <Input
                 autoFocus
@@ -133,8 +102,8 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                   }
                 }}
               />
-            </NamespaceContainer>
-            {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
+            </S.NamespaceContainer>
+            {errorMessage && <S.ErrorMessageLabel>*{errorMessage}</S.ErrorMessageLabel>}
           </>
         ) : null}
       </>
