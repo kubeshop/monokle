@@ -89,6 +89,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const isPreviewResourceId = useAppSelector(state => Boolean(state.main.previewResourceId));
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -395,7 +396,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                 </TabPane>
               )}
 
-              {selectedResource?.kind === 'Pod' && (
+              {selectedResource?.kind === 'Pod' && isPreviewResourceId && (
                 <TabPane key="logs" tab={<TabHeader>Logs</TabHeader>}>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
