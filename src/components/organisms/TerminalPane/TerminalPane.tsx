@@ -27,17 +27,25 @@ const TerminalPane: React.FC = () => {
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const webContentsId = useAppSelector(state => state.main.webContentsId);
+  const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
+
   const terminalContainerRef = useRef<HTMLDivElement>(null);
+  const terminalDataRef = useRef<IDisposable>();
   const terminalResizeRef = useRef<IDisposable>();
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
   const onKillTerminalHandler = () => {
     dispatch(setLeftBottomMenuSelection(null));
+
+    terminal.dispose();
+    terminalDataRef.current?.dispose();
+    terminalResizeRef.current?.dispose();
+
+    ipcRenderer.send('shell.ptyProcessKill', {webContentsId});
   };
 
   useEffect(() => {
@@ -58,7 +66,7 @@ const TerminalPane: React.FC = () => {
       ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
     });
 
-    terminal.onData(data => {
+    terminalDataRef.current = terminal.onData(data => {
       ipcRenderer.send('shell.ptyProcessWriteData', {data, webContentsId});
     });
 
@@ -67,12 +75,6 @@ const TerminalPane: React.FC = () => {
     return () => {
       ipcRenderer.removeListener('shell.incomingData', onIncomingData);
     };
-
-    // return () => {
-    //   onResizeHandler.dispose();
-    //   onDataHandler.dispose();
-    //   terminalRef.current?.dispose();
-    // };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webContentsId]);

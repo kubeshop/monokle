@@ -13,6 +13,7 @@ import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
+import {terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
 
@@ -39,15 +40,16 @@ combineListeners([
 ]);
 
 const appReducer = combineReducers({
-  config: configSlice.reducer,
-  main: mainSlice.reducer,
   alert: alertSlice.reducer,
-  logs: logsSlice.reducer,
-  ui: uiSlice.reducer,
-  navigator: navigatorSlice.reducer,
-  uiCoach: uiCoachSlice.reducer,
-  extension: extensionSlice.reducer,
   compare: compareSlice.reducer,
+  config: configSlice.reducer,
+  extension: extensionSlice.reducer,
+  logs: logsSlice.reducer,
+  main: mainSlice.reducer,
+  navigator: navigatorSlice.reducer,
+  terminal: terminalSlice.reducer,
+  ui: uiSlice.reducer,
+  uiCoach: uiCoachSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
