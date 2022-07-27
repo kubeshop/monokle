@@ -21,9 +21,7 @@ import {Icon, MonoPaneTitle} from '@atoms';
 import * as S from './TerminalPane.styled';
 
 let terminalId = '';
-const terminal = new Terminal({cursorBlink: true, fontSize: 12});
 const fitAddon = new FitAddon();
-terminal.loadAddon(fitAddon);
 
 const TerminalPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -36,12 +34,11 @@ const TerminalPane: React.FC = () => {
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
+  const terminalRef = useRef<Terminal>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
   const terminalDataRef = useRef<IDisposable>();
   const incomingDataRef = useRef((_: any, data: string | Uint8Array) => {
-    console.log('Data:', data);
-
-    terminal.write(data);
+    terminalRef.current?.write(data);
   });
   const terminalResizeRef = useRef<IDisposable>();
 
@@ -50,8 +47,9 @@ const TerminalPane: React.FC = () => {
   const onKillTerminalHandler = () => {
     dispatch(setLeftBottomMenuSelection(null));
 
-    terminal.clear();
-    terminal.dispose();
+    terminalRef.current?.clear();
+    terminalRef.current?.dispose();
+    terminalRef.current = undefined;
     terminalDataRef.current?.dispose();
     terminalResizeRef.current?.dispose();
     ipcRenderer.removeListener('shell.incomingData', incomingDataRef.current);
@@ -73,19 +71,21 @@ const TerminalPane: React.FC = () => {
       return;
     }
 
+    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
+    terminalRef.current.loadAddon(fitAddon);
     ipcRenderer.send('shell.init', {rootFilePath, webContentsId});
 
     terminalId = uuidv4();
-    terminal.open(terminalContainerRef.current);
-    terminal.focus();
+    terminalRef.current.open(terminalContainerRef.current);
+    terminalRef.current.focus();
 
     ipcRenderer.on('shell.incomingData', incomingDataRef.current);
 
-    terminalResizeRef.current = terminal.onResize(({cols, rows}) => {
+    terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
       ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
     });
 
-    terminalDataRef.current = terminal.onData(data => {
+    terminalDataRef.current = terminalRef.current.onData(data => {
       ipcRenderer.send('shell.ptyProcessWriteData', {data, webContentsId});
     });
 
@@ -105,7 +105,7 @@ const TerminalPane: React.FC = () => {
       fitAddon.fit();
     }, 250);
 
-    terminal.focus();
+    terminalRef.current?.focus();
   }, [bottomPaneHeight, bottomSelection]);
 
   return (
