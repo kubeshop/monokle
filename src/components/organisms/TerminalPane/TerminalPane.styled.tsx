@@ -1,10 +1,21 @@
-import {DownCircleFilled as RawDownCircleFilled} from '@ant-design/icons';
+import {DeleteOutlined as RawDeleteOutlined, DownCircleFilled as RawDownCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+export const DeleteOutlined = styled(RawDeleteOutlined)`
+  font-size: 16px;
+  cursor: pointer;
+`;
 
 export const DownCircleFilled = styled(RawDownCircleFilled)`
   font-size: 16px;
   cursor: pointer;
+`;
+
+export const TerminalActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 export const TerminalContainer = styled.div<{$height: number}>`

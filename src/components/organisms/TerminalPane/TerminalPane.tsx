@@ -3,10 +3,13 @@ import {ipcRenderer} from 'electron';
 import React, {useEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Terminal} from 'xterm';
+import {Tooltip} from 'antd';
+
+import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
@@ -29,8 +32,13 @@ const TerminalPane: React.FC = () => {
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
+  const terminalResizeRef = useRef<IDisposable>();
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
+
+  const onKillTerminalHandler = () => {
+    dispatch(setLeftBottomMenuSelection(null));
+  };
 
   useEffect(() => {
     if (!webContentsId || !terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
@@ -46,7 +54,7 @@ const TerminalPane: React.FC = () => {
 
     ipcRenderer.on('shell.incomingData', onIncomingData);
 
-    terminal.onResize(({cols, rows}) => {
+    terminalResizeRef.current = terminal.onResize(({cols, rows}) => {
       ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
     });
 
@@ -78,20 +86,16 @@ const TerminalPane: React.FC = () => {
   }, [rootFilePath, webContentsId]);
 
   useEffect(() => {
+    if (bottomSelection !== 'terminal') {
+      return;
+    }
+
     setTimeout(() => {
       fitAddon.fit();
     }, 250);
 
     terminal.focus();
-  }, [bottomPaneHeight]);
-
-  useEffect(() => {
-    if (bottomSelection !== 'terminal') {
-      return;
-    }
-
-    terminal.focus();
-  }, [bottomSelection]);
+  }, [bottomPaneHeight, bottomSelection]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
@@ -101,7 +105,13 @@ const TerminalPane: React.FC = () => {
           <MonoPaneTitle style={{paddingLeft: '10px'}}>Terminal</MonoPaneTitle>
         </S.TitleLabel>
 
-        <S.DownCircleFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
+        <S.TerminalActions>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
+            <S.DeleteOutlined onClick={onKillTerminalHandler} />
+          </Tooltip>
+
+          <S.DownCircleFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
+        </S.TerminalActions>
       </S.TitleBar>
 
       <S.TerminalContainer ref={terminalContainerRef} $height={height - titleBarHeight} />
