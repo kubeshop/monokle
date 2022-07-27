@@ -17,14 +17,13 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@models/ui';
+import {WalkThroughCollection} from '@models/walkthrough';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import {WalkThroughCollection} from '@components/molecules/WalkThrough/types';
 
 import electronStore from '@utils/electronStore';
 

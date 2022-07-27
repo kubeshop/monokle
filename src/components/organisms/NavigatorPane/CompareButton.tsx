@@ -9,7 +9,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/Walkthrough';
 
 export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const dispatch = useAppDispatch();

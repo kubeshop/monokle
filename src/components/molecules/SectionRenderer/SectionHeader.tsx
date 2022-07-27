@@ -4,7 +4,7 @@ import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models
 
 import {useAppDispatch} from '@redux/hooks';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/Walkthrough';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';

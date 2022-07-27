@@ -28,7 +28,7 @@ import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors'
 
 import {FileExplorer} from '@atoms';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/Walkthrough';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 

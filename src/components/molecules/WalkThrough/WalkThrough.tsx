@@ -4,14 +4,13 @@ import {Popover, PopoverProps} from 'antd';
 
 import {CloseOutlined} from '@ant-design/icons';
 
+import {StepEnum, WalkThroughCollection, WalkThroughContentProps, WalkThroughStep} from '@models/walkthrough';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkThrough, handleWalkThroughStep} from '@redux/reducers/ui';
 
-import {newReleaseFeatureContent} from './newReleaseFeaturesContent';
-import {StepEnum, WalkThroughCollection, WalkThroughContentProps, WalkThroughStep} from './types';
-import {walkThroughNoviceContent} from './walkThroughNoviceContent';
-
-import * as S from './styled';
+import * as S from './Walkthrough.styled';
+import {newReleaseFeaturesContent, noviceContent} from './content';
 
 type WalkThroughProps<C extends WalkThroughCollection> = {
   step: WalkThroughStep<C>;
@@ -21,8 +20,8 @@ type WalkThroughProps<C extends WalkThroughCollection> = {
 };
 
 const walkThroughCollection = {
-  novice: walkThroughNoviceContent,
-  release: newReleaseFeatureContent,
+  novice: noviceContent,
+  release: newReleaseFeaturesContent,
 };
 
 const WalkThroughTitle = (props: {title: string; collection: WalkThroughCollection}) => {

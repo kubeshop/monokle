@@ -14,6 +14,7 @@ import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
+import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
@@ -34,8 +35,6 @@ import {isInClusterModeSelector} from '@redux/selectors';
 import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
-
-import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 

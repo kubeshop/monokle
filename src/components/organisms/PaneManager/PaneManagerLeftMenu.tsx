@@ -19,7 +19,7 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import Icon from '@atoms/Icon';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/Walkthrough';
 
 import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';

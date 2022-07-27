@@ -49,7 +49,7 @@ import {
 
 import {TabHeader} from '@atoms';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import WalkThrough from '@components/molecules/Walkthrough';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 

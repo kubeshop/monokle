@@ -1,1 +1,1 @@
-export {default} from './WalkThrough';
+export {default} from './Walkthrough';
