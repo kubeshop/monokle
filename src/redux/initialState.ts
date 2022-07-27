@@ -8,6 +8,7 @@ import {AppState} from '@models/appstate';
 import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
+import {TerminalState} from '@models/terminal';
 import {PaneConfiguration, UiState} from '@models/ui';
 import {UiCoachState} from '@models/uiCoach';
 
@@ -255,13 +256,18 @@ const initialExtensionState: ExtensionState = {
   isPluginsDrawerVisible: false,
 };
 
+const initialTerminalState: TerminalState = {
+  runningTerminals: [],
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
-  main: initialAppState,
-  logs: initialLogsState,
-  ui: initialUiState,
-  navigator: initialNavigatorState,
-  uiCoach: initialUiCoachState,
   extension: initialExtensionState,
+  logs: initialLogsState,
+  main: initialAppState,
+  navigator: initialNavigatorState,
+  terminal: initialTerminalState,
+  ui: initialUiState,
+  uiCoach: initialUiCoachState,
 };
