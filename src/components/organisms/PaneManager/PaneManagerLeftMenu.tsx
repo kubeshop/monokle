@@ -183,7 +183,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         </Walkthrough>
 
         <FeatureFlag name="ImagesPane">
-          <WalkThrough placement="leftTop" collection="release" step="images">
+          <Walkthrough placement="leftTop" collection="release" step="images">
             <PaneTooltip
               show={!leftActive || !(leftMenuSelection === 'images-pane')}
               title="View Images"
@@ -198,7 +198,7 @@ const PaneManagerLeftMenu: React.FC = () => {
                 <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
               </MenuButton>
             </PaneTooltip>
-          </WalkThrough>
+          </Walkthrough>
         </FeatureFlag>
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'templates-pane')}
