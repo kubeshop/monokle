@@ -32,9 +32,9 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import FileExplorer from '@atoms/FileExplorer';
+import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import FileExplorer from '@atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 

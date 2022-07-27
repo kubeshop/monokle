@@ -7,7 +7,7 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
 
-import NotificationMarkdown from '@components/molecules/NotificationMarkdown';
+import {NotificationMarkdown} from '@molecules';
 
 const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();

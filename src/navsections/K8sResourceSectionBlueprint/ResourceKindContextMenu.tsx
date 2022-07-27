@@ -22,9 +22,9 @@ import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import {Dots} from '@atoms';
+import {ContextMenu} from '@molecules';
 
-import ContextMenu from '@components/molecules/ContextMenu';
+import {Dots} from '@atoms';
 
 import {defineHotkey} from '@utils/defineHotkey';
 

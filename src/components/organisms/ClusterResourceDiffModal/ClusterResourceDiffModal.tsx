@@ -27,7 +27,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';

@@ -14,10 +14,9 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
-import {MonoPaneTitle} from '@atoms';
+import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
-import {ResourceFilter, SectionRenderer} from '@components/molecules';
-import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
+import {MonoPaneTitle} from '@atoms';
 
 import {FeatureFlag} from '@utils/features';
 
