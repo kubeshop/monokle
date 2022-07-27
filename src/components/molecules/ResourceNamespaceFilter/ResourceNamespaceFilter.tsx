@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {Select} from 'antd';
 
@@ -9,10 +9,16 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 const ALL_OPTIONS = '<all>';
 
-function ResourceNamespaceFilter(props: {customNamespaces?: string[]}) {
+interface IProps {
+  customNamespaces?: string[];
+}
+
+const ResourceNamespaceFilter: React.FC<IProps> = props => {
   const {customNamespaces} = props;
+
   const dispatch = useAppDispatch();
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
+
   const [namespaces] = useNamespaces({extra: ['all', 'default']});
 
   const currentNamespaces = useMemo(() => {
@@ -52,6 +58,6 @@ function ResourceNamespaceFilter(props: {customNamespaces?: string[]}) {
       })}
     </Select>
   );
-}
+};
 
 export default ResourceNamespaceFilter;
