@@ -3,6 +3,7 @@
 /* eslint-disable no-restricted-syntax */
 import * as ASAR from 'asar';
 import * as fs from 'fs';
+import log from 'loglevel';
 import os from 'os';
 import * as path from 'path';
 import {Page} from 'playwright';
@@ -57,7 +58,7 @@ export async function startApp(): Promise<StartAppResponse> {
     throw new Error('too many windows open');
   }
   const appWindow: Page = windows[0];
-  appWindow.on('console', console.log);
+  appWindow.on('console', log.info);
 
   await appWindow.screenshot({
     path: getRecordingPath(appInfo.platform, 'before-modals.png'),
@@ -154,7 +155,7 @@ export interface ElectronAppInfo {
  * return the path to the app's executable and the path to the app's main file.
  */
 export function parseElectronApp(buildDir: string): ElectronAppInfo {
-  console.log(`Parsing Electron app in ${buildDir}`);
+  log.info(`Parsing Electron app in ${buildDir}`);
   let platform: string | undefined;
   if (buildDir.endsWith('.app')) {
     buildDir = path.dirname(buildDir);
@@ -307,7 +308,6 @@ export const deleteApplicationConfig = (platform: string) => {
       fs.unlinkSync(path.join(os.homedir(), tempPath, 'config.json'));
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error.message);
+    log.error(error.message);
   }
 };

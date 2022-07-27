@@ -16,7 +16,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectClusterDiffMatch, setDiffResourceInClusterDiff, unselectClusterDiffMatch} from '@redux/reducers/main';
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -85,6 +85,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -118,9 +119,9 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
 
     return isKustomizationResource(firstLocalResource)
-      ? makeApplyKustomizationText(firstLocalResource.name, kubeConfigContext)
-      : makeApplyResourceText(firstLocalResource.name, kubeConfigContext);
-  }, [firstLocalResource, kubeConfigContext]);
+      ? makeApplyKustomizationText(firstLocalResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(firstLocalResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [firstLocalResource, kubeConfigContext, kubeConfigContextColor]);
 
   const onClickDiff = () => {
     if (!firstLocalResource) {

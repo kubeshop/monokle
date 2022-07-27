@@ -73,6 +73,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
@@ -83,6 +84,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const settings = useAppSelector(settingsSelector);
@@ -170,6 +172,9 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectedPath,
     helmValuesMap,
     helmChartMap,
+    helmTemplatesMap,
+    matchOptions,
+    isDirty,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
@@ -275,7 +280,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       setCode(newCode);
       setOrgCode(newCode);
       setDirty(false);
-      dispatch(editorHasReloadedSelectedPath());
+      dispatch(editorHasReloadedSelectedPath(false));
     } else {
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }

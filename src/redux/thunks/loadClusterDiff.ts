@@ -40,7 +40,7 @@ export const loadClusterDiff = createAsyncThunk<
   try {
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = currentKubeContext(state.config);
-    const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
+    const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
     const kc = createKubeClient(kubeConfigPath, currentContext);
     try {
       const res = clusterAccess.length

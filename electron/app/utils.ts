@@ -20,9 +20,8 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
+import {getSegmentClient} from '@utils/segment';
 import {APP_INSTALLED} from '@utils/telemetry';
-
-import {getSegmentClient} from './segment';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
@@ -116,7 +115,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
   };
 
   if (!disableTracking) {
-    console.log('New Session.');
+    log.info('New Session.');
     fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
     segmentClient?.track({
       event: 'APP_SESSION',
@@ -125,7 +124,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
   }
 
   if (!storedDeviceID) {
-    console.log('New Installation.');
+    log.info('New Installation.');
     if (NUCLEUS_SH_APP_ID) {
       Nucleus.track(APP_INSTALLED, {appVersion});
     }

@@ -5,7 +5,10 @@ import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} f
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
+import {ReloadOutlined} from '@ant-design/icons';
+
 import _ from 'lodash';
+import log from 'loglevel';
 import path from 'path';
 
 import {
@@ -30,6 +33,7 @@ import {ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
+import {closeKubeConfigBrowseSetting, openKubeConfigBrowseSetting} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -63,6 +67,7 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
+  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
@@ -91,11 +96,15 @@ export const Settings = ({
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfig(config?.kubeConfig?.path);
+    dispatch(closeKubeConfigBrowseSetting());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
 
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
+    dispatch(openKubeConfigBrowseSetting());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
   useEffect(() => {
@@ -215,6 +224,7 @@ export const Settings = ({
       return;
     }
     setCurrentKubeConfig(e.target.value);
+    dispatch(closeKubeConfigBrowseSetting());
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -224,6 +234,7 @@ export const Settings = ({
       if (file.path) {
         const selectedFilePath = file.path;
         setCurrentKubeConfig(selectedFilePath);
+        dispatch(closeKubeConfigBrowseSetting());
       }
     }
   };
@@ -248,8 +259,7 @@ export const Settings = ({
         k8sVersion: selectedK8SVersion,
       });
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error(error.message);
+      log.error(error.message);
     }
   };
 
@@ -347,9 +357,13 @@ export const Settings = ({
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
-            Browse
-          </S.Button>
+          {isKubeConfigBrowseSettingsOpen ? (
+            <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
+              Browse
+            </S.Button>
+          ) : (
+            <ReloadOutlined style={{padding: '1em'}} spin />
+          )}
         </Tooltip>
         <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </S.Div>

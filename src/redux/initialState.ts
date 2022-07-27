@@ -26,6 +26,7 @@ const initialAppState: AppState = {
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
+  helmTemplatesMap: {},
   previewLoader: {
     isLoading: false,
   },
@@ -60,6 +61,17 @@ const initialAppState: AppState = {
   imagesList: [],
   validationIntegration: undefined,
   autosaving: {},
+  search: {
+    searchQuery: '',
+    replaceQuery: '',
+    queryMatchParams: {
+      matchCase: false,
+      matchWholeWord: false,
+      regExp: false,
+    },
+    searchHistory: electronStore.get('appConfig.recentSearch') || [],
+    currentMatch: null,
+  },
 };
 
 const initialAppConfigState: AppConfig = {
@@ -105,6 +117,9 @@ const initialAppConfigState: AppConfig = {
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
   disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
+  clusterAccess: [],
+  isAccessLoading: false,
+  kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
 };
 
 const initialAlertState: AlertState = {};
@@ -114,6 +129,7 @@ const initialLogsState: LogsState = {
 };
 
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
 let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfiguration');
 
@@ -165,13 +181,20 @@ const initialUiState: UiState = {
     absolutePathToEntity: '',
   },
   leftMenu: {
+    bottomSelection: uiLeftMenuBottomSelection,
+    expandedFolders: [],
+    expandedSearchedFiles: ['filter'],
+    isValidationDrawerVisible: false,
     selection: uiLeftMenuSelection,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
-    expandedFolders: [],
+    activeTab: null,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
+  },
+  kubeConfigBrowseSettings: {
+    isOpen: false,
   },
   folderExplorer: {
     isOpen: false,

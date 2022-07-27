@@ -1,9 +1,9 @@
 # What is a Monokle Template?
 
-A Monokle Template is a mechanism for creating visual forms and interpolating the data 
+A Monokle Template is a mechanism for creating visual forms and interpolating the data
 from those forms into one or multiple manifests.
 
-For each form, we must define the JSON schema of the data to use as an input and a 
+For each form, we must define the JSON schema of the data to use as an input and a
 UI-schema for customizing the visuals of the forms (for example, specifying which widgets should be used).
 
 Monokle uses the [React-Schema-Form component](https://github.com/rjsf-team/react-jsonschema-form) to render
@@ -95,18 +95,19 @@ Example:
 }
 ```
 
-The role of this form is to specify information about how to render the form - read more about ui-schemas in the 
-[UI-Schema Documentation](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/) 
+The role of this form is to specify information about how to render the form - read more about ui-schemas in the
+[UI-Schema Documentation](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/)
 
-### **Custom Form Widgets** 
+### **Custom Form Widgets**
 
 Monokle 1.5.0 provides a number of [custom form widgets](https://react-jsonschema-form.readthedocs.io/en/latest/advanced-customization/custom-widgets-fields/) to provide a better user experience:
 
 - `namespaceSelection`: Shows a dropdown with all namespaces in the current set of resources.
+- `imageSelection`: Shows a dropdown with all the images found in the current set of resources.
 - `apiGroupSelection`: Shows a dropdown with all apiGroups known by Monokle.
 - `podSelectSelection`: Shows a dropdown with all labels assigned to any pods or pod-specs in the current set of resources.
-- `resourceSelection`: Shows a dropdown with resource names from the current set of resources. This can be narrowed down by 
-  adding a ui:options.resourceKinds property containing a |-separated string of desired resourceKinds. 
+- `resourceSelection`: Shows a dropdown with resource names from the current set of resources. This can be narrowed down by
+  adding a ui:options.resourceKinds property containing a |-separated string of desired resourceKinds.
 
 For example:
 
@@ -127,9 +128,9 @@ All these widgets allow entry of custom values - i.e. none require you to select
 
 ## **Property Interpolation**
 
-Monokle uses `[[` and `]]` as escape delimiters for script interpolation. 
+Monokle uses `[[` and `]]` as escape delimiters for script interpolation.
 
-For the JSON Schema example above example, if this form is the first one in the `forms` array 
+For the JSON Schema example above example, if this form is the first one in the `forms` array
 from `monokle-template.json`, then we will be able to use the values in the template manifests:
 
 ```yaml
@@ -139,7 +140,7 @@ otherProperty: [[forms[0].image]]
 ```
 
 Scripts are run in a sandboxed environment giving you access to built-in Javascript objects. For
-example the following is taken from the [basic-role-template](https://github.com/kubeshop/monokle-default-templates-plugin/blob/main/basic-role-template/template.yaml) which will create a YAML array of 
+example the following is taken from the [basic-role-template](https://github.com/kubeshop/monokle-default-templates-plugin/blob/main/basic-role-template/template.yaml) which will create a YAML array of
 selected verbs in the corresponding form.
 
 ```yaml
@@ -184,7 +185,7 @@ Using the `manifests` property from the monokle-template file, specify the above
 ```
 
 ### **Referenced Helm Chart Templates**
- 
+
 The value of the `type` property from `monokle-template.json` is `"helm-chart"`.
 
 Example of `monokle-template.json`:
@@ -243,6 +244,5 @@ for the first time and available in the Templates Explorer when working with you
 
 ![Default Templates](img/default-templates-1.6.0.gif)
 
-Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
+Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to
 see which templates that are included and their corresponding schemas and manifests.
-

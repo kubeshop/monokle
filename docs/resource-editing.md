@@ -16,9 +16,9 @@ Right-clicking in the editor shows a list of available commands. Pressing F1 ope
 When editing resources (not files), the editor is schema-aware for all native Kubernetes resources, which provides
 auto-complete (Ctrl-Space) and context-sensitive hover documentation.
 
-![Source Editor Auto Complete](img/source-editor-auto-complete-1.5.0.png)
+![Source Editor Auto Complete](img/source-editor-auto-complete-1.9.png)
 
-![Source Editor Context Hover](img/source-editor-context-hover.png)
+![Source Editor Context Hover](img/source-editor-context-hover-1.9.png)
 
 When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding Kubernetes documentation in a browser window:
 
@@ -42,32 +42,24 @@ While hovering over a broken link in the Editor, a pop-up window will allow you 
 
 Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the **Delete** or **Deploy** actions are available for both resources.
 
-![Working with Multiple Resources](img/select-multi-resource-1.6.0.png) 
+![Working with Multiple Resources](img/select-multi-resource-1.9.png) 
 
 ## **Add a Resource**
 
 While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
-![Add Resource](img/add-resource-1.5.0.png)
+![Add Resource](img/add-resource-1.9.png)
 
-For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
-
-![Resource save](img/add-resource-save.png)
 
 While creating a resource, it is possible to select an existing resource as a template from the drop-down menu. 
 
-![Resource template](img/template.png)
+![Resource template](img/template-1.9.png)
 
 ## **Edit Resources in a Cluster**
 
 You can easily view and edit resources from clusters. After making changes in a resource, you can quickly deploy them back to the cluster.
 
 ![Resource cluster](img/deploy-to-cluster-1.5.0.png)
-
-### **Saving Changes**
-
-The **Save** button on top of the editor will be enabled only if valid changes have been made - invalid YAML will not be savable. Saving a resource will update the containing file correspondingly and recalculate all affected ingoing/outging links for
-the resource.
 
 ## **Editing Files**
 
@@ -90,11 +82,11 @@ on how to use the Form Editor for ConfigMaps.**-->
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.6.0.png)
+![Resource Options](img/navigator-resource-options-1.9.png)
 
 Unknown Resources will display in the Navigator but only have the **Rename** and **Delete** options:
 
-![Unknown Resource Options](img/navigator-unknown-resource-options-1.6.0.png)
+![Unknown Resource Options](img/navigator-unknown-resource-options-1.9.png)
 
 ### **Rename a Resource**
 
@@ -120,4 +112,4 @@ Kubernetes secret resources are shown in the Navigator. A **Secret** is an objec
 
 Highlight the secret resource in the Navigator and the source will be displayed in the Editor pane. There, you can hover over the encoded secret value to see the decoded value (for **username** in the example below):
 
-![Secret Resource](img/secret-resource-hover-2-1.6.0.png)
+![Secret Resource](img/secret-resource-hover-2-1.9.png)

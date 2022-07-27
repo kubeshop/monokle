@@ -1,9 +1,8 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {HelmPreviewConfiguration} from '@models/appconfig';
-import {FileMapType, HelmValuesMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {HelmChart, HelmValuesFile} from '@models/helm';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@models/appstate';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
@@ -13,6 +12,8 @@ import {isDefined} from '@utils/filter';
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
+import HelmChartContextMenu from './HelmChartContextMenu';
+import HelmChartContextMenuWrapper from './HelmChartContextMenuWrapper';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
@@ -20,6 +21,7 @@ import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
 
 type TemplatesScopeType = {
   fileMap: FileMapType;
+  helmTemplatesMap: HelmTemplatesMapType;
   isFolderOpen: boolean;
   selectedPath: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
@@ -130,15 +132,16 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
-  const templateFilesSectionBlueprint: SectionBlueprint<FileEntry, TemplatesScopeType> = {
+  const templateFilesSectionBlueprint: SectionBlueprint<HelmTemplate, TemplatesScopeType> = {
     name: 'Templates',
     id: `${helmChart.id}-templates`,
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
       return {
-        isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         fileMap: state.main.fileMap,
+        helmTemplatesMap: state.main.helmTemplatesMap,
+        isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         selectedPath: state.main.selectedPath,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
@@ -149,7 +152,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         if (!currentHelmChart) {
           return [];
         }
-        return currentHelmChart.templateFilePaths.map(filePath => scope.fileMap[filePath.filePath]).filter(isDefined);
+        return currentHelmChart.templateIds.map(id => scope.helmTemplatesMap[id]).filter(isDefined);
       },
       isInitialized: scope => {
         return scope.isFolderOpen;
@@ -171,7 +174,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
-      getInstanceId: rawItem => rawItem.filePath,
+      getInstanceId: rawItem => rawItem.id,
       builder: {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
@@ -191,6 +194,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {
           component: ItemPrefix,
         },
@@ -269,6 +274,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         quickAction: {
           component: HelmChartQuickAction,
           options: {isVisibleOnHover: true},
@@ -342,6 +349,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
+        contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
+        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
       },

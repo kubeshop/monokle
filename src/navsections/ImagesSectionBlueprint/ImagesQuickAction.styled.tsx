@@ -2,10 +2,11 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const ReplaceSpan = styled.span<{$isSelected: boolean}>`
+export const ReplaceSpan = styled.span<{$isDisabled: boolean; $isSelected: boolean}>`
   font-weight: 500;
   font-size: 12px;
   margin: 0 15px 0 5px;
-  cursor: pointer;
-  color: ${({$isSelected}) => ($isSelected ? Colors.blackPure : Colors.blue6)};
+  color: ${({$isDisabled, $isSelected}) =>
+    $isSelected ? Colors.blackPure : $isDisabled ? Colors.grey6 : Colors.blue6};
+  cursor: ${({$isDisabled}) => ($isDisabled ? 'not-allowed' : 'pointer')};
 `;

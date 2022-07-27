@@ -9,6 +9,7 @@ import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants'
 import {
   HighlightItems,
   LayoutSizeType,
+  LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
@@ -57,9 +58,16 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
+    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+      state.leftMenu.bottomSelection = action.payload;
+      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+    },
     setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
+    },
+    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
+      state.leftMenu.activeTab = action.payload;
     },
     toggleRightMenu: (state: Draft<UiState>) => {
       state.rightMenu.isActive = !state.rightMenu.isActive;
@@ -207,6 +215,9 @@ export const uiSlice = createSlice({
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
     },
+    setExpandedSearchedFiles: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
+      state.leftMenu.expandedSearchedFiles = action.payload;
+    },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
     },
@@ -218,6 +229,12 @@ export const uiSlice = createSlice({
     },
     closeFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: false};
+    },
+    closeKubeConfigBrowseSetting: (state: Draft<UiState>) => {
+      state.kubeConfigBrowseSettings = {isOpen: false};
+    },
+    openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
+      state.kubeConfigBrowseSettings = {isOpen: true};
     },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
@@ -343,7 +360,9 @@ export const {
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
+  setExpandedSearchedFiles,
   setLayoutSize,
+  setLeftBottomMenuSelection,
   setLeftMenuIsActive,
   setLeftMenuSelection,
   setMonacoEditor,
@@ -359,5 +378,8 @@ export const {
   toggleStartProjectPane,
   zoomIn,
   zoomOut,
+  openKubeConfigBrowseSetting,
+  closeKubeConfigBrowseSetting,
+  setActiveTab,
 } = uiSlice.actions;
 export default uiSlice.reducer;

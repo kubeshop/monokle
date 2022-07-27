@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import {Locator, Page} from 'playwright';
 
 import {expect, test} from '@playwright/test';
@@ -21,7 +22,7 @@ test.beforeEach(async () => {
 
 test.afterEach(async () => {
   await pause(1000);
-  appWindow.on('console', console.log);
+  appWindow.on('console', log.info);
 });
 
 test('Validate title', async () => {

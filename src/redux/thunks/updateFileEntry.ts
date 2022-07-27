@@ -9,9 +9,10 @@ import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {RootState} from '@models/rootstate';
 
-import {UpdateFileEntryPayload} from '@redux/reducers/main';
+import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
+import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
@@ -39,8 +40,9 @@ export const updateFileEntry = createAsyncThunk(
         const filePath = path.join(rootFolder, payload.path);
 
         if (getFileStats(filePath)?.isDirectory() === false) {
-          fs.writeFileSync(filePath, payload.content);
+          fs.writeFileSync(filePath, payload.text);
           fileEntry.timestamp = getFileTimestamp(filePath);
+          fileEntry.text = payload.text;
 
           if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
             try {
@@ -50,7 +52,7 @@ export const updateFileEntry = createAsyncThunk(
               if (!helmChart) {
                 throw new Error(`Couldn't find the helm chart for path: ${fileEntry.filePath}`);
               }
-              const fileContent = parse(payload.content);
+              const fileContent = parse(payload.text);
               if (typeof fileContent?.name !== 'string') {
                 throw new Error(`Couldn't get the name property of the helm chart at path: ${fileEntry.filePath}`);
               }
@@ -65,7 +67,7 @@ export const updateFileEntry = createAsyncThunk(
               deleteResource(r, mainState.resourceMap);
             });
 
-            const extractedResources = extractK8sResources(payload.content, filePath.substring(rootFolder.length));
+            const extractedResources = extractK8sResources(payload.text, filePath.substring(rootFolder.length));
 
             let resourceIds: string[] = [];
 
@@ -92,6 +94,10 @@ export const updateFileEntry = createAsyncThunk(
                 policyPlugins: [],
               }
             );
+
+            if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
+              reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
+            }
           }
         }
 
@@ -108,6 +114,23 @@ export const updateFileEntry = createAsyncThunk(
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
+    return nextMainState;
+  }
+);
+
+export const updateFileEntries = createAsyncThunk(
+  'main/updateFileEntries',
+  async (payload: UpdateFilesEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: RootState = thunkAPI.getState();
+
+    const nextMainState: any = createNextState(state.main, mainState => {
+      payload.pathes.forEach(ps => {
+        const fileEntry = mainState.fileMap[ps.relativePath];
+        const content = fs.readFileSync(ps.absolutePath, 'utf8');
+        fileEntry.text = content;
+        return {...mainState.fileMap, fileEntry};
+      });
+    });
 
     return nextMainState;
   }

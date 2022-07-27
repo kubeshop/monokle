@@ -6,7 +6,14 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
-import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  AppState,
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
@@ -14,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {
   HelmChartEventEmitter,
   createHelmChart,
-  createHelmFile,
+  createHelmTemplate,
   createHelmValuesFile,
   findContainingHelmCharts,
   getHelmChartFromFileEntry,
@@ -58,15 +65,20 @@ interface CreateFileEntryArgs {
   fileEntryPath: string;
   fileMap: FileMapType;
   helmChartId?: string;
+  text?: string;
+  extension: string;
 }
 
-export function createFileEntry({fileEntryPath, fileMap, helmChartId}: CreateFileEntryArgs) {
+// TODO: Maybe text shouldn't be optional
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, text, extension}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     isExcluded: false,
     isSupported: false,
     helmChartId,
+    text,
+    extension,
   };
 
   const timestamp = getFileTimestamp(getAbsoluteFilePath(fileEntryPath, fileMap));
@@ -88,6 +100,7 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
     filePath: rootFolder,
     isExcluded: false,
     isSupported: false,
+    extension: path.extname(rootFolder),
   };
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
   return rootEntry;
@@ -97,16 +110,16 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
  * Checks if the specified filename should be excluded per the project exclusion config
  */
 
-export function fileIsExcluded(fileEntry: FileEntry, projectConfig: ProjectConfig) {
-  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(fileEntry.filePath, e));
+export function fileIsExcluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
+  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(filePath, e));
 }
 
 /**
  * Checks if the specified filename should be excluded per the project inclusion config
  */
 
-export function fileIsIncluded(fileEntry: FileEntry, projectConfig: ProjectConfig) {
-  return projectConfig.fileIncludes?.some(e => micromatch.isMatch(path.basename(fileEntry.filePath), e));
+export function fileIsIncluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
+  return projectConfig.fileIncludes?.some(e => micromatch.isMatch(path.basename(filePath), e));
 }
 
 /**
@@ -127,7 +140,7 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: File
 
   try {
     fileEntry.isSupported = true;
-    extractK8sResourcesFromFile(getAbsoluteFilePath(fileEntry.filePath, fileMap), fileMap).forEach(resource => {
+    extractK8sResourcesFromFile(fileEntry.filePath, fileMap).forEach(resource => {
       if (!hasSupportedResourceContent(resource)) {
         fileEntry.isSupported = false;
         return;
@@ -158,6 +171,7 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
+  helmTemplatesMap: HelmTemplatesMapType,
   depth: number = 1,
   helmChart?: HelmChart
 ) {
@@ -183,20 +197,33 @@ export function readFiles(
         fileMap,
         helmChartMap,
         helmValuesMap,
+        helmTemplatesMap,
         depth
       )
     );
   } else {
     files.forEach(file => {
+      let text;
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id});
-      if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
-        createHelmFile(fileEntry, helmChart, fileMap);
+
+      const isDir = getFileStats(filePath)?.isDirectory();
+      const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
+      const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
+
+      if (isIncluded && (!isDir || !isExcluded)) {
+        text = fs.readFileSync(path.join(filePath), 'utf8');
       }
-      if (fileIsExcluded(fileEntry, projectConfig)) {
+
+      const extension = path.extname(fileEntryPath);
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, text});
+
+      if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
+        createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
+      }
+      if (isExcluded) {
         fileEntry.isExcluded = true;
-      } else if (getFileStats(filePath)?.isDirectory()) {
+      } else if (isDir) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
@@ -208,6 +235,7 @@ export function readFiles(
             fileMap,
             helmChartMap,
             helmValuesMap,
+            helmTemplatesMap,
             depth + 1,
             helmChart
           );
@@ -219,7 +247,7 @@ export function readFiles(
           helmValuesMap,
           fileMap,
         });
-      } else if (fileIsIncluded(fileEntry, projectConfig)) {
+      } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
         extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
 
@@ -276,6 +304,14 @@ export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) 
 }
 
 /**
+ * Returns the relative path for the specified absolute path
+ */
+export function getRelativeFilePath(absolutePath: string) {
+  const pathArr = absolutePath.split('/');
+  return `/${pathArr[pathArr.length - 1]}`;
+}
+
+/**
  * Returns the absolute path to the specified FileEntry
  */
 
@@ -303,10 +339,9 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType): K8sResource[] {
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  const rootEntry = fileMap[ROOT_FILE_ENTRY];
-  return extractK8sResources(fileContent, rootEntry ? filePath.substr(rootEntry.filePath.length) : filePath);
+export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource[] {
+  const fileContent = fileMap[relativePath].text || '';
+  return extractK8sResources(fileContent, relativePath);
 }
 
 /**
@@ -360,8 +395,8 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
 function shouldReloadResourcesFromFile(fileEntry: FileEntry, projectConfig: ProjectConfig) {
   return (
     !isHelmValuesFile(fileEntry.filePath) &&
-    !fileIsExcluded(fileEntry, projectConfig) &&
-    fileIsIncluded(fileEntry, projectConfig)
+    !fileIsExcluded(fileEntry.filePath, projectConfig) &&
+    fileIsIncluded(fileEntry.filePath, projectConfig)
   );
 }
 
@@ -452,7 +487,7 @@ export function reloadFile(
   }
 
   if (wasFileSelected) {
-    selectFilePath(fileEntry.filePath, state);
+    selectFilePath({filePath: fileEntry.filePath, state});
     state.shouldEditorReloadSelectedPath = true;
   }
 }
@@ -548,9 +583,11 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap});
+  const fileText = fs.readFileSync(absolutePath, 'utf8');
+  const extension = path.extname(absolutePath);
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, text: fileText, extension});
 
-  if (!fileIsIncluded(fileEntry, projectConfig)) {
+  if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
   }
 
@@ -565,6 +602,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   // seems to be a regular manifest file
   else {
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
+
     if (resourcesFromFile.length > 0) {
       reprocessResources(
         getK8sVersion(projectConfig),
@@ -591,6 +629,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
     const folderEntry = createFileEntry({
       fileEntryPath: absolutePath.substring(rootFolder.length),
       fileMap: state.fileMap,
+      extension: path.extname(absolutePath),
     });
     folderEntry.children = readFiles(
       absolutePath,
@@ -598,7 +637,8 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       state.resourceMap,
       state.fileMap,
       state.helmChartMap,
-      state.helmValuesMap
+      state.helmValuesMap,
+      state.helmTemplatesMap
     );
     return folderEntry;
   }
@@ -764,7 +804,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
  * Selects the specified filePath - used by several reducers
  */
 
-export function selectFilePath(filePath: string, state: AppState) {
+export function selectFilePath({filePath, state}: {filePath: string; state: AppState}) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
 

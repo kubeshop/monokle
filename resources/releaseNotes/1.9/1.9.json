@@ -1,0 +1,9 @@
+{
+  "title": "Here's what's new in Monokle 1.9",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-1-9-0-release",
+  "about": {
+    "when": "July 2022",
+    "title": "In this release, we bring you:",
+    "features": ["Find & Replace", "Color Code Cluster Environments", "UI/UX improvements"]
+  }
+}

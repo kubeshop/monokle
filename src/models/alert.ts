@@ -26,4 +26,5 @@ export type AlertType = {
   createdAt?: number;
   duration?: number | null;
   extraContentType?: ExtraContentType;
+  silent?: boolean;
 };

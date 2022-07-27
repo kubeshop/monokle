@@ -26,13 +26,13 @@ nav:
     - Creating Resources: creating-resources.md
     - Editing Resources: resource-editing.md
     - Validating Resources: resource-validation.md
+    - Compare and Sync: compare-sync.md
   - Working with Projects: projects.md
   - Working with Images: images.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
   - Working with Clusters:
     - Cluster Integration: cluster-integration.md
-    - Cluster Compare: compare-sync.md
   - Deploy/Diff: apply-and-diff.md
   - Development:
     - Development: development.md

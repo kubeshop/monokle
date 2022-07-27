@@ -90,6 +90,11 @@ function extractSiblingMatchers(refMapper: any) {
         break;
       case 'groupMatcher':
         refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
+
+        // groupMatcher supports a defaultGroup configuration property - copy if specified
+        if (refMapper.source.matcherProperties && refMapper.source.matcherProperties['groupMatcher']) {
+          refMapper.source.matcherProperties['group'] = refMapper.source.matcherProperties['groupMatcher'];
+        }
         break;
       default:
         break;

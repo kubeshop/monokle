@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import {useMemo} from 'react';
 
 import {Tooltip} from 'antd';
@@ -5,7 +7,7 @@ import {Tooltip} from 'antd';
 import semver from 'semver';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
+import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
@@ -75,6 +77,7 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
           <S.MenuItemLabel>Settings</S.MenuItemLabel>
         </S.MenuItem>
       </Tooltip>
+
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
         <S.MenuItem
           onClick={() => {
@@ -88,12 +91,14 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
           <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
         </S.MenuItem>
       </Tooltip>
+
       <S.MenuItem style={{borderBottom: 'none'}}>
         <S.MenuItemIcon>
           <S.QuestionCircleOutlined />
         </S.MenuItemIcon>
         <S.MenuItemLabel>Help</S.MenuItemLabel>
       </S.MenuItem>
+
       <S.MenuItemLinks>
         <S.HelpLink
           type="link"
@@ -167,6 +172,20 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
           About Monokle
         </S.HelpLink>
       </S.MenuItemLinks>
+
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FeedbackTooltip}>
+        <S.MenuItem
+          onClick={() => {
+            shell.openExternal('https://49x902y6r6t.typeform.com/to/vkFBEYYt');
+            handleMenuClose();
+          }}
+        >
+          <S.MenuItemIcon>
+            <S.CommentOutlined />
+          </S.MenuItemIcon>
+          <S.MenuItemLabel>Feedback</S.MenuItemLabel>
+        </S.MenuItem>
+      </Tooltip>
     </S.MenuContainer>
   );
 };

@@ -24,7 +24,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {currentConfigSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {
+  currentConfigSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -70,6 +75,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
@@ -217,9 +223,9 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
-  }, [selectedResource, kubeConfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [selectedResource, kubeConfigContext, kubeConfigContextColor]);
 
   const helmChartConfirmModalTitle = useMemo(() => {
     if (!selectedValuesFileId) {

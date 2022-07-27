@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -30,21 +30,21 @@ import ProjectSelection from './ProjectSelection';
 const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
-
-  const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [showAutosaving, setShowAutosaving] = useState(false);
@@ -133,77 +133,75 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && <S.PreviewRow noborder="true" previewType={previewType} />}
+      {isInPreviewMode && <S.PreviewRow $previewType={previewType} $kubeConfigContextColor={kubeConfigContextColor} />}
 
-      <S.Header noborder="true">
-        <S.Row noborder="true">
-          <div style={{display: 'flex', alignItems: 'center'}}>
-            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+      <S.Header>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
-            {activeProject && (
-              <>
-                <S.Divider type="vertical" style={{marginRight: '1rem'}} />
-                <ProjectSelection />
-                <CreateProject />
-              </>
-            )}
-            {isStartProjectPaneVisible && activeProject && (
-              <>
-                <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
-                <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-                  Back to Project
-                </S.BackToProjectButton>
-              </>
-            )}
+          {activeProject && (
+            <>
+              <S.Divider type="vertical" style={{marginRight: '1rem'}} />
+              <ProjectSelection />
+              <CreateProject />
+            </>
+          )}
+          {isStartProjectPaneVisible && activeProject && (
+            <>
+              <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
+              <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
+                Back to Project
+              </S.BackToProjectButton>
+            </>
+          )}
 
-            {showAutosaving && (
-              <S.AutosavingContainer>
-                {autosavingStatus ? (
-                  <>
-                    <ReloadOutlined spin />
-                    Saving...
-                  </>
-                ) : autosavingError ? (
-                  <S.AutosavingErrorContainer>
-                    Your changes could not be saved
-                    <Button type="link" onClick={createGitHubIssue}>
-                      Report
-                    </Button>
-                  </S.AutosavingErrorContainer>
-                ) : (
-                  autosavingStatus === false && 'Saved'
-                )}
-              </S.AutosavingContainer>
-            )}
-          </div>
+          {showAutosaving && (
+            <S.AutosavingContainer>
+              {autosavingStatus ? (
+                <>
+                  <ReloadOutlined spin />
+                  Saving...
+                </>
+              ) : autosavingError ? (
+                <S.AutosavingErrorContainer>
+                  Your changes could not be saved
+                  <Button type="link" onClick={createGitHubIssue}>
+                    Report
+                  </Button>
+                </S.AutosavingErrorContainer>
+              ) : (
+                autosavingStatus === false && 'Saved'
+              )}
+            </S.AutosavingContainer>
+          )}
+        </div>
 
-          <div style={{display: 'flex', alignItems: 'center'}}>
-            <ClusterSelection previewResource={previewResource} />
-            <S.SettingsCol>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-                <Badge count={unseenNotificationsCount} size="small">
-                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
-                </Badge>
-              </Tooltip>
-              <Dropdown
-                visible={isHelpMenuOpen}
-                onVisibleChange={() => {
-                  setIsHelpMenuOpen(!isHelpMenuOpen);
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <ClusterSelection previewResource={previewResource} />
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
+            <Badge count={unseenNotificationsCount} size="small">
+              <S.BellOutlined onClick={toggleNotificationsDrawer} />
+            </Badge>
+          </Tooltip>
+
+          <Dropdown
+            visible={isHelpMenuOpen}
+            onVisibleChange={() => {
+              setIsHelpMenuOpen(!isHelpMenuOpen);
+            }}
+            overlay={
+              <HelpMenu
+                onMenuClose={() => {
+                  setIsHelpMenuOpen(false);
                 }}
-                overlay={
-                  <HelpMenu
-                    onMenuClose={() => {
-                      setIsHelpMenuOpen(false);
-                    }}
-                  />
-                }
-                placement="bottomLeft"
-              >
-                <S.EllipsisOutlined />
-              </Dropdown>
-            </S.SettingsCol>
-          </div>
-        </S.Row>
+              />
+            }
+            placement="bottomLeft"
+          >
+            <S.EllipsisOutlined />
+          </Dropdown>
+        </div>
       </S.Header>
     </S.PageHeaderContainer>
   );

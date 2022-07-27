@@ -31,12 +31,11 @@ import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -90,44 +89,35 @@ const SettingsManager: React.FC = () => {
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'kubeConfig'});
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'folderReadsMaxDepth'});
     }
     if (!_.isEqual(config?.k8sVersion, appConfig.k8sVersion)) {
       dispatch(updateK8sVersion(config?.k8sVersion || PREDEFINED_K8S_VERSION));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'k8sVersion'});
     }
     if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
       dispatch(updateScanExcludes(config?.scanExcludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'scanExcludes'});
     }
     if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
       dispatch(updateFileIncludes(config?.fileIncludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'fileIncludes'});
     }
   };
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'loadLastFolderOnStartup'});
   };
 
   const handleChangeClusterSelectorVisibilty = (e: any) => {
     dispatch(updateClusterSelectorVisibilty(e.target.checked));
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'changeClusterSelectorVisibilty'});
   };
 
   const handleToggleEventTracking = () => {
     dispatch(toggleEventTracking());
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'toggleEventTracking'});
   };
 
   const handleToggleErrorReporting = () => {
     dispatch(toggleErrorReporting());
-    trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'toggleErrorReporting'});
   };
 
   const onProjectNameChange = (projectName: string) => {
@@ -155,7 +145,6 @@ const SettingsManager: React.FC = () => {
     () => {
       if (currentProjectsRootPath && currentProjectsRootPath !== projectsRootPath) {
         dispatch(changeProjectsRootPath(currentProjectsRootPath));
-        trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'global', settingKey: 'currentProjectsRootPath'});
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,

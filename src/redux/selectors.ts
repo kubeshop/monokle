@@ -17,6 +17,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import Colors from '../styles/Colors';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 import {isUnsavedResource} from './services/resource';
 
@@ -165,13 +166,22 @@ export const fileIncludesSelector = createSelector(
   }
 );
 
-export const currentKubeContext = (configState: AppConfig) => {
-  if (configState.projectConfig?.kubeConfig?.currentContext) {
-    return configState.projectConfig?.kubeConfig?.currentContext;
+export const kubeConfigContextColorSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    if (!config.kubeConfig.currentContext) {
+      return Colors.volcano8;
+    }
+
+    return config.kubeConfigContextsColors[config.kubeConfig.currentContext] || Colors.volcano8;
   }
+);
+
+export const currentKubeContext = (configState: AppConfig) => {
   if (configState.kubeConfig.currentContext) {
     return configState.kubeConfig.currentContext;
   }
+
   return '';
 };
 
@@ -185,9 +195,6 @@ export const kubeConfigContextSelector = createSelector(
 export const kubeConfigContextsSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.contexts) {
-      return config.projectConfig?.kubeConfig?.contexts;
-    }
     if (config.kubeConfig.contexts) {
       return config.kubeConfig.contexts;
     }
@@ -207,7 +214,7 @@ export const currentClusterAccessSelector = createSelector(
       return [];
     }
 
-    return config.projectConfig.clusterAccess?.filter(ca => ca.context === currentContext) || [];
+    return config.clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
 );
 

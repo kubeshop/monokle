@@ -1,7 +1,7 @@
-import {HelmChart, HelmValuesFile} from '@models/helm';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
 import {AlertType} from './alert';
-import {FileEntry} from './fileentry';
+import {CurrentMatch, FileEntry} from './fileentry';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sresource';
@@ -41,6 +41,10 @@ type HelmValuesMapType = {
   [id: string]: HelmValuesFile;
 };
 
+type HelmTemplatesMapType = {
+  [id: string]: HelmTemplate;
+};
+
 type PreviewLoaderType = {
   isLoading: boolean;
   targetId?: string;
@@ -74,7 +78,7 @@ type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistor
 type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
 type ResourceFilterType = {
-  name?: string;
+  names?: string[];
   kinds?: string[];
   namespace?: string;
   labels: Record<string, string | null>;
@@ -94,6 +98,12 @@ type ClusterToLocalResourcesMatch = {
   resourceNamespace: string;
   clusterResourceId?: string;
   localResourceIds?: string[];
+};
+
+export type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
 };
 
 interface AppState {
@@ -117,6 +127,8 @@ interface AppState {
   helmChartMap: HelmChartMapType;
   /** maps values ids to helm values files */
   helmValuesMap: HelmValuesMapType;
+  /** maps values ids to helm templates */
+  helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
   /** if we are currently in the process of selecting a file - used for one-time UI updates */
@@ -133,6 +145,14 @@ interface AppState {
   checkedResourceIds: string[];
   /** the currently selected path */
   selectedPath?: string;
+  /** the line number for the match in file */
+  search: {
+    searchQuery: string;
+    replaceQuery: string;
+    queryMatchParams: MatchParamProps;
+    currentMatch: CurrentMatch | null;
+    searchHistory: string[];
+  };
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the currently selected preview configuration */
@@ -191,6 +211,7 @@ interface AppState {
       stack: string;
     };
   };
+  webContentsId?: number;
 }
 
 export interface KubernetesObject {
@@ -215,6 +236,7 @@ export type {
   ImagesListType,
   HelmChartMapType,
   HelmValuesMapType,
+  HelmTemplatesMapType,
   PreviewLoaderType,
   SelectionHistoryEntry,
   PreviewType,

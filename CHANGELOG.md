@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.1](https://github.com/kubeshop/monokle/compare/v1.9.1-nightly-2022-07-14.0...v1.9.1) (2022-07-14)
+
+
+### Bug Fixes
+
+* add null checker for isKustomizationFile function ([da07417](https://github.com/kubeshop/monokle/commit/da07417b1e5c313f2b8abebee0563aaabdd2f06b))
+
+## [1.9.0](https://github.com/kubeshop/monokle/compare/v1.8.2-nightly-2022-07-12.0...v1.9.0) (2022-07-12)
+
+
+### Features
+
+* add feedback option to help menu ([520204e](https://github.com/kubeshop/monokle/commit/520204e1627fefdb627051f3213f1bad73165ed4))
+
+
+### Bug Fixes
+
+* added media queries and fixed styling in StartProjectPage ([0909edf](https://github.com/kubeshop/monokle/commit/0909edf9ab72a702a0b898f05a6f9ab07ea27bff))
+* added new media query stop to fix Entry screen ([58ee42a](https://github.com/kubeshop/monokle/commit/58ee42ae6ab8818f6859dcd7084a30dae11f8220))
+* removed media query and displaying title always in two lines after investigation with [@julio](https://github.com/julio) ([107ac39](https://github.com/kubeshop/monokle/commit/107ac392437f73ecc30cbdd76afa44c82f6bc3c6))
+* update editor on multiple resource delete ([971da97](https://github.com/kubeshop/monokle/commit/971da97df3a74e46a8e6dda15f4d2ccfad419b0e))
+
 ### [1.8.1](https://github.com/kubeshop/monokle/compare/v1.8.1-nightly-2022-06-24.0...v1.8.1) (2022-06-24)
 
 

@@ -32,13 +32,15 @@ const MessageBox: React.FC = () => {
       return;
     }
 
-    // @ts-ignore
-    notification[notificationType]({
-      key: alert.id,
-      message: alert.title,
-      description: <NotificationMarkdown notification={alert} type={notificationType} />,
-      duration: alert.duration || 4,
-    });
+    if (!alert.silent) {
+      // @ts-ignore
+      notification[notificationType]({
+        key: alert.id,
+        message: alert.title,
+        description: <NotificationMarkdown notification={alert} type={notificationType} />,
+        duration: alert.duration || 4,
+      });
+    }
 
     dispatch(clearAlert());
   }, [alert, dispatch, notificationType]);

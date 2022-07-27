@@ -8,7 +8,13 @@ interface HelmChart {
   filePath: string;
   name: string;
   valueFileIds: string[]; // ids of contained Helm value files
-  templateFilePaths: HelmChartFile[]; // other files contained in the helm chart
+  templateIds: string[]; // ids of contained Helm templates
+}
+
+interface HelmChartMenuItem {
+  id: string;
+  name: string;
+  subItems: {id: string; name: string}[];
 }
 
 interface HelmValueMatch {
@@ -40,10 +46,12 @@ interface RangeAndValue {
   value: string;
 }
 
-interface HelmChartFile {
+interface HelmTemplate {
   id: string;
   filePath: string;
+  name: string;
   values: RangeAndValue[];
+  helmChartId: string;
 }
 
-export type {HelmChart, HelmValuesFile, RangeAndValue, HelmValueMatch};
+export type {HelmChart, HelmChartMenuItem, HelmValuesFile, RangeAndValue, HelmValueMatch, HelmTemplate};

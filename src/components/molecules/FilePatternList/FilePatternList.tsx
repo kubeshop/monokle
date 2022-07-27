@@ -1,8 +1,6 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Input, InputRef, Tooltip} from 'antd';
-
-import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -10,44 +8,33 @@ import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import {useFocus} from '@utils/hooks';
 
+import * as S from './FilePatternList.styled';
 import FilePatternListItem from './FilePatternListItem';
 
 type FilePatternListProps = {
+  tooltip: string;
   value: string[];
   onChange: (patterns: string[]) => void;
-  tooltip: string;
   isSettingsOpened?: boolean;
-  showButtonLabel?: string;
   showApplyButton?: boolean;
+  showButtonLabel?: string;
   onApplyClick?: () => void;
 };
 
-const StyledUl = styled.ul`
-  padding-left: 20px;
-`;
-
-const StyledButton = styled(Button)`
-  margin-top: 10px;
-  margin-right: 5px;
-  margin-bottom: 10px;
-`;
-
-const FilePatternList = (props: FilePatternListProps) => {
+const FilePatternList: React.FC<FilePatternListProps> = props => {
   const {value, onChange, tooltip, isSettingsOpened, showButtonLabel, showApplyButton, onApplyClick} = props;
-
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
   const filePatternInputRef = useRef<any>();
+  const isValueNotEmpty = useMemo(() => value.length > 0, [value]);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
     setPatternInput('');
   });
 
-  const isPatternUnique = (patternStr: string) => {
-    return !value.includes(patternStr);
-  };
+  const isPatternUnique = useCallback((patternStr: string) => !value.includes(patternStr), [value]);
 
   const addPattern = () => {
     if (value.includes(patternInput)) {
@@ -89,17 +76,19 @@ const FilePatternList = (props: FilePatternListProps) => {
 
   return (
     <div>
-      <StyledUl>
-        {value.map(pattern => (
-          <FilePatternListItem
-            key={pattern}
-            pattern={pattern}
-            validateInput={isPatternUnique}
-            onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
-            onRemove={() => removePattern(pattern)}
-          />
-        ))}
-      </StyledUl>
+      {isValueNotEmpty && (
+        <S.FilePatternList>
+          {value.map(pattern => (
+            <FilePatternListItem
+              key={pattern}
+              pattern={pattern}
+              validateInput={isPatternUnique}
+              onChange={(oldPattern, newPattern) => updatePattern(oldPattern, newPattern)}
+              onRemove={() => removePattern(pattern)}
+            />
+          ))}
+        </S.FilePatternList>
+      )}
       {isAddingPattern ? (
         <div ref={filePatternInputRef}>
           <Input
@@ -108,9 +97,10 @@ const FilePatternList = (props: FilePatternListProps) => {
             onChange={e => setPatternInput(e.target.value)}
             onPressEnter={addPattern}
           />
+
           <div>
-            <StyledButton onClick={addPattern}>OK</StyledButton>
-            <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+            <S.Button onClick={addPattern}>OK</S.Button>
+            <S.Button onClick={onClickCancel}>Cancel</S.Button>
           </div>
         </div>
       ) : (

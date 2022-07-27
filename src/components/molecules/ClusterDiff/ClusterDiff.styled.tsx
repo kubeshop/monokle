@@ -1,7 +1,13 @@
+import {Divider as RawDivider} from 'antd';
+
 import styled from 'styled-components';
 
 export const Container = styled.div<{height?: number}>`
   ${props => props.height && `height: ${props.height};`}
+`;
+
+export const Divider = styled(RawDivider)`
+  margin: 8px 0px;
 `;
 
 export const FilterContainer = styled.span`

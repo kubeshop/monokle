@@ -1,6 +1,9 @@
+import {ReactNode} from 'react';
+
 import {Dropdown} from 'antd';
 
 interface ContextMenuProps {
+  children: ReactNode;
   overlay: React.ReactElement;
   triggerOnRightClick?: boolean;
 }

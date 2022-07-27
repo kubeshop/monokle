@@ -2,11 +2,28 @@
  * A file or folder in the file system.
  */
 
+export interface MatchNode {
+  lineNumber: number;
+  start: number;
+  end: number;
+  currentMatchNumber: number;
+  wholeLine: string;
+  matchesInLine: string[];
+}
+
+export interface CurrentMatch {
+  matchesInFile: MatchNode[];
+  currentMatchIdx: number;
+  replaceWith?: string;
+}
+
 interface FileEntry {
   /** the name of the file */
   name: string;
   /** the path of the file relative to the root folder - used as key in the fileMap */
   filePath: string;
+  /** file extension */
+  extension: string;
   /** if the file/folder is excluded from the navigator */
   isExcluded: boolean;
   /** if the file is found in global inclusion config ( config.fileIncludes ) */
@@ -17,6 +34,12 @@ interface FileEntry {
   timestamp?: number;
   /** the id of the helm chart this file might belong to */
   helmChartId?: string;
+  /** file content */
+  text?: string;
+  /** quantity of found matches for query */
+  matchCount?: number;
+  /** lines containing matches */
+  matchLines?: MatchNode[][];
 }
 
 export type {FileEntry};

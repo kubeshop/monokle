@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
@@ -83,7 +83,7 @@ export const NamespaceSelection = (params: any) => {
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`create '${inputValue}'`}
+          {`Create '${inputValue}'`}
         </Option>
       )}
       {namespaces.map(namespace => (

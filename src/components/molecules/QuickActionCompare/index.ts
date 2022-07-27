@@ -1,1 +1,1 @@
-export * from './QuickActionCompare';
+export {default} from './QuickActionCompare';

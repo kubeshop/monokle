@@ -1,17 +1,15 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {useDebounce} from 'react-use';
 
 import {Modal} from 'antd';
 
+import fs from 'fs';
 import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {AlertEnum, ExtraContentType} from '@models/alert';
@@ -19,9 +17,9 @@ import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {
@@ -31,13 +29,12 @@ import {
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
+import {isInClusterModeSelector} from '@redux/selectors';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
-import UpdateNotice from '@organisms/UpdateNotice';
+import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
 
-import FileExplorer from '@components/atoms/FileExplorer';
+import {FileExplorer} from '@atoms';
+
 import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -77,7 +74,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
 const App = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
@@ -85,12 +82,12 @@ const App = () => {
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
+  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
@@ -105,12 +102,9 @@ const App = () => {
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-  const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
@@ -139,7 +133,7 @@ const App = () => {
   );
 
   const onExecutedFrom = useCallback(
-    (_, data) => {
+    (_: any, data: any) => {
       const targetPath = data?.path?.startsWith('.') ? path.resolve(data.path) : data.path;
       if (targetPath) {
         const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === targetPath);
@@ -197,15 +191,43 @@ const App = () => {
     fetchAppVersion().then(version => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
 
+      const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
+
       // check if the current version is the next big release version for showing the modal with release notes
-      if (
-        !semver.valid(lastSeenReleaseNotesVersion) ||
-        semver.satisfies(version, `>=${semver.inc(lastSeenReleaseNotesVersion, 'minor')}`)
-      ) {
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+      // if middle release, show silent notification
+      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
+        dispatch(
+          setAlert({
+            title: 'A new version of Monokle has been installed!',
+            message: '',
+            type: AlertEnum.Success,
+            silent: true,
+          })
+        );
+
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      }
     });
+
+    // check if current projects root folder still exists, otherwise delete it
+    projects.forEach(project => {
+      if (!fs.existsSync(project.rootFolder)) {
+        dispatch(setDeleteProject(project));
+        dispatch(
+          setAlert({
+            title: 'Project removed',
+            message: `We removed project ${project.name} from Monokle because its root folder no longer exists`,
+            type: AlertEnum.Warning,
+          })
+        );
+      }
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseReleaseNotes = useCallback(() => {
@@ -295,14 +317,6 @@ const App = () => {
     };
   }, [onSetMainProcessEnv]);
 
-  useDebounce(
-    () => {
-      loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
-    },
-    DEFAULT_KUBECONFIG_DEBOUNCE,
-    [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]
-  );
-
   const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -331,7 +345,9 @@ const App = () => {
   };
 
   const settingsDrawerOnClose = () => {
-    dispatch(toggleSettings());
+    if (isKubeConfigBrowseSettingsOpen) {
+      dispatch(toggleSettings());
+    }
   };
 
   useEffect(() => {

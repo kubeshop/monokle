@@ -17,6 +17,8 @@ import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import Sidebar from './Sidebar';
 
+const CustomReactFlowProvider: React.FC<{children: React.ReactNode}> = ReactFlowProvider;
+
 function mapResourceToElement(resource: K8sResource): Node {
   return {
     id: resource.id,
@@ -137,7 +139,7 @@ const GraphView: React.FC<IProps> = props => {
     );
   }, [resourceMap, setNodes]);
 
-  const onLoad = useCallback(instance => {
+  const onLoad = useCallback((instance: any) => {
     setReactFlow(instance);
   }, []);
 
@@ -152,7 +154,7 @@ const GraphView: React.FC<IProps> = props => {
     <Row ref={containerRef}>
       <span style={{width, height: editorHeight}}>
         <div className="zoompanflow">
-          <ReactFlowProvider>
+          <CustomReactFlowProvider>
             <div className="reactflow-wrapper" style={{width: 600, height: graphAreaHeight}}>
               <ReactFlow
                 minZoom={0.1}
@@ -171,7 +173,7 @@ const GraphView: React.FC<IProps> = props => {
               </ReactFlow>
             </div>
             <Sidebar reactFlow={reactFlow} />
-          </ReactFlowProvider>
+          </CustomReactFlowProvider>
         </div>
       </span>
     </Row>

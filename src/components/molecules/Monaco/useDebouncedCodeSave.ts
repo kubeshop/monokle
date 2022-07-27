@@ -29,10 +29,12 @@ function useDebouncedCodeSave(
     } else {
       return;
     }
+
     // is a file and no resource selected?
     if (selectedPath && !selectedResourceId) {
       try {
-        dispatch(updateFileEntry({path: selectedPath, content: value}));
+        dispatch(updateFileEntry({path: selectedPath, text: value}));
+
         setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);

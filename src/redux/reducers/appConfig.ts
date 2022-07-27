@@ -1,3 +1,4 @@
+// import * as k8s from '@kubernetes/client-node';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -9,7 +10,7 @@ import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {
   AppConfig,
-  ClusterAccessWithContext,
+  ClusterAccess,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -19,9 +20,10 @@ import {
   TextSizes,
   Themes,
 } from '@models/appconfig';
+import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
-import {currentKubeContext} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -31,9 +33,10 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
-import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
+import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -85,6 +88,40 @@ export const setOpenProject = createAsyncThunk(
 export const setLoadingProject = createAsyncThunk('config/loadingProject', async (loading: boolean, thunkAPI: any) => {
   thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
 });
+
+export const updateClusterNamespaces = createAsyncThunk(
+  'config/updateClusterNamespaces',
+  async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
+    thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
+
+    let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
+    const newNamespaces = values.filter(
+      v => accesses.findIndex(a => v.cluster === a.context && v.namespace === a.namespace) === -1
+    );
+    const removedNamespaces = accesses
+      .filter(a => values.findIndex(v => a.context === v.cluster) > -1)
+      .filter(a => values.findIndex(v => a.namespace === v.namespace) === -1);
+    accesses = accesses.filter(a => a.context !== values[0].cluster);
+
+    newNamespaces.forEach(({namespace, cluster}) => {
+      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      const kubeClient = createKubeClient(kubeConfigPath, cluster);
+      createNamespace(kubeClient, namespace);
+    });
+
+    removedNamespaces.forEach(({namespace, context}) => {
+      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      removeNamespaceFromCluster(namespace, kubeConfigPath, context);
+    });
+
+    const results: ClusterAccess[] = await Promise.all(
+      values.map(value => getKubeAccess(value.namespace, value.cluster))
+    );
+
+    thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
+    thunkAPI.dispatch(configSlice.actions.setAccessLoading(false));
+  }
+);
 
 type UpdateProjectConfigPayload = {config: ProjectConfig | null; fromConfigFile: boolean};
 
@@ -150,14 +187,9 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
-      if (state.projectConfig) {
-        state.projectConfig.isAccessLoading = true;
-      }
     },
     setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      if (state.projectConfig) {
-        state.projectConfig.isAccessLoading = action.payload;
-      }
+      state.isAccessLoading = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
@@ -235,8 +267,8 @@ export const configSlice = createSlice({
       }
 
       const kubeConfig = state.projectConfig?.kubeConfig;
-      const serializedIncomingConfig = flatten<any, any>(action.payload);
-      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
+      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
       const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
       keys.forEach(key => {
@@ -256,34 +288,6 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
-    updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccessWithContext[]>) => {
-      if (!state.selectedProjectRootFolder) {
-        return;
-      }
-
-      if (!state.projectConfig) {
-        state.projectConfig = {};
-      }
-
-      state.projectConfig.isAccessLoading = false;
-
-      let updateForContext: string;
-      if (!action.payload.length) {
-        updateForContext = currentKubeContext(state);
-      } else {
-        // check that update is just for one cluster
-        updateForContext = action.payload[0].context;
-        const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
-        if (!isUpdatingOneContext) {
-          return;
-        }
-      }
-
-      const otherClusterAccesses =
-        state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
-
-      state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
-    },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
         return;
@@ -299,8 +303,8 @@ export const configSlice = createSlice({
       }
 
       const projectConfig = state.projectConfig;
-      const serializedIncomingConfig = flatten<any, any>(action.payload.config);
-      const serializedState = flatten<any, any>(state.projectConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload.config, {safe: true});
+      const serializedState = flatten<any, any>(state.projectConfig, {safe: true});
 
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
       if (action.payload.fromConfigFile) {
@@ -314,14 +318,9 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
-      const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
-
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-          if (cloneProjectConfig && !_.isEmpty(cloneProjectConfig)) {
-            trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
-          }
         }
       });
 
@@ -368,15 +367,14 @@ export const configSlice = createSlice({
         state.settings = {};
       }
 
-      const serializedIncomingSettings = flatten<any, any>(action.payload);
-      const serializedState = flatten<any, any>(state.settings);
+      const serializedIncomingSettings = flatten<any, any>(action.payload, {safe: true});
+      const serializedState = flatten<any, any>(state.settings, {safe: true});
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingSettings);
 
       keys.forEach(key => {
         const projectSettings = state.settings;
         if (projectSettings) {
           _.set(projectSettings, key, serializedIncomingSettings[key]);
-          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: key});
         }
       });
 
@@ -404,6 +402,15 @@ export const configSlice = createSlice({
       }
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
+    setKubeConfigContextColor: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{color: ClusterColors; name: string}>
+    ) => {
+      const {color, name} = action.payload;
+
+      state.kubeConfigContextsColors[name] = color;
+      electronStore.set('appConfig.kubeConfigContextsColors', state.kubeConfigContextsColors);
+    },
     updateTelemetry: (
       state: Draft<AppConfig>,
       action: PayloadAction<{disableErrorReporting: boolean; disableEventTracking: boolean}>
@@ -413,6 +420,30 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
+    addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
+      const access = state.clusterAccess.find(
+        c => c.context === action.payload.context && c.namespace === action.payload.namespace
+      );
+      if (!access) {
+        state.clusterAccess.push(action.payload);
+      }
+      state.isAccessLoading = false;
+    },
+    removeNamespaceFromContext: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{context: string; namespace: string}>
+    ) => {
+      const index = state.clusterAccess.findIndex(
+        c => c.context === action.payload.context && c.namespace === action.payload.namespace
+      );
+      if (index && index > -1) {
+        state.clusterAccess.splice(index, 1);
+      }
+      state.isAccessLoading = false;
+    },
+    updateClusterAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
+      state.clusterAccess = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -421,38 +452,6 @@ export const configSlice = createSlice({
     });
   },
 });
-
-export const {
-  setFilterObjects,
-  setAutoZoom,
-  setCurrentContext,
-  updateFolderReadsMaxDepth,
-  updateLanguage,
-  updateNewVersion,
-  updateFileIncludes,
-  updateLoadLastProjectOnStartup,
-  updateScanExcludes,
-  updateTextSize,
-  updateTheme,
-  setKubeConfig,
-  updateProjectConfig,
-  updateProjectKubeConfig,
-  updateClusterSelectorVisibilty,
-  setUserDirs,
-  createProject,
-  changeCurrentProjectName,
-  changeProjectsRootPath,
-  updateApplicationSettings,
-  updateProjectKubeAccess,
-  updateK8sVersion,
-  handleFavoriteTemplate,
-  toggleEventTracking,
-  toggleErrorReporting,
-  setAccessLoading,
-  updateTelemetry,
-  toggleProjectPin,
-} = configSlice.actions;
-export default configSlice.reducer;
 
 export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boolean) => {
   if (projects.length === 0) {
@@ -467,3 +466,37 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
   const [lastOpened, ...rest] = sortedProjects;
   return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
 };
+
+export const {
+  addNamespaceToContext,
+  changeCurrentProjectName,
+  changeProjectsRootPath,
+  createProject,
+  handleFavoriteTemplate,
+  removeNamespaceFromContext,
+  setAccessLoading,
+  setAutoZoom,
+  setCurrentContext,
+  setFilterObjects,
+  setKubeConfig,
+  setKubeConfigContextColor,
+  setUserDirs,
+  toggleErrorReporting,
+  toggleEventTracking,
+  toggleProjectPin,
+  updateApplicationSettings,
+  updateClusterSelectorVisibilty,
+  updateFileIncludes,
+  updateFolderReadsMaxDepth,
+  updateLanguage,
+  updateLoadLastProjectOnStartup,
+  updateK8sVersion,
+  updateNewVersion,
+  updateProjectConfig,
+  updateProjectKubeConfig,
+  updateScanExcludes,
+  updateTelemetry,
+  updateTextSize,
+  updateTheme,
+} = configSlice.actions;
+export default configSlice.reducer;

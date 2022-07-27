@@ -11,6 +11,7 @@ import {
   DEFAULT_PLUGINS,
   DEFAULT_TEMPLATES_PLUGIN_URL,
   DEPENDENCIES_HELP_URL,
+  NEW_VERSION_CHECK_INTERVAL,
 } from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
@@ -19,10 +20,11 @@ import {NewVersionCode} from '@models/appconfig';
 import {setAlert} from '@redux/reducers/alert';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} from '@redux/reducers/extension';
-import {setAppRehydrating} from '@redux/reducers/main';
+import {setAppRehydrating, setWebContentsId} from '@redux/reducers/main';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
+import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
 import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
@@ -38,7 +40,6 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
-import {disableSegment, enableSegment, getSegmentClient} from './segment';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
@@ -190,6 +191,10 @@ export const createWindow = (givenPath?: string) => {
     );
 
     await checkNewVersion(dispatch, true);
+    setInterval(async () => {
+      await checkNewVersion(dispatch, true);
+    }, NEW_VERSION_CHECK_INTERVAL);
+
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));
 
@@ -242,6 +247,7 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
+    dispatch(setWebContentsId(win.webContents.id));
     convertRecentFilesToRecentProjects(dispatch);
   });
 

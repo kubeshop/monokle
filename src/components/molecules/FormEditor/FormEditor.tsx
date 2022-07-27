@@ -1,5 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
@@ -28,20 +27,26 @@ import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
 
+interface IProps {
+  formSchema: any;
+  formUiSchema?: any;
+}
+
 /**
  * Load schemas every time for now - should be cached in the future...
  */
 
-const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
+const FormEditor: React.FC<IProps> = props => {
   const {formSchema, formUiSchema} = props;
+
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(selectedResourceSelector);
-  const settings = useSelector(settingsSelector);
+  const settings = useAppSelector(settingsSelector);
 
   const [formData, setFormData] = useState<any>();
   const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
