@@ -1,5 +1,9 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {useEffect, useState} from 'react';
 
+import log from 'loglevel';
+import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
@@ -9,13 +13,16 @@ import {createKubeClient} from '@utils/kubeclient';
 
 import * as S from './Logs.styled';
 
-const stream = require('stream');
-const k8s = require('@kubernetes/client-node');
-const log = require('loglevel');
-
 type LogLineType = {
   id: string;
   text: string;
+};
+
+const logOptions = {
+  follow: true,
+  tailLines: 50,
+  pretty: false,
+  timestamps: false,
 };
 
 const Logs = () => {
@@ -43,16 +50,11 @@ const Logs = () => {
         ]);
       });
 
-      k8sLog
-        .log(resource.namespace, resource.name, containerName, logStream, {
-          follow: true,
-          tailLines: 50,
-          pretty: false,
-          timestamps: false,
-        })
-        .catch((err: Error) => {
+      if (resource.namespace) {
+        k8sLog.log(resource.namespace, resource.name, containerName, logStream, logOptions).catch((err: Error) => {
           log.error(err);
         });
+      }
     }
 
     return () => {
