@@ -28,7 +28,7 @@ const BottomPaneManager: React.FC = () => {
   return (
     <S.BottomPaneManagerContainer>
       {Object.values(terminalsMap).map(terminal => (
-        <TerminalPane key={terminal.id} />
+        <TerminalPane key={terminal.id} terminalId={terminal.id} />
       ))}
     </S.BottomPaneManagerContainer>
   );
