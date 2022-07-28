@@ -58,7 +58,7 @@ const TerminalPane: React.FC = () => {
     terminalResizeRef.current?.dispose();
     ipcRenderer.removeListener('shell.incomingData', incomingDataRef.current);
 
-    ipcRenderer.send('shell.ptyProcessKill', {webContentsId});
+    ipcRenderer.send('shell.ptyProcessKill', {terminalId: selectedTerminal});
 
     // if there is only one running terminal
     if (runningTerminals.length === 1) {
@@ -68,7 +68,10 @@ const TerminalPane: React.FC = () => {
     dispatch(removeRunningTerminal(selectedTerminal));
   };
 
-  const onAddTerminalHandler = () => {};
+  const onAddTerminalHandler = () => {
+    // const newTerminalId = uuidv4();
+    // dispatch(setSelectedTerminal(newTerminalId));
+  };
 
   useEffect(() => {
     if (
@@ -86,7 +89,7 @@ const TerminalPane: React.FC = () => {
 
     terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
     terminalRef.current.loadAddon(fitAddon);
-    ipcRenderer.send('shell.init', {rootFilePath, webContentsId});
+    ipcRenderer.send('shell.init', {rootFilePath, terminalId: selectedTerminal, webContentsId});
 
     terminalRef.current.open(terminalContainerRef.current);
     terminalRef.current.focus();
@@ -94,11 +97,11 @@ const TerminalPane: React.FC = () => {
     ipcRenderer.on('shell.incomingData', incomingDataRef.current);
 
     terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
-      ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
+      ipcRenderer.send('shell.resize', {cols, rows});
     });
 
     terminalDataRef.current = terminalRef.current.onData(data => {
-      ipcRenderer.send('shell.ptyProcessWriteData', {data, webContentsId});
+      ipcRenderer.send('shell.ptyProcessWriteData', {data, terminalId: selectedTerminal});
     });
 
     fitAddon.fit();
@@ -106,7 +109,7 @@ const TerminalPane: React.FC = () => {
     dispatch(addRunningTerminal(selectedTerminal));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bottomSelection, rootFilePath, webContentsId]);
+  }, [bottomSelection, selectedTerminal, rootFilePath, webContentsId]);
 
   useEffect(() => {
     if (bottomSelection !== 'terminal') {
@@ -118,7 +121,7 @@ const TerminalPane: React.FC = () => {
     }, 250);
 
     terminalRef.current?.focus();
-  }, [bottomPaneHeight, bottomSelection]);
+  }, [bottomPaneHeight, bottomSelection, selectedTerminal]);
 
   // treat the case where the bottom selection is set to terminal and the user opens Monokle
   useEffect(() => {

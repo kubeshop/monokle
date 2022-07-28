@@ -271,7 +271,7 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 });
 
 ipcMain.on('shell.init', (event, args) => {
-  const {rootFilePath, webContentsId} = args;
+  const {rootFilePath, terminalId, webContentsId} = args;
 
   if (!webContentsId) {
     return;
@@ -279,7 +279,7 @@ ipcMain.on('shell.init', (event, args) => {
 
   const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
 
-  if (ptyProcessMap[webContentsId]) {
+  if (ptyProcessMap[terminalId]) {
     return;
   }
 
@@ -293,7 +293,7 @@ ipcMain.on('shell.init', (event, args) => {
       useConpty: false,
     });
 
-    ptyProcessMap[webContentsId] = ptyProcess;
+    ptyProcessMap[terminalId] = ptyProcess;
 
     if (currentWebContents) {
       ptyProcess.onData((incomingData: any) => {
@@ -308,18 +308,16 @@ ipcMain.on('shell.init', (event, args) => {
 });
 
 ipcMain.on('shell.resize', (event, args) => {
-  const {webContentsId, cols, rows} = args;
+  const {cols, rows} = args;
 
-  const ptyProcess = ptyProcessMap[webContentsId];
-
-  if (ptyProcess) {
+  Object.values(ptyProcessMap).forEach(ptyProcess => {
     ptyProcess.resize(cols, rows);
-  }
+  });
 });
 
 ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
-  const {data, webContentsId} = d;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {data, terminalId} = d;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (ptyProcess) {
     ptyProcess.write(data);
@@ -327,8 +325,8 @@ ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
 });
 
 ipcMain.on('shell.ptyProcessKill', (event, data) => {
-  const {webContentsId} = data;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {terminalId} = data;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (!ptyProcess) {
     return;
@@ -344,5 +342,5 @@ ipcMain.on('shell.ptyProcessKill', (event, data) => {
     ptyProcess.kill();
   }
 
-  delete ptyProcessMap[webContentsId];
+  delete ptyProcessMap[terminalId];
 });
