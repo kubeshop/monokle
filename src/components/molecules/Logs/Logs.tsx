@@ -52,13 +52,6 @@ const Logs = () => {
         })
         .catch((err: Error) => {
           log.error(err);
-        })
-        .then((req: any) => {
-          if (req) {
-            setTimeout(() => {
-              req.abort();
-            }, 5000);
-          }
         });
     }
 
