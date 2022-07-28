@@ -13,7 +13,7 @@ import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addRunningTerminal, removeRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {addTerminal, removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 
 import {Icon, MonoPaneTitle} from '@atoms';
@@ -27,8 +27,8 @@ const TerminalPane: React.FC = () => {
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const runningTerminals = useAppSelector(state => state.terminal.runningTerminals);
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
@@ -61,11 +61,11 @@ const TerminalPane: React.FC = () => {
     ipcRenderer.send('shell.ptyProcessKill', {terminalId: selectedTerminal});
 
     // if there is only one running terminal
-    if (runningTerminals.length === 1) {
+    if (Object.keys(terminalsMap).length === 1) {
       dispatch(setSelectedTerminal(undefined));
     }
 
-    dispatch(removeRunningTerminal(selectedTerminal));
+    dispatch(removeTerminal(selectedTerminal));
   };
 
   const onAddTerminalHandler = () => {
@@ -82,7 +82,7 @@ const TerminalPane: React.FC = () => {
       !selectedTerminal ||
       !terminalContainerRef.current ||
       terminalContainerRef.current.childElementCount !== 0 ||
-      (runningTerminals.length && runningTerminals.includes(selectedTerminal))
+      terminalsMap[selectedTerminal]?.isRunning
     ) {
       return;
     }
@@ -106,7 +106,7 @@ const TerminalPane: React.FC = () => {
 
     fitAddon.fit();
 
-    dispatch(addRunningTerminal(selectedTerminal));
+    dispatch(setRunningTerminal(selectedTerminal));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSelection, selectedTerminal, rootFilePath, webContentsId]);
@@ -131,6 +131,7 @@ const TerminalPane: React.FC = () => {
 
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
+    dispatch(addTerminal(newTerminalId));
   }, [bottomSelection, dispatch, selectedTerminal]);
 
   return (

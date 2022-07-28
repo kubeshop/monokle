@@ -16,7 +16,7 @@ import {
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectedTerminal} from '@redux/reducers/terminal';
+import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
@@ -48,7 +48,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
-  const runningTerminals = useAppSelector(state => state.terminal.runningTerminals);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -85,10 +85,11 @@ const PaneManagerLeftMenu: React.FC = () => {
   };
 
   const onTerminalSelectionHandler = () => {
-    if (!runningTerminals.length) {
+    if (!Object.keys(terminalsMap).length) {
       const newTerminalId = uuidv4();
 
       dispatch(setSelectedTerminal(newTerminalId));
+      dispatch(addTerminal(newTerminalId));
     }
 
     handleLeftBottomMenuSelection('terminal');

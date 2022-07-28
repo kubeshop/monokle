@@ -257,7 +257,7 @@ const initialExtensionState: ExtensionState = {
 };
 
 const initialTerminalState: TerminalState = {
-  runningTerminals: [],
+  terminalsMap: {},
 };
 
 export default {
