@@ -240,9 +240,13 @@ Note: A plugin can contain one or multiple templates.
 ## **Default Monokle Templates**
 
 Monokle includes a default set of templates which are installed automatically when starting Monokle
-for the first time and available in the Templates Explorer when working with your Monokle projects:
+for the first time and available in the Templates Explorer when working with your Monokle projects.
 
-![Default Templates](img/default-templates-1.6.0.gif)
+Click on the View Templates icon to view the included templates:
+
+![View Templates](img/view-template-icon-1.9.png)
+
+![Default Templates](img/default-templates-1.9.gif)
 
 Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to
-see which templates that are included and their corresponding schemas and manifests.
+see which templates are included and their corresponding schemas and manifests.
