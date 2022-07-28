@@ -2,6 +2,8 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
+import {v4 as uuidv4} from 'uuid';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
   FileExplorerTabTooltip,
@@ -14,6 +16,7 @@ import {
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
@@ -45,6 +48,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
+  const runningTerminals = useAppSelector(state => state.terminal.runningTerminals);
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -78,6 +82,16 @@ const PaneManagerLeftMenu: React.FC = () => {
         dispatch(toggleLeftMenu());
       }
     }
+  };
+
+  const onTerminalSelectionHandler = () => {
+    if (!runningTerminals.length) {
+      const newTerminalId = uuidv4();
+
+      dispatch(setSelectedTerminal(newTerminalId));
+    }
+
+    handleLeftBottomMenuSelection('terminal');
   };
 
   const checkIsTabSelected = useCallback(
@@ -254,7 +268,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             id="terminal"
             isSelected={checkIsBottomTabSelected('terminal')}
             isActive={isActive}
-            onClick={() => handleLeftBottomMenuSelection('terminal')}
+            onClick={onTerminalSelectionHandler}
             disabled={!activeProject}
           >
             <MenuIcon iconName="terminal" active={isActive} isSelected />

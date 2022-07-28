@@ -14,11 +14,14 @@ export const terminalSlice = createSlice({
     removeRunningTerminal: (state: Draft<TerminalState>, action: PayloadAction<string>) => {
       state.runningTerminals = state.runningTerminals.filter(id => id !== action.payload);
     },
+    setSelectedTerminal: (state: Draft<TerminalState>, action: PayloadAction<string | undefined>) => {
+      state.selectedTerminal = action.payload;
+    },
     setWebContentsId: (state: Draft<TerminalState>, action: PayloadAction<number>) => {
       state.webContentsId = action.payload;
     },
   },
 });
 
-export const {addRunningTerminal, removeRunningTerminal, setWebContentsId} = terminalSlice.actions;
+export const {addRunningTerminal, removeRunningTerminal, setSelectedTerminal, setWebContentsId} = terminalSlice.actions;
 export default terminalSlice.reducer;

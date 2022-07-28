@@ -13,14 +13,13 @@ import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addRunningTerminal, removeRunningTerminal} from '@redux/reducers/terminal';
+import {addRunningTerminal, removeRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 
 import {Icon, MonoPaneTitle} from '@atoms';
 
 import * as S from './TerminalPane.styled';
 
-let terminalId = '';
 const fitAddon = new FitAddon();
 
 const TerminalPane: React.FC = () => {
@@ -29,6 +28,7 @@ const TerminalPane: React.FC = () => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const runningTerminals = useAppSelector(state => state.terminal.runningTerminals);
+  const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
@@ -45,6 +45,10 @@ const TerminalPane: React.FC = () => {
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
   const onKillTerminalHandler = () => {
+    if (!selectedTerminal) {
+      return;
+    }
+
     dispatch(setLeftBottomMenuSelection(null));
 
     terminalRef.current?.clear();
@@ -56,8 +60,12 @@ const TerminalPane: React.FC = () => {
 
     ipcRenderer.send('shell.ptyProcessKill', {webContentsId});
 
-    dispatch(removeRunningTerminal(terminalId));
-    terminalId = '';
+    // if there is only one running terminal
+    if (runningTerminals.length === 1) {
+      dispatch(setSelectedTerminal(undefined));
+    }
+
+    dispatch(removeRunningTerminal(selectedTerminal));
   };
 
   const onAddTerminalHandler = () => {};
@@ -68,9 +76,10 @@ const TerminalPane: React.FC = () => {
       bottomSelection !== 'terminal' ||
       !rootFilePath ||
       !webContentsId ||
+      !selectedTerminal ||
       !terminalContainerRef.current ||
       terminalContainerRef.current.childElementCount !== 0 ||
-      (runningTerminals.length && runningTerminals.includes(terminalId))
+      (runningTerminals.length && runningTerminals.includes(selectedTerminal))
     ) {
       return;
     }
@@ -79,7 +88,6 @@ const TerminalPane: React.FC = () => {
     terminalRef.current.loadAddon(fitAddon);
     ipcRenderer.send('shell.init', {rootFilePath, webContentsId});
 
-    terminalId = uuidv4();
     terminalRef.current.open(terminalContainerRef.current);
     terminalRef.current.focus();
 
@@ -95,7 +103,7 @@ const TerminalPane: React.FC = () => {
 
     fitAddon.fit();
 
-    dispatch(addRunningTerminal(terminalId));
+    dispatch(addRunningTerminal(selectedTerminal));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSelection, rootFilePath, webContentsId]);
@@ -111,6 +119,16 @@ const TerminalPane: React.FC = () => {
 
     terminalRef.current?.focus();
   }, [bottomPaneHeight, bottomSelection]);
+
+  // treat the case where the bottom selection is set to terminal and the user opens Monokle
+  useEffect(() => {
+    if (selectedTerminal || bottomSelection !== 'terminal') {
+      return;
+    }
+
+    const newTerminalId = uuidv4();
+    dispatch(setSelectedTerminal(newTerminalId));
+  }, [bottomSelection, dispatch, selectedTerminal]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
