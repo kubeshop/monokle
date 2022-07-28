@@ -7,3 +7,7 @@ export const BottomPaneManagerContainer = styled.div`
   border-left: ${AppBorders.sectionDivider};
   padding: 8px 16px;
 `;
+
+export const Tab = styled.div`
+  padding: 10px;
+`;

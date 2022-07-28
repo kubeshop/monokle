@@ -88,8 +88,8 @@ const PaneManagerLeftMenu: React.FC = () => {
     if (!Object.keys(terminalsMap).length) {
       const newTerminalId = uuidv4();
 
-      dispatch(setSelectedTerminal(newTerminalId));
       dispatch(addTerminal(newTerminalId));
+      dispatch(setSelectedTerminal(newTerminalId));
     }
 
     handleLeftBottomMenuSelection('terminal');

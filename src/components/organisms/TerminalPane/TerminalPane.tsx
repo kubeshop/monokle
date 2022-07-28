@@ -69,8 +69,9 @@ const TerminalPane: React.FC = () => {
   };
 
   const onAddTerminalHandler = () => {
-    // const newTerminalId = uuidv4();
-    // dispatch(setSelectedTerminal(newTerminalId));
+    const newTerminalId = uuidv4();
+    dispatch(addTerminal(newTerminalId));
+    dispatch(setSelectedTerminal(newTerminalId));
   };
 
   useEffect(() => {
@@ -122,17 +123,6 @@ const TerminalPane: React.FC = () => {
 
     terminalRef.current?.focus();
   }, [bottomPaneHeight, bottomSelection, selectedTerminal]);
-
-  // treat the case where the bottom selection is set to terminal and the user opens Monokle
-  useEffect(() => {
-    if (selectedTerminal || bottomSelection !== 'terminal') {
-      return;
-    }
-
-    const newTerminalId = uuidv4();
-    dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal(newTerminalId));
-  }, [bottomSelection, dispatch, selectedTerminal]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef}>
