@@ -10,7 +10,7 @@ import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {KillTerminalTooltip} from '@constants/tooltips';
+import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addRunningTerminal, removeRunningTerminal} from '@redux/reducers/terminal';
@@ -59,6 +59,8 @@ const TerminalPane: React.FC = () => {
     dispatch(removeRunningTerminal(terminalId));
     terminalId = '';
   };
+
+  const onAddTerminalHandler = () => {};
 
   useEffect(() => {
     if (
@@ -119,6 +121,10 @@ const TerminalPane: React.FC = () => {
         </S.TitleLabel>
 
         <S.TerminalActions>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AddTerminalTooltip}>
+            <S.PlusOutlined onClick={onAddTerminalHandler} />
+          </Tooltip>
+
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
             <S.DeleteOutlined onClick={onKillTerminalHandler} />
           </Tooltip>
