@@ -24,7 +24,7 @@ const walkThroughCollection = {
   release: newReleaseFeaturesContent,
 };
 
-const WalkThroughTitle = (props: {title: string; collection: WalkThroughCollection}) => {
+const WalkthroughTitle = (props: {title: string; collection: WalkThroughCollection}) => {
   const {title, collection} = props;
   const dispatch = useAppDispatch();
 
@@ -40,7 +40,7 @@ const WalkThroughTitle = (props: {title: string; collection: WalkThroughCollecti
   );
 };
 
-const WalkThroughContent = (props: WalkThroughContentProps) => {
+const WalkthroughContent = (props: WalkThroughContentProps) => {
   const {data, currentStep, collection} = props;
   const dispatch = useAppDispatch();
 
@@ -68,7 +68,7 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
   );
 };
 
-const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
+const Walkthrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
   const {placement, step, collection, children} = props;
   const walkThroughStep = useAppSelector(state => state.ui.walkThrough[collection].currentStep);
   const data = walkThroughCollection[collection][walkThroughStep] || {};
@@ -76,8 +76,8 @@ const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>
   return (
     <Popover
       placement={placement}
-      content={<WalkThroughContent data={data} currentStep={walkThroughStep} collection={collection} />}
-      title={<WalkThroughTitle title={data.title} collection={collection} />}
+      content={<WalkthroughContent data={data} currentStep={walkThroughStep} collection={collection} />}
+      title={<WalkthroughTitle title={data.title} collection={collection} />}
       visible={data.step === step}
       overlayClassName="walkthrough"
     >
@@ -86,4 +86,4 @@ const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>
   );
 };
 
-export default WalkThrough;
+export default Walkthrough;
