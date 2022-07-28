@@ -86,9 +86,32 @@ Monokle is now in **Preview Mode** (as indicated by the header at the top):
 - Selecting **Preview** for a different values file will switch the preview to the output of Helm for that file.
 - Selecting **Exit** in the top right or next to the values file restores the previous resource navigator.
 
-## **Editing of Values Files During Preview**
+## **Editing of Values Files**
+
+If you're editing Helm Values files, Monokle will highlight all properties that have been referenced by any templates.
+The list of paths to template files is shown when hovering over the highlighted value.
+
+![Helm Values References](img/helm-values-reference-1-8-0.png)
 
 When previewing a Helm values file, it is possible to edit the previewed file and recreate the preview, allowing
 you to quickly assess the impact of any changes on the generated files, instead of having to exit and recreate the preview to make a change.
  
+![Edit Helm](img/helm-preview-reload-1.5.0.png)
+
 ![Edit Helm](img/helm-preview-reload-1.9.png)
+
+## **Working with Helm Templates**
+
+Each Helm Chart from the Helm pane has a subsection which displays all templates of that chart.
+Clicking on a template will select it and open it in the Editor.
+
+When you hover over a value referenced from a Values file, the popup that appears will display the following information:
+- The path to the values file where the reference is from.
+- The referenced value, so you don't have to switch to the Values file.
+- A link to quickly navigate to the location of that value.
+
+![Helm Templates](img/helm-templates-1-8-0.png)
+
+If Monokle cannot find any values file with the referenced path from a Helm template, it will highlight it in yellow:
+
+![Helm Templates Unsatisfied Reference](img/helm-templates-unsatisfied-1-8-0.png)
