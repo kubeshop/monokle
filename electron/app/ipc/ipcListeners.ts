@@ -308,11 +308,12 @@ ipcMain.on('shell.init', (event, args) => {
 });
 
 ipcMain.on('shell.resize', (event, args) => {
-  const {cols, rows} = args;
+  const {cols, rows, terminalId} = args;
+  const ptyProcess = ptyProcessMap[terminalId];
 
-  Object.values(ptyProcessMap).forEach(ptyProcess => {
+  if (ptyProcess) {
     ptyProcess.resize(cols, rows);
-  });
+  }
 });
 
 ipcMain.on('shell.ptyProcessWriteData', (event, d) => {

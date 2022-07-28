@@ -22,8 +22,6 @@ import {useWindowSize} from '@utils/hooks';
 
 import * as S from './TerminalPane.styled';
 
-const fitAddon = new FitAddon();
-
 interface IProps {
   terminalId: string;
 }
@@ -51,6 +49,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current?.write(data);
   });
   const terminalResizeRef = useRef<IDisposable>();
+  const addonRef = useRef<FitAddon>();
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
@@ -61,6 +60,8 @@ const TerminalPane: React.FC<IProps> = props => {
 
     dispatch(setLeftBottomMenuSelection(null));
 
+    addonRef.current?.dispose();
+    addonRef.current = undefined;
     terminalRef.current?.clear();
     terminalRef.current?.dispose();
     terminalRef.current = undefined;
@@ -99,7 +100,8 @@ const TerminalPane: React.FC<IProps> = props => {
     }
 
     terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
-    terminalRef.current.loadAddon(fitAddon);
+    addonRef.current = new FitAddon();
+    terminalRef.current.loadAddon(addonRef.current);
     ipcRenderer.send('shell.init', {rootFilePath, terminalId, webContentsId});
 
     terminalRef.current.open(terminalContainerRef.current);
@@ -108,7 +110,7 @@ const TerminalPane: React.FC<IProps> = props => {
     ipcRenderer.on(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
     terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
-      ipcRenderer.send('shell.resize', {cols, rows});
+      ipcRenderer.send('shell.resize', {cols, rows, terminalId});
     });
 
     terminalDataRef.current = terminalRef.current.onData(data => {
@@ -116,7 +118,7 @@ const TerminalPane: React.FC<IProps> = props => {
     });
 
     setTimeout(() => {
-      fitAddon.fit();
+      addonRef.current?.fit();
     }, 250);
 
     dispatch(setRunningTerminal(terminalId));
@@ -129,11 +131,8 @@ const TerminalPane: React.FC<IProps> = props => {
       return;
     }
 
-    console.log('Fitting again');
-    console.log('TerminalID:', terminalId);
-
     setTimeout(() => {
-      fitAddon.fit();
+      addonRef.current?.fit();
     }, 250);
 
     terminalRef.current?.focus();
