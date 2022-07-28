@@ -68,7 +68,7 @@ const WalkThroughContent = (props: WalkThroughContentProps) => {
   );
 };
 
-const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
+const Walkthrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>) => {
   const {placement, step, collection, children} = props;
   const walkThroughStep = useAppSelector(state => state.ui.walkThrough[collection].currentStep);
   const data = walkThroughCollection[collection][walkThroughStep] || {};
@@ -86,4 +86,4 @@ const WalkThrough = <C extends WalkThroughCollection>(props: WalkThroughProps<C>
   );
 };
 
-export default WalkThrough;
+export default Walkthrough;

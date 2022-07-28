@@ -62,6 +62,8 @@ const TerminalPane: React.FC = () => {
 
   useEffect(() => {
     if (
+      !bottomSelection ||
+      bottomSelection !== 'terminal' ||
       !rootFilePath ||
       !webContentsId ||
       !terminalContainerRef.current ||
