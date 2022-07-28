@@ -285,11 +285,12 @@ ipcMain.on('shell.init', (event, args) => {
 
   try {
     const ptyProcess = pty.spawn(shell, [], {
-      name: 'xterm-color',
+      name: 'xterm-256color',
       rows: 24,
       cols: 80,
       cwd: rootFilePath,
       env: process.env as Record<string, string>,
+      useConpty: false,
     });
 
     ptyProcessMap[webContentsId] = ptyProcess;

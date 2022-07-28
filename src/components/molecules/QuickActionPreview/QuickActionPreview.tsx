@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -7,26 +5,21 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {stopPreview} from '@redux/services/preview';
 
-import * as S from './styled';
+import * as S from './QuickActionPreview.styled';
 
-const QuickActionPreview = (props: {
-  isItemSelected: boolean;
+interface IProps {
+  exitPreviewTooltip: string;
   isItemBeingPreviewed: boolean;
+  isItemSelected: boolean;
   previewTooltip: string;
   reloadPreviewTooltip: string;
-  exitPreviewTooltip: string;
-  selectAndPreview: () => void;
   reloadPreview: () => void;
-}) => {
-  const {
-    isItemSelected,
-    isItemBeingPreviewed,
-    previewTooltip,
-    reloadPreviewTooltip,
-    exitPreviewTooltip,
-    selectAndPreview,
-    reloadPreview,
-  } = props;
+  selectAndPreview: () => void;
+}
+
+const QuickActionPreview: React.FC<IProps> = props => {
+  const {isItemSelected, isItemBeingPreviewed, previewTooltip, reloadPreviewTooltip, exitPreviewTooltip} = props;
+  const {reloadPreview, selectAndPreview} = props;
 
   const dispatch = useAppDispatch();
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);

@@ -745,9 +745,6 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.selectedValuesFileId = undefined;
     },
-    setWebContentsId: (state: Draft<AppState>, action: PayloadAction<number>) => {
-      state.webContentsId = action.payload;
-    },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
@@ -1240,10 +1237,11 @@ export const mainSlice = createSlice({
       (state, action) => {
         if (action.payload?.alert) {
           const notification: AlertType = action.payload.alert;
-          notification.id = uuidv4();
-          notification.hasSeen = false;
-          notification.createdAt = new Date().getTime();
-          state.notifications = [notification, ...state.notifications];
+
+          state.notifications = [
+            {...notification, id: uuidv4(), hasSeen: false, createdAt: new Date().getTime()},
+            ...state.notifications,
+          ];
         }
       }
     );
@@ -1351,7 +1349,6 @@ export const {
   setImagesSearchedValue,
   setSelectingFile,
   setSelectionHistory,
-  setWebContentsId,
   startPreviewLoader,
   stopPreviewLoader,
   toggleAllRules,

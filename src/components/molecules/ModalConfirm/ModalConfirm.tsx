@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Modal} from 'antd';
 
-import * as S from './styled';
+import * as S from './ModalConfirm.styled';
 
 interface IProps {
   isVisible: boolean;
