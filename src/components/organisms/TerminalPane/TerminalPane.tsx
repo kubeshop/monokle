@@ -18,6 +18,8 @@ import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 
 import {Icon, MonoPaneTitle} from '@atoms';
 
+import {useWindowSize} from '@utils/hooks';
+
 import * as S from './TerminalPane.styled';
 
 const fitAddon = new FitAddon();
@@ -36,6 +38,8 @@ const TerminalPane: React.FC<IProps> = props => {
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
+
+  const {height: windowHeight, width: windowWidth} = useWindowSize();
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
@@ -62,7 +66,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current = undefined;
     terminalDataRef.current?.dispose();
     terminalResizeRef.current?.dispose();
-    ipcRenderer.removeListener('shell.incomingData', incomingDataRef.current);
+    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
     ipcRenderer.send('shell.ptyProcessKill', {terminalId});
 
@@ -101,7 +105,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current.open(terminalContainerRef.current);
     terminalRef.current.focus();
 
-    ipcRenderer.on('shell.incomingData', incomingDataRef.current);
+    ipcRenderer.on(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
     terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
       ipcRenderer.send('shell.resize', {cols, rows});
@@ -111,7 +115,9 @@ const TerminalPane: React.FC<IProps> = props => {
       ipcRenderer.send('shell.ptyProcessWriteData', {data, terminalId});
     });
 
-    fitAddon.fit();
+    setTimeout(() => {
+      fitAddon.fit();
+    }, 250);
 
     dispatch(setRunningTerminal(terminalId));
 
@@ -119,16 +125,20 @@ const TerminalPane: React.FC<IProps> = props => {
   }, [bottomSelection, rootFilePath, webContentsId]);
 
   useEffect(() => {
-    if (bottomSelection !== 'terminal') {
+    if (bottomSelection !== 'terminal' || selectedTerminal !== terminalId) {
       return;
     }
+
+    console.log('Fitting again');
+    console.log('TerminalID:', terminalId);
 
     setTimeout(() => {
       fitAddon.fit();
     }, 250);
 
     terminalRef.current?.focus();
-  }, [bottomPaneHeight, bottomSelection, selectedTerminal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bottomPaneHeight, bottomSelection, selectedTerminal, windowHeight, windowWidth]);
 
   return (
     <S.TerminalPaneContainer ref={containerRef} style={{display: selectedTerminal === terminalId ? 'block' : 'none'}}>
@@ -151,7 +161,10 @@ const TerminalPane: React.FC<IProps> = props => {
         </S.TerminalActions>
       </S.TitleBar>
 
-      <S.TerminalContainer ref={terminalContainerRef} $height={height - titleBarHeight} />
+      <S.TerminalContainer
+        ref={terminalContainerRef}
+        $height={height - titleBarHeight - (Object.keys(terminalsMap).length > 1 ? 44 : 0)}
+      />
     </S.TerminalPaneContainer>
   );
 };

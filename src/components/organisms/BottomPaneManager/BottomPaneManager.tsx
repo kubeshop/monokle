@@ -27,6 +27,16 @@ const BottomPaneManager: React.FC = () => {
 
   return (
     <S.BottomPaneManagerContainer>
+      {Object.keys(terminalsMap).length > 1 ? (
+        <S.TabsContainer>
+          {Object.keys(terminalsMap).map((id, index) => (
+            <S.Tab key={id} $selected={selectedTerminal === id} onClick={() => dispatch(setSelectedTerminal(id))}>
+              Terminal {index}
+            </S.Tab>
+          ))}
+        </S.TabsContainer>
+      ) : null}
+
       {Object.values(terminalsMap).map(terminal => (
         <TerminalPane key={terminal.id} terminalId={terminal.id} />
       ))}

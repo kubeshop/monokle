@@ -70,7 +70,7 @@ const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
-// string is the webContentsId
+// string is the terminal id
 let ptyProcessMap: Record<string, pty.IPty> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
@@ -297,7 +297,7 @@ ipcMain.on('shell.init', (event, args) => {
 
     if (currentWebContents) {
       ptyProcess.onData((incomingData: any) => {
-        currentWebContents.send('shell.incomingData', incomingData);
+        currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
       });
     } else {
       log.error('Web contents is not found');
