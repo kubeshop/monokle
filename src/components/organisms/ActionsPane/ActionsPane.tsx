@@ -276,6 +276,10 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
+
+    if (activeTabKey === 'logs' && selectedResource?.kind !== 'Pod') {
+      setActiveTabKey('source');
+    }
   }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath, schemaForSelectedPath]);
 
   useEffect(() => {

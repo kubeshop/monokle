@@ -30,7 +30,7 @@ const Logs = () => {
     const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
     const k8sLog = new k8s.Log(kc);
     const logStream = new stream.PassThrough();
-    if (resource) {
+    if (resource && resource.kind === 'Pod') {
       const containerName = resource.content?.spec?.containers[0]?.name;
 
       logStream.on('data', (chunk: any) => {
