@@ -2,12 +2,11 @@ import {useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
-import {Button, Switch, Tag} from 'antd';
+import {Button, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
-import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
@@ -29,55 +28,20 @@ import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import Colors from '@styles/Colors';
-
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
+import * as S from './ResourceDiff.styled';
 
 // @ts-ignore
 const {yaml} = languages || {};
 
-const MonacoDiffContainer = styled.div<{height: string; width: string}>`
-  ${props => `
-    height: ${props.height};
-    width: ${props.width};
-  `}
-  padding: 8px;
-  & .monaco-editor .monaco-editor-background {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .monaco-editor .margin {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .diffOverview {
-    background-color: ${Colors.grey1000} !important;
-  }
-`;
-
-const SwitchContainer = styled.span`
-  /* margin-right: 20px; */
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
-`;
-
-const StyledSwitchLabel = styled.span`
-  margin-left: 8px;
-  cursor: pointer;
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 8px;
-  padding-bottom: 5px;
-`;
-
-const StyledTag = styled(Tag)`
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: 600;
-`;
+const options = {
+  renderSideBySide: true,
+  automaticLayoutResize: true,
+  minimap: {
+    enabled: false,
+  },
+  readOnly: true,
+};
 
 const ResourceDiff = (props: {
   localResource: K8sResource;
@@ -88,32 +52,23 @@ const ResourceDiff = (props: {
   const dispatch = useAppDispatch();
   const {localResource, clusterResourceText, isInClusterDiff, onApply} = props;
 
-  const windowSize = useWindowSize();
-
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const projectConfig = useAppSelector(currentConfigSelector);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
+  const previewType = useAppSelector(state => state.main.previewType);
+  const projectConfig = useAppSelector(currentConfigSelector);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
+
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
-  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const windowSize = useWindowSize();
 
   useResourceYamlSchema(yaml, String(userDataDir), String(k8sVersion), localResource);
-
-  const options = {
-    renderSideBySide: true,
-    automaticLayoutResize: true,
-    minimap: {
-      enabled: false,
-    },
-    readOnly: true,
-  };
 
   const confirmModalTitle = useMemo(
     () =>
@@ -177,7 +132,7 @@ const ResourceDiff = (props: {
 
   return (
     <>
-      <MonacoDiffContainer width="100%" height="58vh" ref={containerRef}>
+      <S.MonacoDiffContainer ref={containerRef}>
         <MonacoDiffEditor
           key={monacoDiffContainerWidth}
           language="yaml"
@@ -188,10 +143,10 @@ const ResourceDiff = (props: {
           width={containerWidth}
           height={containerHeight}
         />
-      </MonacoDiffContainer>
+      </S.MonacoDiffContainer>
 
-      <TagsContainer>
-        <StyledTag>Local</StyledTag>
+      <S.TagsContainer>
+        <S.Tag>Local</S.Tag>
         <Button
           type="primary"
           ghost
@@ -211,13 +166,13 @@ const ResourceDiff = (props: {
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>
-        <StyledTag>Cluster</StyledTag>
-      </TagsContainer>
+        <S.Tag>Cluster</S.Tag>
+      </S.TagsContainer>
 
-      <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+      <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
         <Switch checked={shouldDiffIgnorePaths} />
-        <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
-      </SwitchContainer>
+        <S.SwitchLabel>Hide ignored fields</S.SwitchLabel>
+      </S.SwitchContainer>
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect

@@ -26,9 +26,9 @@ import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducer
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
-import {FileExplorer} from '@atoms';
+import {Walkthrough} from '@molecules';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -248,7 +248,7 @@ const ProjectSelection = () => {
 
   return (
     <S.ProjectContainer id="projects-dropdown-container">
-      <WalkThrough placement="leftTop" step="template" collection="novice">
+      <Walkthrough placement="leftTop" step="template" collection="novice">
         <Dropdown
           disabled={previewLoader.isLoading}
           overlay={projectMenu}
@@ -265,7 +265,7 @@ const ProjectSelection = () => {
             </S.Button>
           </Tooltip>
         </Dropdown>
-      </WalkThrough>
+      </Walkthrough>
 
       <FileExplorer {...fileExplorerProps} />
     </S.ProjectContainer>

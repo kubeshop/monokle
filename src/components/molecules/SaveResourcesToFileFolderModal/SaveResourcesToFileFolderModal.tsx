@@ -33,7 +33,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
-import * as S from './styled';
+import * as S from './SaveResourcesToFileFolderModal.styled';
 
 const {Option} = Select;
 
@@ -104,7 +104,7 @@ const generateFullFileName = (
   return fullFileName;
 };
 
-const SaveResourceToFileFolderModal: React.FC = () => {
+const SaveResourcesToFileFolderModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -411,4 +411,4 @@ const SaveResourceToFileFolderModal: React.FC = () => {
   );
 };
 
-export default SaveResourceToFileFolderModal;
+export default SaveResourcesToFileFolderModal;

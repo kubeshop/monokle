@@ -1,6 +1,6 @@
-import {WalkThroughContentProps} from './types';
+import {WalkThroughContentProps} from '@models/walkthrough';
 
-export const newReleaseFeatureContent: WalkThroughContentProps['data'][] = [
+export const newReleaseFeaturesContent: WalkThroughContentProps['data'][] = [
   {
     step: 'compare',
     title: 'Compare anything',
