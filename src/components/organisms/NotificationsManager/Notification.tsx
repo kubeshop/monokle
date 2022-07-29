@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
-import NotificationMarkdown from '@molecules/NotificationMarkdown';
+import {NotificationMarkdown} from '@molecules';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 

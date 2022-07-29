@@ -1,50 +1,24 @@
-import React from 'react';
-
-import styled from 'styled-components';
-
 import {ResourceValidationError} from '@models/k8sresource';
 
-import Colors, {FontColors} from '@styles/Colors';
+import * as S from './ValidationErrorLink.styled';
 
-const StyledRefText = styled.span`
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
+interface IProps {
+  validationError: ResourceValidationError;
+  onClick: () => void;
+}
 
-const StyledPositionText = styled.span`
-  margin-left: 5px;
-  color: ${FontColors.grey};
-`;
-
-const StyledErrorMessage = styled.span`
-  margin-left: 5px;
-  font-style: italic;
-  color: ${Colors.redError};
-`;
-
-const ValidationErrorLink = (props: {validationError: ResourceValidationError; onClick?: () => void}) => {
+const ValidationErrorLink: React.FC<IProps> = props => {
   const {validationError, onClick} = props;
 
-  const linkText = validationError.property;
-
-  const handleClick = () => {
-    if (!onClick) {
-      return;
-    }
-    onClick();
-  };
-
   return (
-    <div onClick={handleClick}>
-      <StyledRefText>{linkText}</StyledRefText>
+    <div onClick={onClick}>
+      <S.RefText>{validationError.property}</S.RefText>
       {validationError.errorPos && (
-        <StyledPositionText>
+        <S.PositionText>
           {validationError.errorPos.line}:{validationError.errorPos.column}
-        </StyledPositionText>
+        </S.PositionText>
       )}
-      <StyledErrorMessage>{validationError.message}</StyledErrorMessage>
+      <S.ErrorMessage>{validationError.message}</S.ErrorMessage>
     </div>
   );
 };

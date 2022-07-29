@@ -5,12 +5,9 @@ import path from 'path';
 import {ResourceMapType} from '@models/appstate';
 import {ResourceRef} from '@models/k8sresource';
 
-import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {Icon} from '@atoms';
-
-import Colors from '@styles/Colors';
-
+import RefIcon from './RefIcon';
 import * as S from './RefLink.styled';
 
 interface IProps {
@@ -31,28 +28,6 @@ const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   }
   return ref.name;
 };
-
-const RefIcon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSProperties}) => {
-  const {resourceRef, style} = props;
-
-  if (isOutgoingRef(resourceRef.type)) {
-    if (resourceRef.target?.type === 'image') {
-      return <Icon name="images" style={style} />;
-    }
-
-    return <Icon name="outgoingRefs" style={style} />;
-  }
-
-  if (isIncomingRef(resourceRef.type)) {
-    return <Icon name="incomingRefs" style={style} />;
-  }
-
-  if (isUnsatisfiedRef(resourceRef.type)) {
-    return <Icon name="warning" style={style} color={Colors.yellowWarning} />;
-  }
-
-  return null;
-});
 
 const ResourceRefLink: React.FC<IProps> = props => {
   const {isDisabled, resourceRef, resourceMap, onClick} = props;
@@ -111,7 +86,7 @@ const ResourceRefLink: React.FC<IProps> = props => {
 
   return (
     <S.RefLinkContainer onClick={handleClick}>
-      {RefIcon && <RefIcon resourceRef={resourceRef} style={{marginRight: 5}} />}
+      <RefIcon resourceRef={resourceRef} style={{marginRight: 5}} />
 
       {linkText}
 

@@ -45,11 +45,10 @@ import {
   ModalConfirmWithNamespaceSelect,
   Monaco,
   PreviewConfigurationDetails,
+  Walkthrough,
 } from '@molecules';
 
 import {TabHeader} from '@atoms';
-
-import WalkThrough from '@components/molecules/WalkThrough';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -343,9 +342,9 @@ const ActionsPane: React.FC<Props> = ({height}) => {
               <TabPane
                 key="source"
                 tab={
-                  <WalkThrough placement="leftTop" step="syntax" collection="novice">
+                  <Walkthrough placement="leftTop" step="syntax" collection="novice">
                     <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
-                  </WalkThrough>
+                  </Walkthrough>
                 }
               >
                 {isFolderLoading || previewLoader.isLoading ? (

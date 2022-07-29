@@ -21,30 +21,31 @@ nav:
   - UI Overview: overview.md
   - Working with File Explorer: file-explorer.md
   - Working with the Form Editor: form-editor.md
-  - Working with Resources: 
+  - Working with Resources:
     - Navigating Resources: resource-navigation.md
     - Creating Resources: creating-resources.md
     - Editing Resources: resource-editing.md
     - Validating Resources: resource-validation.md
-    - Compare and Sync: cluster-compare.md
+    - Compare and Sync: compare-sync.md
   - Working with Projects: projects.md
+  - Working with Images: images.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Working with Clusters: 
+  - Working with Clusters:
     - Cluster Integration: cluster-integration.md
   - Deploy/Diff: apply-and-diff.md
-  - Development: 
+  - Development:
     - Development: development.md
     - Architecture: architecture.md
     - Testing: testing.md
     - Contributing: contributing.md
-  - Monokle Plugins: 
+  - Monokle Plugins:
     - Plugins: plugins.md
     - Templates: templates.md
   - Keyboard Shortcuts: hotkeys.md
   - FAQ: faq.md
   - Telemetry: telemetry.md
-  - Tutorials: 
+  - Tutorials:
     - How to Configure Monokle: tutorials/how-to-configure-monokle.md
     - How to Work with Manifests: tutorials/how-to-navigate-and-edit-manifests.md
     - How to Browse Clusters: tutorials/how-to-browse-clusters.md

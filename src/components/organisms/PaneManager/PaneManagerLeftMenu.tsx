@@ -17,9 +17,9 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
-import Icon from '@atoms/Icon';
+import {Walkthrough} from '@molecules';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import Icon from '@atoms/Icon';
 
 import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
@@ -127,6 +127,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             />
           </MenuButton>
         </PaneTooltip>
+
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
           title={<KustomizeTabTooltip />}
@@ -154,7 +155,8 @@ const PaneManagerLeftMenu: React.FC = () => {
             </S.Badge>
           </MenuButton>
         </PaneTooltip>
-        <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
+
+        <Walkthrough placement="rightTop" step="kustomizeHelm" collection="novice">
           <PaneTooltip
             show={!leftActive || !(leftMenuSelection === 'helm-pane')}
             title={<HelmTabTooltip />}
@@ -178,9 +180,10 @@ const PaneManagerLeftMenu: React.FC = () => {
               </S.Badge>
             </MenuButton>
           </PaneTooltip>
-        </WalkThrough>
+        </Walkthrough>
+
         <FeatureFlag name="ImagesPane">
-          <WalkThrough placement="leftTop" collection="release" step="images">
+          <Walkthrough placement="leftTop" collection="release" step="images">
             <PaneTooltip
               show={!leftActive || !(leftMenuSelection === 'images-pane')}
               title="View Images"
@@ -195,7 +198,7 @@ const PaneManagerLeftMenu: React.FC = () => {
                 <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
               </MenuButton>
             </PaneTooltip>
-          </WalkThrough>
+          </Walkthrough>
         </FeatureFlag>
         <PaneTooltip
           show={!leftActive || !(leftMenuSelection === 'templates-pane')}

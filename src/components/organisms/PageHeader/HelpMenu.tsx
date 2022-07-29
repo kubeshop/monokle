@@ -9,6 +9,8 @@ import semver from 'semver';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
+import {StepEnum} from '@models/walkthrough';
+
 import {useAppDispatch} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
@@ -19,8 +21,6 @@ import {
   openReleaseNotesDrawer,
   toggleSettings,
 } from '@redux/reducers/ui';
-
-import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 

@@ -16,9 +16,9 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
-import {Dots, Spinner} from '@atoms';
+import {ContextMenu} from '@molecules';
 
-import ContextMenu from '@components/molecules/ContextMenu';
+import {Dots, Spinner} from '@atoms';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
