@@ -29,7 +29,7 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
 
   return getInformation() ? (
     <Tooltip placement="top" title={getInformation()}>
-      <S.InfoCircleOutlined isSelected={itemInstance.isSelected} />
+      <S.InfoCircleOutlined $isSelected={itemInstance.isSelected} />
     </Tooltip>
   ) : null;
 };
