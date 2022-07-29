@@ -58,8 +58,6 @@ const TerminalPane: React.FC<IProps> = props => {
       return;
     }
 
-    dispatch(setLeftBottomMenuSelection(null));
-
     addonRef.current?.dispose();
     addonRef.current = undefined;
     terminalRef.current?.clear();
@@ -73,7 +71,16 @@ const TerminalPane: React.FC<IProps> = props => {
 
     // if there is only one running terminal
     if (Object.keys(terminalsMap).length === 1) {
+      dispatch(setLeftBottomMenuSelection(null));
       dispatch(setSelectedTerminal(undefined));
+    } else {
+      const index = Object.keys(terminalsMap).indexOf(terminalId);
+
+      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
+        ? Object.keys(terminalsMap)[index + 1]
+        : Object.keys(terminalsMap)[index - 1];
+
+      dispatch(setSelectedTerminal(switchTerminalId));
     }
 
     dispatch(removeTerminal(terminalId));
