@@ -1,6 +1,12 @@
+interface TerminalType {
+  id: string;
+  isRunning: boolean;
+}
+
 interface TerminalState {
-  runningTerminals: string[];
+  terminalsMap: Record<string, TerminalType>;
+  selectedTerminal?: string;
   webContentsId?: number;
 }
 
-export type {TerminalState};
+export type {TerminalState, TerminalType};

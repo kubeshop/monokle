@@ -8,6 +8,7 @@ export const ClusterExplorerTooltips = {
 };
 export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
 export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
+export const AddTerminalTooltip = 'Add new terminal';
 export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';

@@ -70,7 +70,7 @@ const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
-// string is the webContentsId
+// string is the terminal id
 let ptyProcessMap: Record<string, pty.IPty> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
@@ -271,7 +271,7 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 });
 
 ipcMain.on('shell.init', (event, args) => {
-  const {rootFilePath, webContentsId} = args;
+  const {rootFilePath, terminalId, webContentsId} = args;
 
   if (!webContentsId) {
     return;
@@ -279,7 +279,7 @@ ipcMain.on('shell.init', (event, args) => {
 
   const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
 
-  if (ptyProcessMap[webContentsId]) {
+  if (ptyProcessMap[terminalId]) {
     return;
   }
 
@@ -293,11 +293,11 @@ ipcMain.on('shell.init', (event, args) => {
       useConpty: false,
     });
 
-    ptyProcessMap[webContentsId] = ptyProcess;
+    ptyProcessMap[terminalId] = ptyProcess;
 
     if (currentWebContents) {
       ptyProcess.onData((incomingData: any) => {
-        currentWebContents.send('shell.incomingData', incomingData);
+        currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
       });
     } else {
       log.error('Web contents is not found');
@@ -308,9 +308,8 @@ ipcMain.on('shell.init', (event, args) => {
 });
 
 ipcMain.on('shell.resize', (event, args) => {
-  const {webContentsId, cols, rows} = args;
-
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {cols, rows, terminalId} = args;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (ptyProcess) {
     ptyProcess.resize(cols, rows);
@@ -318,8 +317,8 @@ ipcMain.on('shell.resize', (event, args) => {
 });
 
 ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
-  const {data, webContentsId} = d;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {data, terminalId} = d;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (ptyProcess) {
     ptyProcess.write(data);
@@ -327,22 +326,19 @@ ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
 });
 
 ipcMain.on('shell.ptyProcessKill', (event, data) => {
-  const {webContentsId} = data;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {terminalId} = data;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (!ptyProcess) {
     return;
   }
 
-  if (process.platform === 'win32') {
-    try {
-      process.kill(ptyProcess.pid);
-    } catch (e) {
-      log.error(e);
-    }
-  } else {
+  try {
     ptyProcess.kill();
+    process.kill(ptyProcess.pid);
+  } catch (e) {
+    log.error(e);
   }
 
-  delete ptyProcessMap[webContentsId];
+  delete ptyProcessMap[terminalId];
 });
