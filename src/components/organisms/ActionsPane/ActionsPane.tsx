@@ -117,9 +117,37 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     }
   }, [isButtonShrinked, tabsList]);
 
-  const isKustomization = isKustomizationResource(selectedResource);
-  const resourceKindHandler =
-    selectedResource && !isKustomization ? getResourceKindHandler(selectedResource.kind) : undefined;
+  const isKustomization = useMemo(() => isKustomizationResource(selectedResource), [selectedResource]);
+  const resourceKindHandler = useMemo(
+    () => (selectedResource && !isKustomization ? getResourceKindHandler(selectedResource.kind) : undefined),
+    [isKustomization, selectedResource]
+  );
+
+  const confirmModalTitle = useMemo(() => {
+    if (!selectedResource) {
+      return '';
+    }
+
+    return isKustomizationResource(selectedResource)
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
+  }, [selectedResource, kubeConfigContext, kubeConfigContextColor]);
+
+  const helmChartConfirmModalTitle = useMemo(() => {
+    if (!selectedValuesFileId) {
+      return '';
+    }
+    const helmValuesFile: HelmValuesFile | undefined = helmValuesMap[selectedValuesFileId];
+
+    if (!helmValuesFile) {
+      return '';
+    }
+    const helmChart: HelmChart | undefined = helmChartMap[helmValuesFile.helmChartId];
+    if (!helmChart) {
+      return '';
+    }
+    return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
+  }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
   const applySelection = useCallback(() => {
     if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
@@ -143,14 +171,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     kubeConfigContext,
     selectedResourceId,
   ]);
-
-  useEffect(() => {
-    if (monacoEditor.apply) {
-      applySelection();
-      dispatch(setMonacoEditor({apply: false}));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
     if (!kubeConfigContext || kubeConfigContext === '') {
@@ -216,31 +236,13 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     [dispatch, fileMap, helmChartMap, helmValuesMap, kubeConfigPath, kubeConfigContext, selectedValuesFileId]
   );
 
-  const confirmModalTitle = useMemo(() => {
-    if (!selectedResource) {
-      return '';
+  useEffect(() => {
+    if (monacoEditor.apply) {
+      applySelection();
+      dispatch(setMonacoEditor({apply: false}));
     }
-
-    return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
-      : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
-  }, [selectedResource, kubeConfigContext, kubeConfigContextColor]);
-
-  const helmChartConfirmModalTitle = useMemo(() => {
-    if (!selectedValuesFileId) {
-      return '';
-    }
-    const helmValuesFile: HelmValuesFile | undefined = helmValuesMap[selectedValuesFileId];
-
-    if (!helmValuesFile) {
-      return '';
-    }
-    const helmChart: HelmChart | undefined = helmChartMap[helmValuesFile.helmChartId];
-    if (!helmChart) {
-      return '';
-    }
-    return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
-  }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monacoEditor]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {

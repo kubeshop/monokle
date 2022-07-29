@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const StyledContentContainerDiv = styled.div`
+export const ContentContainerDiv = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
@@ -10,7 +10,7 @@ export const StyledContentContainerDiv = styled.div`
   z-index: 2;
 `;
 
-export const StyledContentDiv = styled.div`
+export const ContentDiv = styled.div`
   padding: 12px 24px;
 
   img {
@@ -23,8 +23,9 @@ export const HeightFillDiv = styled.div`
   height: 440px;
 `;
 
-export const StyledTextContainer = styled.div`
+export const TextContainer = styled.div`
   overflow: hidden;
+
   .ant-typography {
     display: block;
   }
