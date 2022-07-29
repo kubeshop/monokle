@@ -25,7 +25,8 @@ export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality
 export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const ExpandTreeTooltip = 'Expand all folders';
-export const FeedbackTooltip = 'Help us on our mission to improve Monokle by answering a few questions';
+export const FeedbackTooltip =
+  'Monokle is open source and free of charge. Would you help us to improve it by dedicating 2 minutes to answer our questions?';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
