@@ -1,7 +1,5 @@
 import {Checkbox as RawCheckbox} from 'antd';
 
-import {InfoCircleOutlined} from '@ant-design/icons';
-
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -113,6 +111,11 @@ export const SuffixContainer = styled.span`
   align-items: center;
 `;
 
+export const InformationContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 export const QuickActionContainer = styled.span`
   margin-left: auto;
 `;
@@ -128,14 +131,4 @@ export const BlankSpace = styled.span`
 
 export const Checkbox = styled(RawCheckbox)<{$level: number}>`
   margin-left: -24px;
-`;
-
-export const StyledInfoCircleOutlined = styled(InfoCircleOutlined)<{isSelected: boolean}>`
-  ${props => {
-    if (props.isSelected) {
-      return `color: ${Colors.blackPure};`;
-    }
-    return `color: ${Colors.blue9};`;
-  }};
-  padding: 0 5px;
 `;
