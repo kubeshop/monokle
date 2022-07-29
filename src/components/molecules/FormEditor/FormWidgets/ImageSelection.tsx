@@ -9,7 +9,6 @@ import * as S from './styled';
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
-const EMPTY_VALUE = 'NONE';
 
 export const ImageSelection: React.FC = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
@@ -34,14 +33,14 @@ export const ImageSelection: React.FC = (params: any) => {
 
   useEffect(() => {
     if (!value) {
-      setSelectValue(EMPTY_VALUE);
+      setSelectValue(undefined);
     } else {
       setSelectValue(value);
     }
   }, [value]);
 
   useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
+    if (!selectValue) {
       onChange(undefined);
     } else {
       onChange(selectValue);
@@ -65,8 +64,8 @@ export const ImageSelection: React.FC = (params: any) => {
       value={selectValue}
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
+      placeholder="Select or create your image"
     >
-      <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && images.filter(image => image === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
           {`Create '${inputValue}'`}
