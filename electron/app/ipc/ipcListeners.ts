@@ -333,14 +333,11 @@ ipcMain.on('shell.ptyProcessKill', (event, data) => {
     return;
   }
 
-  if (process.platform === 'win32') {
-    try {
-      process.kill(ptyProcess.pid);
-    } catch (e) {
-      log.error(e);
-    }
-  } else {
+  try {
     ptyProcess.kill();
+    process.kill(ptyProcess.pid);
+  } catch (e) {
+    log.error(e);
   }
 
   delete ptyProcessMap[terminalId];
