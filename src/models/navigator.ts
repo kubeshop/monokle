@@ -42,6 +42,10 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
+  information?: {
+    component: ItemCustomComponent;
+    options?: ItemCustomComponentOptions;
+  };
   disableHoverStyle?: boolean;
   isCheckVisibleOnHover?: boolean;
   lastItemMarginBottom?: number;

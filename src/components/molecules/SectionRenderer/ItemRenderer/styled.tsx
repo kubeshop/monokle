@@ -111,6 +111,11 @@ export const SuffixContainer = styled.span`
   align-items: center;
 `;
 
+export const InformationContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 export const QuickActionContainer = styled.span`
   margin-left: auto;
 `;
