@@ -143,13 +143,11 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               </S.SuffixContainer>
             )}
 
-            {Information.Component &&
-              !options?.disableSuffix &&
-              (Information.options?.isVisibleOnHover ? isHovered : true) && (
-                <S.InformationContainer>
-                  <Information.Component itemInstance={itemInstance} options={Information.options} />
-                </S.InformationContainer>
-              )}
+            {Information.Component && (Information.options?.isVisibleOnHover ? isHovered : true) && (
+              <S.InformationContainer>
+                <Information.Component itemInstance={itemInstance} options={Information.options} />
+              </S.InformationContainer>
+            )}
 
             <S.BlankSpace onClick={onClick} />
 
