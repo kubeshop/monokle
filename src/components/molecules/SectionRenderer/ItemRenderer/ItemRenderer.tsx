@@ -1,5 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import {Tooltip} from 'antd';
+
+import {DateTime} from 'luxon';
+
 import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -43,6 +47,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const dispatch = useAppDispatch();
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -83,6 +88,17 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
     () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : WrapperPlacehoder),
     [ContextMenuWrapper.Component]
   );
+
+  const getInformation = useCallback(() => {
+    let text = DateTime.fromISO(resourceMap[itemId].content.metadata.creationTimestamp)
+      .toRelative()
+      ?.replace(' ago', '');
+
+    if (resourceMap[itemId].content?.status?.phase) {
+      text = `${text} | ${resourceMap[itemId].content.status.phase}`;
+    }
+    return text;
+  }, [resourceMap, itemId]);
 
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
@@ -142,6 +158,10 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
               </S.SuffixContainer>
             )}
+
+            <Tooltip placement="top" title={getInformation()}>
+              <S.StyledInfoCircleOutlined isSelected={itemInstance.isSelected} />
+            </Tooltip>
 
             <S.BlankSpace onClick={onClick} />
 
