@@ -29,4 +29,4 @@ export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
 export {default as TitleBar} from './TitleBar';
 export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
-export {default as Walkthrough} from './Walkthrough/Walkthrough';
+export {default as Walkthrough} from './Walkthrough';
