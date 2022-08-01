@@ -17,7 +17,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -67,7 +67,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
@@ -120,6 +120,12 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const menuItems = [
+    ...(isInClusterMode && resource.kind === 'Pod'
+      ? [
+          {key: 'shell', label: 'Shell'},
+          {key: 'divider-1', type: 'divider'},
+        ]
+      : []),
     ...(isInPreviewMode || isUnsavedResource(resource)
       ? [
           {
@@ -128,7 +134,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
             disabled: isInPreviewMode,
             onClick: onClickSaveToFileFolder,
           },
-          {key: 'divider', type: 'divider'},
+          {key: 'divider-2', type: 'divider'},
         ]
       : []),
     {key: 'rename', label: 'Rename', onClick: onClickRename},
