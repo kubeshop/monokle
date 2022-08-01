@@ -22,7 +22,7 @@ const BottomPaneManager: React.FC = () => {
 
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal(newTerminalId));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false}));
   }, [bottomSelection, dispatch, selectedTerminal]);
 
   return (
@@ -38,7 +38,7 @@ const BottomPaneManager: React.FC = () => {
       ) : null}
 
       {Object.values(terminalsMap).map(terminal => (
-        <TerminalPane key={terminal.id} terminalId={terminal.id} />
+        <TerminalPane key={terminal.id} terminal={terminal} />
       ))}
     </S.BottomPaneManagerContainer>
   );

@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {TerminalState} from '@models/terminal';
+import {TerminalState, TerminalType} from '@models/terminal';
 
 import initialState from '@redux/initialState';
 
@@ -8,8 +8,10 @@ export const terminalSlice = createSlice({
   name: 'terminal',
   initialState: initialState.terminal,
   reducers: {
-    addTerminal: (state: Draft<TerminalState>, action: PayloadAction<string>) => {
-      state.terminalsMap[action.payload] = {id: action.payload, isRunning: false};
+    addTerminal: (state: Draft<TerminalState>, action: PayloadAction<TerminalType>) => {
+      const {id} = action.payload;
+
+      state.terminalsMap[id] = action.payload;
     },
     removeTerminal: (state: Draft<TerminalState>, action: PayloadAction<string>) => {
       delete state.terminalsMap[action.payload];

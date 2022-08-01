@@ -299,6 +299,8 @@ ipcMain.on('shell.init', (event, args) => {
       ptyProcess.onData((incomingData: any) => {
         currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
       });
+
+      currentWebContents.send(`shell.initialized.${terminalId}`);
     } else {
       log.error('Web contents is not found');
     }

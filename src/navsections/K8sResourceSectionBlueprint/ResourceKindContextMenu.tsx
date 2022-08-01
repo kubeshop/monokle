@@ -6,6 +6,7 @@ import {Menu, Modal} from 'antd';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+import {v4 as uuidv4} from 'uuid';
 
 import hotkeys from '@constants/hotkeys';
 
@@ -16,7 +17,13 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
-import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
+import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {
+  openNewResourceWizard,
+  openRenameResourceModal,
+  openSaveResourcesToFileFolderModal,
+  setLeftBottomMenuSelection,
+} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
@@ -67,6 +74,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -119,10 +127,20 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
   };
 
+  const onClickOpenShell = () => {
+    if (!bottomSelection || bottomSelection !== 'terminal') {
+      dispatch(setLeftBottomMenuSelection('terminal'));
+    }
+
+    const newTerminalId = uuidv4();
+    dispatch(setSelectedTerminal(newTerminalId));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: 'ls'}));
+  };
+
   const menuItems = [
     ...(isInClusterMode && resource.kind === 'Pod'
       ? [
-          {key: 'shell', label: 'Shell'},
+          {key: 'shell', label: 'Shell', onClick: onClickOpenShell},
           {key: 'divider-1', type: 'divider'},
         ]
       : []),
