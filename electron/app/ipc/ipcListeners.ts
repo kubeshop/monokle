@@ -3,7 +3,6 @@ import {BrowserWindow, app, ipcMain} from 'electron';
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import * as pty from 'node-pty';
 import Nucleus from 'nucleus-nodejs';
 import os from 'os';
 import * as path from 'path';
@@ -71,7 +70,7 @@ const machineId = machineIdSync();
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 // string is the terminal id
-let ptyProcessMap: Record<string, pty.IPty> = {};
+let ptyProcessMap: Record<string, any> = {};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
@@ -284,24 +283,26 @@ ipcMain.on('shell.init', (event, args) => {
   }
 
   try {
-    const ptyProcess = pty.spawn(shell, [], {
-      name: 'xterm-256color',
-      rows: 24,
-      cols: 80,
-      cwd: rootFilePath,
-      env: process.env as Record<string, string>,
-      useConpty: false,
-    });
-
-    ptyProcessMap[terminalId] = ptyProcess;
-
-    if (currentWebContents) {
-      ptyProcess.onData((incomingData: any) => {
-        currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
+    import('node-pty').then(pty => {
+      const ptyProcess = pty.spawn(shell, [], {
+        name: 'xterm-256color',
+        rows: 24,
+        cols: 80,
+        cwd: rootFilePath,
+        env: process.env as Record<string, string>,
+        useConpty: false,
       });
-    } else {
-      log.error('Web contents is not found');
-    }
+
+      ptyProcessMap[terminalId] = ptyProcess;
+
+      if (currentWebContents) {
+        ptyProcess.onData((incomingData: any) => {
+          currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
+        });
+      } else {
+        log.error('Web contents is not found');
+      }
+    });
   } catch (e) {
     log.error('Pty process could not be created ', e);
   }
