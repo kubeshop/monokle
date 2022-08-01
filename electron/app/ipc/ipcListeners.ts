@@ -304,6 +304,7 @@ ipcMain.on('shell.init', (event, args) => {
       } else {
         log.error('Web contents is not found');
       }
+    });
   } catch (e) {
     log.error('Pty process could not be created ', e);
   }
