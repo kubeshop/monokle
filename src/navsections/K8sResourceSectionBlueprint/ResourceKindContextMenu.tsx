@@ -77,15 +77,33 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
   const previewType = useAppSelector(state => state.main.previewType);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
+
+  const shellCommand = useMemo(() => {
+    if (resource.kind !== 'Pod') {
+      return;
+    }
+
+    let terminalCommand = `${osPlatform !== 'win32' ? 'exec ' : ''}kubectl exec -i -t -n `;
+    terminalCommand += `${resource.namespace || 'default'} ${resource.name}`;
+
+    const container = resource.content.spec?.containers[0];
+
+    if (container) {
+      terminalCommand += ` -c ${container.name} -- sh -c "clear; (bash || ash || sh)"`;
+    }
+
+    return terminalCommand;
+  }, [osPlatform, resource.content.spec?.containers, resource.kind, resource.name, resource.namespace]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -134,7 +152,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
 
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: 'ls'}));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: shellCommand}));
   };
 
   const menuItems = [
