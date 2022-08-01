@@ -12,6 +12,8 @@ import {FitAddon} from 'xterm-addon-fit';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
+import {TerminalType} from '@models/terminal';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
@@ -23,11 +25,13 @@ import {useWindowSize} from '@utils/hooks';
 import * as S from './TerminalPane.styled';
 
 interface IProps {
-  terminalId: string;
+  terminal: TerminalType;
 }
 
 const TerminalPane: React.FC<IProps> = props => {
-  const {terminalId} = props;
+  const {
+    terminal: {defaultCommand, id: terminalId},
+  } = props;
 
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
@@ -88,8 +92,8 @@ const TerminalPane: React.FC<IProps> = props => {
 
   const onAddTerminalHandler = () => {
     const newTerminalId = uuidv4();
-    dispatch(addTerminal(newTerminalId));
-    dispatch(setSelectedTerminal(newTerminalId));
+
+    dispatch(addTerminal({id: newTerminalId, isRunning: false}));
   };
 
   useEffect(() => {
@@ -112,7 +116,6 @@ const TerminalPane: React.FC<IProps> = props => {
     ipcRenderer.send('shell.init', {rootFilePath, terminalId, webContentsId});
 
     terminalRef.current.open(terminalContainerRef.current);
-    terminalRef.current.focus();
 
     ipcRenderer.on(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
@@ -124,8 +127,17 @@ const TerminalPane: React.FC<IProps> = props => {
       ipcRenderer.send('shell.ptyProcessWriteData', {data, terminalId});
     });
 
+    ipcRenderer.on(`shell.initialized.${terminalId}`, () => {
+      if (defaultCommand) {
+        setTimeout(() => {
+          ipcRenderer.send('shell.ptyProcessWriteData', {data: `${defaultCommand}\r`, terminalId});
+        }, 200);
+      }
+    });
+
     setTimeout(() => {
       addonRef.current?.fit();
+      terminalRef.current?.focus();
     }, 250);
 
     dispatch(setRunningTerminal(terminalId));
@@ -140,9 +152,9 @@ const TerminalPane: React.FC<IProps> = props => {
 
     setTimeout(() => {
       addonRef.current?.fit();
+      terminalRef.current?.focus();
     }, 250);
 
-    terminalRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomPaneHeight, bottomSelection, selectedTerminal, windowHeight, windowWidth]);
 

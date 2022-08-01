@@ -1,6 +1,7 @@
 interface TerminalType {
   id: string;
   isRunning: boolean;
+  defaultCommand?: string;
 }
 
 interface TerminalState {
