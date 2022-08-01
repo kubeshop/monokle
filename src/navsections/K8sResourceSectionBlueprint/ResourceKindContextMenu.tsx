@@ -89,7 +89,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   }, [itemInstance, selectedResourceId]);
 
   const shellCommand = useMemo(() => {
-    if (resource.kind !== 'Pod') {
+    if (!resource || resource.kind !== 'Pod') {
       return;
     }
 
@@ -103,7 +103,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     }
 
     return terminalCommand;
-  }, [osPlatform, resource.content.spec?.containers, resource.kind, resource.name, resource.namespace]);
+  }, [osPlatform, resource]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
