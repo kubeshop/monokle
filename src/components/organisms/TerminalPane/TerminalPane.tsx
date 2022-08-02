@@ -1,36 +1,33 @@
 import {ipcRenderer} from 'electron';
 
 import React, {useEffect, useMemo, useRef} from 'react';
-import {useMeasure} from 'react-use';
 
-import {Tooltip} from 'antd';
-
-import {v4 as uuidv4} from 'uuid';
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {TerminalType} from '@models/terminal';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addTerminal, removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
-
-import {Icon, MonoPaneTitle} from '@atoms';
 
 import {useWindowSize} from '@utils/hooks';
 
 import * as S from './TerminalPane.styled';
 
 interface IProps {
+  height: number;
   terminal: TerminalType;
+  terminalToKill: string;
 }
 
 const TerminalPane: React.FC<IProps> = props => {
   const {
+    height,
     terminal: {defaultCommand, id: terminalId},
+    terminalToKill,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -43,9 +40,6 @@ const TerminalPane: React.FC<IProps> = props => {
 
   const {height: windowHeight, width: windowWidth} = useWindowSize();
 
-  const [containerRef, {height}] = useMeasure<HTMLDivElement>();
-  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
-
   const terminalRef = useRef<Terminal>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
   const terminalDataRef = useRef<IDisposable>();
@@ -56,45 +50,6 @@ const TerminalPane: React.FC<IProps> = props => {
   const addonRef = useRef<FitAddon>();
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
-
-  const onKillTerminalHandler = () => {
-    if (!selectedTerminal || selectedTerminal !== terminalId) {
-      return;
-    }
-
-    addonRef.current?.dispose();
-    addonRef.current = undefined;
-    terminalRef.current?.clear();
-    terminalRef.current?.dispose();
-    terminalRef.current = undefined;
-    terminalDataRef.current?.dispose();
-    terminalResizeRef.current?.dispose();
-    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
-
-    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-
-    // if there is only one running terminal
-    if (Object.keys(terminalsMap).length === 1) {
-      dispatch(setLeftBottomMenuSelection(null));
-      dispatch(setSelectedTerminal(undefined));
-    } else {
-      const index = Object.keys(terminalsMap).indexOf(terminalId);
-
-      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-        ? Object.keys(terminalsMap)[index + 1]
-        : Object.keys(terminalsMap)[index - 1];
-
-      dispatch(setSelectedTerminal(switchTerminalId));
-    }
-
-    dispatch(removeTerminal(terminalId));
-  };
-
-  const onAddTerminalHandler = () => {
-    const newTerminalId = uuidv4();
-
-    dispatch(addTerminal({id: newTerminalId, isRunning: false}));
-  };
 
   useEffect(() => {
     if (
@@ -158,31 +113,44 @@ const TerminalPane: React.FC<IProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomPaneHeight, bottomSelection, selectedTerminal, windowHeight, windowWidth]);
 
+  useEffect(() => {
+    if (terminalToKill !== terminalId) {
+      return;
+    }
+
+    addonRef.current?.dispose();
+    addonRef.current = undefined;
+    terminalRef.current?.clear();
+    terminalRef.current?.dispose();
+    terminalRef.current = undefined;
+    terminalDataRef.current?.dispose();
+    terminalResizeRef.current?.dispose();
+    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
+
+    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
+
+    // if there is only one running terminal
+    if (Object.keys(terminalsMap).length === 1) {
+      dispatch(setLeftBottomMenuSelection(null));
+      dispatch(setSelectedTerminal(undefined));
+    } else {
+      const index = Object.keys(terminalsMap).indexOf(terminalId);
+
+      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
+        ? Object.keys(terminalsMap)[index + 1]
+        : Object.keys(terminalsMap)[index - 1];
+
+      dispatch(setSelectedTerminal(switchTerminalId));
+    }
+
+    dispatch(removeTerminal(terminalId));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terminalId, terminalToKill]);
+
   return (
-    <S.TerminalPaneContainer ref={containerRef} style={{display: selectedTerminal === terminalId ? 'block' : 'none'}}>
-      <S.TitleBar ref={titleBarRef}>
-        <S.TitleLabel>
-          <Icon name="terminal" />
-          <MonoPaneTitle style={{paddingLeft: '10px'}}>Terminal</MonoPaneTitle>
-        </S.TitleLabel>
-
-        <S.TerminalActions>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AddTerminalTooltip}>
-            <S.PlusOutlined onClick={onAddTerminalHandler} />
-          </Tooltip>
-
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-            <S.DeleteOutlined onClick={onKillTerminalHandler} />
-          </Tooltip>
-
-          <S.DownCircleFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
-        </S.TerminalActions>
-      </S.TitleBar>
-
-      <S.TerminalContainer
-        ref={terminalContainerRef}
-        $height={height - titleBarHeight - (Object.keys(terminalsMap).length > 1 ? 44 : 0)}
-      />
+    <S.TerminalPaneContainer $height={height} style={{display: selectedTerminal === terminalId ? 'block' : 'none'}}>
+      <S.TerminalContainer ref={terminalContainerRef} $height={height - 14} />
     </S.TerminalPaneContainer>
   );
 };
