@@ -4,6 +4,7 @@ import {
   PlusCircleFilled as RawPlusCircleFilled,
 } from '@ant-design/icons';
 
+import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
@@ -34,8 +35,8 @@ export const Tab = styled.div<{$selected: boolean}>`
   gap: 8px;
   padding: 10px 1px;
   cursor: pointer;
-  color: ${({$selected}) => ($selected ? Colors.blue6 : Colors.whitePure)};
-  font-weight: ${({$selected}) => ($selected ? '700' : '400')};
+  color: ${({$selected}) => ($selected ? Colors.blue6 : rgba(Colors.whitePure, 0.85))};
+  font-weight: 600;
   ${({$selected}) => ($selected ? `border-bottom: 1px solid ${Colors.blue6}` : '')};
 `;
 
