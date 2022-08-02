@@ -82,3 +82,4 @@ export const ReloadFolderTooltip = () => (
 export const ResetFiltersTooltip = () => <HotkeyLabel text="Reset Filters" name="RESET_RESOURCE_FILTERS" />;
 export const SettingsTooltip = () => <HotkeyLabel text="Open Settings" name="TOGGLE_SETTINGS" />;
 export const ValidationTabTooltip = () => <HotkeyLabel text="View Validation" name="OPEN_VALIDATION_TAB" />;
+export const TerminalPaneTooltip = () => <HotkeyLabel text="View Terminal" name="TOGGLE_TERMINAL_PANE" />;
