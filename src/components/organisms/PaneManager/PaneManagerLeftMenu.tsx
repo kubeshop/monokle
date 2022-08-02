@@ -10,6 +10,7 @@ import {
   HelmTabTooltip,
   KustomizeTabTooltip,
   TemplatesTabTooltip,
+  TerminalPaneTooltip,
   ValidationTabTooltip,
 } from '@constants/tooltips';
 
@@ -122,7 +123,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     <S.Container id="LeftToolbar" $isLeftActive={isActive}>
       <S.IconsContainer>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'file-explorer')}
+          show={!leftActive || leftMenuSelection !== 'file-explorer'}
           title={<FileExplorerTabTooltip />}
           placement="right"
         >
@@ -144,7 +145,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         </PaneTooltip>
 
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
+          show={!leftActive || leftMenuSelection !== 'kustomize-pane'}
           title={<KustomizeTabTooltip />}
           placement="right"
         >
@@ -173,7 +174,7 @@ const PaneManagerLeftMenu: React.FC = () => {
 
         <Walkthrough placement="rightTop" step="kustomizeHelm" collection="novice">
           <PaneTooltip
-            show={!leftActive || !(leftMenuSelection === 'helm-pane')}
+            show={!leftActive || leftMenuSelection !== 'helm-pane'}
             title={<HelmTabTooltip />}
             placement="right"
           >
@@ -200,7 +201,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         <FeatureFlag name="ImagesPane">
           <Walkthrough placement="leftTop" collection="release" step="images">
             <PaneTooltip
-              show={!leftActive || !(leftMenuSelection === 'images-pane')}
+              show={!leftActive || leftMenuSelection !== 'images-pane'}
               title="View Images"
               placement="right"
             >
@@ -216,7 +217,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           </Walkthrough>
         </FeatureFlag>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'templates-pane')}
+          show={!leftActive || leftMenuSelection !== 'templates-pane'}
           title={TemplatesTabTooltip}
           placement="right"
         >
@@ -236,7 +237,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'validation-pane')}
+          show={!leftActive || leftMenuSelection !== 'validation-pane'}
           title={<ValidationTabTooltip />}
           placement="right"
         >
@@ -250,7 +251,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuIcon iconName="validation" active={isActive} isSelected={checkIsTabSelected('validation-pane')} />
           </MenuButton>
         </PaneTooltip>
-        <PaneTooltip show={!leftActive || !(leftMenuSelection === 'search')} title="Advanced Search" placement="right">
+        <PaneTooltip show={!leftActive || leftMenuSelection !== 'search'} title="Advanced Search" placement="right">
           <MenuButton
             isSelected={checkIsTabSelected('search')}
             isActive={isActive}
@@ -265,15 +266,21 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <S.IconsContainer>
         <FeatureFlag name="Terminal">
-          <MenuButton
-            id="terminal"
-            isSelected={checkIsBottomTabSelected('terminal')}
-            isActive={isActive}
-            onClick={onTerminalSelectionHandler}
-            disabled={!activeProject}
+          <PaneTooltip
+            show={!leftActive || leftMenuBottomSelection !== 'terminal'}
+            title={<TerminalPaneTooltip />}
+            placement="right"
           >
-            <MenuIcon iconName="terminal" active={isActive} isSelected />
-          </MenuButton>
+            <MenuButton
+              id="terminal"
+              isSelected={checkIsBottomTabSelected('terminal')}
+              isActive={isActive}
+              onClick={onTerminalSelectionHandler}
+              disabled={!activeProject}
+            >
+              <MenuIcon iconName="terminal" active={isActive} isSelected />
+            </MenuButton>
+          </PaneTooltip>
         </FeatureFlag>
       </S.IconsContainer>
     </S.Container>
