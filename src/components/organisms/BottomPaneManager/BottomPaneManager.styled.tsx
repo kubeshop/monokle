@@ -37,14 +37,14 @@ export const Tab = styled.div<{$selected: boolean}>`
   cursor: pointer;
   color: ${({$selected}) => ($selected ? Colors.blue6 : rgba(Colors.whitePure, 0.85))};
   font-weight: 600;
-  ${({$selected}) => ($selected ? `border-bottom: 1px solid ${Colors.blue6}` : '')};
+  ${({$selected}) => ($selected ? `border-bottom: 2px solid ${Colors.blue6}` : '')};
 `;
 
 export const Tabs = styled.div`
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0px 14px;
+  gap: 0px 20px;
 `;
 
 export const TabsActions = styled.div`
