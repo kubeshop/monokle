@@ -10,6 +10,7 @@ import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 
 import {Icon} from '@atoms';
 
@@ -69,7 +70,7 @@ const BottomPaneManager: React.FC = () => {
         </S.Tabs>
 
         <S.TabsActions>
-          <S.CaretDownFilled />
+          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
         </S.TabsActions>
       </S.TabsContainer>
 
