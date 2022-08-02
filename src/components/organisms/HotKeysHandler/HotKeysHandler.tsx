@@ -12,6 +12,7 @@ import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   setActiveTab,
+  setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
@@ -184,6 +185,19 @@ const HotKeysHandler = () => {
       diffSelectedResource();
     },
     [diffSelectedResource, isKubeConfigPathValid]
+  );
+
+  useHotkeys(
+    hotkeys.TOGGLE_TERMINAL_PANE.key,
+    () => {
+      if (uiState.leftMenu.bottomSelection === 'terminal') {
+        dispatch(setLeftBottomMenuSelection(null));
+      } else {
+        dispatch(setLeftBottomMenuSelection('terminal'));
+      }
+    },
+    {enableOnTags: ['TEXTAREA']},
+    [uiState.leftMenu.bottomSelection]
   );
 
   useHotkeys(
