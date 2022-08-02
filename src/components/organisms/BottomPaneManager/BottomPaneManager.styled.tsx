@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
+import {PanelColors} from '@styles/Colors';
 
 export const BottomPaneManagerContainer = styled.div`
   height: 100%;
-  border-left: ${AppBorders.sectionDivider};
+  border-left: 9px solid ${PanelColors.toolBar};
   padding: 8px 16px;
 `;
 
