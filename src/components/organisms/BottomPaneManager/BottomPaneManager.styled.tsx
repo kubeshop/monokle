@@ -1,4 +1,8 @@
-import {CloseOutlined as RawCloseOutlined, PlusCircleFilled as RawPlusCircleFilled} from '@ant-design/icons';
+import {
+  CaretDownFilled as RawCaretDownFilled,
+  CloseOutlined as RawCloseOutlined,
+  PlusCircleFilled as RawPlusCircleFilled,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -8,6 +12,10 @@ import Colors, {PanelColors} from '@styles/Colors';
 export const BottomPaneManagerContainer = styled.div`
   height: 100%;
   border-left: 9px solid ${PanelColors.toolBar};
+`;
+
+export const CaretDownFilled = styled(RawCaretDownFilled)`
+  color: ${Colors.whitePure};
 `;
 
 export const CloseOutlined = styled(RawCloseOutlined)`
@@ -37,8 +45,15 @@ export const Tabs = styled.div`
   gap: 14px;
 `;
 
+export const TabsActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 export const TabsContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   border-bottom: ${AppBorders.sectionDivider};
   padding: 0px 10px;
 `;

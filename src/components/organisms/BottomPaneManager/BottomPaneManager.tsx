@@ -67,6 +67,10 @@ const BottomPaneManager: React.FC = () => {
             <S.PlusCircleFilled onClick={onAddTerminalHandler} />
           </Tooltip>
         </S.Tabs>
+
+        <S.TabsActions>
+          <S.CaretDownFilled />
+        </S.TabsActions>
       </S.TabsContainer>
 
       {Object.values(terminalsMap).map(terminal => (
@@ -75,7 +79,6 @@ const BottomPaneManager: React.FC = () => {
           height={height - tabsContainerHeight}
           terminal={terminal}
           terminalToKill={terminalToKill}
-          onTerminalKilled={() => setTerminalToKill('')}
         />
       ))}
     </S.BottomPaneManagerContainer>

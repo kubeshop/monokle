@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {forwardRef, useEffect, useImperativeHandle, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
@@ -21,52 +21,14 @@ interface IProps {
   height: number;
   terminal: TerminalType;
   terminalToKill: string;
-  onTerminalKilled: () => void;
 }
 
-const TerminalPane: React.FC<IProps> = forwardRef((props, ref) => {
+const TerminalPane: React.FC<IProps> = props => {
   const {
     height,
     terminal: {defaultCommand, id: terminalId},
     terminalToKill,
-    onTerminalKilled,
   } = props;
-
-  useImperativeHandle(ref, () => ({
-    killTerminalHandler() {
-      if (!selectedTerminal || selectedTerminal !== terminalId) {
-        return;
-      }
-
-      addonRef.current?.dispose();
-      addonRef.current = undefined;
-      terminalRef.current?.clear();
-      terminalRef.current?.dispose();
-      terminalRef.current = undefined;
-      terminalDataRef.current?.dispose();
-      terminalResizeRef.current?.dispose();
-      ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
-
-      ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-
-      // if there is only one running terminal
-      if (Object.keys(terminalsMap).length === 1) {
-        dispatch(setLeftBottomMenuSelection(null));
-        dispatch(setSelectedTerminal(undefined));
-      } else {
-        const index = Object.keys(terminalsMap).indexOf(terminalId);
-
-        let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-          ? Object.keys(terminalsMap)[index + 1]
-          : Object.keys(terminalsMap)[index - 1];
-
-        dispatch(setSelectedTerminal(switchTerminalId));
-      }
-
-      dispatch(removeTerminal(terminalId));
-      onTerminalKilled();
-    },
-  }));
 
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
@@ -191,6 +153,6 @@ const TerminalPane: React.FC<IProps> = forwardRef((props, ref) => {
       <S.TerminalContainer ref={terminalContainerRef} $height={height - 14} />
     </S.TerminalPaneContainer>
   );
-});
+};
 
 export default React.memo(TerminalPane);
