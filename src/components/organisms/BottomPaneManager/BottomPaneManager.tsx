@@ -35,10 +35,6 @@ const BottomPaneManager: React.FC = () => {
     dispatch(addTerminal({id: newTerminalId, isRunning: false}));
   };
 
-  const onKillTerminalHandler = (terminalId: string) => {
-    setTerminalToKill(terminalId);
-  };
-
   // treat the case where the bottom selection is first set to terminal or terminal was already opened
   useEffect(() => {
     if (selectedTerminal || bottomSelection !== 'terminal') {
@@ -59,7 +55,7 @@ const BottomPaneManager: React.FC = () => {
               <Icon name="terminal" />
               Terminal {index ? index + 1 : ''}
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-                <S.CloseOutlined onClick={() => onKillTerminalHandler(id)} />
+                <S.CloseOutlined onClick={() => setTerminalToKill(id)} />
               </Tooltip>
             </S.Tab>
           ))}

@@ -42,7 +42,8 @@ export const Tab = styled.div<{$selected: boolean}>`
 export const Tabs = styled.div`
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 0px 14px;
 `;
 
 export const TabsActions = styled.div`
