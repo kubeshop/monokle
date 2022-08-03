@@ -35,6 +35,11 @@ export const PlusCircleFilled = styled(RawPlusCircleFilled)`
   cursor: pointer;
 `;
 
+export const PodNamespaceLabel = styled.span`
+  font-style: italic;
+  color: ${Colors.grey6};
+`;
+
 export const Tab = styled.div<{$selected: boolean}>`
   display: flex;
   align-items: center;
@@ -44,6 +49,12 @@ export const Tab = styled.div<{$selected: boolean}>`
   color: ${({$selected}) => ($selected ? Colors.blue6 : rgba(Colors.whitePure, 0.85))};
   font-weight: 600;
   ${({$selected}) => ($selected ? `border-bottom: 2px solid ${Colors.blue6}` : '')};
+`;
+
+export const TabName = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
 `;
 
 export const Tabs = styled.div`

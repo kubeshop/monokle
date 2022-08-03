@@ -1,7 +1,10 @@
+import {K8sResource} from './k8sresource';
+
 interface TerminalType {
   id: string;
   isRunning: boolean;
   defaultCommand?: string;
+  pod?: K8sResource;
 }
 
 interface TerminalSettingsType {

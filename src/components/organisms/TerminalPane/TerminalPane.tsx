@@ -150,7 +150,7 @@ const TerminalPane: React.FC<IProps> = props => {
   }, [terminalId, terminalToKill]);
 
   useEffect(() => {
-    if (!terminalRef.current) {
+    if (!terminalRef.current || terminalRef.current.options.fontSize === settings.fontSize) {
       return;
     }
 
