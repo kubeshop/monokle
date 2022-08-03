@@ -257,6 +257,9 @@ const initialExtensionState: ExtensionState = {
 };
 
 const initialTerminalState: TerminalState = {
+  settings: {
+    fontSize: electronStore.get('terminal.settings.fontSize'),
+  },
   terminalsMap: {},
 };
 

@@ -35,6 +35,7 @@ const TerminalPane: React.FC<IProps> = props => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
+  const settings = useAppSelector(state => state.terminal.settings);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
@@ -65,7 +66,7 @@ const TerminalPane: React.FC<IProps> = props => {
       return;
     }
 
-    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
+    terminalRef.current = new Terminal({cursorBlink: true, fontSize: settings.fontSize});
     addonRef.current = new FitAddon();
     terminalRef.current.loadAddon(addonRef.current);
     ipcRenderer.send('shell.init', {rootFilePath, terminalId, webContentsId});
@@ -147,6 +148,18 @@ const TerminalPane: React.FC<IProps> = props => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [terminalId, terminalToKill]);
+
+  useEffect(() => {
+    if (!terminalRef.current) {
+      return;
+    }
+
+    terminalRef.current.options.fontSize = settings.fontSize;
+
+    setTimeout(() => {
+      addonRef.current?.fit();
+    }, 250);
+  }, [settings.fontSize]);
 
   return (
     <S.TerminalPaneContainer $height={height} style={{display: selectedTerminal === terminalId ? 'block' : 'none'}}>

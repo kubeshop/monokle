@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
 import {v4 as uuidv4} from 'uuid';
 
@@ -15,6 +15,7 @@ import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 import {Icon} from '@atoms';
 
 import TerminalPane from '../TerminalPane';
+import TerminalOptions from '../TerminalPane/TerminalOptions';
 import * as S from './BottomPaneManager.styled';
 
 const BottomPaneManager: React.FC = () => {
@@ -66,6 +67,10 @@ const BottomPaneManager: React.FC = () => {
         </S.Tabs>
 
         <S.TabsActions>
+          <Dropdown mouseEnterDelay={0.5} placement="bottomRight" overlay={<TerminalOptions />}>
+            <S.EllipsisOutlined />
+          </Dropdown>
+
           <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
         </S.TabsActions>
       </S.TabsContainer>
