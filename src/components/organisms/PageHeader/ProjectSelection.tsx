@@ -260,8 +260,10 @@ const ProjectSelection = () => {
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
               <S.ProjectLabel>Project</S.ProjectLabel>
-              <S.ProjectName>{activeProject.name}</S.ProjectName>
-              <S.DownOutlined />
+              <S.ProjectContent>
+                <S.ProjectName>{activeProject.name}</S.ProjectName>
+                <S.DownOutlined />
+              </S.ProjectContent>
             </S.Button>
           </Tooltip>
         </Dropdown>
