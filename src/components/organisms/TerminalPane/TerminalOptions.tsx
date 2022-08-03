@@ -35,7 +35,7 @@ const TerminalOptions: React.FC = () => {
 
   return (
     <S.TerminalOptionsContainer>
-      <Form initialValues={settings} form={form} layout="vertical" onChange={updateSettingsHandler}>
+      <S.Form initialValues={settings} form={form} layout="vertical" onChange={updateSettingsHandler}>
         <Form.Item
           name="fontSize"
           label="Font size"
@@ -65,7 +65,7 @@ const TerminalOptions: React.FC = () => {
         >
           <S.InputNumber placeholder="Enter font size" />
         </Form.Item>
-      </Form>
+      </S.Form>
     </S.TerminalOptionsContainer>
   );
 };
