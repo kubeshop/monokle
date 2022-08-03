@@ -13,7 +13,12 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  isInPreviewModeSelector,
+  selectedResourceSelector,
+  settingsSelector,
+} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
@@ -42,8 +47,8 @@ const FormEditor: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const previewType = useAppSelector(state => state.main.previewType);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(selectedResourceSelector);
   const settings = useAppSelector(settingsSelector);
@@ -156,9 +161,10 @@ const FormEditor: React.FC<IProps> = props => {
     }
   }, [formSchema, settings]);
 
-  const isReadOnlyMode = useMemo(() => {
-    return isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode;
-  }, [isInPreviewMode, previewType, settings.allowEditInClusterMode]);
+  const isReadOnlyMode = useMemo(
+    () => isInPreviewMode || (isInClusterMode && !settings.allowEditInClusterMode),
+    [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
+  );
 
   if (!selectedResource && !selectedPath) {
     return <div>Nothing selected..</div>;
