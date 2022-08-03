@@ -274,6 +274,7 @@ export const configSlice = createSlice({
       keys.forEach(key => {
         if (kubeConfig) {
           _.set(kubeConfig, key, serializedIncomingConfig[key]);
+          _.set(state.kubeConfig, key, serializedIncomingConfig[key]);
         }
       });
 
