@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
@@ -7,6 +7,8 @@ import {v4 as uuidv4} from 'uuid';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
+
+import {TerminalType} from '@models/terminal';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
@@ -36,6 +38,26 @@ const BottomPaneManager: React.FC = () => {
     dispatch(addTerminal({id: newTerminalId, isRunning: false}));
   };
 
+  const renderTerminalName = useCallback((terminal: TerminalType, index: number) => {
+    let name = '';
+
+    if (terminal.pod) {
+      name += terminal.pod.name;
+    } else {
+      name += 'Terminal';
+
+      if (index) {
+        name += ` ${index + 1}`;
+      }
+    }
+
+    return (
+      <S.TabName>
+        {name} {terminal.pod?.namespace ? <S.PodNamespaceLabel>{terminal.pod.namespace}</S.PodNamespaceLabel> : null}
+      </S.TabName>
+    );
+  }, []);
+
   // treat the case where the bottom selection is first set to terminal or terminal was already opened
   useEffect(() => {
     if (selectedTerminal || bottomSelection !== 'terminal') {
@@ -51,12 +73,18 @@ const BottomPaneManager: React.FC = () => {
     <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>
       <S.TabsContainer ref={tabsContainerRef}>
         <S.Tabs>
-          {Object.keys(terminalsMap).map((id, index) => (
-            <S.Tab key={id} $selected={selectedTerminal === id} onClick={() => dispatch(setSelectedTerminal(id))}>
+          {Object.values(terminalsMap).map((terminal, index) => (
+            <S.Tab
+              key={terminal.id}
+              $selected={selectedTerminal === terminal.id}
+              onClick={() => dispatch(setSelectedTerminal(terminal.id))}
+            >
               <Icon name="terminal" />
-              Terminal {index ? index + 1 : ''}
+
+              {renderTerminalName(terminal, index)}
+
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-                <S.CloseOutlined onClick={() => setTerminalToKill(id)} />
+                <S.CloseOutlined onClick={() => setTerminalToKill(terminal.id)} />
               </Tooltip>
             </S.Tab>
           ))}

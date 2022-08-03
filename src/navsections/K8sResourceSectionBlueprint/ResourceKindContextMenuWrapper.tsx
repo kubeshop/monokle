@@ -118,7 +118,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
 
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: shellCommand}));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: shellCommand, pod: resource}));
   };
 
   const menuItems = [
