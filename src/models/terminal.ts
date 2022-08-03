@@ -4,10 +4,15 @@ interface TerminalType {
   defaultCommand?: string;
 }
 
+interface TerminalSettingsType {
+  fontSize: number;
+}
+
 interface TerminalState {
+  settings: TerminalSettingsType;
   terminalsMap: Record<string, TerminalType>;
   selectedTerminal?: string;
   webContentsId?: number;
 }
 
-export type {TerminalState, TerminalType};
+export type {TerminalSettingsType, TerminalState, TerminalType};
