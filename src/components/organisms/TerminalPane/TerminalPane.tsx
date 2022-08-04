@@ -129,6 +129,7 @@ const TerminalPane: React.FC<IProps> = props => {
     Modal.confirm({
       title: `Are you sure you want to kill ${name}?`,
       icon: <ExclamationCircleOutlined />,
+      okText: 'Yes',
       onOk() {
         return new Promise(resolve => {
           addonRef.current?.dispose();
