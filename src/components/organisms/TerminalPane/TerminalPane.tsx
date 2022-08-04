@@ -2,6 +2,10 @@ import {ipcRenderer} from 'electron';
 
 import React, {useEffect, useMemo, useRef} from 'react';
 
+import {Modal} from 'antd';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
@@ -19,16 +23,17 @@ import * as S from './TerminalPane.styled';
 
 interface IProps {
   height: number;
+  index: number;
   terminal: TerminalType;
   terminalToKill: string;
+  removeTerminalToKillId: () => void;
 }
 
 const TerminalPane: React.FC<IProps> = props => {
   const {
-    height,
-    terminal: {defaultCommand, id: terminalId},
-    terminalToKill,
+    terminal: {defaultCommand, id: terminalId, pod},
   } = props;
+  const {height, index: terminalIndex, terminalToKill, removeTerminalToKillId} = props;
 
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
@@ -119,32 +124,47 @@ const TerminalPane: React.FC<IProps> = props => {
       return;
     }
 
-    addonRef.current?.dispose();
-    addonRef.current = undefined;
-    terminalRef.current?.clear();
-    terminalRef.current?.dispose();
-    terminalRef.current = undefined;
-    terminalDataRef.current?.dispose();
-    terminalResizeRef.current?.dispose();
-    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
+    const name = pod ? `${pod.name} terminal` : `Terminal ${terminalIndex ? `(${terminalIndex + 1})` : ''}`;
 
-    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
+    Modal.confirm({
+      title: `Are you sure you want to kill ${name}?`,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        return new Promise(resolve => {
+          addonRef.current?.dispose();
+          addonRef.current = undefined;
+          terminalRef.current?.clear();
+          terminalRef.current?.dispose();
+          terminalRef.current = undefined;
+          terminalDataRef.current?.dispose();
+          terminalResizeRef.current?.dispose();
+          ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
-    // if there is only one running terminal
-    if (Object.keys(terminalsMap).length === 1) {
-      dispatch(setLeftBottomMenuSelection(null));
-      dispatch(setSelectedTerminal(undefined));
-    } else {
-      const index = Object.keys(terminalsMap).indexOf(terminalId);
+          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
 
-      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-        ? Object.keys(terminalsMap)[index + 1]
-        : Object.keys(terminalsMap)[index - 1];
+          // if there is only one running terminal
+          if (Object.keys(terminalsMap).length === 1) {
+            dispatch(setLeftBottomMenuSelection(null));
+            dispatch(setSelectedTerminal(undefined));
+          } else {
+            const index = Object.keys(terminalsMap).indexOf(terminalId);
 
-      dispatch(setSelectedTerminal(switchTerminalId));
-    }
+            let switchTerminalId = Object.keys(terminalsMap)[index + 1]
+              ? Object.keys(terminalsMap)[index + 1]
+              : Object.keys(terminalsMap)[index - 1];
 
-    dispatch(removeTerminal(terminalId));
+            dispatch(setSelectedTerminal(switchTerminalId));
+          }
+
+          dispatch(removeTerminal(terminalId));
+          resolve({});
+        });
+      },
+      onCancel() {
+        terminalRef.current?.focus();
+        removeTerminalToKillId();
+      },
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [terminalId, terminalToKill]);
