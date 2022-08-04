@@ -30,10 +30,6 @@ const Scale = () => {
 
   const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInPreviewMode, [kind, isInPreviewMode]);
 
-  const reconnectToCluster = () => {
-    restartPreview(currentContext, 'cluster', dispatch);
-  };
-
   useEffect(() => {
     setReplicas(defaultReplica);
   }, [currentResource, defaultReplica]);
@@ -43,7 +39,7 @@ const Scale = () => {
       toggleScaling(true);
       await scaleDeployment({name, replicas, namespace, currentContext, kubeConfigPath});
       toggleScaling(false);
-      reconnectToCluster();
+      restartPreview(currentContext, 'cluster', dispatch);
     }
     dispatch(closeScaleModal());
   };

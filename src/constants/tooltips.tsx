@@ -85,3 +85,4 @@ export const ValidationTabTooltip = () => <HotkeyLabel text="View Validation" na
 export const TerminalPaneTooltip = () => <HotkeyLabel text="View Terminal" name="TOGGLE_TERMINAL_PANE" />;
 
 export const ScaleTooltip = () => <HotkeyLabel text="Change the number of replicas" name="SCALE" />;
+export const RestartTooltip = 'Restart deployment';

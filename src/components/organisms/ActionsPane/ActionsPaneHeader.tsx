@@ -33,6 +33,7 @@ import {TitleBar} from '@molecules';
 import {Icon} from '@atoms';
 
 import * as S from './ActionsPaneHeader.styled';
+import Restart from './Restart/Restart';
 import Scale from './Scale/Scale';
 
 interface IProps {
@@ -244,6 +245,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
 
         <S.ButtonContainer>
           <Scale />
+          <Restart />
           <Tooltip
             mouseEnterDelay={TOOLTIP_DELAY}
             title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
