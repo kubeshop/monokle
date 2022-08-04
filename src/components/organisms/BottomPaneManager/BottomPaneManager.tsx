@@ -47,7 +47,7 @@ const BottomPaneManager: React.FC = () => {
       name += 'Terminal';
 
       if (index) {
-        name += ` ${index + 1}`;
+        name += ` (${index + 1})`;
       }
     }
 
@@ -84,7 +84,12 @@ const BottomPaneManager: React.FC = () => {
               {renderTerminalName(terminal, index)}
 
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-                <S.CloseOutlined onClick={() => setTerminalToKill(terminal.id)} />
+                <S.CloseOutlined
+                  onClick={e => {
+                    e.stopPropagation();
+                    setTerminalToKill(terminal.id);
+                  }}
+                />
               </Tooltip>
             </S.Tab>
           ))}
@@ -103,12 +108,14 @@ const BottomPaneManager: React.FC = () => {
         </S.TabsActions>
       </S.TabsContainer>
 
-      {Object.values(terminalsMap).map(terminal => (
+      {Object.values(terminalsMap).map((terminal, index) => (
         <TerminalPane
           key={terminal.id}
           height={height - tabsContainerHeight}
+          index={index}
           terminal={terminal}
           terminalToKill={terminalToKill}
+          removeTerminalToKillId={() => setTerminalToKill('')}
         />
       ))}
     </S.BottomPaneManagerContainer>
