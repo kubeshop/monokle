@@ -317,6 +317,10 @@ ipcMain.on('shell.init', (event, args) => {
           currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
         });
 
+        ptyProcess.onExit(() => {
+          currentWebContents.send(`shell.exit.${terminalId}`);
+        });
+
         currentWebContents.send(`shell.initialized.${terminalId}`);
       } else {
         log.error('Web contents is not found');
@@ -339,8 +343,6 @@ ipcMain.on('shell.resize', (event, args) => {
 ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
   const {data, terminalId} = d;
   const ptyProcess = ptyProcessMap[terminalId];
-
-  console.log('Data:', data);
 
   if (ptyProcess) {
     ptyProcess.write(data);

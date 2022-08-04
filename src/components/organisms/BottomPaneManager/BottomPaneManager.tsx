@@ -65,8 +65,8 @@ const BottomPaneManager: React.FC = () => {
     }
 
     const newTerminalId = uuidv4();
-    dispatch(setSelectedTerminal(newTerminalId));
     dispatch(addTerminal({id: newTerminalId, isRunning: false}));
+    dispatch(setSelectedTerminal(newTerminalId));
   }, [bottomSelection, dispatch, selectedTerminal]);
 
   return (
