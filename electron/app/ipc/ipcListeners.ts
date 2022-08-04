@@ -72,6 +72,23 @@ const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
 
+const killTerminal = (id: string) => {
+  const ptyProcess = ptyProcessMap[id];
+
+  if (!ptyProcess) {
+    return;
+  }
+
+  try {
+    ptyProcess.kill();
+    process.kill(ptyProcess.pid);
+  } catch (e) {
+    log.error(e);
+  }
+
+  delete ptyProcessMap[id];
+};
+
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
@@ -300,6 +317,10 @@ ipcMain.on('shell.init', (event, args) => {
           currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
         });
 
+        ptyProcess.onExit(() => {
+          currentWebContents.send(`shell.exit.${terminalId}`);
+        });
+
         currentWebContents.send(`shell.initialized.${terminalId}`);
       } else {
         log.error('Web contents is not found');
@@ -330,18 +351,6 @@ ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
 
 ipcMain.on('shell.ptyProcessKill', (event, data) => {
   const {terminalId} = data;
-  const ptyProcess = ptyProcessMap[terminalId];
 
-  if (!ptyProcess) {
-    return;
-  }
-
-  try {
-    ptyProcess.kill();
-    process.kill(ptyProcess.pid);
-  } catch (e) {
-    log.error(e);
-  }
-
-  delete ptyProcessMap[terminalId];
+  killTerminal(terminalId);
 });

@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {Modal} from 'antd';
 
@@ -57,6 +57,37 @@ const TerminalPane: React.FC<IProps> = props => {
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
+  const killTerminal = useCallback(() => {
+    addonRef.current?.dispose();
+    addonRef.current = undefined;
+    terminalRef.current?.clear();
+    terminalRef.current?.dispose();
+    terminalRef.current = undefined;
+    terminalDataRef.current?.dispose();
+    terminalResizeRef.current?.dispose();
+    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
+
+    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
+
+    // if there is only one running terminal
+    if (Object.keys(terminalsMap).length === 1) {
+      dispatch(setLeftBottomMenuSelection(null));
+      dispatch(setSelectedTerminal(undefined));
+    } else {
+      const index = Object.keys(terminalsMap).indexOf(terminalId);
+
+      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
+        ? Object.keys(terminalsMap)[index + 1]
+        : Object.keys(terminalsMap)[index - 1];
+
+      dispatch(setSelectedTerminal(switchTerminalId));
+    }
+
+    dispatch(removeTerminal(terminalId));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (
       !bottomSelection ||
@@ -79,6 +110,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current.open(terminalContainerRef.current);
 
     ipcRenderer.on(`shell.incomingData.${terminalId}`, incomingDataRef.current);
+    ipcRenderer.on(`shell.exit.${terminalId}`, killTerminal);
 
     terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
       ipcRenderer.send('shell.resize', {cols, rows, terminalId});
@@ -132,32 +164,7 @@ const TerminalPane: React.FC<IProps> = props => {
       okText: 'Yes',
       onOk() {
         return new Promise(resolve => {
-          addonRef.current?.dispose();
-          addonRef.current = undefined;
-          terminalRef.current?.clear();
-          terminalRef.current?.dispose();
-          terminalRef.current = undefined;
-          terminalDataRef.current?.dispose();
-          terminalResizeRef.current?.dispose();
-          ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
-
-          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-
-          // if there is only one running terminal
-          if (Object.keys(terminalsMap).length === 1) {
-            dispatch(setLeftBottomMenuSelection(null));
-            dispatch(setSelectedTerminal(undefined));
-          } else {
-            const index = Object.keys(terminalsMap).indexOf(terminalId);
-
-            let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-              ? Object.keys(terminalsMap)[index + 1]
-              : Object.keys(terminalsMap)[index - 1];
-
-            dispatch(setSelectedTerminal(switchTerminalId));
-          }
-
-          dispatch(removeTerminal(terminalId));
+          killTerminal();
           resolve({});
         });
       },
