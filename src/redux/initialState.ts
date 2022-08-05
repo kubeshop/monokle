@@ -260,6 +260,7 @@ const initialTerminalState: TerminalState = {
   settings: {
     fontSize: electronStore.get('terminal.settings.fontSize'),
   },
+  shells: [],
   terminalsMap: {},
 };
 

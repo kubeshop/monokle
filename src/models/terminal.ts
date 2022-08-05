@@ -13,6 +13,7 @@ interface TerminalSettingsType {
 
 interface TerminalState {
   settings: TerminalSettingsType;
+  shells: string[];
   terminalsMap: Record<string, TerminalType>;
   selectedTerminal?: string;
   webContentsId?: number;

@@ -24,6 +24,9 @@ export const terminalSlice = createSlice({
     setSelectedTerminal: (state: Draft<TerminalState>, action: PayloadAction<string | undefined>) => {
       state.selectedTerminal = action.payload;
     },
+    setShells: (state: Draft<TerminalState>, action: PayloadAction<string[]>) => {
+      state.shells = action.payload;
+    },
     setTerminalSettings: (state: Draft<TerminalState>, action: PayloadAction<TerminalSettingsType>) => {
       state.settings = action.payload;
       electronStore.set('terminal.settings', action.payload);
@@ -39,6 +42,7 @@ export const {
   removeTerminal,
   setRunningTerminal,
   setSelectedTerminal,
+  setShells,
   setTerminalSettings,
   setWebContentsId,
 } = terminalSlice.actions;
