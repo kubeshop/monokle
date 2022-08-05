@@ -1,6 +1,7 @@
 import {
   CaretDownFilled as RawCaretDownFilled,
   CloseOutlined as RawCloseOutlined,
+  DownOutlined as RawDownOutlined,
   EllipsisOutlined as RawEllipsisOutlined,
   PlusCircleFilled as RawPlusCircleFilled,
 } from '@ant-design/icons';
@@ -24,13 +25,24 @@ export const CloseOutlined = styled(RawCloseOutlined)`
   color: ${Colors.grey6};
 `;
 
+export const DownOutlined = styled(RawDownOutlined)`
+  cursor: pointer;
+  font-size: 12px;
+`;
+
 export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   font-size: 16px;
   cursor: pointer;
 `;
 
-export const PlusCircleFilled = styled(RawPlusCircleFilled)`
+export const NewTabActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: ${Colors.blue6};
+`;
+
+export const PlusCircleFilled = styled(RawPlusCircleFilled)`
   font-size: 16px;
   cursor: pointer;
 `;

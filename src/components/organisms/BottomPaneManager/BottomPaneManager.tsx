@@ -18,6 +18,7 @@ import {setTerminalShells} from '@redux/services/terminalShells';
 import {Icon} from '@atoms';
 
 import TerminalPane from '../TerminalPane';
+import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';
 import TerminalOptions from '../TerminalPane/TerminalOptions';
 import * as S from './BottomPaneManager.styled';
 
@@ -108,9 +109,15 @@ const BottomPaneManager: React.FC = () => {
             </S.Tab>
           ))}
 
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AddTerminalTooltip}>
-            <S.PlusCircleFilled onClick={onAddTerminalHandler} />
-          </Tooltip>
+          <S.NewTabActions>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AddTerminalTooltip}>
+              <S.PlusCircleFilled onClick={onAddTerminalHandler} />
+            </Tooltip>
+
+            <Dropdown overlay={<NewTerminalOptions />} placement="bottomLeft" trigger={['click']}>
+              <S.DownOutlined />
+            </Dropdown>
+          </S.NewTabActions>
         </S.Tabs>
 
         <S.TabsActions>
