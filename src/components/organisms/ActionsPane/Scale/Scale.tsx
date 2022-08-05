@@ -57,6 +57,7 @@ const Scale = () => {
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
+          ghost
         >
           Scale
         </Button>
