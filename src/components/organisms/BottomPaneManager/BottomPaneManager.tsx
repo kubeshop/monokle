@@ -13,6 +13,7 @@ import {TerminalType} from '@models/terminal';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
+import {setTerminalShells} from '@redux/services/terminalShells';
 
 import {Icon} from '@atoms';
 
@@ -23,7 +24,10 @@ import * as S from './BottomPaneManager.styled';
 const BottomPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
+  const settings = useAppSelector(state => state.terminal.settings);
+  const shellsMap = useAppSelector(state => state.terminal.shellsMap);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [terminalToKill, setTerminalToKill] = useState<string>('');
@@ -64,10 +68,16 @@ const BottomPaneManager: React.FC = () => {
       return;
     }
 
+    if (!Object.keys(shellsMap).length) {
+      setTerminalShells(osPlatform, settings, dispatch);
+    }
+
     const newTerminalId = uuidv4();
     dispatch(addTerminal({id: newTerminalId, isRunning: false}));
     dispatch(setSelectedTerminal(newTerminalId));
-  }, [bottomSelection, dispatch, selectedTerminal]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bottomSelection, selectedTerminal]);
 
   return (
     <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>

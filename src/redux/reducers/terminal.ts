@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {TerminalSettingsType, TerminalState, TerminalType} from '@models/terminal';
+import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@models/terminal';
 
 import initialState from '@redux/initialState';
 
@@ -24,8 +24,8 @@ export const terminalSlice = createSlice({
     setSelectedTerminal: (state: Draft<TerminalState>, action: PayloadAction<string | undefined>) => {
       state.selectedTerminal = action.payload;
     },
-    setShells: (state: Draft<TerminalState>, action: PayloadAction<string[]>) => {
-      state.shells = action.payload;
+    setShells: (state: Draft<TerminalState>, action: PayloadAction<ShellsMapType>) => {
+      state.shellsMap = action.payload;
     },
     setTerminalSettings: (state: Draft<TerminalState>, action: PayloadAction<TerminalSettingsType>) => {
       state.settings = action.payload;

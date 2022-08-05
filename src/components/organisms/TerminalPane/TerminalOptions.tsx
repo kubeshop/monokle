@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Form} from 'antd';
+import {Form, Radio} from 'antd';
 
 import {debounce} from 'lodash';
 
@@ -14,6 +14,7 @@ import * as S from './TerminalOptions.styled';
 const TerminalOptions: React.FC = () => {
   const dispatch = useAppDispatch();
   const settings = useAppSelector(state => state.terminal.settings);
+  const shellsMap = useAppSelector(state => state.terminal.shellsMap);
 
   const [form] = Form.useForm();
 
@@ -36,6 +37,18 @@ const TerminalOptions: React.FC = () => {
   return (
     <S.TerminalOptionsContainer>
       <S.Form initialValues={settings} form={form} layout="vertical" onChange={updateSettingsHandler}>
+        <Form.Item name="defaultShell" label="Shell type">
+          <Radio.Group>
+            {Object.entries(shellsMap).map(([shell, shellObject]) => (
+              <Radio key={shell} value={shell}>
+                {shellObject.name}
+              </Radio>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+
+        <S.Divider />
+
         <Form.Item
           name="fontSize"
           label="Font size"

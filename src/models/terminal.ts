@@ -1,5 +1,11 @@
 import {K8sResource} from './k8sresource';
 
+interface ShellType {
+  name: string;
+}
+
+type ShellsMapType = Record<string, ShellType>;
+
 interface TerminalType {
   id: string;
   isRunning: boolean;
@@ -8,15 +14,16 @@ interface TerminalType {
 }
 
 interface TerminalSettingsType {
+  defaultShell: string;
   fontSize: number;
 }
 
 interface TerminalState {
   settings: TerminalSettingsType;
-  shells: string[];
+  shellsMap: ShellsMapType;
   terminalsMap: Record<string, TerminalType>;
   selectedTerminal?: string;
   webContentsId?: number;
 }
 
-export type {TerminalSettingsType, TerminalState, TerminalType};
+export type {ShellType, ShellsMapType, TerminalSettingsType, TerminalState, TerminalType};
