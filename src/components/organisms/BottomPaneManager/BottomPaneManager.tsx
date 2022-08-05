@@ -39,7 +39,7 @@ const BottomPaneManager: React.FC = () => {
     const newTerminalId = uuidv4();
 
     dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal({id: newTerminalId, isRunning: false}));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: settings.defaultShell}));
   };
 
   const renderTerminalName = useCallback((terminal: TerminalType, index: number) => {
@@ -68,16 +68,20 @@ const BottomPaneManager: React.FC = () => {
       return;
     }
 
-    if (!Object.keys(shellsMap).length) {
-      setTerminalShells(osPlatform, settings, dispatch);
-    }
-
     const newTerminalId = uuidv4();
-    dispatch(addTerminal({id: newTerminalId, isRunning: false}));
+    dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: settings.defaultShell}));
     dispatch(setSelectedTerminal(newTerminalId));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bottomSelection, selectedTerminal]);
+  }, [bottomSelection, selectedTerminal, shellsMap]);
+
+  useEffect(() => {
+    if (Object.keys(shellsMap).length) {
+      return;
+    }
+
+    setTerminalShells(osPlatform, settings, dispatch);
+  }, [dispatch, osPlatform, settings, shellsMap]);
 
   return (
     <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>

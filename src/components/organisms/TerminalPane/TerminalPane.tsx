@@ -31,7 +31,7 @@ interface IProps {
 
 const TerminalPane: React.FC<IProps> = props => {
   const {
-    terminal: {defaultCommand, id: terminalId, pod},
+    terminal: {defaultCommand, id: terminalId, pod, shell},
   } = props;
   const {height, index: terminalIndex, terminalToKill, removeTerminalToKillId} = props;
 
@@ -105,7 +105,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current = new Terminal({cursorBlink: true, fontSize: settings.fontSize});
     addonRef.current = new FitAddon();
     terminalRef.current.loadAddon(addonRef.current);
-    ipcRenderer.send('shell.init', {rootFilePath, terminalId, webContentsId});
+    ipcRenderer.send('shell.init', {rootFilePath, shell, terminalId, webContentsId});
 
     terminalRef.current.open(terminalContainerRef.current);
 

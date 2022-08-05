@@ -67,7 +67,6 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
-const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
@@ -287,7 +286,7 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 });
 
 ipcMain.on('shell.init', (event, args) => {
-  const {rootFilePath, terminalId, webContentsId} = args;
+  const {rootFilePath, shell, terminalId, webContentsId} = args;
 
   if (!webContentsId) {
     return;

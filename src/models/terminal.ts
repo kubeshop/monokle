@@ -2,6 +2,7 @@ import {K8sResource} from './k8sresource';
 
 interface ShellType {
   name: string;
+  shell: string;
 }
 
 type ShellsMapType = Record<string, ShellType>;
@@ -9,6 +10,7 @@ type ShellsMapType = Record<string, ShellType>;
 interface TerminalType {
   id: string;
   isRunning: boolean;
+  shell: string;
   defaultCommand?: string;
   pod?: K8sResource;
 }

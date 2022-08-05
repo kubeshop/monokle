@@ -40,7 +40,7 @@ const TerminalOptions: React.FC = () => {
         <Form.Item name="defaultShell" label="Shell type">
           <Radio.Group>
             {Object.entries(shellsMap).map(([shell, shellObject]) => (
-              <Radio key={shell} value={shell}>
+              <Radio key={shell} value={shellObject.shell}>
                 {shellObject.name}
               </Radio>
             ))}

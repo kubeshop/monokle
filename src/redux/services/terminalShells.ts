@@ -10,7 +10,7 @@ const detectAvailableUnixShells = (): ShellsMapType => {
   const contents = fs.readFileSync('/etc/shells', 'utf8');
   console.log(contents);
 
-  return {bash: {name: 'Bash'}, zsh: {name: 'Zsh'}};
+  return {bash: {name: 'Bash', shell: 'bash'}, zsh: {name: 'Zsh', shell: 'zsh'}};
 };
 
 export const setTerminalShells = (
@@ -21,8 +21,8 @@ export const setTerminalShells = (
   let shellsMap: ShellsMapType = {};
 
   if (osPlatform === 'win32') {
-    shellsMap['powershell'] = {name: 'Powershell'};
-    shellsMap['cmd'] = {name: 'Command Prompt'};
+    shellsMap['powershell'] = {name: 'Powershell', shell: 'powershell.exe'};
+    shellsMap['cmd'] = {name: 'Command Prompt', shell: 'cmd.exe'};
   } else {
     shellsMap = detectAvailableUnixShells();
   }
