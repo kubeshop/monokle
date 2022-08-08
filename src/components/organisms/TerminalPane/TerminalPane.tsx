@@ -14,8 +14,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {TerminalType} from '@models/terminal';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
-import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
+import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -31,7 +30,7 @@ interface IProps {
 
 const TerminalPane: React.FC<IProps> = props => {
   const {
-    terminal: {defaultCommand, id: terminalId, pod},
+    terminal: {defaultCommand, id: terminalId, pod, shell},
   } = props;
   const {height, index: terminalIndex, terminalToKill, removeTerminalToKillId} = props;
 
@@ -67,22 +66,6 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalResizeRef.current?.dispose();
     ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
-    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-
-    // if there is only one running terminal
-    if (Object.keys(terminalsMap).length === 1) {
-      dispatch(setLeftBottomMenuSelection(null));
-      dispatch(setSelectedTerminal(undefined));
-    } else {
-      const index = Object.keys(terminalsMap).indexOf(terminalId);
-
-      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-        ? Object.keys(terminalsMap)[index + 1]
-        : Object.keys(terminalsMap)[index - 1];
-
-      dispatch(setSelectedTerminal(switchTerminalId));
-    }
-
     dispatch(removeTerminal(terminalId));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,7 +88,7 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalRef.current = new Terminal({cursorBlink: true, fontSize: settings.fontSize});
     addonRef.current = new FitAddon();
     terminalRef.current.loadAddon(addonRef.current);
-    ipcRenderer.send('shell.init', {rootFilePath, terminalId, webContentsId});
+    ipcRenderer.send('shell.init', {rootFilePath, shell, terminalId, webContentsId});
 
     terminalRef.current.open(terminalContainerRef.current);
 
@@ -164,7 +147,7 @@ const TerminalPane: React.FC<IProps> = props => {
       okText: 'Yes',
       onOk() {
         return new Promise(resolve => {
-          killTerminal();
+          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
           resolve({});
         });
       },

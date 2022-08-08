@@ -56,6 +56,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
 
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
@@ -118,7 +119,15 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
 
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
-    dispatch(addTerminal({id: newTerminalId, isRunning: false, defaultCommand: shellCommand, pod: resource}));
+    dispatch(
+      addTerminal({
+        id: newTerminalId,
+        isRunning: false,
+        defaultCommand: shellCommand,
+        pod: resource,
+        shell: defaultShell,
+      })
+    );
   };
 
   const menuItems = [

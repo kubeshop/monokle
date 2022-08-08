@@ -42,6 +42,7 @@ import PaneTooltip from './PaneTooltip';
 const PaneManagerLeftMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
@@ -89,7 +90,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     if (!Object.keys(terminalsMap).length) {
       const newTerminalId = uuidv4();
 
-      dispatch(addTerminal({id: newTerminalId, isRunning: false}));
+      dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: defaultShell}));
       dispatch(setSelectedTerminal(newTerminalId));
     }
 
