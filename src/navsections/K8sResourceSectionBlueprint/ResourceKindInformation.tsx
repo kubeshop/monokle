@@ -20,7 +20,7 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
       text = DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
     }
 
-    if (text) {
+    if (text && resource.content?.status?.phase) {
       text = `${text} | `;
     }
 
