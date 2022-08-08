@@ -14,8 +14,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {TerminalType} from '@models/terminal';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {removeTerminal, setRunningTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
-import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
+import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -66,22 +65,6 @@ const TerminalPane: React.FC<IProps> = props => {
     terminalDataRef.current?.dispose();
     terminalResizeRef.current?.dispose();
     ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
-
-    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-
-    // if there is only one running terminal
-    if (Object.keys(terminalsMap).length === 1) {
-      dispatch(setLeftBottomMenuSelection(null));
-      dispatch(setSelectedTerminal(undefined));
-    } else {
-      const index = Object.keys(terminalsMap).indexOf(terminalId);
-
-      let switchTerminalId = Object.keys(terminalsMap)[index + 1]
-        ? Object.keys(terminalsMap)[index + 1]
-        : Object.keys(terminalsMap)[index - 1];
-
-      dispatch(setSelectedTerminal(switchTerminalId));
-    }
 
     dispatch(removeTerminal(terminalId));
 
@@ -164,7 +147,7 @@ const TerminalPane: React.FC<IProps> = props => {
       okText: 'Yes',
       onOk() {
         return new Promise(resolve => {
-          killTerminal();
+          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
           resolve({});
         });
       },
