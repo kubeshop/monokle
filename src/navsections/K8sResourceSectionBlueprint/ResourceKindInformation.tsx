@@ -15,10 +15,17 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
 
   const getInformation = useCallback(() => {
-    let text = DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
+    let text;
+    if (!(resource && resource.content && resource.content.metadata)) {
+      text = DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
+    }
+
+    if (text) {
+      text = `${text} | `;
+    }
 
     if (resource.content?.status?.phase) {
-      text = `${text} | ${resource.content.status.phase}`;
+      text = `${text}${resource.content.status.phase}`;
     }
     return text;
   }, [resource]);
