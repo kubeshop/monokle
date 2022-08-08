@@ -8,6 +8,7 @@ export const ClusterExplorerTooltips = {
 };
 export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
 export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
+export const AddTerminalTooltip = 'Add new terminal';
 export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
@@ -25,7 +26,8 @@ export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality
 export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const ExpandTreeTooltip = 'Expand all folders';
-export const FeedbackTooltip = 'Help us on our mission to improve Monokle by answering a few questions';
+export const FeedbackTooltip =
+  'Monokle is open source and free of charge. Would you help us to improve it by dedicating 2 minutes to answer our questions?';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
@@ -80,3 +82,4 @@ export const ReloadFolderTooltip = () => (
 export const ResetFiltersTooltip = () => <HotkeyLabel text="Reset Filters" name="RESET_RESOURCE_FILTERS" />;
 export const SettingsTooltip = () => <HotkeyLabel text="Open Settings" name="TOGGLE_SETTINGS" />;
 export const ValidationTabTooltip = () => <HotkeyLabel text="View Validation" name="OPEN_VALIDATION_TAB" />;
+export const TerminalPaneTooltip = () => <HotkeyLabel text="View Terminal" name="TOGGLE_TERMINAL_PANE" />;

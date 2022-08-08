@@ -10,18 +10,18 @@ Let’s get started!
 
 Launch Monokle and click on the **Settings** button to access the Settings widget:
 
-![Settings](img/settings-1.6.0.png)
+![Settings](img/settings-1.9.png)
 
 ## **2. Set kubeconfig**
 
 Enter the kubeconfig file path in the KUBECONFIG text field. The kubeconfig parameter is used when viewing cluster
 resources and deploying/diffing local resources to a cluster.
 
-![Kubeconfig](img/kubeconfig-1.6.0.png)
+![Kubeconfig](img/kubeconfig-1.9.png)
 
 Alternatively, you can click on the **Browse** button to fetch the kubeconfig file for configuring cluster access. 
 
-![Browse](img/browse-1.6.0.png)
+![Browse](img/browse-1.9.png)
 
 Select the required folder to configure the cluster. 
 
@@ -34,22 +34,22 @@ Select the required folder to configure the cluster.
 Monokle will look for Kubernetes manifests in files matching this filter, by default this is set to *.yaml/*.yml files.
 Click on the **Add Pattern** button to include the files having the corresponding extension.
 
-![Add pattern](img/add-pattern-1.6.0.png)
+![Add pattern](img/add-pattern-1.9.png)
 
 Enter the extension pattern in the Files Include textbox and click **OK**. 
 
-![Ok](img/ok-1.6.0.png)
+![Ok](img/ok-1.9.png)
 
 ## **4. Files: Exclude**
 
 Monokle will ignore files/folders matching any of the specified paths, even if they match an above inclusion pattern.
 Click on the **Add Pattern** button to exclude the files having the corresponding extension. For example, node_modules.
 
-![Add pattern](img/add-pattern-7.png)
+![Add pattern](img/add-pattern-7-1.9.png)
 
 Enter the extension pattern in the Files Exclude textbox and hit the OK button. 
 
-![Ok](img/ok-8.png)
+![Ok](img/ok-8-1.9.png)
 
 ## **5. Helm Preview Mode**
 
@@ -64,7 +64,7 @@ Click on the Helm Preview Mode dropdown to select any of the viewing states. The
 
 Tick the **Automatically Load Last Folder** checkbox to reload the last reviewed folder when launching Monokle. 
 
-![Startup](img/startup-1.6.0.png)
+![Startup](img/startup-1.9.png)
 
 ## **Questions or Comments?**
 

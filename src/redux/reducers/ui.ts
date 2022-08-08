@@ -17,14 +17,13 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@models/ui';
+import {WalkthroughCollection} from '@models/walkthrough';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import {WalkThroughCollection} from '@components/molecules/WalkThrough/types';
 
 import electronStore from '@utils/electronStore';
 
@@ -281,13 +280,13 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkThrough: (state: Draft<UiState>, action: PayloadAction<WalkThroughCollection>) => {
+    cancelWalkthrough: (state: Draft<UiState>, action: PayloadAction<WalkthroughCollection>) => {
       const collection = action.payload;
       state.walkThrough[collection].currentStep = -1;
     },
-    handleWalkThroughStep: (
+    handleWalkthroughStep: (
       state: Draft<UiState>,
-      action: PayloadAction<{step: number; collection: WalkThroughCollection}>
+      action: PayloadAction<{step: number; collection: WalkthroughCollection}>
     ) => {
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
@@ -324,7 +323,7 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  cancelWalkThrough,
+  cancelWalkthrough,
   closeAboutModal,
   closeClusterDiff,
   closeCreateFileFolderModal,
@@ -341,7 +340,7 @@ export const {
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
-  handleWalkThroughStep,
+  handleWalkthroughStep,
   highlightItem,
   openAboutModal,
   openClusterDiff,

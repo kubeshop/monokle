@@ -13,7 +13,7 @@ import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
-import {terminalSlice} from './reducers/terminal';
+import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
 
@@ -37,6 +37,7 @@ combineListeners([
   compareListeners.filterListener,
   resourceMapChangedListener,
   imageSelectedListener,
+  removedTerminalListener,
 ]);
 
 const appReducer = combineReducers({

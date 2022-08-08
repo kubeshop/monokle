@@ -2,8 +2,6 @@ import {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
-import styled from 'styled-components';
-
 import {K8sResource} from '@models/k8sresource';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
@@ -13,12 +11,7 @@ import {Icon} from '@atoms';
 import Colors from '@styles/Colors';
 
 import RefsPopoverContent from './RefsPopoverContent';
-
-const StyledIconsContainer = styled.span`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-`;
+import * as S from './ResourceRefsIconPopover.styled';
 
 const baseIconStyle: React.CSSProperties = {
   fontSize: '14px',
@@ -82,7 +75,7 @@ const ResourceRefsIconPopover = (props: {
         </RefsPopoverContent>
       }
     >
-      <StyledIconsContainer>
+      <S.IconsContainer>
         <Icon
           name={iconType}
           style={type === 'incoming' ? {...baseIconStyle, marginRight: 5} : {...baseIconStyle, marginLeft: 5}}
@@ -95,7 +88,7 @@ const ResourceRefsIconPopover = (props: {
             color={isSelected ? Colors.blackPure : Colors.yellowWarning}
           />
         )}
-      </StyledIconsContainer>
+      </S.IconsContainer>
     </Popover>
   );
 };

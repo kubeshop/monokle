@@ -141,99 +141,100 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
     handleChange({});
   }, [handleChange]);
 
-  const content = (
-    <div style={{width: 380}}>
-      <Tabs>
-        <Tabs.TabPane tab="General" key="2" style={{marginTop: 4, marginBottom: 8}}>
-          <Space direction="vertical" style={{width: '100%'}}>
-            <Row style={{alignItems: 'center'}}>
-              <Col span={8}>
-                <span>Namespace</span>
-              </Col>
-              <Col span={16}>
-                <Input value={namespace} onChange={e => setNamespace(e.target.value)} />
-              </Col>
-            </Row>
-
-            <Row style={{alignItems: 'center'}}>
-              <Col span={8}>
-                <span>Resource Kind</span>
-              </Col>
-              <Col span={16}>
-                <Input value={kind} onChange={e => setKind(e.target.value)} />
-              </Col>
-            </Row>
-          </Space>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane
-          tab={
-            <Badge dot={labelCount > 0} color={Colors.blue7} offset={[4, 3]}>
-              Labels
-            </Badge>
-          }
-          key="1"
-        >
-          <Space direction="vertical" style={{width: '100%'}}>
-            <NewKeyValueInput onAddKeyValue={handleAddLabelFilter} />
-
-            {filter?.labels &&
-              Object.entries(filter.labels).map(kvPair => {
-                return (
-                  <KeyValueInput
-                    key={kvPair[0]}
-                    pair={kvPair}
-                    onDelete={handleRemoveLabelFilter}
-                    onChange={handleUpdateLabelFilter}
-                  />
-                );
-              })}
-          </Space>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane
-          tab={
-            <Badge dot={annotationCount > 0} color={Colors.blue7} offset={[4, 3]}>
-              Annotations
-            </Badge>
-          }
-          key="3"
-        >
-          <Space direction="vertical" style={{width: '100%'}}>
-            <NewKeyValueInput onAddKeyValue={handleAddAnnotationFilter} />
-
-            {filter?.annotations &&
-              Object.entries(filter.annotations).map(kvPair => {
-                return (
-                  <KeyValueInput
-                    key={kvPair[0]}
-                    pair={kvPair}
-                    onDelete={handleRemoveAnnotationFilter}
-                    onChange={handleUpdateAnnotationFilter}
-                  />
-                );
-              })}
-          </Space>
-        </Tabs.TabPane>
-      </Tabs>
-
-      <div style={{marginTop: 14, display: 'flex', justifyContent: 'space-between'}}>
-        <div />
-        <Space>
-          <Button type="link" onClick={handleClearAllFilters}>
-            Clear all filters
-          </Button>
-        </Space>
-      </div>
-    </div>
-  );
-
   if (disabled) {
     return <>{filterButton}</>;
   }
 
   return (
-    <Popover content={content} placement="bottomRight">
+    <Popover
+      content={
+        <div style={{width: 380}}>
+          <Tabs>
+            <Tabs.TabPane tab="General" key="2" style={{marginTop: 4, marginBottom: 8}}>
+              <Space direction="vertical" style={{width: '100%'}}>
+                <Row style={{alignItems: 'center'}}>
+                  <Col span={8}>
+                    <span>Namespace</span>
+                  </Col>
+                  <Col span={16}>
+                    <Input value={namespace} onChange={e => setNamespace(e.target.value)} />
+                  </Col>
+                </Row>
+
+                <Row style={{alignItems: 'center'}}>
+                  <Col span={8}>
+                    <span>Resource Kind</span>
+                  </Col>
+                  <Col span={16}>
+                    <Input value={kind} onChange={e => setKind(e.target.value)} />
+                  </Col>
+                </Row>
+              </Space>
+            </Tabs.TabPane>
+
+            <Tabs.TabPane
+              tab={
+                <Badge dot={labelCount > 0} color={Colors.blue7} offset={[4, 3]}>
+                  Labels
+                </Badge>
+              }
+              key="1"
+            >
+              <Space direction="vertical" style={{width: '100%'}}>
+                <NewKeyValueInput onAddKeyValue={handleAddLabelFilter} />
+
+                {filter?.labels &&
+                  Object.entries(filter.labels).map(kvPair => {
+                    return (
+                      <KeyValueInput
+                        key={kvPair[0]}
+                        pair={kvPair}
+                        onDelete={handleRemoveLabelFilter}
+                        onChange={handleUpdateLabelFilter}
+                      />
+                    );
+                  })}
+              </Space>
+            </Tabs.TabPane>
+
+            <Tabs.TabPane
+              tab={
+                <Badge dot={annotationCount > 0} color={Colors.blue7} offset={[4, 3]}>
+                  Annotations
+                </Badge>
+              }
+              key="3"
+            >
+              <Space direction="vertical" style={{width: '100%'}}>
+                <NewKeyValueInput onAddKeyValue={handleAddAnnotationFilter} />
+
+                {filter?.annotations &&
+                  Object.entries(filter.annotations).map(kvPair => {
+                    return (
+                      <KeyValueInput
+                        key={kvPair[0]}
+                        pair={kvPair}
+                        onDelete={handleRemoveAnnotationFilter}
+                        onChange={handleUpdateAnnotationFilter}
+                      />
+                    );
+                  })}
+              </Space>
+            </Tabs.TabPane>
+          </Tabs>
+
+          <div style={{marginTop: 14, display: 'flex', justifyContent: 'space-between'}}>
+            <div />
+            <Space>
+              <Button type="link" onClick={handleClearAllFilters}>
+                Clear all filters
+              </Button>
+            </Space>
+          </div>
+        </div>
+      }
+      placement="bottomRight"
+    >
       {filterButton}
     </Popover>
   );

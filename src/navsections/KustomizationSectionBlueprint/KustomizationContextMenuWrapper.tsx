@@ -9,7 +9,7 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
-import ContextMenu from '@components/molecules/ContextMenu';
+import {ContextMenu} from '@molecules';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;

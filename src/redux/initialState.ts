@@ -257,7 +257,12 @@ const initialExtensionState: ExtensionState = {
 };
 
 const initialTerminalState: TerminalState = {
-  runningTerminals: [],
+  settings: {
+    defaultShell: electronStore.get('terminal.settings.defaultShell'),
+    fontSize: electronStore.get('terminal.settings.fontSize'),
+  },
+  shellsMap: {},
+  terminalsMap: {},
 };
 
 export default {

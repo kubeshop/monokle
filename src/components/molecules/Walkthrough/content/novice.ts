@@ -1,6 +1,6 @@
-import {WalkThroughContentProps} from './types';
+import {WalkthroughContentProps} from '@models/walkthrough';
 
-export const walkThroughNoviceContent: WalkThroughContentProps['data'][] = [
+export const noviceContent: WalkthroughContentProps['data'][] = [
   {
     step: 'template',
     title: 'Find your projects here',

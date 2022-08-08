@@ -4,7 +4,9 @@ import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {ScrollIntoView} from '@molecules';
+
+import {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -44,7 +46,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay} = useItemCustomization(
+  const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay, Information} = useItemCustomization(
     blueprint.customization
   );
 
@@ -139,6 +141,12 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               <S.SuffixContainer>
                 <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
               </S.SuffixContainer>
+            )}
+
+            {Information.Component && (Information.options?.isVisibleOnHover ? isHovered : true) && (
+              <S.InformationContainer>
+                <Information.Component itemInstance={itemInstance} options={Information.options} />
+              </S.InformationContainer>
             )}
 
             <S.BlankSpace onClick={onClick} />

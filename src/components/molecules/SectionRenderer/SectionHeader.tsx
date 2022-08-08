@@ -4,7 +4,7 @@ import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models
 
 import {useAppDispatch} from '@redux/hooks';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import {Walkthrough} from '@molecules';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
@@ -113,7 +113,7 @@ function SectionHeader(props: SectionHeaderProps) {
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
             {name === 'K8s Resources' ? (
-              <WalkThrough placement="rightTop" step="resource" collection="novice">
+              <Walkthrough placement="rightTop" step="resource" collection="novice">
                 <S.Name
                   $isSelected={sectionInstance.isSelected && isCollapsed}
                   $isHighlighted={sectionInstance.isSelected && isCollapsed}
@@ -128,7 +128,7 @@ function SectionHeader(props: SectionHeaderProps) {
                 >
                   {name}
                 </S.Name>
-              </WalkThrough>
+              </Walkthrough>
             ) : (
               <S.Name
                 $isSelected={sectionInstance.isSelected && isCollapsed}

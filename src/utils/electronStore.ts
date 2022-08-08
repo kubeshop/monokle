@@ -253,6 +253,22 @@ const schema = {
       },
     },
   },
+  terminal: {
+    type: 'object',
+    properties: {
+      settings: {
+        type: 'object',
+        properties: {
+          defaultShell: {
+            type: 'string',
+          },
+          fontSize: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -304,6 +320,12 @@ const defaults = {
   },
   pluginConfig: {
     policies: [],
+  },
+  terminal: {
+    settings: {
+      defaultShell: '',
+      fontSize: 14,
+    },
   },
 };
 

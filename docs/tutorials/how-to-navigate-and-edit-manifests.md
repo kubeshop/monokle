@@ -17,7 +17,7 @@ Launch Monokle and, on the welcome screen, there are three option to start worki
  Click **Select an existing project** to add your project folder containing K8 resources. 
 
 
-![Image 1](img/image-1-1.6.0.png)
+![Image 1](img/new-user-start-screen.png)
 
 ## **2. Select Folder**
 
@@ -31,7 +31,7 @@ In the file explorer, you can view manifests, including their resources, and the
 
 Scroll up & down to navigate and select the required manifests. 
 
-![Image 3](img/imaged-3-1.6.0.gif)
+![Image 3](img/imaged-3-1.9.gif)
 
 Once you select a manifest, its related resources will be highlighted automatically in the navigator. 
 
@@ -41,7 +41,7 @@ Once you select a manifest, its related resources will be highlighted automatica
 
 Click on outgoing and incoming links to navigate the corresponding resources. 
 
-![Resource Link](img/resource-link-4-1.6.0.gif) 
+![Resource Link](img/resource-link-4-1.9.gif) 
 
 > The warning triangle reflects that the link refers to broken resource links - see [Resource Links](../resource-navigation.md#resource-links)
 
@@ -51,7 +51,7 @@ Click on outgoing and incoming links to navigate the corresponding resources.
 
 Select the required resource in the Navigator. 
 
- ![Resources](img/resources-6-1.6.0.png) 
+ ![Resources](img/resources-6-1.9.png) 
 
 Once you select a resource, its source code will be launched and highlighted in the editor. 
 

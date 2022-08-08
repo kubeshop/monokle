@@ -38,7 +38,7 @@ import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import FilePatternList from '@molecules/FilePatternList';
+import {FilePatternList} from '@molecules';
 
 import {useFocus} from '@utils/hooks';
 

@@ -1,38 +1,49 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useEffect, useMemo, useRef} from 'react';
-import {useMeasure} from 'react-use';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {Tooltip} from 'antd';
+import {Modal} from 'antd';
 
-import {v4 as uuidv4} from 'uuid';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {KillTerminalTooltip} from '@constants/tooltips';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {TerminalType} from '@models/terminal';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addRunningTerminal, removeRunningTerminal} from '@redux/reducers/terminal';
-import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
+import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
-import {Icon, MonoPaneTitle} from '@atoms';
+import {useWindowSize} from '@utils/hooks';
 
 import * as S from './TerminalPane.styled';
 
-let terminalId = '';
-const fitAddon = new FitAddon();
+interface IProps {
+  height: number;
+  index: number;
+  terminal: TerminalType;
+  terminalToKill: string;
+  removeTerminalToKillId: () => void;
+}
 
-const TerminalPane: React.FC = () => {
+const TerminalPane: React.FC<IProps> = props => {
+  const {
+    terminal: {defaultCommand, id: terminalId, pod, shell},
+  } = props;
+  const {height, index: terminalIndex, terminalToKill, removeTerminalToKillId} = props;
+
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const runningTerminals = useAppSelector(state => state.terminal.runningTerminals);
+  const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
+  const settings = useAppSelector(state => state.terminal.settings);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
-  const [containerRef, {height}] = useMeasure<HTMLDivElement>();
-  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
+  const {height: windowHeight, width: windowWidth} = useWindowSize();
 
   const terminalRef = useRef<Terminal>();
   const terminalContainerRef = useRef<HTMLDivElement>(null);
@@ -41,91 +52,129 @@ const TerminalPane: React.FC = () => {
     terminalRef.current?.write(data);
   });
   const terminalResizeRef = useRef<IDisposable>();
+  const addonRef = useRef<FitAddon>();
 
   const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY]?.filePath, [fileMap]);
 
-  const onKillTerminalHandler = () => {
-    dispatch(setLeftBottomMenuSelection(null));
-
+  const killTerminal = useCallback(() => {
+    addonRef.current?.dispose();
+    addonRef.current = undefined;
     terminalRef.current?.clear();
     terminalRef.current?.dispose();
     terminalRef.current = undefined;
     terminalDataRef.current?.dispose();
     terminalResizeRef.current?.dispose();
-    ipcRenderer.removeListener('shell.incomingData', incomingDataRef.current);
+    ipcRenderer.removeListener(`shell.incomingData.${terminalId}`, incomingDataRef.current);
 
-    ipcRenderer.send('shell.ptyProcessKill', {webContentsId});
+    dispatch(removeTerminal(terminalId));
 
-    dispatch(removeRunningTerminal(terminalId));
-    terminalId = '';
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (
+      !bottomSelection ||
+      bottomSelection !== 'terminal' ||
       !rootFilePath ||
       !webContentsId ||
+      !selectedTerminal ||
       !terminalContainerRef.current ||
       terminalContainerRef.current.childElementCount !== 0 ||
-      (runningTerminals.length && runningTerminals.includes(terminalId))
+      terminalsMap[terminalId]?.isRunning
     ) {
       return;
     }
 
-    terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
-    terminalRef.current.loadAddon(fitAddon);
-    ipcRenderer.send('shell.init', {rootFilePath, webContentsId});
+    terminalRef.current = new Terminal({cursorBlink: true, fontSize: settings.fontSize});
+    addonRef.current = new FitAddon();
+    terminalRef.current.loadAddon(addonRef.current);
+    ipcRenderer.send('shell.init', {rootFilePath, shell, terminalId, webContentsId});
 
-    terminalId = uuidv4();
     terminalRef.current.open(terminalContainerRef.current);
-    terminalRef.current.focus();
 
-    ipcRenderer.on('shell.incomingData', incomingDataRef.current);
+    ipcRenderer.on(`shell.incomingData.${terminalId}`, incomingDataRef.current);
+    ipcRenderer.on(`shell.exit.${terminalId}`, killTerminal);
 
     terminalResizeRef.current = terminalRef.current.onResize(({cols, rows}) => {
-      ipcRenderer.send('shell.resize', {cols, rows, webContentsId});
+      ipcRenderer.send('shell.resize', {cols, rows, terminalId});
     });
 
     terminalDataRef.current = terminalRef.current.onData(data => {
-      ipcRenderer.send('shell.ptyProcessWriteData', {data, webContentsId});
+      ipcRenderer.send('shell.ptyProcessWriteData', {data, terminalId});
     });
 
-    fitAddon.fit();
+    ipcRenderer.on(`shell.initialized.${terminalId}`, () => {
+      if (defaultCommand) {
+        setTimeout(() => {
+          ipcRenderer.send('shell.ptyProcessWriteData', {data: `${defaultCommand}\r`, terminalId});
+        }, 200);
+      }
+    });
 
-    dispatch(addRunningTerminal(terminalId));
+    setTimeout(() => {
+      addonRef.current?.fit();
+      terminalRef.current?.focus();
+    }, 250);
+
+    dispatch(setRunningTerminal(terminalId));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSelection, rootFilePath, webContentsId]);
 
   useEffect(() => {
-    if (bottomSelection !== 'terminal') {
+    if (bottomSelection !== 'terminal' || selectedTerminal !== terminalId) {
       return;
     }
 
     setTimeout(() => {
-      fitAddon.fit();
+      addonRef.current?.fit();
+      terminalRef.current?.focus();
     }, 250);
 
-    terminalRef.current?.focus();
-  }, [bottomPaneHeight, bottomSelection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bottomPaneHeight, bottomSelection, selectedTerminal, windowHeight, windowWidth]);
+
+  useEffect(() => {
+    if (terminalToKill !== terminalId) {
+      return;
+    }
+
+    const name = pod ? `${pod.name} terminal` : `Terminal ${terminalIndex ? `(${terminalIndex + 1})` : ''}`;
+
+    Modal.confirm({
+      title: `Are you sure you want to kill ${name}?`,
+      icon: <ExclamationCircleOutlined />,
+      okText: 'Yes',
+      onOk() {
+        return new Promise(resolve => {
+          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
+          resolve({});
+        });
+      },
+      onCancel() {
+        terminalRef.current?.focus();
+        removeTerminalToKillId();
+      },
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terminalId, terminalToKill]);
+
+  useEffect(() => {
+    if (!terminalRef.current || terminalRef.current.options.fontSize === settings.fontSize) {
+      return;
+    }
+
+    terminalRef.current.options.fontSize = settings.fontSize;
+
+    setTimeout(() => {
+      addonRef.current?.fit();
+    }, 250);
+  }, [settings.fontSize]);
 
   return (
-    <S.TerminalPaneContainer ref={containerRef}>
-      <S.TitleBar ref={titleBarRef}>
-        <S.TitleLabel>
-          <Icon name="terminal" />
-          <MonoPaneTitle style={{paddingLeft: '10px'}}>Terminal</MonoPaneTitle>
-        </S.TitleLabel>
-
-        <S.TerminalActions>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-            <S.DeleteOutlined onClick={onKillTerminalHandler} />
-          </Tooltip>
-
-          <S.DownCircleFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
-        </S.TerminalActions>
-      </S.TitleBar>
-
-      <S.TerminalContainer ref={terminalContainerRef} $height={height - titleBarHeight} />
+    <S.TerminalPaneContainer $height={height} style={{display: selectedTerminal === terminalId ? 'block' : 'none'}}>
+      <S.TerminalContainer ref={terminalContainerRef} $height={height - 14} />
     </S.TerminalPaneContainer>
   );
 };

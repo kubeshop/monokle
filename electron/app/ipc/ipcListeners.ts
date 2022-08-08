@@ -3,7 +3,6 @@ import {BrowserWindow, app, ipcMain} from 'electron';
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import * as pty from 'node-pty';
 import Nucleus from 'nucleus-nodejs';
 import os from 'os';
 import * as path from 'path';
@@ -68,10 +67,26 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
-const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
-// string is the webContentsId
-let ptyProcessMap: Record<string, pty.IPty> = {};
+// string is the terminal id
+let ptyProcessMap: Record<string, any> = {};
+
+const killTerminal = (id: string) => {
+  const ptyProcess = ptyProcessMap[id];
+
+  if (!ptyProcess) {
+    return;
+  }
+
+  try {
+    ptyProcess.kill();
+    process.kill(ptyProcess.pid);
+  } catch (e) {
+    log.error(e);
+  }
+
+  delete ptyProcessMap[id];
+};
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   Nucleus.track(eventName, {...payload});
@@ -271,7 +286,7 @@ ipcMain.on('global-electron-store-update', (event, args: any) => {
 });
 
 ipcMain.on('shell.init', (event, args) => {
-  const {rootFilePath, webContentsId} = args;
+  const {rootFilePath, shell, terminalId, webContentsId} = args;
 
   if (!webContentsId) {
     return;
@@ -279,38 +294,45 @@ ipcMain.on('shell.init', (event, args) => {
 
   const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
 
-  if (ptyProcessMap[webContentsId]) {
+  if (ptyProcessMap[terminalId]) {
     return;
   }
 
   try {
-    const ptyProcess = pty.spawn(shell, [], {
-      name: 'xterm-256color',
-      rows: 24,
-      cols: 80,
-      cwd: rootFilePath,
-      env: process.env as Record<string, string>,
-      useConpty: false,
-    });
-
-    ptyProcessMap[webContentsId] = ptyProcess;
-
-    if (currentWebContents) {
-      ptyProcess.onData((incomingData: any) => {
-        currentWebContents.send('shell.incomingData', incomingData);
+    import('node-pty').then(pty => {
+      const ptyProcess = pty.spawn(shell, [], {
+        name: 'xterm-256color',
+        rows: 24,
+        cols: 80,
+        cwd: rootFilePath,
+        env: process.env as Record<string, string>,
+        useConpty: false,
       });
-    } else {
-      log.error('Web contents is not found');
-    }
+
+      ptyProcessMap[terminalId] = ptyProcess;
+
+      if (currentWebContents) {
+        ptyProcess.onData((incomingData: any) => {
+          currentWebContents.send(`shell.incomingData.${terminalId}`, incomingData);
+        });
+
+        ptyProcess.onExit(() => {
+          currentWebContents.send(`shell.exit.${terminalId}`);
+        });
+
+        currentWebContents.send(`shell.initialized.${terminalId}`);
+      } else {
+        log.error('Web contents is not found');
+      }
+    });
   } catch (e) {
     log.error('Pty process could not be created ', e);
   }
 });
 
 ipcMain.on('shell.resize', (event, args) => {
-  const {webContentsId, cols, rows} = args;
-
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {cols, rows, terminalId} = args;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (ptyProcess) {
     ptyProcess.resize(cols, rows);
@@ -318,8 +340,8 @@ ipcMain.on('shell.resize', (event, args) => {
 });
 
 ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
-  const {data, webContentsId} = d;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {data, terminalId} = d;
+  const ptyProcess = ptyProcessMap[terminalId];
 
   if (ptyProcess) {
     ptyProcess.write(data);
@@ -327,22 +349,7 @@ ipcMain.on('shell.ptyProcessWriteData', (event, d) => {
 });
 
 ipcMain.on('shell.ptyProcessKill', (event, data) => {
-  const {webContentsId} = data;
-  const ptyProcess = ptyProcessMap[webContentsId];
+  const {terminalId} = data;
 
-  if (!ptyProcess) {
-    return;
-  }
-
-  if (process.platform === 'win32') {
-    try {
-      process.kill(ptyProcess.pid);
-    } catch (e) {
-      log.error(e);
-    }
-  } else {
-    ptyProcess.kill();
-  }
-
-  delete ptyProcessMap[webContentsId];
+  killTerminal(terminalId);
 });

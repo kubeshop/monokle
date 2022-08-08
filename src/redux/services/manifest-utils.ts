@@ -24,75 +24,80 @@ export function mergeManifests(template: string, values: string) {
 
   const pathsToRemove: any[] = [];
 
-  // start by updating and removing values in template doc
-  visit(templateDoc, {
-    // scalar values
-    Scalar(key, node, path) {
-      if (key === 'value') {
+  try {
+    // start by updating and removing values in template doc
+    visit(templateDoc, {
+      // scalar values
+      Scalar(key, node, path) {
+        if (key === 'value') {
+          const valueNode = findValueNode(valuesDoc, path);
+          if (valueNode && 'value' in valueNode) {
+            node.value = valueNode.value;
+          } else {
+            pathsToRemove.push(createNodePath(path));
+          }
+        }
+      },
+      // sequences
+      Seq(key, node, path) {
         const valueNode = findValueNode(valuesDoc, path);
-        if (valueNode && 'value' in valueNode) {
-          node.value = valueNode.value;
+        if (isSeq(valueNode)) {
+          // brute-force replace sequences for now - need to revisit since sequence nodes could be/contain objects
+          // that would be reordered unintentionally
+          node.items = valueNode.items;
+          if (node.items.length === 0) {
+            pathsToRemove.push(createNodePath(path));
+          }
+          return visit.SKIP;
+        }
+      },
+    });
+
+    pathsToRemove.forEach(path => {
+      templateDoc.deleteIn(path);
+
+      // delete any empty maps/sequences left by the deleted node
+      while (path.length > 0) {
+        path = path.slice(0, path.length - 1);
+        let node = templateDoc.getIn(path);
+        if ((isMap(node) || isSeq(node)) && node.items.length === 0) {
+          templateDoc.deleteIn(path);
         } else {
-          pathsToRemove.push(createNodePath(path));
+          break;
         }
       }
-    },
-    // sequences
-    Seq(key, node, path) {
-      const valueNode = findValueNode(valuesDoc, path);
-      if (isSeq(valueNode)) {
-        // brute-force replace sequences for now - need to revisit since sequence nodes could be/contain objects
-        // that would be reordered unintentionally
-        node.items = valueNode.items;
-        if (node.items.length === 0) {
-          pathsToRemove.push(createNodePath(path));
+    });
+
+    // now add missing values to template doc
+    visit(valuesDoc, {
+      Scalar(key, node, path) {
+        if (key === 'value') {
+          copyValueIfMissing(templateDoc, path);
+        }
+      },
+      // sequences
+      Seq(key, node, path) {
+        if (key !== 'value' || node.items.length > 0) {
+          copyValueIfMissing(templateDoc, path);
         }
         return visit.SKIP;
-      }
-    },
-  });
+      },
+    });
 
-  pathsToRemove.forEach(path => {
-    templateDoc.deleteIn(path);
+    // cleanup
+    visit(templateDoc, {
+      Pair(key, node) {
+        if ((isMap(node.value) || isSeq(node.value)) && typeof node.value.items === 'undefined') {
+          return visit.REMOVE;
+        }
+      },
+    });
 
-    // delete any empty maps/sequences left by the deleted node
-    while (path.length > 0) {
-      path = path.slice(0, path.length - 1);
-      let node = templateDoc.getIn(path);
-      if ((isMap(node) || isSeq(node)) && node.items.length === 0) {
-        templateDoc.deleteIn(path);
-      } else {
-        break;
-      }
-    }
-  });
-
-  // now add missing values to template doc
-  visit(valuesDoc, {
-    Scalar(key, node, path) {
-      if (key === 'value') {
-        copyValueIfMissing(templateDoc, path);
-      }
-    },
-    // sequences
-    Seq(key, node, path) {
-      if (key !== 'value' || node.items.length > 0) {
-        copyValueIfMissing(templateDoc, path);
-      }
-      return visit.SKIP;
-    },
-  });
-
-  // cleanup
-  visit(templateDoc, {
-    Pair(key, node) {
-      if ((isMap(node.value) || isSeq(node.value)) && typeof node.value.items === 'undefined') {
-        return visit.REMOVE;
-      }
-    },
-  });
-
-  return templateDoc.toString().trim();
+    return templateDoc.toString().trim();
+  } catch {
+    log.error('Could not parse YAML content');
+    return '';
+  }
 }
 
 function findValueNode(valuesDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {

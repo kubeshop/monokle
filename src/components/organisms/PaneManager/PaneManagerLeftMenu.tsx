@@ -2,24 +2,28 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-design/icons';
 
+import {v4 as uuidv4} from 'uuid';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
   FileExplorerTabTooltip,
   HelmTabTooltip,
   KustomizeTabTooltip,
   TemplatesTabTooltip,
+  TerminalPaneTooltip,
   ValidationTabTooltip,
 } from '@constants/tooltips';
 
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
-import Icon from '@atoms/Icon';
+import {Walkthrough} from '@molecules';
 
-import WalkThrough from '@components/molecules/WalkThrough';
+import Icon from '@atoms/Icon';
 
 import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
@@ -38,6 +42,7 @@ import PaneTooltip from './PaneTooltip';
 const PaneManagerLeftMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
@@ -45,6 +50,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const kustomizations = useAppSelector(kustomizationsSelector);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
@@ -80,6 +86,17 @@ const PaneManagerLeftMenu: React.FC = () => {
     }
   };
 
+  const onTerminalSelectionHandler = () => {
+    if (!Object.keys(terminalsMap).length) {
+      const newTerminalId = uuidv4();
+
+      dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: defaultShell}));
+      dispatch(setSelectedTerminal(newTerminalId));
+    }
+
+    handleLeftBottomMenuSelection('terminal');
+  };
+
   const checkIsTabSelected = useCallback(
     (selection: LeftMenuSelectionType) => Boolean(activeProject) && leftMenuSelection === selection,
     [activeProject, leftMenuSelection]
@@ -107,7 +124,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     <S.Container id="LeftToolbar" $isLeftActive={isActive}>
       <S.IconsContainer>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'file-explorer')}
+          show={!leftActive || leftMenuSelection !== 'file-explorer'}
           title={<FileExplorerTabTooltip />}
           placement="right"
         >
@@ -127,8 +144,9 @@ const PaneManagerLeftMenu: React.FC = () => {
             />
           </MenuButton>
         </PaneTooltip>
+
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'kustomize-pane')}
+          show={!leftActive || leftMenuSelection !== 'kustomize-pane'}
           title={<KustomizeTabTooltip />}
           placement="right"
         >
@@ -154,9 +172,10 @@ const PaneManagerLeftMenu: React.FC = () => {
             </S.Badge>
           </MenuButton>
         </PaneTooltip>
-        <WalkThrough placement="rightTop" step="kustomizeHelm" collection="novice">
+
+        <Walkthrough placement="rightTop" step="kustomizeHelm" collection="novice">
           <PaneTooltip
-            show={!leftActive || !(leftMenuSelection === 'helm-pane')}
+            show={!leftActive || leftMenuSelection !== 'helm-pane'}
             title={<HelmTabTooltip />}
             placement="right"
           >
@@ -178,11 +197,12 @@ const PaneManagerLeftMenu: React.FC = () => {
               </S.Badge>
             </MenuButton>
           </PaneTooltip>
-        </WalkThrough>
+        </Walkthrough>
+
         <FeatureFlag name="ImagesPane">
-          <WalkThrough placement="leftTop" collection="release" step="images">
+          <Walkthrough placement="leftTop" collection="release" step="images">
             <PaneTooltip
-              show={!leftActive || !(leftMenuSelection === 'images-pane')}
+              show={!leftActive || leftMenuSelection !== 'images-pane'}
               title="View Images"
               placement="right"
             >
@@ -195,10 +215,10 @@ const PaneManagerLeftMenu: React.FC = () => {
                 <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
               </MenuButton>
             </PaneTooltip>
-          </WalkThrough>
+          </Walkthrough>
         </FeatureFlag>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'templates-pane')}
+          show={!leftActive || leftMenuSelection !== 'templates-pane'}
           title={TemplatesTabTooltip}
           placement="right"
         >
@@ -218,7 +238,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
         <PaneTooltip
-          show={!leftActive || !(leftMenuSelection === 'validation-pane')}
+          show={!leftActive || leftMenuSelection !== 'validation-pane'}
           title={<ValidationTabTooltip />}
           placement="right"
         >
@@ -232,7 +252,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuIcon iconName="validation" active={isActive} isSelected={checkIsTabSelected('validation-pane')} />
           </MenuButton>
         </PaneTooltip>
-        <PaneTooltip show={!leftActive || !(leftMenuSelection === 'search')} title="Advanced Search" placement="right">
+        <PaneTooltip show={!leftActive || leftMenuSelection !== 'search'} title="Advanced Search" placement="right">
           <MenuButton
             isSelected={checkIsTabSelected('search')}
             isActive={isActive}
@@ -247,15 +267,21 @@ const PaneManagerLeftMenu: React.FC = () => {
 
       <S.IconsContainer>
         <FeatureFlag name="Terminal">
-          <MenuButton
-            id="terminal"
-            isSelected={checkIsBottomTabSelected('terminal')}
-            isActive={isActive}
-            onClick={() => handleLeftBottomMenuSelection('terminal')}
-            disabled={!activeProject}
+          <PaneTooltip
+            show={!leftActive || leftMenuBottomSelection !== 'terminal'}
+            title={<TerminalPaneTooltip />}
+            placement="right"
           >
-            <MenuIcon iconName="terminal" active={isActive} isSelected />
-          </MenuButton>
+            <MenuButton
+              id="terminal"
+              isSelected={checkIsBottomTabSelected('terminal')}
+              isActive={isActive}
+              onClick={onTerminalSelectionHandler}
+              disabled={!activeProject}
+            >
+              <MenuIcon iconName="terminal" active={isActive} isSelected />
+            </MenuButton>
+          </PaneTooltip>
         </FeatureFlag>
       </S.IconsContainer>
     </S.Container>

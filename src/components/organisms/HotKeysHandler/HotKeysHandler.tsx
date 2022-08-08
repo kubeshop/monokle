@@ -12,6 +12,7 @@ import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   setActiveTab,
+  setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
@@ -32,9 +33,9 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import FileExplorer from '@atoms/FileExplorer';
+import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import FileExplorer from '@atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -184,6 +185,19 @@ const HotKeysHandler = () => {
       diffSelectedResource();
     },
     [diffSelectedResource, isKubeConfigPathValid]
+  );
+
+  useHotkeys(
+    hotkeys.TOGGLE_TERMINAL_PANE.key,
+    () => {
+      if (uiState.leftMenu.bottomSelection === 'terminal') {
+        dispatch(setLeftBottomMenuSelection(null));
+      } else {
+        dispatch(setLeftBottomMenuSelection('terminal'));
+      }
+    },
+    {enableOnTags: ['TEXTAREA']},
+    [uiState.leftMenu.bottomSelection]
   );
 
   useHotkeys(
