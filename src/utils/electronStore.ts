@@ -259,6 +259,9 @@ const schema = {
       settings: {
         type: 'object',
         properties: {
+          defaultShell: {
+            type: 'string',
+          },
           fontSize: {
             type: 'number',
           },
@@ -320,6 +323,7 @@ const defaults = {
   },
   terminal: {
     settings: {
+      defaultShell: '',
       fontSize: 14,
     },
   },

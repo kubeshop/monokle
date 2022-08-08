@@ -1,10 +1,13 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {TerminalSettingsType, TerminalState, TerminalType} from '@models/terminal';
+import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@models/terminal';
 
 import initialState from '@redux/initialState';
+import {AppListenerFn} from '@redux/listeners/base';
 
 import electronStore from '@utils/electronStore';
+
+import {setLeftBottomMenuSelection} from './ui';
 
 export const terminalSlice = createSlice({
   name: 'terminal',
@@ -16,13 +19,28 @@ export const terminalSlice = createSlice({
       state.terminalsMap[id] = action.payload;
     },
     removeTerminal: (state: Draft<TerminalState>, action: PayloadAction<string>) => {
-      delete state.terminalsMap[action.payload];
+      const id = action.payload;
+
+      if (id === state.selectedTerminal && Object.keys(state.terminalsMap).length > 1) {
+        const index = Object.keys(state.terminalsMap).indexOf(id);
+
+        const switchTerminalId = Object.keys(state.terminalsMap)[index + 1]
+          ? Object.keys(state.terminalsMap)[index + 1]
+          : Object.keys(state.terminalsMap)[index - 1];
+
+        state.selectedTerminal = switchTerminalId;
+      }
+
+      delete state.terminalsMap[id];
     },
     setRunningTerminal: (state: Draft<TerminalState>, action: PayloadAction<string>) => {
       state.terminalsMap[action.payload].isRunning = true;
     },
     setSelectedTerminal: (state: Draft<TerminalState>, action: PayloadAction<string | undefined>) => {
       state.selectedTerminal = action.payload;
+    },
+    setShells: (state: Draft<TerminalState>, action: PayloadAction<ShellsMapType>) => {
+      state.shellsMap = action.payload;
     },
     setTerminalSettings: (state: Draft<TerminalState>, action: PayloadAction<TerminalSettingsType>) => {
       state.settings = action.payload;
@@ -39,7 +57,26 @@ export const {
   removeTerminal,
   setRunningTerminal,
   setSelectedTerminal,
+  setShells,
   setTerminalSettings,
   setWebContentsId,
 } = terminalSlice.actions;
 export default terminalSlice.reducer;
+
+/* * * * * * * * * * * * * *
+ * Listeners
+ * * * * * * * * * * * * * */
+
+export const removedTerminalListener: AppListenerFn = listen => {
+  listen({
+    type: removeTerminal.type,
+    effect: async (_action, {dispatch, getState}) => {
+      const terminalsMap = getState().terminal.terminalsMap;
+
+      if (!Object.keys(terminalsMap).length) {
+        dispatch(setLeftBottomMenuSelection(null));
+        dispatch(setSelectedTerminal(undefined));
+      }
+    },
+  });
+};
