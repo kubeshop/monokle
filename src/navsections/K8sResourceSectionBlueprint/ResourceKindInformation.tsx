@@ -16,7 +16,7 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
 
   const getInformation = useCallback(() => {
     let text;
-    if (!(resource && resource.content && resource.content.metadata)) {
+    if (resource && resource.content && resource.content.metadata) {
       text = DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
     }
 
