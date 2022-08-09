@@ -21,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {isInClusterModeSelector, knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
@@ -49,6 +49,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedImage = useAppSelector(state => state.main.selectedImage);
@@ -117,9 +118,10 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }, [selectedPath]);
 
   const isDeployButtonDisabled = useMemo(() => {
-    if (!isKubeConfigPathValid) {
+    if (!isKubeConfigPathValid || isInClusterMode) {
       return true;
     }
+
     return (
       (!selectedResourceId && !selectedPath) ||
       (selectedPath && selectedPath.endsWith(HELM_CHART_ENTRY_FILE)) ||
@@ -128,7 +130,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         !isKustomizationResource(selectedResource) &&
         (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
     );
-  }, [selectedResource, knownResourceKinds, selectedResourceId, selectedPath, isKubeConfigPathValid]);
+  }, [isKubeConfigPathValid, isInClusterMode, selectedResourceId, selectedPath, selectedResource, knownResourceKinds]);
 
   const isDiffButtonDisabled = useMemo(() => {
     if (!isKubeConfigPathValid) {
