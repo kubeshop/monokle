@@ -42,13 +42,11 @@ const Restart = () => {
   };
 
   return (
-    <>
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-        <Button type="primary" size="small" ghost onClick={handleClick} disabled={!isBtnEnabled}>
-          Restart
-        </Button>
-      </Tooltip>
-    </>
+    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
+      <Button type="primary" size="small" ghost onClick={handleClick} disabled={!isBtnEnabled}>
+        Restart
+      </Button>
+    </Tooltip>
   );
 };
 
