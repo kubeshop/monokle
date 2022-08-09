@@ -44,6 +44,7 @@ export const DownOutlined = styled(RawDownOutlined)`
   right: 8px !important;
   color: ${Colors.whitePure};
   font-size: 12px !important;
+  padding-top: 1px;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
