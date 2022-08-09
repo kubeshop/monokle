@@ -25,11 +25,9 @@ import {replaceSelectedMatchesWithConfirm} from '@redux/support/replaceSelectedM
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
-import {ClusterDiff, ResourceDiff} from '@molecules';
+import {ClusterDiff, ModalConfirmWithNamespaceSelect, ResourceDiff} from '@molecules';
 
 import {Icon} from '@atoms';
-
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
 

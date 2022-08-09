@@ -3,16 +3,19 @@ import React, {useCallback} from 'react';
 import {ComparisonView, compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
 
-import * as S from './styled';
+import * as S from './QuickActionCompare.styled';
 
-type Props = {
-  isItemSelected: boolean;
+interface IProps {
   from: 'quick-helm-compare' | 'quick-kustomize-compare';
+  isItemSelected: boolean;
   view: ComparisonView;
-};
+}
 
-export const QuickActionCompare: React.FC<Props> = ({isItemSelected, from, view}) => {
+const QuickActionCompare: React.FC<IProps> = props => {
+  const {from, isItemSelected, view} = props;
+
   const dispatch = useAppDispatch();
+
   const handleCompare = useCallback(() => {
     dispatch(
       compareToggled({
@@ -31,3 +34,5 @@ export const QuickActionCompare: React.FC<Props> = ({isItemSelected, from, view}
     </S.Container>
   );
 };
+
+export default QuickActionCompare;

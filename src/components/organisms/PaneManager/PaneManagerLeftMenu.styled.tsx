@@ -11,13 +11,19 @@ export const Badge = styled(RawBadge)`
   }
 `;
 
-export const Container = styled.div<{isLeftActive: boolean}>`
+export const Container = styled.div<{$isLeftActive: boolean}>`
   height: 100%;
   width: 50px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
   box-sizing: content-box;
+  background-color: ${props => (props.$isLeftActive ? BackgroundColors.darkThemeBackground : PanelColors.toolBar)};
+`;
+
+export const IconsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 7px;
-  background-color: ${props => (props.isLeftActive ? BackgroundColors.darkThemeBackground : PanelColors.toolBar)}};
 `;

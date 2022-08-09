@@ -9,7 +9,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter} from '@redux/reducers/main';
 
-import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
+import {ResourceRefsIconPopover} from '@molecules';
 
 import Colors from '@styles/Colors';
 

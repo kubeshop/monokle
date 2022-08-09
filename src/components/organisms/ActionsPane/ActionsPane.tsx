@@ -6,7 +6,7 @@ import {useMeasure} from 'react-use';
 
 import {Tabs, Tooltip} from 'antd';
 
-import {BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {BookOutlined} from '@ant-design/icons';
 
 import {HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -42,14 +42,14 @@ import {
   FormEditor,
   HelmChartModalConfirmWithNamespaceSelect,
   ImageDetails,
+  Logs,
   ModalConfirmWithNamespaceSelect,
   Monaco,
   PreviewConfigurationDetails,
+  Walkthrough,
 } from '@molecules';
 
 import {TabHeader} from '@atoms';
-
-import WalkThrough from '@components/molecules/WalkThrough';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -89,6 +89,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const isPreviewResourceId = useAppSelector(state => Boolean(state.main.previewResourceId));
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -275,6 +276,10 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
+
+    if (activeTabKey === 'logs' && selectedResource?.kind !== 'Pod') {
+      setActiveTabKey('source');
+    }
   }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath, schemaForSelectedPath]);
 
   useEffect(() => {
@@ -343,9 +348,9 @@ const ActionsPane: React.FC<Props> = ({height}) => {
               <TabPane
                 key="source"
                 tab={
-                  <WalkThrough placement="leftTop" step="syntax" collection="novice">
-                    <TabHeader icon={<CodeOutlined />}>Source</TabHeader>
-                  </WalkThrough>
+                  <Walkthrough placement="leftTop" step="syntax" collection="novice">
+                    <TabHeader>Source</TabHeader>
+                  </Walkthrough>
                 }
               >
                 {isFolderLoading || previewLoader.isLoading ? (
@@ -360,7 +365,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
 
               {schemaForSelectedPath ||
               (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-                <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
+                <TabPane key="form" tab={<TabHeader>Form</TabHeader>}>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'form' ? (
@@ -386,11 +391,21 @@ const ActionsPane: React.FC<Props> = ({height}) => {
               ) : null}
 
               {selectedResource && resourceKindHandler && !isKustomization && (
-                <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
+                <TabPane key="metadataForm" tab={<TabHeader>Metadata</TabHeader>}>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'metadataForm' ? (
                     <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
+                  ) : null}
+                </TabPane>
+              )}
+
+              {selectedResource?.kind === 'Pod' && isPreviewResourceId && (
+                <TabPane key="logs" tab={<TabHeader>Logs</TabHeader>}>
+                  {isFolderLoading || previewLoader.isLoading ? (
+                    <S.Skeleton active />
+                  ) : activeTabKey === 'logs' ? (
+                    <Logs />
                   ) : null}
                 </TabPane>
               )}

@@ -7,7 +7,7 @@ import {toggleLeftMenu} from '@redux/reducers/ui';
 
 import {MonoPaneTitle} from '@atoms';
 
-import * as S from './styled';
+import * as S from './TitleBar.styled';
 
 interface IProps {
   title: string;
@@ -27,7 +27,9 @@ const TitleBar: React.FC<IProps> = props => {
           {title}
           {leftButtons && <div style={{marginLeft: '10px', height: '24px'}}>{leftButtons}</div>}
         </S.Container>
+
         {children && <S.RightButtons>{children}</S.RightButtons>}
+
         {closable && (
           <Button id="pane-close" onClick={() => dispatch(toggleLeftMenu())} type="link" size="small">
             <S.ArrowIcon />

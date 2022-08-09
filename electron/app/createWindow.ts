@@ -21,6 +21,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} from '@redux/reducers/extension';
 import {setAppRehydrating} from '@redux/reducers/main';
+import {setWebContentsId} from '@redux/reducers/terminal';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
@@ -123,11 +124,11 @@ export const createWindow = (givenPath?: string) => {
     win.webContents.openDevTools();
   }
 
-  autoUpdater.on('update-available', (data: any) => {
+  autoUpdater.on('update-available', () => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
   });
 
-  autoUpdater.on('update-not-available', (data: any) => {
+  autoUpdater.on('update-not-available', () => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
   });
 
@@ -139,7 +140,7 @@ export const createWindow = (givenPath?: string) => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
   });
 
-  autoUpdater.on('update-downloaded', (data: any) => {
+  autoUpdater.on('update-downloaded', () => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
@@ -247,6 +248,7 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
+    dispatch(setWebContentsId(win.webContents.id));
     convertRecentFilesToRecentProjects(dispatch);
   });
 

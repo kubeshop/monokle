@@ -777,10 +777,11 @@ export const mainSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
       const notification: AlertType = action.payload;
-      notification.id = uuidv4();
-      notification.hasSeen = false;
-      notification.createdAt = new Date().getTime();
-      state.notifications = [notification, ...state.notifications];
+
+      state.notifications = [
+        {...notification, id: uuidv4(), hasSeen: false, createdAt: new Date().getTime()},
+        ...state.notifications,
+      ];
     });
 
     builder
@@ -952,8 +953,9 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
+          const extension = path.extname(relativeFilePath);
           const newFileEntry: FileEntry = {
-            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap}),
+            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
             isSupported: true,
             timestamp: resourcePayload.fileTimestamp,
           };
@@ -1236,10 +1238,11 @@ export const mainSlice = createSlice({
       (state, action) => {
         if (action.payload?.alert) {
           const notification: AlertType = action.payload.alert;
-          notification.id = uuidv4();
-          notification.hasSeen = false;
-          notification.createdAt = new Date().getTime();
-          state.notifications = [notification, ...state.notifications];
+
+          state.notifications = [
+            {...notification, id: uuidv4(), hasSeen: false, createdAt: new Date().getTime()},
+            ...state.notifications,
+          ];
         }
       }
     );
@@ -1351,6 +1354,7 @@ export const {
   stopPreviewLoader,
   toggleAllRules,
   toggleClusterOnlyResourcesInClusterDiff,
+  toggleMatchParams,
   toggleRule,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
@@ -1363,7 +1367,6 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
-  toggleMatchParams,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

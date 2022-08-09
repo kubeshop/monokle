@@ -9,18 +9,18 @@ import semver from 'semver';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
+import {StepEnum} from '@models/walkthrough';
+
 import {useAppDispatch} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
-  cancelWalkThrough,
-  handleWalkThroughStep,
+  cancelWalkthrough,
+  handleWalkthroughStep,
   openAboutModal,
   openKeyboardShortcutsModal,
   openReleaseNotesDrawer,
   toggleSettings,
 } from '@redux/reducers/ui';
-
-import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
@@ -134,8 +134,8 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
           type="link"
           size="small"
           onClick={() => {
-            dispatch(cancelWalkThrough('novice'));
-            dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+            dispatch(cancelWalkthrough('novice'));
+            dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
             handleMenuClose();
           }}
         >

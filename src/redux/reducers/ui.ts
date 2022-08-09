@@ -9,6 +9,7 @@ import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants'
 import {
   HighlightItems,
   LayoutSizeType,
+  LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
@@ -16,14 +17,13 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@models/ui';
+import {WalkthroughCollection} from '@models/walkthrough';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import {WalkThroughCollection} from '@components/molecules/WalkThrough/types';
 
 import electronStore from '@utils/electronStore';
 
@@ -57,11 +57,15 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
+    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+      state.leftMenu.bottomSelection = action.payload;
+      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+    },
     setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
-    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setActiveTab: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
       state.leftMenu.activeTab = action.payload;
     },
     toggleRightMenu: (state: Draft<UiState>) => {
@@ -276,13 +280,13 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkThrough: (state: Draft<UiState>, action: PayloadAction<WalkThroughCollection>) => {
+    cancelWalkthrough: (state: Draft<UiState>, action: PayloadAction<WalkthroughCollection>) => {
       const collection = action.payload;
       state.walkThrough[collection].currentStep = -1;
     },
-    handleWalkThroughStep: (
+    handleWalkthroughStep: (
       state: Draft<UiState>,
-      action: PayloadAction<{step: number; collection: WalkThroughCollection}>
+      action: PayloadAction<{step: number; collection: WalkthroughCollection}>
     ) => {
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
@@ -319,7 +323,7 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  cancelWalkThrough,
+  cancelWalkthrough,
   closeAboutModal,
   closeClusterDiff,
   closeCreateFileFolderModal,
@@ -336,7 +340,7 @@ export const {
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
-  handleWalkThroughStep,
+  handleWalkthroughStep,
   highlightItem,
   openAboutModal,
   openClusterDiff,
@@ -357,6 +361,7 @@ export const {
   setExpandedFolders,
   setExpandedSearchedFiles,
   setLayoutSize,
+  setLeftBottomMenuSelection,
   setLeftMenuIsActive,
   setLeftMenuSelection,
   setMonacoEditor,

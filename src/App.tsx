@@ -14,6 +14,7 @@ import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
+import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
@@ -25,18 +26,15 @@ import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResourc
 import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
-  handleWalkThroughStep,
+  handleWalkthroughStep,
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
-import UpdateNotice from '@organisms/UpdateNotice';
+import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
-
-import {StepEnum} from '@components/molecules/WalkThrough/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -70,7 +68,7 @@ const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
-const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
+const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
 
@@ -234,9 +232,9 @@ const App = () => {
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
     if (!electronStore.get('appConfig.lastSeenReleaseNotesVersion')) {
-      dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
     } else {
-      dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'release'}));
+      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'release'}));
     }
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
   }, [appVersion, dispatch]);
@@ -431,7 +429,7 @@ const App = () => {
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isReplaceImageModalVisible && <ReplaceImageModal />}
-          {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
+          {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
           {showReleaseNotes && (
             <Modal
               width="900px"

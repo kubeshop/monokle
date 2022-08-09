@@ -2,7 +2,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 
-import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
+import {ResourceRefsIconPopover} from '@molecules';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

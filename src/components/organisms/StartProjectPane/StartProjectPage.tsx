@@ -57,7 +57,7 @@ const StartProjectPage = () => {
           const {itemId, itemLogo, itemTitle, itemSemiTitle, itemDescription, itemAction} = item;
 
           return (
-            <S.StartProjectItem id={itemId} onClick={itemAction}>
+            <S.StartProjectItem key={itemId} id={itemId} onClick={itemAction}>
               <S.StartProjectItemLogo src={itemLogo} />
               <S.StartProjectItemTitle>
                 {itemTitle}

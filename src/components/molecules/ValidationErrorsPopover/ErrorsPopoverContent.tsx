@@ -1,9 +1,5 @@
 import {useMemo} from 'react';
 
-import {Divider, Typography} from 'antd';
-
-import styled from 'styled-components';
-
 import {K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
 
@@ -13,40 +9,15 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
 
-import Colors from '@styles/Colors';
+import * as S from './ErrorsPopoverContent.styled';
 
-const {Text} = Typography;
+interface IProps {
+  resource: K8sResource;
+}
 
-const Container = styled.div`
-  margin: 0;
-  padding: 0 8px;
-  height: 100%;
-  width: 100%;
-  max-height: 350px;
-  overflow-y: auto;
-`;
-
-const PopoverTitle = styled(Text)`
-  font-weight: 500;
-`;
-
-const StyledDivider = styled(Divider)`
-  margin: 5px 0;
-`;
-
-const StyledRefDiv = styled.div`
-  display: block;
-  margin: 5px 0;
-`;
-
-const StyledDescription = styled.div`
-  display: block;
-  width: 600px;
-  color: ${Colors.grey7};
-`;
-
-const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
+const ErrorsPopoverContent: React.FC<IProps> = props => {
   const {resource} = props;
+
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -95,16 +66,18 @@ const ErrorsPopoverContent = (props: {resource: K8sResource}) => {
   };
 
   return (
-    <Container>
-      <PopoverTitle>Validation Errors</PopoverTitle>
-      <StyledDivider />
+    <S.Container>
+      <S.PopoverTitle>Validation Errors</S.PopoverTitle>
+
+      <S.Divider />
+
       {errors.map(error => (
-        <StyledRefDiv key={`${error.property}:${error.message}-${error.errorPos?.line}:${error.errorPos?.column}`}>
+        <S.RefDiv key={`${error.property}:${error.message}-${error.errorPos?.line}:${error.errorPos?.column}`}>
           <ValidationErrorLink validationError={error} onClick={() => onLinkClick(error)} />
-          {error.description && <StyledDescription>{error.description}</StyledDescription>}
-        </StyledRefDiv>
+          {error.description && <S.Description>{error.description}</S.Description>}
+        </S.RefDiv>
       ))}
-    </Container>
+    </S.Container>
   );
 };
 

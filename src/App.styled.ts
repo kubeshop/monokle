@@ -10,14 +10,6 @@ export const AppContainer = styled.div`
   overflow: hidden;
 `;
 
-export const MainContainer = styled.div`
-  height: 100%;
-  width: 100%;
-
-  display: grid;
-  grid-template-rows: max-content 1fr max-content;
-`;
-
 export const Button = styled(RawButton)`
   padding: 5px;
   color: ${Colors.blue6};
@@ -27,4 +19,12 @@ export const Button = styled(RawButton)`
     color: ${Colors.blue6};
     opacity: 0.8;
   }
+`;
+
+export const MainContainer = styled.div`
+  height: 100%;
+  width: 100%;
+
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
 `;

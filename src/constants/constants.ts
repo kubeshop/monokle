@@ -11,6 +11,7 @@ export const ROOT_FILE_ENTRY = '<root>';
 export const APP_MIN_WIDTH = 800;
 export const APP_MIN_HEIGHT = 600;
 export const TOOLTIP_DELAY = 1.0;
+export const LONGER_TOOLTIP_DELAY = 2.0;
 export const TOOLTIP_K8S_SELECTION = 'Select which kubernetes schema version to use for validation';
 export const ERROR_MSG_FALLBACK = 'Looks like something unexpected went wrong. Please try again later.';
 export const REF_PATH_SEPARATOR = '#';
@@ -24,8 +25,6 @@ export const DEPENDENCIES_HELP_URL = 'https://kubeshop.github.io/monokle/getting
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const DEFAULT_PANE_TITLE_HEIGHT = 40;
-export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
-export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
@@ -57,7 +56,7 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
   navPane: 0.25,
   rightPane: 0,
-  actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+  bottomPaneHeight: 200,
   recentProjectsPaneWidth: 450,
 };
 

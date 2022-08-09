@@ -8,6 +8,7 @@ import {AppState} from '@models/appstate';
 import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
+import {TerminalState} from '@models/terminal';
 import {PaneConfiguration, UiState} from '@models/ui';
 import {UiCoachState} from '@models/uiCoach';
 
@@ -129,6 +130,7 @@ const initialLogsState: LogsState = {
 };
 
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
 let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfiguration');
 
@@ -180,13 +182,14 @@ const initialUiState: UiState = {
     absolutePathToEntity: '',
   },
   leftMenu: {
-    selection: uiLeftMenuSelection,
-    isActive:
-      !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
+    bottomSelection: uiLeftMenuBottomSelection,
     expandedFolders: [],
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
-    activeTab: undefined,
+    selection: uiLeftMenuSelection,
+    isActive:
+      !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
+    activeTab: null,
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
@@ -253,13 +256,23 @@ const initialExtensionState: ExtensionState = {
   isPluginsDrawerVisible: false,
 };
 
+const initialTerminalState: TerminalState = {
+  settings: {
+    defaultShell: electronStore.get('terminal.settings.defaultShell'),
+    fontSize: electronStore.get('terminal.settings.fontSize'),
+  },
+  shellsMap: {},
+  terminalsMap: {},
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
-  main: initialAppState,
-  logs: initialLogsState,
-  ui: initialUiState,
-  navigator: initialNavigatorState,
-  uiCoach: initialUiCoachState,
   extension: initialExtensionState,
+  logs: initialLogsState,
+  main: initialAppState,
+  navigator: initialNavigatorState,
+  terminal: initialTerminalState,
+  ui: initialUiState,
+  uiCoach: initialUiCoachState,
 };

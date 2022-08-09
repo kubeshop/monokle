@@ -8,7 +8,7 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
@@ -16,9 +16,9 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
-import {Dots, Spinner} from '@atoms';
+import {ContextMenu} from '@molecules';
 
-import ContextMenu from '@components/molecules/ContextMenu';
+import {Dots, Spinner} from '@atoms';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
@@ -81,6 +81,20 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
+
+  const tooltipOverlayStyle = useMemo(() => {
+    const style: Record<string, string> = {
+      fontSize: '12px',
+      wordBreak: 'break-all',
+      wordWrap: 'normal',
+    };
+
+    if (isMatchItem) {
+      style['display'] = 'none';
+    }
+
+    return style;
+  }, [isMatchItem]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -284,8 +298,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
-          overlayStyle={isMatchItem ? {display: 'none'} : {}}
-          mouseEnterDelay={TOOLTIP_DELAY}
+          overlayStyle={tooltipOverlayStyle}
+          mouseEnterDelay={LONGER_TOOLTIP_DELAY}
           title={absolutePath}
           placement="bottom"
         >

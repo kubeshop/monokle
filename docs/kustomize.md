@@ -13,11 +13,11 @@ All examples below are from the [Argo Rollouts Manifest Folder](https://github.c
 
 In Settings, set the defaults for working with Kustomize in Monokle:
 
-![Kustomize Settings](img/kustomize-settings-1.6.0.png)
+![Kustomize Settings](img/kustomize-settings-1.9.png)
 
 Use the drop-down selector to select how to invoke Kustomize when previewing or applying kustomization files:
 
-![Invoke Kustomize](img/invoke-kustomize-setting-1.6.0.png)
+![Invoke Kustomize](img/invoke-kustomize-setting-1.9.png)
 
 Tick the check box to enable Helm-related functionality when invoking Kustomize.
 
@@ -26,7 +26,7 @@ Tick the check box to enable Helm-related functionality when invoking Kustomize.
 When selecting a folder containing kustomization.yaml files, these files will automatically be displayed in a **Kustomizations** section 
 on top of the Navigator:
 
-![Kustomize Navigation](img/kustomize-navigation-1.6.0.png)
+![Kustomize Navigation](img/kustomize-navigation-1.9.png)
 
 In the screenshot:
 
@@ -38,7 +38,7 @@ In the screenshot:
 
 Just as with K8s resources, hovering over the link-icon to the right of the kustomization name shows its outgoing links:
 
-![Kustomize Outgoing Links](img/kustomize-outgoing-links-1.4.0.png)
+![Kustomize Outgoing Links](img/kustomize-outgoing-links-1.9.png)
 
 Here we can see the 10 resources included by the selected kustomization.
 
@@ -55,14 +55,14 @@ Preview functionality helps you understand what resources would be installed in 
 
 Hovering over a kustomization reveals a **Preview** action to the right:
 
-![Kustomize Preview Action](img/kustomize-preview-action-1.4.0.png)
+![Kustomize Preview Action](img/kustomize-preview-action-1.9.png)
 
 Selecting this action will run kustomize on the selected file with the **-k** option and replace the contents of the Navigator with the 
 generated resources.  
 
 For example previewing the "base" kustomization above will result in the following:
 
-![Kustomize Preview](img/kustomize-preview-1.6.0.png)
+![Kustomize Preview](img/kustomize-preview-1.9.png)
 
 Monokle is now in **Preview Mode** (as indicated by the header at the top):
 
@@ -73,14 +73,14 @@ Monokle is now in **Preview Mode** (as indicated by the header at the top):
 - Selecting **Preview** for a different kustomization will switch the output of kustomize to that resource instead.
 - Selecting **Exit** in the top right or next to the kustomization restores the previous resource navigator.
 
-In the screenshot we can see that the selected kustomization resulted in 7 resources that contain references to the image
+In the screenshot we can see that the selected kustomization resulted in 14 resources that contain references to the image
 specified in the kustomization configuration:
 
-![Kustomize Preview Content](img/kustomize-preview-content-1.6.0.png)
+![Kustomize Preview Content](img/kustomize-preview-content-1.9.png)
 
 ## **Editing of Kustomizations During Preview**
 
 When previewing a kustomization, it is possible to edit the previewed kustomization.yaml file and recreate the preview, allowing 
 you to quickly assess the impact of any changes on the generated files, instead of having to exit and recreate the preview to make a change.
  
-![Edit kustomization during Preview](img/kust-preview-reload-1.6.0.png)
+![Edit kustomization during Preview](img/kust-preview-reload-1.9.png)

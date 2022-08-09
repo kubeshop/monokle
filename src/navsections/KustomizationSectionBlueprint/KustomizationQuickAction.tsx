@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import hotkeys from '@constants/hotkeys';
@@ -14,8 +14,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
-import {QuickActionCompare} from '@components/molecules/QuickActionCompare';
-import QuickActionPreview from '@components/molecules/QuickActionPreview';
+import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';

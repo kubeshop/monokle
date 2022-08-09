@@ -67,7 +67,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         });
     } else if (selectedOption === 'existing') {
       onOk({name: selectedNamespace, new: false});
-    } else if (selectedOption === 'none') {
+    } else if (!selectedOption || selectedOption === 'none') {
       onOk();
     }
   }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
@@ -133,7 +133,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           value={selectedOption}
         >
           <Radio value="existing">Use existing namespace</Radio>
-          {hasOneNamespaceWithFullAccess && <Radio value="create">Create namespace</Radio>}
+          <Radio value="create">Create namespace</Radio>
           <Radio value="none">None</Radio>
         </Radio.Group>
 

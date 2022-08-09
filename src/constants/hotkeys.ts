@@ -68,7 +68,7 @@ export const hotkeys = createHotkeys({
     category: 'tool',
   },
   OPEN_NEW_RESOURCE_WIZARD: {
-    name: 'Open new Resource Wizard',
+    name: 'Open New Resource Wizard',
     key: 'ctrl+n, cmd+n',
     category: 'navigation',
   },
@@ -105,6 +105,11 @@ export const hotkeys = createHotkeys({
   OPEN_VALIDATION_TAB: {
     name: 'Open Validation Tab',
     key: 'ctrl+shift+v, command+shift+v',
+    category: 'navigation',
+  },
+  TOGGLE_TERMINAL_PANE: {
+    name: 'Toggle Terminal Pane',
+    key: 'ctrl+`, command+`',
     category: 'navigation',
   },
   RESET_RESOURCE_FILTERS: {
@@ -148,7 +153,7 @@ export const hotkeys = createHotkeys({
     category: 'tool',
   },
   REPLACE: {
-    name: 'Search Files',
+    name: 'Search and Replace Files',
     key: 'ctrl+shift+f, command+shift+f',
     category: 'tool',
   },

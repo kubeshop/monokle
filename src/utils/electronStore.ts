@@ -154,6 +154,9 @@ const schema = {
       leftMenu: {
         type: 'object',
         properties: {
+          bottomSelection: {
+            type: ['string', 'null'],
+          },
           selection: {
             type: 'string',
           },
@@ -250,6 +253,22 @@ const schema = {
       },
     },
   },
+  terminal: {
+    type: 'object',
+    properties: {
+      settings: {
+        type: 'object',
+        properties: {
+          defaultShell: {
+            type: 'string',
+          },
+          fontSize: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -280,6 +299,7 @@ const defaults = {
     isSettingsOpen: false,
     isNewResourceWizardOpen: false,
     leftMenu: {
+      bottomSelection: null,
       selection: 'file-explorer',
       isActive: true,
     },
@@ -300,6 +320,12 @@ const defaults = {
   },
   pluginConfig: {
     policies: [],
+  },
+  terminal: {
+    settings: {
+      defaultShell: '',
+      fontSize: 14,
+    },
   },
 };
 
