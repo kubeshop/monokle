@@ -133,7 +133,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           value={selectedOption}
         >
           <Radio value="existing">Use existing namespace</Radio>
-          {hasOneNamespaceWithFullAccess && <Radio value="create">Create namespace</Radio>}
+          <Radio value="create">Create namespace</Radio>
           <Radio value="none">None</Radio>
         </Radio.Group>
 
