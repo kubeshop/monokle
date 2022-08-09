@@ -40,11 +40,10 @@ export const ProjectContent = styled.div`
 `;
 
 export const DownOutlined = styled(RawDownOutlined)`
-  padding-top: 2px;
   position: absolute !important;
   right: 8px !important;
   color: ${Colors.whitePure};
-  font-size: 10px !important;
+  font-size: 12px !important;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -85,17 +84,16 @@ export const ProjectMenu = styled.div`
 `;
 
 export const ProjectLabel = styled.div`
-  max-width: 200px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   color: ${Colors.grey7};
-  width: 56px;
+  width: 60px;
   text-align: left;
-  padding-left: 8px;
+  padding: 0px 6px 0px 8px;
 `;
 
 export const ProjectName = styled.div`

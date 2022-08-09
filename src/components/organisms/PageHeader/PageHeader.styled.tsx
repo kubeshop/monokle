@@ -81,4 +81,6 @@ export const Divider = styled(RawDivider)`
   border-color: ${Colors.grey3};
   height: 28px;
   margin: 0;
+  margin-right: 1rem;
+  top: 0;
 `;
