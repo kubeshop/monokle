@@ -24,15 +24,20 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
+const getNonCustomClusterObjects = async (dispatch: any, kc: any, namespace?: string) => {
   return Promise.allSettled(
     getRegisteredKindHandlers()
       .filter(handler => !handler.isCustom)
-      .map(resourceKindHandler =>
-        resourceKindHandler
+      .map(resourceKindHandler => {
+        if (resourceKindHandler.watchResources) {
+          return resourceKindHandler
+            .watchResources(dispatch, kc, {namespace})
+            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion));
+        }
+        return resourceKindHandler
           .listResourcesInCluster(kc, {namespace})
-          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-      )
+          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion));
+      })
   );
 };
 
@@ -50,8 +55,10 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     const kc = createKubeClient(kubeConfigPath, context);
     const results =
       clusterAccess && clusterAccess.length > 0
-        ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
-        : await getNonCustomClusterObjects(kc);
+        ? await Promise.all(
+            clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(thunkAPI.dispatch, kc, ca.namespace))
+          )
+        : await getNonCustomClusterObjects(thunkAPI.dispatch, kc);
 
     const resources = flatten(results);
 

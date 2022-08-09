@@ -1,9 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+
+import {clusterResourceWatcher} from '.';
 
 const ResourceQuotaHandler: ResourceKindHandler = {
   kind: 'ResourceQuota',
@@ -29,6 +33,23 @@ const ResourceQuotaHandler: ResourceKindHandler = {
     await k8sCoreV1Api.deleteNamespacedResourceQuota(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/policy/resource-quotas/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      ResourceQuotaHandler.watcherReq.abort();
+      ResourceQuotaHandler.watcherReq = undefined;
+    } catch (e: any) {
+      ResourceQuotaHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/api/v1/namespaces/${args[2].namespace}/resourcequotas`
+      : `/api/v1/resourcequotas`;
+    clusterResourceWatcher(ResourceQuotaHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return ResourceQuotaHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default ResourceQuotaHandler;

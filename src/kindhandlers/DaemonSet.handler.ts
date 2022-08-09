@@ -1,10 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {clusterResourceWatcher} from '.';
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const DaemonSetHandler: ResourceKindHandler = {
@@ -32,6 +35,23 @@ const DaemonSetHandler: ResourceKindHandler = {
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      DaemonSetHandler.watcherReq.abort();
+      DaemonSetHandler.watcherReq = undefined;
+    } catch (e: any) {
+      DaemonSetHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/apis/apps/v1/namespaces/${args[2].namespace}/daemonsets`
+      : `/apis/apps/v1/daemonsets`;
+    clusterResourceWatcher(DaemonSetHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return DaemonSetHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default DaemonSetHandler;

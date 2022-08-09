@@ -1,5 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -7,6 +9,8 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {implicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
+
+import {clusterResourceWatcher} from '.';
 
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
@@ -68,6 +72,23 @@ const ServiceAccountHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      ServiceAccountHandler.watcherReq.abort();
+      ServiceAccountHandler.watcherReq = undefined;
+    } catch (e: any) {
+      ServiceAccountHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/api/v1/namespaces/${args[2].namespace}/serviceaccounts`
+      : `/api/v1/serviceaccounts`;
+    clusterResourceWatcher(ServiceAccountHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return ServiceAccountHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default ServiceAccountHandler;

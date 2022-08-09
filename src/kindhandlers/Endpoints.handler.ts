@@ -1,11 +1,15 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {optionalExplicitNamespaceMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
+import {clusterResourceWatcher} from '.';
 
 const EndpointsHandler: ResourceKindHandler = {
   kind: 'Endpoints',
@@ -55,6 +59,23 @@ const EndpointsHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpoints-v1-core',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      EndpointsHandler.watcherReq.abort();
+      EndpointsHandler.watcherReq = undefined;
+    } catch (e: any) {
+      EndpointsHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/api/v1/namespaces/${args[2].namespace}/endpoints`
+      : `/api/v1/endpoints`;
+    clusterResourceWatcher(EndpointsHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return EndpointsHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default EndpointsHandler;

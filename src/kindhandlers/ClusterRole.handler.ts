@@ -1,9 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+
+import {clusterResourceWatcher} from '.';
 
 const ClusterRoleHandler: ResourceKindHandler = {
   kind: 'ClusterRole',
@@ -27,6 +31,21 @@ const ClusterRoleHandler: ResourceKindHandler = {
     await k8sRbacV1Api.deleteClusterRole(resource.name);
   },
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      ClusterRoleHandler.watcherReq.abort();
+      ClusterRoleHandler.watcherReq = undefined;
+    } catch (e: any) {
+      ClusterRoleHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = `/apis/rbac.authorization.k8s.io/v1/clusterroles`;
+    clusterResourceWatcher(ClusterRoleHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return ClusterRoleHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default ClusterRoleHandler;

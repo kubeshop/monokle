@@ -1,3 +1,5 @@
+import * as k8s from '@kubernetes/client-node';
+
 import EventEmitter from 'events';
 import fs from 'fs';
 import {readdir} from 'fs/promises';
@@ -6,8 +8,9 @@ import micromatch from 'micromatch';
 import path from 'path';
 
 import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ClusterResourceOptions, RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
@@ -235,4 +238,32 @@ async function* findFiles(dir: string, ext: string): any {
 
 export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
   return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
+}
+
+export async function clusterResourceWatcher(
+  kindHandler: ResourceKindHandler,
+  requestPath: string,
+  dispatch: any,
+  kubeconfig: k8s.KubeConfig,
+  options: ClusterResourceOptions,
+  crds?: K8sResource
+) {
+  kindHandler.disconnectFromCluster && kindHandler.disconnectFromCluster();
+
+  kindHandler.watcherReq = await new k8s.Watch(kubeconfig).watch(
+    requestPath,
+    {allowWatchBookmarks: true},
+    (type: string, apiObj: any) => {
+      if (type === 'ADDED' || type === 'MODIFIED') {
+        dispatch(updateClusterResource(apiObj));
+      }
+      if (type === 'DELETED') {
+        dispatch(deleteClusterResource(apiObj));
+      }
+    },
+    () => {
+      kindHandler.disconnectFromCluster && kindHandler.disconnectFromCluster();
+      kindHandler.watchResources && kindHandler.watchResources(dispatch, kubeconfig, options, crds);
+    }
+  );
 }

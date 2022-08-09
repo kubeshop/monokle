@@ -1,10 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {clusterResourceWatcher} from '.';
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const PodHandler: ResourceKindHandler = {
@@ -32,6 +35,21 @@ const PodHandler: ResourceKindHandler = {
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/pods/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      PodHandler.watcherReq.abort();
+      PodHandler.watcherReq = undefined;
+    } catch (e: any) {
+      PodHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace ? `/api/v1/namespaces/${args[2].namespace}/pods` : `/api/v1/pods`;
+    clusterResourceWatcher(PodHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return PodHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default PodHandler;

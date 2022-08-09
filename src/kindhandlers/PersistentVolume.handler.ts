@@ -1,5 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -7,6 +9,8 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
+
+import {clusterResourceWatcher} from '.';
 
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
@@ -94,6 +98,21 @@ const PersistentVolumeHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      PersistentVolumeHandler.watcherReq.abort();
+      PersistentVolumeHandler.watcherReq = undefined;
+    } catch (e: any) {
+      PersistentVolumeHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = `/api/v1/persistentvolumes`;
+    clusterResourceWatcher(PersistentVolumeHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return PersistentVolumeHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default PersistentVolumeHandler;

@@ -17,6 +17,7 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ImagesListType,
+  KubernetesObject,
   MatchParamProps,
   PreviewType,
   ResourceFilterType,
@@ -28,11 +29,12 @@ import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
-import {currentConfigSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
@@ -57,12 +59,13 @@ import {updateResource} from '@redux/thunks/updateResource';
 import electronStore from '@utils/electronStore';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
-import {parseYamlDocument} from '@utils/yaml';
+import {jsonToYaml, parseYamlDocument} from '@utils/yaml';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
 import {
   deleteResource,
+  extractK8sResources,
   getResourceKindsWithTargetingRefs,
   isFileResource,
   processResources,
@@ -295,6 +298,30 @@ export const reprocessResource = createAsyncThunk<AppState, K8sResource, ThunkAp
     });
 
     return nextMainState;
+  }
+);
+
+export const updateClusterResource = createAsyncThunk(
+  'main/updateClusterResource',
+  async (k8sObject: KubernetesObject, thunkAPI: any) => {
+    const state: RootState = thunkAPI.getState();
+    const currentContext = kubeConfigContextSelector(state);
+
+    const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
+
+    if (!state.main.previewLoader.isLoading) {
+      thunkAPI.dispatch(mainSlice.actions.updateClusterResource(resource));
+    }
+  }
+);
+
+export const deleteClusterResource = createAsyncThunk(
+  'main/updateClusterResource',
+  async (k8sObject: KubernetesObject, thunkAPI: any) => {
+    const state: RootState = thunkAPI.getState();
+    const currentContext = kubeConfigContextSelector(state);
+    const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
+    thunkAPI.dispatch(mainSlice.actions.deleteClusterResource(resource));
   }
 );
 
@@ -772,6 +799,12 @@ export const mainSlice = createSlice({
       }
       electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
       state.search.searchHistory = [...newSearchHistory, action.payload];
+    },
+    updateClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      state.resourceMap[action.payload.id] = action.payload;
+    },
+    deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      delete state.resourceMap[action.payload.id];
     },
   },
   extraReducers: builder => {

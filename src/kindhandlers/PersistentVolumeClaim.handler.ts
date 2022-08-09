@@ -1,9 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+
+import {clusterResourceWatcher} from '.';
 
 const PersistentVolumeClaimHandler: ResourceKindHandler = {
   kind: 'PersistentVolumeClaim',
@@ -40,6 +44,23 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      PersistentVolumeClaimHandler.watcherReq.abort();
+      PersistentVolumeClaimHandler.watcherReq = undefined;
+    } catch (e: any) {
+      PersistentVolumeClaimHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/api/v1/namespaces/${args[2].namespace}/persistentvolumeclaims`
+      : `/api/v1/persistentvolumeclaims`;
+    clusterResourceWatcher(PersistentVolumeClaimHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return PersistentVolumeClaimHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default PersistentVolumeClaimHandler;

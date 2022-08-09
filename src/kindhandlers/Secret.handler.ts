@@ -1,9 +1,13 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+
+import {clusterResourceWatcher} from '.';
 
 const SecretHandler: ResourceKindHandler = {
   kind: 'Secret',
@@ -40,6 +44,23 @@ const SecretHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/configuration/secret/',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      SecretHandler.watcherReq.abort();
+      SecretHandler.watcherReq = undefined;
+    } catch (e: any) {
+      SecretHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/api/v1/namespaces/${args[2].namespace}/secrets`
+      : `/api/v1/secrets`;
+    clusterResourceWatcher(SecretHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return SecretHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default SecretHandler;

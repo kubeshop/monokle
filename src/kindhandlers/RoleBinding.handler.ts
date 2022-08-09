@@ -1,11 +1,15 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
+import {clusterResourceWatcher} from '.';
 
 const RoleBindingHandler: ResourceKindHandler = {
   kind: 'RoleBinding',
@@ -85,6 +89,23 @@ const RoleBindingHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',
+  watcherReq: undefined,
+  disconnectFromCluster() {
+    try {
+      RoleBindingHandler.watcherReq.abort();
+      RoleBindingHandler.watcherReq = undefined;
+    } catch (e: any) {
+      RoleBindingHandler.watcherReq = undefined;
+      log.log(e.message);
+    }
+  },
+  async watchResources(...args) {
+    const requestPath: string = args[2]?.namespace
+      ? `/apis/rbac.authorization.k8s.io/v1/namespaces/${args[2].namespace}/rolebindings`
+      : `/apis/rbac.authorization.k8s.io/v1/rolebindings`;
+    clusterResourceWatcher(RoleBindingHandler, requestPath, args[0], args[1], args[2], args[3]);
+    return RoleBindingHandler.listResourcesInCluster(args[1], args[2], args[3]);
+  },
 };
 
 export default RoleBindingHandler;
