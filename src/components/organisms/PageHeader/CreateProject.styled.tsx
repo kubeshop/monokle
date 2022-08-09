@@ -4,8 +4,6 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-
-
 export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
