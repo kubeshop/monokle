@@ -2,10 +2,6 @@ import {ipcRenderer} from 'electron';
 
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {Modal} from 'antd';
-
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
@@ -22,17 +18,15 @@ import * as S from './TerminalPane.styled';
 
 interface IProps {
   height: number;
-  index: number;
   terminal: TerminalType;
   terminalToKill: string;
-  removeTerminalToKillId: () => void;
 }
 
 const TerminalPane: React.FC<IProps> = props => {
   const {
-    terminal: {defaultCommand, id: terminalId, pod, shell},
+    terminal: {defaultCommand, id: terminalId, shell},
   } = props;
-  const {height, index: terminalIndex, terminalToKill, removeTerminalToKillId} = props;
+  const {height, terminalToKill} = props;
 
   const dispatch = useAppDispatch();
   const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
@@ -139,25 +133,7 @@ const TerminalPane: React.FC<IProps> = props => {
       return;
     }
 
-    const name = pod ? `${pod.name} terminal` : `Terminal ${terminalIndex ? `(${terminalIndex + 1})` : ''}`;
-
-    Modal.confirm({
-      title: `Are you sure you want to kill ${name}?`,
-      icon: <ExclamationCircleOutlined />,
-      okText: 'Yes',
-      onOk() {
-        return new Promise(resolve => {
-          ipcRenderer.send('shell.ptyProcessKill', {terminalId});
-          resolve({});
-        });
-      },
-      onCancel() {
-        terminalRef.current?.focus();
-        removeTerminalToKillId();
-      },
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ipcRenderer.send('shell.ptyProcessKill', {terminalId});
   }, [terminalId, terminalToKill]);
 
   useEffect(() => {

@@ -1,3 +1,5 @@
+import {Popconfirm as RawPopconfirm} from 'antd';
+
 import {
   CaretDownFilled as RawCaretDownFilled,
   CloseOutlined as RawCloseOutlined,
@@ -50,6 +52,10 @@ export const PlusCircleFilled = styled(RawPlusCircleFilled)`
 export const PodNamespaceLabel = styled.span`
   font-style: italic;
   color: ${Colors.grey6};
+`;
+
+export const Popconfirm = styled(RawPopconfirm)`
+  z-index: 10000;
 `;
 
 export const Tab = styled.div<{$selected: boolean}>`
