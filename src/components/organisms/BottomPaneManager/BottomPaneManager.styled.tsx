@@ -61,6 +61,10 @@ export const Tab = styled.div<{$selected: boolean}>`
   color: ${({$selected}) => ($selected ? Colors.blue6 : rgba(Colors.whitePure, 0.85))};
   font-weight: 600;
   ${({$selected}) => ($selected ? `border-bottom: 2px solid ${Colors.blue6}` : '')};
+
+  &:first-child {
+    margin-left: 10px;
+  }
 `;
 
 export const TabName = styled.div`
@@ -69,11 +73,11 @@ export const TabName = styled.div`
   gap: 5px;
 `;
 
-export const Tabs = styled.div`
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0px 20px;
+export const Tabs = styled.div<{$count: number}>`
+  display: grid;
+  grid-template-columns: ${({$count}) => `repeat(${$count + 1}, max-content)`};
+  grid-column-gap: 20px;
+  overflow-x: auto;
 `;
 
 export const TabsActions = styled.div`
@@ -86,5 +90,6 @@ export const TabsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   border-bottom: ${AppBorders.sectionDivider};
-  padding: 0px 10px;
+  padding-right: 10px;
+  gap: 10px;
 `;

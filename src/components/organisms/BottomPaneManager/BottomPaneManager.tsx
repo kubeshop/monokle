@@ -87,7 +87,7 @@ const BottomPaneManager: React.FC = () => {
   return (
     <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>
       <S.TabsContainer ref={tabsContainerRef}>
-        <S.Tabs>
+        <S.Tabs $count={Object.keys(terminalsMap).length}>
           {Object.values(terminalsMap).map((terminal, index) => (
             <S.Tab
               key={terminal.id}
