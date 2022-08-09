@@ -71,6 +71,7 @@ export type UiState = {
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;
+  isScaleModalOpen: boolean;
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;

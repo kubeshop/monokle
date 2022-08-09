@@ -33,6 +33,8 @@ import {TitleBar} from '@molecules';
 import {Icon} from '@atoms';
 
 import * as S from './ActionsPaneHeader.styled';
+import Restart from './Restart/Restart';
+import Scale from './Scale/Scale';
 
 interface IProps {
   selectedResource: K8sResource | undefined;
@@ -184,9 +186,9 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Button>
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
-          <S.DiffButton size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
+          <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
             Edit
-          </S.DiffButton>
+          </Button>
         </Tooltip>
       </TitleBar>
     );
@@ -241,39 +243,37 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Tooltip>
         )}
 
-        <Tooltip
-          mouseEnterDelay={TOOLTIP_DELAY}
-          title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
-          placement="bottomLeft"
-        >
-          <Button
-            loading={Boolean(applyingResource)}
-            type="primary"
-            size="small"
-            ghost
-            onClick={applySelection}
-            disabled={isDeployButtonDisabled}
-            icon={<Icon name="kubernetes" />}
+        <S.ButtonContainer>
+          <Scale />
+          <Restart />
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
+            placement="bottomLeft"
           >
-            {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-          </Button>
-        </Tooltip>
+            <Button
+              loading={Boolean(applyingResource)}
+              type="primary"
+              size="small"
+              ghost
+              onClick={applySelection}
+              disabled={isDeployButtonDisabled}
+              icon={<Icon name="kubernetes" />}
+            >
+              {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+            </Button>
+          </Tooltip>
 
-        <Tooltip
-          mouseEnterDelay={TOOLTIP_DELAY}
-          title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
-          placement="bottomLeft"
-        >
-          <S.DiffButton
-            size="small"
-            type="primary"
-            ghost
-            onClick={diffSelectedResource}
-            disabled={isDiffButtonDisabled}
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
+            placement="bottomLeft"
           >
-            Diff
-          </S.DiffButton>
-        </Tooltip>
+            <Button size="small" type="primary" ghost onClick={diffSelectedResource} disabled={isDiffButtonDisabled}>
+              Diff
+            </Button>
+          </Tooltip>
+        </S.ButtonContainer>
       </>
     </TitleBar>
   );
