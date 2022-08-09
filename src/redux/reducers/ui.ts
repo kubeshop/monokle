@@ -271,6 +271,12 @@ export const uiSlice = createSlice({
     closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
       state.isKeyboardShortcutsModalOpen = false;
     },
+    openScaleModal: (state: Draft<UiState>) => {
+      state.isScaleModalOpen = true;
+    },
+    closeScaleModal: (state: Draft<UiState>) => {
+      state.isScaleModalOpen = false;
+    },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
     },
@@ -380,5 +386,7 @@ export const {
   openKubeConfigBrowseSetting,
   closeKubeConfigBrowseSetting,
   setActiveTab,
+  openScaleModal,
+  closeScaleModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

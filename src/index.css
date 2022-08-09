@@ -37,7 +37,7 @@ code {
 }
 
 .reflex-container.horizontal > .reflex-splitter {
-  height: 2px;
+  height: 1px;
   background-color: #262626;
   border: 0px;
 }
@@ -382,6 +382,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
