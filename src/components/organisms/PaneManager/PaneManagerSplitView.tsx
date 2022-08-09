@@ -70,7 +70,7 @@ const PaneManagerSplitView: React.FC = () => {
 
       {/* react-reflex does not work as intended when you
             use fragments so keep this separate. */}
-      {leftActiveMenu && <ReflexSplitter propagate />}
+      {leftActiveMenu && <ReflexSplitter propagate style={{backgroundColor: '#191F21'}} />}
 
       <ReflexElement
         id="navPane"

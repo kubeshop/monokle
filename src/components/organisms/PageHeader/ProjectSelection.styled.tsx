@@ -17,7 +17,7 @@ export const Button = styled(RawButton)`
   align-items: center;
   margin-right: 0px;
   padding: 0px;
-  width: 172px;
+  width: 100%;
 
   :hover,
   :focus {
@@ -33,12 +33,18 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   }
 `;
 
+export const ProjectContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 export const DownOutlined = styled(RawDownOutlined)`
-  padding-top: 2px;
   position: absolute !important;
   right: 8px !important;
   color: ${Colors.whitePure};
-  font-size: 10px !important;
+  font-size: 12px !important;
+  padding-top: 1px;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -67,10 +73,10 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
-  border: none;
-  width: 180px;
+  width: 240px;
   background: ${Colors.grey3b};
   padding: 2px 4px;
+  border-radius: 4px;
 `;
 
 export const ProjectMenu = styled.div`
@@ -79,17 +85,16 @@ export const ProjectMenu = styled.div`
 `;
 
 export const ProjectLabel = styled.div`
-  max-width: 200px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   color: ${Colors.grey7};
-  width: 56px;
+  width: 60px;
   text-align: left;
-  padding-left: 8px;
+  padding: 0px 6px 0px 8px;
 `;
 
 export const ProjectName = styled.div`

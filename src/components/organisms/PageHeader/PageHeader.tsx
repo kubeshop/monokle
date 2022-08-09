@@ -141,7 +141,7 @@ const PageHeader = () => {
 
           {activeProject && (
             <>
-              <S.Divider type="vertical" style={{marginRight: '1rem'}} />
+              <S.Divider type="vertical" />
               <ProjectSelection />
               <CreateProject />
             </>

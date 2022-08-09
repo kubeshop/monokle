@@ -24,7 +24,7 @@ export const DropdownContainer = styled.div`
   height: 28px;
   width: 28px;
   background: ${Colors.grey3b};
-  margin-left: 4px;
+  margin-left: 10px;
 `;
 
 export const Menu = styled(RawMenu)`

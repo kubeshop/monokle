@@ -25,6 +25,7 @@ import * as S from './BottomPaneManager.styled';
 const BottomPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const isLeftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
   const settings = useAppSelector(state => state.terminal.settings);
@@ -85,7 +86,7 @@ const BottomPaneManager: React.FC = () => {
   }, [dispatch, osPlatform, settings, shellsMap]);
 
   return (
-    <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>
+    <S.BottomPaneManagerContainer ref={bottomPaneManagerRef} $isLeftMenuActive={isLeftMenuActive}>
       <S.TabsContainer ref={tabsContainerRef}>
         <S.Tabs $count={Object.keys(terminalsMap).length}>
           {Object.values(terminalsMap).map((terminal, index) => (

@@ -14,9 +14,14 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import Colors, {PanelColors} from '@styles/Colors';
 
-export const BottomPaneManagerContainer = styled.div`
+export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean}>`
   height: 100%;
-  border-left: 9px solid ${PanelColors.toolBar};
+
+  ${({$isLeftMenuActive}) => {
+    if ($isLeftMenuActive) {
+      return `border-left: 9px solid ${PanelColors.toolBar}`;
+    }
+  }}
 `;
 
 export const CaretDownFilled = styled(RawCaretDownFilled)`
