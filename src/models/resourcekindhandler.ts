@@ -108,14 +108,22 @@ interface ResourceKindHandler {
     crd?: K8sResource
   ): Promise<any[]>;
 
-  watchResources?(
+  /**
+   * Watch all resources of this type using the provided kubeconfig and dispatch to store
+   */
+
+  watchResources(
     dispatch: any,
     kubeconfig: k8s.KubeConfig,
     options: ClusterResourceOptions,
     crd?: K8sResource
   ): Promise<any[]>;
 
-  disconnectFromCluster?(): void;
+  /**
+   * Delete listeners on stop preview
+   */
+
+  disconnectFromCluster(): void;
 
   /**
    * Delete the specified resource from the cluster

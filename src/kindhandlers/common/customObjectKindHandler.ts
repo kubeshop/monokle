@@ -7,7 +7,7 @@ import path from 'path';
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ClusterResourceOptions, RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {loadResource} from '@redux/services';
 import {extractSchema} from '@redux/services/schema';
@@ -203,11 +203,15 @@ const createNamespacedCustomObjectKindHandler = (
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  return {
+  const customKindHandler = {
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
     isNamespaced: true,
-    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
+    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName] as [
+      navigatorName: string,
+      sectionName: string,
+      subsectionName: string
+    ],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
     helpLink,
@@ -226,7 +230,7 @@ const createNamespacedCustomObjectKindHandler = (
         resource.name
       );
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options: ClusterResourceOptions, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
@@ -284,7 +288,14 @@ const createNamespacedCustomObjectKindHandler = (
         resource.name
       );
     },
+    watcherReq: undefined,
+    disconnectFromCluster() {},
+    async watchResources(...args: any[]) {
+      return customKindHandler.listResourcesInCluster(args[1], args[2], args[3]);
+    },
   };
+
+  return customKindHandler;
 };
 
 const createClusterCustomObjectKindHandler = (
@@ -298,11 +309,15 @@ const createClusterCustomObjectKindHandler = (
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  return {
+  const customKindHandler = {
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
     isNamespaced: false,
-    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
+    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName] as [
+      navigatorName: string,
+      sectionName: string,
+      subsectionName: string
+    ],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,
     outgoingRefMappers,
@@ -315,7 +330,7 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       return customObjectsApi.getClusterCustomObject(group, version, kindPlural, resource.name);
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options: ClusterResourceOptions, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
@@ -352,5 +367,12 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       await customObjectsApi.deleteClusterCustomObject(group, version, kindPlural, resource.name);
     },
+    watcherReq: undefined,
+    disconnectFromCluster() {},
+    async watchResources(...args: any[]) {
+      return customKindHandler.listResourcesInCluster(args[1], args[2], args[3]);
+    },
   };
+
+  return customKindHandler;
 };

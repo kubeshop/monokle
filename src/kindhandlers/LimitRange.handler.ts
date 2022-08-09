@@ -1,7 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
 
-import log from 'loglevel';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -40,7 +38,6 @@ const LimitRangeHandler: ResourceKindHandler = {
       LimitRangeHandler.watcherReq = undefined;
     } catch (e: any) {
       LimitRangeHandler.watcherReq = undefined;
-      log.log(e.message);
     }
   },
   async watchResources(...args) {

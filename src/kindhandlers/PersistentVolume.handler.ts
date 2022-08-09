@@ -1,7 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
 
-import log from 'loglevel';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -105,7 +103,6 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       PersistentVolumeHandler.watcherReq = undefined;
     } catch (e: any) {
       PersistentVolumeHandler.watcherReq = undefined;
-      log.log(e.message);
     }
   },
   async watchResources(...args) {

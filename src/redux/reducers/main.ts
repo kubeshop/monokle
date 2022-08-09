@@ -305,11 +305,9 @@ export const updateClusterResource = createAsyncThunk(
   'main/updateClusterResource',
   async (k8sObject: KubernetesObject, thunkAPI: any) => {
     const state: RootState = thunkAPI.getState();
-    const currentContext = kubeConfigContextSelector(state);
-
-    const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
-
     if (!state.main.previewLoader.isLoading) {
+      const currentContext = kubeConfigContextSelector(state);
+      const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
       thunkAPI.dispatch(mainSlice.actions.updateClusterResource(resource));
     }
   }
@@ -530,10 +528,12 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = true;
       state.previewLoader.targetId = action.payload.targetId;
       state.previewType = action.payload.previewType;
+      electronStore.set('main.previewLoader.isLoading', true);
     },
     stopPreviewLoader: (state: Draft<AppState>) => {
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
+      electronStore.set('main.previewLoader.isLoading', false);
     },
     resetResourceFilter: (state: Draft<AppState>) => {
       state.resourceFilter = {labels: {}, annotations: {}};
@@ -830,6 +830,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -837,6 +838,7 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
         state.selectionHistory = state.previousSelectionHistory;
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       });
 
     builder
@@ -854,6 +856,7 @@ export const mainSlice = createSlice({
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       })
       .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -861,6 +864,7 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
         state.selectionHistory = state.previousSelectionHistory;
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       });
 
     builder
@@ -875,6 +879,7 @@ export const mainSlice = createSlice({
         state.selectedPath = undefined;
         state.checkedResourceIds = [];
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       })
       .addCase(runPreviewConfiguration.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -882,6 +887,7 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
         state.selectionHistory = state.previousSelectionHistory;
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       });
 
     builder
@@ -901,6 +907,7 @@ export const mainSlice = createSlice({
           resource.isHighlighted = false;
         });
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -908,6 +915,7 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
         state.selectionHistory = state.previousSelectionHistory;
         state.previousSelectionHistory = [];
+        electronStore.set('main.previewLoader.isLoading', false);
       });
 
     builder
@@ -922,11 +930,13 @@ export const mainSlice = createSlice({
         if (resource) {
           updateSelectionAndHighlights(state, resource);
         }
+        electronStore.set('main.previewLoader.isLoading', false);
       })
       .addCase(repreviewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
         state.previewType = undefined;
+        electronStore.set('main.previewLoader.isLoading', false);
       });
 
     builder.addCase(setRootFolder.pending, state => {
@@ -973,6 +983,7 @@ export const mainSlice = createSlice({
         selectedMatches: [],
       };
       resetSelectionHistory(state);
+      electronStore.set('main.previewLoader.isLoading', false);
     });
 
     builder.addCase(saveUnsavedResources.fulfilled, (state, action) => {

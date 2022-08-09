@@ -1,7 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
 
-import log from 'loglevel';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -96,7 +94,6 @@ const RoleBindingHandler: ResourceKindHandler = {
       RoleBindingHandler.watcherReq = undefined;
     } catch (e: any) {
       RoleBindingHandler.watcherReq = undefined;
-      log.log(e.message);
     }
   },
   async watchResources(...args) {

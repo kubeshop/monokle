@@ -14,6 +14,7 @@ import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
+import electronStore from '@utils/electronStore';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -252,12 +253,14 @@ export async function clusterResourceWatcher(
 
   kindHandler.watcherReq = await new k8s.Watch(kubeconfig).watch(
     requestPath,
-    {allowWatchBookmarks: true},
+    {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
-      if (type === 'ADDED' || type === 'MODIFIED') {
+      const isPreviewLoaderLoading = Boolean(electronStore.get('main.previewLoader.isLoading'));
+
+      if (!isPreviewLoaderLoading && (type === 'ADDED' || type === 'MODIFIED')) {
         dispatch(updateClusterResource(apiObj));
       }
-      if (type === 'DELETED') {
+      if (!isPreviewLoaderLoading && type === 'DELETED') {
         dispatch(deleteClusterResource(apiObj));
       }
     },
