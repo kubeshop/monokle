@@ -34,7 +34,7 @@ import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getK8sVersion} from '@redux/services/projectConfig';
@@ -305,7 +305,8 @@ export const updateClusterResource = createAsyncThunk(
   'main/updateClusterResource',
   async (k8sObject: KubernetesObject, thunkAPI: any) => {
     const state: RootState = thunkAPI.getState();
-    if (!state.main.previewLoader.isLoading) {
+    const isInClusterMode = isInClusterModeSelector(state);
+    if (isInClusterMode) {
       const currentContext = kubeConfigContextSelector(state);
       const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
       thunkAPI.dispatch(mainSlice.actions.updateClusterResource(resource));
@@ -314,12 +315,15 @@ export const updateClusterResource = createAsyncThunk(
 );
 
 export const deleteClusterResource = createAsyncThunk(
-  'main/updateClusterResource',
+  'main/deleteClusterResource',
   async (k8sObject: KubernetesObject, thunkAPI: any) => {
     const state: RootState = thunkAPI.getState();
-    const currentContext = kubeConfigContextSelector(state);
-    const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
-    thunkAPI.dispatch(mainSlice.actions.deleteClusterResource(resource));
+    const isInClusterMode = isInClusterModeSelector(state);
+    if (isInClusterMode) {
+      const currentContext = kubeConfigContextSelector(state);
+      const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(k8sObject), PREVIEW_PREFIX + currentContext);
+      thunkAPI.dispatch(mainSlice.actions.deleteClusterResource(resource));
+    }
   }
 );
 
