@@ -11,6 +11,7 @@ export const ROOT_FILE_ENTRY = '<root>';
 export const APP_MIN_WIDTH = 800;
 export const APP_MIN_HEIGHT = 600;
 export const TOOLTIP_DELAY = 1.0;
+export const LONGER_TOOLTIP_DELAY = 2.0;
 export const TOOLTIP_K8S_SELECTION = 'Select which kubernetes schema version to use for validation';
 export const ERROR_MSG_FALLBACK = 'Looks like something unexpected went wrong. Please try again later.';
 export const REF_PATH_SEPARATOR = '#';

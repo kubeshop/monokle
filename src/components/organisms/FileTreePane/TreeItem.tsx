@@ -8,7 +8,7 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
@@ -297,7 +297,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip overlayStyle={tooltipOverlayStyle} mouseEnterDelay={2.0} title={absolutePath} placement="bottom">
+        <Tooltip
+          overlayStyle={tooltipOverlayStyle}
+          mouseEnterDelay={LONGER_TOOLTIP_DELAY}
+          title={absolutePath}
+          placement="bottom"
+        >
           <S.TitleWrapper>
             <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
             {canPreview(relativePath) && (
