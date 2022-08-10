@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import {useEffect, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -23,6 +25,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
   const [learnMoreUrl, setLearnMoreUrl] = useState<string>();
   const [markdown, setMarkdown] = useState<string>();
   const [base64svg, setBase64svg] = useState<string>();
+  const [callToAction, setCallToAction] = useState<{text: string; url: string} | undefined>();
 
   useEffect(() => {
     fetchAppVersion().then(version => {
@@ -42,6 +45,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
       const versionInfo = JSON.parse(rawVersionInfo);
       setTitle(versionInfo.title);
       setLearnMoreUrl(versionInfo.learnMoreUrl);
+      setCallToAction(versionInfo.callToAction);
       setMarkdown(rawMarkdown);
       setBase64svg(Buffer.from(rawSvg).toString('base64'));
     });
@@ -78,12 +82,17 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           <S.Image src={`data:image/svg+xml;base64,${base64svg}`} alt="Release illustration" />
         </S.Illustration>
       </S.Container>
+      {callToAction && (
+        <S.CallToActionButton type="primary" onClick={() => shell.openExternal(callToAction.url)}>
+          {callToAction.text}
+        </S.CallToActionButton>
+      )}
       {!singleColumn && (
         <S.Actions>
           <Button type="ghost" onClick={() => openUrlInExternalBrowser(learnMoreUrl)}>
             Learn more
           </Button>
-          <S.ConfirmButton onClick={onClose} type="primary">
+          <S.ConfirmButton onClick={onClose} type={callToAction ? 'ghost' : 'primary'}>
             Got it
           </S.ConfirmButton>
         </S.Actions>
