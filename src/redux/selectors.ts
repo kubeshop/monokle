@@ -76,11 +76,12 @@ export const filteredResourceSelector = createSelector(
 );
 
 export const filteredResourceMapSelector = createSelector(
-  (state: RootState) => state.main.resourceMap,
-  (state: RootState) => state.main.resourceFilter,
-  (resourceMap, filter) =>
+  (state: RootState) => state,
+  state =>
     _.keyBy(
-      Object.values(resourceMap).filter(resource => isResourcePassingFilter(resource, filter)),
+      Object.values(state.main.resourceMap).filter(resource =>
+        isResourcePassingFilter(resource, state.main.resourceFilter, isInPreviewModeSelector(state))
+      ),
       'id'
     )
 );

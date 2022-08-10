@@ -157,6 +157,11 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+shift+f, command+shift+f',
     category: 'tool',
   },
+  SCALE: {
+    name: 'Scale replicas',
+    key: 'ctrl+shift+s, command+shift+s',
+    category: 'tool',
+  },
 });
 
 function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {

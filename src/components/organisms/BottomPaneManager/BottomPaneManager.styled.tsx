@@ -1,3 +1,5 @@
+import {Popconfirm as RawPopconfirm} from 'antd';
+
 import {
   CaretDownFilled as RawCaretDownFilled,
   CloseOutlined as RawCloseOutlined,
@@ -12,9 +14,14 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import Colors, {PanelColors} from '@styles/Colors';
 
-export const BottomPaneManagerContainer = styled.div`
+export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean}>`
   height: 100%;
-  border-left: 9px solid ${PanelColors.toolBar};
+
+  ${({$isLeftMenuActive}) => {
+    if ($isLeftMenuActive) {
+      return `border-left: 9px solid ${PanelColors.toolBar}`;
+    }
+  }}
 `;
 
 export const CaretDownFilled = styled(RawCaretDownFilled)`
@@ -52,6 +59,10 @@ export const PodNamespaceLabel = styled.span`
   color: ${Colors.grey6};
 `;
 
+export const Popconfirm = styled(RawPopconfirm)`
+  z-index: 10000;
+`;
+
 export const Tab = styled.div<{$selected: boolean}>`
   display: flex;
   align-items: center;
@@ -61,6 +72,10 @@ export const Tab = styled.div<{$selected: boolean}>`
   color: ${({$selected}) => ($selected ? Colors.blue6 : rgba(Colors.whitePure, 0.85))};
   font-weight: 600;
   ${({$selected}) => ($selected ? `border-bottom: 2px solid ${Colors.blue6}` : '')};
+
+  &:first-child {
+    margin-left: 10px;
+  }
 `;
 
 export const TabName = styled.div`
@@ -69,11 +84,11 @@ export const TabName = styled.div`
   gap: 5px;
 `;
 
-export const Tabs = styled.div`
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0px 20px;
+export const Tabs = styled.div<{$count: number}>`
+  display: grid;
+  grid-template-columns: ${({$count}) => `repeat(${$count + 1}, max-content)`};
+  grid-column-gap: 20px;
+  overflow-x: auto;
 `;
 
 export const TabsActions = styled.div`
@@ -86,5 +101,6 @@ export const TabsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   border-bottom: ${AppBorders.sectionDivider};
-  padding: 0px 10px;
+  padding-right: 10px;
+  gap: 10px;
 `;

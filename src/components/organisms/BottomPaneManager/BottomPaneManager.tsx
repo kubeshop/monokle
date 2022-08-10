@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Dropdown, Tooltip} from 'antd';
+import {Dropdown, Popconfirm, Tooltip} from 'antd';
 
 import {v4 as uuidv4} from 'uuid';
 
@@ -25,6 +25,7 @@ import * as S from './BottomPaneManager.styled';
 const BottomPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const isLeftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedTerminal = useAppSelector(state => state.terminal.selectedTerminal);
   const settings = useAppSelector(state => state.terminal.settings);
@@ -85,9 +86,9 @@ const BottomPaneManager: React.FC = () => {
   }, [dispatch, osPlatform, settings, shellsMap]);
 
   return (
-    <S.BottomPaneManagerContainer ref={bottomPaneManagerRef}>
+    <S.BottomPaneManagerContainer ref={bottomPaneManagerRef} $isLeftMenuActive={isLeftMenuActive}>
       <S.TabsContainer ref={tabsContainerRef}>
-        <S.Tabs>
+        <S.Tabs $count={Object.keys(terminalsMap).length}>
           {Object.values(terminalsMap).map((terminal, index) => (
             <S.Tab
               key={terminal.id}
@@ -98,13 +99,27 @@ const BottomPaneManager: React.FC = () => {
 
               {renderTerminalName(terminal, index)}
 
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KillTerminalTooltip}>
-                <S.CloseOutlined
-                  onClick={e => {
-                    e.stopPropagation();
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottom" title={KillTerminalTooltip}>
+                <Popconfirm
+                  placement="top"
+                  title={`Are you sure you want to kill ${
+                    terminal.pod ? `${terminal.pod.name} terminal` : `Terminal ${index ? `(${index + 1})` : ''}`
+                  }?`}
+                  okText="Yes"
+                  onConfirm={e => {
+                    e?.stopPropagation();
                     setTerminalToKill(terminal.id);
                   }}
-                />
+                  onCancel={e => {
+                    e?.stopPropagation();
+                  }}
+                >
+                  <S.CloseOutlined
+                    onClick={e => {
+                      e.stopPropagation();
+                    }}
+                  />
+                </Popconfirm>
               </Tooltip>
             </S.Tab>
           ))}
@@ -129,14 +144,12 @@ const BottomPaneManager: React.FC = () => {
         </S.TabsActions>
       </S.TabsContainer>
 
-      {Object.values(terminalsMap).map((terminal, index) => (
+      {Object.values(terminalsMap).map(terminal => (
         <TerminalPane
           key={terminal.id}
           height={height - tabsContainerHeight}
-          index={index}
           terminal={terminal}
           terminalToKill={terminalToKill}
-          removeTerminalToKillId={() => setTerminalToKill('')}
         />
       ))}
     </S.BottomPaneManagerContainer>

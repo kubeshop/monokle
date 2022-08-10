@@ -25,5 +25,5 @@ export const IconsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
 `;
