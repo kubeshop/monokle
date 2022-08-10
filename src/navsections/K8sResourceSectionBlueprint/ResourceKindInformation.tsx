@@ -49,13 +49,13 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
 
           {statusInfo && (
             <>
-              <span>Status</span> <S.Tag>{statusInfo}</S.Tag>
+              <span>Status</span> <S.Tag $status={statusInfo}>{statusInfo}</S.Tag>
             </>
           )}
         </S.InfoContainer>
       }
     >
-      <S.InfoCircleOutlined $isSelected={itemInstance.isSelected} />
+      <S.InfoCircleFilled $isSelected={itemInstance.isSelected} />
     </Tooltip>
   );
 };
