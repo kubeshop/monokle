@@ -139,7 +139,7 @@ export function makeResourceKindNavSection(
         contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
         isCheckVisibleOnHover: true,
-        information: {component: ResourceKindInformation},
+        information: {component: ResourceKindInformation, options: {isVisibleOnHover: true}},
       },
     },
   };

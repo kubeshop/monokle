@@ -89,7 +89,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
       prefix: {component: ResourceKindPrefix},
       suffix: {component: ResourceKindSuffix},
-      information: {component: ResourceKindInformation},
+      information: {component: ResourceKindInformation, options: {isVisibleOnHover: true}},
     },
   },
 };
