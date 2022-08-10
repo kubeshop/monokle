@@ -6,7 +6,7 @@ import {UNSAVED_PREFIX} from '@constants/constants';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
-import {addMultipleResources, addResource, selectK8sResource} from '@redux/reducers/main';
+import {addMultipleResources, addResource} from '@redux/reducers/main';
 
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -65,7 +65,6 @@ export function createUnsavedResource(
     isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
   };
   dispatch(addResource(newResource));
-  dispatch(selectK8sResource({resourceId: newResource.id}));
 
   return newResource;
 }
@@ -114,7 +113,6 @@ export function createMultipleUnsavedResources(
   }));
 
   dispatch(addMultipleResources(newResources));
-  dispatch(selectK8sResource({resourceId: newResources[newResources.length - 1].id}));
 
   return newResources;
 }
