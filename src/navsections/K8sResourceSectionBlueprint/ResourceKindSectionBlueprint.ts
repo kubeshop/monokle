@@ -4,6 +4,7 @@ import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RootState} from '@models/rootstate';
 
 import {
   checkMultipleResourceIds,
@@ -12,7 +13,7 @@ import {
   uncheckMultipleResourceIds,
   uncheckResourceId,
 } from '@redux/reducers/main';
-import {activeResourcesSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -33,6 +34,7 @@ export type ResourceKindScopeType = {
   selectedResourceId: string | undefined;
   selectedPath: string | undefined;
   checkedResourceIds: string[];
+  state: RootState;
 };
 
 export function makeResourceKindNavSection(
@@ -51,6 +53,7 @@ export function makeResourceKindNavSection(
         selectedResourceId: state.main.selectedResourceId,
         selectedPath: state.main.selectedPath,
         checkedResourceIds: state.main.checkedResourceIds,
+        state,
       };
     },
     builder: {
@@ -105,7 +108,12 @@ export function makeResourceKindNavSection(
         isHighlighted: rawItem => rawItem.isHighlighted,
         isDirty: rawItem => isUnsavedResource(rawItem),
         isVisible: (rawItem, scope) => {
-          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
+          const isPassingFilter = isResourcePassingFilter(
+            rawItem,
+            scope.resourceFilter,
+            isInPreviewModeSelector(scope.state)
+          );
+
           return isPassingFilter;
         },
         isCheckable: () => true,

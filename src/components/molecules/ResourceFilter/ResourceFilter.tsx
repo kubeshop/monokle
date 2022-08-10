@@ -13,7 +13,7 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 
 import {KeyValueInput} from '@atoms';
 
@@ -44,13 +44,14 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const areFiltersDisabled = useAppSelector(
     state => Boolean(state.main.checkedResourceIds.length) || Boolean(state.main.clusterDiff.selectedMatches.length)
   );
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPaneWideEnough = useAppSelector(state => windowWidth * state.ui.paneConfiguration.navPane > 330);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
@@ -309,7 +310,7 @@ const ResourceFilter = () => {
         <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
         <S.SelectStyled
           defaultValue={ROOT_OPTIONS}
-          disabled={areFiltersDisabled}
+          disabled={isInPreviewMode || areFiltersDisabled}
           showSearch
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}

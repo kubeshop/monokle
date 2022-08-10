@@ -19,7 +19,7 @@ export function makeResourceNameKindNamespaceIdentifier(partialResource: {
   }`;
 }
 
-export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
+export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (
     filters.names &&
     filters.names.length &&
@@ -27,18 +27,25 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   ) {
     return false;
   }
+
   if (filters.kinds?.length && !filters.kinds?.includes(resource.kind)) {
     return false;
   }
+
   if (filters.namespace) {
     const resourceNamespace = resource.namespace || 'default';
     if (resourceNamespace !== filters.namespace) {
       return false;
     }
   }
-  if (filters.fileOrFolderContainedIn && !resource.filePath.startsWith(filters.fileOrFolderContainedIn)) {
+  if (
+    !isInPreviewMode &&
+    filters.fileOrFolderContainedIn &&
+    !resource.filePath.startsWith(filters.fileOrFolderContainedIn)
+  ) {
     return false;
   }
+
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
     const templateLabels = resource.content?.spec?.template?.metadata?.labels;

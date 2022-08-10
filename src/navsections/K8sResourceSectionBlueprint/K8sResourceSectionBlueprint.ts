@@ -5,9 +5,10 @@ import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RootState} from '@models/rootstate';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourcesSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -92,6 +93,7 @@ export type K8sResourceScopeType = {
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
   checkedResourceIds: string[];
+  state: RootState;
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
@@ -110,6 +112,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       activeResources: activeResourcesSelector(state),
       resourceFilter: state.main.resourceFilter,
       checkedResourceIds: state.main.checkedResourceIds,
+      state,
     };
   },
   builder: {
@@ -123,7 +126,9 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       return (
         scope.isFolderOpen &&
         (scope.activeResources.length === 0 ||
-          scope.activeResources.every(resource => !isResourcePassingFilter(resource, scope.resourceFilter)))
+          scope.activeResources.every(
+            resource => !isResourcePassingFilter(resource, scope.resourceFilter, isInPreviewModeSelector(scope.state))
+          ))
       );
     },
     makeCheckable: scope => {
