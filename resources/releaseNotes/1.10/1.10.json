@@ -1,0 +1,13 @@
+{
+  "title": "Happy Birthday, Monokle!",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-1-10-0-release",
+  "callToAction": {
+    "text": "Take our survey",
+    "url": "https://49x902y6r6t.typeform.com/to/vkFBEYYt"
+  },
+  "about": {
+    "when": "August 2022",
+    "title": "In this release, we bring you:",
+    "features": ["Terminal", "Live logs for Pods", "Scale & Restart actions for Deployments"]
+  }
+}
