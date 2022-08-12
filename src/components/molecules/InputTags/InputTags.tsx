@@ -25,6 +25,12 @@ const InputTags: React.FC<IProps> = props => {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && e.preventDefault();
   const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // delete last tag on backspace
+    if (e.key === 'Backspace' && !inputValue && tags.length) {
+      onTagRemove(tags[tags.length - 1]);
+      return;
+    }
+
     if (e.key !== 'Enter' || !inputValue) {
       return;
     }
