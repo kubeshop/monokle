@@ -30,9 +30,17 @@ export const Icon = styled(RawIcon)<{$type: 'warning' | 'error'}>`
 
 export const StyledMenu = styled(Menu)`
   max-height: 400px;
-  padding: 4px 0;
+  padding: 0;
   border-right: none;
   overflow-y: scroll;
+
+  & .ant-dropdown-menu-item {
+    padding: 2px 8px;
+
+    &.ant-dropdown-menu-item-active {
+      background: transparent;
+    }
+  }
 `;
 
 export const StyledMenuItem = styled(Menu.Item)`
