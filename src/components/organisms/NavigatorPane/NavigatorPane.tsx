@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import {useMeasure} from 'react-use';
 
 import {Badge, Button, Tooltip} from 'antd';
 
@@ -47,6 +48,8 @@ const NavPane: React.FC<Props> = ({height}) => {
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
+  const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
+
   const appliedFilters = useMemo(
     () =>
       Object.entries(resourceFilters)
@@ -68,7 +71,7 @@ const NavPane: React.FC<Props> = ({height}) => {
   };
 
   return (
-    <S.NavigatorPaneContainer>
+    <S.NavigatorPaneContainer ref={navigatorPaneRef}>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
@@ -108,7 +111,7 @@ const NavPane: React.FC<Props> = ({height}) => {
             </Badge>
 
             <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
-              <CompareButton />
+              <CompareButton width={width} />
             </FeatureFlag>
           </S.TitleBarRightButtons>
         </S.TitleBar>
