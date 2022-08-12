@@ -161,6 +161,7 @@ const App = () => {
     if (!shouldTriggerTelemetryNotification) {
       return;
     }
+
     dispatch(
       setAlert({
         title: 'Monokle telemetry',
@@ -168,6 +169,7 @@ const App = () => {
         type: AlertEnum.Info,
         extraContentType: ExtraContentType.Telemetry,
         duration: 5,
+        id: 'monokle_telemetry_alert',
       })
     );
   }, [shouldTriggerTelemetryNotification, dispatch]);

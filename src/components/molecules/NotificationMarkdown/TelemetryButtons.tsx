@@ -37,9 +37,7 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
 
   const handleOk = () => {
     disableTelemetryNotification();
-    if (notificationId) {
-      return;
-    }
+
     store.dispatch(toggleNotifications());
   };
 
