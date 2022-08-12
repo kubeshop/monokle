@@ -279,7 +279,7 @@ const PaneManagerLeftMenu: React.FC = () => {
               onClick={onTerminalSelectionHandler}
               disabled={!activeProject}
             >
-              <MenuIcon iconName="terminal" active={isActive} isSelected />
+              <MenuIcon iconName="terminal" active={isActive} isSelected={checkIsBottomTabSelected('terminal')} />
             </MenuButton>
           </PaneTooltip>
         </FeatureFlag>
