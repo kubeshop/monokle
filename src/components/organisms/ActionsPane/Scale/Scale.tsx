@@ -8,7 +8,7 @@ import {ScaleTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
 import {
-  isInPreviewModeSelector,
+  isInClusterModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   selectedResourceSelector,
@@ -18,21 +18,23 @@ import scaleDeployment from '@redux/services/scaleDeployment';
 
 const Scale = () => {
   const dispatch = useAppDispatch();
-  const currentResource = useAppSelector(selectedResourceSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
-  const defaultReplica = currentResource?.content?.spec?.replicas;
-  const [replicas, setReplicas] = useState<number>(defaultReplica);
-  const [scaling, toggleScaling] = useState(false);
   const currentContext = useAppSelector(kubeConfigContextSelector);
+  const currentResource = useAppSelector(selectedResourceSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
+
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {name, namespace, kind} = currentResource || {};
 
-  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInPreviewMode, [kind, isInPreviewMode]);
+  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInClusterMode, [kind, isInClusterMode]);
+  const defaultReplica = useMemo(() => currentResource?.content?.spec?.replicas, [currentResource]);
 
-  useEffect(() => {
-    setReplicas(defaultReplica);
-  }, [currentResource, defaultReplica]);
+  const [replicas, setReplicas] = useState<number>(defaultReplica);
+  const [scaling, toggleScaling] = useState(false);
+
+  const handleCancel = () => {
+    dispatch(closeScaleModal());
+  };
 
   const handleScaleOk = async () => {
     if (name && namespace) {
@@ -44,9 +46,9 @@ const Scale = () => {
     dispatch(closeScaleModal());
   };
 
-  const handleCancel = () => {
-    dispatch(closeScaleModal());
-  };
+  useEffect(() => {
+    setReplicas(defaultReplica);
+  }, [defaultReplica]);
 
   return (
     <>

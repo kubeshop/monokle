@@ -21,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {isInClusterModeSelector, knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
@@ -55,6 +55,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const selectedPreviewConfiguration = useAppSelector(state => {
@@ -244,8 +245,13 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         )}
 
         <S.ButtonContainer>
-          <Scale />
-          <Restart />
+          {isInClusterMode && (
+            <>
+              <Scale />
+              <Restart />
+            </>
+          )}
+
           <Tooltip
             mouseEnterDelay={TOOLTIP_DELAY}
             title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
