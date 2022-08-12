@@ -9,7 +9,7 @@ import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  isInPreviewModeSelector,
+  isInClusterModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   selectedResourceSelector,
@@ -18,14 +18,15 @@ import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
 const Restart = () => {
-  const currentResource = useAppSelector(selectedResourceSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const currentContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const dispatch = useAppDispatch();
+  const currentContext = useAppSelector(kubeConfigContextSelector);
+  const currentResource = useAppSelector(selectedResourceSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+
   const {name, namespace, kind} = currentResource || {};
 
-  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInPreviewMode, [kind, isInPreviewMode]);
+  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInClusterMode, [kind, isInClusterMode]);
 
   const handleClick = () => {
     Modal.confirm({
