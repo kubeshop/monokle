@@ -35,10 +35,16 @@ export const uiSlice = createSlice({
       state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
     },
     zoomIn: () => {
-      webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+      const newZoomFactor = webFrame.getZoomFactor() + 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     zoomOut: () => {
-      webFrame.setZoomFactor(Number(webFrame.getZoomFactor() - 0.1));
+      const newZoomFactor = webFrame.getZoomFactor() - 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;

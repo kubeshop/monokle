@@ -72,6 +72,7 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
+      zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
