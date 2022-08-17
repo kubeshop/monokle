@@ -20,6 +20,8 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 
+import * as S from './HelmChartQuickAction.styled';
+
 const selectQuickActionData = (state: RootState, itemId: string) => {
   const thisValuesFile = selectHelmValues(state.main, itemId);
   invariant(thisValuesFile, 'values not found');
@@ -79,33 +81,33 @@ const QuickAction = (props: ItemCustomComponentProps) => {
     reloadPreview();
   });
 
-  if (isAnyPreviewing && !isThisPreviewing) {
-    return (
-      <QuickActionCompare
-        isItemSelected={itemInstance.isSelected}
-        from="quick-helm-compare"
-        view={{
-          leftSet: previewingResourceSet,
-          rightSet: {
-            type: 'helm',
-            chartId: thisValuesFile?.helmChartId,
-            valuesId: thisValuesFile?.id,
-          },
-        }}
-      />
-    );
-  }
-
   return (
-    <QuickActionPreview
-      isItemSelected={itemInstance.isSelected}
-      isItemBeingPreviewed={isThisPreviewing}
-      previewTooltip={HelmPreviewTooltip}
-      reloadPreviewTooltip={ReloadHelmPreviewTooltip}
-      exitPreviewTooltip={ExitHelmPreviewTooltip}
-      selectAndPreview={selectAndPreviewHelmValuesFile}
-      reloadPreview={reloadPreview}
-    />
+    <S.QuickActionsContainer>
+      {isAnyPreviewing && !isThisPreviewing && (
+        <QuickActionCompare
+          isItemSelected={itemInstance.isSelected}
+          from="quick-helm-compare"
+          view={{
+            leftSet: previewingResourceSet,
+            rightSet: {
+              type: 'helm',
+              chartId: thisValuesFile?.helmChartId,
+              valuesId: thisValuesFile?.id,
+            },
+          }}
+        />
+      )}
+
+      <QuickActionPreview
+        isItemSelected={itemInstance.isSelected}
+        isItemBeingPreviewed={isThisPreviewing}
+        previewTooltip={HelmPreviewTooltip}
+        reloadPreviewTooltip={ReloadHelmPreviewTooltip}
+        exitPreviewTooltip={ExitHelmPreviewTooltip}
+        selectAndPreview={selectAndPreviewHelmValuesFile}
+        reloadPreview={reloadPreview}
+      />
+    </S.QuickActionsContainer>
   );
 };
 
