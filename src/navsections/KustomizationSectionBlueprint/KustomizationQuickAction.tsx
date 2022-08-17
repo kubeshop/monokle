@@ -19,6 +19,8 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 
+import * as S from './KustomizationQuickAction.styled';
+
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
@@ -55,35 +57,35 @@ const QuickAction = (props: ItemCustomComponentProps) => {
     reloadPreview();
   });
 
-  if (isAnyPreviewing && !isThisPreviewing) {
-    return (
-      <QuickActionCompare
-        from="quick-kustomize-compare"
-        isItemSelected={itemInstance.isSelected}
-        view={{
-          leftSet: {
-            type: 'kustomize',
-            kustomizationId: previewResourceId,
-          },
-          rightSet: {
-            type: 'kustomize',
-            kustomizationId: itemInstance.id,
-          },
-        }}
-      />
-    );
-  }
-
   return (
-    <QuickActionPreview
-      isItemSelected={itemInstance.isSelected}
-      isItemBeingPreviewed={isItemBeingPreviewed}
-      previewTooltip={KustomizationPreviewTooltip}
-      reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}
-      exitPreviewTooltip={ExitKustomizationPreviewTooltip}
-      selectAndPreview={selectAndPreviewKustomization}
-      reloadPreview={reloadPreview}
-    />
+    <S.Container>
+      {isAnyPreviewing && !isThisPreviewing && (
+        <QuickActionCompare
+          from="quick-kustomize-compare"
+          isItemSelected={itemInstance.isSelected}
+          view={{
+            leftSet: {
+              type: 'kustomize',
+              kustomizationId: previewResourceId,
+            },
+            rightSet: {
+              type: 'kustomize',
+              kustomizationId: itemInstance.id,
+            },
+          }}
+        />
+      )}
+
+      <QuickActionPreview
+        isItemSelected={itemInstance.isSelected}
+        isItemBeingPreviewed={isItemBeingPreviewed}
+        previewTooltip={KustomizationPreviewTooltip}
+        reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}
+        exitPreviewTooltip={ExitKustomizationPreviewTooltip}
+        selectAndPreview={selectAndPreviewKustomization}
+        reloadPreview={reloadPreview}
+      />
+    </S.Container>
   );
 };
 
