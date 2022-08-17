@@ -200,6 +200,8 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
 
   useEffect(() => {
     return () => {
+      setFindingMatches(false);
+      setCurrentMatch(null);
       dispatch(setActiveTab(null));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
