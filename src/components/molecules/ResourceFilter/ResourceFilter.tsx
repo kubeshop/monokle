@@ -7,7 +7,7 @@ import {ClearOutlined} from '@ant-design/icons';
 
 import {isEmpty, mapValues} from 'lodash';
 
-import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 import {ResetFiltersTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -50,7 +50,9 @@ const ResourceFilter = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isPaneWideEnough = useAppSelector(state => windowWidth * state.ui.paneConfiguration.navPane > 330);
+  const isPaneWideEnough = useAppSelector(
+    state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
+  );
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 

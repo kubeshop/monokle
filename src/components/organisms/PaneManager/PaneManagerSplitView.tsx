@@ -44,7 +44,7 @@ const PaneManagerSplitView: React.FC = () => {
   const handleResize = useCallback(
     (elements: any) => {
       const updates = elements.reduce((obj: any, el: any) => {
-        if (!['leftPane', 'navPane'].includes(el.props.id)) return obj;
+        if (!['leftPane', 'navPane', 'editPane'].includes(el.props.id)) return obj;
         obj[el.props['id']] = el.props['flex'];
         return obj;
       }, {});

@@ -162,7 +162,7 @@ export type UiState = {
 export type PaneConfiguration = {
   leftPane: number;
   navPane: number;
-  rightPane: number;
+  editPane: number;
   bottomPaneHeight: number;
   recentProjectsPaneWidth: number;
 };
