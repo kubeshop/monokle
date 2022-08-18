@@ -776,10 +776,13 @@ export const mainSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
-      const notification: AlertType = action.payload;
-      notification.id = uuidv4();
-      notification.hasSeen = false;
-      notification.createdAt = new Date().getTime();
+      const notification: AlertType = {
+        ...action.payload,
+        id: uuidv4(),
+        hasSeen: false,
+        createdAt: new Date().getTime(),
+      };
+
       state.notifications = [notification, ...state.notifications];
     });
 

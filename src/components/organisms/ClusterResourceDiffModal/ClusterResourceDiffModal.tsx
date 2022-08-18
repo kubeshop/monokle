@@ -32,7 +32,7 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import * as S from './styled';
+import * as S from './ClusterResourceDiffModal.styled';
 
 const monacoEditorOptions = {
   readOnly: true,
@@ -246,7 +246,7 @@ const ClusterResourceDiffModal = () => {
 
   return (
     <>
-      <S.StyledModal
+      <S.Modal
         centered
         footer={null}
         title={
@@ -268,7 +268,7 @@ const ClusterResourceDiffModal = () => {
               </Select>
               <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
                 <Switch checked={shouldDiffIgnorePaths} />
-                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+                <S.SwitchLabel>Hide ignored fields</S.SwitchLabel>
               </S.SwitchContainer>
             </S.FileSelectContainer>
           </S.TitleContainer>
@@ -295,11 +295,11 @@ const ClusterResourceDiffModal = () => {
           ) : (
             <>
               <S.TagsContainer>
-                <S.StyledTag>
+                <S.Tag>
                   Cluster{' '}
                   <ClusterName $kubeConfigContextColor={kubeConfigContextColor}>{kubeConfigContext}</ClusterName>
-                </S.StyledTag>
-                <S.StyledTag>Local</S.StyledTag>
+                </S.Tag>
+                <S.Tag>Local</S.Tag>
               </S.TagsContainer>
               <S.MonacoDiffContainer width="100%" height="calc(100% - 80px)" ref={containerRef}>
                 <MonacoDiffEditor
@@ -329,7 +329,7 @@ const ClusterResourceDiffModal = () => {
             </>
           )}
         </ResizableBox>
-      </S.StyledModal>
+      </S.Modal>
 
       {targetResourceId && isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
