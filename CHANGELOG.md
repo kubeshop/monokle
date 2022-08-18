@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/kubeshop/monokle/compare/v1.9.2-nightly-2022-08-10.0...v1.10.0) (2022-08-10)
+
+
+### Features
+
+* call to action in release notes ([0263f31](https://github.com/kubeshop/monokle/commit/0263f3150068286d4e8b9ea4a7577fd316e2f8b3))
+
+
+### Bug Fixes
+
+* ignore file/folder contained in filter when in preview mode ([dfc0b22](https://github.com/kubeshop/monokle/commit/dfc0b22240c57dab48f6306dad491c8f66a219d9))
+* select and highlight first created resource from templates ([0946e14](https://github.com/kubeshop/monokle/commit/0946e14adb2543ff9ea8e61286ddceab5ace6fb6))
+* upgrade antd from 4.21.6 to 4.21.7 ([0506e8b](https://github.com/kubeshop/monokle/commit/0506e8b3e534ea49cb82c7d061061c93c9e69d06))
+
 ### [1.9.1](https://github.com/kubeshop/monokle/compare/v1.9.1-nightly-2022-07-14.0...v1.9.1) (2022-07-14)
 
 

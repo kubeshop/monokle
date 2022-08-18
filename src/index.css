@@ -18,26 +18,26 @@ code {
 }
 
 .reflex-container.vertical > .reflex-splitter {
-  width: 2px;
+  width: 1px;
   background-color: #262626;
   border: 0px;
 }
 
 .reflex-container.vertical > .reflex-splitter:hover {
-  background-color: #dbdbdb;
+  background-color: #262626;
   transition: all 0.5s ease;
   border: 0px;
 }
 
 .reflex-container.vertical > .reflex-splitter.active {
   background-color: rgba(23, 125, 220, 0.5);
-  border-right: 1px solid rgba(23, 125, 220, 0.5);
-  border-left: 1px solid rgba(23, 125, 220, 0.5);
+  border-right: 2px solid rgba(23, 125, 220, 0.5);
+  border-left: 2px solid rgba(23, 125, 220, 0.5);
   transition: all 0.25s ease;
 }
 
 .reflex-container.horizontal > .reflex-splitter {
-  height: 2px;
+  height: 1px;
   background-color: #262626;
   border: 0px;
 }
@@ -382,6 +382,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {

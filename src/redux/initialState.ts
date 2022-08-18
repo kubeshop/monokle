@@ -149,6 +149,7 @@ const initialUiState: UiState = {
   isSettingsOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
+  isScaleModalOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -257,7 +258,12 @@ const initialExtensionState: ExtensionState = {
 };
 
 const initialTerminalState: TerminalState = {
-  runningTerminals: [],
+  settings: {
+    defaultShell: electronStore.get('terminal.settings.defaultShell'),
+    fontSize: electronStore.get('terminal.settings.fontSize'),
+  },
+  shellsMap: {},
+  terminalsMap: {},
 };
 
 export default {

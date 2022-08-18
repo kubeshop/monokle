@@ -250,7 +250,16 @@ export const addMultipleResources = createAsyncThunk<AppState, K8sResource[], Th
     const userDataDir = String(state.config.userDataDir);
 
     const nextMainState = createNextState(state.main, mainState => {
-      resources.forEach(resource => {
+      clearResourceSelections(mainState.resourceMap);
+
+      resources.forEach((resource, index) => {
+        // select first resource
+        if (!index) {
+          resource.isSelected = true;
+          resource.isHighlighted = true;
+          mainState.selectedResourceId = resource.id;
+        }
+
         mainState.resourceMap[resource.id] = resource;
         const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 

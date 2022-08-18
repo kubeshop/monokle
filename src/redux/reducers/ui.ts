@@ -17,7 +17,7 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@models/ui';
-import {WalkThroughCollection} from '@models/walkthrough';
+import {WalkthroughCollection} from '@models/walkthrough';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -35,10 +35,16 @@ export const uiSlice = createSlice({
       state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
     },
     zoomIn: () => {
-      webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+      const newZoomFactor = webFrame.getZoomFactor() + 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     zoomOut: () => {
-      webFrame.setZoomFactor(Number(webFrame.getZoomFactor() - 0.1));
+      const newZoomFactor = webFrame.getZoomFactor() - 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
@@ -271,6 +277,12 @@ export const uiSlice = createSlice({
     closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
       state.isKeyboardShortcutsModalOpen = false;
     },
+    openScaleModal: (state: Draft<UiState>) => {
+      state.isScaleModalOpen = true;
+    },
+    closeScaleModal: (state: Draft<UiState>) => {
+      state.isScaleModalOpen = false;
+    },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
     },
@@ -280,13 +292,13 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkThrough: (state: Draft<UiState>, action: PayloadAction<WalkThroughCollection>) => {
+    cancelWalkthrough: (state: Draft<UiState>, action: PayloadAction<WalkthroughCollection>) => {
       const collection = action.payload;
       state.walkThrough[collection].currentStep = -1;
     },
-    handleWalkThroughStep: (
+    handleWalkthroughStep: (
       state: Draft<UiState>,
-      action: PayloadAction<{step: number; collection: WalkThroughCollection}>
+      action: PayloadAction<{step: number; collection: WalkthroughCollection}>
     ) => {
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
@@ -323,7 +335,7 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  cancelWalkThrough,
+  cancelWalkthrough,
   closeAboutModal,
   closeClusterDiff,
   closeCreateFileFolderModal,
@@ -340,7 +352,7 @@ export const {
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
-  handleWalkThroughStep,
+  handleWalkthroughStep,
   highlightItem,
   openAboutModal,
   openClusterDiff,
@@ -380,5 +392,7 @@ export const {
   openKubeConfigBrowseSetting,
   closeKubeConfigBrowseSetting,
   setActiveTab,
+  openScaleModal,
+  closeScaleModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

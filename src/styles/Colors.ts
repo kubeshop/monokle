@@ -71,9 +71,11 @@ enum Colors {
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
 
+  green5 = '#3c8618',
   green6 = '#49AA19',
   green7 = '#6ABE39', // Polar Green
-  green8 = '#6F9412',
+  green8 = '#8fd460',
+  green9 = '#b2e58b',
   green10 = '#3E4F13', // Dark Green
 
   highlightGreen = '#33BCB7',

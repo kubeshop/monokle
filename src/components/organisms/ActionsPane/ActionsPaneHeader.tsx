@@ -21,7 +21,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {isInClusterModeSelector, knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
@@ -33,6 +33,8 @@ import {TitleBar} from '@molecules';
 import {Icon} from '@atoms';
 
 import * as S from './ActionsPaneHeader.styled';
+import Restart from './Restart/Restart';
+import Scale from './Scale/Scale';
 
 interface IProps {
   selectedResource: K8sResource | undefined;
@@ -53,6 +55,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
   const selectedPreviewConfiguration = useAppSelector(state => {
@@ -184,9 +187,9 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Button>
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
-          <S.DiffButton size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
+          <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
             Edit
-          </S.DiffButton>
+          </Button>
         </Tooltip>
       </TitleBar>
     );
@@ -241,39 +244,42 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           </Tooltip>
         )}
 
-        <Tooltip
-          mouseEnterDelay={TOOLTIP_DELAY}
-          title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
-          placement="bottomLeft"
-        >
-          <Button
-            loading={Boolean(applyingResource)}
-            type="primary"
-            size="small"
-            ghost
-            onClick={applySelection}
-            disabled={isDeployButtonDisabled}
-            icon={<Icon name="kubernetes" />}
-          >
-            {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-          </Button>
-        </Tooltip>
+        <S.ButtonContainer>
+          {isInClusterMode && (
+            <>
+              <Scale />
+              <Restart />
+            </>
+          )}
 
-        <Tooltip
-          mouseEnterDelay={TOOLTIP_DELAY}
-          title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
-          placement="bottomLeft"
-        >
-          <S.DiffButton
-            size="small"
-            type="primary"
-            ghost
-            onClick={diffSelectedResource}
-            disabled={isDiffButtonDisabled}
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
+            placement="bottomLeft"
           >
-            Diff
-          </S.DiffButton>
-        </Tooltip>
+            <Button
+              loading={Boolean(applyingResource)}
+              type="primary"
+              size="small"
+              ghost
+              onClick={applySelection}
+              disabled={isDeployButtonDisabled}
+              icon={<Icon name="kubernetes" />}
+            >
+              {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+            </Button>
+          </Tooltip>
+
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
+            placement="bottomLeft"
+          >
+            <Button size="small" type="primary" ghost onClick={diffSelectedResource} disabled={isDiffButtonDisabled}>
+              Diff
+            </Button>
+          </Tooltip>
+        </S.ButtonContainer>
       </>
     </TitleBar>
   );

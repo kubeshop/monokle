@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useMemo} from 'react';
 
 import {Tooltip} from 'antd';
 
@@ -14,22 +14,48 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
 
-  const getInformation = useCallback(() => {
-    let text = DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
-
-    if (resource.content?.status?.phase) {
-      text = `${text} | ${resource.content.status.phase}`;
+  const ageInfo = useMemo(() => {
+    if (!resource?.content?.metadata) {
+      return '';
     }
-    return text;
+
+    return DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
   }, [resource]);
 
-  if (!resource) {
+  const statusInfo = useMemo(() => {
+    if (!resource?.content?.status?.phase) {
+      return '';
+    }
+
+    return resource.content.status.phase;
+  }, [resource]);
+
+  if (!resource || (!ageInfo && !statusInfo)) {
     return null;
   }
 
-  return getInformation() ? (
-    <Tooltip placement="top" title={getInformation()}>
-      <S.InfoCircleOutlined isSelected={itemInstance.isSelected} />
+  return (
+    <Tooltip
+      placement="top"
+      title={
+        <S.InfoContainer>
+          {ageInfo && (
+            <>
+              Age <S.Tag>{ageInfo}</S.Tag>
+            </>
+          )}
+
+          {ageInfo && statusInfo && '|'}
+
+          {statusInfo && (
+            <>
+              <span>Status</span> <S.Tag $status={statusInfo}>{statusInfo}</S.Tag>
+            </>
+          )}
+        </S.InfoContainer>
+      }
+    >
+      <S.InfoCircleFilled $isSelected={itemInstance.isSelected} />
     </Tooltip>
-  ) : null;
+  );
 };

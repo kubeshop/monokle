@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import {PreviewType} from '@models/appstate';
 import {ClusterColors} from '@models/cluster';
 
-import {AppBorders} from '@styles/Borders';
 import Colors, {FontColors, PanelColors} from '@styles/Colors';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
@@ -51,7 +50,6 @@ export const Header = styled(Layout.Header)`
   width: 100%;
   line-height: 30px;
   background: ${PanelColors.headerBar};
-  border-bottom: ${AppBorders.pageDivider};
   min-height: 48px;
   z-index: 1;
   height: 30px;
@@ -81,4 +79,6 @@ export const Divider = styled(RawDivider)`
   border-color: ${Colors.grey3};
   height: 28px;
   margin: 0;
+  margin-right: 1rem;
+  top: 0;
 `;

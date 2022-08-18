@@ -7,6 +7,8 @@ import invariant from 'tiny-invariant';
 import {PartialResourceSet, resourceSetSelected, selectHelmResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import * as S from '../ResourceSetSelectColor.styled';
+
 type Props = {
   side: 'left' | 'right';
 };
@@ -38,19 +40,21 @@ export const HelmValuesOrConfigSelect: React.FC<Props> = ({side}) => {
   }
 
   return (
-    <Select
-      placeholder="Select values…"
-      onSelect={handleSelect}
-      value={currentHelmValuesOrConfig?.id}
-      style={{width: 160}}
-    >
-      {options.map(values => {
-        return (
-          <Select.Option key={values.id} value={values.id}>
-            {values.name}
-          </Select.Option>
-        );
-      })}
-    </Select>
+    <S.SelectColor>
+      <Select
+        placeholder="Select values…"
+        onSelect={handleSelect}
+        value={currentHelmValuesOrConfig?.id}
+        style={{width: 160}}
+      >
+        {options.map(values => {
+          return (
+            <Select.Option key={values.id} value={values.id}>
+              {values.name}
+            </Select.Option>
+          );
+        })}
+      </Select>
+    </S.SelectColor>
   );
 };

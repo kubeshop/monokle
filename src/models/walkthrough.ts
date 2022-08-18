@@ -1,16 +1,16 @@
-export type WalkThroughCollection = 'novice' | 'release';
+export type WalkthroughCollection = 'novice' | 'release';
 
-export type WalkThroughStep<C extends WalkThroughCollection = WalkThroughCollection> = C extends 'novice'
+export type WalkthroughStep<C extends WalkthroughCollection = WalkthroughCollection> = C extends 'novice'
   ? 'template' | 'resource' | 'syntax' | 'kustomizeHelm'
   : 'compare' | 'images';
 
-export type WalkThroughContentProps = {
+export type WalkthroughContentProps = {
   data: {
-    step: WalkThroughStep;
+    step: WalkthroughStep;
     title: string;
     content: string;
   };
-  collection: WalkThroughCollection;
+  collection: WalkthroughCollection;
   currentStep: number;
 };
 

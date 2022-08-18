@@ -15,6 +15,7 @@ import {PreviewType} from '@models/appstate';
 import {ClusterColors} from '@models/cluster';
 
 import Colors from '@styles/Colors';
+import {Device} from '@styles/Device';
 
 interface RawButtonProps extends ButtonProps {
   $kubeConfigContextColor?: ClusterColors;
@@ -123,6 +124,7 @@ export const ClusterActionButton = styled(RawButton)`
 `;
 
 export const ClusterButton = styled(RawButton)`
+  width: 100%;
   display: flex;
   align-items: center;
   color: ${Colors.whitePure};
@@ -141,6 +143,7 @@ export const ClusterContainer = styled.div`
   border: none;
   border-radius: 4px;
   line-height: 28px !important;
+  min-width: 340px;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -162,7 +165,8 @@ export const ClusterDropdownClusterName = styled.div`
 `;
 
 export const ClusterContextName = styled.span`
-  max-width: 100px;
+  width: 100%;
+  text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -185,7 +189,11 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   border-radius: ${props => (props.isHalfBordered ? '0 4px 4px 0' : '4px')};
   padding: 0 1rem;
   background: ${Colors.grey3b};
-  border: 1px solid ${Colors.grey6};
+  border: none;
+
+  @media ${Device.laptop} {
+    min-width: 340px;
+  }
 `;
 
 export const ClusterStatusText = styled.span<{

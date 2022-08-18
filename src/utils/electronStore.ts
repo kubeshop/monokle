@@ -193,6 +193,9 @@ const schema = {
           },
         },
       },
+      zoomFactor: {
+        type: 'number',
+      },
     },
   },
   uiCoach: {
@@ -253,6 +256,22 @@ const schema = {
       },
     },
   },
+  terminal: {
+    type: 'object',
+    properties: {
+      settings: {
+        type: 'object',
+        properties: {
+          defaultShell: {
+            type: 'string',
+          },
+          fontSize: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -297,6 +316,7 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
+    zoomFactor: 1,
   },
   kubeConfig: {
     namespaces: [],
@@ -304,6 +324,12 @@ const defaults = {
   },
   pluginConfig: {
     policies: [],
+  },
+  terminal: {
+    settings: {
+      defaultShell: '',
+      fontSize: 14,
+    },
   },
 };
 

@@ -179,8 +179,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
         },
-        getMeta: () => {
+        getMeta: template => {
           return {
+            filePath: template.filePath,
             itemPrefixStyle: {
               paddingLeft: 10,
             },
@@ -190,7 +191,13 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
-          dispatch(selectFile({filePath: itemInstance.id}));
+          const filePath: string | undefined = itemInstance.meta?.filePath;
+
+          if (!filePath) {
+            return;
+          }
+
+          dispatch(selectFile({filePath}));
         },
       },
       customization: {

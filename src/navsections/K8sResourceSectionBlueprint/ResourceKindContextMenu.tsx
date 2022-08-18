@@ -6,6 +6,7 @@ import {Menu, Modal} from 'antd';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+import {v4 as uuidv4} from 'uuid';
 
 import hotkeys from '@constants/hotkeys';
 
@@ -16,8 +17,14 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
-import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {
+  openNewResourceWizard,
+  openRenameResourceModal,
+  openSaveResourcesToFileFolderModal,
+  setLeftBottomMenuSelection,
+} from '@redux/reducers/ui';
+import {isInClusterModeSelector, isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -67,17 +74,37 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
   const previewType = useAppSelector(state => state.main.previewType);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
+
+  const shellCommand = useMemo(() => {
+    if (!resource || resource.kind !== 'Pod') {
+      return;
+    }
+
+    let terminalCommand = `${osPlatform !== 'win32' ? 'exec ' : ''}kubectl exec -i -t -n `;
+    terminalCommand += `${resource.namespace || 'default'} ${resource.name}`;
+
+    const container = resource.content.spec?.containers[0];
+
+    if (container) {
+      terminalCommand += ` -c ${container.name} -- sh -c "clear; (bash || ash || sh)"`;
+    }
+
+    return terminalCommand;
+  }, [osPlatform, resource]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -119,7 +146,31 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
   };
 
+  const onClickOpenShell = () => {
+    if (!bottomSelection || bottomSelection !== 'terminal') {
+      dispatch(setLeftBottomMenuSelection('terminal'));
+    }
+
+    const newTerminalId = uuidv4();
+    dispatch(setSelectedTerminal(newTerminalId));
+    dispatch(
+      addTerminal({
+        id: newTerminalId,
+        isRunning: false,
+        defaultCommand: shellCommand,
+        pod: resource,
+        shell: defaultShell,
+      })
+    );
+  };
+
   const menuItems = [
+    ...(isInClusterMode && resource.kind === 'Pod'
+      ? [
+          {key: 'shell', label: 'Shell', onClick: onClickOpenShell},
+          {key: 'divider-1', type: 'divider'},
+        ]
+      : []),
     ...(isInPreviewMode || isUnsavedResource(resource)
       ? [
           {
@@ -128,7 +179,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
             disabled: isInPreviewMode,
             onClick: onClickSaveToFileFolder,
           },
-          {key: 'divider', type: 'divider'},
+          {key: 'divider-2', type: 'divider'},
         ]
       : []),
     {key: 'rename', label: 'Rename', onClick: onClickRename},

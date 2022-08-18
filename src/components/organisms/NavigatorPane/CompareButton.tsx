@@ -11,7 +11,7 @@ import {useAppDispatch} from '@redux/hooks';
 
 import {Walkthrough} from '@molecules';
 
-export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
+export const CompareButton: React.FC<{width: number; children?: React.ReactNode}> = ({children, width}) => {
   const dispatch = useAppDispatch();
   const onClickClusterComparison = () => {
     dispatch(compareToggled({value: true}));
@@ -20,16 +20,22 @@ export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}
   return (
     <Walkthrough collection="release" step="compare">
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Compare resources" placement="bottom">
-        <Button
-          onClick={onClickClusterComparison}
-          icon={<SwapOutlined />}
-          type="primary"
-          ghost
-          size="small"
-          style={{marginLeft: 8}}
-        >
-          {children}
-        </Button>
+        {width > 410 ? (
+          <Button style={{padding: '4px 10px'}} type="link" onClick={onClickClusterComparison}>
+            Compare & Sync
+          </Button>
+        ) : (
+          <Button
+            onClick={onClickClusterComparison}
+            icon={<SwapOutlined />}
+            type="primary"
+            ghost
+            size="small"
+            style={{marginLeft: 8}}
+          >
+            {children}
+          </Button>
+        )}
       </Tooltip>
     </Walkthrough>
   );

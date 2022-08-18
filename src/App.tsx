@@ -26,7 +26,7 @@ import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResourc
 import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
-  handleWalkThroughStep,
+  handleWalkthroughStep,
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
@@ -161,6 +161,7 @@ const App = () => {
     if (!shouldTriggerTelemetryNotification) {
       return;
     }
+
     dispatch(
       setAlert({
         title: 'Monokle telemetry',
@@ -168,6 +169,7 @@ const App = () => {
         type: AlertEnum.Info,
         extraContentType: ExtraContentType.Telemetry,
         duration: 5,
+        id: 'monokle_telemetry_alert',
       })
     );
   }, [shouldTriggerTelemetryNotification, dispatch]);
@@ -232,9 +234,9 @@ const App = () => {
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
     if (!electronStore.get('appConfig.lastSeenReleaseNotesVersion')) {
-      dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'novice'}));
+      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
     } else {
-      dispatch(handleWalkThroughStep({step: StepEnum.Next, collection: 'release'}));
+      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'release'}));
     }
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
   }, [appVersion, dispatch]);

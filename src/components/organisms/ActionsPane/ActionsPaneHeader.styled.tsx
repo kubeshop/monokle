@@ -2,9 +2,14 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-export const DiffButton = styled(Button)`
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
   margin-left: 8px;
-  margin-right: 4px;
+
+  Button {
+    margin: 0 4px;
+  }
 `;
 
 export const LeftArrowButton = styled(Button)`

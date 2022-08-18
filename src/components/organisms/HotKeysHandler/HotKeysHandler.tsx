@@ -11,7 +11,9 @@ import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
+  openScaleModal,
   setActiveTab,
+  setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
@@ -24,6 +26,7 @@ import {
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
+  selectedResourceSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -51,6 +54,7 @@ const HotKeysHandler = () => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
+  const currentResource = useAppSelector(selectedResourceSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -69,6 +73,16 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.SELECT_FOLDER.key, () => {
     openFileExplorer();
   });
+
+  useHotkeys(
+    hotkeys.SCALE.key,
+    () => {
+      if (currentResource?.kind === 'Deployment' && isInPreviewMode) {
+        dispatch(openScaleModal());
+      }
+    },
+    [currentResource, isInPreviewMode]
+  );
 
   useHotkeys(
     hotkeys.REFRESH_FOLDER.key,
@@ -184,6 +198,19 @@ const HotKeysHandler = () => {
       diffSelectedResource();
     },
     [diffSelectedResource, isKubeConfigPathValid]
+  );
+
+  useHotkeys(
+    hotkeys.TOGGLE_TERMINAL_PANE.key,
+    () => {
+      if (uiState.leftMenu.bottomSelection === 'terminal') {
+        dispatch(setLeftBottomMenuSelection(null));
+      } else {
+        dispatch(setLeftBottomMenuSelection('terminal'));
+      }
+    },
+    {enableOnTags: ['TEXTAREA']},
+    [uiState.leftMenu.bottomSelection]
   );
 
   useHotkeys(
