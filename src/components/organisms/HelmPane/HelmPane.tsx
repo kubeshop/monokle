@@ -4,7 +4,7 @@ import {SectionRenderer, TitleBar} from '@molecules';
 
 import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
-import * as S from './styled';
+import * as S from './HelmPane.styled';
 
 const HelmPane: React.FC = () => {
   return (
