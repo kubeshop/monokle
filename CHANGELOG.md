@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.1](https://github.com/kubeshop/monokle/compare/v1.10.1-nightly-2022-08-19.0...v1.10.1) (2022-08-19)
+
+
+### Bug Fixes
+
+* upgrade antd from 4.22.1 to 4.22.2 ([1854211](https://github.com/kubeshop/monokle/commit/185421156321ab40879804b2fdcc6f2c13400bac))
+
 ## [1.10.0](https://github.com/kubeshop/monokle/compare/v1.9.2-nightly-2022-08-10.0...v1.10.0) (2022-08-10)
 
 
