@@ -1,11 +1,10 @@
-# Test purposes, We will use this whenever we want to create a signed application
-
+# Test purposes, We will use this whenever we want to create a signed release
 name: monokle-sign-notarize-publish-test
 
-# Add your branch name here
 on:
   push:
     branches:
+      # Add your branch name here
       - erdikose/test/test
 
   # Allows you to run this workflow manually from the Actions tab
