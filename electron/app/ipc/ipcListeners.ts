@@ -65,7 +65,7 @@ const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
-let machineId = machineIdSync();
+const machineId = machineIdSync();
 
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
@@ -88,7 +88,6 @@ const killTerminal = (id: string) => {
 };
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
-  machineId = machineIdSync();
   Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
   if (segmentClient) {
@@ -263,21 +262,9 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  console.log('quit-and-install');
-  try {
-    trackEvent(UPDATE_APPLICATION);
-    setImmediate(() => {
-      app.removeAllListeners('window-all-closed');
-      const browserWindows = BrowserWindow.getAllWindows();
-      browserWindows.forEach(browserWindow => {
-        browserWindow.removeAllListeners('close');
-      });
-      autoUpdater.quitAndInstall();
-    });
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
-  } catch (error) {
-    console.log(error);
-  }
+  trackEvent(UPDATE_APPLICATION);
+  autoUpdater.quitAndInstall();
+  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
 ipcMain.on('force-reload', async (event: any) => {
