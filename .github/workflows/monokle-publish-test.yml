@@ -119,7 +119,6 @@ jobs:
           prerelease: true
           omitBody: true
           tag: 'test'
-          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
       - name: Archive Binary
@@ -242,7 +241,6 @@ jobs:
           prerelease: true
           omitBody: true
           tag: 'test'
-          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
       - name: Archive Binary
@@ -340,7 +338,6 @@ jobs:
           prerelease: true
           omitBody: true
           tag: 'test'
-          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
       - name: Archive Binary
