@@ -1,6 +1,10 @@
 import {AppImageUpdater, MacUpdater, NsisUpdater} from 'electron-updater';
 import {GenericServerOptions} from 'electron-updater/node_modules/builder-util-runtime';
 
+import {join} from 'path';
+
+const isDev = process.env.NODE_ENV === 'development';
+
 const options: GenericServerOptions = {
   provider: 'generic',
   url: 'https://github.com/kubeshop/monokle/releases/download/latest-version',
@@ -18,4 +22,11 @@ if (process.platform === 'win32') {
 }
 autoUpdater.logger = console;
 
+if (isDev) {
+  autoUpdater.updateConfigPath = join(__dirname, '..', '..', '..', 'dev-app-update.yml');
+}
+
 export default autoUpdater;
+
+// electron-updater will be updated to latest version after this fix
+// https://github.com/electron-userland/electron-builder/issues/6863#issuecomment-1141519417

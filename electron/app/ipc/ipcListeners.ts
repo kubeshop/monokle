@@ -4,7 +4,6 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
-import os from 'os';
 import * as path from 'path';
 
 import {
@@ -263,9 +262,21 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  trackEvent(UPDATE_APPLICATION);
-  autoUpdater.quitAndInstall();
-  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  console.log('quit-and-install');
+  try {
+    trackEvent(UPDATE_APPLICATION);
+    setImmediate(() => {
+      app.removeAllListeners('window-all-closed');
+      const browserWindows = BrowserWindow.getAllWindows();
+      browserWindows.forEach(browserWindow => {
+        browserWindow.removeAllListeners('close');
+      });
+      autoUpdater.quitAndInstall();
+    });
+    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 ipcMain.on('force-reload', async (event: any) => {

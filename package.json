@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.10.1",
+  "version": "1.10.0",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -59,7 +59,7 @@
     "craco-alias": "3.0.1",
     "craco-less": "2.0.0",
     "cross-env": "7.0.3",
-    "electron": "19.0.11",
+    "electron": "19.0.13",
     "electron-builder": "23.3.3",
     "electron-notarize": "1.2.1",
     "electron-reload": "2.0.0-alpha.1",
@@ -114,9 +114,9 @@
     "default-shell": "2.2.0",
     "electron-devtools-installer": "3.2.0",
     "electron-log": "4.4.8",
-    "electron-store": "8.0.2",
+    "electron-store": "8.1.0",
     "electron-unhandled": "4.0.1",
-    "electron-updater": "4.6.5",
+    "electron-updater": "5.2.1",
     "es6-tween": "5.5.11",
     "execa": "5.1.1",
     "fast-deep-equal": "3.1.3",
@@ -134,7 +134,7 @@
     "new-github-issue-url": "1.0.0",
     "node-fetch": "2.6.7",
     "node-machine-id": "1.1.12",
-    "node-pty": "0.10.1",
+    "node-pty": "0.11.0-beta11",
     "nucleus-nodejs": "3.0.9",
     "numeral": "2.0.6",
     "polished": "4.2.2",
@@ -167,8 +167,8 @@
     "uuid": "8.3.2",
     "vm2": "3.9.10",
     "web-vitals": "2.1.4",
-    "xterm": "^4.19.0",
-    "xterm-addon-fit": "^0.5.0",
+    "xterm": "4.19.0",
+    "xterm-addon-fit": "0.5.0",
     "yaml": "2.1.1",
     "yargs": "17.4.0"
   },
@@ -196,7 +196,8 @@
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "ui-test": "xvfb-maybe npx playwright test --workers=1",
-    "custom-script": "npx ts-node src/scripts/index.ts"
+    "custom-script": "npx ts-node src/scripts/index.ts",
+    "sign-dev-electron-app": "codesign --deep --force --verbose --sign - node_modules/electron/dist/Electron.app"
   },
   "build": {
     "appId": "io.kubeshop.monokle",
