@@ -27,6 +27,3 @@ if (isDev) {
 }
 
 export default autoUpdater;
-
-// electron-updater will be updated to latest version after this fix
-// https://github.com/electron-userland/electron-builder/issues/6863#issuecomment-1141519417
