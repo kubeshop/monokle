@@ -65,7 +65,7 @@ const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
-const machineId = machineIdSync();
+let machineId = machineIdSync();
 
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
@@ -88,6 +88,7 @@ const killTerminal = (id: string) => {
 };
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
+  machineId = machineIdSync();
   Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
   if (segmentClient) {
