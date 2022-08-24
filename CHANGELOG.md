@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.2](https://github.com/kubeshop/monokle/compare/v1.10.2-nightly-2022-08-24.0...v1.10.2) (2022-08-24)
+
+
+### Bug Fixes
+
+* auto-updater issue ([096e49e](https://github.com/kubeshop/monokle/commit/096e49ec94726382801b4b3ed87e062540175731))
+* improved handling of invalid Chart.yaml ([4cc41e6](https://github.com/kubeshop/monokle/commit/4cc41e68f16f7cb92e0ce7b6d579c1bc79a7c231))
+* preview configuration details crashing ([8d9c60a](https://github.com/kubeshop/monokle/commit/8d9c60a5885cf33c19af7bbabd4cf0fd775f04cf))
+* select file on match line click ([e5ab3ad](https://github.com/kubeshop/monokle/commit/e5ab3ada17f96a7505aff9701e1de701b8e644d5))
+* upgrade type-fest from 2.17.0 to 2.18.0 ([372514d](https://github.com/kubeshop/monokle/commit/372514ded0fb5ec425dcbf0082baa045088a043d))
+
 ### [1.10.1](https://github.com/kubeshop/monokle/compare/v1.10.1-nightly-2022-08-19.0...v1.10.1) (2022-08-19)
 
 
