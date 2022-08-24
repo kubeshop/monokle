@@ -26,6 +26,7 @@ nav:
     - Creating Resources: creating-resources.md
     - Editing Resources: resource-editing.md
     - Validating Resources: resource-validation.md
+    - Working with Multiple Resources: working-with-multiple-resources.md
   - Working with Projects: projects.md
   - Working with Images: images.md
   - Working with Kustomize: kustomize.md
