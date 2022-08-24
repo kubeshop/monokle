@@ -11,8 +11,8 @@ export const useFileSelect = () => {
 
   const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
-    const {isExcluded, isSupported, isTextExtension} = info.node;
-    if ((isExcluded || !isSupported) && !isTextExtension) {
+    const {isExcluded, isSupported, isTextExtension, isLine} = info.node;
+    if (!isLine && (isExcluded || !isSupported) && !isTextExtension) {
       return;
     }
 

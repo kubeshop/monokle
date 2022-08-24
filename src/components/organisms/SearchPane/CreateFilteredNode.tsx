@@ -46,7 +46,7 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
             />
           ),
           isFolder: false,
-          isLeaf: true,
+          isLine: true,
           matchItemArr: line,
         })) || [],
     };
