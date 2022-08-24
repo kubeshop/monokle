@@ -22,14 +22,6 @@ const PreviwConfigurationDetails: React.FC = () => {
   const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
   const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
-  const helmChart = useAppSelector(state => {
-    if (!previewConfiguration) {
-      return undefined;
-    }
-    return Object.values(state.main.helmChartMap).find(
-      chart => chart.filePath === previewConfiguration.helmChartFilePath
-    );
-  });
 
   const previewConfiguration = useMemo(
     () =>
@@ -38,6 +30,15 @@ const PreviwConfigurationDetails: React.FC = () => {
         : undefined,
     [selectedPreviewConfigurationId, previewConfigurationMap]
   );
+
+  const helmChart = useAppSelector(state => {
+    if (!previewConfiguration) {
+      return undefined;
+    }
+    return Object.values(state.main.helmChartMap).find(
+      chart => chart.filePath === previewConfiguration.helmChartFilePath
+    );
+  });
 
   const orderedValuesFilePaths = useMemo(
     () =>
