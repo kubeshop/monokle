@@ -17,7 +17,7 @@ import MonokleAbout from '@assets/MonokleAbout.svg';
 
 import packageJson from '@root/package.json';
 
-import * as S from './AboutMonokle.styled';
+import * as S from './AboutModal.styled';
 
 const {Text} = Typography;
 
@@ -77,10 +77,10 @@ const AboutModal = () => {
     >
       <span id="WelcomeModal">
         <S.HeightFillDiv />
-        <S.StyledContentContainerDiv>
-          <S.StyledContentDiv>
+        <S.ContentContainerDiv>
+          <S.ContentDiv>
             <img src={MonokleAbout} />
-            <S.StyledTextContainer>
+            <S.TextContainer>
               <Text>Version: {appVersion}</Text>
               <Text>Released in {about?.when}</Text>
               <Divider style={{margin: '8px 0'}} />
@@ -100,9 +100,9 @@ const AboutModal = () => {
                   ))}
                 </ul>
               </Text>
-            </S.StyledTextContainer>
-          </S.StyledContentDiv>
-        </S.StyledContentContainerDiv>
+            </S.TextContainer>
+          </S.ContentDiv>
+        </S.ContentContainerDiv>
       </span>
     </Modal>
   );

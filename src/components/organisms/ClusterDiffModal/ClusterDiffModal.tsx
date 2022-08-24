@@ -1,11 +1,9 @@
 import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ResizableBox, ResizeHandle} from 'react-resizable';
 
-import {Button, Modal, Skeleton, message} from 'antd';
+import {Button, Skeleton, message} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
@@ -31,64 +29,7 @@ import {Icon} from '@atoms';
 
 import {useWindowSize} from '@utils/hooks';
 
-import Colors, {BackgroundColors} from '@styles/Colors';
-
-const Container = styled.div`
-  display: block;
-  margin: 0;
-  padding: 0;
-  height: 75vh;
-  overflow: hidden;
-`;
-
-const SkeletonContainer = styled.div`
-  padding: 10px;
-`;
-
-const StyledModal = styled(Modal)<{previewing: boolean}>`
-  & .ant-modal-body {
-    padding: 8px;
-    overflow-x: hidden;
-  }
-
-  ${props =>
-    props.previewing &&
-    `
-    & .ant-modal-header {
-      background: ${BackgroundColors.previewModeBackground};
-    }
-    & .ant-modal-title {
-      color: ${Colors.blackPure} !important;
-    }
-    & .ant-modal-close-x {
-      color: ${Colors.blackPure} !important;
-    }
-  `}
-
-  & .custom-modal-handle {
-    position: absolute;
-    top: 50%;
-    height: 100%;
-    width: 10px;
-    background-color: transparent;
-    cursor: col-resize;
-    transform: translateY(-50%);
-  }
-
-  & .custom-modal-handle-e {
-    right: -5px;
-  }
-
-  & .custom-modal-handle-w {
-    left: -5px;
-  }
-`;
-
-const StyledButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+import * as S from './ClusterDiffModal.styled';
 
 type ResourceDiffState = {
   isLoading: boolean;
@@ -96,7 +37,7 @@ type ResourceDiffState = {
   clusterResourceText?: string;
 };
 
-function ClusterDiffModal() {
+const ClusterDiffModal = () => {
   const dispatch = useAppDispatch();
   const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
   const hasClusterDiffFailed = useAppSelector(state => state.main.clusterDiff.hasFailed);
@@ -308,13 +249,14 @@ function ClusterDiffModal() {
   };
 
   return (
-    <StyledModal
+    <S.Modal
+      $previewing={isInPreviewMode}
       title={title}
       visible={isClusterDiffVisible}
       width="min-content"
       onCancel={onCancel}
       footer={
-        <StyledButtonsContainer>
+        <S.ButtonsContainer>
           <Button
             type="primary"
             ghost
@@ -350,10 +292,9 @@ function ClusterDiffModal() {
               onCancel={() => setIsApplyModalVisible(false)}
             />
           )}
-        </StyledButtonsContainer>
+        </S.ButtonsContainer>
       }
       centered
-      previewing={isInPreviewMode}
     >
       <ResizableBox
         width={resizableBoxWidth}
@@ -366,16 +307,16 @@ function ClusterDiffModal() {
           <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
         )}
       >
-        <Container ref={containerRef}>
+        <S.Container ref={containerRef}>
           {!hasClusterDiffLoaded ? (
-            <SkeletonContainer>
+            <S.SkeletonContainer>
               <Skeleton active />
-            </SkeletonContainer>
+            </S.SkeletonContainer>
           ) : isResourceDiffVisible ? (
             resourceDiffState.isLoading ? (
-              <SkeletonContainer>
+              <S.SkeletonContainer>
                 <Skeleton active />
-              </SkeletonContainer>
+              </S.SkeletonContainer>
             ) : (
               resourceDiffState.localResource &&
               resourceDiffState.clusterResourceText && (
@@ -395,10 +336,10 @@ function ClusterDiffModal() {
           ) : (
             <ClusterDiff />
           )}
-        </Container>
+        </S.Container>
       </ResizableBox>
-    </StyledModal>
+    </S.Modal>
   );
-}
+};
 
 export default ClusterDiffModal;
