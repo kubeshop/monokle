@@ -4,7 +4,6 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
-import os from 'os';
 import * as path from 'path';
 
 import {

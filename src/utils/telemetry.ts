@@ -1,9 +1,12 @@
 import {ipcRenderer} from 'electron';
 
+import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 
 import {getSegmentClient} from './segment';
 import {isRendererThread} from './thread';
+
+const machineId: string = machineIdSync();
 
 export const trackEvent = <TEvent extends Event>(
   eventName: TEvent,
@@ -17,6 +20,7 @@ export const trackEvent = <TEvent extends Event>(
     segmentClient?.track({
       event: eventName,
       properties: payload,
+      userId: machineId,
     });
   }
 };
@@ -29,6 +33,7 @@ export const trackError = (error: any) => {
     segmentClient?.track({
       event: 'Error',
       properties: error,
+      userId: machineId,
     });
   }
 };
