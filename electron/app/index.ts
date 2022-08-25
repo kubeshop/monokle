@@ -12,6 +12,7 @@ import '@utils/segment';
 
 import terminal from '@root/cli/terminal';
 
+import './git/ipc';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
 import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from './utils';
