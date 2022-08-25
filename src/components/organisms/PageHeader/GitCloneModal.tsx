@@ -11,12 +11,15 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import * as S from './GitCloneModal.styled';
+
 type Props = {
+  onCancel?: () => void;
   onComplete?: () => void;
 };
 
 const GitCloneModal = (props: Props) => {
-  const {onComplete} = props;
+  const {onComplete, onCancel} = props;
   const dispatch = useAppDispatch();
   const [localPath, setLocalPath] = useState<string>();
   const [repoPath, setRepoPath] = useState<string>();
@@ -44,13 +47,19 @@ const GitCloneModal = (props: Props) => {
   };
 
   return (
-    <Modal visible onOk={onOk} confirmLoading={isCloning}>
-      <p>Local path:</p>
-      <Input readOnly value={localPath} onChange={e => setLocalPath(e.target.value)} />
-      <Button onClick={() => openFileExplorer()}>Browse</Button>
+    <Modal visible onOk={onOk} confirmLoading={isCloning} onCancel={onCancel}>
+      <S.FieldLabel>Project location:</S.FieldLabel>
+      <S.LocalPathField>
+        <Input readOnly value={localPath} onChange={e => setLocalPath(e.target.value)} />
+        <Button onClick={() => openFileExplorer()}>Browse</Button>
+      </S.LocalPathField>
       <FileExplorer {...fileExplorerProps} />
-      <p>Repo path:</p>
-      <Input value={repoPath} onChange={e => setRepoPath(e.target.value)} />
+      <S.FieldLabel>Repository URL:</S.FieldLabel>
+      <Input
+        value={repoPath}
+        onChange={e => setRepoPath(e.target.value)}
+        placeholder="https://github.com/kubeshop/monokle"
+      />
     </Modal>
   );
 };
