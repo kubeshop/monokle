@@ -24,6 +24,9 @@ enum Colors {
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1
 
+  coldGrey = '#31393C',
+  warmGrey = '#222222',
+
   // Notifications
   greenOkay = '#09b89d',
   polarGreen = '#6ABE39',
