@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.3](https://github.com/kubeshop/monokle/compare/v1.10.3-nightly-2022-08-26.0...v1.10.3) (2022-08-26)
+
+
+### Features
+
+* start project by cloning git repo ([b28f1c1](https://github.com/kubeshop/monokle/commit/b28f1c11d2ef5586f6e529f4ad9aefeb3cf04cfc))
+
+
+### Bug Fixes
+
+* downgrade electron version ([50ff222](https://github.com/kubeshop/monokle/commit/50ff222330cb360e7f7356deb85695cfff3647b2))
+
 ### [1.10.2](https://github.com/kubeshop/monokle/compare/v1.10.2-nightly-2022-08-24.0...v1.10.2) (2022-08-24)
 
 
