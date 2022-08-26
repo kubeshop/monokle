@@ -1,8 +1,8 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {BranchesOutlined} from '@ant-design/icons';
 
-import {GitBranch} from '@models/git';
+import {useAppSelector} from '@redux/hooks';
 
 import {TableSelect} from '@components/atoms';
 
@@ -10,25 +10,22 @@ import BranchTable from './BranchTable';
 
 function BranchSelect() {
   const [visible, setVisible] = useState(false);
-  // const {repoWithOwner, owner, repo, ref} = useRepoParams();
-  // const [fetchBranches, {data}] = useLazyGetBranchesQuery();
 
-  // const branchCount = data?.getRepository.branches.totalCount ?? 0;
-  // const branches = data?.getRepository.branches.nodes ?? [];
+  const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
 
-  const branches: GitBranch[] = [];
-  const branchCount = 1;
+  const localBranches = useAppSelector(state =>
+    Object.values(state.git.repo?.branchMap || {}).filter(b => !b.name.startsWith('remotes'))
+  );
 
-  // const handleTableToggle = useCallback(
-  //   (newVisible: boolean) => {
-  //     // fetchBranches({owner, repo});
-  //     setVisible(newVisible);
-  //   },
-  //   [fetchBranches, setVisible, owner, repo]
-  // );
+  const handleTableToggle = useCallback(
+    (newVisible: boolean) => {
+      setVisible(newVisible);
+    },
+    [setVisible]
+  );
 
   const handleSelect = () => {};
-  const handleTableToggle = () => {};
+  // const handleTableToggle = () => {};
 
   // const handleSelect = useCallback(
   //   ({name}: GitBranch) => {
@@ -41,9 +38,9 @@ function BranchSelect() {
 
   return (
     <TableSelect
-      value="Default"
+      value={currentBranch || 'default'}
       icon={<BranchesOutlined />}
-      table={<BranchTable onSelect={handleSelect} branches={branches} branchCount={branchCount} />}
+      table={<BranchTable onSelect={handleSelect} branches={localBranches} branchCount={localBranches.length} />}
       tablePlacement="bottomLeft"
       tableVisible={visible}
       onTableToggle={handleTableToggle}

@@ -36,5 +36,12 @@ export const Table = styled((props: TableProps<GitBranch>) => <RawTable<GitBranc
   .ant-table-tbody {
     color: white;
     background: ${Colors.warmGrey} !important;
+    overflow-y: hidden;
+  }
+  .ant-table-header {
+    margin-bottom: 0px;
+  }
+  .ant-table-header .ant-table-thead .ant-table-cell:first-child {
+    border-left: none !important;
   }
 `;

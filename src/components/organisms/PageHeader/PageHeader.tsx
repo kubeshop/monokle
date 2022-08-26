@@ -19,6 +19,8 @@ import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
+import BranchSelect from '@components/molecules/BranchSelect';
+
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
@@ -43,6 +45,7 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
 
   let timeoutRef = useRef<any>(null);
 
@@ -143,6 +146,11 @@ const PageHeader = () => {
             <>
               <S.Divider type="vertical" />
               <ProjectSelection />
+              {hasGitRepo && (
+                <span style={{marginLeft: 8}}>
+                  <BranchSelect />
+                </span>
+              )}
               <CreateProject />
             </>
           )}
