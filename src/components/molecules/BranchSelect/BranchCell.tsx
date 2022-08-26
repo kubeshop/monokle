@@ -23,7 +23,7 @@ export function NameCell({onSelect, branch}: Props) {
 
       <BranchUpdated>
         {/* <Icon name="commit" color={Colors.grey7} size="sm" style={{paddingTop: 2}} /> */}
-        <span style={{marginLeft: 6}}>{branch.shortSha}</span>
+        <span style={{marginLeft: 6}}>{branch.commitSha}</span>
       </BranchUpdated>
     </Box>
   );

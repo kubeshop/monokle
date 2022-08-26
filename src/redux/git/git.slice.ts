@@ -2,6 +2,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {GitRepo, GitSliceState} from '@models/git';
 
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {gitInitialState} from './git.initialState';
 
 export const gitSlice = createSlice({
@@ -14,6 +16,11 @@ export const gitSlice = createSlice({
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(setRootFolder.fulfilled, (state, action) => {
+      state.repo = action.payload.gitRepo;
+    });
   },
 });
 
