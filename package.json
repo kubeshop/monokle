@@ -101,7 +101,7 @@
     "@open-policy-agent/opa-wasm": "1.7.0",
     "@reduxjs/toolkit": "1.8.3",
     "@rjsf/antd": "4.2.0",
-    "@rjsf/core": "4.2.2",
+    "@rjsf/core": "4.2.3",
     "@trodi/electron-splashscreen": "1.0.2",
     "@types/analytics-node": "3.1.9",
     "ajv": "6.12.6",
