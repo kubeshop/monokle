@@ -59,7 +59,7 @@ const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
-const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
+const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize', 'git'];
 const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {

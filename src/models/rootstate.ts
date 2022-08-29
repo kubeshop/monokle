@@ -4,6 +4,7 @@ import {AlertState} from './alert';
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
 import {ExtensionState} from './extension';
+import {GitSliceState} from './git';
 import {LogsState} from './logs';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
@@ -25,4 +26,5 @@ export type RootState = {
   terminal: TerminalState;
   ui: UiState;
   uiCoach: UiCoachState;
+  git: GitSliceState;
 };

@@ -9,6 +9,7 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
+import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
@@ -21,6 +22,7 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
+import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 /**
@@ -97,6 +99,15 @@ export const setRootFolder = createAsyncThunk<
     numberOfResources: Object.values(resourceMap).length,
   });
 
+  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
+    'git.isFolderGitRepo',
+    'git.isFolderGitRepo.result',
+    rootFolder
+  );
+  const gitRepo = isFolderGitRepo
+    ? await promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolder)
+    : undefined;
+
   return {
     projectConfig,
     fileMap,
@@ -107,5 +118,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
+    gitRepo,
   };
 });
