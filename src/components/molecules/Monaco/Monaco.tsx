@@ -6,7 +6,7 @@ import {useMeasure} from 'react-use';
 import fs from 'fs';
 import log from 'loglevel';
 import 'monaco-editor';
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
 // @ts-ignore
@@ -251,6 +251,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       const resource = resourceMap[selectedResourceId];
       if (resource) {
         newCode = resource.text;
+        editor?.getModel()?.dispose();
         editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
     } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
@@ -258,6 +259,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       const fileStats = getFileStats(filePath);
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
+        editor?.getModel()?.dispose();
+        // monaco has no language registered for tpl extension so use yaml instead (as these could be Helm templates)
+        if (filePath.toLowerCase().endsWith('.tpl')) {
+          editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+        } else {
+          editor?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
+        }
       }
     }
 
