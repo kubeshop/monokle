@@ -61,7 +61,7 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
 };
 
 export const PANE_CONSTRAINT_VALUES = {
-  minEditPane: 0.4,
+  minEditPane: 0.34,
   navPane: 330,
 };
 
