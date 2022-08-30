@@ -27,7 +27,8 @@ const detectAvailableUnixShells = (osPlatform: NodeJS.Platform): ShellsMapType =
       }
     });
   } else {
-    shellsMap['bash'] = {name: 'Bash', shell: 'bash'};
+    shellsMap['bash'] = {name: 'bash', shell: 'bash'};
+    shellsMap['zsh'] = {name: 'zsh', shell: 'zsh'};
   }
 
   return shellsMap;
