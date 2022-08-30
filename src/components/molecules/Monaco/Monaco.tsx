@@ -31,6 +31,7 @@ import {
   selectImage,
   selectK8sResource,
   setAutosavingStatus,
+  setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
@@ -85,6 +86,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
+  const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const settings = useAppSelector(settingsSelector);
@@ -295,7 +297,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   }, [selectedResource]);
 
   useEffect(() => {
-    if (editor) {
+    if (editor && lastChangedLine) {
+      editor.revealLine(lastChangedLine);
+      dispatch(setLastChangedLine(0));
+    } else if (editor) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }

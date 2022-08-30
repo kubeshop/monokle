@@ -9,6 +9,7 @@ import {ThunkApi} from '@models/thunk';
 import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {getLineChanged} from '@redux/services/manifest-utils';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
@@ -42,6 +43,11 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
 
         const fileMap = mainState.fileMap;
         if (resource) {
+          const prevContent = resource.text;
+          const newContent = text;
+          const lineChanged = getLineChanged(prevContent, newContent);
+          mainState.lastChangedLine = lineChanged;
+
           performResourceContentUpdate(resource, text, fileMap, resourceMap);
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
           reprocessResources(

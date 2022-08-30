@@ -184,6 +184,20 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   text-decoration-style: dotted;
 }
 
+@keyframes fade {
+  from {
+    background-color: #6ABE39;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.monokleEditorLastModifiedLineInlineClass {
+  animation-duration: 5s;
+  animation-name: fade;
+}
+
 .ant-menu-submenu-popup {
   max-height: 250px !important;
   overflow-y: scroll !important;

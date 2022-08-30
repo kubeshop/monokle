@@ -757,6 +757,9 @@ export const mainSlice = createSlice({
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },
+    setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.lastChangedLine = action.payload;
+    },
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
     },
@@ -1378,6 +1381,7 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
+  setLastChangedLine,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
