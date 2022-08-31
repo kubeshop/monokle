@@ -426,6 +426,7 @@ export const mainSlice = createSlice({
       action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
     ) => {
       const resource = state.resourceMap[action.payload.resourceId];
+      state.lastChangedLine = 0;
       if (resource) {
         updateSelectionAndHighlights(state, resource);
         updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);

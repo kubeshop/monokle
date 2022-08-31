@@ -223,6 +223,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   const onChange = (newValue: any) => {
+    dispatch(setLastChangedLine(0));
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
@@ -298,8 +299,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   useEffect(() => {
     if (editor && lastChangedLine) {
-      editor.revealLine(lastChangedLine);
-      dispatch(setLastChangedLine(0));
+      editor.revealLineInCenter(lastChangedLine);
     } else if (editor) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));

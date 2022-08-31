@@ -184,18 +184,9 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   text-decoration-style: dotted;
 }
 
-@keyframes fade {
-  from {
-    background-color: #6ABE39;
-  }
-  to {
-    background-color: transparent;
-  }
-}
-
 .monokleEditorLastModifiedLineInlineClass {
-  animation-duration: 5s;
-  animation-name: fade;
+  background-color: #6ABE39;
+  color: black !important;
 }
 
 .ant-menu-submenu-popup {

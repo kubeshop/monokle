@@ -20,6 +20,7 @@ type UpdateResourcePayload = {
   text: string;
   preventSelectionAndHighlightsUpdate?: boolean;
   isInClusterMode?: boolean;
+  isUpdateFromForm?: boolean;
 };
 
 export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, ThunkApi>(
@@ -31,7 +32,7 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     const userDataDir = String(state.config.userDataDir);
     const policyPlugins = state.main.policies.plugins;
 
-    const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate} = payload;
+    const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
 
     let error: any;
 
@@ -45,8 +46,10 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
         if (resource) {
           const prevContent = resource.text;
           const newContent = text;
-          const lineChanged = getLineChanged(prevContent, newContent);
-          mainState.lastChangedLine = lineChanged;
+          if (isUpdateFromForm) {
+            const lineChanged = getLineChanged(prevContent, newContent);
+            mainState.lastChangedLine = lineChanged;
+          }
 
           performResourceContentUpdate(resource, text, fileMap, resourceMap);
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
