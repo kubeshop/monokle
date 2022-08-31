@@ -407,6 +407,8 @@ function getSiblingValues(outgoingRefMapper: RefMapper, sourceResource: K8sResou
       siblingValues[key] = value;
     });
   }
+
+  siblingValues[sourceRefNode.key] = sourceRefNode.scalar.value;
   return siblingValues;
 }
 
