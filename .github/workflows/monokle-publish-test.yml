@@ -127,7 +127,8 @@ jobs:
         name: Bump Homebrew
         with:
           # GitHub token, required, not the default one
-          token: ${{secrets.github_token}}
+          token: ${{secrets.CI_BOT_TOKEN}}
+          org: kubeshop
           tap: kubeshop/core
           # Formula name, required
           cask: monokle
