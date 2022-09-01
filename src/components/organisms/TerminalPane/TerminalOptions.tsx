@@ -37,7 +37,7 @@ const TerminalOptions: React.FC = () => {
   return (
     <S.TerminalOptionsContainer>
       <S.Form initialValues={settings} form={form} layout="vertical" onChange={updateSettingsHandler}>
-        <Form.Item name="defaultShell" label="Shell type">
+        <Form.Item name="defaultShell" label="Default shell type">
           <Radio.Group>
             {Object.entries(shellsMap).map(([shell, shellObject]) => (
               <Radio key={shell} value={shellObject.shell}>
