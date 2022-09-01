@@ -17,6 +17,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -289,6 +290,14 @@ const FileTreePane: React.FC<Props> = ({height}) => {
 
               if (isKustomizationFilePath(props.filePath)) {
                 return <Icon name="kustomize" style={{fontSize: 15}} />;
+              }
+
+              if (
+                isHelmChartFile(props.filePath) ||
+                isHelmTemplateFile(props.filePath) ||
+                isHelmValuesFile(props.filePath)
+              ) {
+                return <Icon name="helm" style={{fontSize: 18, paddingTop: '2px'}} />;
               }
 
               return <FileOutlined />;
