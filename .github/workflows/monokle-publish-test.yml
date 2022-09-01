@@ -134,6 +134,7 @@ jobs:
           cask: monokle
           tag: 'downloads'
           livecheck: true
+          force: true
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
