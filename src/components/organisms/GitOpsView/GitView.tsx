@@ -10,11 +10,7 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 
 import * as S from './GitView.styled';
 
-type Props = {
-  height: number;
-};
-
-const GitView: React.FC<Props> = ({height}) => {
+const GitView: React.FC = () => {
   // add redux logic after implementation with git flow
   const [selected, setSelectedItem] = useState(false);
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();

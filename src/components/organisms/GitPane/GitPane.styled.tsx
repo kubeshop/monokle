@@ -1,5 +1,3 @@
-import {Button} from 'antd';
-
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';

@@ -1,6 +1,6 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 
-import {Button, Checkbox, List, Menu, Select} from 'antd';
+import {Button, Checkbox, List, Menu} from 'antd';
 
 import {FileOutlined} from '@ant-design/icons';
 
