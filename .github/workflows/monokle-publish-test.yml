@@ -123,14 +123,15 @@ jobs:
           tag: 'test'
           token: ${{ secrets.github_token }}
 
-      - uses: dawidd6/action-homebrew-bump-formula@v3.8.0
+      - uses: macauley/action-homebrew-bump-cask@v1
+        name: Bump Homebrew
         with:
           # GitHub token, required, not the default one
           token: ${{secrets.github_token}}
           tap: kubeshop/core
           # Formula name, required
-          formula: monokle
-          tag: ${{ github.event.client_payload.ref }}
+          cask: monokle
+          tag: 'downloads'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
