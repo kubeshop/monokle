@@ -5,7 +5,7 @@ on:
   push:
     branches:
       # Add your branch name here
-      - erdikose/test/test
+      - erdikose/feat/add-homebrew
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -122,6 +122,15 @@ jobs:
           omitBody: true
           tag: 'test'
           token: ${{ secrets.github_token }}
+
+      - uses: dawidd6/action-homebrew-bump-formula@v3.8.0
+        with:
+          # GitHub token, required, not the default one
+          token: ${{secrets.github_token}}
+          tap: kubeshop/core
+          # Formula name, required
+          formula: monokle
+          tag: ${{ github.event.client_payload.ref }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
