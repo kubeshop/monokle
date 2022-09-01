@@ -297,7 +297,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
                 isHelmTemplateFile(props.filePath) ||
                 isHelmValuesFile(props.filePath)
               ) {
-                return <Icon name="helm" style={{fontSize: 18, paddingTop: '2px'}} />;
+                return <Icon name="helm" style={{fontSize: 18, paddingTop: '3px'}} />;
               }
 
               return <FileOutlined />;
