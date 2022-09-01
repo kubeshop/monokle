@@ -133,7 +133,7 @@ jobs:
           # Formula name, required
           cask: monokle
           tag: 'downloads'
-          livecheck: false
+          livecheck: true
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
