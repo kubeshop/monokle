@@ -428,6 +428,7 @@ export const mainSlice = createSlice({
       action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
     ) => {
       const resource = state.resourceMap[action.payload.resourceId];
+      state.lastChangedLine = 0;
       if (resource) {
         updateSelectionAndHighlights(state, resource);
         updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);
@@ -758,6 +759,9 @@ export const mainSlice = createSlice({
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
+    },
+    setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.lastChangedLine = action.payload;
     },
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
@@ -1380,6 +1384,7 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
+  setLastChangedLine,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

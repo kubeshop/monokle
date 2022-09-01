@@ -4,6 +4,7 @@ import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
 import applyErrorIntel from './applyErrorIntel';
+import applyLineDecorationIntel from './applyLineDecorationIntel';
 import applyPolicyIntel from './applyPolicyIntel';
 import applyRefIntel from './applyRefIntel';
 
@@ -22,6 +23,7 @@ export const resourceCodeIntel: CodeIntelApply = {
     resourceMap,
     fileMap,
     model,
+    lastChangedLine,
   }) => {
     const disposables: monaco.IDisposable[] = [];
     const decorations: monaco.editor.IModelDeltaDecoration[] = [];
@@ -45,6 +47,9 @@ export const resourceCodeIntel: CodeIntelApply = {
 
     const errorIntel = applyErrorIntel(resource);
     decorations.push(...errorIntel.decorations);
+
+    const lineDecorationIntel = applyLineDecorationIntel(lastChangedLine);
+    decorations.push(...lineDecorationIntel.decorations);
 
     const policyIntel = applyPolicyIntel(resource);
     decorations.push(...policyIntel.decorations);

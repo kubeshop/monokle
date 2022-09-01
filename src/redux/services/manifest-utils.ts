@@ -204,3 +204,12 @@ export function extractObjectsFromYaml(yamlText: string) {
   }
   return result;
 }
+
+export function getLineChanged(prevContent: string, currentContent: string): number {
+  const prevArr = prevContent.split('\n');
+  const currentArr = currentContent.split('\n');
+  const diffLineIdx = prevArr.findIndex((line, idx) => {
+    return line !== currentArr[idx];
+  });
+  return diffLineIdx + 1;
+}
