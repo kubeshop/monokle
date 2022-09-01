@@ -129,7 +129,7 @@ jobs:
           # GitHub token, required, not the default one
           token: ${{secrets.CI_BOT_TOKEN}}
           org: kubeshop
-          tap: kubeshop/core
+          tap: kubeshop/monokle
           # Formula name, required
           cask: monokle
           tag: 'downloads'
