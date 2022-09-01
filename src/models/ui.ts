@@ -54,6 +54,7 @@ export type MonacoUiState = {
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
+  | 'git-pane'
   | 'kustomize-pane'
   | 'templates-pane'
   | 'images-pane'
