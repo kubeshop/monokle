@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {Button, Tooltip} from 'antd';
 
-import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FileOutlined, FolderOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 import path from 'path';
@@ -17,6 +17,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {TitleBar} from '@molecules';
@@ -281,6 +282,17 @@ const FileTreePane: React.FC<Props> = ({height}) => {
               return node.highlight;
             }}
             disabled={isInPreviewMode || previewLoader.isLoading}
+            icon={(props: any) => {
+              if (props.isFolder) {
+                return <FolderOutlined />;
+              }
+
+              if (isKustomizationFilePath(props.filePath)) {
+                return <Icon name="kustomize" style={{fontSize: 15}} />;
+              }
+
+              return <FileOutlined />;
+            }}
             showIcon
             showLine={{showLeafIcon: false}}
           />
