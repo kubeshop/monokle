@@ -132,7 +132,7 @@ jobs:
           tap: kubeshop/monokle
           # Formula name, required
           cask: monokle
-          tag: 'downloads'
+          tag: v1.10.0
           livecheck: true
           force: true
 
