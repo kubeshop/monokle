@@ -185,7 +185,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
             itemPrefixStyle: {
               paddingLeft: 10,
             },
-            itemPrefixIcon: 'file',
+            itemPrefixIcon: 'helm',
           };
         },
       },
@@ -271,7 +271,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
             itemPrefixStyle: {
               paddingLeft: 10,
             },
-            itemPrefixIcon: 'file',
+            itemPrefixIcon: 'helm',
           };
         },
       },
@@ -338,7 +338,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       builder: {
         getMeta: chart => ({
           filePath: chart.filePath,
-          itemPrefixIcon: 'file',
+          itemPrefixIcon: 'helm',
         }),
         isSelected: (chart, scope) => {
           return scope.selectedPath === chart.filePath;
