@@ -9,6 +9,12 @@ export type GitRepo = {
   branchMap: Record<string, GitBranch>;
 };
 
+export type GitChangedFile = {
+  name: string;
+  path: string;
+};
+
 export type GitSliceState = {
+  changedFiles: GitChangedFile[];
   repo?: GitRepo;
 };

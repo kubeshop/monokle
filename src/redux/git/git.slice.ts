@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {GitRepo, GitSliceState} from '@models/git';
+import {GitChangedFile, GitRepo, GitSliceState} from '@models/git';
 
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -10,16 +10,22 @@ export const gitSlice = createSlice({
   name: 'git',
   initialState: gitInitialState,
   reducers: {
-    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo>) => {
-      state.repo = action.payload;
-    },
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
+
+    setChangedFiles: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile[]>) => {
+      state.changedFiles = action.payload;
+    },
+
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
       if (state.repo) {
         state.repo.currentBranch = action.payload;
       }
+    },
+
+    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo>) => {
+      state.repo = action.payload;
     },
   },
   extraReducers: builder => {
@@ -29,5 +35,5 @@ export const gitSlice = createSlice({
   },
 });
 
-export const {setRepo, clearRepo, setCurrentBranch} = gitSlice.actions;
+export const {clearRepo, setChangedFiles, setCurrentBranch, setRepo} = gitSlice.actions;
 export default gitSlice.reducer;

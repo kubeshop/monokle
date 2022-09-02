@@ -7,8 +7,10 @@ import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {GitChangedFile} from '@models/git';
 import {RootState} from '@models/rootstate';
 
+import {setChangedFiles} from '@redux/git';
 import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -118,7 +120,11 @@ export const updateFileEntry = createAsyncThunk(
     }
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      console.log('Result:', result);
+      const changedFiles: GitChangedFile[] = result.files.map((file: any) => ({
+        name: file.file,
+        path: Object.values(state.main.fileMap).find(f => f.name === file.file)?.filePath,
+      }));
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
     });
 
     return nextMainState;

@@ -3,9 +3,11 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 import log from 'loglevel';
 
 import {AppState} from '@models/appstate';
+import {GitChangedFile} from '@models/git';
 import {RootState} from '@models/rootstate';
 import {ThunkApi} from '@models/thunk';
 
+import {setChangedFiles} from '@redux/git';
 import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
@@ -100,7 +102,8 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     }
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      console.log('Result:', result);
+      const changedFiles: GitChangedFile[] = result.files.map((file: any) => ({name: file.file, path: ''}));
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
     });
 
     return nextMainState;
