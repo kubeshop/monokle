@@ -99,7 +99,7 @@
     "@dnd-kit/sortable": "6.0.1",
     "@kubernetes/client-node": "0.17.0",
     "@open-policy-agent/opa-wasm": "1.7.0",
-    "@reduxjs/toolkit": "1.8.3",
+    "@reduxjs/toolkit": "1.8.4",
     "@rjsf/antd": "4.2.0",
     "@rjsf/core": "4.2.3",
     "@trodi/electron-splashscreen": "1.0.2",
