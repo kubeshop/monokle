@@ -51,3 +51,10 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.checkout(branchName);
 }
+
+export async function getChangedFiles(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  const gitDiff = await git.diffSummary();
+
+  return gitDiff;
+}
