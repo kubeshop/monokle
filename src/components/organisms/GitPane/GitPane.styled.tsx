@@ -13,12 +13,15 @@ export const FileList = styled.div`
   display: flex;
   flex-direction: column;
 `;
-export const FilesAction = styled.div``;
+export const FilesAction = styled.div`
+  border-top: 1px solid ${Colors.grey3};
+  padding-top: 14px;
+  padding-left: 14px;
+`;
 
 export const Files = styled.div`
   margin-top: 12px;
   height: 100%;
-  margin-left: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -35,7 +38,14 @@ export const List = styled.ol`
   margin: 0;
 `;
 
+export const ChangeListWrapper = styled.div`
+  margin-top: 6px;
+  margin-left: 14px;
+  margin-bottom: 20px;
+`;
+
 export const ChangeList = styled.div`
+  margin-left: 4px;
   font-weight: 700;
   font-size: 14px;
   line-height: 22px;
@@ -60,6 +70,7 @@ export const FileIcon = styled.div`
 export const FileItem = styled.div`
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
   width: 100%;
 `;
 

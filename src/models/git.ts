@@ -10,5 +10,6 @@ export type GitRepo = {
 };
 
 export type GitSliceState = {
+  selectedItem?: boolean;
   repo?: GitRepo;
 };

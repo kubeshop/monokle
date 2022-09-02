@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
 
-import {Button, Checkbox, List, Menu} from 'antd';
+import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
 
-import {FileOutlined} from '@ant-design/icons';
+import {DownOutlined, FileOutlined} from '@ant-design/icons';
 
-import {ContextMenu, TitleBar} from '@molecules';
+import {setSelectedItem} from '@redux/git';
+import {useAppDispatch} from '@redux/hooks';
 
-import {Dots} from '@components/atoms';
+import {TitleBar} from '@molecules';
+
+import {Dots, Icon} from '@components/atoms';
 
 import * as S from './GitPane.styled';
 
@@ -29,6 +32,7 @@ const data = [
 ];
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
+  const dispatch = useAppDispatch();
   const [list, setList] = useState(data);
   const [selected, setSelected] = useState([]);
   const [hovered, setHovered] = useState({});
@@ -61,39 +65,45 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     }
   };
 
+  const handleFileClick = e => {
+    // e.preventDefault();
+    console.log('handleFileClick!');
+    dispatch(setSelectedItem());
+  };
+
   const menuItems = [
     {
       key: 'commit_to_new',
-      label: 'Commit to a new branch & PR',
-      onClick: () => {},
+      label: <div>Commit to a new branch & PR</div>,
     },
     {
       key: 'commit_to_main',
-      label: 'Commit to the main branch & PR',
-      onClick: () => {},
+      label: <div>Commit to the main branch & PR</div>,
     },
     {
       key: 'diff',
-      label: 'Diff',
-      onClick: () => {},
+      label: <div>Diff</div>,
     },
     {
       key: 'rollback',
-      label: 'Rollback',
-      onClick: () => {},
+      label: <div>Rollback</div>,
     },
   ];
+
+  const DropdownMenu = <Menu items={menuItems} />;
 
   return (
     <S.GitPaneContainer id="GitPane" style={{height}}>
       <TitleBar title="Commit" closable />
       <S.Files>
         <S.FileList>
-          <Checkbox onChange={handleSelectAll}>
-            <S.ChangeList>
-              Changelist <S.ChangeListStatus>{data.length} files</S.ChangeListStatus>
-            </S.ChangeList>
-          </Checkbox>
+          <S.ChangeListWrapper>
+            <Checkbox onChange={handleSelectAll}>
+              <S.ChangeList>
+                Changelist <S.ChangeListStatus>{data.length} files</S.ChangeListStatus>
+              </S.ChangeList>
+            </Checkbox>
+          </S.ChangeListWrapper>
           <List
             dataSource={list}
             renderItem={item => {
@@ -101,7 +111,12 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 <List.Item
                   onMouseEnter={() => handleEnter(item)}
                   onMouseLeave={handleLeave}
-                  style={{justifyContent: 'flex-start'}}
+                  style={{
+                    borderBottom: 'none',
+                    padding: '6px 14px 6px 14px',
+                    justifyContent: 'flex-start',
+                    background: selected.find(searchItem => searchItem.id === item.id) && 'rgba(255, 255, 255, 0.07)',
+                  }}
                 >
                   <S.SelectAll>
                     <Checkbox
@@ -110,7 +125,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                     />
                   </S.SelectAll>
                   <S.FileItem>
-                    <S.FileItemData>
+                    <S.FileItemData onClick={handleFileClick}>
                       <S.FileIcon>
                         <FileOutlined />
                       </S.FileIcon>
@@ -118,9 +133,11 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
                     {hovered.id === item.id && (
-                      <ContextMenu overlay={<Menu items={menuItems} />}>
-                        <Dots />
-                      </ContextMenu>
+                      <Dropdown overlay={DropdownMenu} trigger={['click']}>
+                        <Space onClick={e => e.preventDefault()}>
+                          <Dots />
+                        </Space>
+                      </Dropdown>
                     )}
                   </S.FileItem>
                 </List.Item>
@@ -129,18 +146,19 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
           />
         </S.FileList>
 
-        <S.FilesAction>
-          {selected.length > 0 && (
-            <Button
-              onClick={() => {
-                setSelected([]);
-                setList([]);
-              }}
-            >
-              Commit to a new branch & PR
-            </Button>
-          )}
-        </S.FilesAction>
+        {selected.length > 0 && (
+          <S.FilesAction>
+            <Dropdown overlay={DropdownMenu} trigger={['click']}>
+              <Space>
+                <Button type="primary" onClick={e => e.preventDefault()} size="large">
+                  <Icon name="git-ops" />
+                  Commit to a new branch & PR
+                  <DownOutlined />
+                </Button>
+              </Space>
+            </Dropdown>
+          </S.FilesAction>
+        )}
       </S.Files>
     </S.GitPaneContainer>
   );

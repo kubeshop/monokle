@@ -60,6 +60,7 @@ export const GitFileBar = styled.div`
 
 export const GitRefFile = styled.div`
   display: flex;
+  align-items: center;
   padding-top: 10px;
   margin-left: 16px;
   padding-bottom: 10px;
@@ -98,4 +99,19 @@ export const FileType = styled.div<{type?: string}>`
 
 export const FileEmptyState = styled.div`
   width: 50%;
+`;
+
+export const FileName = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${Colors.blue10};
+`;
+
+export const FilePath = styled.div`
+  margin-left: 8px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  color: ${Colors.grey7};
 `;

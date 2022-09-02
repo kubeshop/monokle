@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
+import {useAppSelector} from '@redux/hooks';
+
 import {TitleBar} from '@components/molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -12,8 +14,9 @@ import * as S from './GitView.styled';
 
 const GitView: React.FC = () => {
   // add redux logic after implementation with git flow
+  const isSelectedItem = useAppSelector(state => state.git.selectedItem);
   const [selected, setSelectedItem] = useState(false);
-  const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
+  const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
   const options = {
     readOnly: false,
     renderSideBySide: true,
@@ -28,17 +31,29 @@ const GitView: React.FC = () => {
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>
-          <S.FileEmptyState>Select a file in the left</S.FileEmptyState>
+          {!isSelectedItem && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
+          {isSelectedItem && (
+            <>
+              <S.FileName>Filename</S.FileName>
+              <S.FilePath>filepath</S.FilePath>
+            </>
+          )}
         </S.GitRefFile>
         <S.GitChangedFile>
           <S.FileType type="changed">Changed</S.FileType>
-          <S.FileEmptyState>Select a file in the left</S.FileEmptyState>
+          {!isSelectedItem && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
+          {isSelectedItem && (
+            <>
+              <S.FileName>Filename</S.FileName>
+              <S.FilePath>filepath</S.FilePath>
+            </>
+          )}
         </S.GitChangedFile>
       </S.GitFileBar>
       <S.MonacoDiffContainer width="100%" ref={containerRef}>
-        {selected && (
+        {isSelectedItem && (
           <MonacoDiffEditor
-            width="100%"
+            width={containerWidth}
             height={containerHeight}
             language="yaml"
             original="original"
@@ -48,7 +63,7 @@ const GitView: React.FC = () => {
           />
         )}
 
-        {!selected && (
+        {!isSelectedItem && (
           <S.EmptyStateContainer>
             <S.EmptyStateItem>
               <S.GitEmptyImage src={GitSelectItem} />
