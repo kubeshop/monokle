@@ -32,11 +32,11 @@ interface IProps {
   selectedResource: K8sResource | undefined;
   applySelection: () => void;
   diffSelectedResource: () => void;
+  actionsPaneWidth: number;
 }
 
 const ActionsPaneHeader: React.FC<IProps> = props => {
-  const {selectedResource, applySelection, diffSelectedResource} = props;
-  const editorPaneSize: number = useAppSelector(state => state.ui.paneConfiguration.editPane);
+  const {selectedResource, applySelection, diffSelectedResource, actionsPaneWidth} = props;
 
   const dispatch = useAppDispatch();
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -199,7 +199,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         )}
 
         <S.ButtonContainer>
-          {editorPaneSize > PANE_CONSTRAINT_VALUES.minEditPane && (
+          {actionsPaneWidth > PANE_CONSTRAINT_VALUES.minEditPane && (
             <>
               <Scale />
               <Restart />
@@ -208,7 +208,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             </>
           )}
 
-          {editorPaneSize <= PANE_CONSTRAINT_VALUES.minEditPane && (
+          {actionsPaneWidth <= PANE_CONSTRAINT_VALUES.minEditPane && (
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>

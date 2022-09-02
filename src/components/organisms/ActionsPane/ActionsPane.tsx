@@ -295,6 +295,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   return (
     <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane">
       <ActionsPaneHeader
+        actionsPaneWidth={actionsPaneWidth}
         selectedResource={selectedResource}
         applySelection={applySelection}
         diffSelectedResource={diffSelectedResource}
