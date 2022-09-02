@@ -102,7 +102,21 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     }
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      const changedFiles: GitChangedFile[] = result.files.map((file: any) => ({name: file.file, path: ''}));
+      const {unstagedChangedFiles, stagedChangedFiles} = result;
+
+      const changedFiles: GitChangedFile[] = [
+        ...stagedChangedFiles.map((file: any) => ({
+          status: 'staged',
+          name: file,
+          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
+        })),
+        ...unstagedChangedFiles.map((file: any) => ({
+          status: 'unstaged',
+          name: file,
+          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
+        })),
+      ];
+
       thunkAPI.dispatch(setChangedFiles(changedFiles));
     });
 

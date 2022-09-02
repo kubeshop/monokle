@@ -12,6 +12,7 @@ export type GitRepo = {
 export type GitChangedFile = {
   name: string;
   path: string;
+  status: 'staged' | 'unstaged';
 };
 
 export type GitSliceState = {

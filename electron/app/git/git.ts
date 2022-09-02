@@ -54,7 +54,8 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 
 export async function getChangedFiles(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  const gitDiff = await git.diffSummary();
+  const stagedChangedFiles = (await git.diff({'--name-only': null, '--staged': null})).split('\n').filter(el => el);
+  const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
 
-  return gitDiff;
+  return {stagedChangedFiles, unstagedChangedFiles};
 }
