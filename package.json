@@ -155,7 +155,7 @@
     "redux-thunk": "2.4.1",
     "replace-in-file": "6.3.5",
     "reselect": "4.1.6",
-    "runtypes": "6.5.1",
+    "runtypes": "6.6.0",
     "semver": "7.3.7",
     "shelljs": "0.8.5",
     "simple-git": "3.13.0",
