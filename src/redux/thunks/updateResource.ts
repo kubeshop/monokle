@@ -16,7 +16,6 @@ import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 
-import {formatGitChangedFiles} from '@utils/git';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 type UpdateResourcePayload = {
@@ -101,10 +100,11 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
       return {...state.main, autosaving: {status: false, error}};
     }
 
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      const changedFiles = formatGitChangedFiles(result, state.main.fileMap);
-
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: projectRootFolderPath,
+      fileMap: state.main.fileMap,
+    }).then(result => {
+      thunkAPI.dispatch(setChangedFiles(result));
     });
 
     return nextMainState;

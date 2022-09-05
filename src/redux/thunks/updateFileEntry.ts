@@ -18,7 +18,6 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
-import {formatGitChangedFiles} from '@utils/git';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 export const updateFileEntry = createAsyncThunk(
@@ -119,10 +118,11 @@ export const updateFileEntry = createAsyncThunk(
       return {...state.main, autosaving: {status: false, error}};
     }
 
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      const changedFiles = formatGitChangedFiles(result, state.main.fileMap);
-
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: projectRootFolderPath,
+      fileMap: state.main.fileMap,
+    }).then(result => {
+      thunkAPI.dispatch(setChangedFiles(result));
     });
 
     return nextMainState;

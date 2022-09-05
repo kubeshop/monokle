@@ -10,7 +10,9 @@ export type GitRepo = {
 };
 
 export type GitChangedFile = {
+  modifiedContent: string;
   name: string;
+  originalContent: string;
   path: string;
   status: 'staged' | 'unstaged';
 };

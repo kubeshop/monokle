@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {FileMapType} from '@models/appstate';
 import {GitChangedFile} from '@models/git';
 
@@ -5,16 +7,26 @@ export function formatGitChangedFiles(result: any, fileMap: FileMapType): GitCha
   const {unstagedChangedFiles, stagedChangedFiles} = result;
 
   const changedFiles: GitChangedFile[] = [
-    ...stagedChangedFiles.map((file: any) => ({
-      status: 'staged',
-      name: file,
-      path: Object.values(fileMap).find(f => f.name === file)?.filePath,
-    })),
-    ...unstagedChangedFiles.map((file: any) => ({
-      status: 'unstaged',
-      name: file,
-      path: Object.values(fileMap).find(f => f.name === file)?.filePath,
-    })),
+    ...stagedChangedFiles.map((file: any) => {
+      const foundFile = Object.values(fileMap).find(f => f.filePath.substring(1) === file.replaceAll('/', path.sep));
+
+      return {
+        status: 'staged',
+        modifiedContent: foundFile?.text,
+        name: foundFile?.name,
+        path: file,
+      };
+    }),
+    ...unstagedChangedFiles.map((file: any) => {
+      const foundFile = Object.values(fileMap).find(f => f.filePath.substring(1) === file.replaceAll('/', path.sep));
+
+      return {
+        status: 'unstaged',
+        modifiedContent: foundFile?.text,
+        name: foundFile?.name,
+        path: file,
+      };
+    }),
   ];
 
   return changedFiles;

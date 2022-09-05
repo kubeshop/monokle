@@ -22,7 +22,6 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
-import {formatGitChangedFiles} from '@utils/git';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
@@ -110,10 +109,10 @@ export const setRootFolder = createAsyncThunk<
     : undefined;
 
   const gitChangedFiles = isFolderGitRepo
-    ? formatGitChangedFiles(
-        await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', rootFolder),
-        fileMap
-      )
+    ? await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolder,
+        fileMap,
+      })
     : [];
 
   return {
