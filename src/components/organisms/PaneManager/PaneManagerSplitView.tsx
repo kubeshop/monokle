@@ -1,6 +1,10 @@
 import React, {Suspense, useCallback, useMemo} from 'react';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
+import {
+  DEFAULT_PANE_CONFIGURATION,
+  GUTTER_SPLIT_VIEW_PANE_WIDTH,
+  MIN_SPLIT_VIEW_PANE_WIDTH,
+} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
@@ -23,7 +27,8 @@ const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const bottomPaneHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomPaneHeight =
+    useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight) || DEFAULT_PANE_CONFIGURATION.bottomPaneHeight;
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
@@ -39,7 +44,7 @@ const PaneManagerSplitView: React.FC = () => {
   const handleResize = useCallback(
     (elements: any) => {
       const updates = elements.reduce((obj: any, el: any) => {
-        if (!['leftPane', 'navPane'].includes(el.props.id)) return obj;
+        if (!['leftPane', 'navPane', 'editPane'].includes(el.props.id)) return obj;
         obj[el.props['id']] = el.props['flex'];
         return obj;
       }, {});

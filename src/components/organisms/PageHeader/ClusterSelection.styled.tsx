@@ -240,6 +240,7 @@ export const PreviewMode = styled.div<{
   $previewType?: PreviewType;
   $kubeConfigContextColor: ClusterColors;
 }>`
+  white-space: nowrap;
   border-radius: 4px 0 0 4px;
   padding: 0 0.5rem;
   color: ${props =>

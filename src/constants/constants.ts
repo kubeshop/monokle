@@ -55,9 +55,14 @@ export const CLUSTER_AVAILABLE_COLORS = [
 export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
   navPane: 0.25,
-  rightPane: 0,
+  editPane: 0,
   bottomPaneHeight: 200,
   recentProjectsPaneWidth: 450,
+};
+
+export const PANE_CONSTRAINT_VALUES = {
+  minEditPane: 400,
+  navPane: 330,
 };
 
 export const PREDEFINED_K8S_VERSION = '1.24.2';
