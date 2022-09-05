@@ -19,5 +19,6 @@ export type GitChangedFile = {
 
 export type GitSliceState = {
   changedFiles: GitChangedFile[];
+  selectedItem?: boolean;
   repo?: GitRepo;
 };

@@ -13,6 +13,9 @@ export const gitSlice = createSlice({
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
+    setSelectedItem: (state: Draft<GitSliceState>) => {
+      state.selectedItem = !state.selectedItem;
+    },
 
     setChangedFiles: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile[]>) => {
       state.changedFiles = action.payload;
@@ -36,5 +39,5 @@ export const gitSlice = createSlice({
   },
 });
 
-export const {clearRepo, setChangedFiles, setCurrentBranch, setRepo} = gitSlice.actions;
+export const {clearRepo, setChangedFiles, setCurrentBranch, setSelectedItem, setRepo} = gitSlice.actions;
 export default gitSlice.reducer;
