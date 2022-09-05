@@ -7,7 +7,6 @@ import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {GitChangedFile} from '@models/git';
 import {RootState} from '@models/rootstate';
 
 import {setChangedFiles} from '@redux/git';
@@ -19,6 +18,7 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
+import {formatGitChangedFiles} from '@utils/git';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 export const updateFileEntry = createAsyncThunk(
@@ -120,20 +120,7 @@ export const updateFileEntry = createAsyncThunk(
     }
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      const {unstagedChangedFiles, stagedChangedFiles} = result;
-
-      const changedFiles: GitChangedFile[] = [
-        ...stagedChangedFiles.map((file: any) => ({
-          status: 'staged',
-          name: file,
-          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
-        })),
-        ...unstagedChangedFiles.map((file: any) => ({
-          status: 'unstaged',
-          name: file,
-          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
-        })),
-      ];
+      const changedFiles = formatGitChangedFiles(result, state.main.fileMap);
 
       thunkAPI.dispatch(setChangedFiles(changedFiles));
     });

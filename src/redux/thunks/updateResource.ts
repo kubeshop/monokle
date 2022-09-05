@@ -3,7 +3,6 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 import log from 'loglevel';
 
 import {AppState} from '@models/appstate';
-import {GitChangedFile} from '@models/git';
 import {RootState} from '@models/rootstate';
 import {ThunkApi} from '@models/thunk';
 
@@ -17,6 +16,7 @@ import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 
+import {formatGitChangedFiles} from '@utils/git';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 type UpdateResourcePayload = {
@@ -102,20 +102,7 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     }
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', projectRootFolderPath).then(result => {
-      const {unstagedChangedFiles, stagedChangedFiles} = result;
-
-      const changedFiles: GitChangedFile[] = [
-        ...stagedChangedFiles.map((file: any) => ({
-          status: 'staged',
-          name: file,
-          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
-        })),
-        ...unstagedChangedFiles.map((file: any) => ({
-          status: 'unstaged',
-          name: file,
-          path: Object.values(state.main.fileMap).find(f => f.name === file)?.filePath,
-        })),
-      ];
+      const changedFiles = formatGitChangedFiles(result, state.main.fileMap);
 
       thunkAPI.dispatch(setChangedFiles(changedFiles));
     });
