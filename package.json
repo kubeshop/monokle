@@ -116,7 +116,7 @@
     "electron-log": "4.4.8",
     "electron-store": "8.1.0",
     "electron-unhandled": "4.0.1",
-    "electron-updater": "5.2.1",
+    "electron-updater": "5.2.2",
     "es6-tween": "5.5.11",
     "execa": "5.1.1",
     "fast-deep-equal": "3.1.3",
