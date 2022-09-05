@@ -116,7 +116,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip,dist/*.tar.gz'
           draft: false
           prerelease: true
           omitBody: true
@@ -348,7 +348,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage,dist/*.tar.gz'
           draft: false
           prerelease: true
           omitBody: true
