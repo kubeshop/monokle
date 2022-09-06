@@ -33,12 +33,11 @@ const GitView: React.FC = () => {
   //   setSelectedItem(selectedItem);
   // }, [selectedItem, changedFiles]);
 
-  // useEffect(() => {
-  //   const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
-  //   console.log('itemToUpdate modifiedContent', itemToUpdate?.modifiedContent);
-  //   setSelectedItem(itemToUpdate);
-  //   // setSelectedItem(selectedItem);
-  // }, [changedFiles, selectedItem]);
+  useEffect(() => {
+    const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem?.name);
+    setSelectedItem(itemToUpdate);
+    // setSelectedItem(selectedItem);
+  }, [changedFiles, selectedItem]);
 
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
@@ -71,8 +70,8 @@ const GitView: React.FC = () => {
             width={containerWidth}
             height={containerHeight}
             language="yaml"
-            original={selected.originalContent}
-            value={selected.modifiedContent}
+            original={selected?.originalContent}
+            value={selected?.modifiedContent}
             options={options}
             theme={KUBESHOP_MONACO_THEME}
           />
