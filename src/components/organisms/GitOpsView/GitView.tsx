@@ -4,7 +4,7 @@ import {useMeasure} from 'react-use';
 
 import {isEmpty} from 'lodash';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@components/molecules';
 
@@ -26,11 +26,6 @@ const GitView: React.FC = () => {
       enabled: false,
     },
   };
-
-  // useEffect(() => {
-  //   console.log('changes?');
-  //   setSelectedItem(selectedItem);
-  // }, [selectedItem, changedFiles]);
 
   useEffect(() => {
     const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem?.name);
