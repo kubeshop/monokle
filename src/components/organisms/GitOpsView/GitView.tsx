@@ -1,8 +1,10 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
-import {useAppSelector} from '@redux/hooks';
+import {isEmpty} from 'lodash';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@components/molecules';
 
@@ -13,9 +15,10 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 import * as S from './GitView.styled';
 
 const GitView: React.FC = () => {
-  // add redux logic after implementation with git flow
-  const isSelectedItem = useAppSelector(state => state.git.selectedItem);
-  const [selected, setSelectedItem] = useState(false);
+  const dispatch = useAppDispatch();
+  const selectedItem = useAppSelector(state => state.git.selectedItem);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const [selected, setSelectedItem] = useState(selectedItem);
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
   const options = {
     readOnly: false,
@@ -25,45 +28,57 @@ const GitView: React.FC = () => {
     },
   };
 
+  // useEffect(() => {
+  //   console.log('changes?');
+  //   setSelectedItem(selectedItem);
+  // }, [selectedItem, changedFiles]);
+
+  // useEffect(() => {
+  //   const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
+  //   console.log('itemToUpdate modifiedContent', itemToUpdate?.modifiedContent);
+  //   setSelectedItem(itemToUpdate);
+  //   // setSelectedItem(selectedItem);
+  // }, [changedFiles, selectedItem]);
+
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
       <TitleBar title="Editor" />
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>
-          {!isSelectedItem && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
-          {isSelectedItem && (
+          {isEmpty(selected) && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
+          {!isEmpty(selected) && (
             <>
-              <S.FileName>Filename</S.FileName>
-              <S.FilePath>filepath</S.FilePath>
+              <S.FileName>{selected?.name}</S.FileName>
+              <S.FilePath>{selected?.path}</S.FilePath>
             </>
           )}
         </S.GitRefFile>
         <S.GitChangedFile>
           <S.FileType type="changed">Changed</S.FileType>
-          {!isSelectedItem && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
-          {isSelectedItem && (
+          {isEmpty(selected) && <S.FileEmptyState>Select a file in the left</S.FileEmptyState>}
+          {!isEmpty(selected) && (
             <>
-              <S.FileName>Filename</S.FileName>
-              <S.FilePath>filepath</S.FilePath>
+              <S.FileName>{selected?.name}</S.FileName>
+              <S.FilePath>{selected?.path}</S.FilePath>
             </>
           )}
         </S.GitChangedFile>
       </S.GitFileBar>
       <S.MonacoDiffContainer width="100%" ref={containerRef}>
-        {isSelectedItem && (
+        {!isEmpty(selected) && (
           <MonacoDiffEditor
             width={containerWidth}
             height={containerHeight}
             language="yaml"
-            original="original"
-            value="changed"
+            original={selected.originalContent}
+            value={selected.modifiedContent}
             options={options}
             theme={KUBESHOP_MONACO_THEME}
           />
         )}
 
-        {!isSelectedItem && (
+        {isEmpty(selected) && (
           <S.EmptyStateContainer>
             <S.EmptyStateItem>
               <S.GitEmptyImage src={GitSelectItem} />

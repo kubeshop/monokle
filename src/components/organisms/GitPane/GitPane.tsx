@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
 
 import {DownOutlined, FileOutlined} from '@ant-design/icons';
 
+import {isEmpty} from 'lodash';
+
 import {setSelectedItem} from '@redux/git';
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
@@ -13,29 +15,15 @@ import {Dots, Icon} from '@components/atoms';
 
 import * as S from './GitPane.styled';
 
-const data = [
-  {
-    id: '1',
-    name: 'argo-rollouts',
-    path: '/path/secondpath',
-  },
-  {
-    id: '2',
-    name: 'argo-rollouts-deployment',
-    path: '/path/deployment',
-  },
-  {
-    id: '3',
-    name: 'argo-rollouts',
-    path: '/path',
-  },
-];
-
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
-  const [list, setList] = useState(data);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const selectedItem = useAppSelector(state => state.git.selectedItem);
+  const [list, setList] = useState(changedFiles);
   const [selected, setSelected] = useState([]);
   const [hovered, setHovered] = useState({});
+
+  console.log('changedFiles', changedFiles);
 
   const handleEnter = item => {
     setHovered(item);
@@ -65,10 +53,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     }
   };
 
-  const handleFileClick = e => {
+  const handleFileClick = item => {
     // e.preventDefault();
-    console.log('handleFileClick!');
-    dispatch(setSelectedItem());
+    dispatch(setSelectedItem(item));
   };
 
   const menuItems = [
@@ -92,6 +79,12 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
   const DropdownMenu = <Menu items={menuItems} />;
 
+  useEffect(() => {
+    // const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
+    setList(changedFiles);
+    // !isEmpty(selectedItem) && dispatch(setSelectedItem(itemToUpdate));
+  }, [changedFiles]);
+
   return (
     <S.GitPaneContainer id="GitPane" style={{height}}>
       <TitleBar title="Commit" closable />
@@ -100,12 +93,12 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
           <S.ChangeListWrapper>
             <Checkbox onChange={handleSelectAll}>
               <S.ChangeList>
-                Changelist <S.ChangeListStatus>{data.length} files</S.ChangeListStatus>
+                Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
               </S.ChangeList>
             </Checkbox>
           </S.ChangeListWrapper>
           <List
-            dataSource={list}
+            dataSource={changedFiles}
             renderItem={item => {
               return (
                 <List.Item
@@ -125,7 +118,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                     />
                   </S.SelectAll>
                   <S.FileItem>
-                    <S.FileItemData onClick={handleFileClick}>
+                    <S.FileItemData onClick={() => handleFileClick(item)}>
                       <S.FileIcon>
                         <FileOutlined />
                       </S.FileIcon>
