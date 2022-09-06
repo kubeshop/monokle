@@ -33,12 +33,12 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
-      - name: Checkout Project B
-          uses: actions/checkout@master
-          with: 
-            repository: kubeshop/homebrew-monokle
-            token: ${{ secrets.github_token }}
-            path: ./homebrew-monokle
+      - name: Checkout Homebrew Project
+        uses: actions/checkout@master
+        with: 
+          repository: kubeshop/homebrew-monokle
+          token: ${{ secrets.github_token }}
+          path: ./homebrew-monokle
 
       # Check memory and cpu
       - name: Verify Runner Resources
