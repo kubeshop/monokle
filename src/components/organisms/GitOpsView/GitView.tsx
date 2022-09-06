@@ -15,7 +15,6 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 import * as S from './GitView.styled';
 
 const GitView: React.FC = () => {
-  const dispatch = useAppDispatch();
   const selectedItem = useAppSelector(state => state.git.selectedItem);
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const [selected, setSelectedItem] = useState(selectedItem);

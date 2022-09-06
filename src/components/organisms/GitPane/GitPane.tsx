@@ -4,8 +4,6 @@ import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
 
 import {DownOutlined, FileOutlined} from '@ant-design/icons';
 
-import {isEmpty} from 'lodash';
-
 import {setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -18,12 +16,10 @@ import * as S from './GitPane.styled';
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
-  const selectedItem = useAppSelector(state => state.git.selectedItem);
+  // const selectedItem = useAppSelector(state => state.git.selectedItem);
   const [list, setList] = useState(changedFiles);
   const [selected, setSelected] = useState([]);
   const [hovered, setHovered] = useState({});
-
-  console.log('changedFiles', changedFiles);
 
   const handleEnter = item => {
     setHovered(item);
