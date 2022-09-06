@@ -1,6 +1,7 @@
 export type GitBranch = {
   name: string;
   commitSha: string;
+  type: 'local' | 'remote';
 };
 
 export type GitRepo = {

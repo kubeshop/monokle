@@ -33,13 +33,29 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
 
 export async function fetchGitRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  const branchSummary = await git.branch();
+  const remoteBranchSummary = await git.branch({'-r': null});
+  const localBranches = await git.branchLocal();
 
   const gitRepo: GitRepo = {
-    branches: branchSummary.all,
-    currentBranch: branchSummary.current,
-    branchMap: Object.fromEntries(
-      Object.entries(branchSummary.branches).map(([key, value]) => [key, {name: value.name, commitSha: value.commit}])
+    branches: [...localBranches.all, ...remoteBranchSummary.all],
+    currentBranch: localBranches.current || remoteBranchSummary.current,
+    branchMap: {},
+  };
+
+  gitRepo.branchMap = Object.fromEntries(
+    Object.entries({...localBranches.branches}).map(([key, value]) => [
+      key,
+      {name: value.name, commitSha: value.commit, type: 'local'},
+    ])
+  );
+
+  gitRepo.branchMap = {
+    ...gitRepo.branchMap,
+    ...Object.fromEntries(
+      Object.entries({...remoteBranchSummary.branches}).map(([key, value]) => [
+        key,
+        {name: value.name.replace('remotes/', ''), commitSha: value.commit, type: 'remote'},
+      ])
     ),
   };
 

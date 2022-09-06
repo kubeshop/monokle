@@ -14,11 +14,11 @@ type Props = {
 export function NameCell({onSelect, branch}: Props) {
   return (
     <S.Box onClick={() => onSelect(branch)}>
-      {branch.name.startsWith('remotes/') ? <S.CloudOutlined /> : <S.BranchesOutlined />}
+      {branch.type === 'remote' ? <S.CloudOutlined /> : <S.BranchesOutlined />}
 
       <div>
         <Space size="small">
-          <S.NameLabel>{branch.name.replace('remotes/', '')}</S.NameLabel>
+          <S.NameLabel>{branch.name}</S.NameLabel>
           <CopyButton content={branch.name} />
         </Space>
 
