@@ -120,7 +120,7 @@ export const updateFileEntry = createAsyncThunk(
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
       localPath: projectRootFolderPath,
-      fileMap: state.main.fileMap,
+      fileMap: nextMainState.fileMap,
     }).then(result => {
       thunkAPI.dispatch(setChangedFiles(result));
     });
