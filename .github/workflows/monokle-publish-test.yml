@@ -33,6 +33,13 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
+      - name: Checkout Project B
+          uses: actions/checkout@master
+          with: 
+            repository: kubeshop/homebrew-monokle
+            token: ${{ secrets.github_token }}
+            path: ./homebrew-monokle
+
       # Check memory and cpu
       - name: Verify Runner Resources
         run: |
@@ -116,25 +123,22 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip,dist/*.tar.gz'
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
           draft: false
           prerelease: true
           omitBody: true
           tag: 'test'
           token: ${{ secrets.github_token }}
 
-      - name: Generate Cask file
-        run: ./generate-cask.sh > ./monokle.rb
-
-      - name: Pushes Homebrew Cask
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.github_token }}
-        with:
-          source_file: 'monokle.rb'
-          destination_repo: 'kubeshop/homebrew-monokle'
-          destination_folder: 'Casks'
-          commit_message: 'Update cask to new version'
+      - name: Generate and push Cask file
+        run: |
+            ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
+            cd ./homebrew-monokle
+            git add .
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git commit -am "Update cask to new version"
+            git push
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -348,7 +352,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage,dist/*.tar.gz'
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
           draft: false
           prerelease: true
           omitBody: true
