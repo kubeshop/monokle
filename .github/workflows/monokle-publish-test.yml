@@ -35,7 +35,7 @@ jobs:
 
       - name: Checkout Homebrew Project
         uses: actions/checkout@master
-        with: 
+        with:
           repository: kubeshop/homebrew-monokle
           token: ${{ secrets.github_token }}
           path: ./homebrew-monokle
@@ -132,13 +132,15 @@ jobs:
 
       - name: Generate and push Cask file
         run: |
-            ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
-            cd ./homebrew-monokle
-            git add .
-            git config user.name github-actions
-            git config user.email github-actions@github.com
-            git commit -am "Update cask to new version"
-            git push
+          ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
+          cd ./homebrew-monokle
+          git add .
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -am "Update cask to new version"
+          git push
+        with:
+          token: ${{ secrets.github_token }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
