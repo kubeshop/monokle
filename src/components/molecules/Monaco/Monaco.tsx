@@ -304,8 +304,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
+  }, [editor, selectedResourceId, firstCodeLoadedOnEditor, lastChangedLine]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {

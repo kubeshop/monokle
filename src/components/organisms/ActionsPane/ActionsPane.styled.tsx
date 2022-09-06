@@ -61,4 +61,9 @@ export const Tabs = styled(RawTabs)`
   & .ant-tabs-content {
     height: 100%;
   }
+
+  & .ant-tabs-extra-content {
+    display: flex;
+    align-items: center;
+  }
 `;

@@ -13,6 +13,7 @@ export const AutoLoadLastProjectTooltip = 'Load last project when starting Monok
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
+export const EditWithFormTooltip = 'Edit resource with form';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';

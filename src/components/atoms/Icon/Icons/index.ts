@@ -18,3 +18,4 @@ export {default as Validation} from './Validation';
 export {default as Warning} from './Warning';
 export {default as YAMLSyntax} from './YAMLSyntax';
 export {default as Search} from './Search';
+export {default as SplitView} from './SplitView';
