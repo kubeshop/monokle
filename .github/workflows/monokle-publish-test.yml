@@ -123,18 +123,18 @@ jobs:
           tag: 'test'
           token: ${{ secrets.github_token }}
 
-      - uses: macauley/action-homebrew-bump-cask@v1
-        name: Bump Homebrew
+      - name: Generate Cask file
+        run: ./generate-cask.sh > ./monokle.rb
+
+      - name: Pushes Homebrew Cask
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.github_token }}
         with:
-          # GitHub token, required, not the default one
-          token: ${{secrets.CI_BOT_TOKEN}}
-          org: kubeshop
-          tap: kubeshop/monokle
-          # Formula name, required
-          cask: monokle
-          tag: v1.10.0
-          livecheck: true
-          force: true
+          source_file: 'monokle.rb'
+          destination_repo: 'kubeshop/homebrew-monokle'
+          destination_folder: 'Casks'
+          commit_message: 'Update cask to new version'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
