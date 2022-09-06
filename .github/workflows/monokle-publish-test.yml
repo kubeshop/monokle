@@ -139,8 +139,8 @@ jobs:
           git config user.email github-actions@github.com
           git commit -am "Update cask to new version"
           git push
-        with:
-          token: ${{ secrets.github_token }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
