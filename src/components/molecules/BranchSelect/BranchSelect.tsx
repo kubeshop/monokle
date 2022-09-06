@@ -31,12 +31,12 @@ function BranchSelect() {
   );
 
   const handleSelect = useCallback(
-    ({name}: GitBranch) => {
+    (branch: GitBranch) => {
       promiseFromIpcRenderer('git.checkoutGitBranch', 'git.checkoutGitBranch.result', {
         localPath: rootFolderPath,
-        branchName: name,
+        branchName: branch.type === 'local' ? branch.name : branch.name.replace('origin/', ''),
       }).then(() => {
-        dispatch(setCurrentBranch(name));
+        dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
         setVisible(false);
       });
     },
