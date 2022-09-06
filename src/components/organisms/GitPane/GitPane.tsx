@@ -4,6 +4,8 @@ import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
 
 import {DownOutlined, FileOutlined} from '@ant-design/icons';
 
+import {GitChangedFile} from '@models/git';
+
 import {setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -16,27 +18,26 @@ import * as S from './GitPane.styled';
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
-  // const selectedItem = useAppSelector(state => state.git.selectedItem);
   const [list, setList] = useState(changedFiles);
-  const [selected, setSelected] = useState([]);
-  const [hovered, setHovered] = useState({});
+  const [selected, setSelected] = useState<GitChangedFile[]>([]);
+  const [hovered, setHovered] = useState<GitChangedFile>({} as GitChangedFile);
 
-  const handleEnter = item => {
+  const handleEnter = (item: GitChangedFile) => {
     setHovered(item);
   };
 
   const handleLeave = () => {
-    setHovered({});
+    setHovered({} as GitChangedFile);
   };
 
-  const handleSelect = (event, item) => {
-    let newSelected;
+  const handleSelect = (event: any, item: GitChangedFile) => {
+    let newSelected: GitChangedFile[];
     if (event.target.checked) {
       newSelected = [...selected];
       newSelected.push(item);
       setSelected(newSelected);
     } else {
-      newSelected = selected.filter(elem => elem.id !== item.id);
+      newSelected = selected.filter(elem => elem.name !== item.name);
       setSelected(newSelected);
     }
   };
@@ -49,7 +50,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     }
   };
 
-  const handleFileClick = item => {
+  const handleFileClick = (item: GitChangedFile) => {
     // e.preventDefault();
     dispatch(setSelectedItem(item));
   };
@@ -104,13 +105,14 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                     borderBottom: 'none',
                     padding: '6px 14px 6px 14px',
                     justifyContent: 'flex-start',
-                    background: selected.find(searchItem => searchItem.id === item.id) && 'rgba(255, 255, 255, 0.07)',
+                    background:
+                      selected.find(searchItem => searchItem.name === item.name) && 'rgba(255, 255, 255, 0.07)',
                   }}
                 >
                   <S.SelectAll>
                     <Checkbox
                       onChange={e => handleSelect(e, item)}
-                      checked={selected.find(searchItem => searchItem.id === item.id)}
+                      checked={Boolean(selected.find(searchItem => searchItem.name === item.name))}
                     />
                   </S.SelectAll>
                   <S.FileItem>
@@ -121,7 +123,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       {item.name}
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
-                    {hovered.id === item.id && (
+                    {hovered.name === item.name && (
                       <Dropdown overlay={DropdownMenu} trigger={['click']}>
                         <Space onClick={e => e.preventDefault()}>
                           <Dots />

@@ -98,7 +98,7 @@ const PaneManagerSplitView: React.FC = () => {
 
       {leftActiveMenu === 'git-pane' && (
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <GitOpsView height={height} />
+          <GitOpsView />
         </ReflexElement>
       )}
     </ReflexContainer>
