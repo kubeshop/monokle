@@ -138,9 +138,9 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git commit -am "Update cask to new version"
-          git push
+          git push https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle.git
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
