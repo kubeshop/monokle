@@ -8,7 +8,7 @@ import {setCurrentBranch} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {rootFolderSelector} from '@redux/selectors';
 
-import {TableSelect} from '@components/atoms';
+import {TableSelect} from '@atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -20,10 +20,6 @@ function BranchSelect() {
   const [visible, setVisible] = useState(false);
 
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
-
-  const localBranches = useAppSelector(state =>
-    Object.values(state.git.repo?.branchMap || {}).filter(b => !b.name.startsWith('remotes'))
-  );
 
   const rootFolderPath = useAppSelector(rootFolderSelector);
 
@@ -51,7 +47,7 @@ function BranchSelect() {
     <TableSelect
       value={currentBranch || 'default'}
       icon={<BranchesOutlined />}
-      table={<BranchTable onSelect={handleSelect} branches={localBranches} branchCount={localBranches.length} />}
+      table={<BranchTable onSelect={handleSelect} />}
       tablePlacement="bottomLeft"
       tableVisible={visible}
       onTableToggle={handleTableToggle}

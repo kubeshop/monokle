@@ -6,7 +6,8 @@ import styled from 'styled-components';
 
 import {GitBranch} from '@models/git';
 
-// import Colors from '@styles/Colors';
+import Colors from '@styles/Colors';
+
 import {NameCell} from './BranchCell';
 
 type Props = {
@@ -22,23 +23,20 @@ export function useBranchTable({branchCount, onSelect}: Props) {
         title: <PrimaryTitle>{branchCount} active branches</PrimaryTitle>,
         render: (_, branch) => <NameCell onSelect={onSelect} branch={branch} />,
       },
-      {
-        key: 'view',
-        // title: <SecondaryTitle>View on repository</SecondaryTitle>,
-        // render: (_, branch) => <span>Testing...</span>,
-        width: 160,
-      },
+      // {
+      //   key: 'view',
+      //   // title: <SecondaryTitle>View on repository</SecondaryTitle>,
+      //   // render: (_, branch) => <span>Testing...</span>,
+      //   width: 160,
+      // },
     ];
   }, [branchCount, onSelect]);
 
   return columns;
 }
 
-const PrimaryTitle = styled.span`
+const PrimaryTitle = styled.div`
   font-size: 16px;
+  color: ${Colors.grey9};
+  font-weight: 700;
 `;
-
-// const SecondaryTitle = styled.span`
-//   font-weight: normal;
-//   color: ${Colors.grey7};
-// `;

@@ -1,27 +1,35 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {SearchOutlined} from '@ant-design/icons';
 
 import {GitBranch} from '@models/git';
 
+import {useAppSelector} from '@redux/hooks';
+
 import * as S from './BranchTable.styled';
 import {useBranchTable} from './useBranchTable';
 
-type Props = {
-  branches: GitBranch[];
-  branchCount: number;
+type IProps = {
   onSelect: (branch: GitBranch) => void;
 };
 
-function BranchTable({branches, branchCount, onSelect}: Props) {
+const BranchTable: React.FC<IProps> = ({onSelect}) => {
+  const branchMap = useAppSelector(state => state.git.repo?.branchMap);
+
   const [searchFilter, setSearchFilter] = useState<string>('');
 
-  const searchedBranches: GitBranch[] = branches.filter(branch => {
-    return branch.name.toLowerCase().includes(searchFilter.toLowerCase());
-  });
+  const searchedBranches: GitBranch[] = useMemo(() => {
+    if (!branchMap) {
+      return [];
+    }
+
+    return Object.values(branchMap).filter(branch => {
+      return branch.name.toLowerCase().includes(searchFilter.toLowerCase());
+    });
+  }, [branchMap, searchFilter]);
 
   const columns = useBranchTable({
-    branchCount,
+    branchCount: searchedBranches.length,
     onSelect,
   });
 
@@ -42,11 +50,10 @@ function BranchTable({branches, branchCount, onSelect}: Props) {
         showSorterTooltip={false}
         pagination={false}
         size="small"
-        scroll={{y: 320}}
-        locale={{emptyText: ' '}}
+        scroll={{y: 350}}
       />
     </S.Container>
   );
-}
+};
 
 export default BranchTable;
