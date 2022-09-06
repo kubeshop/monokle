@@ -145,6 +145,26 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
 
+        <FeatureFlag name="GitOps">
+          <Walkthrough placement="leftTop" collection="release" step="images">
+            <PaneTooltip
+              show={!leftActive || leftMenuSelection !== 'git-pane'}
+              title="View Git operations"
+              placement="right"
+            >
+              <MenuButton
+                id="git-pane"
+                isSelected={checkIsTabSelected('git-pane')}
+                isActive={isActive}
+                onClick={() => setLeftActiveMenu('git-pane')}
+                disabled={!activeProject}
+              >
+                <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+              </MenuButton>
+            </PaneTooltip>
+          </Walkthrough>
+        </FeatureFlag>
+
         <PaneTooltip
           show={!leftActive || leftMenuSelection !== 'kustomize-pane'}
           title={<KustomizeTabTooltip />}

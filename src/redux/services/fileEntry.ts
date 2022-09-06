@@ -490,6 +490,12 @@ export function reloadFile(
     selectFilePath({filePath: fileEntry.filePath, state});
     state.shouldEditorReloadSelectedPath = true;
   }
+
+  const fileStats = getFileStats(absolutePath);
+  if (fileStats && fileStats.isFile()) {
+    const newText = fs.readFileSync(absolutePath, 'utf8');
+    state.fileMap[fileEntry.filePath].text = newText;
+  }
 }
 
 /**
