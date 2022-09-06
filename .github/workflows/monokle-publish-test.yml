@@ -135,8 +135,6 @@ jobs:
           ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
           cd ./homebrew-monokle
           git add .
-          git config user.name github-actions
-          git config user.email github-actions@github.com
           git commit -am "Update cask to new version"
           git push https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle.git
         env:
