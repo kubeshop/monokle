@@ -2,9 +2,10 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import micromatch from 'micromatch';
 
+import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
-import {setChangedFiles, setCurrentBranch} from '@redux/git';
+import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
 import {currentConfigSelector} from '@redux/selectors';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
@@ -29,9 +30,10 @@ export const multiplePathsChanged = createAsyncThunk(
       });
     });
 
-    promiseFromIpcRenderer('git.getCurrentBranch', 'git.getCurrentBranch.result', projectRootFolderPath).then(
+    promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolderPath).then(
       result => {
-        thunkAPI.dispatch(setCurrentBranch(result));
+        thunkAPI.dispatch(setRepo(result));
+        thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
       }
     );
 
