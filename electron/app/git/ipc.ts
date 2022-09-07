@@ -2,7 +2,7 @@ import {ipcMain} from 'electron';
 
 import {FileMapType} from '@models/appstate';
 
-import {checkoutGitBranch, cloneGitRepo, fetchGitRepo, getChangedFiles, isFolderGitRepo} from './git';
+import {checkoutGitBranch, cloneGitRepo, fetchGitRepo, getChangedFiles, getCurrentBranch, isFolderGitRepo} from './git';
 
 ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
   const result = await isFolderGitRepo(path);
@@ -28,4 +28,9 @@ ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; b
 ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fileMap: FileMapType}) => {
   const result = await getChangedFiles(payload.localPath, payload.fileMap);
   event.sender.send('git.getChangedFiles.result', result);
+});
+
+ipcMain.on('git.getCurrentBranch', async (event, localPath: string) => {
+  const result = await getCurrentBranch(localPath);
+  event.sender.send('git.getCurrentBranch.result', result);
 });

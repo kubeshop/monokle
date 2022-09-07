@@ -88,3 +88,10 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
 
   return changedFiles;
 }
+
+export async function getCurrentBranch(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  const branchesSummary = await git.branch();
+
+  return branchesSummary.current;
+}

@@ -4,7 +4,7 @@ import micromatch from 'micromatch';
 
 import {RootState} from '@models/rootstate';
 
-import {setChangedFiles} from '@redux/git';
+import {setChangedFiles, setCurrentBranch} from '@redux/git';
 import {currentConfigSelector} from '@redux/selectors';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
@@ -28,6 +28,12 @@ export const multiplePathsChanged = createAsyncThunk(
         }
       });
     });
+
+    promiseFromIpcRenderer('git.getCurrentBranch', 'git.getCurrentBranch.result', projectRootFolderPath).then(
+      result => {
+        thunkAPI.dispatch(setCurrentBranch(result));
+      }
+    );
 
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
       localPath: projectRootFolderPath,
