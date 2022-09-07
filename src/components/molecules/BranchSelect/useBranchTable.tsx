@@ -20,7 +20,7 @@ export function useBranchTable({branchCount, onSelect}: Props) {
     return [
       {
         key: 'name',
-        title: <PrimaryTitle>{branchCount} active branches</PrimaryTitle>,
+        title: <PrimaryTitle>{branchCount} Active Branches</PrimaryTitle>,
         render: (_, branch) => <NameCell onSelect={onSelect} branch={branch} />,
       },
       // {
