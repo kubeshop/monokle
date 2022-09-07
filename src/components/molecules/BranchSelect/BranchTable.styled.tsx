@@ -1,4 +1,4 @@
-import {Input, Table as RawTable, TableProps} from 'antd';
+import {Input, Select as RawSelect, Table as RawTable, TableProps} from 'antd';
 
 import {rgba} from 'polished';
 import styled from 'styled-components';
@@ -17,6 +17,7 @@ export const Container = styled.div`
 export const TableFilter = styled.div`
   display: flex;
   align-items: center;
+  gap: 8px;
   height: 50px;
   background-color: ${rgba(Colors.coldGrey, 0.5)};
   padding: 12px;
@@ -27,6 +28,14 @@ export const SearchInput = styled(Input)`
   width: 260px;
   height: 32px;
   border: 1px solid ${Colors.grey6};
+`;
+
+export const Select = styled(RawSelect)`
+  width: 180px;
+
+  .ant-select-selector {
+    border: 1px solid ${Colors.grey6} !important;
+  }
 `;
 
 export const Table = styled((props: TableProps<GitBranch>) => <RawTable<GitBranch> {...props} />)`
