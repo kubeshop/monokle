@@ -14,12 +14,15 @@ import {NotificationsTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 
+import {setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import BranchSelect from '@components/molecules/BranchSelect';
+
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -34,6 +37,7 @@ const PageHeader = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -44,8 +48,8 @@ const PageHeader = () => {
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
+  const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
 
   let timeoutRef = useRef<any>(null);
 
@@ -88,6 +92,13 @@ const PageHeader = () => {
 
     shell.openExternal(url);
   }, [autosavingError]);
+
+  const initGitRepo = async () => {
+    await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
+    promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
+      dispatch(setRepo(result));
+    });
+  };
 
   useEffect(() => {
     if (previewResourceId) {
@@ -146,10 +157,12 @@ const PageHeader = () => {
             <>
               <S.Divider type="vertical" />
               <ProjectSelection />
-              {hasGitRepo && (
+              {hasGitRepo ? (
                 <span style={{marginLeft: 8}}>
                   <BranchSelect />
                 </span>
+              ) : (
+                <Button onClick={initGitRepo}>Init</Button>
               )}
               <CreateProject />
             </>

@@ -51,3 +51,8 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.checkout(branchName);
 }
+
+export async function initGitRepo(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.init();
+}
