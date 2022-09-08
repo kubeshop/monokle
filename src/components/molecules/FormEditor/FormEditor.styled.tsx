@@ -1,12 +1,71 @@
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
+export const ArrowIconExpanded = styled.span`
+  display: flex;
+  align-items: center;
+
+  &: after {
+    right: 3px;
+    top: 50%;
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 4px 4px 0 4px;
+    border-color: ${Colors.whitePure} transparent transparent transparent;
+  }
+`;
+
+export const ArrowIconClosed = styled.span`
+  display: flex;
+  align-items: center;
+
+  &: after {
+    right: 3px;
+    top: 50%;
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 4px 0 4px 4px;
+    border-color: transparent transparent transparent ${Colors.whitePure};
+  }
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  background: ${Colors.blackPearl};
+  margin: 1px 0;
+  padding-left: 10px;
+`;
+
+export const TitleText = styled.p`
+  padding: 10px;
+  margin: 0;
+`;
+
+export const ElementText = styled.p`
+  padding: 5px;
+  margin: 0;
+`;
+
+export const PropertyContainer = styled.div`
+  margin-left: 5px;
+`;
+
+export const FieldContainer = styled.div`
+  margin-left: 10px;
+`;
+
 export const FormContainer = styled.div`
   height: 100%;
   width: 100%;
-  padding: 20px 15px 0px 15px;
   margin: 0px;
   overflow-y: auto;
   overflow-x: hidden;
+  margin-left: -10px;
 
   .ant-input[disabled] {
     color: grey;
@@ -16,8 +75,11 @@ export const FormContainer = styled.div`
     color: grey;
   }
 
+  .ant-form-item-extra {
+    min-height: 0;
+  }
+
   .ant-form-item-label {
-    font-weight: bold;
     padding-top: 10px;
     padding-bottom: 0px;
   }
@@ -70,9 +132,6 @@ export const FormContainer = styled.div`
     margin-left: 50px;
   }
 
-  .field-object {
-    margin-top: -10px;
-  }
   .field-string {
     margin-bottom: -10px;
   }

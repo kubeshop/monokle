@@ -70,7 +70,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
         </Col>
       </Row>
       <Row style={{height: '100%'}}>
-        <Col span={12} style={{height: '100%'}}>
+        <Col span={12} style={{height: 'auto'}}>
           <Monaco applySelection={() => {}} diffSelectedResource={() => {}} />
         </Col>
         <Col span={1} />
