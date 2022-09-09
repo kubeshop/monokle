@@ -1,9 +1,10 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {useWindowSize} from 'react-use';
 
 import {Button, Col, Modal, Row} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLastChangedLine} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 
@@ -26,6 +27,11 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId) || 0;
   const selectedResource = resourceMap[selectedResourceId];
   const sizeProps = useModalSize();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(setLastChangedLine(0));
+  }, [dispatch]);
 
   const isKustomization = useMemo(() => isKustomizationResource(selectedResource), [selectedResource]);
   const resourceKindHandler = useMemo(
