@@ -321,7 +321,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                   <>
                     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
                       <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
-                        {isButtonShrinked ? '' : `Edit ${selectedResource?.kind}`} <Icon name="split-view" />
+                        <Icon name="split-view" />
                       </S.ExtraRightButton>
                     </Tooltip>
                     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
@@ -330,7 +330,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                         type="link"
                         ref={extraButton}
                       >
-                        {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
+                        <BookOutlined />
                       </S.ExtraRightButton>
                     </Tooltip>
                   </>

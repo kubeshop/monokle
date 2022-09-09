@@ -66,21 +66,14 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
           </S.SourceNameBlock>
         </Col>
       </Row>
-      <Row>
-        <Col span={12}>
-          <S.BlockTitle>Source</S.BlockTitle>
-        </Col>
-        <Col span={1} />
-        <Col span={11}>
-          <S.BlockTitle>Form</S.BlockTitle>
-        </Col>
-      </Row>
       <Row style={{height: '100%', flexFlow: 'nowrap'}}>
-        <Col span={12} style={{height: 'auto'}}>
+        <S.StyledCol span={12} style={{height: 'auto'}}>
+          <S.BlockTitle>Source</S.BlockTitle>
           <Monaco applySelection={() => {}} diffSelectedResource={() => {}} />
-        </Col>
+        </S.StyledCol>
         <Col span={1} />
-        <Col span={11}>
+        <S.StyledCol span={11}>
+          <S.BlockTitle>Form</S.BlockTitle>
           {isKustomization && selectedResource ? (
             <FormEditor
               formSchema={extractFormSchema(
@@ -95,7 +88,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
               />
             )
           )}
-        </Col>
+        </S.StyledCol>
       </Row>
     </Modal>
   );

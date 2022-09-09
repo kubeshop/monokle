@@ -1,3 +1,5 @@
+import {Col} from 'antd';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -45,4 +47,9 @@ export const FileName = styled.div`
     color: white;
     margin-right: 5px;
   }
+`;
+
+export const StyledCol = styled(Col)`
+  background: ${Colors.blackPure};
+  overflow: hidden;
 `;

@@ -39,6 +39,7 @@ export const TitleWrapper = styled.div`
   background: ${Colors.blackPearl};
   margin: 1px 0;
   padding-left: 10px;
+  cursor: pointer;
 `;
 
 export const TitleText = styled.p`
@@ -63,9 +64,9 @@ export const FormContainer = styled.div`
   height: 100%;
   width: 100%;
   margin: 0px;
+  padding-right: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-left: -10px;
 
   .ant-input[disabled] {
     color: grey;
