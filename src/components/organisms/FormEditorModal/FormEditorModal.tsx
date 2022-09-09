@@ -69,7 +69,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
           <S.BlockTitle>Form</S.BlockTitle>
         </Col>
       </Row>
-      <Row style={{height: '100%'}}>
+      <Row style={{height: '100%', flexFlow: 'nowrap'}}>
         <Col span={12} style={{height: 'auto'}}>
           <Monaco applySelection={() => {}} diffSelectedResource={() => {}} />
         </Col>
