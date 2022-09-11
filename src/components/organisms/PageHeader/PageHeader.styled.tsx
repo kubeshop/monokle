@@ -39,6 +39,11 @@ export const BellOutlined = styled(RawBellOutlined)`
   margin-left: 1.5rem;
 `;
 
+export const BranchSelectContainer = styled.div`
+  margin-left: 8px;
+  padding-top: 1px;
+`;
+
 export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   color: ${Colors.blue6};
   font-size: 1rem;
