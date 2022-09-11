@@ -1,7 +1,10 @@
 import {promises as fs} from 'fs';
 import {SimpleGit, simpleGit} from 'simple-git';
 
+import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
+
+import {formatGitChangedFiles} from '@utils/git';
 
 export async function isFolderGitRepo(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -50,4 +53,22 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
   const {localPath, branchName} = payload;
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.checkout(branchName);
+}
+
+export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const currentBranch = (await git.branch()).current;
+  const stagedChangedFiles = (await git.diff({'--name-only': null, '--staged': null})).split('\n').filter(el => el);
+  const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
+
+  const changedFiles = formatGitChangedFiles({stagedChangedFiles, unstagedChangedFiles}, fileMap);
+
+  for (let i = 0; i < changedFiles.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const originalContent = await git.show(`${currentBranch}:${changedFiles[i].path}`);
+    changedFiles[i].originalContent = originalContent;
+  }
+
+  return changedFiles;
 }

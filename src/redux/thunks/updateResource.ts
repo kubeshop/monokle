@@ -6,6 +6,7 @@ import {AppState} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 import {ThunkApi} from '@models/thunk';
 
+import {setChangedFiles} from '@redux/git';
 import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
@@ -14,6 +15,8 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
+
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 type UpdateResourcePayload = {
   resourceId: string;
@@ -31,6 +34,7 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
     const policyPlugins = state.main.policies.plugins;
+    const projectRootFolderPath = state.config.selectedProjectRootFolder;
 
     const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
 
@@ -95,6 +99,13 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
+
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: projectRootFolderPath,
+      fileMap: nextMainState.fileMap,
+    }).then(result => {
+      thunkAPI.dispatch(setChangedFiles(result));
+    });
 
     return nextMainState;
   }
