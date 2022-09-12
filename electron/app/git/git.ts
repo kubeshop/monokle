@@ -74,6 +74,7 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 export async function initGitRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.init();
+  await git.commit('Initial commit', undefined, {'--allow-empty': null});
 }
 
 export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
