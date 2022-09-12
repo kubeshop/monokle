@@ -158,9 +158,9 @@ const PageHeader = () => {
               <S.Divider type="vertical" />
               <ProjectSelection />
               {hasGitRepo ? (
-                <span style={{marginLeft: 8}}>
+                <S.BranchSelectContainer>
                   <BranchSelect />
-                </span>
+                </S.BranchSelectContainer>
               ) : (
                 <Button onClick={initGitRepo}>Init</Button>
               )}

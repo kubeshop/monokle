@@ -1,5 +1,6 @@
 export {default as Collapse} from './Collapse';
 export {default as Helm} from './Helm';
+export {default as Git} from './Git';
 export {default as K8sSchema} from './K8sSchema';
 export {default as Kustomize} from './Kustomize';
 export {default as Kubernetes} from './Kubernetes';

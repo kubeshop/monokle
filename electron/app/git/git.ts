@@ -1,7 +1,10 @@
 import {promises as fs} from 'fs';
 import {SimpleGit, simpleGit} from 'simple-git';
 
+import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
+
+import {formatGitChangedFiles} from '@utils/git';
 
 export async function isFolderGitRepo(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -33,13 +36,29 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
 
 export async function fetchGitRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  const branchSummary = await git.branch();
+  const remoteBranchSummary = await git.branch({'-r': null});
+  const localBranches = await git.branchLocal();
 
   const gitRepo: GitRepo = {
-    branches: branchSummary.all,
-    currentBranch: branchSummary.current,
-    branchMap: Object.fromEntries(
-      Object.entries(branchSummary.branches).map(([key, value]) => [key, {name: value.name, commitSha: value.commit}])
+    branches: [...localBranches.all, ...remoteBranchSummary.all],
+    currentBranch: localBranches.current || remoteBranchSummary.current,
+    branchMap: {},
+  };
+
+  gitRepo.branchMap = Object.fromEntries(
+    Object.entries({...localBranches.branches}).map(([key, value]) => [
+      key,
+      {name: value.name, commitSha: value.commit, type: 'local'},
+    ])
+  );
+
+  gitRepo.branchMap = {
+    ...gitRepo.branchMap,
+    ...Object.fromEntries(
+      Object.entries({...remoteBranchSummary.branches}).map(([key, value]) => [
+        key,
+        {name: value.name.replace('remotes/', ''), commitSha: value.commit, type: 'remote'},
+      ])
     ),
   };
 
@@ -55,4 +74,29 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 export async function initGitRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.init();
+}
+
+export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const currentBranch = (await git.branch()).current;
+  const stagedChangedFiles = (await git.diff({'--name-only': null, '--staged': null})).split('\n').filter(el => el);
+  const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
+
+  const changedFiles = formatGitChangedFiles({stagedChangedFiles, unstagedChangedFiles}, fileMap);
+
+  for (let i = 0; i < changedFiles.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const originalContent = await git.show(`${currentBranch}:${changedFiles[i].path}`);
+    changedFiles[i].originalContent = originalContent;
+  }
+
+  return changedFiles;
+}
+
+export async function getCurrentBranch(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  const branchesSummary = await git.branch();
+
+  return branchesSummary.current;
 }

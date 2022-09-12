@@ -24,7 +24,7 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {CurrentMatch, FileEntry} from '@models/fileentry';
-import {GitRepo} from '@models/git';
+import {GitChangedFile, GitRepo} from '@models/git';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
@@ -84,6 +84,7 @@ export type SetRootFolderPayload = {
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
+  gitChangedFiles: GitChangedFile[];
   gitRepo?: GitRepo;
 };
 

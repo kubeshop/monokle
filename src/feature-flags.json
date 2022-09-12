@@ -4,5 +4,6 @@
   "ActionsPaneFooter": false,
   "ImagesPane": true,
   "CompareEverything": true,
-  "Terminal": true
+  "Terminal": true,
+  "GitOps": true
 }
