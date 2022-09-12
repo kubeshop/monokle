@@ -65,6 +65,10 @@ export const Header = styled(Layout.Header)`
   justify-content: space-between;
 `;
 
+export const InitButton = styled(RawButton)`
+  margin-left: 8px;
+`;
+
 export const Logo = styled.img`
   height: 45px;
   cursor: pointer;

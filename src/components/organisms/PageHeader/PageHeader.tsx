@@ -162,7 +162,9 @@ const PageHeader = () => {
                   <BranchSelect />
                 </S.BranchSelectContainer>
               ) : (
-                <Button onClick={initGitRepo}>Init</Button>
+                <S.InitButton onClick={initGitRepo} type="link" size="small">
+                  Initialize Git
+                </S.InitButton>
               )}
               <CreateProject />
             </>
