@@ -32,6 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
+import {setRepo} from '@redux/git';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -56,6 +57,7 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
+import {promiseFromIpcRenderer} from '@utils/promises';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
@@ -333,6 +335,7 @@ export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkAp
   'main/multiplePathsRemoved',
   async (filePaths, thunkAPI) => {
     const state = thunkAPI.getState();
+    const gitRepo = state.git.repo;
 
     const nextMainState = createNextState(state.main, mainState => {
       filePaths.forEach((filePath: string) => {
@@ -342,6 +345,16 @@ export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkAp
         }
       });
     });
+
+    const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
+      'git.isFolderGitRepo',
+      'git.isFolderGitRepo.result',
+      state.config.selectedProjectRootFolder
+    );
+
+    if (!isFolderGitRepo && gitRepo) {
+      thunkAPI.dispatch(setRepo(undefined));
+    }
 
     return nextMainState;
   }
