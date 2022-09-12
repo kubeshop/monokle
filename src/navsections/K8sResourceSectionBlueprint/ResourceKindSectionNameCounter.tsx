@@ -26,9 +26,17 @@ function ResourceKindSectionCounter({sectionInstance, onClick}: SectionCustomCom
     <>
       <S.Counter onClick={onClick}>{resourceCount}</S.Counter>
 
-      {isCollapsed && warningCount > 0 ? <S.Badge $type="warning" count={warningCount} size="small" /> : undefined}
+      {isCollapsed && warningCount > 0 ? (
+        <span onClick={onClick}>
+          <S.Badge $type="warning" count={warningCount} size="small" />
+        </span>
+      ) : undefined}
 
-      {isCollapsed && errorCount > 0 ? <S.Badge $type="error" count={errorCount} size="small" /> : undefined}
+      {isCollapsed && errorCount > 0 ? (
+        <span onClick={onClick}>
+          <S.Badge $type="error" count={errorCount} size="small" />
+        </span>
+      ) : undefined}
     </>
   );
 }
