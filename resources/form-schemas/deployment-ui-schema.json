@@ -1,151 +1,199 @@
 {
   "ui:title": "Service Properties",
+  "level": 0,
   "spec": {
     "ui:title": "Object specs",
+    "level": 1,
     "selector": {
       "ui:title": "Selector",
+      "level": 2,
       "matchLabels": {
-        "ui:title": "Match Labels"
+        "ui:title": "Match Labels",
+        "level": 3
       }
     },
     "replicas": {
-      "ui:title": "Replicas"
+      "ui:title": "Replicas",
+      "level": 2
     },
     "strategy": {
       "ui:title": "Strategy",
+      "level": 2,
       "type": {
-        "ui:title": "Type"
+        "ui:title": "Type",
+        "level": 3
       }
     },
     "template": {
       "ui:title": "Template",
+      "level": 2,
       "metadata": {
         "ui:title": "Metadata",
+        "level": 3,
         "labels": {
-          "ui:title": "Labels"
+          "ui:title": "Labels",
+          "level": 4
         }
       },
       "spec": {
         "ui:title": "Spec",
+        "level": 2,
         "containers": {
           "ui:title": "Containers",
+          "level": 3,
           "items": {
             "name": {
-              "ui:title": "Name"
+              "ui:title": "Name",
+              "level": 4
             },
             "image": {
               "ui:title": "Image",
-              "ui:widget": "imageSelection"
+              "ui:widget": "imageSelection",
+              "level": 4
             },
             "ports": {
               "ui:title": "Ports",
+              "level": 4,
               "items": {
                 "name": {
-                  "ui:title": "Name"
+                  "ui:title": "Name",
+                  "level": 5
                 },
                 "containerPort": {
-                  "ui:title": "Container Port"
+                  "ui:title": "Container Port",
+                  "level": 5
                 }
               }
             },
             "resources": {
+              "ui:title": "Resources",
+              "level": 4,
               "limits": {
                 "ui:title": "Limits",
+                "level": 5,
                 "memory": {
-                  "ui:title": "Memory"
+                  "ui:title": "Memory",
+                  "level": 6
                 },
                 "cpu": {
-                  "ui:title": "CPU"
+                  "ui:title": "CPU",
+                  "level": 6
                 }
               },
               "requests": {
                 "ui:title": "Requests",
+                "level": 5,
                 "memory": {
-                  "ui:title": "Memory"
+                  "ui:title": "Memory",
+                  "level": 6
                 },
                 "cpu": {
-                  "ui:title": "CPU"
+                  "ui:title": "CPU",
+                  "level": 6
                 }
               }
             },
             "env": {
               "ui:title": "Environments",
+              "level": 4,
               "items": {
                 "name": {
-                  "ui:title": "Name"
+                  "ui:title": "Name",
+                  "level": 5
                 },
                 "value": {
-                  "ui:title": "Value"
+                  "ui:title": "Value",
+                  "level": 5
                 },
                 "valueFrom": {
                   "ui:label": false,
                   "ui:title": false,
+                  "level": 5,
                   "secretKeyRef": {
                     "ui:label": false,
                     "ui:title": false,
-                    "ui:field": "secretKindSelection"
+                    "ui:field": "secretKindSelection",
+                    "level": 6
                   }
                 }
               }
             },
             "volumeMounts": {
               "ui:title": "Volume Mounts",
+              "level": 4,
               "items": {
                 "name": {
-                  "ui:title": "Name"
+                  "ui:title": "Name",
+                  "level": 5
                 },
                 "mountPath": {
-                  "ui:title": "Mounth Path"
+                  "ui:title": "Mounth Path",
+                  "level": 5
                 },
                 "readOnly": {
-                  "ui:title": "Read Only"
+                  "ui:title": "Read Only",
+                  "level": 5
                 }
               }
             },
             "command": {
               "ui:title": "Commands",
+              "level": 4,
               "items": {
-                "ui:title": "Command"
+                "ui:title": "Command",
+                "level": 5
               }
             },
             "imagePullPolicy": {
-              "ui:title": "Image Pull Policy"
+              "ui:title": "Image Pull Policy",
+              "level": 4
             }
           }
         },
         "securityContext": {
           "ui:title": "Security Context",
+          "level": 3,
           "runAsNonRoot": {
-            "ui:title": "Run as Non Root"
+            "ui:title": "Run as Non Root",
+            "level": 4
           }
         },
         "serviceAccountName": {
-          "ui:title": "Service Account Name"
+          "ui:title": "Service Account Name",
+          "level": 3
         },
         "volumes": {
           "ui:title": "Volumes",
+          "level": 3,
           "items": {
             "emptyDir": {
-              "ui:title": "Empty Dir"
+              "ui:title": "Empty Dir",
+              "level": 4
             },
             "name": {
-              "ui:title": "Name"
+              "ui:title": "Name",
+              "level": 4
             },
             "hostPath": {
               "ui:title": "Host Path",
+              "level": 4,
               "path": {
-                "ui:title": "Path"
+                "ui:title": "Path",
+                "level": 5
               }
             }
           }
         },
         "terminationGracePeriodSeconds": {
+          "level": 3,
           "ui:title": "Termination Grace Period Seconds"
         },
         "imagePullSecrets": {
+          "level": 3,
           "ui:title": "Image Pull Secrets",
           "items": {
             "name": {
+              "level": 4,
               "ui:label": false,
               "ui:title": false,
               "ui:field": "secretKindSelection"

@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {memo, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
@@ -186,15 +186,22 @@ const FormEditor: React.FC<IProps> = props => {
     }
   }
 
-  const ObjectFieldTemplate = ({title, properties}: ObjectFieldTemplateProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const ObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
+    const {title, properties, uiSchema} = props;
     const [isExpanded, toggleExpand] = useState<boolean>(true);
+    const opacity = (10 - (uiSchema?.level ?? 0)) / 10;
 
     return (
       <S.FieldContainer>
-        <S.TitleWrapper onClick={() => toggleExpand(prev => !prev)}>
+        <S.TitleWrapper onClick={() => toggleExpand(prev => !prev)} opacityStep={opacity || 1}>
           {isExpanded ? <S.ArrowIconExpanded /> : <S.ArrowIconClosed />}
 
-          {title ? <S.TitleText>{title}</S.TitleText> : <S.ElementText>element</S.ElementText>}
+          {title ? (
+            <S.TitleText isBold={uiSchema.level === 0}>{title}</S.TitleText>
+          ) : (
+            <S.ElementText>element</S.ElementText>
+          )}
         </S.TitleWrapper>
         {isExpanded && (
           <>
@@ -213,7 +220,7 @@ const FormEditor: React.FC<IProps> = props => {
         schema={schema}
         uiSchema={formUiSchema}
         formData={formData}
-        ObjectFieldTemplate={ObjectFieldTemplate}
+        ObjectFieldTemplate={memo(ObjectFieldTemplate, areEqual)}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
         fields={getCustomFormFields()}

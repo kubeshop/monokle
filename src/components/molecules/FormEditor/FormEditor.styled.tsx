@@ -34,17 +34,30 @@ export const ArrowIconClosed = styled.span`
   }
 `;
 
-export const TitleWrapper = styled.div`
+type TitleWrapperProps = {
+  opacityStep: number;
+};
+
+type TitleTextProps = {
+  isBold?: boolean;
+};
+
+export const TitleWrapper = styled.div<TitleWrapperProps>`
   display: flex;
-  background: ${Colors.blackPearl};
+  background: ${({opacityStep}) => `rgba(17, 29, 44, ${opacityStep})`};
   margin: 1px 0;
   padding-left: 10px;
   cursor: pointer;
 `;
 
-export const TitleText = styled.p`
+export const TitleText = styled.p<TitleTextProps>`
   padding: 10px;
   margin: 0;
+  ${({isBold}) =>
+    isBold &&
+    `
+    font-weight: 600;
+  `}
 `;
 
 export const ElementText = styled.p`

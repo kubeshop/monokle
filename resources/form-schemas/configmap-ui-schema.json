@@ -1,15 +1,19 @@
 {
   "ui:title": "ConfigMap Properties",
+  "level": 0,
   "data": {
     "ui:title": "Configuration Data",
-    "ui:description": "Text configuration data"
+    "ui:description": "Text configuration data",
+    "level": 1
   },
   "binaryData": {
     "ui:title": "Binary Configuration Data",
-    "ui:description": "Binary configuration data"
+    "ui:description": "Binary configuration data",
+    "level": 1
   },
   "immutable": {
     "ui:title": "Immutable",
-    "ui:help": "(ensures that data stored in the ConfigMap cannot be updated)"
+    "ui:help": "(ensures that data stored in the ConfigMap cannot be updated)",
+    "level": 1
   }
 }

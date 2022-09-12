@@ -23,6 +23,8 @@ export const SourceNameBlock = styled.div`
 export const BlockTitle = styled.div`
   display: flex;
   justify-content: space-between;
+  font-weight: 600;
+  font-size: 16px;
   padding: 14px 12px;
   border-radius: 2;
   background-color: ${Colors.coldGrey};
