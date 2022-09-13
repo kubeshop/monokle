@@ -16,6 +16,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
@@ -96,6 +97,10 @@ const PageHeader = () => {
   }, [autosavingError]);
 
   const initGitRepo = async () => {
+    if (!projectRootFolder) {
+      return;
+    }
+
     setIsInitializingGitRepo(true);
 
     await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
@@ -103,6 +108,7 @@ const PageHeader = () => {
     promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
       setIsInitializingGitRepo(false);
+      dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
     });
   };
 

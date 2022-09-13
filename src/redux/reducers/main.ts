@@ -74,6 +74,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
+import {updateProjectsGitRepo} from './appConfig';
 import {closeClusterDiff, setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
@@ -354,6 +355,9 @@ export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkAp
 
     if (!isFolderGitRepo && gitRepo) {
       thunkAPI.dispatch(setRepo(undefined));
+      thunkAPI.dispatch(
+        updateProjectsGitRepo([{path: state.config.selectedProjectRootFolder || '', isGitRepo: false}])
+      );
     }
 
     return nextMainState;
