@@ -55,6 +55,7 @@ const PageHeader = () => {
   let timeoutRef = useRef<any>(null);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+  const [isInitializingGitRepo, setIsInitializingGitRepo] = useState(false);
   const [showAutosaving, setShowAutosaving] = useState(false);
 
   const runningPreviewConfiguration = useAppSelector(state => {
@@ -95,9 +96,13 @@ const PageHeader = () => {
   }, [autosavingError]);
 
   const initGitRepo = async () => {
+    setIsInitializingGitRepo(true);
+
     await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
+
     promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
+      setIsInitializingGitRepo(false);
     });
   };
 
@@ -164,7 +169,13 @@ const PageHeader = () => {
                 </S.BranchSelectContainer>
               ) : (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={InitializeGitTooltip}>
-                  <S.InitButton icon={<Icon name="git" />} onClick={initGitRepo} type="primary" size="small">
+                  <S.InitButton
+                    icon={<Icon name="git" />}
+                    loading={isInitializingGitRepo}
+                    type="primary"
+                    size="small"
+                    onClick={initGitRepo}
+                  >
                     Initialize Git
                   </S.InitButton>
                 </Tooltip>
