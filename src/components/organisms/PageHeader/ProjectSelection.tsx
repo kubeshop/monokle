@@ -186,6 +186,15 @@ const ProjectSelection = () => {
             sorter={(a: Project, b: Project) =>
               a.name && b.name ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : 0
             }
+            render={(name, project) => {
+              let isGitRepo = project.isGitRepo;
+
+              return (
+                <S.TableColumnName>
+                  {isGitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />} {name}
+                </S.TableColumnName>
+              );
+            }}
             width={4}
             ellipsis
           />
