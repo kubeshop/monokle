@@ -2,6 +2,7 @@ export type IconNames =
   | 'images'
   | 'git'
   | 'git-ops'
+  | 'git-project'
   | 'kubernetes'
   | 'collapse'
   | 'opa-status'

@@ -10,7 +10,7 @@ import {ReloadOutlined} from '@ant-design/icons';
 import newGithubIssueUrl from 'new-github-issue-url';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NotificationsTooltip} from '@constants/tooltips';
+import {InitializeGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -163,9 +163,11 @@ const PageHeader = () => {
                   <BranchSelect />
                 </S.BranchSelectContainer>
               ) : (
-                <S.InitButton icon={<Icon name="git" />} onClick={initGitRepo} type="primary" size="small">
-                  Initialize Git
-                </S.InitButton>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={InitializeGitTooltip}>
+                  <S.InitButton icon={<Icon name="git" />} onClick={initGitRepo} type="primary" size="small">
+                    Initialize Git
+                  </S.InitButton>
+                </Tooltip>
               )}
               <CreateProject />
             </>

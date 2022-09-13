@@ -39,6 +39,7 @@ import * as S from './ProjectSelection.styled';
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const gitRepo = useAppSelector(state => state.git.repo);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -260,7 +261,10 @@ const ProjectSelection = () => {
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
               <S.ProjectLabel>Project</S.ProjectLabel>
+
               <S.ProjectContent>
+                {gitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+
                 <S.ProjectName>{activeProject.name}</S.ProjectName>
                 <S.DownOutlined />
               </S.ProjectContent>
