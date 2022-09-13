@@ -1,5 +1,6 @@
 export type IconNames =
   | 'images'
+  | 'git'
   | 'git-ops'
   | 'kubernetes'
   | 'collapse'

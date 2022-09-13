@@ -9,6 +9,7 @@ import Colors from '@styles/Colors';
 import {
   Collapse,
   Git,
+  GitOps,
   Helm,
   Images,
   IncomingRefs,
@@ -42,7 +43,8 @@ type IconProps = {
 const icons: Record<IconNames, React.ComponentType<any>> = {
   'opa-status': OPAStatus,
   images: Images,
-  'git-ops': Git,
+  git: Git,
+  'git-ops': GitOps,
   kubernetes: Kubernetes,
   collapse: Collapse,
   helm: Helm,

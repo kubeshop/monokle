@@ -20,6 +20,7 @@ import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
+import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -162,7 +163,7 @@ const PageHeader = () => {
                   <BranchSelect />
                 </S.BranchSelectContainer>
               ) : (
-                <S.InitButton onClick={initGitRepo} type="link" size="small">
+                <S.InitButton icon={<Icon name="git" />} onClick={initGitRepo} type="primary" size="small">
                   Initialize Git
                 </S.InitButton>
               )}

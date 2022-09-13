@@ -66,7 +66,13 @@ export const Header = styled(Layout.Header)`
 `;
 
 export const InitButton = styled(RawButton)`
-  margin-left: 8px;
+  margin-left: 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 16px;
+  height: 28px;
 `;
 
 export const Logo = styled.img`
