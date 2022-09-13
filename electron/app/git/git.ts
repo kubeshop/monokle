@@ -6,6 +6,19 @@ import {GitRepo} from '@models/git';
 
 import {formatGitChangedFiles} from '@utils/git';
 
+export async function areFoldersGitRepos(paths: string[]) {
+  let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
+
+  for (let i = 0; i <= paths.length - 1; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const isGitRepo = await isFolderGitRepo(paths[i]);
+
+    foldersStatus.push({path: paths[i], isGitRepo});
+  }
+
+  return foldersStatus;
+}
+
 export async function isFolderGitRepo(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
 

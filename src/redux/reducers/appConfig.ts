@@ -1,4 +1,3 @@
-// import * as k8s from '@kubernetes/client-node';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -233,19 +232,6 @@ export const configSlice = createSlice({
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
-    setProjectGitRepo: (state: Draft<AppConfig>, action: PayloadAction<{rootFolder: string; isGitRepo: boolean}>) => {
-      const {isGitRepo, rootFolder} = action.payload;
-
-      const project = state.projects.find(p => p.rootFolder === rootFolder);
-
-      if (!project) {
-        return;
-      }
-
-      project.isGitRepo = isGitRepo;
-
-      electronStore.set('appConfig.projects', state.projects);
-    },
     toggleProjectPin: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       state.projects.forEach((project: Project) => {
         if (project.rootFolder === action.payload.rootFolder) {
@@ -253,6 +239,19 @@ export const configSlice = createSlice({
         }
       });
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    updateProjectsGitRepo: (state: Draft<AppConfig>, action: PayloadAction<{path: string; isGitRepo: boolean}[]>) => {
+      action.payload.forEach(project => {
+        const foundProject = state.projects.find(p => p.rootFolder === project.path);
+
+        if (!foundProject) {
+          return;
+        }
+
+        foundProject.isGitRepo = project.isGitRepo;
+      });
+
       electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
@@ -501,7 +500,6 @@ export const {
   setFilterObjects,
   setKubeConfig,
   setKubeConfigContextColor,
-  setProjectGitRepo,
   setUserDirs,
   toggleErrorReporting,
   toggleEventTracking,
@@ -516,6 +514,7 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectKubeConfig,
+  updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
   updateTextSize,

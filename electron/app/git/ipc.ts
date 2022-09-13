@@ -3,6 +3,7 @@ import {ipcMain} from 'electron';
 import {FileMapType} from '@models/appstate';
 
 import {
+  areFoldersGitRepos,
   checkoutGitBranch,
   cloneGitRepo,
   fetchGitRepo,
@@ -11,6 +12,11 @@ import {
   initGitRepo,
   isFolderGitRepo,
 } from './git';
+
+ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
+  const result = await areFoldersGitRepos(paths);
+  event.sender.send('git.areFoldersGitRepos.result', result);
+});
 
 ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
   const result = await isFolderGitRepo(path);

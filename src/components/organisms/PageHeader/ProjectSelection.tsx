@@ -22,7 +22,7 @@ import {
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
@@ -33,6 +33,7 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getRelativeDate} from '@utils';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import * as S from './ProjectSelection.styled';
 
@@ -251,6 +252,24 @@ const ProjectSelection = () => {
       </S.ProjectMenu>
     );
   };
+
+  useEffect(() => {
+    const foundProjects = projects.filter(p => _.isUndefined(p.isGitRepo));
+
+    if (!foundProjects?.length) {
+      return;
+    }
+
+    promiseFromIpcRenderer(
+      'git.areFoldersGitRepos',
+      'git.areFoldersGitRepos.result',
+      foundProjects.map(p => p.rootFolder)
+    ).then(result => {
+      dispatch(updateProjectsGitRepo(result));
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!activeProject) {
     return null;
