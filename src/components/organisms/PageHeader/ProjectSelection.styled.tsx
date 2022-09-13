@@ -167,3 +167,9 @@ export const Table = styled(props => <RawTable {...props} />)`
     overflow-y: auto !important;
   }
 `;
+
+export const TableColumnName = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
