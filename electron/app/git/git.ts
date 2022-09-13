@@ -8,6 +8,7 @@ import {formatGitChangedFiles} from '@utils/git';
 
 export async function isFolderGitRepo(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
+
   try {
     await git.status();
     return true;

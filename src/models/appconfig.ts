@@ -77,6 +77,7 @@ export type Project = {
   created?: string;
   lastOpened?: string;
   isPinned?: boolean;
+  isGitRepo?: boolean;
 };
 
 export type PreviewConfigValuesFileItem = {

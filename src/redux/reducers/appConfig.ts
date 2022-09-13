@@ -37,12 +37,19 @@ import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  thunkAPI.dispatch(configSlice.actions.createProject(project));
+  const isGitRepo = await promiseFromIpcRenderer(
+    'git.isFolderGitRepo',
+    'git.isFolderGitRepo.result',
+    project.rootFolder
+  );
+
+  thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
@@ -224,6 +231,19 @@ export const configSlice = createSlice({
     deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    setProjectGitRepo: (state: Draft<AppConfig>, action: PayloadAction<{rootFolder: string; isGitRepo: boolean}>) => {
+      const {isGitRepo, rootFolder} = action.payload;
+
+      const project = state.projects.find(p => p.rootFolder === rootFolder);
+
+      if (!project) {
+        return;
+      }
+
+      project.isGitRepo = isGitRepo;
+
       electronStore.set('appConfig.projects', state.projects);
     },
     toggleProjectPin: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
@@ -481,6 +501,7 @@ export const {
   setFilterObjects,
   setKubeConfig,
   setKubeConfigContextColor,
+  setProjectGitRepo,
   setUserDirs,
   toggleErrorReporting,
   toggleEventTracking,
