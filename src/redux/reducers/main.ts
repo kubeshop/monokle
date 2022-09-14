@@ -56,7 +56,7 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
-import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -1395,13 +1395,22 @@ export default mainSlice.reducer;
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return !isEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return (
+        !isEqual(currentState.main.resourceMap, previousState.main.resourceMap) ||
+        !isEqual(currentState.main.resourceFilter, previousState.main.resourceFilter)
+      );
     },
 
     effect: async (_action, {dispatch, getState}) => {
+      const resourceFilter = getState().main.resourceFilter;
       const resourceMap = getActiveResourceMap(getState().main);
+
+      const currentResourcesMap = Object.fromEntries(
+        Object.entries(resourceMap).filter(([, value]) => isResourcePassingFilter(value, resourceFilter))
+      );
+
       const imagesList = getState().main.imagesList;
-      const images = getImages(resourceMap);
+      const images = getImages(currentResourcesMap);
 
       if (!isEqual(images, imagesList)) {
         dispatch(setImagesList(images));
