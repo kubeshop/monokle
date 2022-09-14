@@ -27,7 +27,7 @@ export const gitSlice = createSlice({
       }
     },
 
-    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo>) => {
+    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
       state.repo = action.payload;
     },
   },

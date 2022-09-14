@@ -18,6 +18,7 @@ export const multiplePathsChanged = createAsyncThunk(
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
     const projectRootFolderPath = state.config.selectedProjectRootFolder;
+    const gitRepo = state.git.repo;
 
     const nextMainState = createNextState(state.main, mainState => {
       filePaths.forEach((filePath: string) => {
@@ -30,19 +31,21 @@ export const multiplePathsChanged = createAsyncThunk(
       });
     });
 
-    promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolderPath).then(
-      result => {
-        thunkAPI.dispatch(setRepo(result));
-        thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
-      }
-    );
+    if (gitRepo) {
+      promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolderPath).then(
+        result => {
+          thunkAPI.dispatch(setRepo(result));
+          thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
+        }
+      );
 
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: projectRootFolderPath,
-      fileMap: nextMainState.fileMap,
-    }).then(result => {
-      thunkAPI.dispatch(setChangedFiles(result));
-    });
+      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: projectRootFolderPath,
+        fileMap: nextMainState.fileMap,
+      }).then(result => {
+        thunkAPI.dispatch(setChangedFiles(result));
+      });
+    }
 
     return nextMainState;
   }
