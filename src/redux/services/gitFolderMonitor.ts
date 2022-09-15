@@ -7,7 +7,7 @@ import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 let headWatcher: FSWatcher;
-let objectsWatcher: FSWatcher;
+let indexWatcher: FSWatcher;
 
 /**
  * Creates a monitor for .git folder
@@ -22,15 +22,28 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
     headWatcher.close();
   }
 
-  if (objectsWatcher) {
-    objectsWatcher.close();
+  if (indexWatcher) {
+    indexWatcher.close();
   }
 
   const headAbsolutePath = `${rootFolderPath}${sep}.git${sep}HEAD`;
-  const objectsAbsolutePath = `${rootFolderPath}${sep}.git${sep}objects`;
+  const indexAbsolutePath = `${rootFolderPath}${sep}.git${sep}index`;
 
   headWatcher = watch(headAbsolutePath, {persistent: true, usePolling: true, interval: 1000});
-  objectsWatcher = watch(objectsAbsolutePath, {persistent: true, usePolling: true, interval: 1000});
+  indexWatcher = watch(indexAbsolutePath, {persistent: true, usePolling: true, interval: 1000});
+
+  indexWatcher.on('change', () => {
+    const gitRepo = thunkAPI.getState().git.repo;
+
+    if (gitRepo) {
+      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolderPath,
+        fileMap: thunkAPI.getState().main.fileMap,
+      }).then(result => {
+        thunkAPI.dispatch(setChangedFiles(result));
+      });
+    }
+  });
 
   headWatcher
     .on('change', () => {
@@ -55,17 +68,4 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
         }
       });
     });
-
-  objectsWatcher.on('change', () => {
-    const gitRepo = thunkAPI.getState().git.repo;
-
-    if (gitRepo) {
-      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolderPath,
-        fileMap: thunkAPI.getState().main.fileMap,
-      }).then(result => {
-        thunkAPI.dispatch(setChangedFiles(result));
-      });
-    }
-  });
 }

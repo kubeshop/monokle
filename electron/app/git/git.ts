@@ -124,3 +124,15 @@ export async function stageChangedFiles(localPath: string, filePaths: string[]) 
 
   await git.add(absoluteFilePaths);
 }
+
+export async function unstageFiles(localPath: string, filePaths: string[]) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const absoluteFilePaths = filePaths.map(filePath => `${localPath}${sep}${filePath.replaceAll('/', sep)}`);
+
+  const unstageProperties = absoluteFilePaths.reduce((prev, current) => {
+    return {...prev, [current]: null};
+  }, {} as any);
+
+  await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
+}

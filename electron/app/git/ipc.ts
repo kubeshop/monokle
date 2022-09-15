@@ -12,6 +12,7 @@ import {
   initGitRepo,
   isFolderGitRepo,
   stageChangedFiles,
+  unstageFiles,
 } from './git';
 
 ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
@@ -60,4 +61,11 @@ ipcMain.on('git.stageChangedFiles', async (event, payload: {localPath: string; f
 
   await stageChangedFiles(localPath, filePaths);
   event.sender.send('git.stageChangedFiles.result');
+});
+
+ipcMain.on('git.unstageFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
+  const {filePaths, localPath} = payload;
+
+  await unstageFiles(localPath, filePaths);
+  event.sender.send('git.unstageFiles.result');
 });

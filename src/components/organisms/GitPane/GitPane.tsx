@@ -71,16 +71,23 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
       },
       {
         key: 'stage_changes',
-        label: 'Stage changes',
+        label: items[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
         onClick: () => {
           if (!items?.length) {
             return;
           }
 
-          promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-            localPath: selectedProjectRootFolder,
-            filePaths: items.map(item => item.path),
-          });
+          if (items[0].status === 'unstaged') {
+            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
+              localPath: selectedProjectRootFolder,
+              filePaths: items.map(item => item.path),
+            });
+          } else {
+            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
+              localPath: selectedProjectRootFolder,
+              filePaths: items.map(item => item.path),
+            });
+          }
         },
       },
       {
