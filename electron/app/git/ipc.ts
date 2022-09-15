@@ -11,7 +11,7 @@ import {
   getCurrentBranch,
   initGitRepo,
   isFolderGitRepo,
-  stageChangedFile,
+  stageChangedFiles,
 } from './git';
 
 ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
@@ -55,9 +55,9 @@ ipcMain.on('git.getCurrentBranch', async (event, localPath: string) => {
   event.sender.send('git.getCurrentBranch.result', result);
 });
 
-ipcMain.on('git.stageChangedFile', async (event, payload: {localPath: string; filePath: string}) => {
-  const {filePath, localPath} = payload;
+ipcMain.on('git.stageChangedFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
+  const {filePaths, localPath} = payload;
 
-  await stageChangedFile(localPath, filePath);
-  event.sender.send('git.stageChangedFile.result');
+  await stageChangedFiles(localPath, filePaths);
+  event.sender.send('git.stageChangedFiles.result');
 });

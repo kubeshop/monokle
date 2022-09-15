@@ -60,7 +60,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   };
 
   const renderMenuItems = useCallback(
-    (item?: GitChangedFile) => [
+    (items: GitChangedFile[]) => [
       {
         key: 'commit_to_new',
         label: <div>Commit to a new branch & PR</div>,
@@ -73,15 +73,13 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
         key: 'stage_changes',
         label: 'Stage changes',
         onClick: () => {
-          if (!item) {
+          if (!items?.length) {
             return;
           }
 
-          const {path} = item;
-
-          promiseFromIpcRenderer('git.stageChangedFile', 'git.stageChangedFile.result', {
+          promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
             localPath: selectedProjectRootFolder,
-            filePath: path,
+            filePaths: items.map(item => item.path),
           });
         },
       },
@@ -94,10 +92,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
         label: <div>Rollback</div>,
       },
     ],
-    []
+    [selectedProjectRootFolder]
   );
-
-  const DropdownMenu = <Menu items={renderMenuItems()} />;
 
   useEffect(() => {
     // const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
@@ -147,7 +143,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
                     {hovered.name === item.name && (
-                      <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
+                      <Dropdown overlay={<Menu items={renderMenuItems([item])} />} trigger={['click']}>
                         <Space onClick={e => e.preventDefault()}>
                           <Dots />
                         </Space>
@@ -162,7 +158,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
         {selected.length > 0 && (
           <S.FilesAction>
-            <Dropdown overlay={DropdownMenu} trigger={['click']}>
+            <Dropdown overlay={<Menu items={renderMenuItems(selected)} />} trigger={['click']}>
               <Space>
                 <Button type="primary" onClick={e => e.preventDefault()} size="large">
                   <Icon name="git-ops" />
