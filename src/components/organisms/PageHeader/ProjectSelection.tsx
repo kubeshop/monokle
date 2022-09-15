@@ -22,7 +22,7 @@ import {
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
@@ -33,12 +33,14 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getRelativeDate} from '@utils';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const gitRepo = useAppSelector(state => state.git.repo);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -185,6 +187,15 @@ const ProjectSelection = () => {
             sorter={(a: Project, b: Project) =>
               a.name && b.name ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : 0
             }
+            render={(name, project) => {
+              let isGitRepo = project.isGitRepo;
+
+              return (
+                <S.TableColumnName>
+                  {isGitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />} {name}
+                </S.TableColumnName>
+              );
+            }}
             width={4}
             ellipsis
           />
@@ -242,6 +253,24 @@ const ProjectSelection = () => {
     );
   };
 
+  useEffect(() => {
+    const foundProjects = projects.filter(p => _.isUndefined(p.isGitRepo));
+
+    if (!foundProjects?.length) {
+      return;
+    }
+
+    promiseFromIpcRenderer(
+      'git.areFoldersGitRepos',
+      'git.areFoldersGitRepos.result',
+      foundProjects.map(p => p.rootFolder)
+    ).then(result => {
+      dispatch(updateProjectsGitRepo(result));
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!activeProject) {
     return null;
   }
@@ -260,7 +289,10 @@ const ProjectSelection = () => {
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
               <S.ProjectLabel>Project</S.ProjectLabel>
+
               <S.ProjectContent>
+                {gitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+
                 <S.ProjectName>{activeProject.name}</S.ProjectName>
                 <S.DownOutlined />
               </S.ProjectContent>
