@@ -48,18 +48,18 @@ const GitCloneModal = (props: Props) => {
 
   return (
     <Modal visible onOk={onOk} confirmLoading={isCloning} onCancel={onCancel}>
-      <S.FieldLabel>Project location:</S.FieldLabel>
-      <S.LocalPathField>
-        <Input readOnly value={localPath} onChange={e => setLocalPath(e.target.value)} />
-        <Button onClick={() => openFileExplorer()}>Browse</Button>
-      </S.LocalPathField>
-      <FileExplorer {...fileExplorerProps} />
       <S.FieldLabel>Repository URL:</S.FieldLabel>
       <Input
         value={repoPath}
         onChange={e => setRepoPath(e.target.value)}
         placeholder="https://github.com/kubeshop/monokle"
       />
+      <S.FieldLabel>Choose a local folder to store your project:</S.FieldLabel>
+      <S.LocalPathField>
+        <Input readOnly value={localPath} onChange={e => setLocalPath(e.target.value)} />
+        <Button onClick={() => openFileExplorer()}>Browse</Button>
+      </S.LocalPathField>
+      <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
 };
