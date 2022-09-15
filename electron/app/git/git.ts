@@ -1,4 +1,5 @@
 import {promises as fs} from 'fs';
+import {sep} from 'path';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {FileMapType} from '@models/appstate';
@@ -114,4 +115,11 @@ export async function getCurrentBranch(localPath: string) {
   const branchesSummary = await git.branch();
 
   return branchesSummary.current;
+}
+
+export async function stageChangedFile(localPath: string, filePath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const absoluteFilePath = `${localPath}${sep}${filePath.replaceAll('/', sep)}`;
+  await git.add(absoluteFilePath);
 }

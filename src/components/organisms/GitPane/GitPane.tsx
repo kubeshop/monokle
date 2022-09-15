@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
 
@@ -13,14 +13,18 @@ import {TitleBar} from '@molecules';
 
 import {Dots, Icon} from '@components/atoms';
 
+import {promiseFromIpcRenderer} from '@utils/promises';
+
 import * as S from './GitPane.styled';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+
+  const [hovered, setHovered] = useState<GitChangedFile>({} as GitChangedFile);
   const [list, setList] = useState(changedFiles);
   const [selected, setSelected] = useState<GitChangedFile[]>([]);
-  const [hovered, setHovered] = useState<GitChangedFile>({} as GitChangedFile);
 
   const handleEnter = (item: GitChangedFile) => {
     setHovered(item);
@@ -55,26 +59,45 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     dispatch(setSelectedItem(item));
   };
 
-  const menuItems = [
-    {
-      key: 'commit_to_new',
-      label: <div>Commit to a new branch & PR</div>,
-    },
-    {
-      key: 'commit_to_main',
-      label: <div>Commit to the main branch & PR</div>,
-    },
-    {
-      key: 'diff',
-      label: <div>Diff</div>,
-    },
-    {
-      key: 'rollback',
-      label: <div>Rollback</div>,
-    },
-  ];
+  const renderMenuItems = useCallback(
+    (item?: GitChangedFile) => [
+      {
+        key: 'commit_to_new',
+        label: <div>Commit to a new branch & PR</div>,
+      },
+      {
+        key: 'commit_to_main',
+        label: <div>Commit to the main branch & PR</div>,
+      },
+      {
+        key: 'stage_changes',
+        label: 'Stage changes',
+        onClick: () => {
+          if (!item) {
+            return;
+          }
 
-  const DropdownMenu = <Menu items={menuItems} />;
+          const {path} = item;
+
+          promiseFromIpcRenderer('git.stageChangedFile', 'git.stageChangedFile.result', {
+            localPath: selectedProjectRootFolder,
+            filePath: path,
+          });
+        },
+      },
+      {
+        key: 'diff',
+        label: <div>Diff</div>,
+      },
+      {
+        key: 'rollback',
+        label: <div>Rollback</div>,
+      },
+    ],
+    []
+  );
+
+  const DropdownMenu = <Menu items={renderMenuItems()} />;
 
   useEffect(() => {
     // const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
@@ -124,7 +147,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
                     {hovered.name === item.name && (
-                      <Dropdown overlay={DropdownMenu} trigger={['click']}>
+                      <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
                         <Space onClick={e => e.preventDefault()}>
                           <Dots />
                         </Space>
