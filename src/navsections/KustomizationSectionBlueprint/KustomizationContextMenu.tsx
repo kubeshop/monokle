@@ -95,7 +95,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     {
       key: 'create_resource',
       label: 'Add Resource',
-      disabled: isInPreviewMode,
+      disabled: true,
       onClick: () => {
         onCreateResource({targetFile: target});
       },
