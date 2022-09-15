@@ -23,6 +23,7 @@ import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
 import {kubeConfigPathSelector} from '@redux/selectors';
+import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -68,6 +69,8 @@ export const setOpenProject = createAsyncThunk(
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
     }
+
+    monitorGitFolder(projectRootPath, thunkAPI);
 
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
