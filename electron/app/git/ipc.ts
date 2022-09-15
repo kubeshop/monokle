@@ -6,6 +6,7 @@ import {
   areFoldersGitRepos,
   checkoutGitBranch,
   cloneGitRepo,
+  commitChanges,
   fetchGitRepo,
   getChangedFiles,
   getCurrentBranch,
@@ -68,4 +69,11 @@ ipcMain.on('git.unstageFiles', async (event, payload: {localPath: string; filePa
 
   await unstageFiles(localPath, filePaths);
   event.sender.send('git.unstageFiles.result');
+});
+
+ipcMain.on('git.commitChanges', async (event, payload: {localPath: string; message: string}) => {
+  const {localPath, message} = payload;
+
+  await commitChanges(localPath, message);
+  event.sender.send('git.commitChanges.result');
 });

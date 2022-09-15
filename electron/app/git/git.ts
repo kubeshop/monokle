@@ -136,3 +136,9 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 
   await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
 }
+
+export async function commitChanges(localPath: string, message: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  await git.commit(message);
+}
