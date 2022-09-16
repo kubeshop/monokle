@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {Button, Checkbox, Dropdown, List, Menu, Space} from 'antd';
+import {Button, Checkbox, Dropdown, List, Space} from 'antd';
 
 import {DownOutlined, FileOutlined} from '@ant-design/icons';
 
@@ -13,14 +13,12 @@ import {TitleBar} from '@molecules';
 
 import {Dots, Icon} from '@components/atoms';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
-
+import DropdownMenu from './DropdownMenu';
 import * as S from './GitPane.styled';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [hovered, setHovered] = useState<GitChangedFile>({} as GitChangedFile);
   const [list, setList] = useState(changedFiles);
@@ -59,49 +57,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     dispatch(setSelectedItem(item));
   };
 
-  const renderMenuItems = useCallback(
-    (items: GitChangedFile[]) => [
-      {
-        key: 'commit_to_new',
-        label: <div>Commit to a new branch & PR</div>,
-      },
-      {
-        key: 'commit_to_main',
-        label: <div>Commit to the main branch & PR</div>,
-      },
-      {
-        key: 'stage_changes',
-        label: items[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
-        onClick: () => {
-          if (!items?.length) {
-            return;
-          }
-
-          if (items[0].status === 'unstaged') {
-            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: items.map(item => item.path),
-            });
-          } else {
-            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: items.map(item => item.path),
-            });
-          }
-        },
-      },
-      {
-        key: 'diff',
-        label: <div>Diff</div>,
-      },
-      {
-        key: 'rollback',
-        label: <div>Rollback</div>,
-      },
-    ],
-    [selectedProjectRootFolder]
-  );
-
   useEffect(() => {
     // const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
     setList(changedFiles);
@@ -109,8 +64,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   }, [changedFiles]);
 
   return (
-    <S.GitPaneContainer id="GitPane" style={{height}}>
+    <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
+
       <S.Files>
         <S.FileList>
           <S.ChangeListWrapper>
@@ -135,12 +91,11 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       selected.find(searchItem => searchItem.name === item.name) && 'rgba(255, 255, 255, 0.07)',
                   }}
                 >
-                  <S.SelectAll>
-                    <Checkbox
-                      onChange={e => handleSelect(e, item)}
-                      checked={Boolean(selected.find(searchItem => searchItem.name === item.name))}
-                    />
-                  </S.SelectAll>
+                  <Checkbox
+                    onChange={e => handleSelect(e, item)}
+                    checked={Boolean(selected.find(searchItem => searchItem.name === item.name))}
+                  />
+
                   <S.FileItem>
                     <S.FileItemData onClick={() => handleFileClick(item)}>
                       <S.FileIcon>
@@ -149,8 +104,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       {item.name}
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
+
                     {hovered.name === item.name && (
-                      <Dropdown overlay={<Menu items={renderMenuItems([item])} />} trigger={['click']}>
+                      <Dropdown overlay={<DropdownMenu items={[item]} />} trigger={['click']}>
                         <Space onClick={e => e.preventDefault()}>
                           <Dots />
                         </Space>
@@ -165,7 +121,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
         {selected.length > 0 && (
           <S.FilesAction>
-            <Dropdown overlay={<Menu items={renderMenuItems(selected)} />} trigger={['click']}>
+            <Dropdown overlay={<DropdownMenu items={selected} />} trigger={['click']}>
               <Space>
                 <Button type="primary" onClick={e => e.preventDefault()} size="large">
                   <Icon name="git-ops" />

@@ -2,48 +2,6 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const GitPaneContainer = styled.div`
-  height: 100%;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-export const FileList = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-export const FilesAction = styled.div`
-  border-top: 1px solid ${Colors.grey3};
-  padding-top: 14px;
-  padding-left: 14px;
-`;
-
-export const Files = styled.div`
-  margin-top: 12px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-export const SelectAll = styled.div``;
-
-export const List = styled.ol`
-  height: 100%;
-  list-style-type: none;
-  padding: 0;
-  padding-bottom: 20px;
-  overflow-y: auto;
-  margin: 0;
-`;
-
-export const ChangeListWrapper = styled.div`
-  margin-top: 6px;
-  margin-left: 14px;
-  margin-bottom: 20px;
-`;
-
 export const ChangeList = styled.div`
   margin-left: 4px;
   font-weight: 700;
@@ -60,6 +18,12 @@ export const ChangeListStatus = styled.div`
   font-weight: normal;
   font-size: 12px;
   line-height: 22px;
+`;
+
+export const ChangeListWrapper = styled.div`
+  margin-top: 6px;
+  margin-left: 14px;
+  margin-bottom: 20px;
 `;
 
 export const FileIcon = styled.div`
@@ -83,10 +47,39 @@ export const FileItemData = styled.div`
   color: ${Colors.blue10};
 `;
 
+export const FileList = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 export const FilePath = styled.div`
   color: ${Colors.grey9};
   margin-left: 4px;
   font-weight: normal;
   font-size: 12px;
   line-height: 22px;
+`;
+
+export const Files = styled.div`
+  margin-top: 12px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+export const FilesAction = styled.div`
+  border-top: 1px solid ${Colors.grey3};
+  padding-top: 14px;
+  padding-left: 14px;
+`;
+
+export const GitPaneContainer = styled.div<{$height: number}>`
+  ${({$height}) => `
+    height: ${$height}px;
+  `}
+
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
