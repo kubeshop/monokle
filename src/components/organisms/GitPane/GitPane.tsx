@@ -1,119 +1,128 @@
 import React, {useEffect, useState} from 'react';
 
-import {Button, Checkbox, Dropdown, List, Space} from 'antd';
+import {Button, Checkbox, Dropdown, Space} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {DownOutlined, FileOutlined} from '@ant-design/icons';
+import {DownOutlined} from '@ant-design/icons';
 
 import {GitChangedFile} from '@models/git';
 
-import {setSelectedItem} from '@redux/git';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
-import {Dots, Icon} from '@components/atoms';
+import {Icon} from '@components/atoms';
 
 import DropdownMenu from './DropdownMenu';
+import FileList from './FileList';
 import * as S from './GitPane.styled';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
-  const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
 
-  const [hovered, setHovered] = useState<GitChangedFile | null>(null);
-  const [list, setList] = useState(changedFiles);
-  const [selected, setSelected] = useState<GitChangedFile[]>([]);
+  const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
+  const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
-  const handleSelect = (event: any, item: GitChangedFile) => {
-    let newSelected: GitChangedFile[];
+  const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
+  const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
+
+  const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
-      newSelected = [...selected];
-      newSelected.push(item);
-      setSelected(newSelected);
+      if (item.status === 'staged') {
+        setSelectedStagedFiles([...selectedStagedFiles, item]);
+      } else {
+        setSelectedUnstagedFiles([...selectedUnstagedFiles, item]);
+      }
+    } else if (item.status === 'staged') {
+      setSelectedStagedFiles(selectedStagedFiles.filter(file => file.name !== item.name));
     } else {
-      newSelected = selected.filter(elem => elem.name !== item.name);
-      setSelected(newSelected);
+      setSelectedUnstagedFiles(selectedUnstagedFiles.filter(file => file.name !== item.name));
     }
   };
 
   const handleSelectAll = () => {
-    if (selected.length > 0) {
-      setSelected([]);
+    if (selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length) {
+      setSelectedStagedFiles([]);
+      setSelectedUnstagedFiles([]);
     } else {
-      setSelected(list);
+      setSelectedStagedFiles(stagedFiles);
+      setSelectedUnstagedFiles(unstagedFiles);
     }
   };
 
-  const handleFileClick = (item: GitChangedFile) => {
-    // e.preventDefault();
-    dispatch(setSelectedItem(item));
+  const handleSelectStagedFiles = () => {
+    if (selectedStagedFiles.length === stagedFiles.length) {
+      setSelectedStagedFiles([]);
+    } else {
+      setSelectedStagedFiles(stagedFiles);
+    }
+  };
+
+  const handleSelectUnstagedFiles = () => {
+    if (selectedUnstagedFiles.length === unstagedFiles.length) {
+      setSelectedUnstagedFiles([]);
+    } else {
+      setSelectedUnstagedFiles(unstagedFiles);
+    }
   };
 
   useEffect(() => {
-    // const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem.name);
-    setList(changedFiles);
-    // !isEmpty(selectedItem) && dispatch(setSelectedItem(itemToUpdate));
+    if (!changedFiles?.length) {
+      return;
+    }
+
+    setStagedFiles(changedFiles.filter(file => file.status === 'staged'));
+    setUnstagedFiles(changedFiles.filter(file => file.status === 'unstaged'));
   }, [changedFiles]);
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
 
-      <S.Files>
-        <S.FileList>
-          <S.ChangeListWrapper>
-            <Checkbox onChange={handleSelectAll}>
-              <S.ChangeList>
-                Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
-              </S.ChangeList>
-            </Checkbox>
-          </S.ChangeListWrapper>
-          <List
-            dataSource={changedFiles}
-            renderItem={item => {
-              return (
-                <List.Item
-                  onMouseEnter={() => setHovered(item)}
-                  onMouseLeave={() => setHovered(null)}
-                  style={{
-                    borderBottom: 'none',
-                    padding: '6px 14px 6px 14px',
-                    justifyContent: 'flex-start',
-                    background:
-                      selected.find(searchItem => searchItem.name === item.name) && 'rgba(255, 255, 255, 0.07)',
-                  }}
-                >
-                  <Checkbox
-                    onChange={e => handleSelect(e, item)}
-                    checked={Boolean(selected.find(searchItem => searchItem.name === item.name))}
-                  />
+      <S.FileContainer>
+        <S.CheckboxWrapper>
+          <Checkbox
+            onChange={handleSelectAll}
+            checked={selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length}
+          >
+            <S.ChangeList>
+              Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
+            </S.ChangeList>
+          </Checkbox>
+        </S.CheckboxWrapper>
 
-                  <S.FileItem>
-                    <S.FileItemData onClick={() => handleFileClick(item)}>
-                      <S.FileIcon>
-                        <FileOutlined />
-                      </S.FileIcon>
-                      {item.name}
-                      <S.FilePath>{item.path}</S.FilePath>
-                    </S.FileItemData>
+        <S.CheckboxWrapper>
+          <Checkbox onChange={handleSelectStagedFiles} checked={selectedStagedFiles.length === stagedFiles.length}>
+            <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
+          </Checkbox>
+        </S.CheckboxWrapper>
 
-                    {hovered?.name === item.name && (
-                      <Dropdown overlay={<DropdownMenu items={[item]} />} trigger={['click']}>
-                        <Space onClick={e => e.preventDefault()}>
-                          <Dots />
-                        </Space>
-                      </Dropdown>
-                    )}
-                  </S.FileItem>
-                </List.Item>
-              );
-            }}
-          />
-        </S.FileList>
+        <FileList
+          files={stagedFiles}
+          selectedFiles={selectedStagedFiles}
+          handleSelect={(e, item) => handleSelect(e, item)}
+        />
 
-        {selected.length > 0 && (
+        <br />
+
+        <S.CheckboxWrapper>
+          <Checkbox
+            onChange={handleSelectUnstagedFiles}
+            checked={selectedUnstagedFiles.length === unstagedFiles.length}
+          >
+            <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
+          </Checkbox>
+        </S.CheckboxWrapper>
+
+        <FileList
+          files={unstagedFiles}
+          selectedFiles={selectedUnstagedFiles}
+          handleSelect={(e, item) => handleSelect(e, item)}
+        />
+
+        {selectedStagedFiles.length > 0 && (
           <S.FilesAction>
-            <Dropdown overlay={<DropdownMenu items={selected} />} trigger={['click']}>
+            <Dropdown overlay={<DropdownMenu items={selectedStagedFiles} />} trigger={['click']}>
               <Space>
                 <Button type="primary" onClick={e => e.preventDefault()} size="large">
                   <Icon name="git-ops" />
@@ -124,7 +133,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
             </Dropdown>
           </S.FilesAction>
         )}
-      </S.Files>
+      </S.FileContainer>
     </S.GitPaneContainer>
   );
 };

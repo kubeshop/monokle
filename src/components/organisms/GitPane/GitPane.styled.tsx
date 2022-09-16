@@ -3,27 +3,21 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const ChangeList = styled.div`
-  margin-left: 4px;
   font-weight: 700;
-  font-size: 14px;
-  line-height: 22px;
-  color: ${Colors.whitePure};
+  color: ${Colors.grey9};
   display: flex;
   align-items: center;
+  gap: 8px;
 `;
 
 export const ChangeListStatus = styled.div`
-  color: ${Colors.grey9};
-  margin-left: 4px;
-  font-weight: normal;
-  font-size: 12px;
-  line-height: 22px;
+  color: ${Colors.grey7};
+  font-weight: 600;
 `;
 
-export const ChangeListWrapper = styled.div`
-  margin-top: 6px;
+export const CheckboxWrapper = styled.div`
   margin-left: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 `;
 
 export const FileIcon = styled.div`
@@ -47,11 +41,6 @@ export const FileItemData = styled.div`
   color: ${Colors.blue10};
 `;
 
-export const FileList = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 export const FilePath = styled.div`
   color: ${Colors.grey9};
   margin-left: 4px;
@@ -60,12 +49,8 @@ export const FilePath = styled.div`
   line-height: 22px;
 `;
 
-export const Files = styled.div`
+export const FileContainer = styled.div`
   margin-top: 12px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 `;
 
 export const FilesAction = styled.div`
@@ -82,4 +67,11 @@ export const GitPaneContainer = styled.div<{$height: number}>`
   min-height: 100%;
   display: flex;
   flex-direction: column;
+`;
+
+export const StagedUnstagedLabel = styled.span`
+  font-weight: 700;
+  font-size: 12px;
+  color: ${Colors.cyan8};
+  margin-left: 6px;
 `;
