@@ -1,6 +1,6 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
-import {Checkbox, Dropdown, List, Space} from 'antd';
+import {Checkbox, Dropdown, List, Menu, Space} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {FileOutlined} from '@ant-design/icons';
@@ -8,11 +8,12 @@ import {FileOutlined} from '@ant-design/icons';
 import {GitChangedFile} from '@models/git';
 
 import {setSelectedItem} from '@redux/git';
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {Dots} from '@components/atoms';
 
-import DropdownMenu from './DropdownMenu';
+import {promiseFromIpcRenderer} from '@utils/promises';
+
 import * as S from './FileList.styled';
 
 type IProps = {
@@ -25,8 +26,36 @@ const FileList: React.FC<IProps> = props => {
   const {files, selectedFiles, handleSelect} = props;
 
   const dispatch = useAppDispatch();
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [hovered, setHovered] = useState<GitChangedFile | null>(null);
+
+  const renderMenuItems = useCallback(
+    (item: GitChangedFile) => [
+      {
+        key: 'stage_unstage_changes',
+        label: files[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
+        onClick: () => {
+          if (!files?.length) {
+            return;
+          }
+
+          if (files[0].status === 'unstaged') {
+            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
+              localPath: selectedProjectRootFolder,
+              filePaths: [item.path],
+            });
+          } else {
+            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
+              localPath: selectedProjectRootFolder,
+              filePaths: [item.path],
+            });
+          }
+        },
+      },
+    ],
+    [files, selectedProjectRootFolder]
+  );
 
   return (
     <List
@@ -59,7 +88,7 @@ const FileList: React.FC<IProps> = props => {
             </S.FileItemData>
 
             {hovered?.name === item.name && (
-              <Dropdown overlay={<DropdownMenu items={[item]} showStageUnstageOption />} trigger={['click']}>
+              <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
                 <Space onClick={e => e.preventDefault()}>
                   <Dots />
                 </Space>

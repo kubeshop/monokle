@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
-import {Checkbox, Dropdown} from 'antd';
+import {Checkbox, Menu} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DownOutlined} from '@ant-design/icons';
@@ -13,7 +13,6 @@ import {TitleBar} from '@molecules';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import DropdownMenu from './DropdownMenu';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
 
@@ -24,8 +23,22 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const [loading, setLoading] = useState(false);
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
+  const [showCommitInput, setShowCommitInput] = useState(false);
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
+
+  const menuItems = useMemo(
+    () => [
+      {
+        key: 'commit_to_main',
+        label: 'Commit to the main branch',
+        onClick: () => {
+          setShowCommitInput(true);
+        },
+      },
+    ],
+    []
+  );
 
   const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
@@ -67,27 +80,26 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     }
   };
 
-  const handleStageSelectedFiles = async () => {
+  const handleStageUnstageSelectedFiles = async (type: 'stage' | 'unstage') => {
     setLoading(true);
 
-    await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-      localPath: selectedProjectRootFolder,
-      filePaths: selectedUnstagedFiles.map(item => item.path),
-    });
+    if (type === 'stage') {
+      await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
+        localPath: selectedProjectRootFolder,
+        filePaths: selectedUnstagedFiles.map(item => item.path),
+      });
 
-    setSelectedUnstagedFiles([]);
-    setLoading(false);
-  };
+      setSelectedUnstagedFiles([]);
+    } else {
+      await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
+        localPath: selectedProjectRootFolder,
+        filePaths: selectedStagedFiles.map(item => item.path),
+      });
 
-  const handleUnstageSelectedFiles = async () => {
-    setLoading(true);
+      setSelectedStagedFiles([]);
+    }
 
-    await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-      localPath: selectedProjectRootFolder,
-      filePaths: selectedStagedFiles.map(item => item.path),
-    });
-
-    setSelectedStagedFiles([]);
+    setShowCommitInput(false);
     setLoading(false);
   };
 
@@ -133,17 +145,21 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               handleSelect={(e, item) => handleSelect(e, item)}
             />
             {selectedStagedFiles.length ? (
-              <S.StagedFilesActionsButton type="primary" onClick={handleUnstageSelectedFiles}>
+              <S.StagedFilesActionsButton
+                type="primary"
+                overlay={<Menu items={menuItems} />}
+                trigger={['click']}
+                icon={<DownOutlined />}
+                placement="bottomLeft"
+                onClick={() => {
+                  handleStageUnstageSelectedFiles('unstage');
+                }}
+              >
                 Unstage Selected
-                <Dropdown overlay={<DropdownMenu items={selectedStagedFiles} />} trigger={['click']}>
-                  <DownOutlined
-                    onClick={e => {
-                      e.stopPropagation();
-                    }}
-                  />
-                </Dropdown>
               </S.StagedFilesActionsButton>
             ) : null}
+
+            {showCommitInput ? <div>Test</div> : null}
             <br />
           </>
         ) : null}
@@ -164,7 +180,13 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               handleSelect={(e, item) => handleSelect(e, item)}
             />
             {selectedUnstagedFiles.length ? (
-              <S.StageSelectedButton loading={loading} type="primary" onClick={handleStageSelectedFiles}>
+              <S.StageSelectedButton
+                loading={loading}
+                type="primary"
+                onClick={() => {
+                  handleStageUnstageSelectedFiles('stage');
+                }}
+              >
                 Stage selected
               </S.StageSelectedButton>
             ) : null}

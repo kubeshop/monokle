@@ -1,4 +1,4 @@
-import {Button as RawButton} from 'antd';
+import {Dropdown, Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
 
@@ -20,6 +20,13 @@ export const ChangeListStatus = styled.div`
 export const CheckboxWrapper = styled.div`
   margin-left: 14px;
   margin-bottom: 15px;
+`;
+
+export const DropdownActions = styled.div`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 `;
 
 export const FileIcon = styled.div`
@@ -78,9 +85,18 @@ export const NoChangedFilesLabel = styled.div`
   font-size: 14px;
 `;
 
-export const StagedFilesActionsButton = styled(RawButton)`
+export const StagedFilesActionsButton = styled(Dropdown.Button)`
   margin: 5px 0px 22px 14px;
-  border-radius: 4px;
+
+  & button:first-child {
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+  }
+
+  & button:nth-child(2) {
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+  }
 `;
 
 export const StageSelectedButton = styled(RawButton)`
