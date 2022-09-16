@@ -12,9 +12,6 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const PUBLIC = path.join(__dirname, 'public');
 const SRC = path.join(__dirname, 'src');
-const BUILD = path.join(__dirname, 'build/src');
-
-console.log(BUILD)
 
 const optionalPlugins = [];
 if (process.platform !== 'darwin') {
