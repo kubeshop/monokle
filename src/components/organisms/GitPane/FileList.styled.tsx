@@ -27,7 +27,7 @@ export const FileOutlined = styled(RawFileOutlined)<{$type: 'staged' | 'unstaged
 `;
 
 export const FilePath = styled.div`
-  color: ${Colors.grey9};
+  color: ${Colors.grey7};
   margin-left: 4px;
   font-size: 12px;
 `;

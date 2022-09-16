@@ -96,6 +96,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
       {
         key: 'unstage_changes',
         label: 'Unstage selected',
+        disabled: !selectedStagedFiles.length,
         onClick: () => {
           handleStageUnstageSelectedFiles('unstage');
         },
@@ -146,20 +147,19 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               selectedFiles={selectedStagedFiles}
               handleSelect={(e, item) => handleSelect(e, item)}
             />
-            {selectedStagedFiles.length ? (
-              <S.StagedFilesActionsButton
-                type="primary"
-                overlay={<Menu items={menuItems} />}
-                trigger={['click']}
-                icon={<DownOutlined />}
-                placement="bottomLeft"
-                onClick={() => {
-                  setShowCommitInput(true);
-                }}
-              >
-                Commit to the main branch
-              </S.StagedFilesActionsButton>
-            ) : null}
+
+            <S.StagedFilesActionsButton
+              type="primary"
+              overlay={<Menu items={menuItems} />}
+              trigger={['click']}
+              icon={<DownOutlined />}
+              placement="bottomLeft"
+              onClick={() => {
+                setShowCommitInput(true);
+              }}
+            >
+              Commit to the main branch
+            </S.StagedFilesActionsButton>
 
             {showCommitInput ? (
               <CommitInput
