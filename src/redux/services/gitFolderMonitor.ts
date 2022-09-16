@@ -6,8 +6,7 @@ import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-let headWatcher: FSWatcher;
-let indexWatcher: FSWatcher;
+let watcher: FSWatcher;
 
 /**
  * Creates a monitor for .git folder
@@ -18,38 +17,34 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
     return;
   }
 
-  if (headWatcher) {
-    headWatcher.close();
+  if (watcher) {
+    watcher.close();
   }
 
-  if (indexWatcher) {
-    indexWatcher.close();
-  }
+  const absolutePath = `${rootFolderPath}${sep}.git`;
 
-  const headAbsolutePath = `${rootFolderPath}${sep}.git${sep}HEAD`;
-  const indexAbsolutePath = `${rootFolderPath}${sep}.git${sep}index`;
+  watcher = watch(absolutePath, {persistent: true, usePolling: true, interval: 1000});
 
-  headWatcher = watch(headAbsolutePath, {persistent: true, usePolling: true, interval: 1000});
-  indexWatcher = watch(indexAbsolutePath, {persistent: true, usePolling: true, interval: 1000});
-
-  indexWatcher.on('change', () => {
-    const gitRepo = thunkAPI.getState().git.repo;
-
-    if (gitRepo) {
-      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolderPath,
-        fileMap: thunkAPI.getState().main.fileMap,
-      }).then(result => {
-        thunkAPI.dispatch(setChangedFiles(result));
-      });
-    }
-  });
-
-  headWatcher
-    .on('change', () => {
+  watcher
+    .on('change', path => {
       const gitRepo = thunkAPI.getState().git.repo;
 
-      if (gitRepo) {
+      if (!gitRepo) {
+        return;
+      }
+
+      // commit was made/undoed or file was staged/unstaged
+      if (path === `${absolutePath}${sep}ORIG_HEAD` || path === `${absolutePath}${sep}index`) {
+        promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+          localPath: rootFolderPath,
+          fileMap: thunkAPI.getState().main.fileMap,
+        }).then(result => {
+          thunkAPI.dispatch(setChangedFiles(result));
+        });
+      }
+
+      // branch was switched
+      if (path === `${absolutePath}${sep}HEAD`) {
         promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
           thunkAPI.dispatch(setRepo(result));
           thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
