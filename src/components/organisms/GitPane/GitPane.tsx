@@ -160,9 +160,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               </S.StagedFilesActionsButton>
             ) : null}
 
-            {showCommitInput ? (
-              <CommitInput stagedFiles={stagedFiles} hideCommitInputHandler={() => setShowCommitInput(false)} />
-            ) : null}
+            {showCommitInput ? <CommitInput hideCommitInputHandler={() => setShowCommitInput(false)} /> : null}
             <br />
           </>
         ) : null}

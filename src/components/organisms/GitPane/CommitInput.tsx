@@ -7,29 +7,37 @@ import {CheckOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CommitTooltip} from '@constants/tooltips';
 
-import {GitChangedFile} from '@models/git';
+import {useAppSelector} from '@redux/hooks';
+
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import * as S from './CommitInput.styled';
 
 type IProps = {
-  stagedFiles: GitChangedFile[];
   hideCommitInputHandler: () => void;
 };
 
 const CommitInput: React.FC<IProps> = props => {
-  const {stagedFiles, hideCommitInputHandler} = props;
+  const {hideCommitInputHandler} = props;
+
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleCommit = () => {
+  const handleCommit = async () => {
     if (!message) {
       setErrorMessage('Commit message must not be empty!');
       return;
     }
 
     setLoading(true);
+
+    await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
+      localPath: selectedProjectRootFolder,
+      message,
+    });
 
     setMessage('');
     setLoading(false);

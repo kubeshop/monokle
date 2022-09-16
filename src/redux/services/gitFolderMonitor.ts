@@ -34,7 +34,7 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
       }
 
       // commit was made/undoed or file was staged/unstaged
-      if (path === `${absolutePath}${sep}ORIG_HEAD` || path === `${absolutePath}${sep}index`) {
+      if (path === `${absolutePath}${sep}logs${sep}HEAD` || path === `${absolutePath}${sep}index`) {
         promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
           localPath: rootFolderPath,
           fileMap: thunkAPI.getState().main.fileMap,
