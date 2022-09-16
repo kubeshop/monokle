@@ -2,7 +2,21 @@ import {ipcMain} from 'electron';
 
 import {FileMapType} from '@models/appstate';
 
-import {checkoutGitBranch, cloneGitRepo, fetchGitRepo, getChangedFiles, getCurrentBranch, isFolderGitRepo} from './git';
+import {
+  areFoldersGitRepos,
+  checkoutGitBranch,
+  cloneGitRepo,
+  fetchGitRepo,
+  getChangedFiles,
+  getCurrentBranch,
+  initGitRepo,
+  isFolderGitRepo,
+} from './git';
+
+ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
+  const result = await areFoldersGitRepos(paths);
+  event.sender.send('git.areFoldersGitRepos.result', result);
+});
 
 ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
   const result = await isFolderGitRepo(path);
@@ -23,6 +37,11 @@ ipcMain.on('git.fetchGitRepo', async (event, localPath: string) => {
 ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; branchName: string}) => {
   await checkoutGitBranch(payload);
   event.sender.send('git.checkoutGitBranch.result');
+});
+
+ipcMain.on('git.initGitRepo', async (event, localPath: string) => {
+  await initGitRepo(localPath);
+  event.sender.send('git.initGitRepo.result');
 });
 
 ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fileMap: FileMapType}) => {

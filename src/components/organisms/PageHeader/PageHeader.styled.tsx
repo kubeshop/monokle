@@ -65,6 +65,16 @@ export const Header = styled(Layout.Header)`
   justify-content: space-between;
 `;
 
+export const InitButton = styled(RawButton)`
+  margin-left: 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 16px;
+  height: 28px;
+`;
+
 export const Logo = styled.img`
   height: 45px;
   cursor: pointer;

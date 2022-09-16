@@ -1,4 +1,3 @@
-// import * as k8s from '@kubernetes/client-node';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -24,6 +23,7 @@ import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
 import {kubeConfigPathSelector} from '@redux/selectors';
+import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -37,12 +37,19 @@ import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  thunkAPI.dispatch(configSlice.actions.createProject(project));
+  const isGitRepo = await promiseFromIpcRenderer(
+    'git.isFolderGitRepo',
+    'git.isFolderGitRepo.result',
+    project.rootFolder
+  );
+
+  thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
@@ -62,6 +69,8 @@ export const setOpenProject = createAsyncThunk(
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
     }
+
+    monitorGitFolder(projectRootPath, thunkAPI);
 
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
@@ -233,6 +242,19 @@ export const configSlice = createSlice({
         }
       });
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    updateProjectsGitRepo: (state: Draft<AppConfig>, action: PayloadAction<{path: string; isGitRepo: boolean}[]>) => {
+      action.payload.forEach(project => {
+        const foundProject = state.projects.find(p => p.rootFolder === project.path);
+
+        if (!foundProject) {
+          return;
+        }
+
+        foundProject.isGitRepo = project.isGitRepo;
+      });
+
       electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
@@ -495,6 +517,7 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectKubeConfig,
+  updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
   updateTextSize,
