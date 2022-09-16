@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Button, Checkbox, Dropdown, Space} from 'antd';
+import {Checkbox, Dropdown} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DownOutlined} from '@ant-design/icons';
@@ -10,8 +10,6 @@ import {GitChangedFile} from '@models/git';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
-
-import {Icon} from '@components/atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -81,6 +79,18 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     setLoading(false);
   };
 
+  const handleUnstageSelectedFiles = async () => {
+    setLoading(true);
+
+    await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
+      localPath: selectedProjectRootFolder,
+      filePaths: selectedStagedFiles.map(item => item.path),
+    });
+
+    setSelectedStagedFiles([]);
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (!changedFiles?.length) {
       return;
@@ -110,54 +120,56 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
           </Checkbox>
         </S.CheckboxWrapper>
 
-        <S.CheckboxWrapper>
-          <Checkbox onChange={handleSelectStagedFiles} checked={selectedStagedFiles.length === stagedFiles.length}>
-            <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
-          </Checkbox>
-        </S.CheckboxWrapper>
-
-        <FileList
-          files={stagedFiles}
-          selectedFiles={selectedStagedFiles}
-          handleSelect={(e, item) => handleSelect(e, item)}
-        />
-
-        <br />
-
-        <S.CheckboxWrapper>
-          <Checkbox
-            onChange={handleSelectUnstagedFiles}
-            checked={selectedUnstagedFiles.length === unstagedFiles.length}
-          >
-            <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
-          </Checkbox>
-        </S.CheckboxWrapper>
-
-        <FileList
-          files={unstagedFiles}
-          selectedFiles={selectedUnstagedFiles}
-          handleSelect={(e, item) => handleSelect(e, item)}
-        />
-
-        {selectedUnstagedFiles.length ? (
-          <S.StageSelectedButton loading={loading} type="primary" onClick={handleStageSelectedFiles}>
-            Stage selected
-          </S.StageSelectedButton>
+        {stagedFiles.length ? (
+          <>
+            <S.CheckboxWrapper>
+              <Checkbox onChange={handleSelectStagedFiles} checked={selectedStagedFiles.length === stagedFiles.length}>
+                <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
+              </Checkbox>
+            </S.CheckboxWrapper>
+            <FileList
+              files={stagedFiles}
+              selectedFiles={selectedStagedFiles}
+              handleSelect={(e, item) => handleSelect(e, item)}
+            />
+            {selectedStagedFiles.length ? (
+              <S.StagedFilesActionsButton type="primary" onClick={handleUnstageSelectedFiles}>
+                Unstage Selected
+                <Dropdown overlay={<DropdownMenu items={selectedStagedFiles} />} trigger={['click']}>
+                  <DownOutlined
+                    onClick={e => {
+                      e.stopPropagation();
+                    }}
+                  />
+                </Dropdown>
+              </S.StagedFilesActionsButton>
+            ) : null}
+            <br />
+          </>
         ) : null}
 
-        {selectedStagedFiles.length > 0 && (
-          <S.FilesAction>
-            <Dropdown overlay={<DropdownMenu items={selectedStagedFiles} />} trigger={['click']}>
-              <Space>
-                <Button type="primary" onClick={e => e.preventDefault()} size="large">
-                  <Icon name="git-ops" />
-                  Commit to a new branch & PR
-                  <DownOutlined />
-                </Button>
-              </Space>
-            </Dropdown>
-          </S.FilesAction>
-        )}
+        {unstagedFiles.length ? (
+          <>
+            <S.CheckboxWrapper>
+              <Checkbox
+                onChange={handleSelectUnstagedFiles}
+                checked={selectedUnstagedFiles.length === unstagedFiles.length}
+              >
+                <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
+              </Checkbox>
+            </S.CheckboxWrapper>
+            <FileList
+              files={unstagedFiles}
+              selectedFiles={selectedUnstagedFiles}
+              handleSelect={(e, item) => handleSelect(e, item)}
+            />
+            {selectedUnstagedFiles.length ? (
+              <S.StageSelectedButton loading={loading} type="primary" onClick={handleStageSelectedFiles}>
+                Stage selected
+              </S.StageSelectedButton>
+            ) : null}
+          </>
+        ) : null}
       </S.FileContainer>
     </S.GitPaneContainer>
   );

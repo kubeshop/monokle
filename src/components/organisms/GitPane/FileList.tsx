@@ -30,6 +30,7 @@ const FileList: React.FC<IProps> = props => {
 
   return (
     <List
+      style={{marginTop: '-6px'}}
       dataSource={files}
       renderItem={item => (
         <List.Item
@@ -37,7 +38,7 @@ const FileList: React.FC<IProps> = props => {
           onMouseLeave={() => setHovered(null)}
           style={{
             borderBottom: 'none',
-            padding: '0px 14px 6px 14px',
+            padding: '6px 14px 6px 14px',
             marginBottom: '6px',
             justifyContent: 'flex-start',
             background: selectedFiles.find(searchItem => searchItem.name === item.name) && 'rgba(255, 255, 255, 0.07)',
@@ -58,7 +59,7 @@ const FileList: React.FC<IProps> = props => {
             </S.FileItemData>
 
             {hovered?.name === item.name && (
-              <Dropdown overlay={<DropdownMenu items={[item]} />} trigger={['click']}>
+              <Dropdown overlay={<DropdownMenu items={[item]} showStageUnstageOption />} trigger={['click']}>
                 <Space onClick={e => e.preventDefault()}>
                   <Dots />
                 </Space>

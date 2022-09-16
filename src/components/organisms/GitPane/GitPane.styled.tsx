@@ -78,9 +78,13 @@ export const NoChangedFilesLabel = styled.div`
   font-size: 14px;
 `;
 
+export const StagedFilesActionsButton = styled(RawButton)`
+  margin: 5px 0px 22px 14px;
+  border-radius: 4px;
+`;
+
 export const StageSelectedButton = styled(RawButton)`
-  margin-left: 14px;
-  margin-top: 5px;
+  margin: 5px 0px 0px 14px;
   border-radius: 4px;
 `;
 

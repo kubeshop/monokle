@@ -10,10 +10,11 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 type IProps = {
   items: GitChangedFile[];
+  showStageUnstageOption?: boolean;
 };
 
 const DropdownMenu: React.FC<IProps> = props => {
-  const {items} = props;
+  const {items, showStageUnstageOption} = props;
 
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
@@ -27,27 +28,32 @@ const DropdownMenu: React.FC<IProps> = props => {
         key: 'commit_to_main',
         label: 'Commit to the main branch',
       },
-      {
-        key: 'stage_changes',
-        label: items[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
-        onClick: () => {
-          if (!items?.length) {
-            return;
-          }
+      ...(showStageUnstageOption
+        ? [
+            {
+              key: 'stage_unstage_changes',
+              label: items[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
+              onClick: () => {
+                if (!items?.length) {
+                  return;
+                }
 
-          if (items[0].status === 'unstaged') {
-            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: items.map(item => item.path),
-            });
-          } else {
-            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: items.map(item => item.path),
-            });
-          }
-        },
-      },
+                if (items[0].status === 'unstaged') {
+                  promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
+                    localPath: selectedProjectRootFolder,
+                    filePaths: items.map(item => item.path),
+                  });
+                } else {
+                  promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
+                    localPath: selectedProjectRootFolder,
+                    filePaths: items.map(item => item.path),
+                  });
+                }
+              },
+            },
+          ]
+        : []),
+
       // {
       //   key: 'diff',
       //   label: <div>Diff</div>,
@@ -57,7 +63,7 @@ const DropdownMenu: React.FC<IProps> = props => {
       //   label: <div>Rollback</div>,
       // },
     ],
-    [items, selectedProjectRootFolder]
+    [items, selectedProjectRootFolder, showStageUnstageOption]
   );
 
   return <Menu items={menuItems} />;
