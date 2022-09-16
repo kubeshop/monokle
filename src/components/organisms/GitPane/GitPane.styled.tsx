@@ -69,6 +69,13 @@ export const GitPaneContainer = styled.div<{$height: number}>`
   flex-direction: column;
 `;
 
+export const NoChangedFilesLabel = styled.div`
+  color: ${Colors.grey9};
+  font-weight: 600;
+  padding: 20px;
+  font-size: 14px;
+`;
+
 export const StagedUnstagedLabel = styled.span`
   font-weight: 700;
   font-size: 12px;

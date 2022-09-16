@@ -75,6 +75,10 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     setUnstagedFiles(changedFiles.filter(file => file.status === 'unstaged'));
   }, [changedFiles]);
 
+  if (!changedFiles.length) {
+    return <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>;
+  }
+
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
