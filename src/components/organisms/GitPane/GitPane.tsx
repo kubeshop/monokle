@@ -13,6 +13,7 @@ import {TitleBar} from '@molecules';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import CommitInput from './CommitInput';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
 
@@ -159,7 +160,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               </S.StagedFilesActionsButton>
             ) : null}
 
-            {showCommitInput ? <div>Test</div> : null}
+            {showCommitInput ? (
+              <CommitInput stagedFiles={stagedFiles} hideCommitInputHandler={() => setShowCommitInput(false)} />
+            ) : null}
             <br />
           </>
         ) : null}

@@ -19,6 +19,7 @@ export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Clu
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const CollapseTreeTooltip = 'Collapse all folders';
+export const CommitTooltip = 'Commit to the main branch';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DocumentationTooltip = 'Open Monokle Documentation Website';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
