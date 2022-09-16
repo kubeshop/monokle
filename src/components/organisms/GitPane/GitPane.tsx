@@ -13,18 +13,21 @@ import {TitleBar} from '@molecules';
 
 import {Icon} from '@components/atoms';
 
+import {promiseFromIpcRenderer} from '@utils/promises';
+
 import DropdownMenu from './DropdownMenu';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
-  const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
-  const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
-
+  const [loading, setLoading] = useState(false);
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
+  const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
+  const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
   const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
@@ -64,6 +67,18 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     } else {
       setSelectedUnstagedFiles(unstagedFiles);
     }
+  };
+
+  const handleStageSelectedFiles = async () => {
+    setLoading(true);
+
+    await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
+      localPath: selectedProjectRootFolder,
+      filePaths: selectedUnstagedFiles.map(item => item.path),
+    });
+
+    setSelectedUnstagedFiles([]);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -123,6 +138,12 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
           selectedFiles={selectedUnstagedFiles}
           handleSelect={(e, item) => handleSelect(e, item)}
         />
+
+        {selectedUnstagedFiles.length ? (
+          <S.StageSelectedButton loading={loading} type="primary" onClick={handleStageSelectedFiles}>
+            Stage selected
+          </S.StageSelectedButton>
+        ) : null}
 
         {selectedStagedFiles.length > 0 && (
           <S.FilesAction>

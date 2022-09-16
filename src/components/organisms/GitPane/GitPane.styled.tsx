@@ -1,3 +1,5 @@
+import {Button as RawButton} from 'antd';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -74,6 +76,12 @@ export const NoChangedFilesLabel = styled.div`
   font-weight: 600;
   padding: 20px;
   font-size: 14px;
+`;
+
+export const StageSelectedButton = styled(RawButton)`
+  margin-left: 14px;
+  margin-top: 5px;
+  border-radius: 4px;
 `;
 
 export const StagedUnstagedLabel = styled.span`
