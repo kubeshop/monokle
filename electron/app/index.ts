@@ -10,12 +10,11 @@ import {hideBin} from 'yargs/helpers';
 import {fixPath} from '@utils/path';
 import '@utils/segment';
 
+import '@electron/app/git/ipc';
+import '@electron/app/ipc/ipcListeners';
 import terminal from '@root/cli/terminal';
-
-import './git/ipc';
-import './ipc/ipcListeners';
-import {openApplication} from './openApplication';
-import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from './utils';
+import {openApplication} from '@root/electron/app/openApplication';
+import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from '@root/electron/app/utils';
 
 const isDev = process.env.NODE_ENV === 'development';
 

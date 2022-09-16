@@ -28,6 +28,8 @@
       "@utils": ["src/utils/"],
       "@src/*": ["src/*"],
       "@src": ["src/"],
+      "@electron/*": ["electron/*"],
+      "@electron": ["electron/"],
       "@root/*": ["./*"],
       "@root": ["./"]
     }

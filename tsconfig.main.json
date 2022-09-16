@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "ES2022",
+    "sourceMap": true,
+    "strict": true,
+    "outDir": "./build",
+    "rootDir": "./",
+    "baseUrl": "./",
+    "noEmitOnError": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node"
+  },
+  "include": ["electron"],
+  "extends": "./paths.json"
+}

@@ -77,13 +77,12 @@ export const createWindow = (givenPath?: string) => {
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
-      preload: path.join(__dirname, 'preload.js'),
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
     windowOpts: mainBrowserWindowOptions,
     templateUrl: isDev
-      ? path.normalize(`${__dirname}/../../../public/Splashscreen.html`)
+      ? path.normalize(`${__dirname}/../../public/Splashscreen.html`)
       : path.normalize(`${__dirname}/../../Splashscreen.html`),
     delay: 0,
     splashScreenOpts: {
