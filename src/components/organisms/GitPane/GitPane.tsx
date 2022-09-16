@@ -20,17 +20,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
 
-  const [hovered, setHovered] = useState<GitChangedFile>({} as GitChangedFile);
+  const [hovered, setHovered] = useState<GitChangedFile | null>(null);
   const [list, setList] = useState(changedFiles);
   const [selected, setSelected] = useState<GitChangedFile[]>([]);
-
-  const handleEnter = (item: GitChangedFile) => {
-    setHovered(item);
-  };
-
-  const handleLeave = () => {
-    setHovered({} as GitChangedFile);
-  };
 
   const handleSelect = (event: any, item: GitChangedFile) => {
     let newSelected: GitChangedFile[];
@@ -81,8 +73,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
             renderItem={item => {
               return (
                 <List.Item
-                  onMouseEnter={() => handleEnter(item)}
-                  onMouseLeave={handleLeave}
+                  onMouseEnter={() => setHovered(item)}
+                  onMouseLeave={() => setHovered(null)}
                   style={{
                     borderBottom: 'none',
                     padding: '6px 14px 6px 14px',
@@ -105,7 +97,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
 
-                    {hovered.name === item.name && (
+                    {hovered?.name === item.name && (
                       <Dropdown overlay={<DropdownMenu items={[item]} />} trigger={['click']}>
                         <Space onClick={e => e.preventDefault()}>
                           <Dots />
