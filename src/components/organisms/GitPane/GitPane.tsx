@@ -28,19 +28,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
-  const menuItems = useMemo(
-    () => [
-      {
-        key: 'commit_to_main',
-        label: 'Commit to the main branch',
-        onClick: () => {
-          setShowCommitInput(true);
-        },
-      },
-    ],
-    []
-  );
-
   const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
       if (item.status === 'staged') {
@@ -104,6 +91,20 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     setLoading(false);
   };
 
+  const menuItems = useMemo(
+    () => [
+      {
+        key: 'unstage_changes',
+        label: 'Unstage selected',
+        onClick: () => {
+          handleStageUnstageSelectedFiles('unstage');
+        },
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   useEffect(() => {
     if (!changedFiles?.length) {
       return;
@@ -153,14 +154,21 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 icon={<DownOutlined />}
                 placement="bottomLeft"
                 onClick={() => {
-                  handleStageUnstageSelectedFiles('unstage');
+                  setShowCommitInput(true);
                 }}
               >
-                Unstage Selected
+                Commit to the main branch
               </S.StagedFilesActionsButton>
             ) : null}
 
-            {showCommitInput ? <CommitInput hideCommitInputHandler={() => setShowCommitInput(false)} /> : null}
+            {showCommitInput ? (
+              <CommitInput
+                hideCommitInputHandler={() => {
+                  setShowCommitInput(false);
+                  setSelectedStagedFiles([]);
+                }}
+              />
+            ) : null}
             <br />
           </>
         ) : null}

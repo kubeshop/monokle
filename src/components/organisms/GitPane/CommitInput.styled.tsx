@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const CommitInputContainer = styled.div`
-  margin: 5px 14px 0px 14px;
+  margin: 0px 14px;
   display: flex;
   align-items: center;
   gap: 16px;

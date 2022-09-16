@@ -3,8 +3,6 @@ import {useCallback, useState} from 'react';
 import {Checkbox, Dropdown, List, Menu, Space} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {FileOutlined} from '@ant-design/icons';
-
 import {GitChangedFile} from '@models/git';
 
 import {setSelectedItem} from '@redux/git';
@@ -81,7 +79,7 @@ const FileList: React.FC<IProps> = props => {
           <S.FileItem>
             <S.FileItemData onClick={() => dispatch(setSelectedItem(item))}>
               <S.FileIcon>
-                <FileOutlined />
+                <S.FileOutlined $type={item.status} />
               </S.FileIcon>
               {item.name}
               <S.FilePath>{item.path}</S.FilePath>

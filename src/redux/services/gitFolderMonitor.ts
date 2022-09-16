@@ -27,6 +27,8 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
 
   watcher
     .on('change', path => {
+      console.log('Path:', path);
+
       const gitRepo = thunkAPI.getState().git.repo;
 
       if (!gitRepo) {
@@ -44,7 +46,7 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
       }
 
       // branch was switched
-      if (path === `${absolutePath}${sep}HEAD`) {
+      if (path === `${absolutePath}${sep}HEAD` || path === `${absolutePath}${sep}config`) {
         promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
           thunkAPI.dispatch(setRepo(result));
           thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
