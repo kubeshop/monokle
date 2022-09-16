@@ -50,7 +50,7 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
       <S.Button type="default" onClick={handleOk} id="accept-telemetry">
         I&apos;m fine with it
       </S.Button>
-      <S.Button type="text" onClick={handleNotOk}>
+      <S.Button type="text" onClick={handleNotOk} id="decline-telemetry">
         I&apos;m not
       </S.Button>
     </S.Content>
