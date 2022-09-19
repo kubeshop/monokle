@@ -20,19 +20,20 @@ export const InformationMessage = styled.div`
   color: ${Colors.grey7};
   font-weight: 600;
   min-height: 5rem;
-  max-height: 15rem;
+  max-height: 10rem;
   height: 100%;
 `;
 
 export const StartProjectContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(2, 20rem);
+  grid-column-gap: 1.1rem;
+  grid-row-gap: 1.1rem;
   padding: 0 6rem;
 `;
 
 export const StartProjectItem = styled.div`
-  width: 33%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,6 +41,7 @@ export const StartProjectItem = styled.div`
   padding: 2rem 1rem;
   cursor: pointer;
   background: ${Colors.grey10};
+  border-radius: 4px;
 
   &:hover {
     background: ${Colors.blue7};
@@ -48,13 +50,13 @@ export const StartProjectItem = styled.div`
 `;
 
 export const StartProjectItemLogo = styled.img`
-  width: 10rem;
-  height: 10rem;
+  width: 4.4rem;
+  height: 4.4rem;
 `;
 
 export const StartProjectItemTitle = styled.div`
   margin-top: 1.5rem;
-  font-size: 20px;
+  font-size: 16px;
   color: ${Colors.whitePure};
   font-weight: 600;
   text-align: center;
@@ -62,15 +64,16 @@ export const StartProjectItemTitle = styled.div`
   flex-direction: column;
 `;
 
-export const StartProjectItemSemiTitle = styled.span`
-  display: block;
-`;
-
 export const StartProjectItemDescription = styled.div`
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   font-size: 14px;
-  color: ${Colors.whitePure};
+  font-weight: 400;
+  color: ${Colors.grey7};
   text-align: center;
+
+  ${StartProjectItem}:hover & {
+    color: ${Colors.whitePure};
+  }
 `;
 
 export const StartProjectItemButton = styled(Button)`
