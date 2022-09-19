@@ -12,8 +12,8 @@ export function formatGitChangedFiles(result: any, fileMap: FileMapType): GitCha
 
       return {
         status: 'staged',
-        modifiedContent: foundFile?.text,
-        name: foundFile?.name,
+        modifiedContent: foundFile?.text || '',
+        name: foundFile?.name || file.split('/').pop(),
         path: file,
       };
     }),
@@ -22,8 +22,8 @@ export function formatGitChangedFiles(result: any, fileMap: FileMapType): GitCha
 
       return {
         status: 'unstaged',
-        modifiedContent: foundFile?.text,
-        name: foundFile?.name,
+        modifiedContent: foundFile?.text || '',
+        name: foundFile?.name || file.split('/').pop(),
         path: file,
       };
     }),
