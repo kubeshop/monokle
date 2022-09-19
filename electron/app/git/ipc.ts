@@ -6,6 +6,7 @@ import {
   areFoldersGitRepos,
   checkoutGitBranch,
   cloneGitRepo,
+  deleteLocalBranch,
   fetchGitRepo,
   getChangedFiles,
   getCurrentBranch,
@@ -52,4 +53,9 @@ ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fil
 ipcMain.on('git.getCurrentBranch', async (event, localPath: string) => {
   const result = await getCurrentBranch(localPath);
   event.sender.send('git.getCurrentBranch.result', result);
+});
+
+ipcMain.on('git.deleteLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await deleteLocalBranch(payload.localPath, payload.branchName);
+  event.sender.send('git.deleteLocalBranch.result', result);
 });

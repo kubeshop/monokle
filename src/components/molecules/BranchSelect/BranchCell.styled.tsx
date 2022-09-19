@@ -46,6 +46,7 @@ export const CommitShaLabel = styled.span`
 export const DeleteOutlined = styled(RawDeleteOutlined)`
   color: ${Colors.red7};
   display: none;
+  margin-right: 8px;
 `;
 
 export const NameLabel = styled.div`

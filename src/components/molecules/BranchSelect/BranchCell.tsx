@@ -2,7 +2,11 @@ import {Space} from 'antd';
 
 import {GitBranch} from '@models/git';
 
+import {useAppSelector} from '@redux/hooks';
+
 import {CopyButton} from '@components/atoms';
+
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import * as S from './BranchCell.styled';
 
@@ -13,9 +17,16 @@ type IProps = {
 const BranchCell: React.FC<IProps> = props => {
   const {branch} = props;
 
+  const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+
   const deleteBranch = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
-    console.log('Deleting local branch...');
+
+    promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
+      localPath: selectedProjectRootFolder,
+      branchName: branch.name,
+    });
   };
 
   return (
@@ -34,7 +45,7 @@ const BranchCell: React.FC<IProps> = props => {
         </div>
       </S.BranchInfo>
 
-      <S.DeleteOutlined onClick={deleteBranch} />
+      {branch.type !== 'remote' && branch.name !== currentBranch ? <S.DeleteOutlined onClick={deleteBranch} /> : null}
     </S.Box>
   );
 };
