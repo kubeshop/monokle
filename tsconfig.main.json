@@ -10,7 +10,7 @@
     "noEmitOnError": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "node"
   },
   "include": ["electron"],
   "extends": "./paths.json"
