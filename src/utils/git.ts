@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 
 import {FileMapType} from '@models/appstate';
@@ -17,9 +18,15 @@ export function formatGitChangedFiles(
         f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, file)
       );
 
+      let modifiedContent = foundFile?.text || '';
+
+      if (!modifiedContent && foundFile) {
+        modifiedContent = fs.readFileSync(path.join(projectFolderPath, foundFile.filePath), 'utf8');
+      }
+
       return {
         status: 'staged',
-        modifiedContent: foundFile?.text || '',
+        modifiedContent,
         name: foundFile?.name || file.split('/').pop(),
         path: file,
       };
@@ -29,9 +36,15 @@ export function formatGitChangedFiles(
         f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, file)
       );
 
+      let modifiedContent = foundFile?.text || '';
+
+      if (!modifiedContent && foundFile) {
+        modifiedContent = fs.readFileSync(path.join(projectFolderPath, foundFile.filePath), 'utf8');
+      }
+
       return {
         status: 'unstaged',
-        modifiedContent: foundFile?.text || '',
+        modifiedContent,
         name: foundFile?.name || file.split('/').pop(),
         path: file,
       };
