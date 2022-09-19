@@ -1,6 +1,8 @@
 import {promises as fs} from 'fs';
 import {SimpleGit, simpleGit} from 'simple-git';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
 
@@ -94,11 +96,18 @@ export async function initGitRepo(localPath: string) {
 export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
+  const projectFolderPath = fileMap[ROOT_FILE_ENTRY].filePath;
+  const gitFolderPath = await git.revparse({'--show-toplevel': null});
   const currentBranch = (await git.branch()).current;
   const stagedChangedFiles = (await git.diff({'--name-only': null, '--staged': null})).split('\n').filter(el => el);
   const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
 
-  const changedFiles = formatGitChangedFiles({stagedChangedFiles, unstagedChangedFiles}, fileMap);
+  const changedFiles = formatGitChangedFiles(
+    {stagedChangedFiles, unstagedChangedFiles},
+    fileMap,
+    projectFolderPath,
+    gitFolderPath
+  );
 
   for (let i = 0; i < changedFiles.length; i += 1) {
     // eslint-disable-next-line no-await-in-loop
