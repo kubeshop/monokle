@@ -40,7 +40,10 @@ module.exports = [
             fullySpecified: false,
           },
         },
-        {test: /\.json$/, type: 'json'},
+        {
+          test: /\.json$/,
+          type: 'json',
+        },
       ],
     },
     plugins: [...optionalPlugins],
@@ -53,12 +56,8 @@ module.exports = [
       ],
     },
     output: {
-      path: __dirname + '/build/electron',
+      path: path.resolve(__dirname, 'build'),
       filename: 'main.js',
-    },
-    optimization: {
-      moduleIds: 'deterministic',
-      minimize: false,
     },
   },
 ];

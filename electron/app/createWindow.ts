@@ -82,7 +82,7 @@ export const createWindow = (givenPath?: string) => {
   const splashscreenConfig: Splashscreen.Config = {
     windowOpts: mainBrowserWindowOptions,
     templateUrl: isDev
-      ? path.normalize(`${__dirname}/../../public/Splashscreen.html`)
+      ? path.normalize(`${__dirname}/../public/Splashscreen.html`)
       : path.normalize(`${__dirname}/../../Splashscreen.html`),
     delay: 0,
     splashScreenOpts: {
