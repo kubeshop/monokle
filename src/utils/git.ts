@@ -17,7 +17,7 @@ export function formatGitChangedFiles(
       const foundFile = Object.values(fileMap).find(
         f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, file)
       );
-
+      
       let modifiedContent = foundFile?.text || '';
 
       if (!modifiedContent && foundFile) {
