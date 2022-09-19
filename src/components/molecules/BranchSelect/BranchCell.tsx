@@ -6,26 +6,37 @@ import {CopyButton} from '@components/atoms';
 
 import * as S from './BranchCell.styled';
 
-type Props = {
-  onSelect: (branch: GitBranch) => void;
+type IProps = {
   branch: GitBranch;
 };
 
-export function NameCell({onSelect, branch}: Props) {
+const BranchCell: React.FC<IProps> = props => {
+  const {branch} = props;
+
+  const deleteBranch = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.stopPropagation();
+    console.log('Deleting local branch...');
+  };
+
   return (
-    <S.Box onClick={() => onSelect(branch)}>
-      {branch.type === 'remote' ? <S.CloudOutlined /> : <S.BranchesOutlined />}
+    <S.Box>
+      <S.BranchInfo>
+        {branch.type === 'remote' ? <S.CloudOutlined /> : <S.BranchesOutlined />}
+        <div>
+          <Space size="small">
+            <S.NameLabel>{branch.name}</S.NameLabel>
+            <CopyButton content={branch.name} />
+          </Space>
 
-      <div>
-        <Space size="small">
-          <S.NameLabel>{branch.name}</S.NameLabel>
-          <CopyButton content={branch.name} />
-        </Space>
+          <S.BranchUpdated>
+            <S.CommitShaLabel>{branch.commitSha}</S.CommitShaLabel>
+          </S.BranchUpdated>
+        </div>
+      </S.BranchInfo>
 
-        <S.BranchUpdated>
-          <S.CommitShaLabel>{branch.commitSha}</S.CommitShaLabel>
-        </S.BranchUpdated>
-      </div>
+      <S.DeleteOutlined onClick={deleteBranch} />
     </S.Box>
   );
-}
+};
+
+export default BranchCell;
