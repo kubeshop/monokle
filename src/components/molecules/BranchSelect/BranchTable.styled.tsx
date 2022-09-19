@@ -72,4 +72,8 @@ export const Table = styled((props: TableProps<GitBranch>) => <RawTable<GitBranc
   .ant-table-header .ant-table-thead .ant-table-cell:first-child {
     border-left: none !important;
   }
+
+  .ant-table-cell:hover .anticon-delete {
+    display: block;
+  }
 `;

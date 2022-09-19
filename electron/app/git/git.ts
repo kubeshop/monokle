@@ -115,3 +115,9 @@ export async function getCurrentBranch(localPath: string) {
 
   return branchesSummary.current;
 }
+
+export async function deleteLocalBranch(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  await git.deleteLocalBranch(branchName);
+}
