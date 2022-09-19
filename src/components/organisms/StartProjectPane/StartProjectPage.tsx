@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 import {useAppDispatch} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
@@ -6,18 +8,20 @@ import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
+import GitCloneModal from '../PageHeader/GitCloneModal';
 import Guide from './Guide';
 import * as S from './StartProjectPage.styled';
 
 const StartProjectPage = () => {
   const dispatch = useAppDispatch();
+  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
 
   const handleOpenFolderExplorer = () => {
     dispatch(openFolderExplorer());
   };
 
   const handleGitCloneRepo = () => {
-    // dispatch(openFolderExplorer());
+    setIsGitCloneModalVisible(true);
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -74,6 +78,13 @@ const StartProjectPage = () => {
           );
         })}
       </S.StartProjectContainer>
+
+      {isGitCloneModalVisible && (
+        <GitCloneModal
+          onComplete={() => setIsGitCloneModalVisible(false)}
+          onCancel={() => setIsGitCloneModalVisible(false)}
+        />
+      )}
     </S.Container>
   );
 };
