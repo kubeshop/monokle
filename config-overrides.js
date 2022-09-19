@@ -51,16 +51,13 @@ module.exports = {
 
       isDevelopment && new ReactRefreshWebpackPlugin(),
       new MiniCssExtractPlugin(),
-      new InterpolateHtmlPlugin({
-        PUBLIC_URL: '',
-      }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: path.join(__dirname, 'public', 'index.html'),
-        favicon: path.join(__dirname, 'public', 'icon.ico'),
-        chunks: 'all',
-        publicPath: PUBLIC,
-        inject: 'head',
+        template: path.join(PUBLIC, 'index.html'),
+        hash: true,
+      }),
+      new InterpolateHtmlPlugin({
+        PUBLIC_URL: '',
       }),
     ].filter(Boolean);
     config.module.rules = [

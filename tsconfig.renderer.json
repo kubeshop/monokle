@@ -15,7 +15,8 @@
     "jsx": "react-jsx",
     "strict": true,
     "baseUrl": "./",
-    "outDir": "./build"
+    "outDir": "./build",
+    "rootDir": "./"
   },
   "include": ["src"],
   "extends": "./paths.json"
