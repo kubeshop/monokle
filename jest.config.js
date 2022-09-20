@@ -1,3 +1,6 @@
+const {pathsToModuleNameMapper} = require('ts-jest');
+const {compilerOptions} = require('./tsconfig.json');
+
 module.exports = async () => {
   return {
     verbose: true,
@@ -10,10 +13,6 @@ module.exports = async () => {
         // Options...
       },
     },
-    moduleNameMapper: {
-      '@models/(.+)': '<rootDir>/src/models/$1',
-      '@redux/(.+)': '<rootDir>/src/redux/$1',
-      '@src/(.+)': '<rootDir>/src/$1',
-    },
+    moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {prefix: '<rootDir>/'}),
   };
 };
