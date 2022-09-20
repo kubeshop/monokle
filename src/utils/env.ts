@@ -1,7 +1,6 @@
 // weird workaround to get all ENV values (accessing process.env directly only returns a subset)
 // export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
 // @ts-nocheck
-import {detectDefaultShell} from 'default-shell';
 import execa from 'execa';
 import stripAnsi from 'strip-ansi';
 
@@ -12,21 +11,21 @@ const ENV = {
   DISABLE_AUTO_UPDATE: 'true',
 };
 
-// const detectShell = () => {
-//   const {env} = process;
+const detectShell = () => {
+  const {env} = process;
 
-//   if (process.platform === 'win32') {
-//     return env.COMSPEC || 'cmd.exe';
-//   }
+  if (process.platform === 'win32') {
+    return env.COMSPEC || 'cmd.exe';
+  }
 
-//   if (process.platform === 'darwin') {
-//     return env.SHELL || '/bin/zsh';
-//   }
+  if (process.platform === 'darwin') {
+    return env.SHELL || '/bin/zsh';
+  }
 
-//   return env.SHELL || '/bin/sh';
-// };
+  return env.SHELL || '/bin/sh';
+};
 
-const detectedShell = detectDefaultShell();
+const detectedShell = detectShell();
 
 const parseEnv = env => {
   env = env.split('_SHELL_ENV_DELIMITER_')[1];

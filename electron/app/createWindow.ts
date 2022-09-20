@@ -107,19 +107,19 @@ export const createWindow = (givenPath?: string) => {
   // Hot Reloading
   if (isDev) {
     // eslint-disable-next-line global-require
-    require('electron-reload')(__dirname, {
-      electron: path.join(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'node_modules',
-        '.bin',
-        `electron${process.platform === 'win32' ? '.cmd' : ''}`
-      ),
-      forceHardReset: true,
-      hardResetMethod: 'exit',
-    });
+    // require('electron-reload')(__dirname, {
+    //   electron: path.join(
+    //     __dirname,
+    //     '..',
+    //     '..',
+    //     '..',
+    //     'node_modules',
+    //     '.bin',
+    //     `electron${process.platform === 'win32' ? '.cmd' : ''}`
+    //   ),
+    //   forceHardReset: true,
+    //   hardResetMethod: 'exit',
+    // });
   }
 
   if (isDev) {
