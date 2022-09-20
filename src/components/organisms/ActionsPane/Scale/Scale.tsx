@@ -70,7 +70,18 @@ const Scale = () => {
             <span>Number of replicas</span>
           </Col>
           <Col span={16}>
-            <InputNumber controls={false} type="number" value={replicas} onChange={val => setReplicas(val)} />
+            <InputNumber
+              controls={false}
+              type="number"
+              value={replicas}
+              onChange={val => {
+                if (!val) {
+                  return;
+                }
+
+                setReplicas(val);
+              }}
+            />
           </Col>
         </Row>
       </Modal>
