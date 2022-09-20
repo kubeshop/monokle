@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const FormContainer = styled.div`
   width: 100%;
   margin-top: 16px;
+  padding-left: 10px;
 `;
 
 export const DynamicKeyValueContainer = styled.div`

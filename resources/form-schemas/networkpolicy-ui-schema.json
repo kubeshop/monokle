@@ -1,71 +1,93 @@
 {
   "ui:title": "NetworkPolicy Properties",
+  "level": 0,
   "spec": {
     "ui:title": "Object specs",
+    "level": 1,
     "egress": {
       "ui:title": "Egress",
+      "level": 2,
       "items": {
         "ports": {
           "ui:title": "Ports",
+          "level": 3,
           "items": {
             "endPort": {
-              "ui:title": "End Port"
+              "ui:title": "End Port",
+              "level": 4
             },
             "protocol": {
-              "ui:title": "Protocol"
+              "ui:title": "Protocol",
+              "level": 4
             }
           }
         },
         "to": {
           "ui:title": "To",
+          "level": 3,
           "items": {
             "ipBlock": {
               "ui:title": "Object ipBlocks",
+              "level": 4,
               "cidr": {
-                "ui:title": "Cidr"
+                "ui:title": "Cidr",
+                "level": 5
               },
               "except": {
-                "ui:title": "Except"
+                "ui:title": "Except",
+                "level": 5
               }
             },
             "namespaceSelector": {
               "ui:title": "Object namespaceSelectors",
+              "level": 4,
               "matchExpressions": {
                 "ui:title": "MatchExpressions",
+                "level": 5,
                 "items": {
                   "key": {
-                    "ui:title": "Key"
+                    "ui:title": "Key",
+                    "level": 6
                   },
                   "operator": {
-                    "ui:title": "Operator"
+                    "ui:title": "Operator",
+                    "level": 6
                   },
                   "values": {
-                    "ui:title": "Values"
+                    "ui:title": "Values",
+                    "level": 6
                   }
                 }
               },
               "matchLabels": {
-                "ui:title": "Match Labels"
+                "ui:title": "Match Labels",
+                "level": 5
               }
             },
             "podSelector": {
               "ui:title": "Object podSelectors",
+              "level": 4,
               "matchExpressions": {
                 "ui:title": "MatchExpressions",
+                "level": 5,
                 "items": {
                   "key": {
-                    "ui:title": "Key"
+                    "ui:title": "Key",
+                    "level": 6
                   },
                   "operator": {
-                    "ui:title": "Operator"
+                    "ui:title": "Operator",
+                    "level": 6
                   },
                   "values": {
-                    "ui:title": "Values"
+                    "ui:title": "Values",
+                    "level": 6
                   }
                 }
               },
               "matchLabels": {
-                "ui:title": "Match Labels"
+                "ui:title": "Match Labels",
+                "level": 4
               }
             }
           }
@@ -74,69 +96,89 @@
     },
     "ingress": {
       "ui:title": "Ingress",
+      "level": 2,
       "items": {
         "from": {
           "ui:title": "From",
+          "level": 3,
           "items": {
             "ipBlock": {
               "ui:title": "Object ipBlocks",
+              "level": 4,
               "cidr": {
-                "ui:title": "Cidr"
+                "ui:title": "Cidr",
+                "level": 5
               },
               "except": {
-                "ui:title": "Except"
+                "ui:title": "Except",
+                "level": 4
               }
             },
             "namespaceSelector": {
               "ui:title": "Object namespaceSelectors",
+              "level": 4,
               "matchExpressions": {
                 "ui:title": "MatchExpressions",
+                "level": 5,
                 "items": {
                   "key": {
-                    "ui:title": "Key"
+                    "ui:title": "Key",
+                    "level": 6
                   },
                   "operator": {
-                    "ui:title": "Operator"
+                    "ui:title": "Operator",
+                    "level": 6
                   },
                   "values": {
-                    "ui:title": "Values"
+                    "ui:title": "Values",
+                    "level": 6
                   }
                 }
               },
               "matchLabels": {
-                "ui:title": "Match Labels"
+                "ui:title": "Match Labels",
+                "level": 5
               }
             },
             "podSelector": {
               "ui:title": "Object podSelectors",
+              "level": 4,
               "matchExpressions": {
                 "ui:title": "MatchExpressions",
+                "level": 5,
                 "items": {
                   "key": {
-                    "ui:title": "Key"
+                    "ui:title": "Key",
+                    "level": 6
                   },
                   "operator": {
-                    "ui:title": "Operator"
+                    "ui:title": "Operator",
+                    "level": 6
                   },
                   "values": {
-                    "ui:title": "Values"
+                    "ui:title": "Values",
+                    "level": 6
                   }
                 }
               },
               "matchLabels": {
-                "ui:title": "Match Labels"
+                "ui:title": "Match Labels",
+                "level": 5
               }
             }
           }
         },
         "ports": {
           "ui:title": "Ports",
+          "level": 3,
           "items": {
             "endPort": {
-              "ui:title": "End Port"
+              "ui:title": "End Port",
+              "level": 4
             },
             "protocol": {
-              "ui:title": "Protocol"
+              "ui:title": "Protocol",
+              "level": 4
             }
           }
         }
@@ -144,26 +186,33 @@
     },
     "podSelector": {
       "ui:title": "Object podSelectors",
+      "level": 2,
       "matchExpressions": {
         "ui:title": "MatchExpressions",
+        "level": 3,
         "items": {
           "key": {
-            "ui:title": "Key"
+            "ui:title": "Key",
+            "level": 4
           },
           "operator": {
-            "ui:title": "Operator"
+            "ui:title": "Operator",
+            "level": 4
           },
           "values": {
-            "ui:title": "Values"
+            "ui:title": "Values",
+            "level": 4
           }
         }
       },
       "matchLabels": {
-        "ui:title": "Match Labels"
+        "ui:title": "Match Labels",
+        "level": 3
       }
     },
     "policyTypes": {
-      "ui:title": "Policy Types"
+      "ui:title": "Policy Types",
+      "level": 2
     }
   }
 }
