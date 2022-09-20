@@ -2,3 +2,5 @@
 require = require('esm')(module);
 
 require('./main-electron');
+
+export {};

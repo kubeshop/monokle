@@ -113,7 +113,7 @@ const initialAppConfigState: AppConfig = {
   projects: electronStore.get('appConfig.projects') || [],
   selectedProjectRootFolder: null,
   projectConfig: null,
-  isProjectLoading: true,
+  isProjectLoading: false,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
   k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],

@@ -33,6 +33,7 @@ const customOverrides = (config, env) => {
   config.output = {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].[chunkhash:8].js',
+    publicPath: '/',
   };
   config.resolve = {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -55,6 +56,7 @@ const customOverrides = (config, env) => {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.join(PUBLIC, 'index.html'),
+      publicPath: '',
     }),
     new InterpolateHtmlPlugin({
       PUBLIC_URL: '',
@@ -76,11 +78,11 @@ const customOverrides = (config, env) => {
       test: /\.json$/,
       type: 'json',
     },
-    {
-      test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
-      exclude: /node_modules/,
-      use: ['file-loader?name=[name].[ext]'], // ?name=[name].[ext] is only necessary to preserve the original file name
-    },
+    // {
+    //   test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+    //   exclude: /node_modules/,
+    //   use: ['file-loader?name=[name].[ext]'],
+    // },
     {
       test: /\.less$/,
       use: [
@@ -102,11 +104,11 @@ const customOverrides = (config, env) => {
 };
 
 module.exports = override(
-  customOverrides,
   fixBabelImports('import', {
     libraryName: 'antd',
     libraryDirectory: 'es',
     style: true,
   }),
-  addLessLoader()
+  addLessLoader(),
+  customOverrides
 );

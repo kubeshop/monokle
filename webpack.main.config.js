@@ -8,9 +8,11 @@ if (process.platform !== 'darwin') {
   optionalPlugins.push(new IgnorePlugin({resourceRegExp: /^fsevents$/}));
 }
 
+console.log('NODE_ENV', process.env.NODE_ENV);
+
 module.exports = [
   {
-    mode: 'development',
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     entry: './electron/main.ts',
     target: 'electron-main',
     externals: [nodeExternals()],
@@ -56,7 +58,7 @@ module.exports = [
       ],
     },
     output: {
-      path: path.resolve(__dirname, 'build'),
+      path: path.resolve(__dirname, 'build', 'electron'),
       filename: 'main.js',
     },
   },

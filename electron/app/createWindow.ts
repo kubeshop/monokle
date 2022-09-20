@@ -52,9 +52,11 @@ import {
 } from './utils';
 
 const isDev = process.env.NODE_ENV === 'development';
+console.log('isDev', isDev);
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+console.log('userDataDir', userDataDir);
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
@@ -83,7 +85,7 @@ export const createWindow = (givenPath?: string) => {
     windowOpts: mainBrowserWindowOptions,
     templateUrl: isDev
       ? path.normalize(`${__dirname}/../public/Splashscreen.html`)
-      : path.normalize(`${__dirname}/../../Splashscreen.html`),
+      : path.normalize(`${__dirname}/../Splashscreen.html`),
     delay: 0,
     splashScreenOpts: {
       width: 1200,
@@ -99,7 +101,7 @@ export const createWindow = (givenPath?: string) => {
     win.loadURL('http://localhost:3000/index.html');
   } else {
     // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../../index.html`);
+    win.loadURL(`file://${__dirname}/../index.html`);
   }
 
   // Hot Reloading
