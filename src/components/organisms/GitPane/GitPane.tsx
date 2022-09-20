@@ -19,6 +19,7 @@ import * as S from './GitPane.styled';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [loading, setLoading] = useState(false);
@@ -122,7 +123,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
-      
+
       <S.FileContainer>
         <S.CheckboxWrapper>
           <Checkbox
@@ -158,7 +159,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 setShowCommitInput(true);
               }}
             >
-              Commit to the main branch
+              Commit to {currentBranch || 'main'}
             </S.StagedFilesActionsButton>
 
             {showCommitInput ? (
