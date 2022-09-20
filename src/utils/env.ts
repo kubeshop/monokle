@@ -25,8 +25,6 @@ const detectShell = () => {
   return env.SHELL || '/bin/sh';
 };
 
-const detectedShell = detectShell();
-
 const parseEnv = env => {
   env = env.split('_SHELL_ENV_DELIMITER_')[1];
   const returnValue = {};
@@ -47,7 +45,12 @@ export function shellEnvSync(): any {
     return process.env;
   }
 
+  if (process.platform === 'linux') {
+    return process.env;
+  }
+
   try {
+    const detectedShell = detectShell();
     const {stdout} = execa.sync(detectedShell, args, {extendEnv: true, env: ENV});
     return parseEnv(stdout);
   } catch (error) {

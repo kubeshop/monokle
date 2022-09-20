@@ -3,6 +3,9 @@ const fs = require('fs');
 
 const getResourcesPath = () => (<any>process).resourcesPath;
 
+const LINUX_PATH = '/usr/bin';
+const MACOS_PATH ='/usr/local/bin';
+
 export default (): Promise<void> => {
   const commandPath = path.resolve(getResourcesPath(), `app/darwin/bin/monokle.sh`);
   const commandName = 'monokle';
@@ -12,11 +15,14 @@ export default (): Promise<void> => {
       reject(new TypeError('Expected a string'));
     }
 
-    if (process.platform !== 'darwin') {
+    if (!(process.platform === 'darwin' || process.platform === 'linux')) {
       reject(new Error('Your platform is not supported'));
     }
 
-    const destinationPath = path.join('/usr/local/bin', commandName);
+    let destinationPath:string = path.join(MACOS_PATH, commandName);
+    if(process.platform === 'linux') {
+      destinationPath = path.join(LINUX_PATH, commandName);
+    }
 
     // not catch Error
     fs.readlink(destinationPath, (_: any, realPath: string) => {

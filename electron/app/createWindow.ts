@@ -52,11 +52,9 @@ import {
 } from './utils';
 
 const isDev = process.env.NODE_ENV === 'development';
-console.log('isDev', isDev);
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
-console.log('userDataDir', userDataDir);
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
