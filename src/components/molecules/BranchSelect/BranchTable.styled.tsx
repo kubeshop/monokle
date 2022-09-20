@@ -1,4 +1,4 @@
-import {Input, Select as RawSelect, Table as RawTable, TableProps} from 'antd';
+import {Input, Button as RawButton, Select as RawSelect, Table as RawTable, TableProps} from 'antd';
 
 import {rgba} from 'polished';
 import styled from 'styled-components';
@@ -14,14 +14,8 @@ export const Container = styled.div`
   padding-bottom: 12px;
 `;
 
-export const TableFilter = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 50px;
-  background-color: ${rgba(Colors.coldGrey, 0.5)};
-  padding: 12px;
-  margin-bottom: 8px;
+export const CreateBranchButton = styled(RawButton)`
+  margin-top: 8px;
 `;
 
 export const SearchInput = styled(Input)`
@@ -76,4 +70,14 @@ export const Table = styled((props: TableProps<GitBranch>) => <RawTable<GitBranc
   .ant-table-cell:hover .anticon-delete {
     display: block;
   }
+`;
+
+export const TableFilter = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  background-color: ${rgba(Colors.coldGrey, 0.5)};
+  padding: 12px;
+  margin-bottom: 8px;
 `;

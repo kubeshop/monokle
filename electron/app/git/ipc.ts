@@ -7,6 +7,7 @@ import {
   checkoutGitBranch,
   cloneGitRepo,
   commitChanges,
+  createLocalBranch,
   deleteLocalBranch,
   fetchGitRepo,
   getChangedFiles,
@@ -78,6 +79,11 @@ ipcMain.on('git.commitChanges', async (event, payload: {localPath: string; messa
 });
 
 ipcMain.on('git.deleteLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
-  const result = await deleteLocalBranch(payload.localPath, payload.branchName);
-  event.sender.send('git.deleteLocalBranch.result', result);
+  await deleteLocalBranch(payload.localPath, payload.branchName);
+  event.sender.send('git.deleteLocalBranch.result');
+});
+
+ipcMain.on('git.createLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
+  await createLocalBranch(payload.localPath, payload.branchName);
+  event.sender.send('git.createLocalBranch.result');
 });

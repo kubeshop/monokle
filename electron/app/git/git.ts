@@ -166,3 +166,9 @@ export async function deleteLocalBranch(localPath: string, branchName: string) {
 
   await git.deleteLocalBranch(branchName);
 }
+
+export async function createLocalBranch(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  await git.checkoutLocalBranch(branchName);
+}
