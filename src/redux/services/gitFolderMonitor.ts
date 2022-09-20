@@ -26,20 +26,28 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
   watcher = watch(absolutePath, {persistent: true, usePolling: true, interval: 1000});
 
   watcher
-    .on('change', () => {
+    .on('change', path => {
       const gitRepo = thunkAPI.getState().git.repo;
 
-      if (gitRepo) {
-        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
-          thunkAPI.dispatch(setRepo(result));
-          thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
-        });
+      if (!gitRepo) {
+        return;
+      }
 
+      // commit was made/undoed or file was staged/unstaged
+      if (path === `${absolutePath}${sep}logs${sep}HEAD` || path === `${absolutePath}${sep}index`) {
         promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
           localPath: rootFolderPath,
           fileMap: thunkAPI.getState().main.fileMap,
         }).then(result => {
           thunkAPI.dispatch(setChangedFiles(result));
+        });
+      }
+
+      // branch was switched
+      if (path === `${absolutePath}${sep}HEAD` || path === `${absolutePath}${sep}config`) {
+        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
+          thunkAPI.dispatch(setRepo(result));
+          thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
         });
       }
     })

@@ -6,12 +6,15 @@ import {
   areFoldersGitRepos,
   checkoutGitBranch,
   cloneGitRepo,
+  commitChanges,
   deleteLocalBranch,
   fetchGitRepo,
   getChangedFiles,
   getCurrentBranch,
   initGitRepo,
   isFolderGitRepo,
+  stageChangedFiles,
+  unstageFiles,
 } from './git';
 
 ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
@@ -53,6 +56,25 @@ ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fil
 ipcMain.on('git.getCurrentBranch', async (event, localPath: string) => {
   const result = await getCurrentBranch(localPath);
   event.sender.send('git.getCurrentBranch.result', result);
+});
+
+ipcMain.on('git.stageChangedFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
+  const {filePaths, localPath} = payload;
+
+  await stageChangedFiles(localPath, filePaths);
+  event.sender.send('git.stageChangedFiles.result');
+});
+
+ipcMain.on('git.unstageFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
+  const {filePaths, localPath} = payload;
+
+  await unstageFiles(localPath, filePaths);
+  event.sender.send('git.unstageFiles.result');
+});
+
+ipcMain.on('git.commitChanges', async (event, payload: {localPath: string; message: string}) => {
+  await commitChanges(payload.localPath, payload.message);
+  event.sender.send('git.commitChanges.result');
 });
 
 ipcMain.on('git.deleteLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {

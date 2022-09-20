@@ -1,4 +1,5 @@
 import {promises as fs} from 'fs';
+import {sep} from 'path';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -132,6 +133,32 @@ export async function getCurrentBranch(localPath: string) {
   const branchesSummary = await git.branch();
 
   return branchesSummary.current;
+}
+
+export async function stageChangedFiles(localPath: string, filePaths: string[]) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const absoluteFilePaths = filePaths.map(filePath => `${localPath}${sep}${filePath.replaceAll('/', sep)}`);
+
+  await git.add(absoluteFilePaths);
+}
+
+export async function unstageFiles(localPath: string, filePaths: string[]) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const absoluteFilePaths = filePaths.map(filePath => `${localPath}${sep}${filePath.replaceAll('/', sep)}`);
+
+  const unstageProperties = absoluteFilePaths.reduce((prev, current) => {
+    return {...prev, [current]: null};
+  }, {} as any);
+
+  await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
+}
+
+export async function commitChanges(localPath: string, message: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  await git.commit(message);
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
