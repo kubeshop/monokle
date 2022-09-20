@@ -99,6 +99,10 @@ export const StagedFilesActionsButton = styled(Dropdown.Button)`
   }
 `;
 
+export const StagedFilesContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
 export const StageSelectedButton = styled(RawButton)`
   margin: 5px 0px 0px 14px;
   border-radius: 4px;

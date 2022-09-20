@@ -27,8 +27,6 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
 
   watcher
     .on('change', path => {
-      console.log('Path:', path);
-
       const gitRepo = thunkAPI.getState().git.repo;
 
       if (!gitRepo) {

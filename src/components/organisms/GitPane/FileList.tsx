@@ -56,18 +56,13 @@ const FileList: React.FC<IProps> = props => {
   );
 
   return (
-    <List
-      style={{marginTop: '-6px'}}
+    <S.List
       dataSource={files}
       renderItem={item => (
         <List.Item
           onMouseEnter={() => setHovered(item)}
           onMouseLeave={() => setHovered(null)}
           style={{
-            borderBottom: 'none',
-            padding: '6px 14px 6px 14px',
-            marginBottom: '6px',
-            justifyContent: 'flex-start',
             background: selectedFiles.find(searchItem => searchItem.name === item.name) && 'rgba(255, 255, 255, 0.07)',
           }}
         >

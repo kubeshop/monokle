@@ -136,7 +136,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
         </S.CheckboxWrapper>
 
         {stagedFiles.length ? (
-          <>
+          <S.StagedFilesContainer>
             <S.CheckboxWrapper>
               <Checkbox onChange={handleSelectStagedFiles} checked={selectedStagedFiles.length === stagedFiles.length}>
                 <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
@@ -169,8 +169,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 }}
               />
             ) : null}
-            <br />
-          </>
+          </S.StagedFilesContainer>
         ) : null}
 
         {unstagedFiles.length ? (
