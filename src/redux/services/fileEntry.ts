@@ -492,7 +492,7 @@ export function reloadFile(
   }
 
   const fileStats = getFileStats(absolutePath);
-  if (fileStats && fileStats.isFile()) {
+  if (fileStats && fileStats.isFile() && fileIsIncluded(fileEntry.filePath, projectConfig)) {
     const newText = fs.readFileSync(absolutePath, 'utf8');
     state.fileMap[fileEntry.filePath].text = newText;
   }

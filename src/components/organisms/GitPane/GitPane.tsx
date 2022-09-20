@@ -120,7 +120,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                       <S.FileIcon>
                         <FileOutlined />
                       </S.FileIcon>
-                      {item.name}
+                      <S.FileName $deleted={Boolean(!item.modifiedContent)}>{item.name}</S.FileName>
+
                       <S.FilePath>{item.path}</S.FilePath>
                     </S.FileItemData>
                     {hovered.name === item.name && (
