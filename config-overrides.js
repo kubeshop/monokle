@@ -14,6 +14,8 @@ const aliasMap = configPaths('./paths.json');
 
 const PUBLIC = path.join(__dirname, 'public');
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 const optionalPlugins = [];
 if (process.platform !== 'darwin') {
   optionalPlugins.push(new IgnorePlugin({resourceRegExp: /^fsevents$/}));
@@ -23,15 +25,12 @@ module.exports = alias(aliasMap);
 module.exports.jest = aliasJest(aliasMap);
 
 const webpackCustomOverrides = (config, env) => {
-  const isDevelopment = env !== 'production';
-
   config.node = {__dirname: false};
   config.mode = 'development';
   config.target = 'electron-renderer';
   config.output = {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].[chunkhash:8].js',
-    publicPath: '/',
   };
   config.resolve = {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -108,6 +107,5 @@ module.exports = override(
     style: true,
   }),
   addLessLoader(),
-  webpackCustomOverrides,
-  
+  webpackCustomOverrides
 );
