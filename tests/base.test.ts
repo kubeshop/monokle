@@ -112,9 +112,25 @@ test('Validate decline Telemetry', async () => {
   await waitForDrawerToShow(appWindow, 'Notifications', 5000);
   const buttonDecline = appWindow.locator('#decline-telemetry');
   expect(await buttonDecline.count()).toBe(1);
-  await appWindow.click('#decline-telemetry');
+  await appWindow.click('#decline-telemetry', {noWaitAfter: true, force: true});
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeTruthy();
+});
+
+test('Validate Walk Through Tooltip', async () => {
+  await appWindow.hover("//span[@aria-label='ellipsis' and contains(@class,'anticon')]");
+
+  const tooltipInvisible = appWindow.locator("//div[@role='tooltip']");
+  expect(tooltipInvisible).toBeHidden();
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'settings-popover.png')});
+  const popover = appWindow.locator('#menu-helpers');
+
+  const buttonGuide = await popover.locator('button >> text=Re-play Quick Guide');
+  expect(buttonGuide).toBeTruthy();
+  await appWindow.click('button >> text=Re-play Quick Guide', {noWaitAfter: true, force: true});
+  const tooltip = appWindow.locator("//div[@role='tooltip']");
+  expect(tooltip).toBeTruthy();
+
 });
 
 test.afterAll(async () => {

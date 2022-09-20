@@ -63,7 +63,7 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
   };
 
   return (
-    <S.MenuContainer>
+    <S.MenuContainer id="menu-helpers">
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
         <S.MenuItem
           onClick={() => {
