@@ -6,8 +6,6 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const InterpolateHtmlPlugin = require('interpolate-html-plugin');
 const {IgnorePlugin} = require('webpack');
-const {injectBabelPlugin} = require('react-app-rewired');
-const rewireLess = require('react-app-rewire-less');
 const {override, fixBabelImports} = require('customize-cra');
 const addLessLoader = require('customize-cra-less-loader');
 const {getThemeVariables} = require('antd/dist/theme');
@@ -100,10 +98,6 @@ const webpackCustomOverrides = (config, env) => {
       ],
     },
   ];
-  return config;
-};
-
-const jestCustomOverrides = (config, env) => {
   return config;
 };
 
