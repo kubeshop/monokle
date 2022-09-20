@@ -24,7 +24,7 @@ if (process.platform !== 'darwin') {
 module.exports = alias(aliasMap);
 module.exports.jest = aliasJest(aliasMap);
 
-const customOverrides = (config, env) => {
+const webpackCustomOverrides = (config, env) => {
   const isDevelopment = env !== 'production';
 
   config.node = {__dirname: false};
@@ -103,6 +103,10 @@ const customOverrides = (config, env) => {
   return config;
 };
 
+const jestCustomOverrides = (config, env) => {
+  return config;
+};
+
 module.exports = override(
   fixBabelImports('import', {
     libraryName: 'antd',
@@ -110,5 +114,6 @@ module.exports = override(
     style: true,
   }),
   addLessLoader(),
-  customOverrides
+  webpackCustomOverrides,
+  
 );
