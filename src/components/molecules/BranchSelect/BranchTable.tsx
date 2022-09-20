@@ -35,10 +35,7 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
     return branches.filter(branch => branch.name.toLowerCase().includes(searchFilter.toLowerCase()));
   }, [branchMap, branchType, searchFilter]);
 
-  const columns = useBranchTable({
-    branchCount: filteredBranches.length,
-    onSelect,
-  });
+  const columns = useBranchTable({branchCount: filteredBranches.length});
 
   return (
     <S.Container>
@@ -63,6 +60,11 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
       </S.TableFilter>
 
       <S.Table
+        onRow={branch => ({
+          onClick: () => {
+            onSelect(branch);
+          },
+        })}
         rowKey="name"
         columns={columns}
         dataSource={filteredBranches}

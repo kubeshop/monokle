@@ -1,4 +1,8 @@
-import {BranchesOutlined as RawBranchesOutlined, CloudOutlined as RawCloudOutlined} from '@ant-design/icons';
+import {
+  BranchesOutlined as RawBranchesOutlined,
+  CloudOutlined as RawCloudOutlined,
+  DeleteOutlined as RawDeleteOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -6,8 +10,15 @@ import Colors from '@styles/Colors';
 
 export const Box = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
   cursor: pointer;
+`;
+
+export const BranchInfo = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
 export const BranchesOutlined = styled(RawBranchesOutlined)`
@@ -30,6 +41,12 @@ export const CloudOutlined = styled(RawCloudOutlined)`
 
 export const CommitShaLabel = styled.span`
   color: ${Colors.grey7};
+`;
+
+export const DeleteOutlined = styled(RawDeleteOutlined)`
+  color: ${Colors.red7};
+  display: none;
+  margin-right: 8px;
 `;
 
 export const NameLabel = styled.div`
