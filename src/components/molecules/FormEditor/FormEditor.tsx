@@ -1,10 +1,11 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {memo, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
-import {withTheme} from '@rjsf/core';
+import {ObjectFieldTemplateProps, withTheme} from '@rjsf/core';
 
+import isDeepEqual from 'fast-deep-equal/es6/react';
 import fs from 'fs';
 import log from 'loglevel';
 import {stringify} from 'yaml';
@@ -30,7 +31,10 @@ import {parseYamlDocument} from '@utils/yaml';
 import * as S from './FormEditor.styled';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
-const Form = withTheme(AntDTheme);
+const areEqual = (prevProps: any, nextProps: any) => {
+  return isDeepEqual(prevProps.schema, nextProps.schema);
+};
+const Form = React.memo(withTheme(AntDTheme), areEqual);
 
 interface IProps {
   formSchema: any;
@@ -182,12 +186,41 @@ const FormEditor: React.FC<IProps> = props => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const ObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
+    const {title, properties, uiSchema} = props;
+    const [isExpanded, toggleExpand] = useState<boolean>(true);
+    const opacity = (10 - (uiSchema?.level ?? 0)) / 10;
+
+    return (
+      <S.FieldContainer>
+        <S.TitleWrapper onClick={() => toggleExpand(prev => !prev)} opacityStep={opacity || 1}>
+          {isExpanded ? <S.ArrowIconExpanded /> : <S.ArrowIconClosed />}
+
+          {title ? (
+            <S.TitleText isBold={uiSchema.level === 0}>{title}</S.TitleText>
+          ) : (
+            <S.ElementText>element</S.ElementText>
+          )}
+        </S.TitleWrapper>
+        {isExpanded && (
+          <>
+            {properties.map((element: any) => (
+              <S.PropertyContainer key={element.content.key}>{element.content}</S.PropertyContainer>
+            ))}
+          </>
+        )}
+      </S.FieldContainer>
+    );
+  };
+
   return (
     <S.FormContainer>
       <Form
         schema={schema}
         uiSchema={formUiSchema}
         formData={formData}
+        ObjectFieldTemplate={memo(ObjectFieldTemplate, areEqual)}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
         fields={getCustomFormFields()}

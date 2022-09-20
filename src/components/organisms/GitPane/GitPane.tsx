@@ -122,7 +122,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
-
+      
       <S.FileContainer>
         <S.CheckboxWrapper>
           <Checkbox

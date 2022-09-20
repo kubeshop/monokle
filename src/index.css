@@ -185,8 +185,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 }
 
 .monokleEditorLastModifiedLineInlineClass {
-  background-color: #6ABE39;
-  color: black !important;
+  background-color: #263EA0;
+  transition: 500ms;
 }
 
 .ant-menu-submenu-popup {

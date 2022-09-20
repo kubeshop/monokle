@@ -1,52 +1,69 @@
 {
   "ui:title": "Service Properties",
+  "level": 0,
   "spec": {
     "ui:title": "Object specs",
+    "level": 1,
     "selector": {
-      "ui:title": "Selector"
+      "ui:title": "Selector",
+      "level": 2
     },
     "type": {
-      "ui:title": "Type"
+      "ui:title": "Type",
+      "level": 2
     },
     "externalName": {
-      "ui:title": "External Name"
+      "ui:title": "External Name",
+      "level": 2
     },
     "ports": {
       "ui:title": "Ports",
+      "level": 2,
       "items": {
         "name": {
-          "ui:title": "Name"
+          "ui:title": "Name",
+          "level": 3
         },
         "protocol": {
-          "ui:title": "Protocol"
+          "ui:title": "Protocol",
+          "level": 3
         },
         "port": {
-          "ui:title": "Port"
+          "ui:title": "Port",
+          "level": 3
         },
         "targetPort": {
-          "ui:title": "Target Port"
+          "ui:title": "Target Port",
+          "level": 3
         },
         "nodePort": {
-          "ui:title": "Node Port"
+          "ui:title": "Node Port",
+          "level": 3
         }
       }
     },
     "clusterIP": {
-      "ui:title": "Cluster IP"
+      "ui:title": "Cluster IP",
+      "level": 2
     },
     "externalIPs": {
-      "ui:title": "External IP"
+      "ui:title": "External IP",
+      "level": 2
     }
   },
   "status": {
     "ui:title": "Status",
+    "level": 1,
     "loadBalancer": {
       "ui:title": "Load Balancer",
+      "level": 2,
       "ingress": {
         "ui:title": "Ingress",
+        "level": 3,
         "items": {
           "ip": {
-            "ui:title": "IP"
+            "ui:title": "IP",
+            "level": 4
           }
         }
       }

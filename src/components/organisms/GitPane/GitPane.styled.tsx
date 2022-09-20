@@ -50,6 +50,10 @@ export const FileItemData = styled.div`
   color: ${Colors.blue10};
 `;
 
+export const FileName = styled.span<{$deleted: boolean}>`
+  text-decoration: ${({$deleted}) => ($deleted ? 'line-through' : 'none')};
+`;
+
 export const FilePath = styled.div`
   color: ${Colors.grey9};
   margin-left: 4px;
