@@ -1,6 +1,8 @@
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
-import {Button} from 'antd';
+import {Button, Menu} from 'antd';
+
+import {DownOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -17,6 +19,17 @@ const BottomActions: React.FC = () => {
   const [pushPublishLoading, setPushPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
 
+  const publishHandler = useCallback(async () => {
+    setPushPublishLoading(true);
+
+    await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
+      localPath: selectedProjectRootFolder,
+      branchName: currentBranch || 'main',
+    });
+
+    setPushPublishLoading(false);
+  }, [currentBranch, selectedProjectRootFolder]);
+
   const isBranchOnRemote = useMemo(() => {
     if (!gitRepo) {
       return false;
@@ -25,32 +38,53 @@ const BottomActions: React.FC = () => {
     return gitRepo.branches.includes(`origin/${gitRepo.currentBranch}`);
   }, [gitRepo]);
 
-  const pushPublishButtonLabel = useMemo(() => {
-    if (!isBranchOnRemote) {
-      return 'Publish branch';
-    }
+  const menuItems = useMemo(
+    () => [
+      {
+        key: 'publish_and_push',
+        label: 'Publish & Push',
+        onClick: async () => {
+          setPushPublishLoading(true);
 
-    return 'Push';
-  }, [isBranchOnRemote]);
+          await publishHandler();
+          await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+            localPath: selectedProjectRootFolder,
+            branchName: currentBranch || 'main',
+          });
 
-  const pushPublishHandler = async () => {
+          setPushPublishLoading(false);
+        },
+      },
+    ],
+    [currentBranch, publishHandler, selectedProjectRootFolder]
+  );
+
+  const pushHandler = async () => {
     setPushPublishLoading(true);
-
-    if (!isBranchOnRemote) {
-      await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
-        localPath: selectedProjectRootFolder,
-        branchName: currentBranch || 'main',
-      });
-    }
 
     setPushPublishLoading(false);
   };
 
   return (
     <S.BottomActionsContainer>
-      <Button loading={pushPublishLoading} type="primary" onClick={pushPublishHandler}>
-        {pushPublishButtonLabel}
-      </Button>
+      {!isBranchOnRemote ? (
+        <S.PublishBranchButton
+          loading={pushPublishLoading}
+          icon={<DownOutlined />}
+          placement="topLeft"
+          trigger={['click']}
+          type="primary"
+          overlay={<Menu items={menuItems} />}
+          onClick={publishHandler}
+        >
+          Publish branch
+        </S.PublishBranchButton>
+      ) : (
+        <Button loading={pushPublishLoading} type="primary" onClick={pushHandler}>
+          Push
+        </Button>
+      )}
+
       <Button type="primary" onClick={() => setShowCommitModal(true)}>
         Commit to {currentBranch || 'main'}
       </Button>

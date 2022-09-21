@@ -157,24 +157,25 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.commit(message);
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.deleteLocalBranch(branchName);
 }
 
 export async function createLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.checkoutLocalBranch(branchName);
 }
 
 export async function publishLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.push({'-u': null, origin: null, [branchName]: null});
+}
+
+export async function pushChanges(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.push('origin', branchName);
 }
