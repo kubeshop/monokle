@@ -62,6 +62,11 @@ const BottomActions: React.FC = () => {
   const pushHandler = async () => {
     setPushPublishLoading(true);
 
+    await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+      localPath: selectedProjectRootFolder,
+      branchName: currentBranch || 'main',
+    });
+
     setPushPublishLoading(false);
   };
 
