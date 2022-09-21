@@ -14,7 +14,6 @@ import {TitleBar} from '@molecules';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import BottomActions from './BottomActions';
-import CommitInput from './CommitInput';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
 
@@ -25,7 +24,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const [loading, setLoading] = useState(false);
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
-  const [showCommitInput, setShowCommitInput] = useState(false);
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
@@ -88,7 +86,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
       setSelectedStagedFiles([]);
     }
 
-    setShowCommitInput(false);
     setLoading(false);
   };
 
@@ -144,28 +141,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               >
                 Unstage selected
               </S.StageUnstageSelectedButton>
-            ) : null}
-
-            {/* <S.StagedFilesActionsButton
-              type="primary"
-              overlay={<Menu items={menuItems} />}
-              trigger={['click']}
-              icon={<DownOutlined />}
-              placement="bottomLeft"
-              onClick={() => {
-                setShowCommitInput(true);
-              }}
-            >
-              Commit to {currentBranch || 'main'}
-            </S.StagedFilesActionsButton> */}
-
-            {showCommitInput ? (
-              <CommitInput
-                hideCommitInputHandler={() => {
-                  setShowCommitInput(false);
-                  setSelectedStagedFiles([]);
-                }}
-              />
             ) : null}
           </S.StagedFilesContainer>
         ) : null}
