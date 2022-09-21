@@ -16,6 +16,7 @@ const BottomActions: React.FC = () => {
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
+  const [commitLoading, setCommitLoading] = useState(false);
   const [pushPublishLoading, setPushPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
 
@@ -90,11 +91,15 @@ const BottomActions: React.FC = () => {
         </Button>
       )}
 
-      <Button type="primary" onClick={() => setShowCommitModal(true)}>
+      <Button loading={commitLoading} type="primary" onClick={() => setShowCommitModal(true)}>
         Commit to {currentBranch || 'main'}
       </Button>
 
-      <CommitModal visible={showCommitModal} setShowModal={value => setShowCommitModal(value)} />
+      <CommitModal
+        visible={showCommitModal}
+        setCommitLoading={value => setCommitLoading(value)}
+        setShowModal={value => setShowCommitModal(value)}
+      />
     </S.BottomActionsContainer>
   );
 };
