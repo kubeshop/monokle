@@ -14,8 +14,6 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-// import * as S from './GitCloneModal.styled';
-
 type Props = {
   onCancel?: () => void;
   onComplete?: () => void;
@@ -30,6 +28,7 @@ const GitCloneModal = (props: Props) => {
   const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
   const [formValues, setFormValues] = useState({repoPath: '', localPath: pickedPath});
+  const repoPathPlaceholder = 'https://github.com/kubeshop/monokle/';
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -43,34 +42,17 @@ const GitCloneModal = (props: Props) => {
   );
 
   const onOk = async () => {
-    if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) {
-      if (!formValues.repoPath) {
-        setGitForm.setFields([
-          {
-            name: 'repoPath',
-            errors: ['Please provide Git path!'],
-          },
-        ]);
-      }
-      if (!formValues.localPath && !pickedPath) {
-        setGitForm.setFields([
-          {
-            name: 'localPath',
-            errors: ['Please provide local path!'],
-          },
-        ]);
-      }
-    } else {
-      setIsCloning(true);
-      promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: pickedPath,
-        repoPath: formValues.repoPath,
-      }).then(() => {
-        setIsCloning(false);
-        dispatch(setCreateProject({rootFolder: pickedPath}));
-        onComplete && onComplete();
-      });
-    }
+    if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
+
+    setIsCloning(true);
+    promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
+      localPath: pickedPath,
+      repoPath: formValues.repoPath,
+    }).then(() => {
+      setIsCloning(false);
+      dispatch(setCreateProject({rootFolder: pickedPath}));
+      onComplete && onComplete();
+    });
   };
 
   const setProjectPath = () => {
@@ -110,6 +92,7 @@ const GitCloneModal = (props: Props) => {
           }
           const localPath = field.filter(item => _.includes(item.name.toString(), 'localPath'));
           if (localPath && localPath.length > 0) {
+            setPickedPath(localPath[0].value);
             setFormValues({...formValues, localPath: localPath[0].value});
             setIsEditingRoothPath(true);
           }
@@ -127,7 +110,7 @@ const GitCloneModal = (props: Props) => {
             },
           ]}
         >
-          <Input />
+          <Input placeholder={repoPathPlaceholder} />
         </Form.Item>
 
         <Form.Item label="Location" required tooltip="The local path where your project will live.">
