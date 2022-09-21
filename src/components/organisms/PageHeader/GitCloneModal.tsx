@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {existsSync} from 'fs';
 import _ from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -24,7 +25,7 @@ const GitCloneModal = (props: Props) => {
   const dispatch = useAppDispatch();
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const [isCloning, setIsCloning] = useState<boolean>(false);
-  const [setGitForm] = useForm();
+  const [gitForm] = useForm();
   const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
   const [formValues, setFormValues] = useState({repoPath: '', localPath: pickedPath});
@@ -44,6 +45,19 @@ const GitCloneModal = (props: Props) => {
   const onOk = async () => {
     if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
 
+    const pathExists = existsSync(pickedPath || formValues.localPath);
+    if (pathExists) {
+      gitForm.setFields([
+        {
+          name: 'localPath',
+          value: pickedPath || formValues.localPath,
+          errors: ['Path exists! Please provider a path to empty folder'],
+        },
+      ]);
+
+      return;
+    }
+
     setIsCloning(true);
     promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
       localPath: pickedPath,
@@ -58,7 +72,7 @@ const GitCloneModal = (props: Props) => {
   const setProjectPath = () => {
     const projectPath = pickedPath;
 
-    setGitForm.setFields([
+    gitForm.setFields([
       {
         name: 'localPath',
         value: projectPath,
@@ -82,7 +96,7 @@ const GitCloneModal = (props: Props) => {
     <Modal visible onOk={onOk} confirmLoading={isCloning} onCancel={onCancel}>
       <Form
         layout="vertical"
-        form={setGitForm}
+        form={gitForm}
         initialValues={formValues}
         onFieldsChange={field => {
           const repoPath = field.filter(item => _.includes(item.name.toString(), 'repoPath'));
