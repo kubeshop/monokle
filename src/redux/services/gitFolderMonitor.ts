@@ -3,6 +3,7 @@ import {sep} from 'path';
 
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -38,6 +39,7 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
         promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
           thunkAPI.dispatch(setRepo(result));
           thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
+          thunkAPI.dispatch(setRootFolder(thunkAPI.getState().config.selectedProjectRootFolder));
         });
       }
     })

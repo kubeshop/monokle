@@ -69,35 +69,35 @@ async function goToCommit(hash: string) {
 const testData = [
   {
     hash: startCommit,
-    fileExplorerCount: 54,
+    fileExplorerCount: 53,
     kustomizeCount: 13,
     helmCount: 13,
     navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
-    fileExplorerCount: 33,
+    fileExplorerCount: 32,
     kustomizeCount: 6,
     helmCount: 13,
     navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
-    fileExplorerCount: 16,
+    fileExplorerCount: 15,
     kustomizeCount: 3,
     helmCount: 13,
     navigatorCount: 34,
   },
   {
     hash: startCommit,
-    fileExplorerCount: 54,
+    fileExplorerCount: 53,
     kustomizeCount: 13,
     helmCount: 13,
     navigatorCount: 54,
   },
 ];
 
-test.only('all files should be loaded', async () => {
+test('all files should be loaded', async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'before-git-test.png')});
 
   await mainWindow.clickLogo();
@@ -122,9 +122,6 @@ test.only('all files should be loaded', async () => {
     const kustomizeInnerTexts = (await kustomizePane.kustomizeItemsContainer.allInnerTexts())[0].split('\n');
     expect(kustomizeInnerTexts.length).toEqual(data.kustomizeCount);
 
-    await mainWindow.clickHelmButton();
-    const helmInnerTexts = (await helmPane.helmItemsContainer.allInnerTexts())[0].split('\n');
-    expect(helmInnerTexts.length).toEqual(data.helmCount);
   }
 });
 
