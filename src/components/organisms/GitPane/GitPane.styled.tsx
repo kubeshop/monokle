@@ -62,8 +62,11 @@ export const FilePath = styled.div`
   line-height: 22px;
 `;
 
-export const FileContainer = styled.div`
+export const FileContainer = styled.div<{$height: number}>`
+  position: relative;
+  ${props => `height: ${props.$height ? `${props.$height}px` : '100%'};`}
   margin-top: 12px;
+  overflow-y: auto;
 `;
 
 export const FilesAction = styled.div`
@@ -104,10 +107,10 @@ export const StagedFilesActionsButton = styled(Dropdown.Button)`
 `;
 
 export const StagedFilesContainer = styled.div`
-  margin-bottom: 10px;
+  margin-bottom: 25px;
 `;
 
-export const StageSelectedButton = styled(RawButton)`
+export const StageUnstageSelectedButton = styled(RawButton)`
   margin: 5px 0px 0px 14px;
   border-radius: 4px;
 `;
