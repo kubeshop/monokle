@@ -173,9 +173,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
             ) : null}
           </>
         ) : null}
-
-        <BottomActions />
       </S.FileContainer>
+
+      <BottomActions />
     </S.GitPaneContainer>
   );
 };

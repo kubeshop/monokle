@@ -53,9 +53,8 @@ const CommitModal: React.FC<IProps> = props => {
     >
       <Form layout="vertical" form={form} onFinish={commitHandler}>
         <Form.Item
+          noStyle
           name="message"
-          label="Commit message"
-          style={{marginBottom: '5px'}}
           required
           rules={[
             {
@@ -64,7 +63,7 @@ const CommitModal: React.FC<IProps> = props => {
             },
           ]}
         >
-          <Input />
+          <Input.TextArea autoSize placeholder="Message" />
         </Form.Item>
       </Form>
     </Modal>
