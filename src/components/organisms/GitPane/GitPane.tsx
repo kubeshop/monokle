@@ -16,9 +16,11 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import BottomActions from './BottomActions';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
+import RemoteInput from './RemoteInput';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const hasRemoteRepo = useAppSelector(state => state.git.repo?.hasRemoteRepo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [loading, setLoading] = useState(false);
@@ -105,6 +107,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
+
+      {!hasRemoteRepo ? <RemoteInput /> : null}
 
       <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
         <S.CheckboxWrapper>

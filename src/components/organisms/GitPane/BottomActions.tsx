@@ -82,11 +82,12 @@ const BottomActions: React.FC = () => {
           type="primary"
           overlay={<Menu items={menuItems} />}
           onClick={publishHandler}
+          disabled={!gitRepo?.hasRemoteRepo}
         >
           Publish branch
         </S.PublishBranchButton>
       ) : (
-        <Button loading={pushPublishLoading} type="primary" onClick={pushHandler}>
+        <Button disabled={!gitRepo?.hasRemoteRepo} loading={pushPublishLoading} type="primary" onClick={pushHandler}>
           Push
         </Button>
       )}

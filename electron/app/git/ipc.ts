@@ -16,6 +16,7 @@ import {
   isFolderGitRepo,
   publishLocalBranch,
   pushChanges,
+  setRemote,
   stageChangedFiles,
   unstageFiles,
 } from './git';
@@ -98,4 +99,9 @@ ipcMain.on('git.publishLocalBranch', async (event, payload: {localPath: string; 
 ipcMain.on('git.pushChanges', async (event, payload: {localPath: string; branchName: string}) => {
   await pushChanges(payload.localPath, payload.branchName);
   event.sender.send('git.pushChanges.result');
+});
+
+ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
+  await setRemote(payload.localPath, payload.remoteURL);
+  event.sender.send('git.setRemote.result');
 });

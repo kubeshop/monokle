@@ -60,6 +60,7 @@ export async function fetchGitRepo(localPath: string) {
     branches: [...localBranches.all, ...remoteBranchSummary.all],
     currentBranch: localBranches.current || remoteBranchSummary.current,
     branchMap: {},
+    hasRemoteRepo: false,
   };
 
   gitRepo.branchMap = Object.fromEntries(
@@ -78,6 +79,13 @@ export async function fetchGitRepo(localPath: string) {
       ])
     ),
   };
+
+  try {
+    await git.remote(['show', 'origin']);
+    gitRepo.hasRemoteRepo = true;
+  } catch (e) {
+    gitRepo.hasRemoteRepo = false;
+  }
 
   return gitRepo;
 }
@@ -178,4 +186,10 @@ export async function publishLocalBranch(localPath: string, branchName: string) 
 export async function pushChanges(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.push('origin', branchName);
+}
+
+export async function setRemote(localPath: string, remoteURL: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.addRemote('origin', remoteURL);
+  await git.fetch();
 }
