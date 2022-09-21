@@ -32,7 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
-import {setChangedFiles} from '@redux/git';
+import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -346,7 +346,12 @@ export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkAp
       });
     });
 
-    if (state.git.repo) {
+    const repo = await promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder);
+
+    if (repo) {
+      thunkAPI.dispatch(setRepo(repo));
+      thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
+
       const result = await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
         localPath: projectRootFolder,
         fileMap: nextMainState.fileMap,
