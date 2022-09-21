@@ -14,6 +14,7 @@ import {
   getCurrentBranch,
   initGitRepo,
   isFolderGitRepo,
+  publishLocalBranch,
   stageChangedFiles,
   unstageFiles,
 } from './git';
@@ -86,4 +87,9 @@ ipcMain.on('git.deleteLocalBranch', async (event, payload: {localPath: string; b
 ipcMain.on('git.createLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
   await createLocalBranch(payload.localPath, payload.branchName);
   event.sender.send('git.createLocalBranch.result');
+});
+
+ipcMain.on('git.publishLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
+  await publishLocalBranch(payload.localPath, payload.branchName);
+  event.sender.send('git.publishLocalBranch.result');
 });

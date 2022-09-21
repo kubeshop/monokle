@@ -172,3 +172,9 @@ export async function createLocalBranch(localPath: string, branchName: string) {
 
   await git.checkoutLocalBranch(branchName);
 }
+
+export async function publishLocalBranch(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  await git.push({'-u': null, origin: null, [branchName]: null});
+}
