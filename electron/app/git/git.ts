@@ -111,7 +111,9 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
 
   const stagedChangedFiles = (await git.diff({'--name-only': null, '--cached': null})).split('\n').filter(el => el);
   const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
-  const unstagedAddedFiles = (await git.raw({'ls-files': null, '-o': null})).split('\n').filter(el => el);
+  const unstagedAddedFiles = (await git.raw({'ls-files': null, '-o': null, '--exclude-standard': null}))
+    .split('\n')
+    .filter(el => el);
 
   const changedFiles = formatGitChangedFiles(
     {stagedChangedFiles, unstagedChangedFiles: [...unstagedChangedFiles, ...unstagedAddedFiles]},
