@@ -99,7 +99,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
  * * * * * * * * * * * * * */
 type ModalSizeProps = {
   width: number;
-  bodyStyle: {height: number};
+  bodyStyle: {height: number; overflow: string};
   style: {top: number};
 };
 
@@ -112,6 +112,7 @@ function useModalSize(): ModalSizeProps {
     width: windowSize.width * percentage,
     bodyStyle: {
       height: (windowSize.height - modalHeaderHeight) * percentage,
+      overflow: 'hidden',
     },
     style: {
       top: 25,
