@@ -30,7 +30,9 @@ export function formatGitChangedFiles(
       modifiedContent = fs.readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
     }
 
-    const relativePath = path.dirname(gitFile.path);
+    const relativePath = path.dirname(
+      path.join(gitFolderPath, gitFile.path).replace(`${projectFolderPath}${path.sep}`, '')
+    );
     const filePath = relativePath === '.' ? '' : relativePath;
 
     return {
