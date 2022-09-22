@@ -57,8 +57,6 @@ const FileList: React.FC<IProps> = props => {
     [files, selectedProjectRootFolder]
   );
 
-  console.log(files, 'files');
-
   return (
     <S.List
       dataSource={files}
