@@ -8,9 +8,11 @@ export const GitPaneContainer = styled.div`
   width: 100%;
 `;
 
+// TODO: Setting width to 99% fixes the problem with blurring and jumping monaco editor
+// please try to fix it other way in the future as now i don't really dont know how to handle this problem - @szmski
 export const GitPaneMainContainer = styled.div`
+  width: 99%;
   height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
 `;
