@@ -44,6 +44,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -159,7 +160,9 @@ const PaneManagerLeftMenu: React.FC = () => {
                 onClick={() => setLeftActiveMenu('git-pane')}
                 disabled={!activeProject}
               >
-                <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+                <S.Badge color={Colors.blue6} count={changedFiles.length} size="small">
+                  <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+                </S.Badge>
               </MenuButton>
             </PaneTooltip>
           </Walkthrough>
@@ -181,8 +184,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             <S.Badge
               count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
               color={Colors.blue6}
-              size="default"
-              dot
+              size="small"
             >
               <MenuIcon
                 iconName="kustomize"
