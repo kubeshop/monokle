@@ -37,13 +37,15 @@ export const FilePath = styled.div`
   font-size: 12px;
 `;
 
-export const FileStatus = styled.div<{$type: 'added' | 'deleted' | 'modified'}>`
+export const FileStatus = styled.div<{$type: 'added' | 'deleted' | 'modified' | 'untracked'}>`
   height: 10px;
   width: 10px;
   border: ${({$type}) =>
-    `1px solid ${$type === 'added' ? Colors.cyan8 : $type === 'deleted' ? Colors.volcano6 : Colors.yellow7}`};
+    `1px solid ${
+      $type === 'added' || $type === 'untracked' ? Colors.cyan8 : $type === 'deleted' ? Colors.volcano6 : Colors.yellow7
+    }`};
   background-color: ${({$type}) =>
-    $type === 'added'
+    $type === 'added' || $type === 'untracked'
       ? rgba(Colors.cyan8, 0.3)
       : $type === 'deleted'
       ? rgba(Colors.volcano6, 0.3)

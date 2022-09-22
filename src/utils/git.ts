@@ -4,11 +4,11 @@ import path from 'path';
 import {FileMapType} from '@models/appstate';
 import {GitChangedFile} from '@models/git';
 
-const gitFileType: {[type: string]: 'added' | 'deleted' | 'modified'} = {
+const gitFileType: {[type: string]: 'added' | 'deleted' | 'modified' | 'untracked'} = {
   A: 'added',
   D: 'deleted',
   M: 'modified',
-  '?': 'added',
+  '?': 'untracked',
 };
 
 export function formatGitChangedFiles(
@@ -36,7 +36,12 @@ export function formatGitChangedFiles(
     const filePath = relativePath === '.' ? '' : relativePath;
 
     return {
-      status: gitFile.index.trim() ? 'staged' : 'unstaged',
+      status:
+        gitFile.working_dir.trim() && gitFile.index.trim() && gitFile.index !== '?'
+          ? 'staged'
+          : gitFile.working_dir.trim()
+          ? 'unstaged'
+          : 'staged',
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
       gitPath: gitFile.path,
