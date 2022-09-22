@@ -60,7 +60,7 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     const schemaKey = `${prefix}.${resource.kind}`;
     const schemaCacheKey = `${schemaVersion}-${prefix}.${resource.kind}`;
     if (!schemaCache.has(schemaCacheKey)) {
-      const kindSchema = k8sSchema['definitions'][schemaKey];
+      const kindSchema = k8sSchema?.definitions?.[schemaKey];
       if (kindSchema) {
         Object.keys(k8sSchema).forEach(key => {
           if (key !== 'definitions') {
