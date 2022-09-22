@@ -1,9 +1,9 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {Checkbox, Menu} from 'antd';
+import {Checkbox} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {DownOutlined} from '@ant-design/icons';
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {GitChangedFile} from '@models/git';
 
@@ -13,19 +13,19 @@ import {TitleBar} from '@molecules';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import CommitInput from './CommitInput';
+import BottomActions from './BottomActions';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
+import RemoteInput from './RemoteInput';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
-  const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
+  const hasRemoteRepo = useAppSelector(state => state.git.repo?.hasRemoteRepo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [loading, setLoading] = useState(false);
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
-  const [showCommitInput, setShowCommitInput] = useState(false);
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
@@ -88,24 +88,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
       setSelectedStagedFiles([]);
     }
 
-    setShowCommitInput(false);
     setLoading(false);
   };
-
-  const menuItems = useMemo(
-    () => [
-      {
-        key: 'unstage_changes',
-        label: 'Unstage selected',
-        disabled: !selectedStagedFiles.length,
-        onClick: () => {
-          handleStageUnstageSelectedFiles('unstage');
-        },
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   useEffect(() => {
     if (!changedFiles?.length) {
@@ -124,7 +108,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Commit" closable />
 
-      <S.FileContainer>
+      {!hasRemoteRepo ? <RemoteInput /> : null}
+
+      <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
         <S.CheckboxWrapper>
           <Checkbox
             onChange={handleSelectAll}
@@ -149,26 +135,16 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               handleSelect={(e, item) => handleSelect(e, item)}
             />
 
-            <S.StagedFilesActionsButton
-              type="primary"
-              overlay={<Menu items={menuItems} />}
-              trigger={['click']}
-              icon={<DownOutlined />}
-              placement="bottomLeft"
-              onClick={() => {
-                setShowCommitInput(true);
-              }}
-            >
-              Commit to {currentBranch || 'main'}
-            </S.StagedFilesActionsButton>
-
-            {showCommitInput ? (
-              <CommitInput
-                hideCommitInputHandler={() => {
-                  setShowCommitInput(false);
-                  setSelectedStagedFiles([]);
+            {selectedStagedFiles.length ? (
+              <S.StageUnstageSelectedButton
+                loading={loading}
+                type="primary"
+                onClick={() => {
+                  handleStageUnstageSelectedFiles('unstage');
                 }}
-              />
+              >
+                Unstage selected
+              </S.StageUnstageSelectedButton>
             ) : null}
           </S.StagedFilesContainer>
         ) : null}
@@ -189,7 +165,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
               handleSelect={(e, item) => handleSelect(e, item)}
             />
             {selectedUnstagedFiles.length ? (
-              <S.StageSelectedButton
+              <S.StageUnstageSelectedButton
                 loading={loading}
                 type="primary"
                 onClick={() => {
@@ -197,11 +173,13 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 }}
               >
                 Stage selected
-              </S.StageSelectedButton>
+              </S.StageUnstageSelectedButton>
             ) : null}
           </>
         ) : null}
       </S.FileContainer>
+
+      <BottomActions />
     </S.GitPaneContainer>
   );
 };

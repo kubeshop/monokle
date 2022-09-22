@@ -34,7 +34,11 @@ export function monitorGitFolder(rootFolderPath: string | null, thunkAPI: any) {
       }
 
       // branch was switched
-      if (path === `${absolutePath}${sep}HEAD` || path === `${absolutePath}${sep}config`) {
+      if (
+        path === `${absolutePath}${sep}HEAD` ||
+        path === `${absolutePath}${sep}config` ||
+        path === `${absolutePath}${sep}FETCH_HEAD`
+      ) {
         promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
           thunkAPI.dispatch(setRepo(result));
           thunkAPI.dispatch(setCurrentBranch(result.currentBranch));

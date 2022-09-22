@@ -80,7 +80,7 @@ const FileList: React.FC<IProps> = props => {
               <S.FilePath>{item.path}</S.FilePath>
             </S.FileItemData>
 
-            {hovered?.name === item.name && (
+            {hovered?.name === item.name && hovered.path === item.path && (
               <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
                 <Space onClick={e => e.preventDefault()}>
                   <Dots />

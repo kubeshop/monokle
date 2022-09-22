@@ -60,6 +60,7 @@ export async function fetchGitRepo(localPath: string) {
     branches: [...localBranches.all, ...remoteBranchSummary.all],
     currentBranch: localBranches.current || remoteBranchSummary.current,
     branchMap: {},
+    hasRemoteRepo: false,
   };
 
   gitRepo.branchMap = Object.fromEntries(
@@ -78,6 +79,13 @@ export async function fetchGitRepo(localPath: string) {
       ])
     ),
   };
+
+  try {
+    await git.remote(['show', 'origin']);
+    gitRepo.hasRemoteRepo = true;
+  } catch (e) {
+    gitRepo.hasRemoteRepo = false;
+  }
 
   return gitRepo;
 }
@@ -103,7 +111,9 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
 
   const stagedChangedFiles = (await git.diff({'--name-only': null, '--cached': null})).split('\n').filter(el => el);
   const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
-  const unstagedAddedFiles = (await git.raw({'ls-files': null, '-o': null})).split('\n').filter(el => el);
+  const unstagedAddedFiles = (await git.raw({'ls-files': null, '-o': null, '--exclude-standard': null}))
+    .split('\n')
+    .filter(el => el);
 
   const changedFiles = formatGitChangedFiles(
     {stagedChangedFiles, unstagedChangedFiles: [...unstagedChangedFiles, ...unstagedAddedFiles]},
@@ -157,18 +167,31 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.commit(message);
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.deleteLocalBranch(branchName);
 }
 
 export async function createLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-
   await git.checkoutLocalBranch(branchName);
+}
+
+export async function publishLocalBranch(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.push({'-u': null, origin: null, [branchName]: null});
+}
+
+export async function pushChanges(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.push('origin', branchName);
+}
+
+export async function setRemote(localPath: string, remoteURL: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.addRemote('origin', remoteURL);
+  await git.fetch();
 }
