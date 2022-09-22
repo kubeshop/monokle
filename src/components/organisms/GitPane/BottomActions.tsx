@@ -1,4 +1,5 @@
 import {useCallback, useMemo, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Button, Menu} from 'antd';
 
@@ -19,6 +20,8 @@ const BottomActions: React.FC = () => {
   const [commitLoading, setCommitLoading] = useState(false);
   const [pushPublishLoading, setPushPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
+
+  const [bottomActionsRef, {width: bottomActionsWidth}] = useMeasure<HTMLDivElement>();
 
   const publishHandler = useCallback(async () => {
     setPushPublishLoading(true);
@@ -72,7 +75,16 @@ const BottomActions: React.FC = () => {
   };
 
   return (
-    <S.BottomActionsContainer>
+    <S.BottomActionsContainer ref={bottomActionsRef}>
+      <S.CommitButton
+        $width={bottomActionsWidth / 2 - 48}
+        loading={commitLoading}
+        type="primary"
+        onClick={() => setShowCommitModal(true)}
+      >
+        Commit to {currentBranch || 'main'}
+      </S.CommitButton>
+
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
           loading={pushPublishLoading}
@@ -91,10 +103,6 @@ const BottomActions: React.FC = () => {
           Push
         </Button>
       )}
-
-      <Button loading={commitLoading} type="primary" onClick={() => setShowCommitModal(true)}>
-        Commit to {currentBranch || 'main'}
-      </Button>
 
       <CommitModal
         visible={showCommitModal}
