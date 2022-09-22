@@ -75,14 +75,14 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     if (type === 'stage') {
       await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedUnstagedFiles.map(item => item.path),
+        filePaths: selectedUnstagedFiles.map(item => item.gitPath),
       });
 
       setSelectedUnstagedFiles([]);
     } else {
       await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedStagedFiles.map(item => item.path),
+        filePaths: selectedStagedFiles.map(item => item.gitPath),
       });
 
       setSelectedStagedFiles([]);
@@ -149,33 +149,30 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
           </S.StagedFilesContainer>
         ) : null}
 
-        {unstagedFiles.length ? (
-          <>
-            <S.CheckboxWrapper>
-              <Checkbox
-                onChange={handleSelectUnstagedFiles}
-                checked={selectedUnstagedFiles.length === unstagedFiles.length}
-              >
-                <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
-              </Checkbox>
-            </S.CheckboxWrapper>
-            <FileList
-              files={unstagedFiles}
-              selectedFiles={selectedUnstagedFiles}
-              handleSelect={(e, item) => handleSelect(e, item)}
-            />
-            {selectedUnstagedFiles.length ? (
-              <S.StageUnstageSelectedButton
-                loading={loading}
-                type="primary"
-                onClick={() => {
-                  handleStageUnstageSelectedFiles('stage');
-                }}
-              >
-                Stage selected
-              </S.StageUnstageSelectedButton>
-            ) : null}
-          </>
+        <S.CheckboxWrapper>
+          <Checkbox
+            checked={Boolean(unstagedFiles.length && selectedUnstagedFiles.length === unstagedFiles.length)}
+            disabled={Boolean(!unstagedFiles.length)}
+            onChange={handleSelectUnstagedFiles}
+          >
+            <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
+          </Checkbox>
+        </S.CheckboxWrapper>
+        <FileList
+          files={unstagedFiles}
+          selectedFiles={selectedUnstagedFiles}
+          handleSelect={(e, item) => handleSelect(e, item)}
+        />
+        {selectedUnstagedFiles.length ? (
+          <S.StageUnstageSelectedButton
+            loading={loading}
+            type="primary"
+            onClick={() => {
+              handleStageUnstageSelectedFiles('stage');
+            }}
+          >
+            Stage selected
+          </S.StageUnstageSelectedButton>
         ) : null}
       </S.FileContainer>
 

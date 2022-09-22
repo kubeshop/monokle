@@ -43,12 +43,12 @@ const FileList: React.FC<IProps> = props => {
           if (files[0].status === 'unstaged') {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
-              filePaths: [item.path],
+              filePaths: [item.gitPath],
             });
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,
-              filePaths: [item.path],
+              filePaths: [item.gitPath],
             });
           }
         },

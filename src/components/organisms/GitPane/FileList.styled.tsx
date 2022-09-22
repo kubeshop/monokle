@@ -63,4 +63,8 @@ export const List = styled((props: ListProps<GitChangedFile>) => <RawList<GitCha
     padding: 6px 14px;
     margin-bottom: 6px;
   }
+
+  .ant-list-empty-text {
+    display: none;
+  }
 `;
