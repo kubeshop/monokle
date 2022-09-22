@@ -15,8 +15,10 @@ export type GitChangedFile = {
   modifiedContent: string;
   name: string;
   originalContent: string;
+  gitPath: string;
   path: string;
   status: 'staged' | 'unstaged';
+  type: 'added' | 'deleted' | 'modified';
 };
 
 export type GitSliceState = {

@@ -4,52 +4,45 @@ import path from 'path';
 import {FileMapType} from '@models/appstate';
 import {GitChangedFile} from '@models/git';
 
+const gitFileType: {[type: string]: 'added' | 'deleted' | 'modified'} = {
+  A: 'added',
+  D: 'deleted',
+  M: 'modified',
+  '?': 'added',
+};
+
 export function formatGitChangedFiles(
-  result: any,
+  files: {path: string; index: string; working_dir: string}[],
   fileMap: FileMapType,
   projectFolderPath: string,
   gitFolderPath: string
 ): GitChangedFile[] {
-  const {unstagedChangedFiles, stagedChangedFiles} = result;
+  const changedFiles: GitChangedFile[] = files.map(gitFile => {
+    const fileType = gitFile.index.trim() ? gitFileType[gitFile.index] : gitFileType[gitFile.working_dir];
 
-  const changedFiles: GitChangedFile[] = [
-    ...stagedChangedFiles.map((file: any) => {
-      const foundFile = Object.values(fileMap).find(
-        f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, file)
-      );
+    const foundFile = Object.values(fileMap).find(
+      f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, gitFile.path)
+    );
 
-      let modifiedContent = foundFile?.text || '';
+    let modifiedContent = foundFile?.text || '';
 
-      if (!modifiedContent && foundFile) {
-        modifiedContent = fs.readFileSync(path.join(projectFolderPath, foundFile.filePath), 'utf8');
-      }
+    if (!modifiedContent && fileType !== 'deleted') {
+      modifiedContent = fs.readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
+    }
 
-      return {
-        status: 'staged',
-        modifiedContent,
-        name: foundFile?.name || file.split('/').pop(),
-        path: file,
-      };
-    }),
-    ...unstagedChangedFiles.map((file: any) => {
-      const foundFile = Object.values(fileMap).find(
-        f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, file)
-      );
+    const relativePath = path.dirname(gitFile.path);
+    const filePath = relativePath === '.' ? '' : relativePath;
 
-      let modifiedContent = foundFile?.text || '';
-
-      if (!modifiedContent && foundFile) {
-        modifiedContent = fs.readFileSync(path.join(projectFolderPath, foundFile.filePath), 'utf8');
-      }
-
-      return {
-        status: 'unstaged',
-        modifiedContent,
-        name: foundFile?.name || file.split('/').pop(),
-        path: file,
-      };
-    }),
-  ];
+    return {
+      status: gitFile.index.trim() ? 'staged' : 'unstaged',
+      modifiedContent,
+      name: foundFile?.name || gitFile.path.split('/').pop() || '',
+      gitPath: gitFile.path,
+      path: projectFolderPath.startsWith(gitFolderPath) ? filePath : path.join(gitFolderPath, filePath),
+      originalContent: '',
+      type: fileType,
+    };
+  });
 
   return changedFiles;
 }

@@ -109,25 +109,17 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const gitFolderPath = await git.revparse({'--show-toplevel': null});
   const currentBranch = (await git.branch()).current;
 
-  const stagedChangedFiles = (await git.diff({'--name-only': null, '--cached': null})).split('\n').filter(el => el);
-  const unstagedChangedFiles = (await git.diff({'--name-only': null})).split('\n').filter(el => el);
-  const unstagedAddedFiles = (await git.raw({'ls-files': null, '-o': null, '--exclude-standard': null}))
-    .split('\n')
-    .filter(el => el);
+  const branchStatus = await git.status({'-z': null, '-uall': null});
+  const files = branchStatus.files;
 
-  const changedFiles = formatGitChangedFiles(
-    {stagedChangedFiles, unstagedChangedFiles: [...unstagedChangedFiles, ...unstagedAddedFiles]},
-    fileMap,
-    projectFolderPath,
-    gitFolderPath
-  );
+  const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath);
 
   for (let i = 0; i < changedFiles.length; i += 1) {
     let originalContent: string = '';
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      originalContent = await git.show(`${currentBranch}:${changedFiles[i].path}`);
+      originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
     } catch (error) {
       originalContent = '';
     }
