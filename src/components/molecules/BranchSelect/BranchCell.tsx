@@ -24,7 +24,7 @@ const BranchCell: React.FC<IProps> = props => {
     e.stopPropagation();
 
     Modal.confirm({
-      title: `Are you sure you want to delete ${branch.name}`,
+      title: `Are you sure you want to delete ${branch.name}?`,
       onOk() {
         promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
           localPath: selectedProjectRootFolder,

@@ -184,7 +184,7 @@ const PaneManagerLeftMenu: React.FC = () => {
             <S.Badge
               count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
               color={Colors.blue6}
-              size="small"
+              dot
             >
               <MenuIcon
                 iconName="kustomize"
