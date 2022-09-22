@@ -43,6 +43,9 @@ import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
+  if (!existsSync(project.rootFolder)) {
+    mkdirSync(project.rootFolder, {recursive: true});
+  }
   const isGitRepo = await promiseFromIpcRenderer(
     'git.isFolderGitRepo',
     'git.isFolderGitRepo.result',
