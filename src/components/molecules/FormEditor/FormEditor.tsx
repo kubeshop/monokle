@@ -1,11 +1,10 @@
-import React, {memo, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {ObjectFieldTemplateProps, withTheme} from '@rjsf/core';
 
-import isDeepEqual from 'fast-deep-equal/es6/react';
 import fs from 'fs';
 import log from 'loglevel';
 import {stringify} from 'yaml';
@@ -31,10 +30,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import * as S from './FormEditor.styled';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
-const areEqual = (prevProps: any, nextProps: any) => {
-  return isDeepEqual(prevProps.schema, nextProps.schema);
-};
-const Form = React.memo(withTheme(AntDTheme), areEqual);
+const Form = withTheme(AntDTheme);
 
 interface IProps {
   formSchema: any;
@@ -220,7 +216,7 @@ const FormEditor: React.FC<IProps> = props => {
         schema={schema}
         uiSchema={formUiSchema}
         formData={formData}
-        ObjectFieldTemplate={memo(ObjectFieldTemplate, areEqual)}
+        ObjectFieldTemplate={ObjectFieldTemplate}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
         fields={getCustomFormFields()}
