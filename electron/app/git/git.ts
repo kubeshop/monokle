@@ -1,4 +1,4 @@
-import {promises as fs} from 'fs';
+import {existsSync, promises as fs} from 'fs';
 import {sep} from 'path';
 import {SimpleGit, simpleGit} from 'simple-git';
 
@@ -23,6 +23,9 @@ export async function areFoldersGitRepos(paths: string[]) {
 }
 
 export async function isFolderGitRepo(path: string) {
+  if (!existsSync(path)) {
+    return false;
+  }
   const git: SimpleGit = simpleGit({baseDir: path});
 
   try {
