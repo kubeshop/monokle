@@ -104,6 +104,7 @@ export const setRootFolder = createAsyncThunk<
     'git.isFolderGitRepo.result',
     rootFolder
   );
+
   const gitRepo = isFolderGitRepo
     ? await promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolder)
     : undefined;

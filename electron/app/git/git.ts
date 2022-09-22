@@ -33,6 +33,13 @@ export async function isFolderGitRepo(path: string) {
   }
 }
 
+export async function getRemotePath(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  const gitFolderPath = await git.revparse({'--show-toplevel': null});
+  return gitFolderPath;
+}
+
 export async function cloneGitRepo(payload: {localPath: string; repoPath: string}) {
   const {localPath, repoPath} = payload;
   try {

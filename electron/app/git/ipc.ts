@@ -12,6 +12,7 @@ import {
   fetchGitRepo,
   getChangedFiles,
   getCurrentBranch,
+  getRemotePath,
   initGitRepo,
   isFolderGitRepo,
   publishLocalBranch,
@@ -104,4 +105,9 @@ ipcMain.on('git.pushChanges', async (event, payload: {localPath: string; branchN
 ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
   await setRemote(payload.localPath, payload.remoteURL);
   event.sender.send('git.setRemote.result');
+});
+
+ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
+  const result = await getRemotePath(localPath);
+  event.sender.send('git.getRemotePath.result', result);
 });
