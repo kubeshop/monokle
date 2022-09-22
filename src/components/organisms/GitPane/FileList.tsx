@@ -76,17 +76,19 @@ const FileList: React.FC<IProps> = props => {
               <S.FileIcon>
                 <S.FileOutlined $type={item.status} />
               </S.FileIcon>
-              {item.name}
+              <S.FileName>{item.name}</S.FileName>
               <S.FilePath>{item.path}</S.FilePath>
             </S.FileItemData>
 
-            {hovered?.name === item.name && hovered.path === item.path && (
-              <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
-                <Space onClick={e => e.preventDefault()}>
-                  <Dots />
-                </Space>
-              </Dropdown>
-            )}
+            <S.FileItemOperations>
+              {hovered?.name === item.name && hovered?.path === item.path && (
+                <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
+                  <Space onClick={e => e.preventDefault()}>
+                    <Dots />
+                  </Space>
+                </Dropdown>
+              )}
+            </S.FileItemOperations>
           </S.FileItem>
         </List.Item>
       )}

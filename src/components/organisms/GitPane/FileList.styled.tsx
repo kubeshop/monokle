@@ -17,10 +17,11 @@ export const FileItem = styled.div`
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  width: 100%;
+  width: 95%;
 `;
 
 export const FileItemData = styled.div`
+  width: 90%;
   display: flex;
   align-items: center;
   color: ${Colors.blue10};
@@ -30,10 +31,26 @@ export const FileOutlined = styled(RawFileOutlined)<{$type: 'staged' | 'unstaged
   color: ${({$type}) => ($type === 'staged' ? Colors.grey9 : Colors.grey7)};
 `;
 
+export const FileName = styled.div`
+  max-width: 60%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 export const FilePath = styled.div`
+  max-width: 40%;
   color: ${Colors.grey7};
   margin-left: 4px;
   font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+export const FileItemOperations = styled.div`
+  min-width: 5%;
+  max-width: 10%;
 `;
 
 export const List = styled((props: ListProps<GitChangedFile>) => <RawList<GitChangedFile> {...props} />)`
