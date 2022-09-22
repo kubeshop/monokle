@@ -34,8 +34,17 @@ export const ActionsPaneMainContainer = styled.div`
 `;
 
 export const ExtraRightButton = styled(Button)`
+  display: flex;
+  align-items: center;
   padding: 4px 0px;
   margin-left: 10px;
+
+  &:hover {
+    svg {
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      opacity: 0.6;
+    }
+  }
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -60,5 +69,10 @@ export const Tabs = styled(RawTabs)`
 
   & .ant-tabs-content {
     height: 100%;
+  }
+
+  & .ant-tabs-extra-content {
+    display: flex;
+    align-items: center;
   }
 `;

@@ -1,12 +1,13 @@
 import {useMemo, useState} from 'react';
 
-import {SearchOutlined} from '@ant-design/icons';
+import {PlusCircleFilled, SearchOutlined} from '@ant-design/icons';
 
 import {GitBranch} from '@models/git';
 
 import {useAppSelector} from '@redux/hooks';
 
 import * as S from './BranchTable.styled';
+import CreateBranchInput from './CreateBranchInput';
 import {useBranchTable} from './useBranchTable';
 
 const {Option} = S.Select;
@@ -18,8 +19,9 @@ type IProps = {
 const BranchTable: React.FC<IProps> = ({onSelect}) => {
   const branchMap = useAppSelector(state => state.git.repo?.branchMap);
 
-  const [searchFilter, setSearchFilter] = useState<string>('');
   const [branchType, setBranchType] = useState<string>('all');
+  const [creatingBranch, setCreatingBranch] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
 
   const filteredBranches = useMemo(() => {
     if (!branchMap) {
@@ -35,10 +37,7 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
     return branches.filter(branch => branch.name.toLowerCase().includes(searchFilter.toLowerCase()));
   }, [branchMap, branchType, searchFilter]);
 
-  const columns = useBranchTable({
-    branchCount: filteredBranches.length,
-    onSelect,
-  });
+  const columns = useBranchTable({branchCount: filteredBranches.length});
 
   return (
     <S.Container>
@@ -63,6 +62,11 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
       </S.TableFilter>
 
       <S.Table
+        onRow={branch => ({
+          onClick: () => {
+            onSelect(branch);
+          },
+        })}
         rowKey="name"
         columns={columns}
         dataSource={filteredBranches}
@@ -71,6 +75,12 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
         size="small"
         scroll={{y: 350}}
       />
+
+      <S.CreateBranchButton type="link" icon={<PlusCircleFilled />} onClick={() => setCreatingBranch(true)}>
+        Create new branch
+      </S.CreateBranchButton>
+
+      {creatingBranch ? <CreateBranchInput hideCreateBranchInputHandler={() => setCreatingBranch(false)} /> : null}
     </S.Container>
   );
 };

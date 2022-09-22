@@ -26,6 +26,7 @@ import {
   SeverityLow,
   SeverityMedium,
   Shortcuts,
+  SplitView,
   Terminal,
   Validation,
   Warning,
@@ -66,6 +67,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'k8s-schema': K8sSchema,
   search: Search,
   terminal: Terminal,
+  'split-view': SplitView,
 };
 
 const Icon: React.FC<IconProps> = props => {

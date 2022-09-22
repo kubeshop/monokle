@@ -11,6 +11,7 @@ import {BookOutlined} from '@ant-design/icons';
 import {HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
+  EditWithFormTooltip,
   OpenExternalDocumentationTooltip,
   OpenHelmChartDocumentationTooltip,
   OpenKustomizeDocumentationTooltip,
@@ -20,6 +21,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
+import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
@@ -49,7 +51,7 @@ import {
   Walkthrough,
 } from '@molecules';
 
-import {TabHeader} from '@atoms';
+import {Icon, TabHeader} from '@atoms';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -316,15 +318,22 @@ const ActionsPane: React.FC<Props> = ({height}) => {
               onChange={k => setActiveTabKey(k)}
               tabBarExtraContent={
                 selectedResource && resourceKindHandler?.helpLink ? (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
-                    <S.ExtraRightButton
-                      onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
-                      type="link"
-                      ref={extraButton}
-                    >
-                      {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
-                    </S.ExtraRightButton>
-                  </Tooltip>
+                  <>
+                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
+                      <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
+                        <Icon name="split-view" />
+                      </S.ExtraRightButton>
+                    </Tooltip>
+                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                      <S.ExtraRightButton
+                        onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                        type="link"
+                        ref={extraButton}
+                      >
+                        <BookOutlined />
+                      </S.ExtraRightButton>
+                    </Tooltip>
+                  </>
                 ) : isKustomization ? (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
                     <S.ExtraRightButton

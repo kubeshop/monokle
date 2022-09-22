@@ -8,20 +8,19 @@ import {GitBranch} from '@models/git';
 
 import Colors from '@styles/Colors';
 
-import {NameCell} from './BranchCell';
+import BranchCell from './BranchCell';
 
 type Props = {
   branchCount: number;
-  onSelect: (branch: GitBranch) => void;
 };
 
-export function useBranchTable({branchCount, onSelect}: Props) {
+export function useBranchTable({branchCount}: Props) {
   const columns: ColumnsType<GitBranch> = useMemo(() => {
     return [
       {
         key: 'name',
         title: <PrimaryTitle>{branchCount} Active Branches</PrimaryTitle>,
-        render: (_, branch) => <NameCell onSelect={onSelect} branch={branch} />,
+        render: (_, branch) => <BranchCell branch={branch} />,
       },
       // {
       //   key: 'view',
@@ -30,7 +29,7 @@ export function useBranchTable({branchCount, onSelect}: Props) {
       //   width: 160,
       // },
     ];
-  }, [branchCount, onSelect]);
+  }, [branchCount]);
 
   return columns;
 }

@@ -13,12 +13,14 @@ export const AutoLoadLastProjectTooltip = 'Load last project when starting Monok
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
+export const EditWithFormTooltip = 'Edit resource with form';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const CollapseTreeTooltip = 'Collapse all folders';
+export const CommitTooltip = 'Commit to the main branch';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DocumentationTooltip = 'Open Monokle Documentation Website';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
