@@ -6,6 +6,8 @@ import {useForm} from 'antd/lib/form/Form';
 import {existsSync} from 'fs';
 import _ from 'lodash';
 
+import {DEFAULT_GIT_REPO_PLACEHOLDER} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 
@@ -29,7 +31,6 @@ const GitCloneModal = (props: Props) => {
   const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
   const [formValues, setFormValues] = useState({repoPath: '', localPath: pickedPath});
-  const repoPathPlaceholder = 'https://github.com/kubeshop/monokle/';
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -44,20 +45,6 @@ const GitCloneModal = (props: Props) => {
 
   const onOk = async () => {
     if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
-
-    const pathExists = existsSync(pickedPath || formValues.localPath);
-    if (pathExists) {
-      gitForm.setFields([
-        {
-          name: 'localPath',
-          value: pickedPath || formValues.localPath,
-          errors: ['Path exists! Please provider a path to empty folder'],
-        },
-      ]);
-
-      return;
-    }
-
     setIsCloning(true);
     promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
       localPath: pickedPath,
@@ -124,7 +111,7 @@ const GitCloneModal = (props: Props) => {
             },
           ]}
         >
-          <Input placeholder={repoPathPlaceholder} />
+          <Input placeholder={DEFAULT_GIT_REPO_PLACEHOLDER} />
         </Form.Item>
 
         <Form.Item label="Location" required tooltip="The local path where your project will live.">
@@ -137,6 +124,19 @@ const GitCloneModal = (props: Props) => {
                   required: true,
                   message: 'Please provide your local path!',
                 },
+                ({getFieldValue}) => ({
+                  validator: () => {
+                    return new Promise((resolve: (value?: any) => void, reject) => {
+                      const pathExists = existsSync(getFieldValue('localPath'));
+
+                      if (pathExists) {
+                        reject(new Error('Path exists! Please provider a path to empty folder'));
+                      }
+
+                      resolve();
+                    });
+                  },
+                }),
               ]}
             >
               <Input style={{width: 'calc(100% - 100px)'}} />
