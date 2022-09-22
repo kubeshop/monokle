@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 
-import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
+import AntdIcon, {ExclamationCircleOutlined, FileSyncOutlined} from '@ant-design/icons';
 
 import {IconNames} from '@models/icons';
 
@@ -68,6 +68,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   search: Search,
   terminal: Terminal,
   'split-view': SplitView,
+  crds: FileSyncOutlined,
 };
 
 const Icon: React.FC<IconProps> = props => {

@@ -59,7 +59,9 @@ export type LeftMenuSelectionType =
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
-  | 'search';
+  | 'search'
+  | 'crds';
+
 export type LeftMenuBottomSelectionType = 'terminal' | null;
 export type RightMenuSelectionType = 'logs' | 'graph';
 

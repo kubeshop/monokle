@@ -26,6 +26,7 @@ const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
 const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
+const CrdsPane = React.lazy(() => import('@organisms/CrdsPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -71,6 +72,7 @@ const PaneManagerSplitView: React.FC = () => {
               {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
               {leftActiveMenu === 'validation-pane' && <ValidationPane height={paneHeight} />}
               {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
+              {leftActiveMenu === 'crds' && <CrdsPane />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>
@@ -91,7 +93,7 @@ const PaneManagerSplitView: React.FC = () => {
         </ReflexElement>
       )}
 
-      {/* react-reflex does not work as intended when you use propagate 
+      {/* react-reflex does not work as intended when you use propagate
             without multiple splitters so set is dynamically. */}
       {leftActiveMenu !== 'git-pane' && <ReflexSplitter propagate={Boolean(leftActiveMenu)} />}
 

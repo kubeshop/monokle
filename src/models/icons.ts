@@ -23,4 +23,5 @@ export type IconNames =
   | 'k8s-schema'
   | 'search'
   | 'terminal'
-  | 'split-view';
+  | 'split-view'
+  | 'crds';

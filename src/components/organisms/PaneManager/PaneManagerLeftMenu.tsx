@@ -283,6 +283,15 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
           </MenuButton>
         </PaneTooltip>
+        <PaneTooltip show={!leftActive || leftMenuSelection !== 'crds'} title="CRDs" placement="right">
+          <MenuButton
+            isSelected={checkIsTabSelected('crds')}
+            isActive={isActive}
+            onClick={() => setLeftActiveMenu('crds')}
+          >
+            <MenuIcon iconName="crds" active={isActive} isSelected={checkIsTabSelected('crds')} />
+          </MenuButton>
+        </PaneTooltip>
       </S.IconsContainer>
 
       <S.IconsContainer>
