@@ -1,4 +1,4 @@
-import {Space} from 'antd';
+import {Modal, Space} from 'antd';
 
 import {GitBranch} from '@models/git';
 
@@ -23,9 +23,16 @@ const BranchCell: React.FC<IProps> = props => {
   const deleteBranch = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
 
-    promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
-      localPath: selectedProjectRootFolder,
-      branchName: branch.name,
+    Modal.confirm({
+      title: `Are you sure you want to delete ${branch.name}`,
+      onOk() {
+        promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
+          localPath: selectedProjectRootFolder,
+          branchName: branch.name,
+        });
+      },
+      onCancel() {},
+      zIndex: 100000,
     });
   };
 
