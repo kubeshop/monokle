@@ -76,6 +76,7 @@ const FileList: React.FC<IProps> = props => {
               <S.FileIcon>
                 <S.FileOutlined $type={item.status} />
               </S.FileIcon>
+              <S.FileStatus $type={!item.modifiedContent ? 'deleted' : !item.originalContent ? 'added' : 'modified'} />
               {item.name}
               <S.FilePath>{item.path}</S.FilePath>
             </S.FileItemData>

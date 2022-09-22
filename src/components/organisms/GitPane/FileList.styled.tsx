@@ -2,6 +2,7 @@ import {ListProps, List as RawList} from 'antd';
 
 import {FileOutlined as RawFileOutlined} from '@ant-design/icons';
 
+import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {GitChangedFile} from '@models/git';
@@ -34,6 +35,22 @@ export const FilePath = styled.div`
   color: ${Colors.grey7};
   margin-left: 4px;
   font-size: 12px;
+`;
+
+export const FileStatus = styled.div<{$type: 'added' | 'deleted' | 'modified'}>`
+  height: 10px;
+  width: 10px;
+  border: ${({$type}) =>
+    `1px solid ${$type === 'added' ? Colors.cyan8 : $type === 'deleted' ? Colors.volcano6 : Colors.yellow7}`};
+  background-color: ${({$type}) =>
+    $type === 'added'
+      ? rgba(Colors.cyan8, 0.3)
+      : $type === 'deleted'
+      ? rgba(Colors.volcano6, 0.3)
+      : rgba(Colors.yellow7, 0.3)};
+  border-radius: 3px;
+  margin-right: 8px;
+  margin-top: 1px;
 `;
 
 export const List = styled((props: ListProps<GitChangedFile>) => <RawList<GitChangedFile> {...props} />)`
