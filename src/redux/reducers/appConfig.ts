@@ -48,6 +48,7 @@ export const setCreateProject = createAsyncThunk('config/setCreateProject', asyn
     'git.isFolderGitRepo.result',
     project.rootFolder
   );
+
   thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
