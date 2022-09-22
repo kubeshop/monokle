@@ -1,7 +1,9 @@
 import {useCallback, useState} from 'react';
 
-import {Checkbox, Dropdown, List, Menu, Space} from 'antd';
+import {Checkbox, Dropdown, List, Menu, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {GitChangedFile} from '@models/git';
 
@@ -76,6 +78,10 @@ const FileList: React.FC<IProps> = props => {
               <S.FileIcon>
                 <S.FileOutlined $type={item.status} />
               </S.FileIcon>
+
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.type.charAt(0).toUpperCase() + item.type.slice(1)}>
+                <S.FileStatus $type={item.type} />
+              </Tooltip>
               {item.name}
               <S.FilePath>{item.path}</S.FilePath>
             </S.FileItemData>
