@@ -130,7 +130,7 @@ const GitCloneModal = (props: Props) => {
                       const pathExists = existsSync(getFieldValue('localPath'));
 
                       if (pathExists) {
-                        reject(new Error('Path exists! Please provider a path to empty folder'));
+                        reject(new Error('Path exists! Please provide a path to empty folder'));
                       }
 
                       resolve();
