@@ -8,6 +8,8 @@ export const Badge = styled(RawBadge)`
   & .ant-badge-count {
     top: 4px;
     right: 0px;
+    z-index: 100;
+    padding: 0px 4px;
   }
 
   & .ant-badge-count-sm {
