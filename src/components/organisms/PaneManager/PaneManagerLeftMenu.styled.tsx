@@ -5,9 +5,16 @@ import styled from 'styled-components';
 import {BackgroundColors, PanelColors} from '@styles/Colors';
 
 export const Badge = styled(RawBadge)`
-  & .ant-badge-dot {
-    top: 3px;
-    right: 3px;
+  & .ant-badge-count {
+    top: 4px;
+    right: 0px;
+  }
+
+  & .ant-badge-count-sm {
+    min-width: 12px;
+    height: 12px;
+    font-size: 8px;
+    line-height: 11px;
   }
 `;
 

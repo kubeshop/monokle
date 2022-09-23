@@ -14,23 +14,31 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 
 import * as S from './GitView.styled';
 
-const GitView: React.FC = () => {
-  const selectedItem = useAppSelector(state => state.git.selectedItem);
+const options = {
+  readOnly: false,
+  renderSideBySide: true,
+  minimap: {
+    enabled: false,
+  },
+};
+
+type IProps = {
+  height: number;
+};
+
+const GitView: React.FC<IProps> = props => {
+  const {height} = props;
+
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const selectedItem = useAppSelector(state => state.git.selectedItem);
+
   const [selected, setSelectedItem] = useState(selectedItem);
+
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
-  const options = {
-    readOnly: false,
-    renderSideBySide: true,
-    minimap: {
-      enabled: false,
-    },
-  };
 
   useEffect(() => {
     const itemToUpdate = changedFiles.find(searchItem => searchItem.name === selectedItem?.name);
     setSelectedItem(itemToUpdate);
-    // setSelectedItem(selectedItem);
   }, [changedFiles, selectedItem]);
 
   return (
@@ -58,7 +66,8 @@ const GitView: React.FC = () => {
           )}
         </S.GitChangedFile>
       </S.GitFileBar>
-      <S.MonacoDiffContainer width="100%" ref={containerRef}>
+
+      <S.MonacoDiffContainer ref={containerRef} $height={height - 84}>
         {!isEmpty(selected) && (
           <MonacoDiffEditor
             width={containerWidth}
