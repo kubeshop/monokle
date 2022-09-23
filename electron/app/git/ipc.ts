@@ -44,8 +44,8 @@ ipcMain.on('git.fetchGitRepo', async (event, localPath: string) => {
 });
 
 ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; branchName: string}) => {
-  await checkoutGitBranch(payload);
-  event.sender.send('git.checkoutGitBranch.result');
+  const result = await checkoutGitBranch(payload);
+  event.sender.send('git.checkoutGitBranch.result', result);
 });
 
 ipcMain.on('git.initGitRepo', async (event, localPath: string) => {
