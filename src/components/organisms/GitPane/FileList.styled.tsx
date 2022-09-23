@@ -21,18 +21,20 @@ export const FileItem = styled.div`
   width: 100%;
 `;
 
-export const FileItemData = styled.div`
+export const FileItemData = styled.div<{$isSelected: boolean}>`
   display: flex;
   align-items: center;
-  color: ${Colors.blue10};
+  color: ${({$isSelected}) => ($isSelected ? Colors.blackPure : Colors.blue10)};
+  font-weight: 500;
 `;
 
-export const FileOutlined = styled(RawFileOutlined)<{$type: 'staged' | 'unstaged'}>`
-  color: ${({$type}) => ($type === 'staged' ? Colors.grey9 : Colors.grey7)};
+export const FileOutlined = styled(RawFileOutlined)<{$isSelected: boolean; $type: 'staged' | 'unstaged'}>`
+  color: ${({$isSelected, $type}) =>
+    $isSelected ? Colors.blackPure : $type === 'staged' ? Colors.grey9 : Colors.grey7};
 `;
 
-export const FilePath = styled.div`
-  color: ${Colors.grey7};
+export const FilePath = styled.div<{$isSelected: boolean}>`
+  color: ${({$isSelected}) => ($isSelected ? Colors.grey6 : Colors.grey7)};
   margin-left: 4px;
   font-size: 12px;
 `;
