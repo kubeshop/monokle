@@ -20,6 +20,7 @@ import RemoteInput from './RemoteInput';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const gitRepo = useAppSelector(state => state.git.repo);
   const hasRemoteRepo = useAppSelector(state => state.git.repo?.hasRemoteRepo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
@@ -164,7 +165,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
         <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>
       )}
 
-      <BottomActions />
+      {gitRepo ? <BottomActions /> : null}
     </S.GitPaneContainer>
   );
 };
