@@ -75,14 +75,14 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     if (type === 'stage') {
       await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedUnstagedFiles.map(item => item.path),
+        filePaths: selectedUnstagedFiles.map(item => item.gitPath),
       });
 
       setSelectedUnstagedFiles([]);
     } else {
       await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedStagedFiles.map(item => item.path),
+        filePaths: selectedStagedFiles.map(item => item.gitPath),
       });
 
       setSelectedStagedFiles([]);
@@ -100,61 +100,61 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     setUnstagedFiles(changedFiles.filter(file => file.status === 'unstaged'));
   }, [changedFiles]);
 
-  if (!changedFiles.length) {
-    return <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>;
-  }
-
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBar title="Commit" closable />
+      {changedFiles.length ? (
+        <>
+          <TitleBar title="Commit" closable />
 
-      {!hasRemoteRepo ? <RemoteInput /> : null}
+          {!hasRemoteRepo ? <RemoteInput /> : null}
 
-      <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
-        <S.CheckboxWrapper>
-          <Checkbox
-            onChange={handleSelectAll}
-            checked={selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length}
-          >
-            <S.ChangeList>
-              Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
-            </S.ChangeList>
-          </Checkbox>
-        </S.CheckboxWrapper>
-
-        {stagedFiles.length ? (
-          <S.StagedFilesContainer>
-            <S.CheckboxWrapper>
-              <Checkbox onChange={handleSelectStagedFiles} checked={selectedStagedFiles.length === stagedFiles.length}>
-                <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
-              </Checkbox>
-            </S.CheckboxWrapper>
-            <FileList
-              files={stagedFiles}
-              selectedFiles={selectedStagedFiles}
-              handleSelect={(e, item) => handleSelect(e, item)}
-            />
-
-            {selectedStagedFiles.length ? (
-              <S.StageUnstageSelectedButton
-                loading={loading}
-                type="primary"
-                onClick={() => {
-                  handleStageUnstageSelectedFiles('unstage');
-                }}
-              >
-                Unstage selected
-              </S.StageUnstageSelectedButton>
-            ) : null}
-          </S.StagedFilesContainer>
-        ) : null}
-
-        {unstagedFiles.length ? (
-          <>
+          <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
             <S.CheckboxWrapper>
               <Checkbox
+                onChange={handleSelectAll}
+                checked={selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length}
+              >
+                <S.ChangeList>
+                  Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
+                </S.ChangeList>
+              </Checkbox>
+            </S.CheckboxWrapper>
+
+            {stagedFiles.length ? (
+              <S.StagedFilesContainer>
+                <S.CheckboxWrapper>
+                  <Checkbox
+                    onChange={handleSelectStagedFiles}
+                    checked={selectedStagedFiles.length === stagedFiles.length}
+                  >
+                    <S.StagedUnstagedLabel>STAGED</S.StagedUnstagedLabel>
+                  </Checkbox>
+                </S.CheckboxWrapper>
+                <FileList
+                  files={stagedFiles}
+                  selectedFiles={selectedStagedFiles}
+                  handleSelect={(e, item) => handleSelect(e, item)}
+                />
+
+                {selectedStagedFiles.length ? (
+                  <S.StageUnstageSelectedButton
+                    loading={loading}
+                    type="primary"
+                    onClick={() => {
+                      handleStageUnstageSelectedFiles('unstage');
+                    }}
+                  >
+                    Unstage selected
+                  </S.StageUnstageSelectedButton>
+                ) : null}
+              </S.StagedFilesContainer>
+            ) : null}
+
+            <S.CheckboxWrapper>
+              <Checkbox
+                checked={Boolean(unstagedFiles.length && selectedUnstagedFiles.length === unstagedFiles.length)}
+                disabled={Boolean(!unstagedFiles.length)}
                 onChange={handleSelectUnstagedFiles}
-                checked={selectedUnstagedFiles.length === unstagedFiles.length}
               >
                 <S.StagedUnstagedLabel>UNSTAGED</S.StagedUnstagedLabel>
               </Checkbox>
@@ -175,9 +175,11 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
                 Stage selected
               </S.StageUnstageSelectedButton>
             ) : null}
-          </>
-        ) : null}
-      </S.FileContainer>
+          </S.FileContainer>
+        </>
+      ) : (
+        <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>
+      )}
 
       <BottomActions />
     </S.GitPaneContainer>

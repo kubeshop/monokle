@@ -83,6 +83,7 @@ export const GitPaneContainer = styled.div<{$height: number}>`
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `;
 
 export const NoChangedFilesLabel = styled.div`

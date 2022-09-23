@@ -83,6 +83,7 @@ const CommitModal: React.FC<IProps> = props => {
           ]}
         >
           <Input.TextArea
+            autoFocus
             onBlur={() => setIsFocused(false)}
             onFocus={() => setIsFocused(true)}
             autoSize
