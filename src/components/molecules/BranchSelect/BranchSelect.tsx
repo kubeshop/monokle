@@ -1,5 +1,7 @@
 import {useCallback, useState} from 'react';
 
+import {Modal} from 'antd';
+
 import {BranchesOutlined} from '@ant-design/icons';
 
 import {GitBranch} from '@models/git';
@@ -35,9 +37,17 @@ function BranchSelect() {
       promiseFromIpcRenderer('git.checkoutGitBranch', 'git.checkoutGitBranch.result', {
         localPath: rootFolderPath,
         branchName: branch.type === 'local' ? branch.name : branch.name.replace('origin/', ''),
-      }).then(() => {
-        dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
-        setVisible(false);
+      }).then(result => {
+        if (result.error) {
+          Modal.warning({
+            title: 'Checkout not possible',
+            content: <div>Please commit your changes or stash them before you switch branches.</div>,
+            zIndex: 100000,
+          });
+        } else {
+          dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
+          setVisible(false);
+        }
       });
     },
     [rootFolderPath, dispatch]
