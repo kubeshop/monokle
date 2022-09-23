@@ -14,12 +14,14 @@ import {InitializeGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {setRepo} from '@redux/git';
+import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
+import store from '@redux/store';
 
 import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
@@ -105,8 +107,11 @@ const PageHeader = () => {
 
     await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
 
+    monitorGitFolder(projectRootFolder, store);
+
     promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
+      dispatch(setCurrentBranch(result.currentBranch));
       setIsInitializingGitRepo(false);
       dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
     });

@@ -112,8 +112,8 @@ const FileList: React.FC<IProps> = props => {
             <S.FileItemOperations>
               {hovered?.name === item.name && hovered?.path === item.path && (
                 <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
-                  <Space onClick={e => e.preventDefault()}>
-                    <Dots />
+                  <Space onClick={e => e.stopPropagation()}>
+                    <Dots color={selectedGitFile?.gitPath === item.gitPath ? Colors.blackPure : Colors.blue6} />
                   </Space>
                 </Dropdown>
               )}
