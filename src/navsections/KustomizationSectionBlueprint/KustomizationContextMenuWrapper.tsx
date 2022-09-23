@@ -8,6 +8,7 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -39,21 +40,31 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const resource = useMemo(() => resourceMap[itemInstance.id], [itemInstance.id, resourceMap]);
-  const absolutePath = useMemo(() => getAbsoluteFilePath(resource.filePath, fileMap), [fileMap, resource.filePath]);
-  const basename = useMemo(
-    () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
-    [absolutePath, osPlatform]
+  const resource = useMemo(
+    () => resourceMap[itemInstance.id] as K8sResource | undefined,
+    [itemInstance.id, resourceMap]
   );
-  const dirname = useMemo(
-    () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
-    [absolutePath, osPlatform]
+  const absolutePath = useMemo(
+    () => (resource?.filePath ? getAbsoluteFilePath(resource.filePath, fileMap) : undefined),
+    [fileMap, resource?.filePath]
   );
-  const isRoot = useMemo(() => resource.filePath === ROOT_FILE_ENTRY, [resource.filePath]);
+  const basename = useMemo(() => {
+    if (!absolutePath) {
+      return undefined;
+    }
+    return osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath);
+  }, [absolutePath, osPlatform]);
+  const dirname = useMemo(() => {
+    if (!absolutePath) {
+      return undefined;
+    }
+    return osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath);
+  }, [absolutePath, osPlatform]);
+  const isRoot = useMemo(() => resource?.filePath === ROOT_FILE_ENTRY, [resource?.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const target = useMemo(
-    () => (isRoot ? ROOT_FILE_ENTRY : resource.filePath.replace(path.sep, '')),
-    [isRoot, resource.filePath]
+    () => (isRoot ? ROOT_FILE_ENTRY : resource?.filePath.replace(path.sep, '')),
+    [isRoot, resource?.filePath]
   );
 
   const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
@@ -89,15 +100,15 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     {
       key: 'filter_on_this_file',
       label:
-        fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter
+        fileOrFolderContainedInFilter && resource?.filePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
           : 'Filter on this file',
       disabled: true,
       onClick: () => {
-        if (isRoot || (fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter)) {
+        if (isRoot || (fileOrFolderContainedInFilter && resource?.filePath === fileOrFolderContainedInFilter)) {
           onFilterByFileOrFolder(undefined);
         } else {
-          onFilterByFileOrFolder(resource.filePath);
+          onFilterByFileOrFolder(resource?.filePath);
         }
       },
     },
@@ -106,6 +117,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       label: 'Add to Files: Exclude',
       disabled: isInPreviewMode,
       onClick: () => {
+        if (!resource) {
+          return;
+        }
         onExcludeFromProcessing(resource.filePath);
       },
     },
@@ -114,6 +128,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       key: 'copy_full_path',
       label: 'Copy Path',
       onClick: () => {
+        if (!absolutePath) {
+          return;
+        }
         navigator.clipboard.writeText(absolutePath);
       },
     },
@@ -121,6 +138,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       key: 'copy_relative_path',
       label: 'Copy Relative Path',
       onClick: () => {
+        if (!resource) {
+          return;
+        }
         navigator.clipboard.writeText(resource.filePath);
       },
     },
@@ -130,6 +150,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       label: 'Duplicate',
       disabled: isInPreviewMode,
       onClick: () => {
+        if (!absolutePath || !basename || !dirname) {
+          return;
+        }
         onDuplicate(absolutePath, basename, dirname);
       },
     },
@@ -138,6 +161,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       label: 'Rename',
       disabled: isInPreviewMode,
       onClick: () => {
+        if (!absolutePath) {
+          return;
+        }
         onRename(absolutePath, osPlatform);
       },
     },
@@ -150,6 +176,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
           title: `Are you sure you want to delete "${basename}"?`,
           icon: <ExclamationCircleOutlined />,
           onOk() {
+            if (!absolutePath) {
+              return;
+            }
             deleteEntity(absolutePath, args => dispatchDeleteAlert(dispatch, args));
           },
         });
@@ -160,6 +189,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,
       onClick: () => {
+        if (!absolutePath) {
+          return;
+        }
         showItemInFolder(absolutePath);
       },
     },
