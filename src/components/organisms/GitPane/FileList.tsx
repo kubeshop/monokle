@@ -104,7 +104,9 @@ const FileList: React.FC<IProps> = props => {
                 <S.FileStatus $type={item.type} />
               </Tooltip>
               <S.FileName>{item.name}</S.FileName>
-              <S.FilePath $isSelected={selectedGitFile?.gitPath === item.gitPath}>{item.path}</S.FilePath>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.path}>
+                <S.FilePath $isSelected={selectedGitFile?.gitPath === item.gitPath}>{item.path}</S.FilePath>
+              </Tooltip>
             </S.FileItemData>
 
             <S.FileItemOperations>

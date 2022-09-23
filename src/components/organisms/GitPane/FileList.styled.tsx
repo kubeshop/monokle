@@ -29,6 +29,13 @@ export const FileItemData = styled.div<{$isSelected: boolean}>`
   font-weight: 500;
 `;
 
+export const FileName = styled.div`
+  max-width: 60%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 export const FileOutlined = styled(RawFileOutlined)<{$isSelected: boolean; $type: 'staged' | 'unstaged'}>`
   color: ${({$isSelected, $type}) =>
     $isSelected ? Colors.blackPure : $type === 'staged' ? Colors.grey9 : Colors.grey7};
@@ -36,15 +43,7 @@ export const FileOutlined = styled(RawFileOutlined)<{$isSelected: boolean; $type
 
 export const FilePath = styled.div<{$isSelected: boolean}>`
   color: ${({$isSelected}) => ($isSelected ? Colors.grey6 : Colors.grey7)};
-  max-width: 60%;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-export const FilePath = styled.div`
   max-width: 40%;
-  color: ${Colors.grey7};
   margin-left: 4px;
   font-size: 12px;
   text-overflow: ellipsis;
