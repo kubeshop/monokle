@@ -10,6 +10,7 @@ export const ChangeList = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0px 14px 15px 14px;
 `;
 
 export const ChangeListStatus = styled.div`
@@ -18,8 +19,7 @@ export const ChangeListStatus = styled.div`
 `;
 
 export const CheckboxWrapper = styled.div`
-  margin-left: 14px;
-  margin-bottom: 15px;
+  margin: 0px 14px 15px 14px;
 `;
 
 export const DropdownActions = styled.div`

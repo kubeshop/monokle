@@ -43,16 +43,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     }
   };
 
-  const handleSelectAll = () => {
-    if (selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length) {
-      setSelectedStagedFiles([]);
-      setSelectedUnstagedFiles([]);
-    } else {
-      setSelectedStagedFiles(stagedFiles);
-      setSelectedUnstagedFiles(unstagedFiles);
-    }
-  };
-
   const handleSelectStagedFiles = () => {
     if (selectedStagedFiles.length === stagedFiles.length) {
       setSelectedStagedFiles([]);
@@ -104,21 +94,14 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     <S.GitPaneContainer id="GitPane" $height={height}>
       {changedFiles.length ? (
         <>
-          <TitleBar title="Commit" closable />
+          <TitleBar title="Git" closable />
 
           {!hasRemoteRepo ? <RemoteInput /> : null}
 
           <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
-            <S.CheckboxWrapper>
-              <Checkbox
-                onChange={handleSelectAll}
-                checked={selectedStagedFiles.length + selectedUnstagedFiles.length === changedFiles.length}
-              >
-                <S.ChangeList>
-                  Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
-                </S.ChangeList>
-              </Checkbox>
-            </S.CheckboxWrapper>
+            <S.ChangeList>
+              Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
+            </S.ChangeList>
 
             {stagedFiles.length ? (
               <S.StagedFilesContainer>
