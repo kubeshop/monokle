@@ -1,6 +1,7 @@
 // import {Button, Skeleton, Tabs as RawTabs} from 'antd';
 import styled from 'styled-components';
 
+import {AppBorders} from '@styles/Borders';
 import Colors from '@styles/Colors';
 
 export const GitPaneContainer = styled.div`
@@ -15,22 +16,8 @@ export const GitPaneMainContainer = styled.div`
   flex-direction: column;
 `;
 
-export const MonacoDiffContainer = styled.div<{width: string}>`
-  ${props => `
-    width: ${props.width};
-  `}
-
-  height: 100%;
-
-  & .monaco-editor .monaco-editor-background {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .monaco-editor .margin {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .diffOverview {
-    background-color: ${Colors.grey1000} !important;
-  }
+export const MonacoDiffContainer = styled.div<{$height: number}>`
+  height: ${({$height}) => `${$height}px`};
 `;
 
 export const EmptyStateContainer = styled.div`
@@ -56,6 +43,7 @@ export const GitEmptyImage = styled.img`
 export const GitFileBar = styled.div`
   display: flex;
   width: 100%;
+  border-bottom: ${AppBorders.sectionDivider};
 `;
 
 export const GitRefFile = styled.div`
