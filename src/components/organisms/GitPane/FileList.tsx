@@ -3,15 +3,13 @@ import {useCallback, useState} from 'react';
 import {Checkbox, Dropdown, List, Menu, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {sep} from 'path';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {GitChangedFile} from '@models/git';
 
 import {setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {clearSelectedPath, selectFile} from '@redux/reducers/main';
 
 import {Dots} from '@components/atoms';
 
@@ -31,7 +29,9 @@ const FileList: React.FC<IProps> = props => {
   const {files, selectedFiles, handleSelect} = props;
 
   const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedGitFile = useAppSelector(state => state.git.selectedItem);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [hovered, setHovered] = useState<GitChangedFile | null>(null);
@@ -64,10 +64,14 @@ const FileList: React.FC<IProps> = props => {
   );
 
   const selectItemHandler = (item: GitChangedFile) => {
-    dispatch(setSelectedItem(item));
+    if (selectedGitFile?.gitPath !== item.gitPath) {
+      dispatch(setSelectedItem(item));
+    }
 
-    if (item.modifiedContent) {
-      dispatch(selectFile({filePath: `${sep}${item.gitPath.replaceAll('/', sep)}`}));
+    if (item.modifiedContent && fileMap[item.path]) {
+      dispatch(selectFile({filePath: item.path}));
+    } else if (selectedPath) {
+      dispatch(clearSelectedPath());
     }
   };
 
@@ -105,7 +109,7 @@ const FileList: React.FC<IProps> = props => {
               </Tooltip>
               <S.FileName>{item.name}</S.FileName>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.path}>
-                <S.FilePath $isSelected={selectedGitFile?.gitPath === item.gitPath}>{item.path}</S.FilePath>
+                <S.FilePath $isSelected={selectedGitFile?.gitPath === item.gitPath}>{item.displayPath}</S.FilePath>
               </Tooltip>
             </S.FileItemData>
 

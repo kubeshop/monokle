@@ -30,9 +30,9 @@ export function formatGitChangedFiles(
       modifiedContent = fs.readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
     }
 
-    const relativePath = path.dirname(
-      path.join(gitFolderPath, gitFile.path).replace(`${projectFolderPath}${path.sep}`, '')
-    );
+    const fullGitPath = path.join(gitFolderPath, gitFile.path);
+
+    const relativePath = path.dirname(fullGitPath.replace(`${projectFolderPath}${path.sep}`, ''));
     const filePath = relativePath === '.' ? '' : relativePath;
 
     return {
@@ -44,10 +44,11 @@ export function formatGitChangedFiles(
           : 'staged',
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
-      gitPath: gitFile.path,
-      path: path.join(gitFolderPath, gitFile.path).startsWith(projectFolderPath)
+      gitPath: fullGitPath,
+      path: fullGitPath.replace(projectFolderPath, ''),
+      showingPath: path.join(gitFolderPath, gitFile.path).startsWith(projectFolderPath)
         ? filePath
-        : path.join(gitFolderPath, filePath),
+        : path.join(gitFolderPath, gitFile.path),
       originalContent: '',
       type: fileType,
     };

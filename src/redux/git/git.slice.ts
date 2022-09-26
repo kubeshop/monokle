@@ -43,6 +43,7 @@ export const gitSlice = createSlice({
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.repo = action.payload.gitRepo;
       state.changedFiles = action.payload.gitChangedFiles;
+      state.selectedItem = undefined;
     });
   },
 });

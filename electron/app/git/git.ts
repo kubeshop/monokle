@@ -163,17 +163,13 @@ export async function getCurrentBranch(localPath: string) {
 export async function stageChangedFiles(localPath: string, filePaths: string[]) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
-  const absoluteFilePaths = filePaths.map(filePath => `${localPath}${sep}${filePath.replaceAll('/', sep)}`);
-
-  await git.add(absoluteFilePaths);
+  await git.add(filePaths);
 }
 
 export async function unstageFiles(localPath: string, filePaths: string[]) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
-  const absoluteFilePaths = filePaths.map(filePath => `${localPath}${sep}${filePath.replaceAll('/', sep)}`);
-
-  const unstageProperties = absoluteFilePaths.reduce((prev, current) => {
+  const unstageProperties = filePaths.reduce((prev, current) => {
     return {...prev, [current]: null};
   }, {} as any);
 
