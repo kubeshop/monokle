@@ -1,3 +1,5 @@
+import {Input} from 'antd';
+
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -13,4 +15,12 @@ export const List = styled.ol`
   padding-bottom: 20px;
   overflow-y: auto;
   margin: 0;
+`;
+
+export const RegisterContainer = styled.div`
+  padding: 24px;
+`;
+
+export const RegisterInput = styled(Input)`
+  margin-bottom: 8px;
 `;
