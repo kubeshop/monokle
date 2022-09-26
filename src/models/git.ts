@@ -17,6 +17,7 @@ export type GitChangedFile = {
   originalContent: string;
   gitPath: string;
   path: string;
+  showingPath: string;
   status: 'staged' | 'unstaged';
   type: 'added' | 'deleted' | 'modified' | 'untracked';
 };

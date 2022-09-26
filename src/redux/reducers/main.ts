@@ -723,6 +723,9 @@ export const mainSlice = createSlice({
       state.selectedValuesFileId = undefined;
       state.selectedImage = undefined;
     },
+    clearSelectedPath: (state: Draft<AppState>) => {
+      state.selectedPath = undefined;
+    },
     toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       const enable = action.payload;
       const plugin = state.policies.plugins[0];
@@ -1357,6 +1360,7 @@ export const {
   clearPreview,
   clearPreviewAndSelectionHistory,
   clearSelected,
+  clearSelectedPath,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
   deleteFilterPreset,
