@@ -284,7 +284,7 @@ const ProjectSelection = () => {
           placement="bottomRight"
           trigger={['click']}
           open={isDropdownMenuVisible}
-          onVisibleChange={onDropdownVisibleChange}
+          onOpenChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">

@@ -216,7 +216,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                   trigger={['click']}
                   disabled={isPreviewLoading || isInPreviewMode}
                   open={isClusterDropdownOpen}
-                  onVisibleChange={setIsClusterDropdownOpen}
+                  onOpenChange={setIsClusterDropdownOpen}
                 >
                   <S.ClusterButton type="link" ref={dropdownButtonRef} size="small">
                     <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>

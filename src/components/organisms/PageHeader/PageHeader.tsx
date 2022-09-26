@@ -235,7 +235,7 @@ const PageHeader = () => {
 
           <Dropdown
             open={isHelpMenuOpen}
-            onVisibleChange={() => {
+            onOpenChange={() => {
               setIsHelpMenuOpen(!isHelpMenuOpen);
             }}
             overlay={

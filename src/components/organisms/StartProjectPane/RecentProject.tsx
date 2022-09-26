@@ -73,7 +73,7 @@ const RecentProject: React.FC<RecentProjectProps> = ({project, isActive, onProje
         <Tooltip
           mouseEnterDelay={TOOLTIP_DELAY}
           open={isTooltipMessageVisible}
-          onVisibleChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
+          onOpenChange={() => setIsTooltipMessageVisible(!isTooltipMessageVisible)}
           title={project.isPinned ? 'Unpin this project from the top' : 'Pin this project to the top'}
         >
           {project.isPinned ? (

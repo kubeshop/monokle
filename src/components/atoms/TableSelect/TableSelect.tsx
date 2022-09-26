@@ -21,7 +21,7 @@ function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableT
   return (
     <Dropdown
       open={tableVisible}
-      onVisibleChange={onTableToggle}
+      onOpenChange={onTableToggle}
       overlay={table}
       placement={tablePlacement}
       arrow

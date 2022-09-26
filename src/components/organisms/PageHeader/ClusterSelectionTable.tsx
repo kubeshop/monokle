@@ -280,7 +280,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }
                   trigger="click"
                   zIndex={1500}
-                  onVisibleChange={visible => {
+                  onOpenChange={visible => {
                     if (!visible) {
                       setChangeClusterColor('');
                     }
