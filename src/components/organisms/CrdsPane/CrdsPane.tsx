@@ -1,5 +1,7 @@
 import {useMemo} from 'react';
 
+import {Button, Input} from 'antd';
+
 import {useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors';
 
@@ -12,6 +14,10 @@ const CrdsPane: React.FC = () => {
   return (
     <div>
       <TitleBar title="Custom Resource Definitions" closable />
+      <p>Register CRD</p>
+      <Input placeholder="Enter URL of CRD" />
+      <Button type="primary">Register</Button>
+
       <ul>
         {crdKindHandlers.map(c => (
           <li>
