@@ -76,6 +76,7 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         thunkAPI.getState().config.selectedProjectRootFolder
       ).then(isGitRepo => {
         if (!isGitRepo && thunkAPI.getState().git.repo) {
+          thunkAPI.dispatch(setChangedFiles([]));
           thunkAPI.dispatch(setRepo(undefined));
           thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
         }
