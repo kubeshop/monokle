@@ -46,7 +46,7 @@ export function formatGitChangedFiles(
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
       gitPath: fullGitPath,
       path: fullGitPath.replace(projectFolderPath, ''),
-      showingPath: path.join(gitFolderPath, gitFile.path).startsWith(projectFolderPath)
+      displayPath: path.join(gitFolderPath, gitFile.path).startsWith(projectFolderPath)
         ? filePath
         : path.join(gitFolderPath, gitFile.path),
       originalContent: '',
