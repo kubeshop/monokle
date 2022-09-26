@@ -329,7 +329,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
     <Modal
       className="save-resource"
       title={resourcesIds.length === 1 ? 'Save resource' : `Save resources (${resourcesIds.length})`}
-      visible={isVisible}
+      open={isVisible}
       onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}
       onOk={saveCheckedResourcesToFileFolder}
     >

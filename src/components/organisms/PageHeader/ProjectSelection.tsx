@@ -283,7 +283,7 @@ const ProjectSelection = () => {
           overlay={projectMenu}
           placement="bottomRight"
           trigger={['click']}
-          visible={isDropdownMenuVisible}
+          open={isDropdownMenuVisible}
           onVisibleChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>

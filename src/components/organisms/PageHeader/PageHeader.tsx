@@ -234,7 +234,7 @@ const PageHeader = () => {
           </Tooltip>
 
           <Dropdown
-            visible={isHelpMenuOpen}
+            open={isHelpMenuOpen}
             onVisibleChange={() => {
               setIsHelpMenuOpen(!isHelpMenuOpen);
             }}

@@ -74,7 +74,7 @@ const FiltersPresetModal: React.FC = () => {
   return (
     <Modal
       title={`${uiState?.type === 'load' ? 'Load' : 'Save'} filters preset`}
-      visible={uiState.isOpen}
+      open={uiState.isOpen}
       onCancel={onCancel}
       onOk={onOk}
     >
@@ -84,7 +84,7 @@ const FiltersPresetModal: React.FC = () => {
             <S.Select
               autoFocus
               defaultOpen
-              dropdownClassName="filters-preset-dropdown"
+              popupClassName="filters-preset-dropdown"
               placeholder="Select filter preset"
               showSearch
             >

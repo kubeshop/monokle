@@ -75,7 +75,7 @@ const CreateFileFolderModal: React.FC = () => {
   return (
     <Modal
       title={`Create ${uiState.type}`}
-      visible={uiState.isOpen}
+      open={uiState.isOpen}
       onCancel={() => {
         dispatch(closeCreateFileFolderModal());
       }}

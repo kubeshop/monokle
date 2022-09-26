@@ -64,7 +64,7 @@ const Scale = () => {
           Scale
         </Button>
       </Tooltip>
-      <Modal title="Set number of replicas" visible={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
+      <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>
           <Col span={8}>
             <span>Number of replicas</span>

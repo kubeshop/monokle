@@ -40,7 +40,7 @@ const KeyboardShortcuts = () => {
 
   return (
     <Modal
-      visible={isKeyboardShortcutsVisible}
+      open={isKeyboardShortcutsVisible}
       centered
       width={900}
       onCancel={handleClose}
