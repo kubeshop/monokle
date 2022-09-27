@@ -16,6 +16,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -43,6 +44,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedImage = useAppSelector(state => state.main.selectedImage);
   const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
@@ -201,8 +203,12 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         <S.ButtonContainer>
           {actionsPaneWidth > PANE_CONSTRAINT_VALUES.minEditPane && (
             <>
-              <Scale />
-              <Restart />
+              {isInClusterMode && selectedResource?.kind === 'Deployment' && (
+                <>
+                  <Scale />
+                  <Restart />
+                </>
+              )}
               <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
               <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
             </>
@@ -212,8 +218,13 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>
-                  <Scale />
-                  <Restart />
+                  {isInClusterMode && selectedResource?.kind === 'Deployment' && (
+                    <>
+                      <Scale />
+                      <Restart />
+                    </>
+                  )}
+
                   <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
                   <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
                 </S.DropdownActionContainer>
