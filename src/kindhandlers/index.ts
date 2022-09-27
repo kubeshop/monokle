@@ -186,16 +186,7 @@ async function readBundledCrdKindHandlers() {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
-        const documents = parseAllYamlDocuments(crdContent);
-        documents.forEach(doc => {
-          const crd = doc.toJS({maxAliasCount: -1});
-          if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
-            const kindHandler = extractKindHandler(crd, `kindhandlers${path.sep}handlers`);
-            if (kindHandler) {
-              registerKindHandler(kindHandler, false);
-            }
-          }
-        });
+        registerCrdKindHandlers(crdContent, `kindhandlers${path.sep}handlers`);
       }
     } catch (e) {
       log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
@@ -203,6 +194,19 @@ async function readBundledCrdKindHandlers() {
   }
 
   KindHandlersEventEmitter.emit('loadedKindHandlers');
+}
+
+export function registerCrdKindHandlers(crdContent: string, handlerPath?: string) {
+  const documents = parseAllYamlDocuments(crdContent);
+  documents.forEach(doc => {
+    const crd = doc.toJS({maxAliasCount: -1});
+    if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
+      const kindHandler = extractKindHandler(crd, handlerPath);
+      if (kindHandler) {
+        registerKindHandler(kindHandler, false);
+      }
+    }
+  });
 }
 
 export const awaitKindHandlersLoading = new Promise<void>(resolve => {

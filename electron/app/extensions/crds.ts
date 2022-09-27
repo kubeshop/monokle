@@ -1,7 +1,10 @@
+// import {promises} from 'fs';
 import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
-import {createFolder, deleteFile, doesPathExist, writeFile} from './fileSystem';
+import {registerCrdKindHandlers} from '@src/kindhandlers';
+
+import {createFolder, deleteFile, doesPathExist, getSubfolders, readFiles, writeFile} from './fileSystem';
 
 export async function saveCRD(crdsDir: string, crdContent: string) {
   const doesPluginsDirExist = await doesPathExist(crdsDir);
@@ -36,5 +39,18 @@ export async function saveCRD(crdsDir: string, crdContent: string) {
     }
   } catch {
     console.warn("Couldn't save the CRD because we couldn't parse the content.");
+  }
+}
+
+async function readSavedCrdKindHandlers(crdsDir: string) {
+  const subdirectories = await getSubfolders(crdsDir);
+  for (let i = 0; i < subdirectories.length; i += 1) {
+    const dir = subdirectories[i];
+    // eslint-disable-next-line no-await-in-loop
+    const fileContents = await readFiles(dir);
+    for (let j = 0; j < fileContents.length; j += 1) {
+      const content = fileContents[i];
+      registerCrdKindHandlers(content);
+    }
   }
 }
