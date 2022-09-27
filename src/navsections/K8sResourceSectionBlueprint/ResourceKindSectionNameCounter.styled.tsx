@@ -31,7 +31,8 @@ export const Badge = styled(RawBadge)<{$type: 'error' | 'warning'}>`
   }
 `;
 
-export const Counter = styled.span`
+export const Counter = styled.span<{$isSelected: boolean}>`
   padding: 0 4px 0 8px;
   cursor: pointer;
+  color: ${({$isSelected}) => ($isSelected ? Colors.blackPure : 'inherit')};
 `;
