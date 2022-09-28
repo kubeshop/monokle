@@ -18,6 +18,11 @@ export function doesPathExist(absolutePath: string) {
   }
 }
 
+export function isEmptyDir(dirPath: string) {
+  console.log(fs.readdirSync(dirPath).length, '------ length of files');
+  return fs.readdirSync(dirPath).length === 0;
+}
+
 export function isSubDirectory(parentDir: string, dir: string) {
   const relative = path.relative(parentDir, dir);
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);

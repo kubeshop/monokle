@@ -3,7 +3,6 @@ import {useEffect, useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {existsSync} from 'fs';
 import _ from 'lodash';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER} from '@constants/constants';
@@ -15,6 +14,7 @@ import {FileExplorer} from '@components/atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {isEmptyDir} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 type Props = {
@@ -38,6 +38,7 @@ const GitCloneModal = (props: Props) => {
         setPickedPath(folderPath);
         setFormValues({...formValues});
         setIsEditingRoothPath(false);
+        gitForm.validateFields();
       }
     },
     {isDirectoryExplorer: true}
@@ -71,6 +72,7 @@ const GitCloneModal = (props: Props) => {
     setFormValues({...formValues, localPath: projectsRootPath});
     setIsEditingRoothPath(false);
     setPickedPath(projectsRootPath);
+    gitForm.validateFields();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectsRootPath]);
 
@@ -127,10 +129,10 @@ const GitCloneModal = (props: Props) => {
                 ({getFieldValue}) => ({
                   validator: () => {
                     return new Promise((resolve: (value?: any) => void, reject) => {
-                      const pathExists = existsSync(getFieldValue('localPath'));
+                      const emptyDir = isEmptyDir(getFieldValue('localPath'));
 
-                      if (pathExists) {
-                        reject(new Error('Path exists! Please provide a path to empty folder'));
+                      if (!emptyDir) {
+                        reject(new Error('Folder contains files! Please provide a path to empty folder'));
                       }
 
                       resolve();
