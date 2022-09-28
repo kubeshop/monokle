@@ -69,21 +69,21 @@ async function goToCommit(hash: string) {
 const testData = [
   {
     hash: startCommit,
-    fileExplorerCount: 54,
+    fileExplorerCount: 52,
     kustomizeCount: 13,
     helmCount: 13,
     navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
-    fileExplorerCount: 33,
+    fileExplorerCount: 31,
     kustomizeCount: 6,
     helmCount: 13,
     navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
-    fileExplorerCount: 16,
+    fileExplorerCount: 14,
     kustomizeCount: 3,
     helmCount: 13,
     navigatorCount: 34,
