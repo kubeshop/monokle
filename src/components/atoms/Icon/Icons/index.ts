@@ -1,4 +1,5 @@
 export {default as Collapse} from './Collapse';
+export {default as CRDs} from './CRDs';
 export {default as Helm} from './Helm';
 export {default as Git} from './Git';
 export {default as GitOps} from './GitOps';

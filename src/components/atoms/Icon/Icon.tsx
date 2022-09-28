@@ -1,12 +1,13 @@
 import React, {useMemo} from 'react';
 
-import AntdIcon, {ExclamationCircleOutlined, FileSyncOutlined} from '@ant-design/icons';
+import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {IconNames} from '@models/icons';
 
 import Colors from '@styles/Colors';
 
 import {
+  CRDs,
   Collapse,
   Git,
   GitOps,
@@ -68,7 +69,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   search: Search,
   terminal: Terminal,
   'split-view': SplitView,
-  crds: FileSyncOutlined,
+  crds: CRDs,
 };
 
 const Icon: React.FC<IconProps> = props => {
