@@ -90,7 +90,7 @@ const testData = [
   },
   {
     hash: startCommit,
-    fileExplorerCount: 54,
+    fileExplorerCount: 52,
     kustomizeCount: 13,
     helmCount: 13,
     navigatorCount: 54,
