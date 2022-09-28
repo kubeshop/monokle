@@ -42,6 +42,7 @@ import {
 } from '@redux/services/selection';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
+import {filterGitFolder} from '@utils/git';
 
 import {
   deleteResource,
@@ -202,7 +203,7 @@ export function readFiles(
       )
     );
   } else {
-    files.forEach(file => {
+    filterGitFolder(files).forEach(file => {
       let text;
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
@@ -385,7 +386,7 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
   if (filePath === rootFolder) {
     return fileMap[ROOT_FILE_ENTRY];
   }
-  return filePath.startsWith(rootFolder) ? fileMap[filePath.substr(rootFolder.length)] : undefined;
+  return filePath.startsWith(rootFolder) ? fileMap[filePath.slice(rootFolder.length)] : undefined;
 }
 
 /**
@@ -657,7 +658,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  */
 
 export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
-  const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
+  const parentPath = absolutePath.slice(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {

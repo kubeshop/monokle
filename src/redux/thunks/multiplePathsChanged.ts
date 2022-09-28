@@ -30,14 +30,12 @@ export const multiplePathsChanged = createAsyncThunk(
     });
 
     if (state.git.repo) {
-      const result = await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
         localPath: projectRootFolder,
         fileMap: nextMainState.fileMap,
-      });
-
-      if (result) {
+      }).then(result => {
         thunkAPI.dispatch(setChangedFiles(result));
-      }
+      });
     }
 
     return nextMainState;

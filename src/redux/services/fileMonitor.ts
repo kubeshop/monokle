@@ -3,11 +3,14 @@ import log from 'loglevel';
 
 import {AppDispatch} from '@models/appdispatch';
 
+import {setCurrentBranch, setRepo} from '@redux/git';
 import {multiplePathsRemoved} from '@redux/reducers/main';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 
+import {filterGitFolder} from '@utils/git';
 import {debounceWithPreviousArgs} from '@utils/helpers';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 let watcher: FSWatcher;
 
@@ -32,35 +35,49 @@ export function monitorRootFolder(folder: string, dispatch: AppDispatch) {
       'add',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsAdded(paths));
+        dispatch(multiplePathsAdded(filterGitFolder(paths)));
       }, 1000)
     )
     .on(
       'addDir',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsAdded(paths));
+        dispatch(multiplePathsAdded(filterGitFolder(paths)));
       }, 1000)
     )
     .on(
       'change',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsChanged(paths));
+        dispatch(multiplePathsChanged(filterGitFolder(paths)));
       }, 1000)
     )
     .on(
       'unlink',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsRemoved(paths));
+        dispatch(multiplePathsRemoved(filterGitFolder(paths)));
+
+        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+          if (repo) {
+            dispatch(setRepo(repo));
+            dispatch(setCurrentBranch(repo.currentBranch));
+          }
+        });
       }, 1000)
     )
     .on(
       'unlinkDir',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsRemoved(paths));
+        dispatch(multiplePathsRemoved(filterGitFolder(paths)));
+
+        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+          if (repo) {
+            dispatch(setRepo(repo));
+            dispatch(setCurrentBranch(repo.currentBranch));
+          }
+        });
       }, 1000)
     );
 

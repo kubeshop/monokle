@@ -122,7 +122,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       namePrefix: {
         component: CollapseSectionPrefix,
       },
-      sectionMarginBottom: 12,
       nameSuffix: {
         component: PreviewConfigurationNameSuffix,
         options: {
