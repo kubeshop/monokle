@@ -42,6 +42,7 @@ import {
 } from '@redux/services/selection';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
+import {filterGitFolder} from '@utils/git';
 
 import {
   deleteResource,
@@ -202,7 +203,7 @@ export function readFiles(
       )
     );
   } else {
-    files.forEach(file => {
+    filterGitFolder(files).forEach(file => {
       let text;
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);

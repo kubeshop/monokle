@@ -56,3 +56,7 @@ export function formatGitChangedFiles(
 
   return changedFiles;
 }
+
+export function filterGitFolder(paths: string[]) {
+  return paths.filter(p => p !== '.git' && !p.includes(`${path.sep}.git${path.sep}`) && !p.endsWith('.git'));
+}
