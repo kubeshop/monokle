@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Welcome to Monokle 🧐 - K8s configuration analysis and version control editor!
+  Welcome to Monokle Desktop 🧐 - K8s configuration analysis and version control editor!
 </p>
 
 <p align="center">
@@ -34,8 +34,8 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
-    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Overview" />
-    <p align="center">Click on the image or this link to watch the "Intro to Monokle" short video (3 mins)</p>
+    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Desktop Overview" />
+    <p align="center">Click on the image or this link to watch the "Intro to Monokle Dekstop" short video (3 mins)</p>
   </a>
 </p>
 
@@ -59,7 +59,7 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 <table>
   <tr>
     <td>Windows</td>
-    <td>macOS</td>
+    <td>MacOS</td>
     <td>Linux</td>
   </tr>
   <tr>
