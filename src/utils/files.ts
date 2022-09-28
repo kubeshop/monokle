@@ -19,7 +19,6 @@ export function doesPathExist(absolutePath: string) {
 }
 
 export function isEmptyDir(dirPath: string) {
-  console.log(fs.readdirSync(dirPath).length, '------ length of files');
   return fs.readdirSync(dirPath).length === 0;
 }
 
