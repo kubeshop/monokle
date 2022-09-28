@@ -9,7 +9,6 @@ import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {RootState} from '@models/rootstate';
 
-import {setChangedFiles} from '@redux/git';
 import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -18,7 +17,6 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 export const updateFileEntry = createAsyncThunk(
   'main/updateFileEntry',
@@ -27,7 +25,6 @@ export const updateFileEntry = createAsyncThunk(
     const projectConfig = currentConfigSelector(state);
     const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
-    const projectRootFolderPath = state.config.selectedProjectRootFolder;
 
     let error: any;
 
@@ -117,13 +114,6 @@ export const updateFileEntry = createAsyncThunk(
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
-
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: projectRootFolderPath,
-      fileMap: nextMainState.fileMap,
-    }).then(result => {
-      thunkAPI.dispatch(setChangedFiles(result));
-    });
 
     return nextMainState;
   }

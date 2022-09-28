@@ -385,7 +385,7 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
   if (filePath === rootFolder) {
     return fileMap[ROOT_FILE_ENTRY];
   }
-  return filePath.startsWith(rootFolder) ? fileMap[filePath.substr(rootFolder.length)] : undefined;
+  return filePath.startsWith(rootFolder) ? fileMap[filePath.slice(rootFolder.length)] : undefined;
 }
 
 /**
@@ -657,7 +657,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  */
 
 export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
-  const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
+  const parentPath = absolutePath.slice(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {

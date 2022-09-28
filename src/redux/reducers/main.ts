@@ -32,7 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
-import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
+import {setCurrentBranch, setRepo} from '@redux/git';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -58,6 +58,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
 import {promiseFromIpcRenderer} from '@utils/promises';
+// import {promiseFromIpcRenderer} from '@utils/promises';
 import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
@@ -351,15 +352,6 @@ export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkAp
     if (repo) {
       thunkAPI.dispatch(setRepo(repo));
       thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
-
-      const result = await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: projectRootFolder,
-        fileMap: nextMainState.fileMap,
-      });
-
-      if (result) {
-        thunkAPI.dispatch(setChangedFiles(result));
-      }
     }
 
     return nextMainState;
