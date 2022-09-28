@@ -96,7 +96,14 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 There is a lot of functionality currently being considered:
 
-https://app.zenhub.com/workspaces/monokle-620a8eb717b2fa0010645831/roadmap?invite=true
+- A new streamlined interface that works better for git flows and complex configuration scenarios, where congnitive load is high
+- Additional work on the git and gitops flows, including conflict management and pull request creation
+- Better CRD management
+- A CLI
+- Remote management
+- Drift analysis
+- Integration to other open source projects around K8s
+- Advanced creator mode
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
 
