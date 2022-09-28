@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Welcome to Monokle 🧐 - your friendly desktop UI for managing k8s manifests!
+  Welcome to Monokle Desktop 🧐 - K8s configuration analysis and version control editor!
 </p>
 
 <p align="center">
@@ -34,19 +34,21 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
-    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Overview" />
-    <p align="center">Click on the image or this link to watch the "Intro to Monokle" short video (3 mins)</p>
+    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Desktop Overview" />
+    <p align="center">Click on the image or this link to watch the "Intro to Monokle Dekstop" short video (3 mins)</p>
   </a>
 </p>
 
 ## Core Features
 
 - ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
+- 📇 Leverage Git to manage the lifecycle of your configuration
 - ✅ Validate resources using OPA policy rules
-- 🖊️ Easily edit resources without having to learn or look up yaml syntax
+- 🖊️ Easily edit resources without having to learn or look up yaml syntax and see the changes applied
 - 🔨 Refactor resources with maintained integrity of names and references
 - 📷 Preview and debug resources generated with kustomize or helm
-- 🤝 Diff resources against your cluster and apply changes immediately
+- ➕ Visualize extended resources defined in CRD
+- 🤝 Compare resource versions against your cluster and apply changes immediately or through pull requests
 - 📚 Create multi-step forms using Monokle's templating system to quickly generate manifests
 - 💡 And much more, check out the [Documentation](https://kubeshop.github.io/monokle/)
 
@@ -57,7 +59,7 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 <table>
   <tr>
     <td>Windows</td>
-    <td>macOS</td>
+    <td>MacOS</td>
     <td>Linux</td>
   </tr>
   <tr>
@@ -94,13 +96,10 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 There is a lot of functionality currently being considered:
 
-- Creation of resources/projects - see [Resource creation/manipulation](https://github.com/kubeshop/monokle/projects/4).
-- Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8).
-- Plugin/extension mechanism - see [Extension mechanism for plugins](https://github.com/kubeshop/monokle/issues/177).
-- Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2).
-- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12).
+https://app.zenhub.com/workspaces/monokle-620a8eb717b2fa0010645831/roadmap?invite=true
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
+
 
 ## Getting involved
 
