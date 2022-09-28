@@ -9,6 +9,8 @@ import {registeredKindHandlersSelector} from '@redux/selectors';
 
 import {TitleBar} from '@molecules';
 
+import {saveCRD} from '@utils/crds';
+
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -18,11 +20,13 @@ const CrdsPane: React.FC = () => {
   const kindHandlers = useAppSelector(registeredKindHandlersSelector);
   const crdKindHandlers = useMemo(() => kindHandlers.filter(kh => kh.isCustom), [kindHandlers]);
 
+  const crdsDir = useAppSelector(state => state.config.userCrdsDir);
+
   const [inputUrl, setInputUrl] = useState<string>();
   const [error, setError] = useState<string>();
 
   const registerCRD = async () => {
-    if (!inputUrl) {
+    if (!inputUrl || !crdsDir) {
       // TODO: validate if input is an actual URL
       return;
     }
@@ -40,6 +44,8 @@ const CrdsPane: React.FC = () => {
     } catch {
       setError("Couldn't parse the YAML that was fetched from the provided URL.");
     }
+
+    await saveCRD(crdsDir, text);
   };
 
   return (

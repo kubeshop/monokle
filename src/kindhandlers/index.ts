@@ -11,6 +11,7 @@ import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
+import {getSubfolders, readFiles} from '@utils/fileSystem';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -114,7 +115,7 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, shouldRepl
 }
 
 /**
- * THIS IS NOT REACTIVE, use the knownResourceKindsSelector if you need reactivy
+ * **THIS IS NOT REACTIVE**, use the knownResourceKindsSelector if you need reactivity
  * @returns list of registered resource kinds
  */
 export const getKnownResourceKinds = () => {
@@ -194,6 +195,25 @@ async function readBundledCrdKindHandlers() {
   }
 
   KindHandlersEventEmitter.emit('loadedKindHandlers');
+}
+
+export async function readSavedCrdKindHandlers(crdsDir: string) {
+  const subdirectories = await getSubfolders(crdsDir);
+  for (let i = 0; i < subdirectories.length; i += 1) {
+    const dirName = subdirectories[i];
+    const dirPath = path.join(crdsDir, dirName);
+    let fileContents: string[] = [];
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      fileContents = await readFiles(dirPath);
+    } catch (e) {
+      log.warn(`Couldn't read files from ${dirPath}`);
+    }
+    for (let j = 0; j < fileContents.length; j += 1) {
+      const content = fileContents[i];
+      registerCrdKindHandlers(content);
+    }
+  }
 }
 
 export function registerCrdKindHandlers(crdContent: string, handlerPath?: string) {
