@@ -2,6 +2,8 @@ import {Input} from 'antd';
 
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -18,7 +20,8 @@ export const List = styled.ol`
 `;
 
 export const RegisterContainer = styled.div`
-  padding: 24px;
+  background-color: ${Colors.grey1};
+  padding: 16px;
 `;
 
 export const RegisterInput = styled(Input)`

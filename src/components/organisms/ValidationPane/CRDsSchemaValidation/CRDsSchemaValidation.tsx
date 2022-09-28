@@ -1,12 +1,17 @@
 import {useMemo, useState} from 'react';
 
-import {Button} from 'antd';
+import {Button, Collapse} from 'antd';
 
+import {PlusOutlined} from '@ant-design/icons';
+
+import _ from 'lodash';
 import {parse} from 'yaml';
 
+import {AlertEnum} from '@models/alert';
 import {CRD_SCHEMA_INTEGRATION} from '@models/integrations';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {registeredKindHandlersSelector} from '@redux/selectors';
 
 import {saveCRD} from '@utils/crds';
@@ -19,11 +24,18 @@ import ValidationPaneHeading from '../ValidationPaneHeading';
 import * as S from './styled';
 
 const CRDsSchemaValidation: React.FC = () => {
+  const dispatch = useAppDispatch();
   const kindHandlers = useAppSelector(registeredKindHandlersSelector);
   const crdKindHandlers = useMemo(() => kindHandlers.filter(kh => kh.isCustom), [kindHandlers]);
 
+  const groupedCrdKindHandlers = useMemo(() => {
+    const crdsMap = _.groupBy(crdKindHandlers, crd => crd.clusterApiVersion);
+    return Object.entries(crdsMap).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [crdKindHandlers]);
+
   const crdsDir = useAppSelector(state => state.config.userCrdsDir);
 
+  const [isRegistering, setIsRegistering] = useState(false);
   const [inputUrl, setInputUrl] = useState<string>();
   const [error, setError] = useState<string>();
 
@@ -43,32 +55,65 @@ const CRDsSchemaValidation: React.FC = () => {
       } else {
         setError('Unable to register CRD.');
       }
+      dispatch(
+        setAlert({
+          title: 'Registered CRD',
+          message: `Successfully registered the ${newKindHandler?.kind} CRD from ${newKindHandler?.clusterApiVersion}`,
+          type: AlertEnum.Success,
+        })
+      );
     } catch {
       setError("Couldn't parse the YAML that was fetched from the provided URL.");
     }
 
     await saveCRD(crdsDir, text);
+    cancelRegistering();
+  };
+
+  const cancelRegistering = () => {
+    setIsRegistering(false);
+    setInputUrl(undefined);
+    setError(undefined);
   };
 
   return (
     <div>
       <ValidationPaneHeading integration={CRD_SCHEMA_INTEGRATION} />
-      <S.RegisterContainer>
-        <p>Register CRD</p>
-        <S.RegisterInput value={inputUrl} onChange={e => setInputUrl(e.target.value)} placeholder="Enter URL of CRD" />
-        <Button type="primary" onClick={registerCRD}>
-          Register
-        </Button>
-        {error && <p>{error}</p>}
-      </S.RegisterContainer>
-
-      <ul>
-        {crdKindHandlers.map(c => (
-          <li key={`${c.clusterApiVersion}_${c.kind}`}>
-            {c.clusterApiVersion} - {c.kind}
-          </li>
-        ))}
-      </ul>
+      <div style={{margin: '16px 16px'}}>
+        {isRegistering ? (
+          <S.RegisterContainer>
+            <h3>Register CRD</h3>
+            <S.RegisterInput
+              value={inputUrl}
+              onChange={e => setInputUrl(e.target.value)}
+              placeholder="Enter URL of CRD"
+            />
+            <Button onClick={cancelRegistering} style={{marginRight: 8}}>
+              Cancel
+            </Button>
+            <Button type="primary" onClick={registerCRD}>
+              Register
+            </Button>
+            {error && <p>{error}</p>}
+          </S.RegisterContainer>
+        ) : (
+          <Button onClick={() => setIsRegistering(true)} type="primary" icon={<PlusOutlined />}>
+            Register new CRD
+          </Button>
+        )}
+        <h2 style={{marginTop: 16}}>Registered CRDs</h2>
+        <Collapse>
+          {groupedCrdKindHandlers.map(([apiVersion, crds]) => (
+            <Collapse.Panel header={apiVersion} key={apiVersion}>
+              <ul style={{marginBottom: 0}}>
+                {crds.map(crd => (
+                  <li key={crd.kind}>{crd.kind}</li>
+                ))}
+              </ul>
+            </Collapse.Panel>
+          ))}
+        </Collapse>
+      </div>
     </div>
   );
 };
