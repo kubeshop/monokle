@@ -47,35 +47,39 @@ function BranchSelect() {
         branchName,
       }).then(result => {
         if (result.error) {
+          const addTerminalHandler = () => {
+            // check if there is a terminal with same default command
+            const foundTerminal = Object.values(terminalsMap).find(
+              terminal => terminal.defaultCommand === `git checkout ${branchName}`
+            );
+
+            if (foundTerminal) {
+              dispatch(setSelectedTerminal(foundTerminal.id));
+            } else {
+              const newTerminalId = uuidv4();
+              dispatch(setSelectedTerminal(newTerminalId));
+              dispatch(
+                addTerminal({
+                  id: newTerminalId,
+                  isRunning: false,
+                  defaultCommand: `git checkout ${branchName}`,
+                  shell: defaultShell,
+                })
+              );
+            }
+
+            if (!bottomSelection || bottomSelection !== 'terminal') {
+              dispatch(setLeftBottomMenuSelection('terminal'));
+            }
+          };
+
           Modal.warning({
             title: 'Checkout not possible',
             content: <div>Please commit your changes or stash them before you switch branches.</div>,
             zIndex: 100000,
+            onCancel: addTerminalHandler,
+            onOk: addTerminalHandler,
           });
-
-          // check if there is a terminal with same default command
-          const foundTerminal = Object.values(terminalsMap).find(
-            terminal => terminal.defaultCommand === `git checkout ${branchName}`
-          );
-
-          if (foundTerminal) {
-            dispatch(setSelectedTerminal(foundTerminal.id));
-          } else {
-            const newTerminalId = uuidv4();
-            dispatch(setSelectedTerminal(newTerminalId));
-            dispatch(
-              addTerminal({
-                id: newTerminalId,
-                isRunning: false,
-                defaultCommand: `git checkout ${branchName}`,
-                shell: defaultShell,
-              })
-            );
-          }
-
-          if (!bottomSelection || bottomSelection !== 'terminal') {
-            dispatch(setLeftBottomMenuSelection('terminal'));
-          }
         } else {
           dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
           setVisible(false);
