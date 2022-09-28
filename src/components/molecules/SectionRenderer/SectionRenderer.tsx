@@ -272,9 +272,6 @@ function SectionRenderer(props: SectionRendererProps) {
             parentIndentation={sectionIndentation}
           />
         ))}
-      {sectionBlueprint.customization?.sectionMarginBottom !== undefined && (
-        <div style={{marginBottom: sectionBlueprint.customization.sectionMarginBottom}} />
-      )}
     </>
   );
 }

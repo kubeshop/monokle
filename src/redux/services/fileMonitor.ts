@@ -3,12 +3,14 @@ import log from 'loglevel';
 
 import {AppDispatch} from '@models/appdispatch';
 
+import {setCurrentBranch, setRepo} from '@redux/git';
 import {multiplePathsRemoved} from '@redux/reducers/main';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 
 import {filterGitFolder} from '@utils/git';
 import {debounceWithPreviousArgs} from '@utils/helpers';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 let watcher: FSWatcher;
 
@@ -55,6 +57,13 @@ export function monitorRootFolder(folder: string, dispatch: AppDispatch) {
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
         dispatch(multiplePathsRemoved(filterGitFolder(paths)));
+
+        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+          if (repo) {
+            dispatch(setRepo(repo));
+            dispatch(setCurrentBranch(repo.currentBranch));
+          }
+        });
       }, 1000)
     )
     .on(
@@ -62,6 +71,13 @@ export function monitorRootFolder(folder: string, dispatch: AppDispatch) {
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
         dispatch(multiplePathsRemoved(filterGitFolder(paths)));
+
+        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+          if (repo) {
+            dispatch(setRepo(repo));
+            dispatch(setCurrentBranch(repo.currentBranch));
+          }
+        });
       }, 1000)
     );
 

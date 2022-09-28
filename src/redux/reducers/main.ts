@@ -32,7 +32,6 @@ import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
-import {setCurrentBranch, setRepo} from '@redux/git';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
@@ -57,8 +56,6 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
-import {promiseFromIpcRenderer} from '@utils/promises';
-// import {promiseFromIpcRenderer} from '@utils/promises';
 import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
@@ -327,32 +324,6 @@ export const reprocessAllResources = createAsyncThunk<AppState, void, ThunkApi>(
         policyPlugins,
       });
     });
-
-    return nextMainState;
-  }
-);
-
-export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkApi>(
-  'main/multiplePathsRemoved',
-  async (filePaths, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const projectRootFolder = state.config.selectedProjectRootFolder;
-
-    const nextMainState = createNextState(state.main, mainState => {
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
-        if (fileEntry) {
-          removePath(filePath, mainState, fileEntry);
-        }
-      });
-    });
-
-    const repo = await promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder);
-
-    if (repo) {
-      thunkAPI.dispatch(setRepo(repo));
-      thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
-    }
 
     return nextMainState;
   }
@@ -1241,9 +1212,6 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
-      return action.payload;
-    });
     builder.addCase(transferResource.fulfilled, (state, action) => {
       const {side, delta} = action.payload;
 
@@ -1359,6 +1327,7 @@ export const {
   editorHasReloadedSelectedPath,
   extendResourceFilter,
   loadFilterPreset,
+  multiplePathsRemoved,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
   reloadClusterDiff,

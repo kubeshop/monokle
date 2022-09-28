@@ -1,5 +1,4 @@
 import {existsSync, promises as fs} from 'fs';
-import {sep} from 'path';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
