@@ -35,7 +35,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
         <S.Description>{description}</S.Description>
         <S.Link onClick={openLearnMore}>Learn more</S.Link>
       </span>
-      {id === 'open-policy-agent' && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
+      {integration.isConfigurable && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
     </S.Card>
   );
 };

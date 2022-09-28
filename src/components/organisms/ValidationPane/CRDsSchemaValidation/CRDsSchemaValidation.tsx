@@ -4,19 +4,21 @@ import {Button} from 'antd';
 
 import {parse} from 'yaml';
 
+import {CRD_SCHEMA_INTEGRATION} from '@models/integrations';
+
 import {useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors';
-
-import {TitleBar} from '@molecules';
 
 import {saveCRD} from '@utils/crds';
 
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import * as S from './CrdsPane.styled';
+import ValidationPaneHeading from '../ValidationPaneHeading';
 
-const CrdsPane: React.FC = () => {
+import * as S from './styled';
+
+const CRDsSchemaValidation: React.FC = () => {
   const kindHandlers = useAppSelector(registeredKindHandlersSelector);
   const crdKindHandlers = useMemo(() => kindHandlers.filter(kh => kh.isCustom), [kindHandlers]);
 
@@ -50,7 +52,7 @@ const CrdsPane: React.FC = () => {
 
   return (
     <div>
-      <TitleBar title="Custom Resource Definitions" closable />
+      <ValidationPaneHeading integration={CRD_SCHEMA_INTEGRATION} />
       <S.RegisterContainer>
         <p>Register CRD</p>
         <S.RegisterInput value={inputUrl} onChange={e => setInputUrl(e.target.value)} placeholder="Enter URL of CRD" />
@@ -62,7 +64,7 @@ const CrdsPane: React.FC = () => {
 
       <ul>
         {crdKindHandlers.map(c => (
-          <li>
+          <li key={`${c.clusterApiVersion}_${c.kind}`}>
             {c.clusterApiVersion} - {c.kind}
           </li>
         ))}
@@ -71,4 +73,4 @@ const CrdsPane: React.FC = () => {
   );
 };
 
-export default CrdsPane;
+export default CRDsSchemaValidation;

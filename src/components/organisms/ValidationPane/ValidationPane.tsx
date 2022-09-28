@@ -1,7 +1,10 @@
+import {useMemo} from 'react';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
+import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './OpenPolicyAgent';
 import ValidationOverView from './ValidationOverview';
 import * as S from './ValidationPane.styled';
@@ -13,11 +16,22 @@ interface IProps {
 const ValidationPane: React.FC<IProps> = ({height}) => {
   const integration = useAppSelector(state => state.main.validationIntegration);
 
+  const Panel = useMemo(() => {
+    switch (integration?.id) {
+      case 'open-policy-agent':
+        return ValidationOpenPolicyAgent;
+      case 'crd-schema':
+        return CRDsSchemaValidation;
+      default:
+        return ValidationOverView;
+    }
+  }, [integration]);
+
   return (
     <S.ValidationPaneContainer>
       <TitleBar title="Validate your resources" closable />
 
-      {integration?.id === 'open-policy-agent' ? <ValidationOpenPolicyAgent height={height} /> : <ValidationOverView />}
+      <Panel height={height} />
     </S.ValidationPaneContainer>
   );
 };
