@@ -15,7 +15,7 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 import * as S from './GitView.styled';
 
 const options: monaco.editor.IDiffEditorConstructionOptions = {
-  readOnly: false,
+  readOnly: true,
   renderSideBySide: true,
   inDiffEditor: true,
   renderValidationDecorations: 'off',
