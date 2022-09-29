@@ -1,22 +1,15 @@
-import {Input} from 'antd';
+import {Button, Input} from 'antd';
 
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  margin: 16px;
 `;
 
 export const List = styled.ol`
-  height: 100%;
-  list-style-type: none;
-  padding: 0;
-  padding-bottom: 20px;
-  overflow-y: auto;
-  margin: 0;
+  margin-bottom: 0;
 `;
 
 export const RegisterContainer = styled.div`
@@ -26,4 +19,12 @@ export const RegisterContainer = styled.div`
 
 export const RegisterInput = styled(Input)`
   margin-bottom: 8px;
+`;
+
+export const Subtitle = styled.h2`
+  margin-top: 16px;
+`;
+
+export const CancelButton = styled(Button)`
+  margin-right: 8px;
 `;

@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
@@ -35,6 +36,6 @@ export async function saveCRD(crdsDir: string, crdContent: string) {
       }
     }
   } catch {
-    console.warn("Couldn't save the CRD because we couldn't parse the content.");
+    log.warn("Couldn't save the CRD because we couldn't parse the content.");
   }
 }

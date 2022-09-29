@@ -20,8 +20,7 @@ import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
-
-import * as S from './styled';
+import * as S from './CRDsSchemaValidation.styled';
 
 const CRDsSchemaValidation: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -79,7 +78,7 @@ const CRDsSchemaValidation: React.FC = () => {
   return (
     <div>
       <ValidationPaneHeading integration={CRD_SCHEMA_INTEGRATION} />
-      <div style={{margin: '16px 16px'}}>
+      <S.Container>
         {isRegistering ? (
           <S.RegisterContainer>
             <h3>Register CRD</h3>
@@ -88,9 +87,7 @@ const CRDsSchemaValidation: React.FC = () => {
               onChange={e => setInputUrl(e.target.value)}
               placeholder="Enter URL of CRD"
             />
-            <Button onClick={cancelRegistering} style={{marginRight: 8}}>
-              Cancel
-            </Button>
+            <S.CancelButton onClick={cancelRegistering}>Cancel</S.CancelButton>
             <Button type="primary" onClick={registerCRD}>
               Register
             </Button>
@@ -101,19 +98,19 @@ const CRDsSchemaValidation: React.FC = () => {
             Register new CRD
           </Button>
         )}
-        <h2 style={{marginTop: 16}}>Registered CRDs</h2>
+        <S.Subtitle>Registered CRDs</S.Subtitle>
         <Collapse>
           {groupedCrdKindHandlers.map(([apiVersion, crds]) => (
             <Collapse.Panel header={apiVersion} key={apiVersion}>
-              <ul style={{marginBottom: 0}}>
+              <S.List>
                 {crds.map(crd => (
                   <li key={crd.kind}>{crd.kind}</li>
                 ))}
-              </ul>
+              </S.List>
             </Collapse.Panel>
           ))}
         </Collapse>
-      </div>
+      </S.Container>
     </div>
   );
 };
