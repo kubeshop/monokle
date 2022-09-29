@@ -83,6 +83,20 @@ export const GitProjectIcon = styled(Icon)`
   padding-top: 2px;
 `;
 
+export const GitRepository = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+export const GitRepositoryIcon = styled(Icon)`
+  color: ${Colors.blue6};
+  transition: all 0.2s ease-in !important;
+  padding-top: 2px;
+  width: 20px;
+`;
+
 export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;

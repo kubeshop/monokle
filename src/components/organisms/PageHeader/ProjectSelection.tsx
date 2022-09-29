@@ -161,7 +161,9 @@ const ProjectSelection = () => {
               />
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromGitTooltip} placement="bottomRight">
-              <S.GitButtonFilled onClick={handleGitProject} />
+              <S.GitRepository onClick={handleGitProject}>
+                <S.GitRepositoryIcon name="git-repository" />
+              </S.GitRepository>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
               <S.FolderAddOutlined onClick={() => handleCreateProject(false)} />

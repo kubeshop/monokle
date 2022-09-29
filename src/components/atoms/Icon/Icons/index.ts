@@ -4,6 +4,7 @@ export {default as Helm} from './Helm';
 export {default as Git} from './Git';
 export {default as GitOps} from './GitOps';
 export {default as GitProject} from './GitProject';
+export {default as GitRepository} from './GitRepository';
 export {default as K8sSchema} from './K8sSchema';
 export {default as Kustomize} from './Kustomize';
 export {default as Kubernetes} from './Kubernetes';
