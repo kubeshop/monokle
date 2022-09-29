@@ -92,7 +92,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   }, [changedFiles]);
 
   return (
-    <S.GitPaneContainer id="GitPane" $height={height} $foundChanges={Boolean(changedFiles.length)}>
+    <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Git" closable />
 
       {changedFiles.length ? (
