@@ -2,10 +2,24 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
+import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
 export const ActionItem = styled.div`
+  height: 100%;
   display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background: ${Colors.grey11};
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 24px;
+
+  &:hover {
+    transition: background ${AnimationDurations.base};
+    background: ${Colors.blue7};
+  }
 `;
 
 export const ActionItemButton = styled(Button)`
@@ -20,32 +34,31 @@ export const ActionItemContext = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0 0 0 1rem;
-  font-weight: 400;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
 `;
 
 export const ActionItemLogo = styled.img`
   width: 4.5rem;
   height: 4.5rem;
+  margin-bottom: 20px;
 `;
 
 export const ActionItemText = styled.div``;
 
 export const ActionItems = styled.div`
+  min-height: 150px;
   display: grid;
-  grid-template-columns: repeat(3, 13rem);
-  grid-column-gap: 3rem;
+  grid-template-columns: repeat(4, 15rem);
+  grid-column-gap: 1rem;
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
 `;
 
 export const Actions = styled.div`
-  background: ${Colors.grey3000};
   display: flex;
   flex-direction: column;
-  padding: 2rem 0 1rem 0;
 `;
 
 export const ActionsTitle = styled.div`
@@ -61,6 +74,7 @@ export const Container = styled.div`
   display: grid;
   grid-template-rows: max-content 1fr 15rem;
   grid-row-gap: 10px;
+  margin-bottom: 3rem;
 `;
 
 export const Projects = styled.div`

@@ -29,6 +29,7 @@ export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
 export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
+export const DEFAULT_GIT_REPO_PLACEHOLDER = 'https://github.com/kubeshop/monokle/';
 export const TEMPLATES_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/templates.md';
 export const PLUGINS_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/plugins.md';
 export const DEFAULT_PLUGINS = [
@@ -55,9 +56,14 @@ export const CLUSTER_AVAILABLE_COLORS = [
 export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   leftPane: 0.25,
   navPane: 0.25,
-  rightPane: 0,
-  bottomPaneHeight: 200,
+  editPane: 0,
+  bottomPaneHeight: 250,
   recentProjectsPaneWidth: 450,
+};
+
+export const PANE_CONSTRAINT_VALUES = {
+  minEditPane: 400,
+  navPane: 330,
 };
 
 export const PREDEFINED_K8S_VERSION = '1.24.2';

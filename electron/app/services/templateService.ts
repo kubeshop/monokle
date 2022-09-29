@@ -14,9 +14,10 @@ import {
   validateTemplatePack,
 } from '@models/template';
 
+import {createFolder, doesPathExist} from '@utils/fileSystem';
+
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
-import {createFolder, doesPathExist} from '../extensions/fileSystem';
 import loadExtension from '../extensions/loadExtension';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, makeExtensionDownloadData} from '../utils';

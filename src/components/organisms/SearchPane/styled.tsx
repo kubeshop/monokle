@@ -161,7 +161,7 @@ export const TreeContainer = styled.div`
 `;
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
-  .match-higlight {
+  .match-highlight {
     background: ${Colors.yellow11};
     color: ${Colors.green10};
     font-style: normal;

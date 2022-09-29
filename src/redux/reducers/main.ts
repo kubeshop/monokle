@@ -24,7 +24,7 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {CurrentMatch, FileEntry} from '@models/fileentry';
-import {GitRepo} from '@models/git';
+import {GitChangedFile, GitRepo} from '@models/git';
 import {HelmChart} from '@models/helm';
 import {ImageType} from '@models/image';
 import {ValidationIntegration} from '@models/integrations';
@@ -56,7 +56,7 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
-import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -84,6 +84,7 @@ export type SetRootFolderPayload = {
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
+  gitChangedFiles: GitChangedFile[];
   gitRepo?: GitRepo;
 };
 
@@ -328,24 +329,6 @@ export const reprocessAllResources = createAsyncThunk<AppState, void, ThunkApi>(
   }
 );
 
-export const multiplePathsRemoved = createAsyncThunk<AppState, string[], ThunkApi>(
-  'main/multiplePathsRemoved',
-  async (filePaths, thunkAPI) => {
-    const state = thunkAPI.getState();
-
-    const nextMainState = createNextState(state.main, mainState => {
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
-        if (fileEntry) {
-          removePath(filePath, mainState, fileEntry);
-        }
-      });
-    });
-
-    return nextMainState;
-  }
-);
-
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   if (state.selectedResourceId) {
     const selectedResource = state.resourceMap[state.selectedResourceId];
@@ -428,6 +411,7 @@ export const mainSlice = createSlice({
       action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
     ) => {
       const resource = state.resourceMap[action.payload.resourceId];
+      state.lastChangedLine = 0;
       if (resource) {
         updateSelectionAndHighlights(state, resource);
         updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);
@@ -702,6 +686,9 @@ export const mainSlice = createSlice({
       state.selectedValuesFileId = undefined;
       state.selectedImage = undefined;
     },
+    clearSelectedPath: (state: Draft<AppState>) => {
+      state.selectedPath = undefined;
+    },
     toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       const enable = action.payload;
       const plugin = state.policies.plugins[0];
@@ -758,6 +745,9 @@ export const mainSlice = createSlice({
     },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
+    },
+    setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.lastChangedLine = action.payload;
     },
     setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
       state.imagesList = action.payload;
@@ -1222,9 +1212,6 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(multiplePathsRemoved.fulfilled, (state, action) => {
-      return action.payload;
-    });
     builder.addCase(transferResource.fulfilled, (state, action) => {
       const {side, delta} = action.payload;
 
@@ -1333,12 +1320,14 @@ export const {
   clearPreview,
   clearPreviewAndSelectionHistory,
   clearSelected,
+  clearSelectedPath,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
   deleteFilterPreset,
   editorHasReloadedSelectedPath,
   extendResourceFilter,
   loadFilterPreset,
+  multiplePathsRemoved,
   openPreviewConfigurationEditor,
   openResourceDiffModal,
   reloadClusterDiff,
@@ -1380,6 +1369,7 @@ export const {
   updateSearchHistory,
   updateSearchQuery,
   updateReplaceQuery,
+  setLastChangedLine,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
@@ -1389,13 +1379,22 @@ export default mainSlice.reducer;
 export const resourceMapChangedListener: AppListenerFn = listen => {
   listen({
     predicate: (action, currentState, previousState) => {
-      return !isEqual(currentState.main.resourceMap, previousState.main.resourceMap);
+      return (
+        !isEqual(currentState.main.resourceMap, previousState.main.resourceMap) ||
+        !isEqual(currentState.main.resourceFilter, previousState.main.resourceFilter)
+      );
     },
 
     effect: async (_action, {dispatch, getState}) => {
+      const resourceFilter = getState().main.resourceFilter;
       const resourceMap = getActiveResourceMap(getState().main);
+
+      const currentResourcesMap = Object.fromEntries(
+        Object.entries(resourceMap).filter(([, value]) => isResourcePassingFilter(value, resourceFilter))
+      );
+
       const imagesList = getState().main.imagesList;
-      const images = getImages(resourceMap);
+      const images = getImages(currentResourcesMap);
 
       if (!isEqual(images, imagesList)) {
         dispatch(setImagesList(images));

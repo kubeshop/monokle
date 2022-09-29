@@ -39,6 +39,11 @@ export const BellOutlined = styled(RawBellOutlined)`
   margin-left: 1.5rem;
 `;
 
+export const BranchSelectContainer = styled.div`
+  margin-left: 8px;
+  padding-top: 1px;
+`;
+
 export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   color: ${Colors.blue6};
   font-size: 1rem;
@@ -58,6 +63,16 @@ export const Header = styled(Layout.Header)`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+export const InitButton = styled(RawButton)`
+  margin-left: 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 16px;
+  height: 28px;
 `;
 
 export const Logo = styled.img`

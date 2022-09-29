@@ -3,10 +3,10 @@ import log from 'loglevel';
 import path from 'path';
 import tar from 'tar';
 
+import {createOrRecreateFolder, deleteFile, deleteFolder, doesPathExist, getAllFiles} from '@utils/fileSystem';
 import {downloadFile} from '@utils/http';
 
 import downloadExtensionEntry from './downloadExtensionEntry';
-import {createOrRecreateFolder, deleteFile, deleteFolder, doesPathExist, getAllFiles} from './fileSystem';
 import {DownloadExtensionOptions} from './types';
 
 async function downloadExtension<ExtensionEntryType, ExtensionType>(

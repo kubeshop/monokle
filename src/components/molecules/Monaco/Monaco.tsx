@@ -6,7 +6,7 @@ import {useMeasure} from 'react-use';
 import fs from 'fs';
 import log from 'loglevel';
 import 'monaco-editor';
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
 // @ts-ignore
@@ -31,6 +31,7 @@ import {
   selectImage,
   selectK8sResource,
   setAutosavingStatus,
+  setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
@@ -85,6 +86,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
+  const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const settings = useAppSelector(settingsSelector);
@@ -221,6 +223,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   const onChange = (newValue: any) => {
+    dispatch(setLastChangedLine(0));
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
@@ -251,6 +254,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       const resource = resourceMap[selectedResourceId];
       if (resource) {
         newCode = resource.text;
+        editor?.getModel()?.dispose();
         editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
     } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
@@ -258,6 +262,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       const fileStats = getFileStats(filePath);
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
+        editor?.getModel()?.dispose();
+        // monaco has no language registered for tpl extension so use yaml instead (as these could be Helm templates)
+        if (filePath.toLowerCase().endsWith('.tpl')) {
+          editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+        } else {
+          editor?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
+        }
       }
     }
 
@@ -295,12 +306,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   }, [selectedResource]);
 
   useEffect(() => {
-    if (editor) {
+    if (editor && lastChangedLine) {
+      editor.revealLineInCenter(lastChangedLine);
+    } else if (editor) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
+  }, [editor, selectedResourceId, firstCodeLoadedOnEditor, lastChangedLine]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {

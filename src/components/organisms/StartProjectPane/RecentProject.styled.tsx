@@ -2,6 +2,7 @@ import {DeleteOutlined as RawDeleteOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
 export const ActionsContainer = styled.div`
@@ -14,8 +15,8 @@ export const ActionsContainer = styled.div`
 `;
 
 export const Container = styled.div<{activeproject: boolean}>`
-  border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
-  color: ${props => (props.activeproject ? Colors.lightSeaGreen : Colors.whitePure)};
+  border-left: 4px solid ${props => (props.activeproject ? Colors.blue7 : 'transparent')};
+  color: ${props => (props.activeproject ? Colors.blue7 : Colors.whitePure)};
   cursor: pointer;
   position: relative;
   padding: 0.5rem 1rem;
@@ -25,10 +26,16 @@ export const Container = styled.div<{activeproject: boolean}>`
   }
 
   :hover {
-    background: ${Colors.grey2000};
+    transition: background ${AnimationDurations.base};
+    background: ${Colors.blue7};
+    color: ${props => (props.activeproject ? Colors.blue7 : Colors.whitePure)};
 
     & .anticon-delete {
       display: inline-block;
+    }
+
+    & .anticon-pushpin {
+      color: ${props => props.activeproject && Colors.whitePure};
     }
   }
 `;
@@ -43,6 +50,11 @@ export const Name = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+
+  ${Container}:hover & {
+    transition: color ${AnimationDurations.base};
+    color: ${Colors.whitePure};
+  }
 `;
 
 export const Path = styled.div`
@@ -52,6 +64,11 @@ export const Path = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+
+  ${Container}:hover & {
+    transition: color ${AnimationDurations.base};
+    color: ${Colors.whitePure};
+  }
 `;
 
 export const LastOpened = styled.div`
@@ -61,4 +78,9 @@ export const LastOpened = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+
+  ${Container}:hover & {
+    transition: color ${AnimationDurations.base};
+    color: ${Colors.whitePure};
+  }
 `;

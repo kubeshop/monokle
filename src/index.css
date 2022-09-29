@@ -184,6 +184,11 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   text-decoration-style: dotted;
 }
 
+.monokleEditorLastModifiedLineInlineClass {
+  background-color: #263EA0;
+  transition: 500ms;
+}
+
 .ant-menu-submenu-popup {
   max-height: 250px !important;
   overflow-y: scroll !important;

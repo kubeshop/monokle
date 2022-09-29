@@ -97,7 +97,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     let terminalCommand = `${osPlatform !== 'win32' ? 'exec ' : ''}kubectl exec -i -t -n `;
     terminalCommand += `${resource.namespace || 'default'} ${resource.name}`;
 
-    const container = resource.content.spec?.containers[0];
+    const container = resource.content.spec?.containers?.[0];
 
     if (container) {
       terminalCommand += ` -c ${container.name} -- sh -c "clear; (bash || ash || sh)"`;
@@ -147,10 +147,6 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const onClickOpenShell = () => {
-    if (!bottomSelection || bottomSelection !== 'terminal') {
-      dispatch(setLeftBottomMenuSelection('terminal'));
-    }
-
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
     dispatch(
@@ -162,6 +158,10 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         shell: defaultShell,
       })
     );
+
+    if (!bottomSelection || bottomSelection !== 'terminal') {
+      dispatch(setLeftBottomMenuSelection('terminal'));
+    }
   };
 
   const menuItems = [

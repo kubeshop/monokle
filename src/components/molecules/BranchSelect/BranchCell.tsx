@@ -1,51 +1,60 @@
-import {Space} from 'antd';
-
-import styled from 'styled-components';
+import {Modal, Space} from 'antd';
 
 import {GitBranch} from '@models/git';
 
+import {useAppSelector} from '@redux/hooks';
+
 import {CopyButton} from '@components/atoms';
 
-import Colors from '@styles/Colors';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
-type Props = {
-  onSelect: (branch: GitBranch) => void;
+import * as S from './BranchCell.styled';
+
+type IProps = {
   branch: GitBranch;
 };
 
-export function NameCell({onSelect, branch}: Props) {
+const BranchCell: React.FC<IProps> = props => {
+  const {branch} = props;
+
+  const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+
+  const deleteBranch = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.stopPropagation();
+
+    Modal.confirm({
+      title: `Are you sure you want to delete ${branch.name}?`,
+      onOk() {
+        promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
+          localPath: selectedProjectRootFolder,
+          branchName: branch.name,
+        });
+      },
+      onCancel() {},
+      zIndex: 100000,
+    });
+  };
+
   return (
-    <Box onClick={() => onSelect(branch)}>
-      <Space size="small">
-        <NameLabel>{branch.name}</NameLabel>
-        <CopyButton content={branch.name} />
-      </Space>
+    <S.Box>
+      <S.BranchInfo>
+        {branch.type === 'remote' ? <S.CloudOutlined /> : <S.BranchesOutlined />}
+        <div>
+          <Space size="small">
+            <S.NameLabel>{branch.name}</S.NameLabel>
+            <CopyButton content={branch.name} />
+          </Space>
 
-      <BranchUpdated>
-        {/* <Icon name="commit" color={Colors.grey7} size="sm" style={{paddingTop: 2}} /> */}
-        <span style={{marginLeft: 6}}>{branch.commitSha}</span>
-      </BranchUpdated>
-    </Box>
+          <S.BranchUpdated>
+            <S.CommitShaLabel>{branch.commitSha}</S.CommitShaLabel>
+          </S.BranchUpdated>
+        </div>
+      </S.BranchInfo>
+
+      {branch.type !== 'remote' && branch.name !== currentBranch ? <S.DeleteOutlined onClick={deleteBranch} /> : null}
+    </S.Box>
   );
-}
+};
 
-const Box = styled.div`
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-`;
-
-const NameLabel = styled.div`
-  max-width: 375px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`;
-
-const BranchUpdated = styled.span`
-  display: flex;
-  height: 16px;
-  font-size: 12px;
-  font-weight: 400;
-  color: ${Colors.grey7};
-`;
+export default BranchCell;

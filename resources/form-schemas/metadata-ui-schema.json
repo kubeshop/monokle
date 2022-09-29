@@ -1,35 +1,43 @@
 {
   "metadata": {
     "ui:title": "Object Metadata",
+    "level": 0,
     "name": {
       "ui:title": "Name",
-      "ui:help": "(the name of this object, must be unique within a namespace)"
+      "ui:help": "(the name of this object, must be unique within a namespace)",
+      "level": 1
     },
     "namespace": {
       "ui:title": "Namespace",
       "ui:help": "(defines the namespace in within this object must be unique, empty = default)",
-      "ui:widget": "namespaceSelection"
+      "ui:widget": "namespaceSelection",
+      "level": 1
     },
     "labels": {
       "ui:title": "Labels",
-      "ui:description": "Key/value pairs that can be used for organization and categorization"
+      "ui:description": "Key/value pairs that can be used for organization and categorization",
+      "level": 1
     },
     "annotations": {
       "ui:title": "Annotations",
-      "ui:description": "Arbitrary metadata set/used by external tools"
+      "ui:description": "Arbitrary metadata set/used by external tools",
+      "level": 1
     },
     "clusterName": {
       "ui:title": "Cluster Name",
       "ui:description": "clustername",
-      "ui:help": "(optional name of the cluster which the object belongs to)"
+      "ui:help": "(optional name of the cluster which the object belongs to)",
+      "level": 1
     },
     "generateName": {
       "ui:title": "Generate Name",
-      "ui:help": "(an optional prefix used by the server to generate a unique name ONLY IF the Name field has not been provided)"
+      "ui:help": "(an optional prefix used by the server to generate a unique name ONLY IF the Name field has not been provided)",
+      "level": 1
     },
     "finalizers": {
       "ui:title": "Finalizers",
-      "ui:description": "Must be empty before the object is deleted from the registry"
+      "ui:description": "Must be empty before the object is deleted from the registry",
+      "level": 1
     }
   }
 }

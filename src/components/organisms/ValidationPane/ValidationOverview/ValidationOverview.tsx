@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  CRD_SCHEMA_INTEGRATION,
   K8S_SCHEMA_INTEGRATION,
   OPA_INTEGRATION,
   RESOURCE_LINKS_INTEGRATION,
@@ -21,6 +22,7 @@ const ValidationOverview: React.FC = () => {
 
       <S.ValidationCards>
         <ValidationCard integration={OPA_INTEGRATION} />
+        <ValidationCard integration={CRD_SCHEMA_INTEGRATION} />
         <ValidationCard integration={YAML_SYNTAX_INTEGRATION} />
         <ValidationCard integration={K8S_SCHEMA_INTEGRATION} />
         <ValidationCard integration={RESOURCE_LINKS_INTEGRATION} />

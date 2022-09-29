@@ -42,6 +42,7 @@ enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
 
+  volcano6 = '#D84A1B',
   volcano7 = '#E87040',
   volcano8 = '#F3956A',
 
@@ -64,8 +65,9 @@ enum Colors {
   purple8 = '#AB7AE0',
 
   cyan = '#58D1C9',
-  cyan7 = '#33BCB7',
   cyan5 = '#138585',
+  cyan7 = '#33BCB7',
+  cyan8 = '#58D1C9',
   lightSeaGreen = '#13a8a8',
 
   blue6 = '#1890FF', // Daybreak Blue

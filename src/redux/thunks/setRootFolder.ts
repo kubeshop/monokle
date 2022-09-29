@@ -104,9 +104,17 @@ export const setRootFolder = createAsyncThunk<
     'git.isFolderGitRepo.result',
     rootFolder
   );
+
   const gitRepo = isFolderGitRepo
     ? await promiseFromIpcRenderer<GitRepo>('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolder)
     : undefined;
+
+  const gitChangedFiles = isFolderGitRepo
+    ? await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolder,
+        fileMap,
+      })
+    : [];
 
   return {
     projectConfig,
@@ -118,6 +126,7 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
+    gitChangedFiles,
     gitRepo,
   };
 });

@@ -154,6 +154,10 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     },
     type: 'name',
     ...ServiceAccountTarget,
+
+    shouldCreateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+      return values['serviceAccountName'] !== 'default';
+    },
   },
   {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#persistentvolumeclaimvolumesource-v1-core

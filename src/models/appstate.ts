@@ -211,6 +211,7 @@ interface AppState {
       stack: string;
     };
   };
+  lastChangedLine: number;
 }
 
 export interface KubernetesObject {

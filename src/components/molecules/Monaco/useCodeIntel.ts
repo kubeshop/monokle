@@ -97,6 +97,7 @@ function useCodeIntel(props: CodeIntelProps) {
   const currentFile = Object.values(fileMap).find(file => selectedPath === file.filePath);
   const dispatch = useAppDispatch();
   const isSearchActive = useAppSelector(state => Boolean(state.main.search.searchQuery));
+  const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
 
   const clearCodeIntel = () => {
     if (editor) {
@@ -132,6 +133,7 @@ function useCodeIntel(props: CodeIntelProps) {
           helmTemplatesMap,
           selectFilePath,
           code,
+          lastChangedLine,
           setEditorSelection: ({selection}) => {
             dispatch(
               setMonacoEditor({

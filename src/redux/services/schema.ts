@@ -41,12 +41,16 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     k8sSchema = k8sSchemaCache.get(schemaVersion);
   } else {
     // @ts-ignore
-    k8sSchema = JSON.parse(
-      readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
-    );
-    k8sSchemaCache.clear();
-    schemaCache.clear();
-    k8sSchemaCache.set(schemaVersion, k8sSchema);
+    let schemaPath = path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`);
+
+    try {
+      k8sSchema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+      k8sSchemaCache.clear();
+      schemaCache.clear();
+      k8sSchemaCache.set(schemaVersion, k8sSchema);
+    } catch (e) {
+      log.warn(`Failed to parse schema file ${schemaPath}`, e);
+    }
   }
 
   const resourceKindHandler = getResourceKindHandler(resource.kind);
@@ -56,7 +60,7 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     const schemaKey = `${prefix}.${resource.kind}`;
     const schemaCacheKey = `${schemaVersion}-${prefix}.${resource.kind}`;
     if (!schemaCache.has(schemaCacheKey)) {
-      const kindSchema = k8sSchema['definitions'][schemaKey];
+      const kindSchema = k8sSchema?.definitions?.[schemaKey];
       if (kindSchema) {
         Object.keys(k8sSchema).forEach(key => {
           if (key !== 'definitions') {
@@ -65,10 +69,18 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
         });
 
         Object.keys(kindSchema).forEach(key => {
-          k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
+          try {
+            k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
+          } catch (e) {
+            log.warn('Failed to parse schema ', e);
+          }
         });
 
-        schemaCache.set(schemaCacheKey, JSON.parse(JSON.stringify(k8sSchema)));
+        try {
+          schemaCache.set(schemaCacheKey, JSON.parse(JSON.stringify(k8sSchema)));
+        } catch (e) {
+          log.warn('Failed to parse schema ', e);
+        }
       }
     }
 

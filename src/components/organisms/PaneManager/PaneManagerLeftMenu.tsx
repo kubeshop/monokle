@@ -44,6 +44,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -145,6 +146,28 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
 
+        <FeatureFlag name="GitOps">
+          <Walkthrough placement="leftTop" collection="release" step="images">
+            <PaneTooltip
+              show={!leftActive || leftMenuSelection !== 'git-pane'}
+              title="View Git operations"
+              placement="right"
+            >
+              <MenuButton
+                id="git-pane"
+                isSelected={checkIsTabSelected('git-pane')}
+                isActive={isActive}
+                onClick={() => setLeftActiveMenu('git-pane')}
+                disabled={!activeProject}
+              >
+                <S.Badge color={Colors.blue6} count={changedFiles.length} size="small">
+                  <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+                </S.Badge>
+              </MenuButton>
+            </PaneTooltip>
+          </Walkthrough>
+        </FeatureFlag>
+
         <PaneTooltip
           show={!leftActive || leftMenuSelection !== 'kustomize-pane'}
           title={<KustomizeTabTooltip />}
@@ -161,7 +184,6 @@ const PaneManagerLeftMenu: React.FC = () => {
             <S.Badge
               count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
               color={Colors.blue6}
-              size="default"
               dot
             >
               <MenuIcon

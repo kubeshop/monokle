@@ -172,6 +172,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       label: isFolder ? 'New Resource' : 'Add Resource',
       disabled:
         isInPreviewMode ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||

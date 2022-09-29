@@ -1,13 +1,15 @@
 import {useCallback} from 'react';
 import {useMeasure} from 'react-use';
 
+import {OPA_INTEGRATION} from '@models/integrations';
+
 import {useAppDispatch} from '@redux/hooks';
 import {reprocessAllResources, toggleAllRules} from '@redux/reducers/main';
 
 import {Button} from '@src/App.styled';
 
+import ValidationPaneHeading from '../ValidationPaneHeading';
 import * as S from './ValidationOpenPolicyAgent.styled';
-import {ValidationOpenPolicyAgentHeading} from './ValidationOpenPolicyAgentHeading';
 import {ValidationOpenPolicyAgentTable} from './ValidationOpenPolicyAgentTable';
 
 interface IProps {
@@ -30,7 +32,7 @@ const ValidationOpenPolicyAgent: React.FC<IProps> = ({height}) => {
   return (
     <>
       <div ref={descriptionRef}>
-        <ValidationOpenPolicyAgentHeading />
+        <ValidationPaneHeading integration={OPA_INTEGRATION} />
         <S.DescriptionContainer>
           <S.Description>
             Validate your resources with policies. Enable or disable OPA rules in this list.

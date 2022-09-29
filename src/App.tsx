@@ -18,6 +18,7 @@ import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
+import {toggleForm} from '@redux/forms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
@@ -71,6 +72,7 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
+const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -98,6 +100,7 @@ const App = () => {
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
   const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
+  const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
@@ -367,6 +370,10 @@ const App = () => {
     dispatch(compareToggled({value: false}));
   }, [dispatch]);
 
+  const onCloseFormModal = useCallback(() => {
+    dispatch(toggleForm(false));
+  }, [dispatch]);
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <S.AppContainer>
@@ -421,6 +428,7 @@ const App = () => {
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
+          {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isFiltersPresetModalVisible && <FiltersPresetModal />}

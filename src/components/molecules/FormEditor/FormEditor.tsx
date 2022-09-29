@@ -28,6 +28,7 @@ import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import * as S from './FormEditor.styled';
+import FormObjectFieldTemplate from './FormObjectFieldTemplate';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
@@ -103,7 +104,7 @@ const FormEditor: React.FC<IProps> = props => {
         const isChanged = content.trim() !== selectedResource.text.trim();
         setIsResourceUpdated(isChanged);
         if (isChanged) {
-          dispatch(updateResource({resourceId: selectedResource.id, text: content}));
+          dispatch(updateResource({resourceId: selectedResource.id, text: content, isUpdateFromForm: true}));
         } else {
           dispatch(setAutosavingStatus(false));
         }
@@ -188,6 +189,7 @@ const FormEditor: React.FC<IProps> = props => {
         schema={schema}
         uiSchema={formUiSchema}
         formData={formData}
+        ObjectFieldTemplate={FormObjectFieldTemplate}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
         fields={getCustomFormFields()}

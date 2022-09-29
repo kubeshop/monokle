@@ -11,9 +11,10 @@ import {
   validateTemplatePluginModule,
 } from '@models/plugin';
 
+import {createFolder, doesPathExist} from '@utils/fileSystem';
+
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
-import {createFolder, doesPathExist} from '../extensions/fileSystem';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from '../utils';
 

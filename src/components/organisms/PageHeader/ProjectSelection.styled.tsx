@@ -5,10 +5,13 @@ import {
   DownOutlined as RawDownOutlined,
   FolderAddOutlined as RawFolderAddOutlined,
   FolderOpenOutlined as RawFolderOpenOutlined,
+  FolderOutlined as RawFolderOutlined,
   FormatPainterOutlined as RawFormatPainterOutlined,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+import {Icon} from '@components/atoms';
 
 import Colors from '@styles/Colors';
 
@@ -21,7 +24,9 @@ export const Button = styled(RawButton)`
 
   :hover,
   :focus {
-    color: ${Colors.lightSeaGreen};
+    & span {
+      color: ${Colors.lightSeaGreen} !important;
+    }
   }
 `;
 
@@ -33,18 +38,13 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   }
 `;
 
-export const ProjectContent = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
 export const DownOutlined = styled(RawDownOutlined)`
   position: absolute !important;
   right: 8px !important;
   color: ${Colors.whitePure};
   font-size: 12px !important;
   padding-top: 1px;
+  transition: all 0.2s ease-in;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -58,16 +58,22 @@ export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
   padding-top: 2px;
 `;
 
+export const FolderOutlined = styled(RawFolderOutlined)`
+  font-size: 15px;
+  color: ${Colors.grey9};
+  transition: all 0.2s ease-in !important;
+`;
+
 export const FormatPainterOutlined = styled(RawFormatPainterOutlined)`
   font-size: 20px;
   color: ${Colors.blue6};
   cursor: pointer;
 `;
 
-export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
-  font-size: 20px;
-  color: ${Colors.blue6};
-  cursor: pointer;
+export const GitProjectIcon = styled(Icon)`
+  color: ${Colors.grey9};
+  transition: all 0.2s ease-in !important;
+  padding-top: 2px;
 `;
 
 export const ProjectContainer = styled.div`
@@ -79,9 +85,17 @@ export const ProjectContainer = styled.div`
   border-radius: 4px;
 `;
 
-export const ProjectMenu = styled.div`
-  background-color: ${Colors.grey1000};
-  margin: 10px 0;
+export const ProjectContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+`;
+
+export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
 `;
 
 export const ProjectLabel = styled.div`
@@ -97,25 +111,9 @@ export const ProjectLabel = styled.div`
   padding: 0px 6px 0px 8px;
 `;
 
-export const ProjectName = styled.div`
-  max-width: 6rem;
-  width: 100%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  color: ${Colors.whitePure};
-  font-weight: 600;
-  font-size: 12px;
-  text-align: left;
-
-  :hover,
-  :focus {
-    color: ${Colors.lightSeaGreen};
-  }
-
-  &:disabled {
-    color: inherit !important;
-  }
+export const ProjectMenu = styled.div`
+  background-color: ${Colors.grey1000};
+  margin: 10px 0;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`
@@ -129,6 +127,23 @@ export const ProjectsMenuContainer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 16px;
+`;
+
+export const ProjectName = styled.span`
+  max-width: 6rem;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: ${Colors.whitePure};
+  font-weight: 600;
+  font-size: 12px;
+  text-align: left;
+  transition: all 0.2s ease-in;
+
+  &:disabled {
+    color: inherit !important;
+  }
 `;
 
 export const ProjectTableActions = styled.div`
@@ -151,4 +166,10 @@ export const Table = styled(props => <RawTable {...props} />)`
   & .ant-table-container .ant-table-body {
     overflow-y: auto !important;
   }
+`;
+
+export const TableColumnName = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
 `;
