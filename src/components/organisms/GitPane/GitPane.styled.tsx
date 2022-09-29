@@ -75,7 +75,7 @@ export const FilesAction = styled.div`
   padding-left: 14px;
 `;
 
-export const GitPaneContainer = styled.div<{$height: number}>`
+export const GitPaneContainer = styled.div<{$foundChanges: boolean; $height: number}>`
   ${({$height}) => `
     height: ${$height}px;
   `}
@@ -83,7 +83,7 @@ export const GitPaneContainer = styled.div<{$height: number}>`
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: ${({$foundChanges}) => ($foundChanges ? 'space-between' : 'flex-start')};
 `;
 
 export const NoChangedFilesLabel = styled.div`
