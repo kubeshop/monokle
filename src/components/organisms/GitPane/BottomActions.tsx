@@ -1,12 +1,17 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Button, Menu, Tooltip} from 'antd';
+import {Menu, Tooltip} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
+import {
+  GitCommitDisabledTooltip,
+  GitCommitEnabledTooltip,
+  GitPushDisabledTooltip,
+  GitPushEnabledTooltip,
+} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -31,6 +36,13 @@ const BottomActions: React.FC = () => {
     () => Boolean(!changedFiles.filter(file => file.status === 'staged').length),
     [changedFiles]
   );
+  const isPushDisabled = useMemo(() => {
+    if (!gitRepo) {
+      return true;
+    }
+
+    return Boolean(!gitRepo.commits.length);
+  }, [gitRepo]);
 
   const publishHandler = useCallback(async () => {
     setPushPublishLoading(true);
@@ -116,9 +128,19 @@ const BottomActions: React.FC = () => {
           Publish branch
         </S.PublishBranchButton>
       ) : (
-        <Button disabled={!gitRepo?.hasRemoteRepo} loading={pushPublishLoading} type="primary" onClick={pushHandler}>
-          Push
-        </Button>
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isPushDisabled ? GitPushDisabledTooltip : <GitPushEnabledTooltip commits={gitRepo?.commits || []} />}
+        >
+          <S.PushButton
+            disabled={!gitRepo?.hasRemoteRepo || isPushDisabled}
+            loading={pushPublishLoading}
+            type="primary"
+            onClick={pushHandler}
+          >
+            Push
+          </S.PushButton>
+        </Tooltip>
       )}
 
       <CommitModal

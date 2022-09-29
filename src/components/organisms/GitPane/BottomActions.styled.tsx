@@ -30,3 +30,7 @@ export const PublishBranchButton = styled(Dropdown.Button)`
     width: 100%;
   }
 `;
+
+export const PushButton = styled(RawButton)`
+  width: 100%;
+`;

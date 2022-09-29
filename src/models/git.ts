@@ -8,6 +8,7 @@ export type GitRepo = {
   currentBranch: string;
   branches: string[];
   branchMap: Record<string, GitBranch>;
+  commits: string[];
   hasRemoteRepo: boolean;
 };
 
