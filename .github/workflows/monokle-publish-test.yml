@@ -133,16 +133,17 @@ jobs:
       - name: Generate and push Cask file
         run: |
           ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
-          cd ./homebrew-monokle
-          cat Casks/monokle.rb
-          git config --local user.email "bot-github-ci@kubeshop.io"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          git commit -am "Update cask to new version"
-          git push https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle.git
+
+      - name: Pushes to homebrew-monokle repository
+        uses: cpina/github-action-push-to-another-repository@main
         env:
-          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-          TAG: 'test'
+          API_TOKEN_GITHUB: ${{ secrets.CI_BOT_TOKEN }}
+        with:
+          source-directory: 'homebrew-monokle'
+          destination-github-username: 'kubeshop'
+          destination-repository-name: 'homebrew-monokle'
+          user-email: bot-github-ci@kubeshop.io
+          target-branch: main
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
