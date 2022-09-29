@@ -15,6 +15,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {registeredKindHandlersSelector} from '@redux/selectors';
 
 import {saveCRD} from '@utils/crds';
+import {isValidUrl} from '@utils/urls';
 
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
@@ -40,7 +41,10 @@ const CRDsSchemaValidation: React.FC = () => {
 
   const registerCRD = async () => {
     if (!inputUrl || !crdsDir) {
-      // TODO: validate if input is an actual URL
+      return;
+    }
+    if (inputUrl && !isValidUrl(inputUrl)) {
+      setError('The input is not a valid URL.');
       return;
     }
     const response = await fetch(inputUrl);
@@ -53,6 +57,7 @@ const CRDsSchemaValidation: React.FC = () => {
         registerKindHandler(newKindHandler, false);
       } else {
         setError('Unable to register CRD.');
+        return;
       }
       dispatch(
         setAlert({
@@ -63,6 +68,7 @@ const CRDsSchemaValidation: React.FC = () => {
       );
     } catch {
       setError("Couldn't parse the YAML that was fetched from the provided URL.");
+      return;
     }
 
     await saveCRD(crdsDir, text);
@@ -87,11 +93,11 @@ const CRDsSchemaValidation: React.FC = () => {
               onChange={e => setInputUrl(e.target.value)}
               placeholder="Enter URL of CRD"
             />
+            {error && <S.Error>{error}</S.Error>}
             <S.CancelButton onClick={cancelRegistering}>Cancel</S.CancelButton>
             <Button type="primary" onClick={registerCRD}>
               Register
             </Button>
-            {error && <p>{error}</p>}
           </S.RegisterContainer>
         ) : (
           <Button onClick={() => setIsRegistering(true)} type="primary" icon={<PlusOutlined />}>

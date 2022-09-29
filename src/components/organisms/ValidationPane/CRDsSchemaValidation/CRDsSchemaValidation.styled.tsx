@@ -28,3 +28,7 @@ export const Subtitle = styled.h2`
 export const CancelButton = styled(Button)`
   margin-right: 8px;
 `;
+
+export const Error = styled.p`
+  color: ${Colors.redError};
+`;
