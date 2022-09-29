@@ -44,7 +44,8 @@ export function formatGitChangedFiles(
           : 'staged',
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
-      gitPath: fullGitPath,
+      gitPath: gitFile.path,
+      fullGitPath,
       path: fullGitPath.replace(projectFolderPath, ''),
       displayPath: path.join(gitFolderPath, gitFile.path).startsWith(projectFolderPath)
         ? filePath

@@ -49,12 +49,12 @@ const FileList: React.FC<IProps> = props => {
           if (files[0].status === 'unstaged') {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
-              filePaths: [item.gitPath],
+              filePaths: [item.fullGitPath],
             });
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,
-              filePaths: [item.gitPath],
+              filePaths: [item.fullGitPath],
             });
           }
         },
@@ -64,7 +64,7 @@ const FileList: React.FC<IProps> = props => {
   );
 
   const selectItemHandler = (item: GitChangedFile) => {
-    if (selectedGitFile?.gitPath !== item.gitPath) {
+    if (selectedGitFile?.fullGitPath !== item.fullGitPath) {
       dispatch(setSelectedItem(item));
     }
 
@@ -84,9 +84,9 @@ const FileList: React.FC<IProps> = props => {
           onMouseLeave={() => setHovered(null)}
           style={{
             background:
-              selectedGitFile?.gitPath === item.gitPath
+              selectedGitFile?.fullGitPath === item.fullGitPath
                 ? Colors.selectionGradient
-                : selectedFiles.find(searchItem => searchItem.gitPath === item.gitPath)
+                : selectedFiles.find(searchItem => searchItem.fullGitPath === item.fullGitPath)
                 ? 'rgba(255, 255, 255, 0.07)'
                 : 'transparent',
           }}
@@ -100,16 +100,18 @@ const FileList: React.FC<IProps> = props => {
           />
 
           <S.FileItem>
-            <S.FileItemData $isSelected={selectedGitFile?.gitPath === item.gitPath}>
+            <S.FileItemData $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath}>
               <S.FileIcon>
-                <S.FileOutlined $isSelected={selectedGitFile?.gitPath === item.gitPath} $type={item.status} />
+                <S.FileOutlined $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath} $type={item.status} />
               </S.FileIcon>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.type.charAt(0).toUpperCase() + item.type.slice(1)}>
                 <S.FileStatus $type={item.type} />
               </Tooltip>
               <S.FileName>{item.name}</S.FileName>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.path}>
-                <S.FilePath $isSelected={selectedGitFile?.gitPath === item.gitPath}>{item.displayPath}</S.FilePath>
+                <S.FilePath $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath}>
+                  {item.displayPath}
+                </S.FilePath>
               </Tooltip>
             </S.FileItemData>
 
@@ -117,7 +119,7 @@ const FileList: React.FC<IProps> = props => {
               {hovered?.name === item.name && hovered?.path === item.path && (
                 <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
                   <Space onClick={e => e.stopPropagation()}>
-                    <Dots color={selectedGitFile?.gitPath === item.gitPath ? Colors.blackPure : Colors.blue6} />
+                    <Dots color={selectedGitFile?.fullGitPath === item.fullGitPath ? Colors.blackPure : Colors.blue6} />
                   </Space>
                 </Dropdown>
               )}
