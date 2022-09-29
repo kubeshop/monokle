@@ -8,7 +8,7 @@ export const Container = styled.div`
   margin: 16px;
 `;
 
-export const List = styled.ol`
+export const List = styled.ul`
   margin-bottom: 0;
 `;
 
