@@ -46,9 +46,6 @@ const GitCloneModal = (props: Props) => {
 
   const onOk = async () => {
     await gitForm.validateFields();
-
-    // if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
-
     setIsCloning(true);
     promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
       localPath: pickedPath,
