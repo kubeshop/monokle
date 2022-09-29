@@ -147,10 +147,6 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const onClickOpenShell = () => {
-    if (!bottomSelection || bottomSelection !== 'terminal') {
-      dispatch(setLeftBottomMenuSelection('terminal'));
-    }
-
     const newTerminalId = uuidv4();
     dispatch(setSelectedTerminal(newTerminalId));
     dispatch(
@@ -162,6 +158,10 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         shell: defaultShell,
       })
     );
+
+    if (!bottomSelection || bottomSelection !== 'terminal') {
+      dispatch(setLeftBottomMenuSelection('terminal'));
+    }
   };
 
   const menuItems = [
