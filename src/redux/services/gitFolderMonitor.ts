@@ -41,15 +41,13 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
 
   watcher
     .on('change', path => {
-      console.log('Path:', path);
-
       const gitRepo = thunkAPI.getState().git.repo;
 
       if (!gitRepo) {
         return;
       }
 
-      // commit was undoed
+      // commit was made/undoed
       if (path === `${absolutePath}${sep}logs${sep}refs${sep}heads${sep}${gitRepo.currentBranch}`) {
         promiseFromIpcRenderer('git.getCommits', 'git.getCommits.result', rootFolderPath).then(commits => {
           thunkAPI.dispatch(setLocalCommits(commits));
