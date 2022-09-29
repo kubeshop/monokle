@@ -13,7 +13,10 @@ import {
   GitPushEnabledTooltip,
 } from '@constants/tooltips';
 
-import {useAppSelector} from '@redux/hooks';
+import {AlertEnum} from '@models/alert';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -21,6 +24,7 @@ import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
+  const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const gitRepo = useAppSelector(state => state.git.repo);
@@ -77,11 +81,13 @@ const BottomActions: React.FC = () => {
             branchName: currentBranch || 'main',
           });
 
+          dispatch(setAlert({title: 'Pushed changes successfully', message: '', type: AlertEnum.Success}));
+
           setPushPublishLoading(false);
         },
       },
     ],
-    [currentBranch, publishHandler, selectedProjectRootFolder]
+    [currentBranch, dispatch, publishHandler, selectedProjectRootFolder]
   );
 
   const pushHandler = async () => {

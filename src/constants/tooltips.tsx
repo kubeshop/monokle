@@ -42,6 +42,7 @@ export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize
 export const NewEmptyProjectTooltip = 'New Empty Project';
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const NewProjectFromFolderTooltip = 'New project from existing folder';
+export const NewProjectFromGitTooltip = 'New project from Git repository';
 export const NewProjectFromTemplateTooltip = 'New Project from Template';
 export const NotificationsTooltip = 'Show latest notifications';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
