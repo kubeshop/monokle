@@ -1,9 +1,12 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Button, Menu} from 'antd';
+import {Button, Menu, Tooltip} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -13,6 +16,7 @@ import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
@@ -22,6 +26,11 @@ const BottomActions: React.FC = () => {
   const [showCommitModal, setShowCommitModal] = useState(false);
 
   const [bottomActionsRef, {width: bottomActionsWidth}] = useMeasure<HTMLDivElement>();
+
+  const isCommitDisabled = useMemo(
+    () => Boolean(!changedFiles.filter(file => file.status === 'staged').length),
+    [changedFiles]
+  );
 
   const publishHandler = useCallback(async () => {
     setPushPublishLoading(true);
@@ -76,14 +85,22 @@ const BottomActions: React.FC = () => {
 
   return (
     <S.BottomActionsContainer ref={bottomActionsRef}>
-      <S.CommitButton
-        $width={bottomActionsWidth / 2 - 48}
-        loading={commitLoading}
-        type="primary"
-        onClick={() => setShowCommitModal(true)}
+      <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
+        title={
+          isCommitDisabled ? GitCommitDisabledTooltip : <GitCommitEnabledTooltip branchName={currentBranch || 'main'} />
+        }
       >
-        Commit to {currentBranch || 'main'}
-      </S.CommitButton>
+        <S.CommitButton
+          $width={bottomActionsWidth / 2 - 48}
+          disabled={isCommitDisabled}
+          loading={commitLoading}
+          type="primary"
+          onClick={() => setShowCommitModal(true)}
+        >
+          Commit
+        </S.CommitButton>
+      </Tooltip>
 
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
