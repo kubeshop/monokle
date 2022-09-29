@@ -66,14 +66,14 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     if (type === 'stage') {
       await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedUnstagedFiles.map(item => item.gitPath),
+        filePaths: selectedUnstagedFiles.map(item => item.fullGitPath),
       });
 
       setSelectedUnstagedFiles([]);
     } else {
       await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
         localPath: selectedProjectRootFolder,
-        filePaths: selectedStagedFiles.map(item => item.gitPath),
+        filePaths: selectedStagedFiles.map(item => item.fullGitPath),
       });
 
       setSelectedStagedFiles([]);

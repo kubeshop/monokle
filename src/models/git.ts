@@ -15,7 +15,8 @@ export type GitChangedFile = {
   modifiedContent: string;
   name: string;
   originalContent: string;
-  gitPath: string; // full git path
+  gitPath: string; // relative git path
+  fullGitPath: string; // full git path
   path: string; // filemap path
   displayPath: string; // path displayed inside changed list
   status: 'staged' | 'unstaged';
