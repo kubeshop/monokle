@@ -57,6 +57,6 @@ export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
   icon: 'crds',
   name: 'CRDs Schema',
   description: 'Configure schema validation for Custom Resources based on Custom Resource Definitions.',
-  learnMoreUrl: '',
+  learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-crds/',
   isConfigurable: true,
 };
