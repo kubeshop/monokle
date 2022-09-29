@@ -99,7 +99,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
         <>
           {!hasRemoteRepo ? <RemoteInput /> : null}
 
-          <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT}>
+          <S.FileContainer $height={height - DEFAULT_PANE_TITLE_HEIGHT - (gitRepo ? 71 : 0)}>
             <S.ChangeList>
               Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
             </S.ChangeList>
