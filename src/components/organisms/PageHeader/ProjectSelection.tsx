@@ -160,7 +160,6 @@ const ProjectSelection = () => {
                 }}
               />
             </Tooltip>
-            {/* GIT REPO */}
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromGitTooltip} placement="bottomRight">
               <S.GitButtonFilled onClick={handleGitProject} />
             </Tooltip>
