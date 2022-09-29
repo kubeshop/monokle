@@ -3,13 +3,11 @@ import {useMemo, useState} from 'react';
 import {Dropdown} from 'antd';
 import {ItemType} from 'antd/lib/menu/hooks/useItems';
 
-import {GithubOutlined} from '@ant-design/icons';
-
 import {useAppDispatch} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 
-import {FileExplorer} from '@atoms';
+import {FileExplorer, Icon} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -29,9 +27,9 @@ const CreateProject = () => {
   const items: ItemType[] = useMemo(
     () => [
       {label: 'New from local folder', key: 'new_from_local_folder', icon: <img src={FolderSmallWhiteSvg} />},
+      {label: 'New from Git repository', key: 'new_from_git_repo', icon: <Icon name="git-repository" />},
       {label: 'New from scratch', key: 'new_from_scratch', icon: <img src={FolderSmallPlusWhiteSvg} />},
       {label: 'New from template', key: 'new_from_template', icon: <img src={TemplateSmallWhiteSvg} />},
-      {label: 'New from Git repository', key: 'new_from_git_repo', icon: <GithubOutlined />},
     ],
     []
   );

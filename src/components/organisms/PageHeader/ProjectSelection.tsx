@@ -14,6 +14,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {
   NewEmptyProjectTooltip,
   NewProjectFromFolderTooltip,
+  NewProjectFromGitTooltip,
   NewProjectFromTemplateTooltip,
   ProjectManagementTooltip,
   SearchProjectTooltip,
@@ -35,6 +36,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {getRelativeDate} from '@utils';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import GitCloneModal from './GitCloneModal';
 import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
@@ -47,6 +49,7 @@ const ProjectSelection = () => {
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
+  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const deleteModalVisible = useRef({visible: false});
@@ -104,6 +107,11 @@ const ProjectSelection = () => {
     dispatch(openCreateProjectModal({fromTemplate}));
   };
 
+  const handleGitProject = () => {
+    setIsDropdownMenuVisible(false);
+    setIsGitCloneModalVisible(true);
+  };
+
   const handleDeleteProject = (project: Project) => {
     const title = `Do you want to remove ${project?.name}?`;
     deleteModalVisible.current.visible = true;
@@ -152,6 +160,11 @@ const ProjectSelection = () => {
                 }}
               />
             </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromGitTooltip} placement="bottomRight">
+              <S.GitRepository onClick={handleGitProject}>
+                <S.GitRepositoryIcon name="git-repository" />
+              </S.GitRepository>
+            </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
               <S.FolderAddOutlined onClick={() => handleCreateProject(false)} />
             </Tooltip>
@@ -159,6 +172,12 @@ const ProjectSelection = () => {
               <S.FormatPainterOutlined onClick={() => handleCreateProject(true)} />
             </Tooltip>
           </S.ProjectsMenuActionsContainer>
+          {isGitCloneModalVisible && (
+            <GitCloneModal
+              onComplete={() => setIsGitCloneModalVisible(false)}
+              onCancel={() => setIsGitCloneModalVisible(false)}
+            />
+          )}
         </S.ProjectsMenuContainer>
 
         <S.Table
