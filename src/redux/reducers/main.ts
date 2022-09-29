@@ -942,6 +942,10 @@ export const mainSlice = createSlice({
         refreshDiffResource: undefined,
         selectedMatches: [],
       };
+      state.resourceFilter = {
+        labels: {},
+        annotations: {},
+      };
       resetSelectionHistory(state);
     });
 
