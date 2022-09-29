@@ -501,6 +501,8 @@ export const crdsPathChangedListener: AppListenerFn = listen => {
       const crdsDir = getState().config.userCrdsDir;
 
       if (crdsDir) {
+        // TODO: can we avoid having this property on the window object?
+        (window as any).monokleUserCrdsDir = crdsDir;
         readSavedCrdKindHandlers(crdsDir);
       }
     },
