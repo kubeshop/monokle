@@ -27,16 +27,22 @@ export const gitSlice = createSlice({
       }
     },
 
-    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
-      state.repo = action.payload;
-    },
-
     setHasRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
       if (!state.repo) {
         return;
       }
 
       state.repo.hasRemoteRepo = action.payload;
+    },
+
+    setLocalCommits: (state: Draft<GitSliceState>, action: PayloadAction<string[]>) => {
+      if (state.repo) {
+        state.repo.commits = action.payload;
+      }
+    },
+
+    setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
+      state.repo = action.payload;
     },
   },
   extraReducers: builder => {
@@ -48,6 +54,13 @@ export const gitSlice = createSlice({
   },
 });
 
-export const {clearRepo, setChangedFiles, setCurrentBranch, setHasRemoteRepo, setSelectedItem, setRepo} =
-  gitSlice.actions;
+export const {
+  clearRepo,
+  setChangedFiles,
+  setCurrentBranch,
+  setHasRemoteRepo,
+  setLocalCommits,
+  setSelectedItem,
+  setRepo,
+} = gitSlice.actions;
 export default gitSlice.reducer;

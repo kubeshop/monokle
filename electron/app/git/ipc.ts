@@ -11,6 +11,7 @@ import {
   deleteLocalBranch,
   fetchGitRepo,
   getChangedFiles,
+  getCommits,
   getCurrentBranch,
   getRemotePath,
   initGitRepo,
@@ -110,4 +111,9 @@ ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL
 ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
   const result = await getRemotePath(localPath);
   event.sender.send('git.getRemotePath.result', result);
+});
+
+ipcMain.on('git.getCommits', async (event, localPath: string) => {
+  const result = await getCommits(localPath);
+  event.sender.send('git.getCommits.result', result);
 });

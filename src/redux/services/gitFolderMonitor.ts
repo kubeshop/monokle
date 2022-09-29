@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
-import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
+import {setChangedFiles, setCurrentBranch, setLocalCommits, setRepo} from '@redux/git';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -45,6 +45,13 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
 
       if (!gitRepo) {
         return;
+      }
+
+      // commit was made/undoed
+      if (path === `${absolutePath}${sep}logs${sep}refs${sep}heads${sep}${gitRepo.currentBranch}`) {
+        promiseFromIpcRenderer('git.getCommits', 'git.getCommits.result', rootFolderPath).then(commits => {
+          thunkAPI.dispatch(setLocalCommits(commits));
+        });
       }
 
       // file was staged/unstaged

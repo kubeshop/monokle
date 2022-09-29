@@ -90,3 +90,12 @@ export const TerminalPaneTooltip = () => <HotkeyLabel text="View Terminal" name=
 
 export const ScaleTooltip = () => <HotkeyLabel text="Change the number of replicas" name="SCALE" />;
 export const RestartTooltip = 'Restart deployment';
+
+export const GitCommitDisabledTooltip = 'There are no staged files to commit';
+export const GitPushDisabledTooltip = 'There are no commits to push';
+export const GitCommitEnabledTooltip = ({branchName}: {branchName: string}) => (
+  <div>Commit staged files to {branchName}</div>
+);
+export const GitPushEnabledTooltip = ({commits}: {commits: string[]}) => (
+  <div>Push {commits.length} commits to remote</div>
+);

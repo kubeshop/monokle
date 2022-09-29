@@ -1,9 +1,17 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Button, Menu} from 'antd';
+import {Menu, Tooltip} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {
+  GitCommitDisabledTooltip,
+  GitCommitEnabledTooltip,
+  GitPushDisabledTooltip,
+  GitPushEnabledTooltip,
+} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
 
@@ -17,6 +25,7 @@ import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
   const dispatch = useAppDispatch();
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
@@ -26,6 +35,18 @@ const BottomActions: React.FC = () => {
   const [showCommitModal, setShowCommitModal] = useState(false);
 
   const [bottomActionsRef, {width: bottomActionsWidth}] = useMeasure<HTMLDivElement>();
+
+  const isCommitDisabled = useMemo(
+    () => Boolean(!changedFiles.filter(file => file.status === 'staged').length),
+    [changedFiles]
+  );
+  const isPushDisabled = useMemo(() => {
+    if (!gitRepo) {
+      return true;
+    }
+
+    return Boolean(!gitRepo.commits.length);
+  }, [gitRepo]);
 
   const publishHandler = useCallback(async () => {
     setPushPublishLoading(true);
@@ -82,14 +103,22 @@ const BottomActions: React.FC = () => {
 
   return (
     <S.BottomActionsContainer ref={bottomActionsRef}>
-      <S.CommitButton
-        $width={bottomActionsWidth / 2 - 48}
-        loading={commitLoading}
-        type="primary"
-        onClick={() => setShowCommitModal(true)}
+      <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
+        title={
+          isCommitDisabled ? GitCommitDisabledTooltip : <GitCommitEnabledTooltip branchName={currentBranch || 'main'} />
+        }
       >
-        Commit to {currentBranch || 'main'}
-      </S.CommitButton>
+        <S.CommitButton
+          $width={bottomActionsWidth / 2 - 48}
+          disabled={isCommitDisabled}
+          loading={commitLoading}
+          type="primary"
+          onClick={() => setShowCommitModal(true)}
+        >
+          Commit
+        </S.CommitButton>
+      </Tooltip>
 
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
@@ -105,9 +134,19 @@ const BottomActions: React.FC = () => {
           Publish branch
         </S.PublishBranchButton>
       ) : (
-        <Button disabled={!gitRepo?.hasRemoteRepo} loading={pushPublishLoading} type="primary" onClick={pushHandler}>
-          Push
-        </Button>
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={isPushDisabled ? GitPushDisabledTooltip : <GitPushEnabledTooltip commits={gitRepo?.commits || []} />}
+        >
+          <S.PushButton
+            disabled={!gitRepo?.hasRemoteRepo || isPushDisabled}
+            loading={pushPublishLoading}
+            type="primary"
+            onClick={pushHandler}
+          >
+            Push
+          </S.PushButton>
+        </Tooltip>
       )}
 
       <CommitModal
