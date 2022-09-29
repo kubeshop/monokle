@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {MonacoDiffEditor} from 'react-monaco-editor';
+import {MonacoDiffEditor, monaco} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
 import {isEmpty} from 'lodash';
@@ -14,9 +14,11 @@ import GitSelectItem from '@assets/GitSelectItem.svg';
 
 import * as S from './GitView.styled';
 
-const options = {
+const options: monaco.editor.IDiffEditorConstructionOptions = {
   readOnly: false,
   renderSideBySide: true,
+  inDiffEditor: true,
+  renderValidationDecorations: 'off',
   minimap: {
     enabled: false,
   },
