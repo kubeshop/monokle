@@ -84,7 +84,7 @@ export const setRootFolder = createAsyncThunk<
     policyPlugins,
   });
 
-  monitorRootFolder(rootFolder, thunkAPI.dispatch);
+  monitorRootFolder(rootFolder, thunkAPI);
 
   const generatedAlert = {
     title: 'Folder Import',
