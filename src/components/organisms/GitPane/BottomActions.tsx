@@ -70,6 +70,7 @@ const BottomActions: React.FC = () => {
   const menuItems = useMemo(
     () => [
       {
+        disabled: isPushDisabled,
         key: 'publish_and_push',
         label: 'Publish & Push',
         onClick: async () => {
@@ -87,7 +88,7 @@ const BottomActions: React.FC = () => {
         },
       },
     ],
-    [currentBranch, dispatch, publishHandler, selectedProjectRootFolder]
+    [currentBranch, dispatch, isPushDisabled, publishHandler, selectedProjectRootFolder]
   );
 
   const pushHandler = async () => {

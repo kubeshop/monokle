@@ -68,13 +68,12 @@ export async function fetchGitRepo(localPath: string) {
   try {
     const remoteBranchSummary = await git.branch({'-r': null});
     const localBranches = await git.branchLocal();
-    const commits = (await git.raw('cherry', '-v')).split('\n').filter(el => el);
 
     gitRepo = {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
       currentBranch: localBranches.current || remoteBranchSummary.current,
       branchMap: {},
-      commits,
+      commits: [],
       hasRemoteRepo: false,
     };
 
@@ -103,6 +102,13 @@ export async function fetchGitRepo(localPath: string) {
     gitRepo.hasRemoteRepo = true;
   } catch (e) {
     gitRepo.hasRemoteRepo = false;
+  }
+
+  try {
+    const commits = (await git.raw('cherry', '-v')).split('\n').filter(el => el);
+    gitRepo.commits = commits;
+  } catch (e) {
+    gitRepo.commits = [];
   }
 
   return gitRepo;
