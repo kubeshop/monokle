@@ -38,7 +38,7 @@ import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
-import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
+import useResourceYamlSchema from '@hooks/resourcesHooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';

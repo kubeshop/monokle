@@ -22,7 +22,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {Icon} from '@atoms';
 
-import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
+import useResourceYamlSchema from '@hooks/resourcesHooks/useResourceYamlSchema';
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';

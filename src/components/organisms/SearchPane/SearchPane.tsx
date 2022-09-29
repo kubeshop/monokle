@@ -33,6 +33,7 @@ import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
+import useResourceFilter from '@hooks/resourcesHooks/useResoucreFilter';
 
 import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
@@ -66,7 +67,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const {fileMapFiltered: fileMap} = useResourceFilter();
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);

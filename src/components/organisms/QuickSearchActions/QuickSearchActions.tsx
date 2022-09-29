@@ -14,9 +14,9 @@ import {resetResourceFilter, selectK8sResource, updateResourceFilter} from '@red
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors';
 
+import useResourceFilter from '@hooks/resourcesHooks/useResoucreFilter';
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {isResourcePassingFilter} from '@utils/resources';
 import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
@@ -105,6 +105,7 @@ const QuickSearchActionsV3: React.FC = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+  const {filteredResources} = useResourceFilter();
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
@@ -120,14 +121,6 @@ const QuickSearchActionsV3: React.FC = () => {
       ]),
     ].sort();
   }, [knownResourceKinds, resourceMap]);
-
-  const filteredResources = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(resourceMap).filter(([, resource]) => isResourcePassingFilter(resource, resourceFilter))
-      ),
-    [resourceFilter, resourceMap]
-  );
 
   const applyOption = useCallback(
     (type: string, option: string) => {

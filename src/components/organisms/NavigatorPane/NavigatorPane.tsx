@@ -9,8 +9,6 @@ import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
-import {ResourceFilterType} from '@models/appstate';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
@@ -18,6 +16,8 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
 import {MonoPaneTitle} from '@atoms';
+
+import useResourceFilter from '@hooks/resourcesHooks/useResoucreFilter';
 
 import {FeatureFlag} from '@utils/features';
 
@@ -46,19 +46,9 @@ const NavPane: React.FC<Props> = ({height}) => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
-  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
+  const {appliedFilters} = useResourceFilter();
 
   const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
-
-  const appliedFilters = useMemo(
-    () =>
-      Object.entries(resourceFilters)
-        .map(([key, value]) => {
-          return {filterName: key, filterValue: value};
-        })
-        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length),
-    [resourceFilters]
-  );
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
