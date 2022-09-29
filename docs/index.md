@@ -1,16 +1,19 @@
 # Monokle
 
-Welcome to Monokle - your friendly desktop UI for managing K8s manifests!
+Welcome to Monokle - K8s configuration analysis and version control editor!
 
 Monokle helps you to:
 
-- Quickly get a high-level view of your manifests, their contained resources and relationships.
-- Easily edit resources without having to learn or look up yaml syntax.
-- Refactor resources with maintained integrity of names and references.
-- Preview and debug resources generated with Kustomize or Helm.
-- Diff resources against your cluster and apply changes immediately.
-- Visualize and navigate resources in your clusters.
-- And much more!
+⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
+📇 Leverage Git to manage the lifecycle of your configuration
+✅ Validate resources using OPA policy rules
+🖊️ Easily edit resources without having to learn or look up yaml syntax and see the changes applied
+🔨 Refactor resources with maintained integrity of names and references
+📷 Preview and debug resources generated with kustomize or helm
+➕ Visualize extended resources defined in CRD
+🤝 Compare resource versions against your cluster and apply changes immediately or through pull requests
+📚 Create multi-step forms using Monokle's templating system to quickly generate manifests
+💡 And much more!
 
 For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=ossBDhP_K-4).
 
