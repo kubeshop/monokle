@@ -45,7 +45,10 @@ const GitCloneModal = (props: Props) => {
   );
 
   const onOk = async () => {
-    if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
+    await gitForm.validateFields();
+
+    // if (!formValues.repoPath || (!formValues.localPath && !pickedPath)) return;
+
     setIsCloning(true);
     promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
       localPath: pickedPath,
@@ -72,7 +75,6 @@ const GitCloneModal = (props: Props) => {
     setFormValues({...formValues, localPath: projectsRootPath});
     setIsEditingRoothPath(false);
     setPickedPath(projectsRootPath);
-    gitForm.validateFields();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectsRootPath]);
 
