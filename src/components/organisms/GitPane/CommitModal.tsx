@@ -44,7 +44,7 @@ const CommitModal: React.FC<IProps> = props => {
         message: values.message,
       });
 
-      dispatch(setAlert({title: 'Commited successfully', message: '', type: AlertEnum.Success}));
+      dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
 
       form.resetFields();
     });
