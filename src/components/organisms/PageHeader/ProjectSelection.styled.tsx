@@ -7,6 +7,7 @@ import {
   FolderOpenOutlined as RawFolderOpenOutlined,
   FolderOutlined as RawFolderOutlined,
   FormatPainterOutlined as RawFormatPainterOutlined,
+  GithubFilled as RawGithubFilled,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -28,6 +29,12 @@ export const Button = styled(RawButton)`
       color: ${Colors.lightSeaGreen} !important;
     }
   }
+`;
+
+export const GitButtonFilled = styled(RawGithubFilled)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
 `;
 
 export const DeleteOutlined = styled(RawDeleteOutlined)`

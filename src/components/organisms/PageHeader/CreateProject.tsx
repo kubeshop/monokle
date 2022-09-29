@@ -29,9 +29,9 @@ const CreateProject = () => {
   const items: ItemType[] = useMemo(
     () => [
       {label: 'New from local folder', key: 'new_from_local_folder', icon: <img src={FolderSmallWhiteSvg} />},
+      {label: 'New from Git repository', key: 'new_from_git_repo', icon: <GithubOutlined />},
       {label: 'New from scratch', key: 'new_from_scratch', icon: <img src={FolderSmallPlusWhiteSvg} />},
       {label: 'New from template', key: 'new_from_template', icon: <img src={TemplateSmallWhiteSvg} />},
-      {label: 'New from Git repository', key: 'new_from_git_repo', icon: <GithubOutlined />},
     ],
     []
   );
