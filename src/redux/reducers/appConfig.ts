@@ -22,6 +22,7 @@ import {
 import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
+import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {
@@ -38,6 +39,8 @@ import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -353,12 +356,13 @@ export const configSlice = createSlice({
     },
     setUserDirs: (
       state: Draft<AppConfig>,
-      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
+      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string; crdsDir: string}>
     ) => {
-      const {homeDir, tempDir, dataDir} = action.payload;
+      const {homeDir, tempDir, dataDir, crdsDir} = action.payload;
       state.userHomeDir = homeDir;
       state.userTempDir = tempDir;
       state.userDataDir = dataDir;
+      state.userCrdsDir = crdsDir;
     },
     changeCurrentProjectName: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       if (!state.selectedProjectRootFolder) {
@@ -488,6 +492,21 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
 
   const [lastOpened, ...rest] = sortedProjects;
   return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
+};
+
+export const crdsPathChangedListener: AppListenerFn = listen => {
+  listen({
+    type: setUserDirs.type,
+    effect: async (action, {getState}) => {
+      const crdsDir = getState().config.userCrdsDir;
+
+      if (crdsDir) {
+        // TODO: can we avoid having this property on the window object?
+        (window as any).monokleUserCrdsDir = crdsDir;
+        readSavedCrdKindHandlers(crdsDir);
+      }
+    },
+  });
 };
 
 export const {

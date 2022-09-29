@@ -136,6 +136,7 @@ interface AppConfig {
   userHomeDir?: string;
   userDataDir?: string;
   userTempDir?: string;
+  userCrdsDir?: string;
   isProjectLoading?: boolean;
   projectsRootPath: string;
   k8sVersion: string;

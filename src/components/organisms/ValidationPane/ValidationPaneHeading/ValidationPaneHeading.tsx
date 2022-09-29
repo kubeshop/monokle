@@ -2,15 +2,15 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {OPA_INTEGRATION} from '@models/integrations';
+import {ValidationIntegration} from '@models/integrations';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 
-import * as S from './ValidationOpenPolicyAgentHeading.styled';
+import * as S from './ValidationPaneHeading.styled';
 
-export const ValidationOpenPolicyAgentHeading: React.FC = () => {
-  const {icon, name, learnMoreUrl} = OPA_INTEGRATION;
+const ValidationPaneHeading: React.FC<{integration: ValidationIntegration}> = props => {
+  const {icon, name, learnMoreUrl} = props.integration;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const dispatch = useAppDispatch();
@@ -34,3 +34,5 @@ export const ValidationOpenPolicyAgentHeading: React.FC = () => {
     </S.Heading>
   );
 };
+
+export default ValidationPaneHeading;

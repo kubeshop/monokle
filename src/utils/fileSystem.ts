@@ -1,5 +1,5 @@
 import fs, {promises} from 'fs';
-import { join, sep } from 'path';
+import {join, sep} from 'path';
 import util from 'util';
 
 export const doesPathExist = (path: string) => util.promisify(fs.exists)(path);
@@ -24,9 +24,22 @@ export const getAllFiles = (dirPath: string, arrayOfFiles?: Array<any>) => {
     if (fs.statSync(join(dirPath, file)).isDirectory()) {
       arrayOfFiles = getAllFiles(join(dirPath, file), arrayOfFiles);
     } else {
-      (<Array<any>>arrayOfFiles).push(join(dirPath, sep, file));
+      (arrayOfFiles as Array<any>).push(join(dirPath, sep, file));
     }
   });
 
   return arrayOfFiles;
+};
+
+export const readFiles = async (dirPath: string, extension?: string) => {
+  const entries = await promises.readdir(dirPath, {withFileTypes: true});
+  const files = entries.filter(e => e.isFile() && (extension ? e.name.endsWith(extension) : true));
+
+  const fileContents = await Promise.all(files.map(f => readFile(join(dirPath, f.name))));
+  return fileContents;
+};
+
+export const getSubfolders = async (path: string) => {
+  const entries = await promises.readdir(path, {withFileTypes: true});
+  return entries.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
 };

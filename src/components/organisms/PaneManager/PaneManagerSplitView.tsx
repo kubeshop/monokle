@@ -91,7 +91,7 @@ const PaneManagerSplitView: React.FC = () => {
         </ReflexElement>
       )}
 
-      {/* react-reflex does not work as intended when you use propagate 
+      {/* react-reflex does not work as intended when you use propagate
             without multiple splitters so set is dynamically. */}
       {leftActiveMenu !== 'git-pane' && <ReflexSplitter propagate={Boolean(leftActiveMenu)} />}
 

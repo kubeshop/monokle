@@ -30,6 +30,7 @@ import {
 } from '@redux/services/kustomize';
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
+import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
@@ -751,6 +752,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
               const kindHandler = extractKindHandler(resource.content);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
+                const crdsDir = (window as any).monokleUserCrdsDir;
+                if (typeof crdsDir === 'string') {
+                  saveCRD(crdsDir, resource.text);
+                }
               } else {
                 log.warn('Failed to extract kindHandler', resource.content);
               }

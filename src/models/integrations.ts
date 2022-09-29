@@ -1,6 +1,11 @@
 import {IconNames} from './icons';
 
-export type ValidationIntegrationId = 'k8s-schema' | 'open-policy-agent' | 'resource-links' | 'yaml-syntax';
+export type ValidationIntegrationId =
+  | 'k8s-schema'
+  | 'open-policy-agent'
+  | 'resource-links'
+  | 'yaml-syntax'
+  | 'crd-schema';
 
 export type ValidationIntegration = {
   id: ValidationIntegrationId;
@@ -8,6 +13,7 @@ export type ValidationIntegration = {
   name: string;
   description: string;
   learnMoreUrl: string;
+  isConfigurable?: boolean;
 };
 
 export const K8S_SCHEMA_INTEGRATION: ValidationIntegration = {
@@ -26,6 +32,7 @@ export const OPA_INTEGRATION: ValidationIntegration = {
   description:
     'Open Policy Agent Policy-based control for cloud native environments. Flexible, fine-grained control for administrators across the stack.',
   learnMoreUrl: 'https://github.com/open-policy-agent/opa',
+  isConfigurable: true,
 };
 
 export const RESOURCE_LINKS_INTEGRATION: ValidationIntegration = {
@@ -43,4 +50,13 @@ export const YAML_SYNTAX_INTEGRATION: ValidationIntegration = {
   name: 'YAML Syntax',
   description: 'Validates that your manifests have correct YAML syntax. Always enabled.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
+};
+
+export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
+  id: 'crd-schema',
+  icon: 'crds',
+  name: 'CRDs Schema',
+  description: 'Configure schema validation for Custom Resources based on Custom Resource Definitions.',
+  learnMoreUrl: '',
+  isConfigurable: true,
 };
