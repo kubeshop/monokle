@@ -75,15 +75,14 @@ export const FilesAction = styled.div`
   padding-left: 14px;
 `;
 
-export const GitPaneContainer = styled.div<{$foundChanges: boolean; $height: number}>`
+export const GitPaneContainer = styled.div<{$height: number}>`
   ${({$height}) => `
     height: ${$height}px;
   `}
 
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: ${({$foundChanges}) => ($foundChanges ? 'space-between' : 'flex-start')};
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
 `;
 
 export const NoChangedFilesLabel = styled.div`
