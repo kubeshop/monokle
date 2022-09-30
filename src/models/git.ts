@@ -15,6 +15,8 @@ export type GitRepo = {
   hasRemoteRepo: boolean;
 };
 
+export type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';
+
 export type GitChangedFile = {
   modifiedContent: string;
   name: string;
@@ -24,7 +26,7 @@ export type GitChangedFile = {
   path: string; // filemap path
   displayPath: string; // path displayed inside changed list
   status: 'staged' | 'unstaged';
-  type: 'added' | 'deleted' | 'modified' | 'untracked';
+  type: GitChangedFileType;
 };
 
 export type GitSliceState = {
