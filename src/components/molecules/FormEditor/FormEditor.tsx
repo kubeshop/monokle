@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
+import {ErrorBoundary} from 'react-error-boundary';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
@@ -23,6 +24,8 @@ import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 import {updateResource} from '@redux/thunks/updateResource';
+
+import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
@@ -185,18 +188,20 @@ const FormEditor: React.FC<IProps> = props => {
 
   return (
     <S.FormContainer>
-      <Form
-        schema={schema}
-        uiSchema={formUiSchema}
-        formData={formData}
-        ObjectFieldTemplate={FormObjectFieldTemplate}
-        onChange={onFormUpdate}
-        widgets={getCustomFormWidgets()}
-        fields={getCustomFormFields()}
-        disabled={isReadOnlyMode}
-      >
-        <div />
-      </Form>
+      <ErrorBoundary FallbackComponent={ErrorPage}>
+        <Form
+          schema={schema}
+          uiSchema={formUiSchema}
+          formData={formData}
+          ObjectFieldTemplate={FormObjectFieldTemplate}
+          onChange={onFormUpdate}
+          widgets={getCustomFormWidgets()}
+          fields={getCustomFormFields()}
+          disabled={isReadOnlyMode}
+        >
+          <div />
+        </Form>
+      </ErrorBoundary>
     </S.FormContainer>
   );
 };
