@@ -109,7 +109,7 @@ const PageHeader = () => {
 
     monitorGitFolder(projectRootFolder, store);
 
-    promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
+    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
       dispatch(setCurrentBranch(result.currentBranch));
       setIsInitializingGitRepo(false);

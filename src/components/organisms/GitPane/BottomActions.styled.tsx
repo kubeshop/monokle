@@ -16,13 +16,8 @@ export const BottomActionsContainer = styled.div`
   overflow-x: hidden;
 `;
 
-export const CommitButton = styled(RawButton)<{$width: number}>`
-  & span {
-    width: ${({$width}) => `${$width}px` || '100%'};
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
+export const CommitButton = styled(RawButton)`
+  width: 100%;
 `;
 
 export const PublishBranchButton = styled(Dropdown.Button)`
@@ -31,6 +26,23 @@ export const PublishBranchButton = styled(Dropdown.Button)`
   }
 `;
 
-export const PushButton = styled(RawButton)`
-  width: 100%;
+export const PushPullContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  margin-right: 4px;
+`;
+
+export const SyncButton = styled(Dropdown.Button)`
+  & button:first-child {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+export const SyncButtonLabel = styled.span`
+  margin-right: 10px;
 `;

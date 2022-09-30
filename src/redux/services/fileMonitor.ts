@@ -56,7 +56,7 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
 
-        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+        promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', folder).then(repo => {
           if (repo) {
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
@@ -77,7 +77,7 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
 
-        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', folder).then(repo => {
+        promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', folder).then(repo => {
           if (repo) {
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));

@@ -13,12 +13,20 @@ export const gitSlice = createSlice({
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
+
     setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile>) => {
       state.selectedItem = action.payload;
     },
 
     setChangedFiles: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile[]>) => {
       state.changedFiles = action.payload;
+    },
+
+    setCommits: (state: Draft<GitSliceState>, action: PayloadAction<{ahead: number; behind: number}>) => {
+      if (state.repo) {
+        state.repo.commits.ahead = action.payload.ahead;
+        state.repo.commits.behind = action.payload.behind;
+      }
     },
 
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
@@ -35,12 +43,6 @@ export const gitSlice = createSlice({
       state.repo.hasRemoteRepo = action.payload;
     },
 
-    setLocalCommits: (state: Draft<GitSliceState>, action: PayloadAction<string[]>) => {
-      if (state.repo) {
-        state.repo.commits = action.payload;
-      }
-    },
-
     setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
       state.repo = action.payload;
     },
@@ -54,13 +56,6 @@ export const gitSlice = createSlice({
   },
 });
 
-export const {
-  clearRepo,
-  setChangedFiles,
-  setCurrentBranch,
-  setHasRemoteRepo,
-  setLocalCommits,
-  setSelectedItem,
-  setRepo,
-} = gitSlice.actions;
+export const {clearRepo, setChangedFiles, setCommits, setCurrentBranch, setHasRemoteRepo, setSelectedItem, setRepo} =
+  gitSlice.actions;
 export default gitSlice.reducer;

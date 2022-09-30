@@ -60,7 +60,7 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
   await git.clone(repoPath, localPath);
 }
 
-export async function fetchGitRepo(localPath: string) {
+export async function getGitRepoInfo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   let gitRepo: GitRepo;
@@ -73,7 +73,7 @@ export async function fetchGitRepo(localPath: string) {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
       currentBranch: localBranches.current || remoteBranchSummary.current,
       branchMap: {},
-      commits: [],
+      commits: {ahead: 0, behind: 0},
       hasRemoteRepo: false,
     };
 
@@ -105,10 +105,16 @@ export async function fetchGitRepo(localPath: string) {
   }
 
   try {
-    const commits = (await git.raw('cherry', '-v')).split('\n').filter(el => el);
-    gitRepo.commits = commits;
+    const [aheadCommits, behindCommits] = (
+      await git.raw('rev-list', '--left-right', '--count', `${gitRepo.currentBranch}...origin/${gitRepo.currentBranch}`)
+    )
+      .trim()
+      .split('\t');
+
+    gitRepo.commits.ahead = parseInt(aheadCommits, 10);
+    gitRepo.commits.behind = parseInt(behindCommits, 10);
   } catch (e) {
-    gitRepo.commits = [];
+    return gitRepo;
   }
 
   return gitRepo;
@@ -205,7 +211,13 @@ export async function publishLocalBranch(localPath: string, branchName: string) 
 
 export async function pushChanges(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.push('origin', branchName);
+
+  try {
+    await git.push('origin', branchName);
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function setRemote(localPath: string, remoteURL: string) {
@@ -214,9 +226,34 @@ export async function setRemote(localPath: string, remoteURL: string) {
   await git.fetch();
 }
 
-export async function getCommits(localPath: string) {
+export async function getCommits(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
-  const commits = (await git.raw('cherry', '-v')).split('\n').filter(el => el);
-  return commits;
+  try {
+    const [aheadCommits, behindCommits] = (
+      await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
+    )
+      .trim()
+      .split('\t');
+
+    return {aheadCommits, behindCommits};
+  } catch (e) {
+    return {aheadCommits: 0, behindCommits: 0};
+  }
+}
+
+export async function fetchRepo(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.fetch();
+}
+
+export async function pullChanges(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    await git.pull();
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }

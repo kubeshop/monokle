@@ -206,3 +206,4 @@ export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
 export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;
+export const GIT_ERROR_MODAL_DESCRIPTION = 'Check terminal for more information.';

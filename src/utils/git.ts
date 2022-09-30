@@ -2,12 +2,17 @@ import fs from 'fs';
 import path from 'path';
 
 import {FileMapType} from '@models/appstate';
-import {GitChangedFile} from '@models/git';
+import {GitChangedFile, GitChangedFileType} from '@models/git';
 
-const gitFileType: {[type: string]: 'added' | 'deleted' | 'modified' | 'untracked'} = {
+const gitFileType: {
+  [type: string]: GitChangedFileType;
+} = {
   A: 'added',
   D: 'deleted',
   M: 'modified',
+  R: 'renamed',
+  C: 'conflict',
+  S: 'submodule',
   '?': 'untracked',
 };
 

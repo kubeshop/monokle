@@ -8,9 +8,14 @@ export type GitRepo = {
   currentBranch: string;
   branches: string[];
   branchMap: Record<string, GitBranch>;
-  commits: string[];
+  commits: {
+    ahead: number; // number of commits on local but not on remote ( push )
+    behind: number; // number of commits on remote but not on local ( pull )
+  };
   hasRemoteRepo: boolean;
 };
+
+export type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';
 
 export type GitChangedFile = {
   modifiedContent: string;
@@ -21,7 +26,7 @@ export type GitChangedFile = {
   path: string; // filemap path
   displayPath: string; // path displayed inside changed list
   status: 'staged' | 'unstaged';
-  type: 'added' | 'deleted' | 'modified' | 'untracked';
+  type: GitChangedFileType;
 };
 
 export type GitSliceState = {
