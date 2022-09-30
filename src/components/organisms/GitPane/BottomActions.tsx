@@ -100,7 +100,7 @@ const BottomActions: React.FC = () => {
         onClick: async () => {
           setSyncPublishLoading(true);
           await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
-          dispatch(setAlert({title: 'Repo fetched successfully', message: '', type: AlertEnum.Success}));
+          dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
           setSyncPublishLoading(false);
         },
       },
