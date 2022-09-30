@@ -132,6 +132,7 @@ jobs:
 
       - name: Generate and push Cask file
         run: | 
+          rm -rf homebrew-monokle
           git clone https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle
           ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
           cd homebrew-monokle
