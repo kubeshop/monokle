@@ -1,17 +1,11 @@
 import {useCallback, useMemo, useState} from 'react';
-import {useMeasure} from 'react-use';
 
 import {Menu, Tooltip} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {
-  GitCommitDisabledTooltip,
-  GitCommitEnabledTooltip,
-  GitPushDisabledTooltip,
-  GitPushEnabledTooltip,
-} from '@constants/tooltips';
+import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
 
@@ -31,16 +25,23 @@ const BottomActions: React.FC = () => {
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [commitLoading, setCommitLoading] = useState(false);
-  const [pushPublishLoading, setPushPublishLoading] = useState(false);
+  const [syncPublishLoading, setSyncPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
-
-  const [bottomActionsRef, {width: bottomActionsWidth}] = useMeasure<HTMLDivElement>();
 
   const isCommitDisabled = useMemo(
     () => Boolean(!changedFiles.filter(file => file.status === 'staged').length),
     [changedFiles]
   );
+
   const isPushDisabled = useMemo(() => {
+    if (!gitRepo) {
+      return true;
+    }
+
+    return Boolean(!gitRepo.commits.ahead);
+  }, [gitRepo]);
+
+  const isSyncDisabled = useMemo(() => {
     if (!gitRepo) {
       return true;
     }
@@ -49,14 +50,14 @@ const BottomActions: React.FC = () => {
   }, [gitRepo]);
 
   const publishHandler = useCallback(async () => {
-    setPushPublishLoading(true);
+    setSyncPublishLoading(true);
 
     await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName: currentBranch || 'main',
     });
 
-    setPushPublishLoading(false);
+    setSyncPublishLoading(false);
   }, [currentBranch, selectedProjectRootFolder]);
 
   const isBranchOnRemote = useMemo(() => {
@@ -67,14 +68,14 @@ const BottomActions: React.FC = () => {
     return gitRepo.branches.includes(`origin/${gitRepo.currentBranch}`);
   }, [gitRepo]);
 
-  const menuItems = useMemo(
+  const publishMenuItems = useMemo(
     () => [
       {
         disabled: isPushDisabled,
         key: 'publish_and_push',
         label: 'Publish & Push',
         onClick: async () => {
-          setPushPublishLoading(true);
+          setSyncPublishLoading(true);
 
           await publishHandler();
           await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
@@ -84,22 +85,84 @@ const BottomActions: React.FC = () => {
 
           dispatch(setAlert({title: 'Pushed changes successfully', message: '', type: AlertEnum.Success}));
 
-          setPushPublishLoading(false);
+          setSyncPublishLoading(false);
         },
       },
     ],
     [currentBranch, dispatch, isPushDisabled, publishHandler, selectedProjectRootFolder]
   );
 
-  const pushHandler = async () => {
-    setPushPublishLoading(true);
+  const syncMenuItems = useMemo(
+    () => [
+      {
+        key: 'fetch',
+        label: 'Fetch',
+        onClick: async () => {
+          setSyncPublishLoading(true);
+          await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
+          dispatch(setAlert({title: 'Repo fetched successfully', message: '', type: AlertEnum.Success}));
+          setSyncPublishLoading(false);
+        },
+      },
+      {
+        key: 'pull',
+        label: 'Pull',
+        onClick: async () => {
+          setSyncPublishLoading(true);
+          await promiseFromIpcRenderer('git.pullChanges', 'git.pullChanges.result', selectedProjectRootFolder);
+          dispatch(setAlert({title: 'Pulled changes successfully', message: '', type: AlertEnum.Success}));
+          setSyncPublishLoading(false);
+        },
+      },
+      {
+        disabled: isPushDisabled,
+        key: 'push',
+        label: 'Push',
+        onClick: async () => {
+          setSyncPublishLoading(true);
+          await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+            localPath: selectedProjectRootFolder,
+            branchName: currentBranch || 'main',
+          });
+          dispatch(setAlert({title: 'Pushed changes successfully', message: '', type: AlertEnum.Success}));
+          setSyncPublishLoading(false);
+        },
+      },
+    ],
+    [currentBranch, dispatch, isPushDisabled, selectedProjectRootFolder]
+  );
 
-    await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-      localPath: selectedProjectRootFolder,
-      branchName: currentBranch || 'main',
-    });
+  const syncHandler = async () => {
+    if (!gitRepo) {
+      return;
+    }
 
-    setPushPublishLoading(false);
+    setSyncPublishLoading(true);
+
+    let alertActionMessage = '';
+
+    if (gitRepo.commits.behind) {
+      await promiseFromIpcRenderer('git.pullChanges', 'git.pullChanges.result', selectedProjectRootFolder);
+
+      alertActionMessage = 'Pulled';
+    }
+
+    if (gitRepo.commits.ahead) {
+      await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+        localPath: selectedProjectRootFolder,
+        branchName: currentBranch || 'main',
+      });
+
+      if (alertActionMessage === 'Pulled') {
+        alertActionMessage = 'Synced';
+      } else {
+        alertActionMessage = 'Pushed';
+      }
+    }
+
+    dispatch(setAlert({title: `${alertActionMessage} changes successfully`, message: '', type: AlertEnum.Success}));
+
+    setSyncPublishLoading(false);
   };
 
   if (!gitRepo) {
@@ -107,7 +170,7 @@ const BottomActions: React.FC = () => {
   }
 
   return (
-    <S.BottomActionsContainer ref={bottomActionsRef}>
+    <S.BottomActionsContainer>
       <Tooltip
         mouseEnterDelay={TOOLTIP_DELAY}
         title={
@@ -115,9 +178,8 @@ const BottomActions: React.FC = () => {
         }
       >
         <S.CommitButton
-          $width={bottomActionsWidth / 2 - 48}
           disabled={isCommitDisabled}
-          loading={commitLoading}
+          loading={syncPublishLoading || commitLoading}
           type="primary"
           onClick={() => setShowCommitModal(true)}
         >
@@ -127,43 +189,40 @@ const BottomActions: React.FC = () => {
 
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
-          loading={pushPublishLoading}
+          disabled={!gitRepo.hasRemoteRepo}
+          loading={syncPublishLoading || commitLoading}
           icon={<DownOutlined />}
           placement="topLeft"
           trigger={['click']}
           type="primary"
-          overlay={<Menu items={menuItems} />}
+          overlay={<Menu items={publishMenuItems} />}
           onClick={publishHandler}
-          disabled={!gitRepo.hasRemoteRepo}
         >
           Publish branch
         </S.PublishBranchButton>
       ) : (
-        <Tooltip
-          mouseEnterDelay={TOOLTIP_DELAY}
-          title={
-            isPushDisabled ? GitPushDisabledTooltip : <GitPushEnabledTooltip commitsNumber={gitRepo.commits.ahead} />
-          }
+        <S.SyncButton
+          disabled={!gitRepo.hasRemoteRepo || isSyncDisabled}
+          loading={syncPublishLoading || commitLoading}
+          icon={<DownOutlined />}
+          overlay={<Menu items={syncMenuItems} />}
+          placement="topLeft"
+          trigger={['click']}
+          type="primary"
+          onClick={syncHandler}
         >
-          <S.PushButton
-            disabled={!gitRepo.hasRemoteRepo || isPushDisabled}
-            loading={pushPublishLoading}
-            type="primary"
-            onClick={pushHandler}
-          >
-            Sync
-            {gitRepo.commits.behind > 0 ? (
-              <S.PushPullContainer>
-                {gitRepo.commits.behind} <ArrowDownOutlined />
-              </S.PushPullContainer>
-            ) : null}
-            {gitRepo.commits.ahead > 0 ? (
-              <S.PushPullContainer>
-                {gitRepo.commits.ahead} <ArrowUpOutlined />
-              </S.PushPullContainer>
-            ) : null}
-          </S.PushButton>
-        </Tooltip>
+          <S.SyncButtonLabel>Sync</S.SyncButtonLabel>
+          {gitRepo.commits.behind > 0 ? (
+            <S.PushPullContainer>
+              {gitRepo.commits.behind} <ArrowDownOutlined />
+            </S.PushPullContainer>
+          ) : null}
+          {gitRepo.commits.ahead > 0 ? (
+            <S.PushPullContainer>
+              {gitRepo.commits.ahead} <ArrowUpOutlined />
+            </S.PushPullContainer>
+          ) : null}
+        </S.SyncButton>
       )}
 
       <CommitModal

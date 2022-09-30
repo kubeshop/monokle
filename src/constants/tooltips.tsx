@@ -92,10 +92,6 @@ export const ScaleTooltip = () => <HotkeyLabel text="Change the number of replic
 export const RestartTooltip = 'Restart deployment';
 
 export const GitCommitDisabledTooltip = 'There are no staged files to commit';
-export const GitPushDisabledTooltip = 'There are no commits to push';
 export const GitCommitEnabledTooltip = ({branchName}: {branchName: string}) => (
   <div>Commit staged files to {branchName}</div>
-);
-export const GitPushEnabledTooltip = ({commitsNumber}: {commitsNumber: number}) => (
-  <div>Push {commitsNumber} commits to remote</div>
 );
