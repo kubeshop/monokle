@@ -137,7 +137,8 @@ jobs:
           cd homebrew-monokle
           git config --local user.email "bot-github-ci@kubeshop.io"
           git config --local user.name "github-actions[bot]"
-          git add . git commit -m "core: add new Monokle Cask release"
+          git add . 
+          git commit -m "core: add new Monokle Cask release"
           git push https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle
         env: 
           GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
