@@ -101,8 +101,8 @@ ipcMain.on('git.publishLocalBranch', async (event, payload: {localPath: string; 
 });
 
 ipcMain.on('git.pushChanges', async (event, payload: {localPath: string; branchName: string}) => {
-  await pushChanges(payload.localPath, payload.branchName);
-  event.sender.send('git.pushChanges.result');
+  const result = await pushChanges(payload.localPath, payload.branchName);
+  event.sender.send('git.pushChanges.result', result);
 });
 
 ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
@@ -126,6 +126,6 @@ ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
 });
 
 ipcMain.on('git.pullChanges', async (event, localPath: string) => {
-  await pullChanges(localPath);
-  event.sender.send('git.pullChanges.result');
+  const result = await pullChanges(localPath);
+  event.sender.send('git.pullChanges.result', result);
 });

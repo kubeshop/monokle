@@ -1,10 +1,10 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {Menu, Tooltip} from 'antd';
+import {Menu, Modal, Tooltip} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
@@ -13,16 +13,20 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {addDefaultCommandTerminal} from '@utils/terminal';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
   const dispatch = useAppDispatch();
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [commitLoading, setCommitLoading] = useState(false);
   const [syncPublishLoading, setSyncPublishLoading] = useState(false);
@@ -48,6 +52,56 @@ const BottomActions: React.FC = () => {
 
     return Boolean(!gitRepo.commits.ahead && !gitRepo.commits.behind);
   }, [gitRepo]);
+
+  const pullPushChangesHandler = useCallback(
+    async (type: 'pull' | 'push') => {
+      if (!gitRepo) {
+        return;
+      }
+
+      const result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+        localPath: selectedProjectRootFolder,
+        branchName: currentBranch || 'main',
+      });
+
+      if (result.error) {
+        Modal.warning({
+          title: `${type === 'pull' ? 'Pull' : 'Push'} failed`,
+          content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
+          zIndex: 100000,
+          onCancel: () => {
+            addDefaultCommandTerminal(
+              terminalsMap,
+              `git ${type} origin ${gitRepo.currentBranch}`,
+              defaultShell,
+              bottomSelection,
+              dispatch
+            );
+          },
+          onOk: () => {
+            addDefaultCommandTerminal(
+              terminalsMap,
+              `git ${type} origin ${gitRepo.currentBranch}`,
+              defaultShell,
+              bottomSelection,
+              dispatch
+            );
+          },
+        });
+      } else {
+        dispatch(
+          setAlert({
+            title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
+            message: '',
+            type: AlertEnum.Success,
+          })
+        );
+      }
+
+      return result.error;
+    },
+    [bottomSelection, currentBranch, defaultShell, dispatch, gitRepo, selectedProjectRootFolder, terminalsMap]
+  );
 
   const publishHandler = useCallback(async () => {
     setSyncPublishLoading(true);
@@ -76,20 +130,13 @@ const BottomActions: React.FC = () => {
         label: 'Publish & Push',
         onClick: async () => {
           setSyncPublishLoading(true);
-
           await publishHandler();
-          await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-            localPath: selectedProjectRootFolder,
-            branchName: currentBranch || 'main',
-          });
-
-          dispatch(setAlert({title: 'Pushed changes successfully', message: '', type: AlertEnum.Success}));
-
+          await pullPushChangesHandler('push');
           setSyncPublishLoading(false);
         },
       },
     ],
-    [currentBranch, dispatch, isPushDisabled, publishHandler, selectedProjectRootFolder]
+    [isPushDisabled, publishHandler, pullPushChangesHandler]
   );
 
   const syncMenuItems = useMemo(
@@ -109,8 +156,7 @@ const BottomActions: React.FC = () => {
         label: 'Pull',
         onClick: async () => {
           setSyncPublishLoading(true);
-          await promiseFromIpcRenderer('git.pullChanges', 'git.pullChanges.result', selectedProjectRootFolder);
-          dispatch(setAlert({title: 'Pulled changes successfully', message: '', type: AlertEnum.Success}));
+          await pullPushChangesHandler('pull');
           setSyncPublishLoading(false);
         },
       },
@@ -120,16 +166,12 @@ const BottomActions: React.FC = () => {
         label: 'Push',
         onClick: async () => {
           setSyncPublishLoading(true);
-          await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-            localPath: selectedProjectRootFolder,
-            branchName: currentBranch || 'main',
-          });
-          dispatch(setAlert({title: 'Pushed changes successfully', message: '', type: AlertEnum.Success}));
+          await pullPushChangesHandler('push');
           setSyncPublishLoading(false);
         },
       },
     ],
-    [currentBranch, dispatch, isPushDisabled, selectedProjectRootFolder]
+    [dispatch, isPushDisabled, pullPushChangesHandler, selectedProjectRootFolder]
   );
 
   const syncHandler = async () => {
@@ -142,16 +184,23 @@ const BottomActions: React.FC = () => {
     let alertActionMessage = '';
 
     if (gitRepo.commits.behind) {
-      await promiseFromIpcRenderer('git.pullChanges', 'git.pullChanges.result', selectedProjectRootFolder);
+      const error = await pullPushChangesHandler('pull');
+
+      if (error) {
+        setSyncPublishLoading(false);
+        return;
+      }
 
       alertActionMessage = 'Pulled';
     }
 
     if (gitRepo.commits.ahead) {
-      await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-        localPath: selectedProjectRootFolder,
-        branchName: currentBranch || 'main',
-      });
+      const error = await pullPushChangesHandler('push');
+
+      if (error) {
+        setSyncPublishLoading(false);
+        return;
+      }
 
       if (alertActionMessage === 'Pulled') {
         alertActionMessage = 'Synced';
@@ -161,7 +210,6 @@ const BottomActions: React.FC = () => {
     }
 
     dispatch(setAlert({title: `${alertActionMessage} changes successfully`, message: '', type: AlertEnum.Success}));
-
     setSyncPublishLoading(false);
   };
 

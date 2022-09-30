@@ -211,7 +211,13 @@ export async function publishLocalBranch(localPath: string, branchName: string) 
 
 export async function pushChanges(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.push('origin', branchName);
+
+  try {
+    await git.push('origin', branchName);
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function setRemote(localPath: string, remoteURL: string) {
@@ -243,5 +249,11 @@ export async function fetchRepo(localPath: string) {
 
 export async function pullChanges(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.pull();
+
+  try {
+    await git.pull();
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
