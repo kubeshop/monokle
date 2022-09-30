@@ -188,7 +188,9 @@ const FormEditor: React.FC<IProps> = props => {
 
   return (
     <S.FormContainer>
-      <ErrorBoundary FallbackComponent={ErrorPage}>
+      <ErrorBoundary
+        FallbackComponent={({error}) => <ErrorPage error={error} hideBackButton resetErrorBoundary={() => {}} />}
+      >
         <Form
           schema={schema}
           uiSchema={formUiSchema}
