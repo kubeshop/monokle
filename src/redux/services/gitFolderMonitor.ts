@@ -73,7 +73,7 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         path === `${absolutePath}${sep}config` ||
         path === `${absolutePath}${sep}FETCH_HEAD`
       ) {
-        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
+        promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolderPath).then(result => {
           thunkAPI.dispatch(setRepo(result));
           thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
         });

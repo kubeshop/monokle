@@ -9,14 +9,16 @@ import {
   commitChanges,
   createLocalBranch,
   deleteLocalBranch,
-  fetchGitRepo,
+  fetchRepo,
   getChangedFiles,
   getCommits,
   getCurrentBranch,
+  getGitRepoInfo,
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,
   publishLocalBranch,
+  pullChanges,
   pushChanges,
   setRemote,
   stageChangedFiles,
@@ -39,9 +41,9 @@ ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPa
   event.sender.send('git.cloneGitRepo.result');
 });
 
-ipcMain.on('git.fetchGitRepo', async (event, localPath: string) => {
-  const result = await fetchGitRepo(localPath);
-  event.sender.send('git.fetchGitRepo.result', result);
+ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
+  const result = await getGitRepoInfo(localPath);
+  event.sender.send('git.getGitRepoInfo.result', result);
 });
 
 ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; branchName: string}) => {
@@ -116,4 +118,14 @@ ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
 ipcMain.on('git.getCommits', async (event, payload: {localPath: string; branchName: string}) => {
   const result = await getCommits(payload.localPath, payload.branchName);
   event.sender.send('git.getCommits.result', result);
+});
+
+ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
+  await fetchRepo(localPath);
+  event.sender.send('git.fetchRepo.result');
+});
+
+ipcMain.on('git.pullChanges', async (event, localPath: string) => {
+  await pullChanges(localPath);
+  event.sender.send('git.pullChanges.result');
 });

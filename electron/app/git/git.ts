@@ -60,7 +60,7 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
   await git.clone(repoPath, localPath);
 }
 
-export async function fetchGitRepo(localPath: string) {
+export async function getGitRepoInfo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   let gitRepo: GitRepo;
@@ -234,4 +234,14 @@ export async function getCommits(localPath: string, branchName: string) {
   } catch (e) {
     return {aheadCommits: 0, behindCommits: 0};
   }
+}
+
+export async function fetchRepo(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.fetch();
+}
+
+export async function pullChanges(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.pull();
 }
