@@ -33,4 +33,19 @@ export const PublishBranchButton = styled(Dropdown.Button)`
 
 export const PushButton = styled(RawButton)`
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & > span {
+    margin-right: 10px;
+  }
+`;
+
+export const PushPullContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  margin-right: 4px;
 `;

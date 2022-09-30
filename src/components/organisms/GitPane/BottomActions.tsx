@@ -3,7 +3,7 @@ import {useMeasure} from 'react-use';
 
 import {Menu, Tooltip} from 'antd';
 
-import {DownOutlined} from '@ant-design/icons';
+import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {
@@ -45,7 +45,7 @@ const BottomActions: React.FC = () => {
       return true;
     }
 
-    return Boolean(!gitRepo.commits.length);
+    return Boolean(!gitRepo.commits.ahead && !gitRepo.commits.behind);
   }, [gitRepo]);
 
   const publishHandler = useCallback(async () => {
@@ -102,6 +102,10 @@ const BottomActions: React.FC = () => {
     setPushPublishLoading(false);
   };
 
+  if (!gitRepo) {
+    return null;
+  }
+
   return (
     <S.BottomActionsContainer ref={bottomActionsRef}>
       <Tooltip
@@ -130,22 +134,34 @@ const BottomActions: React.FC = () => {
           type="primary"
           overlay={<Menu items={menuItems} />}
           onClick={publishHandler}
-          disabled={!gitRepo?.hasRemoteRepo}
+          disabled={!gitRepo.hasRemoteRepo}
         >
           Publish branch
         </S.PublishBranchButton>
       ) : (
         <Tooltip
           mouseEnterDelay={TOOLTIP_DELAY}
-          title={isPushDisabled ? GitPushDisabledTooltip : <GitPushEnabledTooltip commits={gitRepo?.commits || []} />}
+          title={
+            isPushDisabled ? GitPushDisabledTooltip : <GitPushEnabledTooltip commitsNumber={gitRepo.commits.ahead} />
+          }
         >
           <S.PushButton
-            disabled={!gitRepo?.hasRemoteRepo || isPushDisabled}
+            disabled={!gitRepo.hasRemoteRepo || isPushDisabled}
             loading={pushPublishLoading}
             type="primary"
             onClick={pushHandler}
           >
-            Push
+            Sync
+            {gitRepo.commits.behind > 0 ? (
+              <S.PushPullContainer>
+                {gitRepo.commits.behind} <ArrowDownOutlined />
+              </S.PushPullContainer>
+            ) : null}
+            {gitRepo.commits.ahead > 0 ? (
+              <S.PushPullContainer>
+                {gitRepo.commits.ahead} <ArrowUpOutlined />
+              </S.PushPullContainer>
+            ) : null}
           </S.PushButton>
         </Tooltip>
       )}

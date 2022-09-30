@@ -113,7 +113,7 @@ ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
   event.sender.send('git.getRemotePath.result', result);
 });
 
-ipcMain.on('git.getCommits', async (event, localPath: string) => {
-  const result = await getCommits(localPath);
+ipcMain.on('git.getCommits', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await getCommits(payload.localPath, payload.branchName);
   event.sender.send('git.getCommits.result', result);
 });
