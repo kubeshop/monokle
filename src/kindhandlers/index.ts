@@ -210,7 +210,7 @@ export async function readSavedCrdKindHandlers(crdsDir: string) {
       log.warn(`Couldn't read files from ${dirPath}`);
     }
     for (let j = 0; j < fileContents.length; j += 1) {
-      const content = fileContents[i];
+      const content = fileContents[j];
       registerCrdKindHandlers(content);
     }
   }

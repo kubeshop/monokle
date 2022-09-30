@@ -14,25 +14,25 @@ export async function saveCRD(crdsDir: string, crdContent: string) {
     for (let i = 0; i < documents.length; i += 1) {
       const doc = documents[i];
       const json = doc.toJSON();
-      const kind = json.kind as string | undefined;
-      const apiVersion = json.apiVersion as string | undefined;
-      if (apiVersion && kind) {
-        const apiVersionDir = path.join(crdsDir, apiVersion.replaceAll(/[\\/ ]/g, '_'));
+      const name = json.metadata?.name as string | undefined;
+      const group = json.spec?.group as string | undefined;
+      if (group && name) {
+        const groupDir = path.join(crdsDir, group.replaceAll(/[\\/ ]/g, '_'));
         // eslint-disable-next-line no-await-in-loop
-        const doesApiVersionDirExist = await doesPathExist(apiVersionDir);
-        if (!doesApiVersionDirExist) {
+        const doesGroupDirExist = await doesPathExist(groupDir);
+        if (!doesGroupDirExist) {
           // eslint-disable-next-line no-await-in-loop
-          await createFolder(apiVersionDir);
+          await createFolder(groupDir);
         }
-        const kindFile = path.join(apiVersionDir, `${kind.replaceAll(/[\\/ ]/g, '_')}.yaml`);
+        const nameFile = path.join(groupDir, `${name.replaceAll(/[\\/ ]/g, '_')}.yaml`);
         // eslint-disable-next-line no-await-in-loop
-        const doesKindFileExist = await doesPathExist(kindFile);
-        if (doesKindFileExist) {
+        const doesNameFileExist = await doesPathExist(nameFile);
+        if (doesNameFileExist) {
           // eslint-disable-next-line no-await-in-loop
-          await deleteFile(kindFile);
+          await deleteFile(nameFile);
         }
         // eslint-disable-next-line no-await-in-loop
-        await writeFile(kindFile, crdContent);
+        await writeFile(nameFile, crdContent);
       }
     }
   } catch {
