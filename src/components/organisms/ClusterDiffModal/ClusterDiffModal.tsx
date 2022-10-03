@@ -252,7 +252,7 @@ const ClusterDiffModal = () => {
     <S.Modal
       $previewing={isInPreviewMode}
       title={title}
-      visible={isClusterDiffVisible}
+      open={isClusterDiffVisible}
       width="min-content"
       onCancel={onCancel}
       footer={

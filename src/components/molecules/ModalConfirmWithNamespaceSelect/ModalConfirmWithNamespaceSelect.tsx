@@ -104,7 +104,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     <Modal
       bodyStyle={{display: onlyClusterScopedResources ? 'none' : 'block'}}
       centered
-      visible={isVisible}
+      open={isVisible}
       title={
         <S.TitleContainer>
           <S.TitleIcon />

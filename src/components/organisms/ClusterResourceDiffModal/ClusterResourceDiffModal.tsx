@@ -273,7 +273,7 @@ const ClusterResourceDiffModal = () => {
             </S.FileSelectContainer>
           </S.TitleContainer>
         }
-        visible={isDiffModalVisible}
+        open={isDiffModalVisible}
         width="min-width"
         onCancel={onCloseHandler}
       >

@@ -71,7 +71,7 @@ const CommitModal: React.FC<IProps> = props => {
     <Modal
       title={`Commit to ${currentBranch || 'main'}`}
       okText="Commit"
-      visible={visible}
+      open={visible}
       onCancel={() => setShowModal(false)}
       onOk={onOkHandler}
       confirmLoading={loading}

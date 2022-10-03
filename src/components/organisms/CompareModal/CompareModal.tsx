@@ -26,7 +26,7 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
-    <Modal footer={null} title="Comparing resources" visible={visible} onCancel={onClose} onOk={onClose} {...sizeProps}>
+    <Modal footer={null} title="Comparing resources" open={visible} onCancel={onClose} onOk={onClose} {...sizeProps}>
       {!isInspecting ? <CompareActionBar /> : <InspectionActionBar />}
 
       <Row ref={containerRef}>

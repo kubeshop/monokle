@@ -263,7 +263,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }
                   overlayClassName="cluster-color-popover"
                   placement="bottom"
-                  visible={changeClusterColor === record.name}
+                  open={changeClusterColor === record.name}
                   title={
                     <>
                       <S.TitleText>Avoid mistakes by selecting an accent color for your cluster.</S.TitleText>
@@ -280,7 +280,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                   }
                   trigger="click"
                   zIndex={1500}
-                  onVisibleChange={visible => {
+                  onOpenChange={visible => {
                     if (!visible) {
                       setChangeClusterColor('');
                     }
