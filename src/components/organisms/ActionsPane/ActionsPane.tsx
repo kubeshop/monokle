@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Tabs, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {BookOutlined} from '@ant-design/icons';
 
@@ -60,8 +60,6 @@ import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';
-
-const {TabPane} = Tabs;
 
 type Props = {
   height: number;
