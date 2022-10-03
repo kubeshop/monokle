@@ -110,7 +110,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
 
   return (
     <Modal
-      visible={isVisible}
+      open={isVisible}
       footer={[
         <Button key="back" onClick={close}>
           Close

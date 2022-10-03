@@ -75,7 +75,7 @@ const RenameEntityModal: React.FC = () => {
   return (
     <Modal
       title="Rename entity"
-      visible={uiState.isOpen}
+      open={uiState.isOpen}
       onCancel={() => {
         dispatch(closeRenameEntityModal());
       }}

@@ -47,7 +47,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
         </Button>
       }
       title="Form Editor"
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       onOk={onClose}
       {...sizeProps}

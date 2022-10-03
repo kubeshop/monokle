@@ -60,7 +60,7 @@ const AboutModal = () => {
 
   return (
     <Modal
-      visible={aboutModalVisible}
+      open={aboutModalVisible}
       centered
       width={400}
       onCancel={handleClose}

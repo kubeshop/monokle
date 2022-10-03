@@ -234,8 +234,8 @@ const PageHeader = () => {
           </Tooltip>
 
           <Dropdown
-            visible={isHelpMenuOpen}
-            onVisibleChange={() => {
+            open={isHelpMenuOpen}
+            onOpenChange={() => {
               setIsHelpMenuOpen(!isHelpMenuOpen);
             }}
             overlay={

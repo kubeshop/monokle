@@ -444,7 +444,7 @@ const App = () => {
             <Modal
               width="900px"
               title="New Release"
-              visible={showReleaseNotes}
+              open={showReleaseNotes}
               onCancel={onCloseReleaseNotes}
               centered
               footer={null}

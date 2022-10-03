@@ -20,8 +20,8 @@ type Props = {
 function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableToggle}: Props) {
   return (
     <Dropdown
-      visible={tableVisible}
-      onVisibleChange={onTableToggle}
+      open={tableVisible}
+      onOpenChange={onTableToggle}
       overlay={table}
       placement={tablePlacement}
       arrow
