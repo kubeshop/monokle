@@ -53,9 +53,9 @@ export const Skeleton = styled(RawSkeleton)`
   width: 95%;
 `;
 
-export const Tabs = styled(RawTabs)`
+export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
-  height: 100%;
+  height: ${({$height}) => `${$height}px`};
   overflow: visible;
 
   & .ant-tabs-nav {
@@ -68,7 +68,7 @@ export const Tabs = styled(RawTabs)`
   }
 
   & .ant-tabs-content {
-    height: 100%;
+    height: ${({$height}) => $height - 46}px;
   }
 
   & .ant-tabs-extra-content {
