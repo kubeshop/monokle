@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/kubeshop/monokle/compare/v1.10.4-nightly-2022-09-30.0...v1.11.0) (2022-09-30)
+
+
+### Features
+
+* add error modal for push/pull ([b28a065](https://github.com/kubeshop/monokle/commit/b28a065ef8e34b06f97a39afd1f446c6f5cc946c))
+* fetch/pull actions ([04147fa](https://github.com/kubeshop/monokle/commit/04147fabceb21851d48a3925b08f24ad14a8d0be))
+* get ahead/behind commits and show count ([78a5365](https://github.com/kubeshop/monokle/commit/78a5365059af18fa0e42c63353c0641d44405e16))
+* sync handler + fetch/pull/push options ([59d5932](https://github.com/kubeshop/monokle/commit/59d5932a0eb4c90976ef2d013d4ec30b512a3b8a))
+
+
+### Bug Fixes
+
+* add error boundry for form ([4fb0628](https://github.com/kubeshop/monokle/commit/4fb062883d36d3623d07ce9ba4b681936d071dfd))
+* add missing git changed file types ([ffac7f8](https://github.com/kubeshop/monokle/commit/ffac7f889dae2dc7809d6f9cffb1526a35f32f1c))
+* conditional button back error boundry ([e50df30](https://github.com/kubeshop/monokle/commit/e50df3071c19fddcd390462981ebc329ebdf24a6))
+* error handling for creating local branch ([53283c0](https://github.com/kubeshop/monokle/commit/53283c0109ffa6a878bd40b294b065ae93e8ea8c))
+* save crds based on group & name ([b64b762](https://github.com/kubeshop/monokle/commit/b64b762022c6d9c728cb014ee04efcfd519f6c69))
+
 ### [1.10.3](https://github.com/kubeshop/monokle/compare/v1.10.3-nightly-2022-08-26.0...v1.10.3) (2022-08-26)
 
 
