@@ -7,7 +7,7 @@ import {Tooltip} from 'antd';
 
 import {BookOutlined} from '@ant-design/icons';
 
-import {HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
   EditWithFormTooltip,
@@ -420,6 +420,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
         <ImageDetails />
       ) : (
         <S.Tabs
+          $height={height - DEFAULT_PANE_TITLE_HEIGHT}
           defaultActiveKey="source"
           activeKey={activeTabKey}
           items={tabItems}
