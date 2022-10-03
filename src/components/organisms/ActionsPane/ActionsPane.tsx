@@ -1,7 +1,6 @@
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ReflexContainer, ReflexElement} from 'react-reflex';
 import {useMeasure} from 'react-use';
 
 import {Tabs, Tooltip} from 'antd';
@@ -296,88 +295,37 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
 
-  return (
-    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane">
-      <ActionsPaneHeader
-        actionsPaneWidth={actionsPaneWidth}
-        selectedResource={selectedResource}
-        applySelection={applySelection}
-        diffSelectedResource={diffSelectedResource}
-      />
-
-      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
-        <ReflexElement flex={1.0}>
-          {selectedPreviewConfigurationId ? (
-            <PreviewConfigurationDetails />
-          ) : selectedImage ? (
-            <ImageDetails />
-          ) : (
-            <S.Tabs
-              defaultActiveKey="source"
-              activeKey={activeTabKey}
-              onChange={k => setActiveTabKey(k)}
-              tabBarExtraContent={
-                selectedResource && resourceKindHandler?.helpLink ? (
-                  <>
-                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
-                      <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
-                        <Icon name="split-view" />
-                      </S.ExtraRightButton>
-                    </Tooltip>
-                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
-                      <S.ExtraRightButton
-                        onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
-                        type="link"
-                        ref={extraButton}
-                      >
-                        <BookOutlined />
-                      </S.ExtraRightButton>
-                    </Tooltip>
-                  </>
-                ) : isKustomization ? (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
-                    <S.ExtraRightButton
-                      onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
-                      type="link"
-                      ref={extraButton}
-                    >
-                      {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
-                    </S.ExtraRightButton>
-                  </Tooltip>
-                ) : selectedPath && isHelmChartFile(selectedPath) ? (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
-                    <S.ExtraRightButton
-                      onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
-                      type="link"
-                      ref={extraButton}
-                    >
-                      {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
-                    </S.ExtraRightButton>
-                  </Tooltip>
-                ) : null
-              }
-            >
-              <TabPane
-                key="source"
-                tab={
-                  <Walkthrough placement="leftTop" step="syntax" collection="novice">
-                    <TabHeader>Source</TabHeader>
-                  </Walkthrough>
-                }
-              >
-                {isFolderLoading || previewLoader.isLoading ? (
-                  <S.Skeleton active />
-                ) : activeTabKey === 'source' ? (
-                  !isClusterDiffVisible &&
-                  (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                    <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
-                  )
-                ) : null}
-              </TabPane>
-
-              {schemaForSelectedPath ||
-              (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-                <TabPane key="form" tab={<TabHeader>Form</TabHeader>}>
+  const tabItems = useMemo(
+    () => [
+      {
+        key: 'source',
+        label: (
+          <Walkthrough placement="leftTop" step="syntax" collection="novice">
+            <TabHeader>Source</TabHeader>
+          </Walkthrough>
+        ),
+        children: (
+          <>
+            {isFolderLoading || previewLoader.isLoading ? (
+              <S.Skeleton active />
+            ) : activeTabKey === 'source' ? (
+              !isClusterDiffVisible &&
+              (selectedResourceId || selectedPath || selectedValuesFileId) && (
+                <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+              )
+            ) : null}
+          </>
+        ),
+        style: {height: '100%'},
+      },
+      ...(schemaForSelectedPath ||
+      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema))
+        ? [
+            {
+              key: 'form',
+              label: <TabHeader>Form</TabHeader>,
+              children: (
+                <>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'form' ? (
@@ -399,32 +347,127 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                       />
                     ) : null
                   ) : null}
-                </TabPane>
-              ) : null}
-
-              {selectedResource && resourceKindHandler && !isKustomization && (
-                <TabPane key="metadataForm" tab={<TabHeader>Metadata</TabHeader>}>
+                </>
+              ),
+            },
+          ]
+        : []),
+      ...(selectedResource && resourceKindHandler && !isKustomization
+        ? [
+            {
+              key: 'metadataForm',
+              label: <TabHeader>Metadata</TabHeader>,
+              children: (
+                <>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'metadataForm' ? (
                     <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
                   ) : null}
-                </TabPane>
-              )}
-
-              {selectedResource?.kind === 'Pod' && isPreviewResourceId && (
-                <TabPane key="logs" tab={<TabHeader>Logs</TabHeader>}>
+                </>
+              ),
+            },
+          ]
+        : []),
+      ...(selectedResource?.kind === 'Pod' && isPreviewResourceId
+        ? [
+            {
+              key: 'logs',
+              label: <TabHeader>Logs</TabHeader>,
+              children: (
+                <>
                   {isFolderLoading || previewLoader.isLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'logs' ? (
                     <Logs />
                   ) : null}
-                </TabPane>
-              )}
-            </S.Tabs>
-          )}
-        </ReflexElement>
-      </ReflexContainer>
+                </>
+              ),
+            },
+          ]
+        : []),
+    ],
+    [
+      activeTabKey,
+      applySelection,
+      diffSelectedResource,
+      isClusterDiffVisible,
+      isFolderLoading,
+      isKustomization,
+      isPreviewResourceId,
+      k8sVersion,
+      previewLoader.isLoading,
+      resourceKindHandler,
+      schemaForSelectedPath,
+      selectedPath,
+      selectedResource,
+      selectedResourceId,
+      selectedValuesFileId,
+      userDataDir,
+    ]
+  );
+
+  return (
+    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height}>
+      <ActionsPaneHeader
+        actionsPaneWidth={actionsPaneWidth}
+        selectedResource={selectedResource}
+        applySelection={applySelection}
+        diffSelectedResource={diffSelectedResource}
+      />
+
+      {selectedPreviewConfigurationId ? (
+        <PreviewConfigurationDetails />
+      ) : selectedImage ? (
+        <ImageDetails />
+      ) : (
+        <S.Tabs
+          defaultActiveKey="source"
+          activeKey={activeTabKey}
+          items={tabItems}
+          onChange={k => setActiveTabKey(k)}
+          tabBarExtraContent={
+            selectedResource && resourceKindHandler?.helpLink ? (
+              <>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
+                  <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
+                    <Icon name="split-view" />
+                  </S.ExtraRightButton>
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                  <S.ExtraRightButton
+                    onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                    type="link"
+                    ref={extraButton}
+                  >
+                    <BookOutlined />
+                  </S.ExtraRightButton>
+                </Tooltip>
+              </>
+            ) : isKustomization ? (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
+                <S.ExtraRightButton
+                  onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
+                  type="link"
+                  ref={extraButton}
+                >
+                  {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
+                </S.ExtraRightButton>
+              </Tooltip>
+            ) : selectedPath && isHelmChartFile(selectedPath) ? (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
+                <S.ExtraRightButton
+                  onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
+                  type="link"
+                  ref={extraButton}
+                >
+                  {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
+                </S.ExtraRightButton>
+              </Tooltip>
+            ) : null
+          }
+        />
+      )}
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect

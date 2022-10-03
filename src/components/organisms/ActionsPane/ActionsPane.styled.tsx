@@ -26,8 +26,8 @@ export const ActionsPaneFooterContainer = styled.div`
   }
 `;
 
-export const ActionsPaneMainContainer = styled.div`
-  height: 100%;
+export const ActionsPaneMainContainer = styled.div<{$height: number}>`
+  height: ${({$height}) => $height}px;
   width: 100%;
   display: flex;
   flex-direction: column;

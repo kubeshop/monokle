@@ -141,7 +141,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
     handleChange({});
   }, [handleChange]);
 
-  const tabsItems = useMemo(
+  const tabItems = useMemo(
     () => [
       {
         key: '2',
@@ -243,7 +243,7 @@ export function FilterPopover({filter, onChange, disabled}: Props) {
     <Popover
       content={
         <div style={{width: 380}}>
-          <Tabs items={tabsItems} />
+          <Tabs items={tabItems} />
 
           <div style={{marginTop: 14, display: 'flex', justifyContent: 'space-between'}}>
             <div />
