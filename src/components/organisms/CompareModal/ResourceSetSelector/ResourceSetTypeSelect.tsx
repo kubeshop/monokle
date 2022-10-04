@@ -38,6 +38,7 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
         </Select.Option>
         <Select.Option value="helm">Helm Preview</Select.Option>
         <Select.Option value="kustomize">Kustomize Preview</Select.Option>
+        <Select.Option value="git">Git</Select.Option>
       </Select>
     </S.SelectColor>
   );

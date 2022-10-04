@@ -57,6 +57,20 @@ export const selectClusterResourceSet = (state: RootState, side: CompareSide) =>
   };
 };
 
+export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'git' || !state.git.repo) {
+    return undefined;
+  }
+
+  const branchName = resourceSet.branchName;
+
+  const allGitBranches = Object.values(state.git.repo.branchMap);
+  const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
+
+  return {allGitBranches, currentGitBranch};
+};
+
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
   const resourceSet = selectResourceSet(state.compare, side);
   if (resourceSet?.type !== 'helm' && resourceSet?.type !== 'helm-custom') {

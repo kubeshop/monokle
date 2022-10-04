@@ -1,0 +1,39 @@
+import {Select} from 'antd';
+
+import invariant from 'tiny-invariant';
+
+import {CompareSide, PartialResourceSet, resourceSetSelected, selectGitResourceSet} from '@redux/compare';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import * as S from '../ResourceSetSelectColor.styled';
+
+type IProps = {
+  side: CompareSide;
+};
+
+const GitBranchSelect: React.FC<IProps> = ({side}) => {
+  const dispatch = useAppDispatch();
+  const resourceSet = useAppSelector(state => selectGitResourceSet(state, side));
+  invariant(resourceSet, 'invalid_state');
+
+  const {allGitBranches, currentGitBranch} = resourceSet;
+
+  const handleSelect = (branchName: string) => {
+    const value: PartialResourceSet = {type: 'git', branchName};
+    dispatch(resourceSetSelected({side, value}));
+  };
+
+  return (
+    <S.SelectColor>
+      <Select onChange={handleSelect} placeholder="Choose Branch..." value={currentGitBranch?.name}>
+        {allGitBranches.map(branch => (
+          <Select.Option key={branch.name} value={branch.name}>
+            {branch.name}
+          </Select.Option>
+        ))}
+      </Select>
+    </S.SelectColor>
+  );
+};
+
+export default GitBranchSelect;
