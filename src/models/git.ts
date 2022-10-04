@@ -2,6 +2,15 @@ export type GitBranch = {
   name: string;
   commitSha: string;
   type: 'local' | 'remote';
+  commits?: {
+    author_email: string;
+    author_name: string;
+    body: string;
+    date: string;
+    hash: string;
+    message: string;
+    refs: string;
+  }[];
 };
 
 export type GitRepo = {

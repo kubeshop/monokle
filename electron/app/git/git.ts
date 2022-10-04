@@ -97,6 +97,17 @@ export async function getGitRepoInfo(localPath: string) {
     return undefined;
   }
 
+  for (let i = 0; i < Object.values(gitRepo.branchMap).length - 1; i += 1) {
+    const branchName = Object.values(gitRepo.branchMap)[i].name;
+
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[`${branchName !== gitRepo.currentBranch ? 'HEAD..' : ''}${branchName}`]: null})).all,
+    ];
+
+    Object.values(gitRepo.branchMap)[i].commits = commits;
+  }
+
   try {
     await git.remote(['show', 'origin']);
     gitRepo.hasRemoteRepo = true;
@@ -226,7 +237,7 @@ export async function setRemote(localPath: string, remoteURL: string) {
   await git.fetch();
 }
 
-export async function getCommits(localPath: string, branchName: string) {
+export async function getCommitsCount(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   try {

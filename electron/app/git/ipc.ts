@@ -11,7 +11,7 @@ import {
   deleteLocalBranch,
   fetchRepo,
   getChangedFiles,
-  getCommits,
+  getCommitsCount,
   getCurrentBranch,
   getGitRepoInfo,
   getRemotePath,
@@ -115,9 +115,9 @@ ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
   event.sender.send('git.getRemotePath.result', result);
 });
 
-ipcMain.on('git.getCommits', async (event, payload: {localPath: string; branchName: string}) => {
-  const result = await getCommits(payload.localPath, payload.branchName);
-  event.sender.send('git.getCommits.result', result);
+ipcMain.on('git.getCommitsCount', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await getCommitsCount(payload.localPath, payload.branchName);
+  event.sender.send('git.getCommitsCount.result', result);
 });
 
 ipcMain.on('git.fetchRepo', async (event, localPath: string) => {

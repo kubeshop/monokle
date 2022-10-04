@@ -49,7 +49,7 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
 
       // commit was made/undoed
       if (path === `${absolutePath}${sep}logs${sep}refs${sep}heads${sep}${gitRepo.currentBranch}`) {
-        promiseFromIpcRenderer('git.getCommits', 'git.getCommits.result', {
+        promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
           localPath: rootFolderPath,
           branchName: gitRepo.currentBranch,
         }).then(commits => {
