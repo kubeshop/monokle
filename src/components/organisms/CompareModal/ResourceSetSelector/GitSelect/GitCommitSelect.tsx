@@ -2,8 +2,8 @@ import {Select} from 'antd';
 
 import invariant from 'tiny-invariant';
 
-import {CompareSide, selectGitResourceSet} from '@redux/compare';
-import {useAppSelector} from '@redux/hooks';
+import {CompareSide, PartialResourceSet, resourceSetSelected, selectGitResourceSet} from '@redux/compare';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from '../ResourceSetSelectColor.styled';
 
@@ -12,10 +12,16 @@ type IProps = {
 };
 
 const GitCommitSelect: React.FC<IProps> = ({side}) => {
+  const dispatch = useAppDispatch();
   const resourceSet = useAppSelector(state => selectGitResourceSet(state, side));
   invariant(resourceSet, 'invalid_state');
 
-  const {currentGitBranch, currentGitBranchCommits} = resourceSet;
+  const {currentCommit, currentGitBranch, currentGitBranchCommits} = resourceSet;
+
+  const handleSelect = (commitHash: string) => {
+    const value: PartialResourceSet = {type: 'git', branchName: currentGitBranch?.name, commitHash};
+    dispatch(resourceSetSelected({side, value}));
+  };
 
   if (!currentGitBranch) {
     return <Select disabled placeholder="Select commit..." style={{width: '100%'}} />;
@@ -23,7 +29,12 @@ const GitCommitSelect: React.FC<IProps> = ({side}) => {
 
   return (
     <S.SelectColor style={{width: '100%'}}>
-      <Select placeholder="Select commit..." style={{width: '100%'}}>
+      <Select
+        placeholder="Select commit..."
+        style={{width: '100%'}}
+        value={currentCommit?.hash}
+        onSelect={handleSelect}
+      >
         {currentGitBranchCommits.map(commit => (
           <Select.Option key={commit.hash} value={commit.hash}>
             {commit.message} <S.CommitHash>{commit.hash.slice(0, 7)}</S.CommitHash>

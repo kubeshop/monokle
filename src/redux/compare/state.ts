@@ -172,6 +172,7 @@ export type KustomizeResourceSet = {
 export type GitResourceSet = {
   type: 'git';
   branchName: string;
+  commitHash?: string;
 };
 
 export type HelmResourceSet = {

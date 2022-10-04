@@ -67,10 +67,10 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
 
   const allGitBranches = Object.values(state.git.repo.branchMap);
   const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
-
   const currentGitBranchCommits = currentGitBranch?.commits || [];
+  const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
 
-  return {allGitBranches, currentGitBranch, currentGitBranchCommits};
+  return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
 };
 
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
