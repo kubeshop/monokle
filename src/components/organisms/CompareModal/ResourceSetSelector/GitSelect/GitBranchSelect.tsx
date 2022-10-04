@@ -19,7 +19,10 @@ const GitBranchSelect: React.FC<IProps> = ({side}) => {
   const {allGitBranches, currentGitBranch} = resourceSet;
 
   const handleSelect = (branchName: string) => {
-    const value: PartialResourceSet = {type: 'git', branchName};
+    // select latest commit by default if exists
+    const commitHash = allGitBranches.find(b => b.name === branchName)?.commits?.[0].hash || '';
+
+    const value: PartialResourceSet = {type: 'git', branchName, commitHash};
     dispatch(resourceSetSelected({side, value}));
   };
 
