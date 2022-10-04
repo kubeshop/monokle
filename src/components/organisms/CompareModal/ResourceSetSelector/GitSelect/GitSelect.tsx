@@ -1,8 +1,7 @@
-import {Space} from 'antd';
-
 import {CompareSide} from '@redux/compare';
 
 import GitBranchSelect from './GitBranchSelect';
+import GitCommitSelect from './GitCommitSelect';
 
 type IProps = {
   side: CompareSide;
@@ -10,9 +9,10 @@ type IProps = {
 
 const GitSelect: React.FC<IProps> = ({side}) => {
   return (
-    <Space wrap>
+    <>
       <GitBranchSelect side={side} />
-    </Space>
+      <GitCommitSelect side={side} />
+    </>
   );
 };
 

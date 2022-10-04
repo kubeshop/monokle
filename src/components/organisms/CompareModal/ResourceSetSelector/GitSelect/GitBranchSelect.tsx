@@ -25,7 +25,12 @@ const GitBranchSelect: React.FC<IProps> = ({side}) => {
 
   return (
     <S.SelectColor>
-      <Select onChange={handleSelect} placeholder="Choose Branch..." value={currentGitBranch?.name}>
+      <Select
+        onChange={handleSelect}
+        placeholder="Choose Branch..."
+        value={currentGitBranch?.name}
+        style={{width: 200}}
+      >
         {allGitBranches.map(branch => (
           <Select.Option key={branch.name} value={branch.name}>
             {branch.name}

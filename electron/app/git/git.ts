@@ -97,12 +97,12 @@ export async function getGitRepoInfo(localPath: string) {
     return undefined;
   }
 
-  for (let i = 0; i < Object.values(gitRepo.branchMap).length - 1; i += 1) {
+  for (let i = 0; i < Object.values(gitRepo.branchMap).length; i += 1) {
     const branchName = Object.values(gitRepo.branchMap)[i].name;
 
     const commits = [
       // eslint-disable-next-line no-await-in-loop
-      ...(await git.log({[`${branchName !== gitRepo.currentBranch ? 'HEAD..' : ''}${branchName}`]: null})).all,
+      ...(await git.log({[branchName]: null})).all,
     ];
 
     Object.values(gitRepo.branchMap)[i].commits = commits;
