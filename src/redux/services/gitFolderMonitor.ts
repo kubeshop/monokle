@@ -47,20 +47,24 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         return;
       }
 
-      // commit was made/undoed
-      if (path === `${absolutePath}${sep}logs${sep}refs${sep}heads${sep}${gitRepo.currentBranch}`) {
+      // commit was made/undoed or push was made
+      if (path.startsWith(`${absolutePath}${sep}logs${sep}refs`)) {
+        const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
+
         promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
           localPath: rootFolderPath,
           branchName: gitRepo.currentBranch,
         }).then(commits => {
-          thunkAPI.dispatch(setCommits({ahead: commits.aheadCommits, behind: commits.behindCommits}));
+          thunkAPI.dispatch(
+            setCommits({ahead: parseInt(commits.aheadCommits, 10), behind: parseInt(commits.behindCommits, 10)})
+          );
         });
 
         promiseFromIpcRenderer('git.getBranchCommits', 'git.getBranchCommits.result', {
           localPath: rootFolderPath,
-          branchName: gitRepo.currentBranch,
+          branchName,
         }).then(commits => {
-          thunkAPI.dispatch(setBranchCommits({branchName: gitRepo.currentBranch, commits}));
+          thunkAPI.dispatch(setBranchCommits({branchName, commits}));
         });
       }
 
