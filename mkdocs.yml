@@ -20,6 +20,7 @@ nav:
   - Feature Overview: features.md
   - UI Overview: overview.md
   - Working with File Explorer: file-explorer.md
+  - Integration with Git: git-integration.md
   - Working with the Form Editor: form-editor.md
   - Working with Resources:
     - Navigating Resources: resource-navigation.md
@@ -34,7 +35,7 @@ nav:
   - Working with Helm Charts: helm.md
   - Working with Clusters:
     - Cluster Integration: cluster-integration.md
-  - Resource Compare: cluster-compare.md
+  - Resource Compare: compare-sync.md
   - Deploy/Diff: apply-and-diff.md
   - Development:
     - Development: development.md

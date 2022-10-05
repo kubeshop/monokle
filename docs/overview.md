@@ -10,11 +10,11 @@ Launch Monokle and, on the welcome screen, there are three options to start work
  - Create a project from scratch.
  - Start from a template.
  
-![Welcome](img/new-user-start-screen.png)
+![Welcome](img/new-user-start-screen-1.11.png)
 
 On subsequent start-ups, Monokle automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled:
 
-![Returning User Screen](img/returning-user-start-screen-1.9.png)
+![Returning User Screen](img/returning-user-start-screen-1.11.png)
 
 ## **Working with Projects**
 
@@ -22,7 +22,7 @@ Click **Select an existing folder** to add your project folder containing K8 res
 
 Monokle is laid out like many other desktop applications:
 
-![Monokle UI](img/monokle-ui-1.9.png)
+![Monokle UI](img/monokle-ui-1.11.png)
 
 Left to right:
 
@@ -112,7 +112,7 @@ Monokle provides a system menu with the common File/Edit/View/Window/Help functi
 
 Mac System Menu:
 
-![MacOS Monokle System Menu](img/mac-system-menu-1.5.0.png)
+![MacOS Monokle System Menu](img/mac-system-menu-1.11.png)
 
 Windows System Menu:
 
@@ -124,7 +124,7 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 
 **Action:** File > New Monokle Window
 
-![Multiple Window](img/multiple-window-1.6.0.png)
+![Multiple Window](img/multiple-windows-1.11.png)
 
 ## **Auto-update**
 
