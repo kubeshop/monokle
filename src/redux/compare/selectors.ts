@@ -170,7 +170,8 @@ export const selectComparisonListItems = createSelector(
   (comparisons = [], [leftType, rightType], defaultNamespace) => {
     const result: ComparisonListItem[] = [];
 
-    const transferable = canTransfer(leftType, rightType);
+    const leftTransferable = canTransfer(leftType, rightType);
+    const rightTransferable = canTransfer(rightType, leftType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -190,8 +191,8 @@ export const selectComparisonListItems = createSelector(
             namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
-            leftTransferable: transferable,
-            rightTransferable: transferable,
+            leftTransferable: leftTransferable && comparison.isDifferent,
+            rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -204,8 +205,8 @@ export const selectComparisonListItems = createSelector(
               : undefined,
             leftActive: isDefined(comparison.left),
             rightActive: isDefined(comparison.right),
-            leftTransferable: transferable && isDefined(comparison.left),
-            rightTransferable: transferable && isDefined(comparison.right),
+            leftTransferable: leftTransferable && isDefined(comparison.left),
+            rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
           });
         }
