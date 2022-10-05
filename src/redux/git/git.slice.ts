@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {GitChangedFile, GitRepo, GitSliceState} from '@models/git';
+import {GitBranchCommit, GitChangedFile, GitRepo, GitSliceState} from '@models/git';
 
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -14,8 +14,15 @@ export const gitSlice = createSlice({
       state.repo = undefined;
     },
 
-    setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile>) => {
-      state.selectedItem = action.payload;
+    setBranchCommits: (
+      state: Draft<GitSliceState>,
+      action: PayloadAction<{branchName: string; commits: GitBranchCommit[]}>
+    ) => {
+      if (state.repo) {
+        const {branchName, commits} = action.payload;
+
+        state.repo.branchMap[branchName].commits = commits;
+      }
     },
 
     setChangedFiles: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile[]>) => {
@@ -46,6 +53,10 @@ export const gitSlice = createSlice({
     setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
       state.repo = action.payload;
     },
+
+    setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile>) => {
+      state.selectedItem = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -56,6 +67,14 @@ export const gitSlice = createSlice({
   },
 });
 
-export const {clearRepo, setChangedFiles, setCommits, setCurrentBranch, setHasRemoteRepo, setSelectedItem, setRepo} =
-  gitSlice.actions;
+export const {
+  clearRepo,
+  setBranchCommits,
+  setChangedFiles,
+  setCommits,
+  setCurrentBranch,
+  setHasRemoteRepo,
+  setSelectedItem,
+  setRepo,
+} = gitSlice.actions;
 export default gitSlice.reducer;

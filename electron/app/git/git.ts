@@ -298,3 +298,18 @@ export async function getCommitResources(localPath: string, branchName: string, 
 
   return resources;
 }
+
+export async function getBranchCommits(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[branchName]: null})).all,
+    ];
+
+    return orderBy(commits, ['date'], ['desc']);
+  } catch (e) {
+    return [];
+  }
+}

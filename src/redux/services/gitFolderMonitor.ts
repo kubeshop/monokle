@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
-import {setChangedFiles, setCommits, setCurrentBranch, setRepo} from '@redux/git';
+import {setBranchCommits, setChangedFiles, setCommits, setCurrentBranch, setRepo} from '@redux/git';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -54,6 +54,13 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
           branchName: gitRepo.currentBranch,
         }).then(commits => {
           thunkAPI.dispatch(setCommits({ahead: commits.aheadCommits, behind: commits.behindCommits}));
+        });
+
+        promiseFromIpcRenderer('git.getBranchCommits', 'git.getBranchCommits.result', {
+          localPath: rootFolderPath,
+          branchName: gitRepo.currentBranch,
+        }).then(commits => {
+          thunkAPI.dispatch(setBranchCommits({branchName: gitRepo.currentBranch, commits}));
         });
       }
 

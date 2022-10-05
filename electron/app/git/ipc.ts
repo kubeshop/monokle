@@ -10,6 +10,7 @@ import {
   createLocalBranch,
   deleteLocalBranch,
   fetchRepo,
+  getBranchCommits,
   getChangedFiles,
   getCommitResources,
   getCommitsCount,
@@ -138,3 +139,8 @@ ipcMain.on(
     event.sender.send('git.getCommitResources.result', result);
   }
 );
+
+ipcMain.on('git.getBranchCommits', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await getBranchCommits(payload.localPath, payload.branchName);
+  event.sender.send('git.getBranchCommits.result', result);
+});
