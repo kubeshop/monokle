@@ -1,10 +1,14 @@
 import {existsSync, promises as fs} from 'fs';
+import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
+import {K8sResource} from '@models/k8sresource';
+
+import {extractK8sResources} from '@redux/services/resource';
 
 import {formatGitChangedFiles} from '@utils/git';
 
@@ -105,7 +109,7 @@ export async function getGitRepoInfo(localPath: string) {
       ...(await git.log({[branchName]: null})).all,
     ];
 
-    Object.values(gitRepo.branchMap)[i].commits = commits;
+    Object.values(gitRepo.branchMap)[i].commits = orderBy(commits, ['date'], ['desc']);
   }
 
   try {
@@ -267,4 +271,30 @@ export async function pullChanges(localPath: string) {
   } catch (e: any) {
     return {error: e.message};
   }
+}
+
+export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  let resources: K8sResource[] = [];
+
+  const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
+    .split('\n')
+    .filter(el => el.includes('.yaml') || el.includes('.yml'));
+
+  for (let i = 0; i < filesPaths.length; i += 1) {
+    let content: string;
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      content = await git.show(`${branchName}:${filesPaths[i]}`);
+    } catch (e) {
+      content = '';
+    }
+
+    if (content) {
+      resources = [...resources, ...extractK8sResources(content, filesPaths[i])];
+    }
+  }
+
+  return resources;
 }

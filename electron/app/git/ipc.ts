@@ -11,6 +11,7 @@ import {
   deleteLocalBranch,
   fetchRepo,
   getChangedFiles,
+  getCommitResources,
   getCommitsCount,
   getCurrentBranch,
   getGitRepoInfo,
@@ -129,3 +130,11 @@ ipcMain.on('git.pullChanges', async (event, localPath: string) => {
   const result = await pullChanges(localPath);
   event.sender.send('git.pullChanges.result', result);
 });
+
+ipcMain.on(
+  'git.getCommitResources',
+  async (event, payload: {localPath: string; branchName: string; commitHash: string}) => {
+    const result = await getCommitResources(payload.localPath, payload.branchName, payload.commitHash);
+    event.sender.send('git.getCommitResources.result', result);
+  }
+);
