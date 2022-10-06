@@ -24,10 +24,11 @@ See [Development](development.md) on how to run Monokle from its source-code.
 ## **Install Dependencies**
 
 
-Monokle uses Helm, Kubectl and Kustomize for corresponding preview functionality.
+Monokle uses Helm, Kubectl and Kustomize for corresponding preview functionality, and Git for version control.
 
 1. [Helm](https://helm.sh/docs/intro/install/) - required for [Helm Preview](./helm.md#helm-preview) functionality
 2. [Kubectl](https://kubernetes.io/docs/tasks/tools/) or [Kustomize](https://kustomize.io) - required for [Kustomize Preview](./kustomize.md#kustomize-preview) and [Apply/Diff](./apply-and-diff.md) functionality
+3. [Git](https://git-scm.com/) - required for Version Control
 
 
 ## **Read Tutorials**
