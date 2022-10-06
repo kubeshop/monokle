@@ -1,6 +1,6 @@
 # Validating Resources
 
-Monokle automatically validates all resources of the corresponding Kubernetes 1.22.1 schemas. In the Navigator, a resource which is not validated is shown with a red error icon. A resource with a broken link is shown with a yellow triangle.
+Monokle automatically validates all resources of the corresponding Kubernetes 1.22.1 schemas. In the Navigator, a resource that is not validated is shown with a red error icon. A resource with a broken link is shown with a yellow triangle.
 
 ![Resource Validation](img/link-syntax-errors-image-1-1.9.png)
 
@@ -30,7 +30,7 @@ Hover on the error icon to check the error details and see the corresponding lin
 
 ## **Inspecting Policy Errors**
 
-Monokle now integrates with the Open Policy Agent and is able to use Rego policies to validate your resources. This means that validation now goes beyond syntax validation and also ensures that semantics are correct. For example, you can enable a policy that ensures that images no longer use the `latest` tag.
+Monokle now integrates with the Open Policy Agent and can use Rego policies to validate your resources. This means that validation now goes beyond syntax validation and also ensures that semantics are correct. For example, you can enable a policy that ensures that images no longer use the `latest` tag.
 
 Let's have a look at how you would configure and remediate violations.
 
@@ -42,13 +42,13 @@ This is the new home for all modules related to validation. Continue by clicking
 
 ![Open OPA drawer](img/opa-table-1.9.png)
 
-Here you can familiarize yourself with the rules that are available. We recommend enabling all of them and afterwards disabling those that generate too much noise for your use cases.
+Here you can familiarize yourself with the available rules. We recommend enabling all of them and afterwards disabling those that generate too much noise for your use cases.
 
 Great! Policy validation is now enabled. Policy errors have the same behavior as syntax errors. This means that you will see a red error icon appear whenever a violation is detected.
 
 ![Policy error navigator](img/opa-error-navigator-1.9.png)
 
-After opening the resource in your editor, you will notice that the error is also marked in gutter and highlighted. Hovering over the error will show you help on how to remediate the violation. Use this information to directly edit your resource and the errors will disappear in real-time.
+After opening the resource in your editor, you will notice that the error is also marked in the gutter and highlighted. Hovering over the error will show you help on how to remediate the violation. Use this information to directly edit your resource and the errors will disappear in real-time.
 
 ![Policy error editor](img/opa-error-editor-1.9.png)
 
@@ -94,7 +94,7 @@ Under the hood, Rego policies are compiled to web assembly. Monokle uses [the op
 
 **Can I use this with Helm and Kustomize?**
 
-No, in this first release only vanilla Kubernetes resources are validated. Let us know if this is something you need by liking our related [Helm][github-validate-helm] and [Kustomize][github-validate-kustomize] GitHub issue.
+No, in this first release only vanilla Kubernetes resources are validated. Let us know if this is something you need by liking our related [Helm][github-validate-helm] and [Kustomize][github-validate-kustomize] GitHub issues.
 
 **Can I use my own Rego policies?**
 
