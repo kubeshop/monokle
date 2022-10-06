@@ -14,6 +14,14 @@ export const gitSlice = createSlice({
       state.repo = undefined;
     },
 
+    closeGitCloneModal: (state: Draft<GitSliceState>) => {
+      state.gitCloneModal.open = false;
+    },
+
+    openGitCloneModal: (state: Draft<GitSliceState>) => {
+      state.gitCloneModal.open = true;
+    },
+
     setBranchCommits: (
       state: Draft<GitSliceState>,
       action: PayloadAction<{branchName: string; commits: GitBranchCommit[]}>
@@ -73,6 +81,8 @@ export const gitSlice = createSlice({
 
 export const {
   clearRepo,
+  closeGitCloneModal,
+  openGitCloneModal,
   setBranchCommits,
   setChangedFiles,
   setCommits,

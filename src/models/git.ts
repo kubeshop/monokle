@@ -42,6 +42,9 @@ export type GitChangedFile = {
 
 export type GitSliceState = {
   changedFiles: GitChangedFile[];
+  gitCloneModal: {
+    open: boolean;
+  };
   isGitInstalled: boolean;
   selectedItem?: GitChangedFile;
   repo?: GitRepo;

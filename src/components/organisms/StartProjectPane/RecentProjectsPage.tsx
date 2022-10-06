@@ -1,18 +1,18 @@
-import {useState} from 'react';
-
 import {Project} from '@models/appconfig';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
+
+import {GitCloneModal} from '@organisms';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import GitCloneModal from '../PageHeader/GitCloneModal';
 import Guide from './Guide';
 import RecentProject from './RecentProject';
 import * as S from './RecentProjectsPage.styled';
@@ -20,10 +20,9 @@ import * as S from './RecentProjectsPage.styled';
 const NewRecentProjectsPane = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const projects = useAppSelector(state => state.config.projects);
-
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
 
   const openProject = (project: Project) => {
     dispatch(setOpenProject(project.rootFolder));
@@ -35,10 +34,6 @@ const NewRecentProjectsPane = () => {
       return;
     }
     openProject(project);
-  };
-
-  const handleGitCloneRepo = () => {
-    setIsGitCloneModalVisible(true);
   };
 
   const handleOpenFolderExplorer = () => {
@@ -91,7 +86,7 @@ const NewRecentProjectsPane = () => {
             id="start-from-git"
             onClick={() => {
               if (isGitInstalled) {
-                handleGitCloneRepo();
+                dispatch(openGitCloneModal());
               }
             }}
           >
@@ -117,12 +112,7 @@ const NewRecentProjectsPane = () => {
         </S.ActionItems>
       </S.Actions>
 
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
+      {isGitCloneModalVisible && <GitCloneModal />}
     </S.Container>
   );
 };

@@ -18,19 +18,22 @@ import {isEmptyDir} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 type Props = {
-  onCancel?: () => void;
-  onComplete?: () => void;
+  onCancel: () => void;
+  onComplete: () => void;
 };
 
 const GitCloneModal = (props: Props) => {
   const {onComplete, onCancel} = props;
+
   const dispatch = useAppDispatch();
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+
   const [isCloning, setIsCloning] = useState<boolean>(false);
-  const [gitForm] = useForm();
   const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
   const [formValues, setFormValues] = useState({repoPath: '', localPath: pickedPath});
+
+  const [gitForm] = useForm();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
