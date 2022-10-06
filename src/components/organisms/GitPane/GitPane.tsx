@@ -37,12 +37,12 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const fileContainerHeight = useMemo(() => {
     let h: number = height - DEFAULT_PANE_TITLE_HEIGHT;
 
-    // 11 is the margin top of the git pane content
+    // 12 is the margin top of the git pane content
     if (gitRepo) {
-      h -= bottomActionsHeight + 11;
+      h -= bottomActionsHeight + 12;
     }
 
-    if (hasRemoteRepo) {
+    if (!hasRemoteRepo) {
       h -= remoteInputHeight;
     }
 
