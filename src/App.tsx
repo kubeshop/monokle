@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+import {useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -236,13 +237,11 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useMount(() => {
     fetchIsGitInstalled().then(isGitInstalled => {
       dispatch(setIsGitInstalled(isGitInstalled));
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);

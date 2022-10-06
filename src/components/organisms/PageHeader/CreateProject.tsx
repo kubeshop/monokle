@@ -32,7 +32,7 @@ const CreateProject = () => {
         disabled: !isGitInstalled,
         label: 'New from Git repository',
         key: 'new_from_git_repo',
-        icon: <Icon name="git-repository" />,
+        icon: <Icon style={{width: 16, marginRight: 10, marginLeft: '-2px'}} name="git-repository" />,
       },
       {label: 'New from scratch', key: 'new_from_scratch', icon: <img src={FolderSmallPlusWhiteSvg} />},
       {label: 'New from template', key: 'new_from_template', icon: <img src={TemplateSmallWhiteSvg} />},

@@ -112,15 +112,18 @@ export async function getGitRepoInfo(localPath: string) {
     return undefined;
   }
 
-  for (let i = 0; i < Object.values(gitRepo.branchMap).length; i += 1) {
-    const branchName = Object.values(gitRepo.branchMap)[i].name;
+  const branchMapValues = Object.values(gitRepo.branchMap);
 
+  for (let i = 0; i < branchMapValues.length; i += 1) {
+    const branchName = branchMapValues[i].name;
+
+    // get the list of commits for each branch found
     const commits = [
       // eslint-disable-next-line no-await-in-loop
       ...(await git.log({[branchName]: null})).all,
     ];
 
-    Object.values(gitRepo.branchMap)[i].commits = orderBy(commits, ['date'], ['desc']);
+    branchMapValues[i].commits = orderBy(commits, ['date'], ['desc']);
   }
 
   try {
@@ -295,6 +298,7 @@ export async function getCommitResources(localPath: string, branchName: string, 
   for (let i = 0; i < filesPaths.length; i += 1) {
     let content: string;
 
+    // get the content of the file found in current branch
     try {
       // eslint-disable-next-line no-await-in-loop
       content = await git.show(`${branchName}:${filesPaths[i]}`);
