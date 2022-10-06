@@ -19,7 +19,7 @@ type IProps = {
 const BranchTable: React.FC<IProps> = ({onSelect}) => {
   const branchMap = useAppSelector(state => state.git.repo?.branchMap);
 
-  const [branchType, setBranchType] = useState<string>('all');
+  const [branchType, setBranchType] = useState<string>('local');
   const [creatingBranch, setCreatingBranch] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
 
