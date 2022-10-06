@@ -99,10 +99,6 @@ ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   }
 });
 
-ipcMain.on('get-user-home-dir', (event: any) => {
-  event.returnValue = userHomeDir;
-});
-
 ipcMain.on(DOWNLOAD_PLUGIN, async (event: any, pluginUrl: string) => {
   try {
     const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);

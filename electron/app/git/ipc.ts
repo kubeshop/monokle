@@ -19,6 +19,7 @@ import {
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,
+  isGitInstalled,
   publishLocalBranch,
   pullChanges,
   pushChanges,
@@ -35,6 +36,11 @@ ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
 ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
   const result = await isFolderGitRepo(path);
   event.sender.send('git.isFolderGitRepo.result', result);
+});
+
+ipcMain.on('git.isGitInstalled', async (event, path: string) => {
+  const result = await isGitInstalled(path);
+  event.sender.send('git.isGitInstalled.result', result);
 });
 
 ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {

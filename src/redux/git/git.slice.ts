@@ -50,6 +50,10 @@ export const gitSlice = createSlice({
       state.repo.hasRemoteRepo = action.payload;
     },
 
+    setIsGitInstalled: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
+      state.isGitInstalled = action.payload;
+    },
+
     setRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRepo | undefined>) => {
       state.repo = action.payload;
     },
@@ -74,6 +78,7 @@ export const {
   setCommits,
   setCurrentBranch,
   setHasRemoteRepo,
+  setIsGitInstalled,
   setSelectedItem,
   setRepo,
 } = gitSlice.actions;

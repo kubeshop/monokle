@@ -12,6 +12,17 @@ import {extractK8sResources} from '@redux/services/resource';
 
 import {formatGitChangedFiles} from '@utils/git';
 
+export async function isGitInstalled(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+
+  try {
+    const result = await git.version();
+    return result.installed;
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
 

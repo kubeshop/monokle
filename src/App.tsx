@@ -19,6 +19,7 @@ import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
 import {toggleForm} from '@redux/forms';
+import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
@@ -43,6 +44,7 @@ import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
+import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
@@ -229,6 +231,14 @@ const App = () => {
           })
         );
       }
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetchIsGitInstalled().then(isGitInstalled => {
+      dispatch(setIsGitInstalled(isGitInstalled));
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
