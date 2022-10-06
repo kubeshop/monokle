@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const BottomActionsRef = styled.div``;
+
 export const ChangeList = styled.div`
   font-weight: 700;
   color: ${Colors.grey9};
@@ -91,6 +93,8 @@ export const NoChangedFilesLabel = styled.div`
   padding: 20px;
   font-size: 14px;
 `;
+
+export const RemoteInputContainer = styled.div``;
 
 export const StagedFilesActionsButton = styled(Dropdown.Button)`
   margin: 5px 0px 22px 14px;
