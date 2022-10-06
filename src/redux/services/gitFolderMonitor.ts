@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
-import {setChangedFiles, setCommits, setCurrentBranch, setRepo} from '@redux/git';
+import {setBranchCommits, setChangedFiles, setCommits, setCurrentBranch, setRepo} from '@redux/git';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -47,13 +47,24 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         return;
       }
 
-      // commit was made/undoed
-      if (path === `${absolutePath}${sep}logs${sep}refs${sep}heads${sep}${gitRepo.currentBranch}`) {
-        promiseFromIpcRenderer('git.getCommits', 'git.getCommits.result', {
+      // commit was made/undoed or push was made
+      if (path.startsWith(`${absolutePath}${sep}logs${sep}refs`)) {
+        const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
+
+        promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
           localPath: rootFolderPath,
           branchName: gitRepo.currentBranch,
         }).then(commits => {
-          thunkAPI.dispatch(setCommits({ahead: commits.aheadCommits, behind: commits.behindCommits}));
+          thunkAPI.dispatch(
+            setCommits({ahead: parseInt(commits.aheadCommits, 10), behind: parseInt(commits.behindCommits, 10)})
+          );
+        });
+
+        promiseFromIpcRenderer('git.getBranchCommits', 'git.getBranchCommits.result', {
+          localPath: rootFolderPath,
+          branchName,
+        }).then(commits => {
+          thunkAPI.dispatch(setBranchCommits({branchName, commits}));
         });
       }
 

@@ -14,6 +14,7 @@ type Props = {
 
 export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   const dispatch = useAppDispatch();
+  const isGitDisabled = useAppSelector(state => Boolean(!state.git.repo));
   const resourceSet = useAppSelector(state => selectResourceSet(state.compare, side));
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
 
@@ -38,6 +39,9 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
         </Select.Option>
         <Select.Option value="helm">Helm Preview</Select.Option>
         <Select.Option value="kustomize">Kustomize Preview</Select.Option>
+        <Select.Option disabled={isGitDisabled} value="git">
+          Git
+        </Select.Option>
       </Select>
     </S.SelectColor>
   );

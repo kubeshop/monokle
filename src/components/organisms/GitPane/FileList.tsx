@@ -68,7 +68,12 @@ const FileList: React.FC<IProps> = props => {
       dispatch(setSelectedItem(item));
     }
 
-    if (item.modifiedContent && fileMap[item.path]) {
+    if (
+      item.modifiedContent &&
+      fileMap[item.path] &&
+      fileMap[item.path].isSupported &&
+      !fileMap[item.path].isExcluded
+    ) {
       dispatch(selectFile({filePath: item.path}));
     } else if (selectedPath) {
       dispatch(clearSelectedPath());

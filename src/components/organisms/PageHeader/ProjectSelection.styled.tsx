@@ -83,11 +83,15 @@ export const GitProjectIcon = styled(Icon)`
   padding-top: 2px;
 `;
 
-export const GitRepository = styled.div`
+export const GitRepository = styled.div<{$disabled: boolean}>`
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+
+  & span {
+    color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  }
 `;
 
 export const GitRepositoryIcon = styled(Icon)`

@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import fs from 'fs';
 import path from 'path';
 
@@ -65,4 +67,13 @@ export function formatGitChangedFiles(
 
 export function filterGitFolder(paths: string[]) {
   return paths.filter(p => p !== '.git' && !p.includes(`${path.sep}.git${path.sep}`) && !p.endsWith('.git'));
+}
+
+export function fetchIsGitInstalled() {
+  return new Promise<boolean>(resolve => {
+    ipcRenderer.once('git.isGitInstalled.result', (_, isGitInstalled) => {
+      resolve(isGitInstalled);
+    });
+    ipcRenderer.send('git.isGitInstalled');
+  });
 }

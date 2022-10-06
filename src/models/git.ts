@@ -1,7 +1,18 @@
+export type GitBranchCommit = {
+  author_email: string;
+  author_name: string;
+  body: string;
+  date: string;
+  hash: string;
+  message: string;
+  refs: string;
+};
+
 export type GitBranch = {
   name: string;
   commitSha: string;
   type: 'local' | 'remote';
+  commits?: GitBranchCommit[];
 };
 
 export type GitRepo = {
@@ -31,6 +42,7 @@ export type GitChangedFile = {
 
 export type GitSliceState = {
   changedFiles: GitChangedFile[];
+  isGitInstalled: boolean;
   selectedItem?: GitChangedFile;
   repo?: GitRepo;
 };

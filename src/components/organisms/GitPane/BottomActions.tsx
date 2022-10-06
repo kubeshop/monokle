@@ -181,8 +181,6 @@ const BottomActions: React.FC = () => {
 
     setSyncPublishLoading(true);
 
-    let alertActionMessage = '';
-
     if (gitRepo.commits.behind) {
       const error = await pullPushChangesHandler('pull');
 
@@ -190,8 +188,6 @@ const BottomActions: React.FC = () => {
         setSyncPublishLoading(false);
         return;
       }
-
-      alertActionMessage = 'Pulled';
     }
 
     if (gitRepo.commits.ahead) {
@@ -201,15 +197,8 @@ const BottomActions: React.FC = () => {
         setSyncPublishLoading(false);
         return;
       }
-
-      if (alertActionMessage === 'Pulled') {
-        alertActionMessage = 'Synced';
-      } else {
-        alertActionMessage = 'Pushed';
-      }
     }
 
-    dispatch(setAlert({title: `${alertActionMessage} changes successfully`, message: '', type: AlertEnum.Success}));
     setSyncPublishLoading(false);
   };
 

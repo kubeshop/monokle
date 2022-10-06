@@ -21,7 +21,7 @@ const LazyDrawer: React.FC<IProps> = props => {
       placement="right"
       title={title}
       open={visible}
-      width="400"
+      width={400}
       onClose={onClose}
       {...rest}
     >

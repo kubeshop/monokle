@@ -1,12 +1,27 @@
 import {existsSync, promises as fs} from 'fs';
+import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
+import {K8sResource} from '@models/k8sresource';
+
+import {extractK8sResources} from '@redux/services/resource';
 
 import {formatGitChangedFiles} from '@utils/git';
+
+export async function isGitInstalled(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+
+  try {
+    const result = await git.version();
+    return result.installed;
+  } catch (e) {
+    return false;
+  }
+}
 
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
@@ -95,6 +110,20 @@ export async function getGitRepoInfo(localPath: string) {
     };
   } catch (e) {
     return undefined;
+  }
+
+  const branchMapValues = Object.values(gitRepo.branchMap);
+
+  for (let i = 0; i < branchMapValues.length; i += 1) {
+    const branchName = branchMapValues[i].name;
+
+    // get the list of commits for each branch found
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[branchName]: null})).all,
+    ];
+
+    branchMapValues[i].commits = orderBy(commits, ['date'], ['desc']);
   }
 
   try {
@@ -226,7 +255,7 @@ export async function setRemote(localPath: string, remoteURL: string) {
   await git.fetch();
 }
 
-export async function getCommits(localPath: string, branchName: string) {
+export async function getCommitsCount(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   try {
@@ -255,5 +284,47 @@ export async function pullChanges(localPath: string) {
     return {};
   } catch (e: any) {
     return {error: e.message};
+  }
+}
+
+export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  let resources: K8sResource[] = [];
+
+  const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
+    .split('\n')
+    .filter(el => el.includes('.yaml') || el.includes('.yml'));
+
+  for (let i = 0; i < filesPaths.length; i += 1) {
+    let content: string;
+
+    // get the content of the file found in current branch
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      content = await git.show(`${branchName}:${filesPaths[i]}`);
+    } catch (e) {
+      content = '';
+    }
+
+    if (content) {
+      resources = [...resources, ...extractK8sResources(content, filesPaths[i])];
+    }
+  }
+
+  return resources;
+}
+
+export async function getBranchCommits(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[branchName]: null})).all,
+    ];
+
+    return orderBy(commits, ['date'], ['desc']);
+  } catch (e) {
+    return [];
   }
 }

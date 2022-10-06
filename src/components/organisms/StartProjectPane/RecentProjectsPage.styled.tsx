@@ -5,20 +5,25 @@ import styled from 'styled-components';
 import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
-export const ActionItem = styled.div`
+export const ActionItem = styled.div<{$disabled?: boolean}>`
   height: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
   background: ${Colors.grey11};
-  cursor: pointer;
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   border-radius: 4px;
   padding: 24px;
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : 'inherit')};
 
   &:hover {
     transition: background ${AnimationDurations.base};
     background: ${Colors.blue7};
+
+    & > div:nth-child(2) {
+      color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
+    }
   }
 `;
 

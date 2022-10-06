@@ -10,6 +10,7 @@ import {resourceSetCleared, resourceSetRefreshed, selectCompareStatus, selectRes
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {ClusterContextSelect} from './ClusterContextSelect';
+import GitSelect from './GitSelect';
 import {HelmSelect} from './HelmSelect';
 import {KustomizeSelect} from './KustomizeSelect';
 import * as S from './ResourceSetSelector.styled';
@@ -36,6 +37,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
     <S.ResourceSetSelectorDiv>
       <S.SelectSpacer>
         <ResourceSetTypeSelect side={side} />
+        {resourceSet?.type === 'git' && <GitSelect side={side} />}
         {resourceSet && ['helm', 'helm-custom'].includes(resourceSet.type) && <HelmSelect side={side} />}
         {resourceSet?.type === 'kustomize' && (
           <S.KustomizeSelectContainer>
