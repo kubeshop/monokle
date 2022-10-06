@@ -59,7 +59,7 @@ const PaneManager: React.FC = () => {
 
           <ReflexContainer
             windowResizeAware
-            style={{height, width, position: 'relative'}}
+            style={{height: height + 1, width, position: 'relative'}}
             onStopResize={handleBottomPaneResize}
           >
             <ReflexElement id="topPane" flex={topPaneFlex}>
