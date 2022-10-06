@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {PlusCircleFilled, SearchOutlined} from '@ant-design/icons';
 
@@ -38,6 +38,16 @@ const BranchTable: React.FC<IProps> = ({onSelect}) => {
   }, [branchMap, branchType, searchFilter]);
 
   const columns = useBranchTable({branchCount: filteredBranches.length});
+
+  useEffect(() => {
+    if (!branchMap) {
+      return;
+    }
+
+    if (!Object.values(branchMap).filter(b => b.type === 'local').length) {
+      setBranchType('all');
+    }
+  }, [branchMap]);
 
   return (
     <S.Container>
