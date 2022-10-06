@@ -19,8 +19,10 @@ import * as S from './RecentProjectsPage.styled';
 
 const NewRecentProjectsPane = () => {
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(state => state.config.projects);
   const activeProject = useAppSelector(activeProjectSelector);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const projects = useAppSelector(state => state.config.projects);
+
   const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
 
   const openProject = (project: Project) => {
@@ -84,7 +86,15 @@ const NewRecentProjectsPane = () => {
             </S.ActionItemContext>
           </S.ActionItem>
 
-          <S.ActionItem id="start-from-git" onClick={handleGitCloneRepo}>
+          <S.ActionItem
+            $disabled={!isGitInstalled}
+            id="start-from-git"
+            onClick={() => {
+              if (isGitInstalled) {
+                handleGitCloneRepo();
+              }
+            }}
+          >
             <S.ActionItemLogo src={CreateFromGit} />
             <S.ActionItemContext>
               <S.ActionItemText>Clone a Git repo</S.ActionItemText>

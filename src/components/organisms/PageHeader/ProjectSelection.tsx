@@ -12,6 +12,7 @@ import _ from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {
+  InstallGitTooltip,
   NewEmptyProjectTooltip,
   NewProjectFromFolderTooltip,
   NewProjectFromGitTooltip,
@@ -43,6 +44,7 @@ const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const gitRepo = useAppSelector(state => state.git.repo);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
@@ -160,8 +162,19 @@ const ProjectSelection = () => {
                 }}
               />
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromGitTooltip} placement="bottomRight">
-              <S.GitRepository onClick={handleGitProject}>
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={isGitInstalled ? NewProjectFromGitTooltip : InstallGitTooltip}
+              placement="bottomRight"
+            >
+              <S.GitRepository
+                $disabled={!isGitInstalled}
+                onClick={() => {
+                  if (isGitInstalled) {
+                    handleGitProject();
+                  }
+                }}
+              >
                 <S.GitRepositoryIcon name="git-repository" />
               </S.GitRepository>
             </Tooltip>

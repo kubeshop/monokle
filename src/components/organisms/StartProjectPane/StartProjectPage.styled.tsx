@@ -33,19 +33,23 @@ export const StartProjectContainer = styled.div`
   padding: 0 6rem;
 `;
 
-export const StartProjectItem = styled.div`
+export const StartProjectItem = styled.div<{$disabled: boolean}>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: 2rem 1rem;
-  cursor: pointer;
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   background: ${Colors.grey10};
   border-radius: 4px;
 
   &:hover {
     background: ${Colors.blue7};
     transition: background ${AnimationDurations.base};
+
+    & > div:nth-child(3) {
+      color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
+    }
   }
 `;
 
@@ -54,26 +58,22 @@ export const StartProjectItemLogo = styled.img`
   height: 4.4rem;
 `;
 
-export const StartProjectItemTitle = styled.div`
+export const StartProjectItemTitle = styled.div<{$disabled: boolean}>`
   margin-top: 1.5rem;
   font-size: 16px;
-  color: ${Colors.whitePure};
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
   font-weight: 600;
   text-align: center;
   display: flex;
   flex-direction: column;
 `;
 
-export const StartProjectItemDescription = styled.div`
+export const StartProjectItemDescription = styled.div<{$disabled: boolean}>`
   margin-top: 1.5rem;
   font-size: 14px;
   font-weight: 400;
-  color: ${Colors.grey7};
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.grey7)};
   text-align: center;
-
-  ${StartProjectItem}:hover & {
-    color: ${Colors.whitePure};
-  }
 `;
 
 export const StartProjectItemButton = styled(Button)`
