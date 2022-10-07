@@ -143,7 +143,7 @@ export const ClusterContainer = styled.div`
   border: none;
   border-radius: 4px;
   line-height: 28px !important;
-  min-width: 340px;
+  min-width: 250px;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -191,8 +191,12 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   background: ${Colors.grey3b};
   border: none;
 
-  @media ${Device.laptop} {
-    min-width: 340px;
+  @media ${Device.laptopM} {
+    min-width: 220px;
+  }
+
+  @media ${Device.laptopL} {
+    min-width: 280px;
   }
 `;
 
