@@ -471,6 +471,12 @@ export function reloadFile(
   projectConfig: ProjectConfig,
   userDataDir: string
 ) {
+  const fileStats = getFileStats(absolutePath);
+  if (fileStats && fileStats.isFile() && fileIsIncluded(fileEntry.filePath, projectConfig)) {
+    const newText = fs.readFileSync(absolutePath, 'utf8');
+    state.fileMap[fileEntry.filePath].text = newText;
+  }
+
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
@@ -490,12 +496,6 @@ export function reloadFile(
   if (wasFileSelected) {
     selectFilePath({filePath: fileEntry.filePath, state});
     state.shouldEditorReloadSelectedPath = true;
-  }
-
-  const fileStats = getFileStats(absolutePath);
-  if (fileStats && fileStats.isFile() && fileIsIncluded(fileEntry.filePath, projectConfig)) {
-    const newText = fs.readFileSync(absolutePath, 'utf8');
-    state.fileMap[fileEntry.filePath].text = newText;
   }
 }
 
