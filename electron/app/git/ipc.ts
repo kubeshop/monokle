@@ -44,9 +44,8 @@ ipcMain.on('git.isGitInstalled', async (event, path: string) => {
 });
 
 ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
-  // TODO: handle errors
-  await cloneGitRepo(payload);
-  event.sender.send('git.cloneGitRepo.result');
+  const result = await cloneGitRepo(payload);
+  event.sender.send('git.cloneGitRepo.result', result);
 });
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {

@@ -51,10 +51,19 @@ const GitCloneModal: React.FC = () => {
       promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
         localPath: `${localPath}${sep}${repoName}`,
         repoPath: repoURL,
-      }).then(() => {
+      }).then(result => {
         setLoading(false);
-        dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
         dispatch(closeGitCloneModal());
+
+        if (result.error) {
+          Modal.warning({
+            title: 'Clone failed!',
+            content: <div>{result.error}</div>,
+            zIndex: 100000,
+          });
+        } else {
+          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
+        }
       });
     });
   };
