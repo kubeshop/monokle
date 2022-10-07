@@ -207,3 +207,5 @@ export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_te
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
 export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;
 export const GIT_ERROR_MODAL_DESCRIPTION = 'Check terminal for more information.';
+export const VALID_URL_REGEX =
+  /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
