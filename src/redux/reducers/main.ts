@@ -183,6 +183,7 @@ export const performResourceContentUpdate = (
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
     resource.text = updatedFileText;
+    fileMap[resource.filePath].text = updatedFileText;
     resource.content = parseYamlDocument(updatedFileText).toJS();
     recalculateResourceRanges(resource, fileMap, resourceMap);
   } else {
