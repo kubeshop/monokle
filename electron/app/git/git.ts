@@ -62,11 +62,11 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
   try {
     const stat = await fs.stat(localPath);
     if (!stat.isDirectory()) {
-      throw new Error(`${localPath} is ot a directory`);
+      throw new Error(`${localPath} is not a directory`);
     }
   } catch (e: any) {
     if (e.code === 'ENOENT') {
-      fs.mkdir(localPath);
+      await fs.mkdir(localPath);
     } else {
       throw e;
     }
