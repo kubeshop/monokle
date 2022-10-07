@@ -25,6 +25,12 @@ export const ComparisonRow = styled(Row)`
   height: 28px;
   margin-left: 8px;
   font-size: 16px;
+  transition: background-color 0.5s;
+  padding: 0px 5px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 `;
 
 export const ActionsCol = styled(Col)`
