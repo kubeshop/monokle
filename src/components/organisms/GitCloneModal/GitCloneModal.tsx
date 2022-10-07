@@ -97,6 +97,11 @@ const GitCloneModal: React.FC = () => {
                         return;
                       }
 
+                      if (!doesPathExist(localPath)) {
+                        reject(new Error('Provided path does not exist!'));
+                        return;
+                      }
+
                       if (repoName && doesPathExist(`${localPath}${sep}${repoName}`)) {
                         reject(
                           new Error(
