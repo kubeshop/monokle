@@ -1,11 +1,14 @@
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 
 import {Dropdown} from 'antd';
 import {ItemType} from 'antd/lib/menu/hooks/useItems';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
+
+import {GitCloneModal} from '@organisms';
 
 import {FileExplorer, Icon} from '@atoms';
 
@@ -17,13 +20,12 @@ import PlusIconSvg from '@assets/PlusIcon.svg';
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
 import * as S from './CreateProject.styled';
-import GitCloneModal from './GitCloneModal';
 
 const CreateProject = () => {
   const dispatch = useAppDispatch();
-  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
 
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
 
   const items: ItemType[] = useMemo(
     () => [
@@ -63,7 +65,7 @@ const CreateProject = () => {
     } else if (key === 'new_from_template') {
       handleCreateProject(true);
     } else if (key === 'new_from_git_repo') {
-      setIsGitCloneModalVisible(true);
+      dispatch(openGitCloneModal());
     }
   };
 
@@ -79,12 +81,7 @@ const CreateProject = () => {
         </S.Button>
       </Dropdown>
       <FileExplorer {...fileExplorerProps} />
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
+      {isGitCloneModalVisible && <GitCloneModal />}
     </S.DropdownContainer>
   );
 };

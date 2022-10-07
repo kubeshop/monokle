@@ -1,29 +1,24 @@
-import {useState} from 'react';
-
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
+
+import {GitCloneModal} from '@organisms';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import GitCloneModal from '../PageHeader/GitCloneModal';
 import Guide from './Guide';
 import * as S from './StartProjectPage.styled';
 
 const StartProjectPage = () => {
   const dispatch = useAppDispatch();
+  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
-
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
 
   const handleOpenFolderExplorer = () => {
     dispatch(openFolderExplorer());
-  };
-
-  const handleGitCloneRepo = () => {
-    setIsGitCloneModalVisible(true);
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -45,7 +40,9 @@ const StartProjectPage = () => {
       itemLogo: CreateFromGit,
       itemTitle: 'Clone a Git repo',
       itemDescription: 'Explore K8s resources from a public Git repo or one your own',
-      itemAction: handleGitCloneRepo,
+      itemAction: () => {
+        dispatch(openGitCloneModal());
+      },
     },
     {
       disabled: false,
@@ -94,12 +91,7 @@ const StartProjectPage = () => {
         })}
       </S.StartProjectContainer>
 
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
+      {isGitCloneModalVisible && <GitCloneModal />}
     </S.Container>
   );
 };
