@@ -2,8 +2,6 @@ import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
-import {GitCloneModal} from '@organisms';
-
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
@@ -14,7 +12,6 @@ import * as S from './StartProjectPage.styled';
 
 const StartProjectPage = () => {
   const dispatch = useAppDispatch();
-  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
 
   const handleOpenFolderExplorer = () => {
@@ -90,8 +87,6 @@ const StartProjectPage = () => {
           );
         })}
       </S.StartProjectContainer>
-
-      {isGitCloneModalVisible && <GitCloneModal />}
     </S.Container>
   );
 };

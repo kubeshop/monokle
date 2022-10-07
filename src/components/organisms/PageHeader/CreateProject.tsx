@@ -8,8 +8,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 
-import {GitCloneModal} from '@organisms';
-
 import {FileExplorer, Icon} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -23,7 +21,6 @@ import * as S from './CreateProject.styled';
 
 const CreateProject = () => {
   const dispatch = useAppDispatch();
-  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
 
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
 
@@ -81,7 +78,6 @@ const CreateProject = () => {
         </S.Button>
       </Dropdown>
       <FileExplorer {...fileExplorerProps} />
-      {isGitCloneModalVisible && <GitCloneModal />}
     </S.DropdownContainer>
   );
 };

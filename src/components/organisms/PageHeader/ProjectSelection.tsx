@@ -29,8 +29,6 @@ import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRep
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
-import {GitCloneModal} from '@organisms';
-
 import {Walkthrough} from '@molecules';
 
 import {FileExplorer} from '@atoms';
@@ -46,7 +44,6 @@ const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const gitRepo = useAppSelector(state => state.git.repo);
-  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
@@ -187,8 +184,6 @@ const ProjectSelection = () => {
               <S.FormatPainterOutlined onClick={() => handleCreateProject(true)} />
             </Tooltip>
           </S.ProjectsMenuActionsContainer>
-
-          {isGitCloneModalVisible && <GitCloneModal />}
         </S.ProjectsMenuContainer>
 
         <S.Table

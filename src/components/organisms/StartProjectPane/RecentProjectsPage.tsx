@@ -6,8 +6,6 @@ import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/ap
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
-import {GitCloneModal} from '@organisms';
-
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
@@ -20,7 +18,6 @@ import * as S from './RecentProjectsPage.styled';
 const NewRecentProjectsPane = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const projects = useAppSelector(state => state.config.projects);
 
@@ -111,8 +108,6 @@ const NewRecentProjectsPane = () => {
           </S.ActionItem>
         </S.ActionItems>
       </S.Actions>
-
-      {isGitCloneModalVisible && <GitCloneModal />}
     </S.Container>
   );
 };
