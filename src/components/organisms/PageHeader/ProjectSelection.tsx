@@ -23,6 +23,7 @@ import {
 
 import {Project} from '@models/appconfig';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
@@ -37,7 +38,6 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {getRelativeDate} from '@utils';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import GitCloneModal from './GitCloneModal';
 import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
@@ -51,7 +51,6 @@ const ProjectSelection = () => {
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const deleteModalVisible = useRef({visible: false});
@@ -111,7 +110,7 @@ const ProjectSelection = () => {
 
   const handleGitProject = () => {
     setIsDropdownMenuVisible(false);
-    setIsGitCloneModalVisible(true);
+    dispatch(openGitCloneModal());
   };
 
   const handleDeleteProject = (project: Project) => {
@@ -185,12 +184,6 @@ const ProjectSelection = () => {
               <S.FormatPainterOutlined onClick={() => handleCreateProject(true)} />
             </Tooltip>
           </S.ProjectsMenuActionsContainer>
-          {isGitCloneModalVisible && (
-            <GitCloneModal
-              onComplete={() => setIsGitCloneModalVisible(false)}
-              onCancel={() => setIsGitCloneModalVisible(false)}
-            />
-          )}
         </S.ProjectsMenuContainer>
 
         <S.Table
