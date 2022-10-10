@@ -30,6 +30,7 @@ const FileList: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const selectedGitFile = useAppSelector(state => state.git.selectedItem);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
@@ -72,7 +73,8 @@ const FileList: React.FC<IProps> = props => {
       item.modifiedContent &&
       fileMap[item.path] &&
       fileMap[item.path].isSupported &&
-      !fileMap[item.path].isExcluded
+      !fileMap[item.path].isExcluded &&
+      fileMap[item.path].filePath.startsWith(fileOrFolderContainedInFilter || '')
     ) {
       dispatch(selectFile({filePath: item.path}));
     } else if (selectedPath) {

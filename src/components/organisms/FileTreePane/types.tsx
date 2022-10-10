@@ -54,6 +54,7 @@ export interface TreeNode {
   isExcluded?: boolean;
   isSupported?: boolean;
   filePath: string;
+  className?: string;
 }
 
 export interface FilterTreeNode extends Omit<TreeNode, 'children'> {
