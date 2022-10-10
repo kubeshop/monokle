@@ -1,10 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import {useMemo} from 'react';
 
-import {Checkbox} from 'antd';
+import {Checkbox, Tooltip} from 'antd';
 
 import {groupBy} from 'lodash';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceSetData} from '@redux/compare';
@@ -91,7 +92,12 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         return (
           <S.ResourceDiv key={id}>
             {showCheckbox ? <Checkbox style={{marginRight: 16}} disabled /> : null}
-            {namespace && <S.ResourceNamespace>{namespace}</S.ResourceNamespace>}
+            {namespace && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={namespace}>
+                <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
+              </Tooltip>
+            )}
+
             <S.ResourceName>{name}</S.ResourceName>
           </S.ResourceDiv>
         );
