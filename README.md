@@ -7,7 +7,7 @@
   <a href="https://monokle.io">Website</a> |
   <a href="https://kubeshop.github.io/monokle/">Documentation</a> |
   <a href="https://discord.gg/uNuhy6GDyn">Discord</a> |
-  <a href="https://kubeshop.io/blog">Blog</a>
+  <a href="https://kubeshop.io/blog-projects/monokle">Blog</a>
 </p>
 
 <p align="center">
@@ -106,7 +106,6 @@ There is a lot of functionality currently being considered:
 - Advanced creator mode
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
-
 
 ## Getting involved
 
