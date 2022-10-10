@@ -89,6 +89,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
       {Wrapper && (
         <Wrapper itemInstance={itemInstance} options={ContextMenuWrapper.options}>
           <S.ItemContainer
+            $isDisabled={itemInstance.isDisabled}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             isSelected={itemInstance.isSelected}

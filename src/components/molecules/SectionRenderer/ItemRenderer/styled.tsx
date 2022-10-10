@@ -16,6 +16,7 @@ type ItemContainerProps = {
   $isSectionCheckable: boolean;
   $hasCustomNameDisplay: boolean;
   $lastItemMarginBottom?: number;
+  $isDisabled: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -29,7 +30,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   }}
   padding-right: 8px;
   margin-bottom: 2px;
-  ${props => props.hasOnClick && `cursor: pointer;`}
+  ${props => props.hasOnClick && !props.$isDisabled && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
       if (props.$lastItemMarginBottom !== undefined) {
@@ -39,7 +40,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
     }
   }}
   ${props => {
-    if (props.disableHoverStyle) {
+    if (props.disableHoverStyle || props.$isDisabled) {
       return;
     }
     if (!props.isSelected && props.isHighlighted) {
