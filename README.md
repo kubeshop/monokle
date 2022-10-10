@@ -65,7 +65,7 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
   <tr>
     <td>
       <p align="center">
-        <img src="docs/img/windows.svg" height="50" width="50" /></p>
+        <img src="docs/img/windows.svg" height="50" width="50" />
       </p>
     </td>
     <td>
