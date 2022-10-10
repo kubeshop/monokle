@@ -21,6 +21,7 @@ import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
+import CRDItem from './CRDItem';
 import * as S from './CRDsSchemaValidation.styled';
 
 const CRDsSchemaValidation: React.FC = () => {
@@ -110,7 +111,7 @@ const CRDsSchemaValidation: React.FC = () => {
             <Collapse.Panel header={apiVersion} key={apiVersion}>
               <S.List>
                 {crds.map(crd => (
-                  <li key={crd.kind}>{crd.kind}</li>
+                  <CRDItem key={crd.kind} crd={crd} />
                 ))}
               </S.List>
             </Collapse.Panel>
