@@ -43,3 +43,10 @@ export const getSubfolders = async (path: string) => {
   const entries = await promises.readdir(path, {withFileTypes: true});
   return entries.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
 };
+
+export const ensureFolderExists = async (folderPath: string) => {
+  const doesFolderExist = await doesPathExist(folderPath);
+  if (!doesFolderExist) {
+    await createFolder(folderPath);
+  }
+};
