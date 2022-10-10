@@ -21,6 +21,7 @@ import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
 
 type TemplatesScopeType = {
   fileMap: FileMapType;
+  fileOrFolderContainedIn: string;
   helmTemplatesMap: HelmTemplatesMapType;
   isFolderOpen: boolean;
   selectedPath: string | undefined;
@@ -30,6 +31,7 @@ type TemplatesScopeType = {
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
   previewValuesFileId: string | undefined;
+  fileOrFolderContainedIn: string;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
   selectedPath: string | undefined;
@@ -37,6 +39,7 @@ export type ValuesFilesScopeType = {
 };
 
 type HelmChartScopeType = {
+  fileOrFolderContainedIn: string;
   selectedPath: string | undefined;
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
@@ -92,6 +95,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
             itemPrefixIcon: 'preview',
           };
         },
+
         isSelected: (item, scope) => {
           return item.id === scope.selectedPreviewConfigurationId;
         },
@@ -139,6 +143,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     getScope: state => {
       return {
         fileMap: state.main.fileMap,
+        fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
         helmTemplatesMap: state.main.helmTemplatesMap,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         selectedPath: state.main.selectedPath,
@@ -175,6 +180,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
       builder: {
+        isDisabled: (rawItem, scope) => !rawItem.filePath.startsWith(scope.fileOrFolderContainedIn),
         isSelected: (rawItem, scope) => {
           return rawItem.filePath === scope.selectedPath;
         },
@@ -222,6 +228,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         isInClusterMode: kubeConfigPath
           ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
           : false,
+        fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
         previewValuesFileId: state.main.previewValuesFileId,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         selectedPath: state.main.selectedPath,
@@ -264,7 +271,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           return rawItem.filePath === scope.selectedPath;
         },
         isDisabled: (rawItem, scope) =>
-          Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
+          Boolean(
+            (scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) ||
+              scope.isInClusterMode ||
+              !rawItem.filePath.startsWith(scope.fileOrFolderContainedIn)
+          ),
         getMeta: () => {
           return {
             itemPrefixStyle: {
@@ -310,6 +321,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         isInClusterMode: kubeConfigPath
           ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
           : false,
+        fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
         previewValuesFileId: state.main.previewValuesFileId,
         selectedPath: state.main.selectedPath,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
@@ -343,7 +355,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           return scope.selectedPath === chart.filePath;
         },
         isDisabled: (rawItem, scope) =>
-          Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
+          Boolean(
+            (scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) ||
+              scope.isInClusterMode ||
+              !rawItem.filePath.startsWith(scope.fileOrFolderContainedIn)
+          ),
       },
       instanceHandler: {
         onClick: (instance, dispatch) => {
