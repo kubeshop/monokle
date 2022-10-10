@@ -42,7 +42,12 @@ const CRDItem: React.FC<IProps> = props => {
   );
 
   return (
-    <S.Row key={crd.kind} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <S.Row
+      key={crd.kind}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      $isHovered={isHovered}
+    >
       <span>{crd.kind}</span>
       {isHovered && (
         <ContextMenu overlay={<Menu items={menuItems} />}>
