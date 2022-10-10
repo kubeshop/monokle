@@ -82,6 +82,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
 
+  const isFiltered = useMemo(
+    () => !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || ''),
+    [fileMap, fileOrFolderContainedInFilter, relativePath]
+  );
+
   const tooltipOverlayStyle = useMemo(() => {
     const style: Record<string, string> = {
       fontSize: '12px',
@@ -296,7 +301,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={isFiltered} overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
           overlayStyle={tooltipOverlayStyle}
@@ -318,26 +323,31 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         )}
         {isTitleHovered && !processingEntity.processingType ? (
           <S.ActionsWrapper>
-            {canPreview(relativePath) && (
+            {canPreview(relativePath) && !isFiltered && (
               <S.PreviewButton
                 type="text"
                 size="small"
-                disabled={isInPreviewMode}
+                disabled={
+                  isInPreviewMode || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')
+                }
                 $isItemSelected={isFileSelected}
                 onClick={handlePreview}
               >
                 Preview
               </S.PreviewButton>
             )}
-            <ContextMenu overlay={<Menu items={menuItems} />}>
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                }}
-              >
-                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
-              </div>
-            </ContextMenu>
+
+            {!isFiltered && (
+              <ContextMenu overlay={<Menu items={menuItems} />}>
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
+                </div>
+              </ContextMenu>
+            )}
           </S.ActionsWrapper>
         ) : null}
       </S.TreeTitleWrapper>
