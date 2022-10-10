@@ -1,11 +1,13 @@
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ResourceMapType} from '@models/appstate';
+import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
+
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -26,6 +28,7 @@ export type KustomizationScopeType = {
   selectedResourceId: string | undefined;
   isPreviewLoading: boolean;
   isKustomizationPreview: boolean;
+  filters: ResourceFilterType;
 };
 
 export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
@@ -49,6 +52,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       selectedResourceId: state.main.selectedResourceId,
       isPreviewLoading: state.main.previewLoader.isLoading,
       isKustomizationPreview: state.main.previewType === 'kustomization',
+      filters: state.main.resourceFilter,
     };
   },
   builder: {
@@ -85,7 +89,11 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,
       isDisabled: (rawItem, scope) =>
-        Boolean((scope.previewResourceId && scope.previewResourceId !== rawItem.id) || scope.isInClusterMode),
+        Boolean(
+          (scope.previewResourceId && scope.previewResourceId !== rawItem.id) ||
+            scope.isInClusterMode ||
+            !isResourcePassingFilter(rawItem, scope.filters, false)
+        ),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

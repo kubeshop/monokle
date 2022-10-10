@@ -18,6 +18,7 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import * as S from './KustomizationQuickAction.styled';
 
@@ -28,6 +29,8 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const isAnyPreviewing = isDefined(previewResourceId);
   const isThisPreviewing = itemInstance.id === previewResourceId;
+  const filters = useAppSelector(state => state.main.resourceFilter);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const isItemBeingPreviewed = useMemo(
     () => previewResourceId !== undefined && previewResourceId === itemInstance.id,
@@ -56,6 +59,10 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
   });
+
+  if (!isResourcePassingFilter(resourceMap[itemInstance.id], filters, false)) {
+    return <span />;
+  }
 
   return (
     <S.Container>
