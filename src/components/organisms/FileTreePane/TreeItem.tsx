@@ -82,9 +82,10 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
 
-  const isFiltered = useMemo(
-    () => !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || ''),
-    [fileMap, fileOrFolderContainedInFilter, relativePath]
+  const isDisabled = useMemo(
+    () =>
+      !isFolder && (!isSupported || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')),
+    [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, relativePath]
   );
 
   const tooltipOverlayStyle = useMemo(() => {
@@ -301,8 +302,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu disabled={isFiltered} overlay={<Menu items={menuItems} />} triggerOnRightClick>
-      <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+    <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+      <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
           overlayStyle={tooltipOverlayStyle}
           mouseEnterDelay={LONGER_TOOLTIP_DELAY}
@@ -323,7 +324,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         )}
         {isTitleHovered && !processingEntity.processingType ? (
           <S.ActionsWrapper>
-            {canPreview(relativePath) && !isFiltered && (
+            {canPreview(relativePath) && !isDisabled && (
               <S.PreviewButton
                 type="text"
                 size="small"
@@ -337,7 +338,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               </S.PreviewButton>
             )}
 
-            {!isFiltered && (
+            {!isDisabled && (
               <ContextMenu overlay={<Menu items={menuItems} />}>
                 <div
                   onClick={e => {

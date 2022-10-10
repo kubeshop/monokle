@@ -29,6 +29,10 @@ export const createNode = (
   const fileExtension = fileEntry.extension.split('.').join('');
   const isTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
 
+  const isSupported =
+    (fileEntry.isSupported || fileEntry.children || isTextExtension) &&
+    (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true);
+
   const node: TreeNode = {
     key,
     title: (
@@ -38,8 +42,7 @@ export const createNode = (
             className={
               fileEntry.isExcluded
                 ? 'excluded-file-entry-name'
-                : (fileEntry.isSupported || fileEntry.children || isTextExtension) &&
-                  (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true)
+                : isSupported
                 ? 'file-entry-name'
                 : 'not-supported-file-entry-name'
             }
@@ -61,6 +64,7 @@ export const createNode = (
     filePath: fileEntry.filePath,
     extension: fileEntry.extension,
     isTextExtension,
+    disabled: !isSupported,
   };
 
   if (fileEntry.children) {
