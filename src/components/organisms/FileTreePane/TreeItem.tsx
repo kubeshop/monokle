@@ -84,7 +84,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const isDisabled = useMemo(
     () =>
-      !isFolder && (!isSupported || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')),
+      (!isFolder && !isSupported) || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || ''),
     [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, relativePath]
   );
 

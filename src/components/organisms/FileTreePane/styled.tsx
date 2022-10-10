@@ -35,7 +35,7 @@ export const FileTreeContainer = styled.div`
     background: transparent;
   }
 
-  & .ant-tree-treenode-disabled:hover::before {
+  & .ant-tree-treenode-not-supported:hover::before {
     background: transparent !important;
   }
 

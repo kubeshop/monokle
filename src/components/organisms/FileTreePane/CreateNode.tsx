@@ -64,7 +64,7 @@ export const createNode = (
     filePath: fileEntry.filePath,
     extension: fileEntry.extension,
     isTextExtension,
-    disabled: !isSupported,
+    className: !isSupported ? 'ant-tree-treenode-not-supported' : '',
   };
 
   if (fileEntry.children) {
