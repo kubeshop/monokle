@@ -46,7 +46,16 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
+  const {
+    isTextExtension,
+    isExcluded,
+    isFolder,
+    isSupported,
+    processingEntity,
+    title,
+    treeKey,
+    parentKey: isMatchItem,
+  } = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -84,8 +93,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const isDisabled = useMemo(
     () =>
-      (!isFolder && !isSupported) || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || ''),
-    [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, relativePath]
+      (!isFolder && !isSupported && !isTextExtension) ||
+      !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || ''),
+    [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
   );
 
   const tooltipOverlayStyle = useMemo(() => {

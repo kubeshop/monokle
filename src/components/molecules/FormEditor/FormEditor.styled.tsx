@@ -77,7 +77,7 @@ export const FormContainer = styled.div`
   height: 100%;
   width: 100%;
   margin: 0px;
-  padding-right: 10px;
+  padding: 10px 10px 10px 0px;
   overflow-y: auto;
   overflow-x: hidden;
 
