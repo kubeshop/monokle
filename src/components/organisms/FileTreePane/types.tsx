@@ -29,6 +29,7 @@ export interface TreeItemProps {
   isExcluded?: boolean;
   isSupported?: boolean;
   isFolder?: boolean;
+  isTextExtension?: boolean;
 }
 
 export interface MatchLine {
