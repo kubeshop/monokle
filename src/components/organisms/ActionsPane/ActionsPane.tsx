@@ -16,13 +16,11 @@ import {
   OpenKustomizeDocumentationTooltip,
 } from '@constants/tooltips';
 
-import {AlertEnum, AlertType} from '@models/alert';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {
@@ -51,6 +49,8 @@ import {
 } from '@molecules';
 
 import {Icon, TabHeader} from '@atoms';
+
+import {useDiff} from '@hooks/resourceHooks';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -96,6 +96,8 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
+
+  const {diffSelectedResource} = useDiff();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -172,23 +174,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     kubeConfigContext,
     selectedResourceId,
   ]);
-
-  const diffSelectedResource = useCallback(() => {
-    if (!kubeConfigContext || kubeConfigContext === '') {
-      const alert: AlertType = {
-        type: AlertEnum.Error,
-        title: 'Diff not available',
-        message: 'No Cluster Configured',
-      };
-
-      dispatch(setAlert(alert));
-      return;
-    }
-
-    if (selectedResourceId) {
-      dispatch(openResourceDiffModal(selectedResourceId));
-    }
-  }, [dispatch, selectedResourceId, kubeConfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -412,9 +397,8 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height}>
       <ActionsPaneHeader
         actionsPaneWidth={actionsPaneWidth}
-        selectedResource={selectedResource}
         applySelection={applySelection}
-        diffSelectedResource={diffSelectedResource}
+        selectedResource={selectedResource}
       />
 
       {selectedPreviewConfigurationId ? (
