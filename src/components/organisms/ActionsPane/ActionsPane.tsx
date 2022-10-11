@@ -347,6 +347,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                   ) : null}
                 </>
               ),
+              style: {height: '100%'},
             },
           ]
         : []),
@@ -364,6 +365,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                   ) : null}
                 </>
               ),
+              style: {height: '100%'},
             },
           ]
         : []),
@@ -381,6 +383,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                   ) : null}
                 </>
               ),
+              style: {height: '100%'},
             },
           ]
         : []),
