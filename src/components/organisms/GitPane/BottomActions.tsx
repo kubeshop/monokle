@@ -50,7 +50,7 @@ const BottomActions: React.FC = () => {
       return true;
     }
 
-    return Boolean(!gitRepo.commits.ahead && !gitRepo.commits.behind);
+    return false;
   }, [gitRepo]);
 
   const pullPushChangesHandler = useCallback(
