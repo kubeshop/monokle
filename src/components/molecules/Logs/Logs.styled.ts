@@ -7,7 +7,9 @@ import Colors from '@styles/Colors';
 const {Text} = Typography;
 
 export const LogContainer = styled.div`
-  margin: 0 20px;
+  padding: 0 10px;
+  height: 100%;
+  overflow-y: auto;
 `;
 
 export const LogText = styled(Text)`
