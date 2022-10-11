@@ -1,8 +1,9 @@
-import {useCallback, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -10,7 +11,7 @@ import {openResourceDiffModal} from '@redux/reducers/main';
 import {knownResourceKindsSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-export const useDiff = () => {
+export const useDiff = (resource?: K8sResource) => {
   const dispatch = useAppDispatch();
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
@@ -19,28 +20,30 @@ export const useDiff = () => {
     state.main.selectedResourceId ? state.main.resourceMap[state.main.selectedResourceId] : undefined
   );
 
+  const currentResource = resource || selectedResource;
+
   const isDisabled = useMemo(() => {
     if (!isKubeConfigPathValid) {
       return true;
     }
-    if (!selectedResource) {
+    if (!currentResource) {
       return true;
     }
-    if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
+    if (isKustomizationPatch(currentResource) || isKustomizationResource(currentResource)) {
       return true;
     }
-    if (!knownResourceKinds.includes(selectedResource.kind)) {
+    if (!knownResourceKinds.includes(currentResource.kind)) {
       return true;
     }
     return false;
-  }, [isKubeConfigPathValid, selectedResource, knownResourceKinds]);
+  }, [isKubeConfigPathValid, currentResource, knownResourceKinds]);
 
   const tooltipTitle = useMemo(
     () => (isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid),
     [isKubeConfigPathValid]
   );
 
-  const diffSelectedResource = useCallback(() => {
+  const diffSelectedResource = () => {
     if (!kubeConfigContext) {
       const alert: AlertType = {
         type: AlertEnum.Error,
@@ -52,10 +55,10 @@ export const useDiff = () => {
       return;
     }
 
-    if (selectedResource?.id) {
-      dispatch(openResourceDiffModal(selectedResource.id));
+    if (currentResource?.id) {
+      dispatch(openResourceDiffModal(currentResource.id));
     }
-  }, [dispatch, kubeConfigContext, selectedResource]);
+  };
 
   return {diffSelectedResource, isDisabled, tooltipTitle};
 };

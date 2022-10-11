@@ -33,6 +33,8 @@ import {ContextMenu} from '@molecules';
 
 import {Dots} from '@atoms';
 
+import {useDiff} from '@hooks/resourceHooks';
+
 import {defineHotkey} from '@utils/defineHotkey';
 
 import Colors from '@styles/Colors';
@@ -84,6 +86,8 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+
+  const {diffSelectedResource, isDisabled: isDiffDisabled} = useDiff(resource);
 
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
@@ -165,10 +169,17 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const menuItems = [
+    {
+      key: 'diff',
+      label: 'Diff',
+      disabled: isDiffDisabled,
+      onClick: diffSelectedResource,
+    },
+    {key: 'divider-1', type: 'divider'},
     ...(isInClusterMode && resource.kind === 'Pod'
       ? [
           {key: 'shell', label: 'Shell', onClick: onClickOpenShell},
-          {key: 'divider-1', type: 'divider'},
+          {key: 'divider-2', type: 'divider'},
         ]
       : []),
     ...(isInPreviewMode || isUnsavedResource(resource)
@@ -179,7 +190,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
             disabled: isInPreviewMode,
             onClick: onClickSaveToFileFolder,
           },
-          {key: 'divider-2', type: 'divider'},
+          {key: 'divider-3', type: 'divider'},
         ]
       : []),
     {key: 'rename', label: 'Rename', onClick: onClickRename},
