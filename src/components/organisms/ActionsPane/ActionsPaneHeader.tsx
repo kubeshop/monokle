@@ -208,7 +208,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                   <Restart />
                 </>
               )}
-              <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
+              <InstallDeploy applySelection={applySelection} />
               <Diff />
             </>
           )}
@@ -224,7 +224,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                     </>
                   )}
 
-                  <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
+                  <InstallDeploy applySelection={applySelection} />
                   <Diff />
                 </S.DropdownActionContainer>
               }
