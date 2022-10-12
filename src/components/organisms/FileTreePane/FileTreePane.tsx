@@ -145,7 +145,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, tree]);
+  }, [tree]);
 
   useEffect(() => {
     if (isSelectingFile) {
