@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Button, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
@@ -10,6 +10,8 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppSelector} from '@redux/hooks';
 import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
+import * as S from '../ActionsPaneHeader.styled';
 
 interface IProps {
   selectedResource: K8sResource | undefined;
@@ -42,9 +44,9 @@ const Diff = ({diffSelectedResource, selectedResource}: IProps) => {
       title={isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid}
       placement="bottomLeft"
     >
-      <Button size="small" type="primary" ghost onClick={diffSelectedResource} disabled={isDiffButtonDisabled}>
+      <S.PrimaryButton size="small" type="primary" onClick={diffSelectedResource} disabled={isDiffButtonDisabled}>
         Diff
-      </Button>
+      </S.PrimaryButton>
     </Tooltip>
   );
 };

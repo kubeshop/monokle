@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Button, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {HELM_CHART_ENTRY_FILE, TOOLTIP_DELAY} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoValid} from '@constants/tooltips';
@@ -11,6 +11,8 @@ import {useAppSelector} from '@redux/hooks';
 import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
+import * as S from '../ActionsPaneHeader.styled';
 
 interface IProps {
   selectedResource: K8sResource | undefined;
@@ -48,16 +50,15 @@ const InstallDeploy = ({applySelection, selectedResource}: IProps) => {
       title={isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid}
       placement="bottomLeft"
     >
-      <Button
+      <S.SecondaryButton
         loading={Boolean(applyingResource)}
-        type="primary"
+        type="default"
         size="small"
-        ghost
         onClick={applySelection}
         disabled={isDeployButtonDisabled}
       >
         {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-      </Button>
+      </S.SecondaryButton>
     </Tooltip>
   );
 };

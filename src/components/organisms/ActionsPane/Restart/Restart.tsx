@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Button, Modal, Tooltip} from 'antd';
+import {Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -16,6 +16,8 @@ import {
 } from '@redux/selectors';
 import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
+
+import * as S from '../ActionsPaneHeader.styled';
 
 const Restart = () => {
   const dispatch = useAppDispatch();
@@ -44,9 +46,9 @@ const Restart = () => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <Button type="primary" size="small" ghost onClick={handleClick} disabled={!isBtnEnabled}>
+      <S.SecondaryButton type="default" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
         Restart
-      </Button>
+      </S.SecondaryButton>
     </Tooltip>
   );
 };
