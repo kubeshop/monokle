@@ -6,6 +6,21 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const PrimaryButton = styled(Button)`
+  border-radius: 4px;
+  padding: 0px 14px;
+  font-weight: 600;
+`;
+
+export const SecondaryButton = styled(Button)`
+  border-radius: 4px;
+  color: ${Colors.blue6};
+  padding: 0px 14px;
+  background-color: ${Colors.grey3b};
+  border: none;
+  font-weight: 600;
+`;
+
 export const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -18,10 +33,18 @@ export const ButtonContainer = styled.div`
 
 export const LeftArrowButton = styled(Button)`
   margin-right: 5px;
+
+  & .anticon {
+    font-size: 16px;
+  }
 `;
 
 export const RightArrowButton = styled(Button)`
   margin-right: 10px;
+
+  & .anticon {
+    font-size: 16px;
+  }
 `;
 
 export const SaveButton = styled(Button)`

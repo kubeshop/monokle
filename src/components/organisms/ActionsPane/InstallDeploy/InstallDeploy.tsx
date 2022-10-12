@@ -1,10 +1,12 @@
-import {Button, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
 import {useInstallDeploy} from '@hooks/resourceHooks';
+
+import * as S from '../ActionsPaneHeader.styled';
 
 interface IProps {
   applySelection: () => void;
@@ -17,16 +19,15 @@ const InstallDeploy = ({applySelection}: IProps) => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <Button
+      <S.SecondaryButton
         loading={Boolean(applyingResource)}
-        type="primary"
+        type="default"
         size="small"
-        ghost
         onClick={applySelection}
         disabled={isDisabled}
       >
         {buttonText}
-      </Button>
+      </S.SecondaryButton>
     </Tooltip>
   );
 };
