@@ -32,12 +32,11 @@ import Scale from './Scale/Scale';
 interface IProps {
   selectedResource: K8sResource | undefined;
   applySelection: () => void;
-  diffSelectedResource: () => void;
   actionsPaneWidth: number;
 }
 
 const ActionsPaneHeader: React.FC<IProps> = props => {
-  const {selectedResource, applySelection, diffSelectedResource, actionsPaneWidth} = props;
+  const {selectedResource, applySelection, actionsPaneWidth} = props;
 
   const dispatch = useAppDispatch();
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -209,8 +208,8 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                   <Restart />
                 </>
               )}
-              <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
-              <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+              <InstallDeploy applySelection={applySelection} />
+              <Diff />
             </>
           )}
 
@@ -225,8 +224,8 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                     </>
                   )}
 
-                  <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
-                  <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+                  <InstallDeploy applySelection={applySelection} />
+                  <Diff />
                 </S.DropdownActionContainer>
               }
               placement="bottomLeft"
