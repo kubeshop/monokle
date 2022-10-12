@@ -71,9 +71,7 @@ export const gitSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(setRootFolder.fulfilled, (state, action) => {
-      state.repo = action.payload.gitRepo;
-      state.changedFiles = action.payload.gitChangedFiles;
+    builder.addCase(setRootFolder.fulfilled, state => {
       state.selectedItem = undefined;
     });
   },

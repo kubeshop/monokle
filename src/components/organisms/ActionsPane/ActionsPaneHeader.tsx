@@ -32,12 +32,11 @@ import Scale from './Scale/Scale';
 interface IProps {
   selectedResource: K8sResource | undefined;
   applySelection: () => void;
-  diffSelectedResource: () => void;
   actionsPaneWidth: number;
 }
 
 const ActionsPaneHeader: React.FC<IProps> = props => {
-  const {selectedResource, applySelection, diffSelectedResource, actionsPaneWidth} = props;
+  const {selectedResource, applySelection, actionsPaneWidth} = props;
 
   const dispatch = useAppDispatch();
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -203,14 +202,14 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         <S.ButtonContainer>
           {actionsPaneWidth > PANE_CONSTRAINT_VALUES.minEditPane && (
             <>
-              <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+              <Diff />
               {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                 <>
                   <Scale />
                   <Restart />
                 </>
               )}
-              <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
+              <InstallDeploy applySelection={applySelection} />
             </>
           )}
 
@@ -218,14 +217,14 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>
-                  <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+                  <Diff />
                   {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                     <>
                       <Scale />
                       <Restart />
                     </>
                   )}
-                  <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
+                  <InstallDeploy applySelection={applySelection} />
                 </S.DropdownActionContainer>
               }
               placement="bottomLeft"

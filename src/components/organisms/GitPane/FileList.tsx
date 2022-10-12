@@ -1,18 +1,23 @@
 import {useCallback, useState} from 'react';
 
-import {Checkbox, Dropdown, List, Menu, Space, Tooltip} from 'antd';
+import {Checkbox, Dropdown, List, Menu, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {AlertEnum} from '@models/alert';
 import {GitChangedFile} from '@models/git';
 
 import {setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {clearSelectedPath, selectFile} from '@redux/reducers/main';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 
 import {Dots} from '@components/atoms';
 
+import {deleteFile} from '@utils/fileSystem';
+import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import Colors from '@styles/Colors';
@@ -37,17 +42,27 @@ const FileList: React.FC<IProps> = props => {
 
   const [hovered, setHovered] = useState<GitChangedFile | null>(null);
 
+  const discardTitle = useCallback((item: GitChangedFile) => {
+    switch (item.type) {
+      case 'added':
+      case 'untracked':
+        return `Are you sure you want to delete ${item.name}? The file will be completely lost!`;
+      case 'modified':
+        return `Are you sure you want to discard changes in ${item.name}?`;
+      case 'deleted':
+        return `Are you sure you want to restore ${item.name}?`;
+      default:
+        return '';
+    }
+  }, []);
+
   const renderMenuItems = useCallback(
     (item: GitChangedFile) => [
       {
         key: 'stage_unstage_changes',
-        label: files[0].status === 'staged' ? 'Unstage changes' : 'Stage changes',
+        label: item.status === 'staged' ? 'Unstage changes' : 'Stage changes',
         onClick: () => {
-          if (!files?.length) {
-            return;
-          }
-
-          if (files[0].status === 'unstaged') {
+          if (item.status === 'unstaged') {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
@@ -60,8 +75,35 @@ const FileList: React.FC<IProps> = props => {
           }
         },
       },
+      ...(item.status === 'unstaged'
+        ? [
+            {
+              key: 'discard_changes',
+              label: 'Discard changes',
+              onClick: () => {
+                Modal.confirm({
+                  title: discardTitle(item),
+                  onOk() {
+                    try {
+                      if (item.type === 'modified') {
+                        dispatch(updateFileEntry({path: item.path, text: item.originalContent}));
+                      } else if (item.type === 'added' || item.type === 'untracked') {
+                        deleteFile(item.fullGitPath);
+                      } else if (item.type === 'deleted') {
+                        createFileWithContent(item.fullGitPath, item.originalContent);
+                      }
+                    } catch (e) {
+                      dispatch(setAlert({title: 'Discard changes failed!', message: '', type: AlertEnum.Error}));
+                    }
+                  },
+                  onCancel() {},
+                });
+              },
+            },
+          ]
+        : []),
     ],
-    [files, selectedProjectRootFolder]
+    [discardTitle, dispatch, selectedProjectRootFolder]
   );
 
   const selectItemHandler = (item: GitChangedFile) => {
@@ -122,10 +164,14 @@ const FileList: React.FC<IProps> = props => {
               </Tooltip>
             </S.FileItemData>
 
-            <S.FileItemOperations>
+            <S.FileItemOperations
+              onClick={e => {
+                e.stopPropagation();
+              }}
+            >
               {hovered?.name === item.name && hovered?.path === item.path && (
                 <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
-                  <Space onClick={e => e.stopPropagation()}>
+                  <Space>
                     <Dots color={selectedGitFile?.fullGitPath === item.fullGitPath ? Colors.blackPure : Colors.blue6} />
                   </Space>
                 </Dropdown>
