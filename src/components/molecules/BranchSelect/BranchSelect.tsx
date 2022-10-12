@@ -70,7 +70,7 @@ function BranchSelect() {
             },
           });
         } else {
-          dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
+          dispatch(setCurrentBranch(branchName));
           setVisible(false);
         }
       });

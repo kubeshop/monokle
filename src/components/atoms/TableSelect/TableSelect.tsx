@@ -6,6 +6,8 @@ import {DownOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {useAppSelector} from '@redux/hooks';
+
 import Colors from '@styles/Colors';
 
 type Props = {
@@ -18,6 +20,8 @@ type Props = {
 };
 
 function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableToggle}: Props) {
+  const gitLoading = useAppSelector(state => state.git.loading);
+
   return (
     <Dropdown
       open={tableVisible}
@@ -27,7 +31,7 @@ function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableT
       arrow
       trigger={['click']}
     >
-      <Button>
+      <Button loading={gitLoading}>
         <Space>
           {icon}
           <span>{value}</span>

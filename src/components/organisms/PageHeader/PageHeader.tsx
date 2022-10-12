@@ -41,6 +41,7 @@ const PageHeader = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -188,7 +189,7 @@ const PageHeader = () => {
                   <S.InitButton
                     disabled={!isGitInstalled}
                     icon={<Icon name="git" />}
-                    loading={isInitializingGitRepo}
+                    loading={isInitializingGitRepo || gitLoading}
                     type="primary"
                     size="small"
                     onClick={initGitRepo}

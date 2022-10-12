@@ -50,6 +50,10 @@ export const gitSlice = createSlice({
       }
     },
 
+    setGitLoading: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+
     setHasRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
       if (!state.repo) {
         return;
@@ -85,6 +89,7 @@ export const {
   setChangedFiles,
   setCommits,
   setCurrentBranch,
+  setGitLoading,
   setHasRemoteRepo,
   setIsGitInstalled,
   setSelectedItem,

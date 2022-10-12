@@ -24,6 +24,7 @@ const BottomActions: React.FC = () => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
@@ -216,7 +217,7 @@ const BottomActions: React.FC = () => {
       >
         <S.CommitButton
           disabled={isCommitDisabled}
-          loading={syncPublishLoading || commitLoading}
+          loading={syncPublishLoading || commitLoading || gitLoading}
           type="primary"
           onClick={() => setShowCommitModal(true)}
         >

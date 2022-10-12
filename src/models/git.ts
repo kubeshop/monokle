@@ -46,6 +46,7 @@ export type GitSliceState = {
     open: boolean;
   };
   isGitInstalled: boolean;
+  loading: boolean;
   selectedItem?: GitChangedFile;
   repo?: GitRepo;
 };
