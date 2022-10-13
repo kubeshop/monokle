@@ -34,13 +34,13 @@ To use Compare & Sync follow these steps:
 - Browse to a folder containing manifests/Kustomizations/Helm charts.  
 - Press the **Compare & Sync** button at the top of the Resource Navigator:  
 
-![Compare & Sync](img/cluster-compare-button-1.6.0.png)
+![Compare & Sync](img/cluster-compare-button-1.11.png)
 
 In the image below you can see an overview of the Compare & Sync modal with each section highlighted in a color that will be explained:  
 
 ![Compare & Sync Overview](img/compare-sync-overview-1-9-1.png)
 
-The top bar, highlighted in red, contains a checkbox to select all rows and then 4 numbered inputs:  
+The top bar, highlighted in <span style="color:red">red</span>, contains a checkbox to select all rows and then 4 numbered inputs:  
 1. Search input for quickly filtering all rows by the name of the resources.  
 
 2. Input for setting the default namespace that a resource should have if it's not already specified in it's yaml content.  
@@ -61,7 +61,7 @@ Before configuring the columns, the UI will look like this:
 ![Configure Compare & Sync](img/compare-sync-configure-1-9-1.png)
 
 Each column can be configured to specify the source of the resources that will be loaded in that column.  
-If we look back at the Overview image from above, the green highlights show the following numbered inputs:  
+If we look back at the Overview image from above, the <span style="color:green">green</span> highlights show the following numbered inputs:  
 1. The dropdown to choose the source type for that column. The options are:  
   - `Local` for loading the resources from the local files in the current project.  
   - `Cluster` for loading resources from a cluster.  
@@ -76,11 +76,11 @@ If we look back at the Overview image from above, the green highlights show the 
   - For `Helm Preview`, there will be two inputs, one for choosing the Chart and one for choosing the Values file.  
   - For `Kustomize Preview` there will be one input for choosing the Kustomization file.  
 
-After both columns are configured with the desired sources, the comparison will take place and you will be able to see the two sets of resources side by side (yellow color in the Overview image).  
+After both columns are configured with the desired sources, the comparison will take place and you will be able to see the two sets of resources side by side (<span style="color:gold">yellow</span> color in the Overview image).  
 
 Clicking on a resource name will open a read-only editor for a quick view of the resource content.  
 
-The sections highlighted in light blue in the Overview image show the actions that can be done on the resources.  
-In the middle blue section, each row of matching resources have the actions that can be applied to the resources.  
+The sections highlighted in <span style="color:#89CFF0">light blue</span> in the Overview image show the actions that can be done on the resources.  
+In the middle <span style="color:blue">blue</span> section, each row of matching resources have the actions that can be applied to the resources.  
 The Diff button appears only if there are differences between the two resources.  
 The bottom buttons can be used for doing batch operations on the resources that are checked.  

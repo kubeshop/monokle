@@ -244,9 +244,9 @@ for the first time and available in the Templates Explorer when working with you
 
 Click on the View Templates icon to view the included templates:
 
-![View Templates](img/view-template-icon-1.9.png)
+![View Templates](img/view-template-icon-1.11.png)
 
-![Default Templates](img/default-templates-1.9.gif)
+![Default Templates](img/default-templates-1.11.gif)
 
 Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to
 see which templates are included and their corresponding schemas and manifests.
