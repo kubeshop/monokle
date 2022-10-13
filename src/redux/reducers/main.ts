@@ -84,8 +84,7 @@ export type SetRootFolderPayload = {
   alert?: AlertType;
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
-  gitChangedFiles: GitChangedFile[];
-  gitRepo?: GitRepo;
+  isGitRepo: boolean;
 };
 
 export type UpdateMultipleResourcesPayload = {

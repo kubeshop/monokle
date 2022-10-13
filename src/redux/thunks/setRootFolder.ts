@@ -129,5 +129,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
+    isGitFolder: isFolderGitRepo,
   };
 });
