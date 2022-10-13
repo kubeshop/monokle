@@ -78,7 +78,7 @@ export const InitButton = styled(RawButton)`
 export const Logo = styled.img`
   height: 45px;
   cursor: pointer;
-  margin-left: -15px;
+  margin-left: -12px;
 `;
 
 export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType; $kubeConfigContextColor?: ClusterColors}>`

@@ -3,6 +3,7 @@ import {Button as RawButton} from 'antd';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
+import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
 export const Button = styled(RawButton)<{$isActive: boolean; $isSelected: boolean}>`
@@ -14,7 +15,7 @@ export const Button = styled(RawButton)<{$isActive: boolean; $isSelected: boolea
   transition: none;
 
   & .anticon {
-    transition: color 0.5s;
+    transition: color ${AnimationDurations.slow};
     background-color: ${({$isActive, $isSelected}) =>
       $isSelected && $isActive ? Colors.geekblue7 : rgba('#333c3f', 0.5)};
     border-radius: 50%;
