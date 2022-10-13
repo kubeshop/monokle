@@ -68,7 +68,10 @@ export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, 
       }
 
       setHighlightNode(node);
-      dispatch(setExpandedFolders(uniqueArr([...expandedFolders, ...Array.from(keys)])));
+
+      if (keys.find(k => !expandedFolders.includes(k))) {
+        dispatch(setExpandedFolders(uniqueArr([...expandedFolders, ...Array.from(keys)])));
+      }
     },
     [dispatch, expandedFolders, highlightNode, tree, treeRef]
   );
