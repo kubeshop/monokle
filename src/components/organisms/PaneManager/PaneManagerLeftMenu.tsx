@@ -51,7 +51,10 @@ const PaneManagerLeftMenu: React.FC = () => {
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
 
   const isActive = useMemo(() => Boolean(activeProject) && leftActive, [activeProject, leftActive]);
-  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
+  const isFolderOpen = useMemo(
+    () => Boolean(activeProject && leftActive && leftMenuSelection === 'file-explorer'),
+    [activeProject, leftActive, leftMenuSelection]
+  );
   const rootFileEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
 
   const handleLeftBottomMenuSelection = (selectedOption: LeftMenuBottomSelectionType) => {
