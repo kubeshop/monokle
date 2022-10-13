@@ -23,16 +23,10 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {Walkthrough} from '@molecules';
 
-import Icon from '@atoms/Icon';
-
 import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
-
-import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
-import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
-import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
@@ -133,12 +127,10 @@ const PaneManagerLeftMenu: React.FC = () => {
             id="file-explorer"
             isSelected={checkIsTabSelected('file-explorer')}
             isActive={isActive}
-            shouldWatchSelectedPath
             onClick={() => setLeftActiveMenu('file-explorer')}
             disabled={!activeProject}
           >
             <MenuIcon
-              style={{marginLeft: 4}}
               icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
               active={isActive}
               isSelected={checkIsTabSelected('file-explorer')}
@@ -178,7 +170,6 @@ const PaneManagerLeftMenu: React.FC = () => {
             isSelected={checkIsTabSelected('kustomize-pane')}
             isActive={isActive}
             onClick={() => setLeftActiveMenu('kustomize-pane')}
-            sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
             disabled={!activeProject}
           >
             <S.Badge
@@ -206,7 +197,6 @@ const PaneManagerLeftMenu: React.FC = () => {
               isSelected={checkIsTabSelected('helm-pane')}
               isActive={isActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
-              sectionNames={[HELM_CHART_SECTION_NAME]}
               disabled={!activeProject}
             >
               <S.Badge
@@ -280,7 +270,6 @@ const PaneManagerLeftMenu: React.FC = () => {
             isActive={isActive}
             onClick={() => setLeftActiveMenu('search')}
             disabled={!activeProject}
-            icon={<Icon name="search" style={{opacity: leftMenuSelection === 'search' ? '1' : '0.5'}} />}
           >
             <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
           </MenuButton>
