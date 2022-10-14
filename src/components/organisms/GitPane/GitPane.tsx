@@ -115,7 +115,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
       <TitleBar title="Git" closable />
 
       {gitLoading ? (
-        <S.Skeleton />
+        <S.Skeleton active />
       ) : changedFiles.length ? (
         <>
           {!hasRemoteRepo ? (

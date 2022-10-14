@@ -228,7 +228,7 @@ const BottomActions: React.FC = () => {
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
           disabled={!gitRepo.hasRemoteRepo}
-          loading={syncPublishLoading || commitLoading}
+          loading={syncPublishLoading || commitLoading || gitLoading}
           icon={<DownOutlined />}
           placement="topLeft"
           trigger={['click']}
@@ -241,7 +241,7 @@ const BottomActions: React.FC = () => {
       ) : (
         <S.SyncButton
           disabled={!gitRepo.hasRemoteRepo || isSyncDisabled}
-          loading={syncPublishLoading || commitLoading}
+          loading={syncPublishLoading || commitLoading || gitLoading}
           icon={<DownOutlined />}
           overlay={<Menu items={syncMenuItems} />}
           placement="topLeft"
