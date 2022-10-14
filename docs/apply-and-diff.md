@@ -10,7 +10,7 @@ When a resource is selected in the navigator, the Editor contains **Deploy** and
     - If the resource does not exist in the cluster, an error will be shown.
     - If the resource _does_ exist, the Diff dialog will be shown.
 
-![Resource Diff](img/diff-tble-8-1.9.png)
+![Resource Diff](img/diff-tble-8-1.11.png)
 
 In this screenshot
 
