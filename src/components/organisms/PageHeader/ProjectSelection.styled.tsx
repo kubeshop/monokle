@@ -197,4 +197,10 @@ export const TableColumnName = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
+
+  & span:nth-child(2) {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;
