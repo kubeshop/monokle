@@ -10,7 +10,7 @@ Launch Monokle and, on the welcome screen, there are three options to start work
  - Create an empty project.
  - Start from a template.
  
-![Welcome](img/new-user-start-screen-1.9.png)
+![Welcome](img/new-user-start-screen-1.11.png)
 
 Click **Select an existing folder** and navigate to an existing project folder containing K8 resources. 
 
@@ -22,10 +22,10 @@ After a project is opened in Monokle, the project selector at the top of the scr
 
 Use this selector to open a new project or switch in between projects:
 
-![Select and Manage Projects](img/select-and-manage-projects-1.9.png)
+![Select and Manage Projects](img/select-and-manage-projects-1.11.png)
 
 ## **Manage Multiple Projects**
 
-![Browse your clusters objects](img/manage-multiple-projects-1.9.gif)
+![Browse your clusters objects](img/manage-multiple-projects-1.11.gif)
 
 Easily switch in between projects to more efficiently work with multiple projects at the same time.

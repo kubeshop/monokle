@@ -11,13 +11,13 @@ All examples below are from the [Emissary Ingress Charts Folder](https://github.
 
 In Settings, set which Helm command to use when generating Helm previews in Monokle:
 
-![Helm Settings](img/helm-settings-1.9.png)
+![Helm Settings](img/helm-settings-1.11.png)
 
 ## **Helm Preview Configurations**
 
 Each Helm chart has a subsection named **Preview Configurations**. This allows you to configure how to run the Helm Preview and then save the configuration in order to quickly use it at any time.
 
-![Helm Preview Configurations](img/helm-preview-configurations-1.9.png)
+![Helm Preview Configurations](img/helm-preview-configurations-1.11.png)
 
 Hovering over the Preview Configurations section will show a Plus button to the right:
 
@@ -50,14 +50,14 @@ If you instead click and select the configuration, the source code editor from t
 When selecting a folder containing Helm charts (identified by Chart.yaml files), these will automatically be displayed in 
 a "Helm Charts" section on top of the Navigator:
 
-![Helm Navigation](img/helm-navigation-1.9.png)
+![Helm Navigation](img/helm-navigation-1.11.png)
 
 In the screenshot:
 
 * The Helm Charts section shows the "emissary-ingress" Helm chart and the contained values files.
 * The single values.yaml file has been selected.
 * The corresponding values.yaml file has been highlighted to the left.
-* The content of the file is shown in the Source editor to the right.
+* The content of the file is shown in the Source editor on the right of the screen.
 
 The Navigator at this point shows any K8s resources that Monokle finds in the selected folder.
 
@@ -68,14 +68,14 @@ a specific values file.
 
 Hovering over a values file reveals a **Preview** action to the right:
 
-![Helm Preview Action](img/helm-preview-action-1.9.png)
+![Helm Preview Action](img/helm-preview-action-1.11.png)
 
 Selecting this action will run Helm on the selected file with either the `install` or `template` option (as configured in the global settings)
 and replace the contents of the Navigator with the generated resources.
 
 For example, previewing the values file above will result in the following:
 
-![Helm Preview Output](img/helm-preview-output-1.9.png)
+![Helm Preview Output](img/helm-preview-output-1.11.png)
 
 Monokle is now in **Preview Mode** (as indicated by the header at the top):
 
@@ -91,14 +91,14 @@ Monokle is now in **Preview Mode** (as indicated by the header at the top):
 If you're editing Helm Values files, Monokle will highlight all properties that have been referenced by any templates.
 The list of paths to template files is shown when hovering over the highlighted value.
 
-![Helm Values References](img/helm-values-reference-1-8-0.png)
+![Helm Values References](img/helm-values-reference-1-11.png)
 
 When previewing a Helm values file, it is possible to edit the previewed file and recreate the preview, allowing
 you to quickly assess the impact of any changes on the generated files, instead of having to exit and recreate the preview to make a change.
  
 ![Edit Helm](img/helm-preview-reload-1.5.0.png)
 
-![Edit Helm](img/helm-preview-reload-1.9.png)
+![Edit Helm](img/helm-preview-reload-1.11.png)
 
 ## **Working with Helm Templates**
 
@@ -110,7 +110,7 @@ When you hover over a value referenced from a Values file, the popup that appear
 - The referenced value, so you don't have to switch to the Values file.
 - A link to quickly navigate to the location of that value.
 
-![Helm Templates](img/helm-templates-1-8-0.png)
+![Helm Templates](img/helm-templates-1.11.png)
 
 If Monokle cannot find any values file with the referenced path from a Helm template, it will highlight it in yellow:
 

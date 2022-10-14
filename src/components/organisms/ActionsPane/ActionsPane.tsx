@@ -16,13 +16,11 @@ import {
   OpenKustomizeDocumentationTooltip,
 } from '@constants/tooltips';
 
-import {AlertEnum, AlertType} from '@models/alert';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {
@@ -51,6 +49,8 @@ import {
 } from '@molecules';
 
 import {Icon, TabHeader} from '@atoms';
+
+import {useDiff} from '@hooks/resourceHooks';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -96,6 +96,8 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
+
+  const {diffSelectedResource} = useDiff();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -150,6 +152,13 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
   }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
+  const isSchemaAvailable = useMemo(
+    () =>
+      schemaForSelectedPath ||
+      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)),
+    [isKustomization, resourceKindHandler?.formEditorOptions?.editorSchema, schemaForSelectedPath, selectedResource]
+  );
+
   const applySelection = useCallback(() => {
     if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
       const helmValuesFile = helmValuesMap[selectedValuesFileId];
@@ -172,23 +181,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     kubeConfigContext,
     selectedResourceId,
   ]);
-
-  const diffSelectedResource = useCallback(() => {
-    if (!kubeConfigContext || kubeConfigContext === '') {
-      const alert: AlertType = {
-        type: AlertEnum.Error,
-        title: 'Diff not available',
-        message: 'No Cluster Configured',
-      };
-
-      dispatch(setAlert(alert));
-      return;
-    }
-
-    if (selectedResourceId) {
-      dispatch(openResourceDiffModal(selectedResourceId));
-    }
-  }, [dispatch, selectedResourceId, kubeConfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -316,8 +308,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
         ),
         style: {height: '100%'},
       },
-      ...(schemaForSelectedPath ||
-      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema))
+      ...(isSchemaAvailable
         ? [
             {
               key: 'form',
@@ -396,6 +387,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
       isFolderLoading,
       isKustomization,
       isPreviewResourceId,
+      isSchemaAvailable,
       k8sVersion,
       previewLoader.isLoading,
       resourceKindHandler,
@@ -412,9 +404,8 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height}>
       <ActionsPaneHeader
         actionsPaneWidth={actionsPaneWidth}
-        selectedResource={selectedResource}
         applySelection={applySelection}
-        diffSelectedResource={diffSelectedResource}
+        selectedResource={selectedResource}
       />
 
       {selectedPreviewConfigurationId ? (
@@ -432,7 +423,12 @@ const ActionsPane: React.FC<Props> = ({height}) => {
             selectedResource && resourceKindHandler?.helpLink ? (
               <>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
-                  <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
+                  <S.ExtraRightButton
+                    disabled={!isSchemaAvailable}
+                    type="link"
+                    onClick={() => dispatch(toggleForm(true))}
+                    ref={extraButton}
+                  >
                     <Icon name="split-view" />
                   </S.ExtraRightButton>
                 </Tooltip>

@@ -2,7 +2,7 @@ import {useCallback, useMemo} from 'react';
 
 import {Button, Dropdown, Tooltip} from 'antd';
 
-import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+import {LeftOutlined, RightOutlined} from '@ant-design/icons';
 
 import {PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {
@@ -32,12 +32,11 @@ import Scale from './Scale/Scale';
 interface IProps {
   selectedResource: K8sResource | undefined;
   applySelection: () => void;
-  diffSelectedResource: () => void;
   actionsPaneWidth: number;
 }
 
 const ActionsPaneHeader: React.FC<IProps> = props => {
-  const {selectedResource, applySelection, diffSelectedResource, actionsPaneWidth} = props;
+  const {selectedResource, applySelection, actionsPaneWidth} = props;
 
   const dispatch = useAppDispatch();
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -159,7 +158,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           disabled={!isLeftArrowEnabled}
           type="link"
           size="small"
-          icon={<ArrowLeftOutlined />}
+          icon={<LeftOutlined />}
         />
 
         <S.RightArrowButton
@@ -167,7 +166,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           disabled={!isRightArrowEnabled}
           type="link"
           size="small"
-          icon={<ArrowRightOutlined />}
+          icon={<RightOutlined />}
         />
       </TitleBar>
     );
@@ -181,7 +180,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           disabled={!isLeftArrowEnabled}
           type="link"
           size="small"
-          icon={<ArrowLeftOutlined />}
+          icon={<LeftOutlined />}
         />
 
         <S.RightArrowButton
@@ -189,7 +188,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           disabled={!isRightArrowEnabled}
           type="link"
           size="small"
-          icon={<ArrowRightOutlined />}
+          icon={<RightOutlined />}
         />
 
         {isSelectedResourceUnsaved && (
@@ -203,14 +202,14 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         <S.ButtonContainer>
           {actionsPaneWidth > PANE_CONSTRAINT_VALUES.minEditPane && (
             <>
+              <Diff />
               {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                 <>
                   <Scale />
                   <Restart />
                 </>
               )}
-              <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
-              <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+              <InstallDeploy applySelection={applySelection} />
             </>
           )}
 
@@ -218,15 +217,14 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>
+                  <Diff />
                   {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                     <>
                       <Scale />
                       <Restart />
                     </>
                   )}
-
-                  <InstallDeploy selectedResource={selectedResource} applySelection={applySelection} />
-                  <Diff diffSelectedResource={diffSelectedResource} selectedResource={selectedResource} />
+                  <InstallDeploy applySelection={applySelection} />
                 </S.DropdownActionContainer>
               }
               placement="bottomLeft"

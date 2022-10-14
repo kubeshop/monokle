@@ -12,6 +12,7 @@ import {
 import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
+import {setChangedFiles, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
@@ -105,16 +106,18 @@ export const setRootFolder = createAsyncThunk<
     rootFolder
   );
 
-  const gitRepo = isFolderGitRepo
-    ? await promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder)
-    : undefined;
+  if (isFolderGitRepo) {
+    promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder).then(repo => {
+      thunkAPI.dispatch(setRepo(repo));
+    });
 
-  const gitChangedFiles = isFolderGitRepo
-    ? await promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolder,
-        fileMap,
-      })
-    : [];
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: rootFolder,
+      fileMap,
+    }).then(changedFiles => {
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
+    });
+  }
 
   return {
     projectConfig,
@@ -126,7 +129,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
-    gitChangedFiles,
-    gitRepo,
+    isGitFolder: isFolderGitRepo,
   };
 });

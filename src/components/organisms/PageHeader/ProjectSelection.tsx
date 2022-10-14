@@ -217,7 +217,8 @@ const ProjectSelection = () => {
 
               return (
                 <S.TableColumnName>
-                  {isGitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />} {name}
+                  {isGitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+                  <span title={name}>{name}</span>
                 </S.TableColumnName>
               );
             }}

@@ -22,7 +22,7 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
   const refs = useMemo(() => {
     return resourcesIds.reduce((currentRefs: {[key: string]: ResourceRef[]}, id) => {
       const resource = resourceMap[id];
-      const resourceRefs = resource.refs;
+      const resourceRefs = resource?.refs;
 
       if (!resourceRefs) {
         return currentRefs;

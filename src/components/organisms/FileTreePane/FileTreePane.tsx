@@ -80,7 +80,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
-  const isCollapsed = expandedFolders.length === 0;
+  const isCollapsed = expandedFolders.length === 0 || expandedFolders.length === 1;
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -145,7 +145,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, tree]);
+  }, [tree]);
 
   useEffect(() => {
     if (isSelectingFile) {
@@ -206,7 +206,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
 
   const onToggleTree = () => {
-    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
+    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : tree ? [tree.key] : []));
   };
 
   return (

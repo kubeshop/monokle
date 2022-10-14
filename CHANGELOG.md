@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.11.1](https://github.com/kubeshop/monokle/compare/v1.11.1-nightly-2022-10-13.0...v1.11.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* is folder icon open/closed ([f74e04f](https://github.com/kubeshop/monokle/commit/f74e04f13a0bfa66fd01ec401b3de13df309aa1c))
+* remove unused ([22581fd](https://github.com/kubeshop/monokle/commit/22581fda0f287a289f97bfab5a76056bb866c4b4))
+* set repo/changed files to initial ([ea2d767](https://github.com/kubeshop/monokle/commit/ea2d76763a8229a5ee98949e4ef7f7e4dbfbc33e))
+
 ## [1.11.0](https://github.com/kubeshop/monokle/compare/v1.10.4-nightly-2022-09-30.0...v1.11.0) (2022-09-30)
 
 
