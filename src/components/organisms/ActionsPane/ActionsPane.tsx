@@ -152,6 +152,13 @@ const ActionsPane: React.FC<Props> = ({height}) => {
     return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
   }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
+  const isSchemaAvailable = useMemo(
+    () =>
+      schemaForSelectedPath ||
+      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)),
+    [isKustomization, resourceKindHandler?.formEditorOptions?.editorSchema, schemaForSelectedPath, selectedResource]
+  );
+
   const applySelection = useCallback(() => {
     if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
       const helmValuesFile = helmValuesMap[selectedValuesFileId];
@@ -301,8 +308,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
         ),
         style: {height: '100%'},
       },
-      ...(schemaForSelectedPath ||
-      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema))
+      ...(isSchemaAvailable
         ? [
             {
               key: 'form',
@@ -381,6 +387,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
       isFolderLoading,
       isKustomization,
       isPreviewResourceId,
+      isSchemaAvailable,
       k8sVersion,
       previewLoader.isLoading,
       resourceKindHandler,
@@ -416,7 +423,12 @@ const ActionsPane: React.FC<Props> = ({height}) => {
             selectedResource && resourceKindHandler?.helpLink ? (
               <>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
-                  <S.ExtraRightButton type="link" onClick={() => dispatch(toggleForm(true))} ref={extraButton}>
+                  <S.ExtraRightButton
+                    disabled={!isSchemaAvailable}
+                    type="link"
+                    onClick={() => dispatch(toggleForm(true))}
+                    ref={extraButton}
+                  >
                     <Icon name="split-view" />
                   </S.ExtraRightButton>
                 </Tooltip>
