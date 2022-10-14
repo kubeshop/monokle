@@ -17,7 +17,7 @@ const LazyDrawer: React.FC<IProps> = props => {
   return (
     <S.Drawer
       bodyStyle={noPadding ? {padding: 0} : {}}
-      closable={false}
+      closable
       placement="right"
       title={title}
       open={visible}
