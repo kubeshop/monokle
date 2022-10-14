@@ -50,7 +50,6 @@ const CommitModal: React.FC<IProps> = props => {
     });
 
     setLoading(false);
-    setCommitLoading(false);
     setShowModal(false);
   };
 
