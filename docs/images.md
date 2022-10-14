@@ -1,6 +1,6 @@
 # Working with Images
 
-Monokle has a dedicated Images panel which can be accessed from the left menu:
+Monokle Desktop has a dedicated Images panel which can be accessed from the left menu:
 
 ![Images Panel](img/images-panel-1-8-0.png)
 

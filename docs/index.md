@@ -1,8 +1,8 @@
-# Monokle
+# Monokle Desktop
 
-Welcome to Monokle - K8s configuration analysis and version control editor!
+Welcome to Monokle Desktop - K8s configuration analysis and version control editor!
 
-Monokle helps you to:
+Monokle Desktop helps you to:
 
 - ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
 - 📇 Leverage Git to manage the lifecycle of your configuration
@@ -15,13 +15,13 @@ Monokle helps you to:
 - 📚 Create multi-step forms using Monokle's templating system to quickly generate manifests
 - 💡 And much more!
 
-For further details on working with Monokle, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Walkthrough Video](https://www.youtube.com/watch?v=ossBDhP_K-4).
+For further details on working with Monokle Desktop, read the [Feature Overview](features.md) document or watch the YouTube [Monokle Desktop Walkthrough Video](https://www.youtube.com/watch?v=ossBDhP_K-4).
 
 <!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://www.youtube.com/watch?v=ossBDhP_K-4)-->
 
 ## **Blog Posts**
 
-Check out the following blog posts with Monokle-related content:
+Check out the following blog posts with Monokle Desktop-related content:
 
 - 1.11 - [Release blog post](https://kubeshop.io/blog/monokle-1-11-0-release) - September 30, 2022
 - 1.10 - [Release blog post](https://kubeshop.io/blog/monokle-v1-10-release-notes) - August 10, 2022

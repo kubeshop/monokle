@@ -2,7 +2,7 @@
 
 ## **Edit Resources Properties via Form**
 
-Monokle shows form editors for diverse Kubernetes resources which allows you to interactively change the specification of your resources using visual controls/inputs.
+Monokle Desktop shows form editors for diverse Kubernetes resources which allows you to interactively change the specification of your resources using visual controls/inputs.
 
 ![Form Editor](img/form-editor-1.11.png)
 

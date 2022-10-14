@@ -1,6 +1,6 @@
-# Monokle Architecture
+# Monokle Desktop Architecture
 
-Monokle is an Electron desktop application built with React & TypeScript.  
+Monokle Desktop is an Electron desktop application built with React & TypeScript.  
 
 Redux Toolkit is used for state management.   
 
@@ -20,7 +20,7 @@ See <https://www.electron.build/> for more info on Electron-builder.
 ## **Folder Structure**
 
 - /electron : Electron main thread - contains startup code and some ipc handlers invoked from the UI.
-- /src : Root for monokle UI application - contains App.tsx, Index.tsx, etc.
+- /src : Root for Monokle Desktop UI application - contains App.tsx, Index.tsx, etc.
     - /components : UI components - coarse to fine grained; organisms -> molecules -> atoms
     - /constants : constants..
     - /models : type definitions for core objects (see below) and states
@@ -73,7 +73,7 @@ The content of most high level [organisms](https://github.com/kubeshop/monokle/t
 
 ## **K8s Schemas**
 
-Monokle currently uses the latest 1.22.1 schemas for validation and editor functionality - 
+Monokle Desktop currently uses the latest 1.22.1 schemas for validation and editor functionality - 
 see [this issue](https://github.com/kubeshop/monokle/issues/321) for making schema version configurable. 
 
 Schemas are currently taken from 
