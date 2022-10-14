@@ -50,6 +50,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewType = useAppSelector(state => state.main.previewType);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
+  const previewCommandId = useAppSelector(state => state.main.previewCommandId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const size: Size = useWindowSize();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
@@ -181,6 +182,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     if (previewType === 'helm-preview-config' && previewConfigurationId) {
       startPreview(previewConfigurationId, 'helm-preview-config', dispatch);
     }
+    if (previewType === 'command' && previewCommandId) {
+      startPreview(previewCommandId, 'command', dispatch);
+    }
   };
 
   if (!isClusterSelectorVisible) {
@@ -201,6 +205,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               {previewType === 'kustomization' && <span>KUSTOMIZATION PREVIEW</span>}
               {previewType === 'helm' && <span>HELM PREVIEW</span>}
               {previewType === 'helm-preview-config' && <span>HELM CONFIG PREVIEW</span>}
+              {previewType === 'command' && <span>COMMAND PREVIEW</span>}
             </S.PreviewMode>
           )}
 
