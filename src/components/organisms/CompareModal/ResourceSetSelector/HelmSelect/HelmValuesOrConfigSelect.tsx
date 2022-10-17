@@ -42,6 +42,7 @@ export const HelmValuesOrConfigSelect: React.FC<Props> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
+        defaultOpen
         placeholder="Select values…"
         onSelect={handleSelect}
         value={currentHelmValuesOrConfig?.id}
