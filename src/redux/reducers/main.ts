@@ -35,6 +35,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import {previewSavedCommand} from '@redux/services/previewCommand';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
@@ -854,6 +855,27 @@ export const mainSlice = createSlice({
       });
 
     builder
+      .addCase(previewSavedCommand.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        resetSelectionHistory(state);
+        state.selectedResourceId = undefined;
+        state.selectedImage = undefined;
+        state.selectedPath = undefined;
+        state.checkedResourceIds = [];
+        state.previousSelectionHistory = [];
+      })
+      .addCase(previewSavedCommand.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetId = undefined;
+        state.previewType = undefined;
+        state.selectionHistory = state.previousSelectionHistory;
+        state.previousSelectionHistory = [];
+      });
+
+    builder
       .addCase(previewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
@@ -919,6 +941,7 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewConfigurationId = undefined;
+      state.previewCommandId = undefined;
       state.previewType = undefined;
       state.previewValuesFileId = undefined;
       state.selectedPreviewConfigurationId = undefined;
@@ -1276,6 +1299,9 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResourceId = undefined;
   state.previewValuesFileId = undefined;
   state.previewConfigurationId = undefined;
+  state.previewCommandId = undefined;
+
+  // TODO: rename "previewResourceId" to "previewTargetId" and maybe add a comment to the property
 
   if (payload.previewResourceId) {
     if (state.previewType === 'kustomization') {
@@ -1299,6 +1325,9 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
     }
     if (state.previewType === 'helm-preview-config') {
       state.previewConfigurationId = payload.previewResourceId;
+    }
+    if (state.previewType === 'command') {
+      state.previewCommandId = payload.previewResourceId;
     }
   }
 

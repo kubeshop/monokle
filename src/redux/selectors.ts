@@ -36,10 +36,14 @@ export const activeResourcesSelector = (state: RootState) => {
   const previewResourceId = state.main.previewResourceId;
   const previewValuesFileId = state.main.previewValuesFileId;
   const previewConfigurationId = state.main.previewConfigurationId;
+  const previewCommandId = state.main.previewCommandId;
 
   return resources.filter(
     r =>
-      ((previewResourceId === undefined && previewValuesFileId === undefined && previewConfigurationId === undefined) ||
+      ((previewResourceId === undefined &&
+        previewValuesFileId === undefined &&
+        previewConfigurationId === undefined &&
+        previewCommandId === undefined) ||
         r.filePath.startsWith(PREVIEW_PREFIX)) &&
       !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
       !r.name.startsWith('Patch:')
@@ -113,7 +117,8 @@ export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConf
 export const isInPreviewModeSelector = (state: RootState) =>
   Boolean(state.main.previewResourceId) ||
   Boolean(state.main.previewValuesFileId) ||
-  Boolean(state.main.previewConfigurationId);
+  Boolean(state.main.previewConfigurationId) ||
+  Boolean(state.main.previewCommandId);
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,

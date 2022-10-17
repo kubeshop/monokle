@@ -50,7 +50,9 @@ export const getPreviewTheme = (
   if (previewType === 'kustomization') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
   }
-
+  if (previewType === 'command') {
+    color = rgbaRatio ? rgba(Colors.lightSeaGreen, rgbaRatio) : Colors.lightSeaGreen;
+  }
   return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
 };
 
