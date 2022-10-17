@@ -19,7 +19,9 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   const dispatch = useAppDispatch();
   const isGitDisabled = useAppSelector(state => Boolean(!state.git.repo));
   const isHelmDisabled = useAppSelector(state => isEmpty(state.main.helmChartMap));
-  const isCommandDisabled = useAppSelector(state => isEmpty(state.config.projectConfig?.savedCommandMap));
+  const isCommandDisabled = useAppSelector(state =>
+    isEmpty(Object.values(state.config.projectConfig?.savedCommandMap || {}).filter(command => Boolean(command)))
+  );
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isKustomizeDisabled = useAppSelector(
     state => !Object.values(state.main.resourceMap).filter(r => isKustomizationResource(r)).length

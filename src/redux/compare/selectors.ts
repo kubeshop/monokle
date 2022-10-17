@@ -1,6 +1,7 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
+import {SavedCommand} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
@@ -80,8 +81,11 @@ export const selectCommandResourceSet = (state: RootState, side: CompareSide) =>
   }
   const {commandId} = resourceSet;
 
-  const allSavedCommands = Object.values(state.config.projectConfig?.savedCommandMap || {});
-  const currentCommand = commandId ? state.config.projectConfig?.savedCommandMap?.[commandId] : undefined;
+  const allSavedCommands = Object.values(state.config.projectConfig?.savedCommandMap || {}).filter(
+    (command): command is SavedCommand => Boolean(command)
+  );
+  let currentCommand = commandId ? state.config.projectConfig?.savedCommandMap?.[commandId] : undefined;
+  currentCommand = currentCommand !== null ? currentCommand : undefined;
 
   return {allSavedCommands, currentCommand};
 };
