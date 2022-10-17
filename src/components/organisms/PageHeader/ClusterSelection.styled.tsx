@@ -51,7 +51,7 @@ export const getPreviewTheme = (
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
   }
   if (previewType === 'command') {
-    color = rgbaRatio ? rgba(Colors.lightSeaGreen, rgbaRatio) : Colors.lightSeaGreen;
+    color = rgbaRatio ? rgba(Colors.purple8, rgbaRatio) : Colors.purple8;
   }
   return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
 };
