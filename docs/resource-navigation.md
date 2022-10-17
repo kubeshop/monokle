@@ -6,7 +6,7 @@ The Navigator shows all resources found in the current project. Resources are gr
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
-![Resource Navigation](img/resource-navigation-1-1.9.png)
+![Resource Navigation](img/resource-navigation-1-1.11.png)
 
 In this screenshot: 
 
@@ -59,7 +59,7 @@ Resource filters allow you to filter the resources based on various properties s
 
 Click on the filter button on the top of the navigator to launch the dialog for configuration.
 
-![Resource Filtering](img/resource-filtering-1.9.png)
+![Resource Filtering](img/resource-filtering-1.11.png)
 
 Users can also add or remove filters by highlighting and hovering over labels, annotations or other metadata properties in the code editor:
 
@@ -67,11 +67,11 @@ Users can also add or remove filters by highlighting and hovering over labels, a
 
 The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
 
-![Quick Filter](img/quick-filter-popup-1.9.png)
+![Quick Filter](img/quick-filter-popup-1.11.png)
 
 ## **Reload Folder On Startup**
 
-You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
+You can choose to reload the last reviewed folder while launching  Desktop. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
 
 ![Reload](img/reload.png)
 
@@ -94,12 +94,11 @@ The Recent Projects option has been added to the system menu to make it easy to 
 
 **Action:** File > Recent Projects
 
-![Recent Folders](img/recent-folders-1.9.png)
+![Recent Folders](img/recent-folders-1.11.png)
 
 ## **Supported Resource Links**
 
-Monokle currently finds and visualizes the following links between Kubernetes resources - please let us know if
-we missed something or got it wrong!
+Monokle Desktop currently finds and visualizes the following links between Kubernetes resources - please let us know if we missed something or got it wrong!
 
 | Resource Type | Outgoing Link(s) identified |
 |:-------------|:---------------------------|

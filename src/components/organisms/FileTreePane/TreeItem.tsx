@@ -46,7 +46,16 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
+  const {
+    isTextExtension,
+    isExcluded,
+    isFolder,
+    isSupported,
+    processingEntity,
+    title,
+    treeKey,
+    parentKey: isMatchItem,
+  } = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -81,6 +90,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
+
+  const isDisabled = useMemo(
+    () =>
+      (!isFolder && !isSupported && !isTextExtension) ||
+      !fileMap[relativePath]?.filePath.startsWith(fileOrFolderContainedInFilter || ''),
+    [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
+  );
 
   const tooltipOverlayStyle = useMemo(() => {
     const style: Record<string, string> = {
@@ -172,6 +188,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       label: isFolder ? 'New Resource' : 'Add Resource',
       disabled:
         isInPreviewMode ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
@@ -295,8 +312,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
-      <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+    <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+      <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
           overlayStyle={tooltipOverlayStyle}
           mouseEnterDelay={LONGER_TOOLTIP_DELAY}
@@ -317,26 +334,31 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         )}
         {isTitleHovered && !processingEntity.processingType ? (
           <S.ActionsWrapper>
-            {canPreview(relativePath) && (
+            {canPreview(relativePath) && !isDisabled && (
               <S.PreviewButton
                 type="text"
                 size="small"
-                disabled={isInPreviewMode}
+                disabled={
+                  isInPreviewMode || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')
+                }
                 $isItemSelected={isFileSelected}
                 onClick={handlePreview}
               >
                 Preview
               </S.PreviewButton>
             )}
-            <ContextMenu overlay={<Menu items={menuItems} />}>
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                }}
-              >
-                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
-              </div>
-            </ContextMenu>
+
+            {!isDisabled && (
+              <ContextMenu overlay={<Menu items={menuItems} />}>
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
+                </div>
+              </ContextMenu>
+            )}
           </S.ActionsWrapper>
         ) : null}
       </S.TreeTitleWrapper>

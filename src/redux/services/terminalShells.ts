@@ -27,7 +27,13 @@ const detectAvailableUnixShells = (osPlatform: NodeJS.Platform): ShellsMapType =
       }
     });
   } else {
-    shellsMap['bash'] = {name: 'Bash', shell: 'bash'};
+    shells.forEach(shellPath => {
+      const shell = getBasename(shellPath);
+
+      if (SUPPORTED_SHELLS['other'].includes(shell)) {
+        shellsMap[shell] = {name: shell.charAt(0).toUpperCase() + shell.slice(1), shell};
+      }
+    });
   }
 
   return shellsMap;

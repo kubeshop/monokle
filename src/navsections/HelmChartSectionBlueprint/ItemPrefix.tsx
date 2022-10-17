@@ -4,6 +4,8 @@ import {EyeOutlined, FileOutlined} from '@ant-design/icons';
 
 import {ItemCustomComponentProps} from '@models/navigator';
 
+import {Icon} from '@atoms';
+
 import Colors from '@styles/Colors';
 
 const ItemPrefix = (props: ItemCustomComponentProps) => {
@@ -28,6 +30,10 @@ const ItemPrefix = (props: ItemCustomComponentProps) => {
 
   if (itemPrefixIcon === 'file') {
     return <FileOutlined style={style} />;
+  }
+
+  if (itemPrefixIcon === 'helm') {
+    return <Icon name="helm" style={{...style, fontSize: 18, transform: 'translateY(1px)'}} />;
   }
 
   return <EyeOutlined style={style} />;

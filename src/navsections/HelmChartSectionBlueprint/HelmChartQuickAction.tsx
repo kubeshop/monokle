@@ -20,6 +20,8 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 
+import * as S from './HelmChartQuickAction.styled';
+
 const selectQuickActionData = (state: RootState, itemId: string) => {
   const thisValuesFile = selectHelmValues(state.main, itemId);
   invariant(thisValuesFile, 'values not found');
@@ -31,6 +33,7 @@ const selectQuickActionData = (state: RootState, itemId: string) => {
   const isAnyPreviewing = isDefined(previewingHelmValues) || isDefined(previewingHelmConfig);
   const isThisPreviewing = itemId === previewingHelmValues?.id;
   const isThisSelected = thisValuesFile?.id === selectedValuesFile?.id;
+  const isFiltered = !thisValuesFile.filePath.startsWith(state.main.resourceFilter.fileOrFolderContainedIn || '');
 
   const previewingResourceSet: ResourceSet | undefined = previewingHelmConfig
     ? {
@@ -46,15 +49,14 @@ const selectQuickActionData = (state: RootState, itemId: string) => {
       }
     : undefined;
 
-  return {thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet};
+  return {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet};
 };
 
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
-  const {thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} = useAppSelector(
-    state => selectQuickActionData(state, itemInstance.id)
-  );
+  const {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} =
+    useAppSelector(state => selectQuickActionData(state, itemInstance.id));
 
   const selectAndPreviewHelmValuesFile = useCallback(() => {
     if (!isThisSelected) {
@@ -79,33 +81,37 @@ const QuickAction = (props: ItemCustomComponentProps) => {
     reloadPreview();
   });
 
-  if (isAnyPreviewing && !isThisPreviewing) {
-    return (
-      <QuickActionCompare
-        isItemSelected={itemInstance.isSelected}
-        from="quick-helm-compare"
-        view={{
-          leftSet: previewingResourceSet,
-          rightSet: {
-            type: 'helm',
-            chartId: thisValuesFile?.helmChartId,
-            valuesId: thisValuesFile?.id,
-          },
-        }}
-      />
-    );
+  if (isFiltered) {
+    return null;
   }
 
   return (
-    <QuickActionPreview
-      isItemSelected={itemInstance.isSelected}
-      isItemBeingPreviewed={isThisPreviewing}
-      previewTooltip={HelmPreviewTooltip}
-      reloadPreviewTooltip={ReloadHelmPreviewTooltip}
-      exitPreviewTooltip={ExitHelmPreviewTooltip}
-      selectAndPreview={selectAndPreviewHelmValuesFile}
-      reloadPreview={reloadPreview}
-    />
+    <S.QuickActionsContainer>
+      {isAnyPreviewing && !isThisPreviewing && (
+        <QuickActionCompare
+          isItemSelected={itemInstance.isSelected}
+          from="quick-helm-compare"
+          view={{
+            leftSet: previewingResourceSet,
+            rightSet: {
+              type: 'helm',
+              chartId: thisValuesFile?.helmChartId,
+              valuesId: thisValuesFile?.id,
+            },
+          }}
+        />
+      )}
+
+      <QuickActionPreview
+        isItemSelected={itemInstance.isSelected}
+        isItemBeingPreviewed={isThisPreviewing}
+        previewTooltip={HelmPreviewTooltip}
+        reloadPreviewTooltip={ReloadHelmPreviewTooltip}
+        exitPreviewTooltip={ExitHelmPreviewTooltip}
+        selectAndPreview={selectAndPreviewHelmValuesFile}
+        reloadPreview={reloadPreview}
+      />
+    </S.QuickActionsContainer>
   );
 };
 

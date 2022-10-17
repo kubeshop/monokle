@@ -78,7 +78,7 @@ const Walkthrough = <C extends WalkthroughCollection>(props: WalkthroughProps<C>
       placement={placement}
       content={<WalkthroughContent data={data} currentStep={walkThroughStep} collection={collection} />}
       title={<WalkthroughTitle title={data.title} collection={collection} />}
-      visible={data.step === step}
+      open={data.step === step}
       overlayClassName="walkthrough"
     >
       {children}

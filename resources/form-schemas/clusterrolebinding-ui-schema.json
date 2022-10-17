@@ -1,31 +1,40 @@
 {
   "ui:title": "RoleBinding Properties",
+  "level": 0,
   "subjects": {
     "ui:title": "Object subjects",
+    "level": 1,
     "items": {
       "kind": {
-        "ui:title": "Kind"
+        "ui:title": "Kind",
+        "level": 2
       },
       "name": {
-        "ui:title": "Name"
+        "ui:title": "Name",
+        "level": 2
       },
       "apiGroup": {
         "ui:title": "API Group",
-        "ui:widget": "apiGroupSelection"
+        "ui:widget": "apiGroupSelection",
+        "level": 2
       }
     }
   },
   "roleRef": {
     "ui:title": "Object subjects",
+    "level": 1,
     "kind": {
-      "ui:title": "Kind"
+      "ui:title": "Kind",
+      "level": 2
     },
     "name": {
       "ui:title": "Name",
-      "ui:help": "This must match the name of the Role or ClusterRole you wish to bind to"
+      "ui:help": "This must match the name of the Role or ClusterRole you wish to bind to",
+      "level": 2
     },
     "apiGroup": {
-      "ui:title": "API Group"
+      "ui:title": "API Group",
+      "level": 2
     }
   }
 }

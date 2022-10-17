@@ -441,7 +441,13 @@ export const Settings = ({
         <InputNumber
           min={1}
           value={localConfig?.folderReadsMaxDepth}
-          onChange={(value: number) => setLocalConfig({...localConfig, folderReadsMaxDepth: value})}
+          onChange={(value: number | null) => {
+            if (!value) {
+              return;
+            }
+
+            setLocalConfig({...localConfig, folderReadsMaxDepth: value});
+          }}
         />
       </S.Div>
       <S.Div>

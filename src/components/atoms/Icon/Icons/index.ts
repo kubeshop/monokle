@@ -1,5 +1,10 @@
 export {default as Collapse} from './Collapse';
+export {default as CRDs} from './CRDs';
 export {default as Helm} from './Helm';
+export {default as Git} from './Git';
+export {default as GitOps} from './GitOps';
+export {default as GitProject} from './GitProject';
+export {default as GitRepository} from './GitRepository';
 export {default as K8sSchema} from './K8sSchema';
 export {default as Kustomize} from './Kustomize';
 export {default as Kubernetes} from './Kubernetes';
@@ -18,3 +23,4 @@ export {default as Validation} from './Validation';
 export {default as Warning} from './Warning';
 export {default as YAMLSyntax} from './YAMLSyntax';
 export {default as Search} from './Search';
+export {default as SplitView} from './SplitView';

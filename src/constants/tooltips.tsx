@@ -20,12 +20,14 @@ export const AutoLoadLastProjectTooltip = 'Load last project when starting Monok
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
+export const EditWithFormTooltip = 'Edit resource with form';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const CollapseTreeTooltip = 'Collapse all folders';
+export const CommitTooltip = 'Commit to the main branch';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DocumentationTooltip = 'Open Monokle Documentation Website';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
@@ -39,6 +41,8 @@ export const FileExplorerChanged = 'File Explorer has some changes. Reload it to
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const HelmPreviewTooltip = 'Preview the Helm Chart with this values file';
 export const ImageTagTooltip = 'Open in external browser';
+export const InitializeGitTooltip = 'Make your project a Git repository';
+export const InstallGitTooltip = 'Git is not installed';
 export const KillTerminalTooltip = 'Kill terminal';
 export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
 export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and deploying kustomization files';
@@ -46,6 +50,7 @@ export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize
 export const NewEmptyProjectTooltip = 'New Empty Project';
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const NewProjectFromFolderTooltip = 'New project from existing folder';
+export const NewProjectFromGitTooltip = 'New project from Git repository';
 export const NewProjectFromTemplateTooltip = 'New Project from Template';
 export const NotificationsTooltip = 'Show latest notifications';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
@@ -93,3 +98,8 @@ export const TerminalPaneTooltip = () => <HotkeyLabel text="View Terminal" name=
 
 export const ScaleTooltip = () => <HotkeyLabel text="Change the number of replicas" name="SCALE" />;
 export const RestartTooltip = 'Restart deployment';
+
+export const GitCommitDisabledTooltip = 'There are no staged files to commit';
+export const GitCommitEnabledTooltip = ({branchName}: {branchName: string}) => (
+  <div>Commit staged files to {branchName}</div>
+);

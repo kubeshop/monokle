@@ -6,8 +6,23 @@ import {BackgroundColors, PanelColors} from '@styles/Colors';
 
 export const Badge = styled(RawBadge)`
   & .ant-badge-dot {
-    top: 3px;
-    right: 3px;
+    top: 6px;
+    right: 6px;
+    z-index: 100;
+  }
+
+  & .ant-badge-count {
+    top: 5px;
+    right: 5px;
+    z-index: 100;
+    padding: 0px 4px;
+  }
+
+  & .ant-badge-count-sm {
+    min-width: 12px;
+    height: 12px;
+    font-size: 8px;
+    line-height: 11px;
   }
 `;
 
@@ -25,5 +40,4 @@ export const IconsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 9px;
 `;

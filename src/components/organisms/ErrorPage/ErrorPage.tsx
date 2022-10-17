@@ -14,7 +14,11 @@ import crashFigure from '@assets/figures/crash.svg';
 import * as S from './ErrorPage.styled';
 import {ErrorStack} from './ErrorStack';
 
-export const ErrorPage: React.FC<FallbackProps> = ({error}) => {
+interface CustomFallbackProps extends FallbackProps {
+  hideBackButton?: boolean;
+}
+
+export const ErrorPage: React.FC<CustomFallbackProps> = ({hideBackButton, error}) => {
   const createGitHubIssue = useCallback(() => {
     const url = newGithubIssueUrl({
       user: 'kubeshop',
@@ -47,9 +51,11 @@ export const ErrorPage: React.FC<FallbackProps> = ({error}) => {
         <Button type="default" onClick={createGitHubIssue}>
           Help us by creating an automatic GitHub issue
         </Button>
-        <Button type="primary" onClick={onRestart}>
-          Back to Monokle
-        </Button>
+        {!hideBackButton && (
+          <Button type="primary" onClick={onRestart}>
+            Back to Monokle
+          </Button>
+        )}
       </Space>
     </S.ErrorContainer>
   );

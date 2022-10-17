@@ -155,7 +155,8 @@ export type ResourceSet =
   | KustomizeResourceSet
   | HelmResourceSet
   | CustomHelmResourceSet
-  | ClusterResourceSet;
+  | ClusterResourceSet
+  | GitResourceSet;
 
 export type LocalResourceSet = {
   type: 'local';
@@ -166,6 +167,12 @@ export type KustomizeResourceSet = {
   type: 'kustomize';
   kustomizationId: string;
   defaultNamespace?: string;
+};
+
+export type GitResourceSet = {
+  type: 'git';
+  branchName: string;
+  commitHash?: string;
 };
 
 export type HelmResourceSet = {

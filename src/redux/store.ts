@@ -6,9 +6,11 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
+import {formSlice} from './forms';
+import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
-import {configSlice} from './reducers/appConfig';
+import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
@@ -38,6 +40,7 @@ combineListeners([
   resourceMapChangedListener,
   imageSelectedListener,
   removedTerminalListener,
+  crdsPathChangedListener,
 ]);
 
 const appReducer = combineReducers({
@@ -51,6 +54,8 @@ const appReducer = combineReducers({
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
   uiCoach: uiCoachSlice.reducer,
+  git: gitSlice.reducer,
+  form: formSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

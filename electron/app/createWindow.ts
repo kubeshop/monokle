@@ -58,8 +58,9 @@ const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
+const crdsDir = path.join(userDataDir, 'savedCRDs');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
-const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
+const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize', 'git'];
 const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {
@@ -72,6 +73,7 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
+      zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
@@ -180,6 +182,7 @@ export const createWindow = (givenPath?: string) => {
         homeDir: userHomeDir,
         tempDir: userTempDir,
         dataDir: userDataDir,
+        crdsDir,
       })
     );
 

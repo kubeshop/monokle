@@ -28,7 +28,13 @@ export const ClusterContextSelect: React.FC<Props> = ({side}) => {
   );
   return (
     <S.SelectColor>
-      <Select onChange={handleSelect} placeholder="Choose context…" value={currentContext?.name} style={{width: 160}}>
+      <Select
+        defaultOpen
+        onChange={handleSelect}
+        placeholder="Choose context…"
+        value={currentContext?.name}
+        style={{width: 160}}
+      >
         {allContexts.map(context => {
           return (
             <Select.Option key={context.name} value={context.name}>

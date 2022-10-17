@@ -46,8 +46,8 @@ export const openApplication = async (givenPath?: string) => {
   });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
+    if (!isDev) {
+      app.exit();
     }
   });
 

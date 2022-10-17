@@ -1,0 +1,9 @@
+{
+  "title": "Monokle 1.11 brings Git integration!",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-1-11-0-release",
+  "about": {
+    "when": "Sept 2022",
+    "title": "In this release, we bring you:",
+    "features": ["Git integration", "Improved Form Editors", "Side by side editors"]
+  }
+}

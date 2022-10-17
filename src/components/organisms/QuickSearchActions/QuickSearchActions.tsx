@@ -270,7 +270,7 @@ const QuickSearchActionsV3: React.FC = () => {
       closable={false}
       destroyOnClose
       footer={null}
-      visible={isOpen}
+      open={isOpen}
       onCancel={() => dispatch(closeQuickSearchActionsPopup())}
     >
       <AutoComplete

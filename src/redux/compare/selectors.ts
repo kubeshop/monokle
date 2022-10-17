@@ -57,6 +57,22 @@ export const selectClusterResourceSet = (state: RootState, side: CompareSide) =>
   };
 };
 
+export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'git' || !state.git.repo) {
+    return undefined;
+  }
+
+  const branchName = resourceSet.branchName;
+
+  const allGitBranches = Object.values(state.git.repo.branchMap);
+  const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
+  const currentGitBranchCommits = currentGitBranch?.commits || [];
+  const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
+
+  return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
+};
+
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
   const resourceSet = selectResourceSet(state.compare, side);
   if (resourceSet?.type !== 'helm' && resourceSet?.type !== 'helm-custom') {
@@ -154,7 +170,8 @@ export const selectComparisonListItems = createSelector(
   (comparisons = [], [leftType, rightType], defaultNamespace) => {
     const result: ComparisonListItem[] = [];
 
-    const transferable = canTransfer(leftType, rightType);
+    const leftTransferable = canTransfer(leftType, rightType);
+    const rightTransferable = canTransfer(rightType, leftType);
 
     const groups = groupBy(comparisons, r => {
       if (r.isMatch) return r.left.kind;
@@ -174,8 +191,8 @@ export const selectComparisonListItems = createSelector(
             namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
             leftActive: true,
             rightActive: true,
-            leftTransferable: transferable,
-            rightTransferable: transferable,
+            leftTransferable: leftTransferable && comparison.isDifferent,
+            rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
           });
         } else {
@@ -188,8 +205,8 @@ export const selectComparisonListItems = createSelector(
               : undefined,
             leftActive: isDefined(comparison.left),
             rightActive: isDefined(comparison.right),
-            leftTransferable: transferable && isDefined(comparison.left),
-            rightTransferable: transferable && isDefined(comparison.right),
+            leftTransferable: leftTransferable && isDefined(comparison.left),
+            rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
           });
         }

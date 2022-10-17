@@ -183,7 +183,7 @@ const CreateProjectModal: React.FC = () => {
           <div>Create an Empty Project</div>
         )
       }
-      visible={uiState?.isOpen}
+      open={uiState?.isOpen}
       onCancel={closeModal}
       style={{opacity: isModalHid ? 0 : 1}}
       transitionName=""

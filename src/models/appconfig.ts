@@ -77,6 +77,7 @@ export type Project = {
   created?: string;
   lastOpened?: string;
   isPinned?: boolean;
+  isGitRepo?: boolean;
 };
 
 export type PreviewConfigValuesFileItem = {
@@ -96,6 +97,12 @@ export type HelmPreviewConfiguration = {
   options: Record<string, string | null>;
 };
 
+export type SavedCommand = {
+  id: string;
+  label: string;
+  content: string;
+};
+
 export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
@@ -106,6 +113,7 @@ export type ProjectConfig = {
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
+  savedCommandMap?: Record<string, SavedCommand>;
 };
 
 interface AppConfig {
@@ -135,6 +143,7 @@ interface AppConfig {
   userHomeDir?: string;
   userDataDir?: string;
   userTempDir?: string;
+  userCrdsDir?: string;
   isProjectLoading?: boolean;
   projectsRootPath: string;
   k8sVersion: string;

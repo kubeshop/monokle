@@ -35,6 +35,10 @@ export const FileTreeContainer = styled.div`
     background: transparent;
   }
 
+  & .ant-tree-treenode-not-supported:hover::before {
+    background: transparent !important;
+  }
+
   & .ant-tree-switcher-leaf-line::before {
     border-right: 1px solid #434343;
   }
@@ -200,10 +204,11 @@ export const TreeTitleText = styled.span`
   position: relative;
 `;
 
-export const TreeTitleWrapper = styled.div`
+export const TreeTitleWrapper = styled.div<{$isDisabled: boolean}>`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
 
   height: 100%;
 

@@ -274,13 +274,18 @@ export function processHelmChartFolder(
 
 export function getHelmChartName(chartFilePath: string) {
   const fileText = fs.readFileSync(chartFilePath, 'utf8');
-  const fileContent = parse(fileText);
+  try {
+    const fileContent = parse(fileText);
 
-  if (typeof fileContent?.name !== 'string') {
-    return `Unamed Chart: ${path.dirname(chartFilePath)}`;
+    if (typeof fileContent?.name !== 'string') {
+      return `Unnamed Chart: ${path.dirname(chartFilePath)}`;
+    }
+
+    return fileContent.name;
+  } catch (e: any) {
+    log.warn(`failed to parse Helm Chart at ${chartFilePath}`);
+    return `Invalid Chart: ${path.dirname(chartFilePath)}`;
   }
-
-  return fileContent.name;
 }
 
 /**

@@ -44,6 +44,7 @@ export interface CodeIntelParams {
   resourceMap: ResourceMapType;
   model: monaco.editor.IModel | null;
   matchOptions?: CurrentMatch | null;
+  lastChangedLine: number;
 }
 
 export interface CodeIntelApply {

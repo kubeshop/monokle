@@ -193,6 +193,9 @@ const schema = {
           },
         },
       },
+      zoomFactor: {
+        type: 'number',
+      },
     },
   },
   uiCoach: {
@@ -313,6 +316,7 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
+    zoomFactor: 1,
   },
   kubeConfig: {
     namespaces: [],

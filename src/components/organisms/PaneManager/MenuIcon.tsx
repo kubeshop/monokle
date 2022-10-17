@@ -15,17 +15,17 @@ const MenuIcon = (props: {
   className?: string;
 }) => {
   const {icon: IconComponent, iconName, active, isSelected, className, style: customStyle = {}} = props;
-  const {color = Colors.grey7} = customStyle;
+  const {color = Colors.grey9} = customStyle;
 
   if (!IconComponent && !iconName) {
     throw new Error('[MenuIcon]: Either icon or iconName should be specified.');
   }
 
   const style = {
-    fontSize: 25,
+    fontSize: 19,
     color,
-    width: '30px',
-    height: '30px',
+    width: '36px',
+    height: '36px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -33,7 +33,7 @@ const MenuIcon = (props: {
   };
 
   if (active && isSelected) {
-    style.color = Colors.grey400;
+    style.color = Colors.cyan9;
   }
 
   if (IconComponent) {

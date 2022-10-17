@@ -26,14 +26,16 @@ export const ActionsPaneFooterContainer = styled.div`
   }
 `;
 
-export const ActionsPaneMainContainer = styled.div`
-  height: 100%;
+export const ActionsPaneMainContainer = styled.div<{$height: number}>`
+  height: ${({$height}) => $height}px;
   width: 100%;
   display: flex;
   flex-direction: column;
 `;
 
 export const ExtraRightButton = styled(Button)`
+  display: flex;
+  align-items: center;
   padding: 4px 0px;
   margin-left: 10px;
 `;
@@ -44,9 +46,9 @@ export const Skeleton = styled(RawSkeleton)`
   width: 95%;
 `;
 
-export const Tabs = styled(RawTabs)`
+export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
-  height: 100%;
+  height: ${({$height}) => `${$height}px`};
   overflow: visible;
 
   & .ant-tabs-nav {
@@ -59,6 +61,11 @@ export const Tabs = styled(RawTabs)`
   }
 
   & .ant-tabs-content {
-    height: 100%;
+    height: ${({$height}) => $height - 46}px;
+  }
+
+  & .ant-tabs-extra-content {
+    display: flex;
+    align-items: center;
   }
 `;

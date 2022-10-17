@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
-import {Button, Col, InputNumber, Modal, Row, Tooltip} from 'antd';
+import {Col, InputNumber, Modal, Row, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ScaleTooltip} from '@constants/tooltips';
@@ -15,6 +15,8 @@ import {
 } from '@redux/selectors';
 import {restartPreview} from '@redux/services/preview';
 import scaleDeployment from '@redux/services/scaleDeployment';
+
+import * as S from '../ActionsPaneHeader.styled';
 
 const Scale = () => {
   const dispatch = useAppDispatch();
@@ -53,24 +55,34 @@ const Scale = () => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <Button
+        <S.SecondaryButton
           loading={Boolean(scaling)}
-          type="primary"
+          type="default"
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
-          ghost
         >
           Scale
-        </Button>
+        </S.SecondaryButton>
       </Tooltip>
-      <Modal title="Set number of replicas" visible={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
+      <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>
           <Col span={8}>
             <span>Number of replicas</span>
           </Col>
           <Col span={16}>
-            <InputNumber controls={false} type="number" value={replicas} onChange={val => setReplicas(val)} />
+            <InputNumber
+              controls={false}
+              type="number"
+              value={replicas}
+              onChange={val => {
+                if (!val) {
+                  return;
+                }
+
+                setReplicas(val);
+              }}
+            />
           </Col>
         </Row>
       </Modal>

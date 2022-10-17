@@ -24,6 +24,9 @@ enum Colors {
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1
 
+  coldGrey = '#31393C',
+  warmGrey = '#222222',
+
   // Notifications
   greenOkay = '#09b89d',
   polarGreen = '#6ABE39',
@@ -39,6 +42,7 @@ enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
 
+  volcano6 = '#D84A1B',
   volcano7 = '#E87040',
   volcano8 = '#F3956A',
 
@@ -61,8 +65,10 @@ enum Colors {
   purple8 = '#AB7AE0',
 
   cyan = '#58D1C9',
-  cyan7 = '#33BCB7',
   cyan5 = '#138585',
+  cyan7 = '#33BCB7',
+  cyan8 = '#58D1C9',
+  cyan9 = '#84E2D8',
   lightSeaGreen = '#13a8a8',
 
   blue6 = '#1890FF', // Daybreak Blue
@@ -70,6 +76,7 @@ enum Colors {
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
+  geekblue7 = '#5273E0',
 
   green5 = '#3c8618',
   green6 = '#49AA19',

@@ -54,11 +54,14 @@ export type MonacoUiState = {
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
+  | 'git-pane'
   | 'kustomize-pane'
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
-  | 'search';
+  | 'search'
+  | 'crds';
+
 export type LeftMenuBottomSelectionType = 'terminal' | null;
 export type RightMenuSelectionType = 'logs' | 'graph';
 
@@ -162,7 +165,7 @@ export type UiState = {
 export type PaneConfiguration = {
   leftPane: number;
   navPane: number;
-  rightPane: number;
+  editPane: number;
   bottomPaneHeight: number;
   recentProjectsPaneWidth: number;
 };

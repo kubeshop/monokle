@@ -20,6 +20,7 @@ export enum InlineDecorationTypes {
   PolicyIssue,
   Match,
   CurrentMatch,
+  LastModified,
 }
 
 const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.IModelDecorationOptions> = {
@@ -79,6 +80,10 @@ const inlineDecorationOptionsByType: Record<InlineDecorationTypes, monaco.editor
   },
   [InlineDecorationTypes.CurrentMatch]: {
     inlineClassName: 'monokleEditorCurrentMatchInlineClass',
+  },
+  [InlineDecorationTypes.LastModified]: {
+    inlineClassName: 'monokleEditorLastModifiedLineInlineClass',
+    isWholeLine: true,
   },
 };
 

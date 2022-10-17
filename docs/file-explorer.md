@@ -8,17 +8,17 @@ The File Explorer shows all files parsed in the folder selected:
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
 file will be shown in the source editor to the right, allowing for direct editing of the file.
 
-![File Explorer Navigation](img/resource-navigation-2-1.9.png)
+![File Explorer Navigation](img/resource-navigation-2-1.11.png)
 
 In this screenshot:
 
-- The argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources.
+- The argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 Kubernetes resources.
 - The 3 ClusterRole resources in the file are highlighed in the Navigator in the middle of the screen.
 - The contents of the file are shown in the editor to the right.
 
 While in the File Explorer, the File Action drop down list is available by clicking the ellipsis to the right of the file name.
 
-![Explorer File Actions](img/explorer-file-actions-1.9.png)
+![Explorer File Actions](img/explorer-file-actions-1.11.png)
 
 In the File Actions pop up menu, the following actions are available:
 
@@ -34,7 +34,7 @@ In the File Actions pop up menu, the following actions are available:
 
 The same functionality is available for Folders:
 
-![Explorer File Actions](img/explorer-folder-actions-1.9.png)
+![Explorer File Actions](img/explorer-folder-actions-1.11.png)
 
 In the Folder Actions pop up menu, the following actions are available:
 

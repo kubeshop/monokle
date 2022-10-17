@@ -360,7 +360,7 @@ const DiffModal = () => {
             </S.NamespaceSelectContainer>
           </S.TitleContainer>
         }
-        visible={isDiffModalVisible}
+        open={isDiffModalVisible}
         centered
         width="min-content"
         onCancel={onCloseHandler}
