@@ -1,14 +1,14 @@
 # What is a Plugin?
 
-Simply, any GitHub repository that contains a `package.json` file (the plugin entry file) can be installed as a plugin if the entry file follows the structure of a Monokle plugin.
+Simply, any GitHub repository that contains a `package.json` file (the plugin entry file) can be installed as a plugin if the entry file follows the structure of a Monokle Desktop plugin.
 
-## **What is the structure of `package.json` for a valid Monokle plugin?**
+## **What is the structure of `package.json` for a valid Monokle Desktop plugin?**
 
-Monokle uses the following properties: `name`, `author`, `version` `repository`, `description`, and `monoklePlugin`.
+Monokle Desktop uses the following properties: `name`, `author`, `version` `repository`, `description`, and `monoklePlugin`.
 
 The `monoklePlugin` property should be an object containing an array named `modules`.
 
-Here’s an example of a `package.json` for a Monokle plugin:
+Here’s an example of a `package.json` for a Monokle Desktop plugin:
 
 ```json
 {
@@ -71,9 +71,9 @@ This should be used only as a workaround for developing plugins.
 On Mac:
 
 - Copy your plugin folder to `/Users/<YourUser>/Libray/Application Support/monokle/monoklePlugins`.
-- Reopen or reload Monokle (from Window -> Reload).
+- Reopen or reload Monokle Desktop (from Window -> Reload).
 
 On Windows:
 
 - Copy your plugin folder to `C:\Users\<YourUser>\AppData\Roaming\monokle\monoklePlugins`.
-- Reopen or reload Monokle (from Window -> Reload).
+- Reopen or reload Monokle Desktop (from Window -> Reload).

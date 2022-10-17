@@ -1,9 +1,9 @@
 # Cluster Integration
 
-Although Monokle is mainly geared toward working with manifest files, it also has the capability to connect 
+Although Monokle Desktop is mainly geared toward working with manifest files, it also has the capability to connect 
 to a cluster and show all contained resources, providing a convenient and easy way to inspect cluster resources.
 
-Monokle will automatically detect the default Kubeconfig file or it can be declared in Settings:
+Monokle Desktop will automatically detect the default Kubeconfig file or it can be declared in Settings:
 
 ![Kubeconfig Setting](img/kubeconfig-setting-1.11.png)
 
@@ -21,7 +21,7 @@ Selecting the **Load** button will attempt to populate the Resource Navigator wi
 
 ![Cluster Preview](img/cluster-preview-1.11.png)
 
-Monokle is now in **Cluster Mode** (as indicated by the header at the top):
+Monokle Desktop is now in **Cluster Mode** (as indicated by the header at the top):
 
 ![Cluster Preview](img/cluster-preview2-1.11.png)
 

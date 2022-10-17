@@ -1,6 +1,6 @@
 # Validating Resources
 
-Monokle automatically validates all resources of the corresponding Kubernetes 1.22.1 schemas. In the Navigator, a resource that is not validated is shown with a red error icon. A resource with a broken link is shown with a yellow triangle.
+Monokle Desktop automatically validates all resources of the corresponding Kubernetes 1.22.1 schemas. In the Navigator, a resource that is not validated is shown with a red error icon. A resource with a broken link is shown with a yellow triangle.
 
 ![Resource Validation](img/link-syntax-errors-image-1-1.9.png)
 
@@ -30,7 +30,7 @@ Hover on the error icon to check the error details and see the corresponding lin
 
 ## **Inspecting Policy Errors**
 
-Monokle now integrates with the Open Policy Agent and can use Rego policies to validate your resources. This means that validation now goes beyond syntax validation and also ensures that semantics are correct. For example, you can enable a policy that ensures that images no longer use the `latest` tag.
+Monokle Desktop integrates with the Open Policy Agent and can use Rego policies to validate your resources. This means that validation now goes beyond syntax validation and also ensures that semantics are correct. For example, you can enable a policy that ensures that images no longer use the `latest` tag.
 
 Let's have a look at how you would configure and remediate violations.
 
@@ -90,7 +90,7 @@ An overview of available rules:
 
 **How does it work?**
 
-Under the hood, Rego policies are compiled to web assembly. Monokle uses [the opa-wasm NPM module][npm-opa-wasm] to load the policy and evaluate your resources in real-time.
+Under the hood, Rego policies are compiled to web assembly. Monokle Desktop uses [the opa-wasm NPM module][npm-opa-wasm] to load the policy and evaluate your resources in real-time.
 
 **Can I use this with Helm and Kustomize?**
 

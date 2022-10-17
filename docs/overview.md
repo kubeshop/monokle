@@ -1,10 +1,10 @@
 # UI Overview
 
-## **Launch Monokle**
+## **Launch Monokle Dekktop**
 
-<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle 🚀</em>
+<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle Desktop 🚀</em>
 
-Launch Monokle and, on the welcome screen, there are three options to start working with projects:
+Launch Monokle Desktop and, on the welcome screen, there are three options to start working with projects:
 
  - Select a folder with K8s resources.
  - Create a project from scratch.
@@ -12,7 +12,7 @@ Launch Monokle and, on the welcome screen, there are three options to start work
  
 ![Welcome](img/new-user-start-screen-1.11.png)
 
-On subsequent start-ups, Monokle automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled:
+On subsequent start-ups, Monokle Desktop automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled:
 
 ![Returning User Screen](img/returning-user-start-screen-1.11.png)
 
@@ -20,9 +20,9 @@ On subsequent start-ups, Monokle automatically loads the most recently selected 
 
 Click **Select an existing folder** to add your project folder containing K8 resources. 
 
-Monokle is laid out like many other desktop applications:
+Monokle Desktop is laid out like many other desktop applications:
 
-![Monokle UI](img/monokle-ui-1.11.png)
+![Monokle Desktop UI](img/monokle-ui-1.11.png)
 
 Left to right:
 
@@ -41,25 +41,25 @@ The top right contains the following buttons:
     - **Settings** -> See **Settings** section below.
     - **Plugins Manager** -> See our [Plugins](plugins.md) documentation for details.
     - **Help**
-      - **Keyboard Shortcuts** -> See [Monokle Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
-      - **Documentation** -> opens the Monokle documentation in your system browser.
+      - **Keyboard Shortcuts** -> See [Monokle Desktop Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
+      - **Documentation** -> opens the Monokle Desktop documentation in your system browser.
       - **New in (Latest Version)** -> See the most recent updates.
-      - **Replay Quick Guide** - Replay the Quick Guide pop ups for Monokle screen navigation.
-      - **GitHub** -> opens the Monokle GitHub repo in your system browser.
-      - **Discord** -> Opens Discord to talk to us about your Monokle experience.
-      - **About Monokle** -> Details about the current version of Monokle.
+      - **Replay Quick Guide** - Replay the Quick Guide pop ups for Monokle Desktop screen navigation.
+      - **GitHub** -> opens the Monokle Desktop GitHub repo in your system browser.
+      - **Discord** -> Opens Discord to talk to us about your Monokle Desktop experience.
+      - **About Monokle Desktop** -> Details about the current version of Monokle Desktop.
   - **Feedback** -> Our feedback survey.
 
 ## **Settings**
 
 Clicking **Settings** in the ellipsis drop down on the top right opens the settings modal:
 
-![Monokle Settings](img/monokle-settings-1.9.gif)
+![Monokle Desktop Settings](img/monokle-settings-1.9.gif)
    
 ### **Active Project Settings**
   - **Project Name**
   - **Kubernetes Version**: Sets Kubernetes' schema version for validation.
-  - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
+  - **Kubeconfig**: Sets which kubeconfig Monokle Desktop should use for all cluster interactions.
   - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
   - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
   - **Helm Preview Mode**: Sets which Helm command to use for generating previews (see [Working with Helm Charts](helm.md)).
@@ -68,7 +68,7 @@ Clicking **Settings** in the ellipsis drop down on the top right opens the setti
   - **Kustomize Command**: Sets how to invoke kustomize when previewing and applying kustomization file.
     - Use kubectl
     - Use kustomize
-  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
+  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle Desktop will parse a specified folder (to avoid going too deep).
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
   - **Form Editor**
@@ -78,7 +78,7 @@ Clicking **Settings** in the ellipsis drop down on the top right opens the setti
     - Allow editing resources
 
 ### **Default Project Settings**  
-  - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
+  - **Kubeconfig**: Sets which kubeconfig Monokle Desktop should use for all cluster interactions.
   - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
   - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
   - **Helm Preview Mode**: Sets which Helm command to use for generating previews (see [Working with Helm Charts](helm.md)).
@@ -87,14 +87,14 @@ Clicking **Settings** in the ellipsis drop down on the top right opens the setti
   - **Kustomize Command**: Sets how to invoke kustomize when previewing and applying kustomization file.
     - Use kubectl
     - Use kustomize
-  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
+  - **Maximum folder-read recursion depth**: Configures how "deep" Monokle Desktop will parse a specified folder (to avoid going too deep).
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
   - **Form Editor**
-    - Create default objects
-    - Set default primitive values
+    - Create default objects.
+    - Set default primitive values.
   - **Cluster Mode**
-    - Allow editing resources
+    - Allow editing resources.
     
 
 ### **Global Settings** 
@@ -103,32 +103,32 @@ Clicking **Settings** in the ellipsis drop down on the top right opens the setti
     - Automatically load last project.
     - Show Cluster Selector.
   - **Telemetry**:
-    - Disable Usage Data
-    - Disable Error Reports
+    - Disable Usage Data.
+    - Disable Error Reports.
 
 ## **System Menu**
 
-Monokle provides a system menu with the common File/Edit/View/Window/Help functionality.
+Monokle Desktop provides a system menu with the common File/Edit/View/Window/Help functionality.
 
 Mac System Menu:
 
-![MacOS Monokle System Menu](img/mac-system-menu-1.11.png)
+![MacOS Monokle Desktop System Menu](img/mac-system-menu-1.11.png)
 
 Windows System Menu:
 
-![Windows Monokle System Menu](img/windows-system-menu.png)
+![Windows Monokle Desktop System Menu](img/windows-system-menu.png)
 
 ## **Multiple Windows**
 
-You can launch multiple project windows using the New Monokle Windows option. This allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.
+You can launch multiple project windows using the New Monokle Desktop Windows option. This allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.
 
-**Action:** File > New Monokle Window
+**Action:** File > New Monokle Desktop Window
 
 ![Multiple Window](img/multiple-windows-1.11.png)
 
 ## **Auto-update**
 
-The Monokle (on Mac) / Help (on Windows) system menus provide a "Check for Update" action that will check for an update
+The Monokle Desktop (on Mac) / Help (on Windows) system menus provide a "Check for Update" action that will check for an update
 and prompt to download, if available.
 
 ![Auto Update](img/monokle-check-for-update.png)

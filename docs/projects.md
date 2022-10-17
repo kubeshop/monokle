@@ -1,10 +1,10 @@
 # Working with Projects
 
-## **Launch Monokle**
+## **Launch Monokle Desktop**
 
-<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle 🚀</em>
+<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle Desktop 🚀</em>
 
-Launch Monokle and, on the welcome screen, there are three options to start working with projects:
+Launch Monokle Desktop and, on the welcome screen, there are three options to start working with projects:
 
  - Select an exisiting folder.
  - Create an empty project.
@@ -18,7 +18,7 @@ Click **Select an existing folder** and navigate to an existing project folder c
 
 ## **Select and Manage a Project**
 
-After a project is opened in Monokle, the project selector at the top of the screen will denote the project that is being displayed in the IDE.
+After a project is opened in Monokle Desktop, the project selector at the top of the screen will denote the project that is being displayed in the IDE.
 
 Use this selector to open a new project or switch in between projects:
 

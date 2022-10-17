@@ -1,6 +1,6 @@
 # Editing Resources
 
-Monokle allows you to edit resource manifests either in a Source Editor or a Form-based Editor which hides the underlying YAML complexity.
+Monokle Desktop allows you to edit resource manifests either in a Source Editor or a Form-based Editor which hides the underlying YAML complexity.
 
 <!--- ## **Source Editor**
 
@@ -46,7 +46,7 @@ Select multiple resources by clicking the checkbox to the left of the resource n
 
 ## **Add a Resource**
 
-While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
+While using Monokle Desktop, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
 ![Add Resource](img/add-resource-1.9.png)
 

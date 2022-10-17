@@ -71,7 +71,7 @@ The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
 
 ## **Reload Folder On Startup**
 
-You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
+You can choose to reload the last reviewed folder while launching  Desktop. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
 
 ![Reload](img/reload.png)
 
@@ -98,8 +98,7 @@ The Recent Projects option has been added to the system menu to make it easy to 
 
 ## **Supported Resource Links**
 
-Monokle currently finds and visualizes the following links between Kubernetes resources - please let us know if
-we missed something or got it wrong!
+Monokle Desktop currently finds and visualizes the following links between Kubernetes resources - please let us know if we missed something or got it wrong!
 
 | Resource Type | Outgoing Link(s) identified |
 |:-------------|:---------------------------|

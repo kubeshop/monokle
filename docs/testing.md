@@ -1,6 +1,6 @@
 # Testing
 
-Monokle tests are written with [Playwright](https://playwright.dev/docs/api/class-electron).
+Monokle Desktop tests are written with [Playwright](https://playwright.dev/docs/api/class-electron).
 
 ## **Run Tests**
 
@@ -22,7 +22,7 @@ To start writing tests first create a build(tests are run against the build whic
 
 `npm run electron:build`
 
-The `startApp()` function should be called and that will start a new monokle instance with the `automation` flag set. More examples of tests can be found in the `./tests` folder
+The `startApp()` function should be called and that will start a new Monokle Desktop instance with the `automation` flag set. More examples of tests can be found in the `./tests` folder
 The `automation` flag is used to change some handlers which cannot be automated by playwright since they are open by the specific OS's
 
 Models should contain most of the logic, we can think of models a mirror for some components in the app with some logic and identifiers for certain elements. Having most of the logic in the models can help with reusing most of the logic we have around tests and more lightweight tests.
