@@ -1,5 +1,12 @@
 import {HotkeyLabel} from '@components/molecules';
 
+export const macOSKeyIcon: Record<string, string> = {
+  alt: '⌥',
+  command: '⌘',
+  cmd: '⌘',
+  shift: '⇧',
+};
+
 export const ClusterExplorerTooltips = {
   default: 'Show/hide Cluster Preview',
   firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
