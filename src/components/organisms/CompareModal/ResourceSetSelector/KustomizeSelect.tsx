@@ -29,6 +29,7 @@ export const KustomizeSelect: React.FC<Props> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
+        defaultOpen
         onChange={id => handleSelect(id as string)}
         placeholder="Choose Kustomization…"
         value={currentKustomization?.id}

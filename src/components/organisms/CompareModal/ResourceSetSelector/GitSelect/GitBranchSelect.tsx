@@ -29,6 +29,7 @@ const GitBranchSelect: React.FC<IProps> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
+        defaultOpen
         onChange={handleSelect}
         placeholder="Choose Branch..."
         value={currentGitBranch?.name}
