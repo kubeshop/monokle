@@ -43,7 +43,7 @@ const HotkeyLabel: React.FC<IProps> = props => {
           .split(',')[0]
           .split('+')
           .map(keyboardKey => (
-            <S.KeyboardKey key={`${keyboardKey}`}>{renderKey(keyboardKey)}</S.KeyboardKey>
+            <S.KeyboardKey key={`${keyboardKey}`}>{renderKey(keyboardKey.trim())}</S.KeyboardKey>
           ))}
       </S.CommandsContainer>
     </S.HotkeyLabelContainer>
