@@ -156,7 +156,8 @@ export type ResourceSet =
   | HelmResourceSet
   | CustomHelmResourceSet
   | ClusterResourceSet
-  | GitResourceSet;
+  | GitResourceSet
+  | CommandResourceSet;
 
 export type LocalResourceSet = {
   type: 'local';
@@ -173,6 +174,11 @@ export type GitResourceSet = {
   type: 'git';
   branchName: string;
   commitHash?: string;
+};
+
+export type CommandResourceSet = {
+  type: 'command';
+  commandId: string;
 };
 
 export type HelmResourceSet = {

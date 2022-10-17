@@ -73,6 +73,19 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
   return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
 };
 
+export const selectCommandResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'command') {
+    return undefined;
+  }
+  const {commandId} = resourceSet;
+
+  const allSavedCommands = Object.values(state.config.projectConfig?.savedCommandMap || {});
+  const currentCommand = commandId ? state.config.projectConfig?.savedCommandMap?.[commandId] : undefined;
+
+  return {allSavedCommands, currentCommand};
+};
+
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {
   const resourceSet = selectResourceSet(state.compare, side);
   if (resourceSet?.type !== 'helm' && resourceSet?.type !== 'helm-custom') {

@@ -18,6 +18,7 @@ import {RootState} from '@models/rootstate';
 
 import {
   ClusterResourceSet,
+  CommandResourceSet,
   CustomHelmResourceSet,
   GitResourceSet,
   HelmResourceSet,
@@ -60,6 +61,9 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
     case 'git': {
       return fetchGitResources(state, options);
     }
+    case 'command': {
+      return fetchCommandResources(state, options);
+    }
     default:
       throw new Error('Not yet implemented');
   }
@@ -78,6 +82,28 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
     }
   );
 
+  return resources;
+}
+
+async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {
+  const command = state.config.projectConfig?.savedCommandMap?.[options.commandId];
+
+  if (!command) {
+    return [];
+  }
+
+  const result = await runCommandInMainThread({
+    commandId: command.id,
+    cmd: command.content,
+    args: [],
+  });
+
+  if (hasCommandFailed(result) || !isDefined(result.stdout)) {
+    const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+    throw new Error(msg);
+  }
+
+  const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
   return resources;
 }
 

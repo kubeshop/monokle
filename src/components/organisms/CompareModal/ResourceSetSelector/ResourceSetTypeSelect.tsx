@@ -2,6 +2,8 @@ import {useCallback} from 'react';
 
 import {Select} from 'antd';
 
+import {isEmpty} from 'lodash';
+
 import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kubeConfigPathValidSelector} from '@redux/selectors';
@@ -16,7 +18,8 @@ type Props = {
 export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   const dispatch = useAppDispatch();
   const isGitDisabled = useAppSelector(state => Boolean(!state.git.repo));
-  const isHelmDisabled = useAppSelector(state => !Object.values(state.main.helmChartMap).length);
+  const isHelmDisabled = useAppSelector(state => isEmpty(state.main.helmChartMap));
+  const isCommandDisabled = useAppSelector(state => isEmpty(state.config.projectConfig?.savedCommandMap));
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isKustomizeDisabled = useAppSelector(
     state => !Object.values(state.main.resourceMap).filter(r => isKustomizationResource(r)).length
@@ -50,6 +53,9 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
         </Select.Option>
         <Select.Option disabled={isGitDisabled} value="git">
           Git
+        </Select.Option>
+        <Select.Option disabled={isCommandDisabled} value="command">
+          Command
         </Select.Option>
       </Select>
     </S.SelectColor>
