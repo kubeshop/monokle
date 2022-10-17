@@ -65,6 +65,11 @@ const FiltersPresetModal: React.FC = () => {
       title: `Are you sure you want to delete ${key}?`,
       onOk() {
         dispatch(deleteFilterPreset(key));
+
+        if (key === form.getFieldValue('preset')) {
+          form.setFieldValue('preset', '');
+        }
+
         dispatch(setAlert({type: AlertEnum.Success, title: `Successfully deleted ${key}`, message: ''}));
       },
       onCancel() {},
