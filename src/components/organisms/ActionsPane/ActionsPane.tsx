@@ -56,7 +56,6 @@ import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
-import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';
@@ -335,24 +334,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
                         formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                       />
                     ) : null
-                  ) : null}
-                </>
-              ),
-              style: {height: '100%'},
-            },
-          ]
-        : []),
-      ...(selectedResource && resourceKindHandler && !isKustomization
-        ? [
-            {
-              key: 'metadataForm',
-              label: <TabHeader>Metadata</TabHeader>,
-              children: (
-                <>
-                  {isFolderLoading || previewLoader.isLoading ? (
-                    <S.Skeleton active />
-                  ) : activeTabKey === 'metadataForm' ? (
-                    <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
                   ) : null}
                 </>
               ),
