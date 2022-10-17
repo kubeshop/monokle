@@ -10,6 +10,7 @@ import {resourceSetCleared, resourceSetRefreshed, selectCompareStatus, selectRes
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {ClusterContextSelect} from './ClusterContextSelect';
+import CommandSelect from './CommandSelect';
 import GitSelect from './GitSelect';
 import {HelmSelect} from './HelmSelect';
 import {KustomizeSelect} from './KustomizeSelect';
@@ -45,6 +46,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
           </S.KustomizeSelectContainer>
         )}
         {resourceSet?.type === 'cluster' && <ClusterContextSelect side={side} />}
+        {resourceSet?.type === 'command' && <CommandSelect side={side} />}
       </S.SelectSpacer>
 
       <S.ActionsDiv>

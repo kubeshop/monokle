@@ -113,7 +113,7 @@ export type ProjectConfig = {
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
-  savedCommandMap?: Record<string, SavedCommand>;
+  savedCommandMap?: Record<string, SavedCommand | null>;
 };
 
 interface AppConfig {

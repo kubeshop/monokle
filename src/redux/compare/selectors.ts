@@ -1,6 +1,7 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
+import {SavedCommand} from '@models/appconfig';
 import {RootState} from '@models/rootstate';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
@@ -71,6 +72,22 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
   const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
 
   return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
+};
+
+export const selectCommandResourceSet = (state: RootState, side: CompareSide) => {
+  const resourceSet = selectResourceSet(state.compare, side);
+  if (resourceSet?.type !== 'command') {
+    return undefined;
+  }
+  const {commandId} = resourceSet;
+
+  const allSavedCommands = Object.values(state.config.projectConfig?.savedCommandMap || {}).filter(
+    (command): command is SavedCommand => Boolean(command)
+  );
+  let currentCommand = commandId ? state.config.projectConfig?.savedCommandMap?.[commandId] : undefined;
+  currentCommand = currentCommand !== null ? currentCommand : undefined;
+
+  return {allSavedCommands, currentCommand};
 };
 
 export const selectHelmResourceSet = (state: RootState, side: CompareSide) => {

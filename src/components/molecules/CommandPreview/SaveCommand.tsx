@@ -3,9 +3,8 @@ import {useState} from 'react';
 import {Button, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
-
-import {SavedCommand} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
@@ -31,7 +30,7 @@ const SaveCommand = () => {
     const values: {label: string; content: string} = await form.validateFields();
     const {label, content} = values;
 
-    const updatedSavedCommandMap: Record<string, SavedCommand> = JSON.parse(JSON.stringify(savedCommandMap));
+    const updatedSavedCommandMap = cloneDeep(savedCommandMap);
     const newCommandId = uuid();
     updatedSavedCommandMap[newCommandId] = {
       id: newCommandId,
@@ -39,7 +38,6 @@ const SaveCommand = () => {
       content,
     };
 
-    // TODO: why aren't the commands persisted between reloads?
     dispatch(
       updateProjectConfig({
         config: {
