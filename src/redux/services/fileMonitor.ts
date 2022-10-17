@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import log from 'loglevel';
 
-import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
+import {setChangedFiles, setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
 import {multiplePathsRemoved} from '@redux/reducers/main';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
@@ -58,6 +58,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
 
         promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', folder).then(repo => {
           if (repo) {
+            if (!thunkAPI.getState().git.loading) {
+              thunkAPI.dispatch(setGitLoading(true));
+            }
+
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
@@ -66,6 +70,7 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
               fileMap: thunkAPI.getState().main.fileMap,
             }).then(result => {
               thunkAPI.dispatch(setChangedFiles(result));
+              thunkAPI.dispatch(setGitLoading(false));
             });
           }
         });
@@ -79,6 +84,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
 
         promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', folder).then(repo => {
           if (repo) {
+            if (!thunkAPI.getState().git.loading) {
+              thunkAPI.dispatch(setGitLoading(true));
+            }
+
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
@@ -87,6 +96,7 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
               fileMap: thunkAPI.getState().main.fileMap,
             }).then(result => {
               thunkAPI.dispatch(setChangedFiles(result));
+              thunkAPI.dispatch(setGitLoading(false));
             });
           }
         });

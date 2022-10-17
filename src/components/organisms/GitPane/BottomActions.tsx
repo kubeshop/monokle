@@ -9,6 +9,7 @@ import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tool
 
 import {AlertEnum} from '@models/alert';
 
+import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -24,12 +25,11 @@ const BottomActions: React.FC = () => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
-  const [commitLoading, setCommitLoading] = useState(false);
-  const [syncPublishLoading, setSyncPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
 
   const isCommitDisabled = useMemo(
@@ -104,15 +104,15 @@ const BottomActions: React.FC = () => {
   );
 
   const publishHandler = useCallback(async () => {
-    setSyncPublishLoading(true);
+    dispatch(setGitLoading(true));
 
     await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName: currentBranch || 'main',
     });
 
-    setSyncPublishLoading(false);
-  }, [currentBranch, selectedProjectRootFolder]);
+    dispatch(setGitLoading(false));
+  }, [currentBranch, dispatch, selectedProjectRootFolder]);
 
   const isBranchOnRemote = useMemo(() => {
     if (!gitRepo) {
@@ -129,14 +129,13 @@ const BottomActions: React.FC = () => {
         key: 'publish_and_push',
         label: 'Publish & Push',
         onClick: async () => {
-          setSyncPublishLoading(true);
+          dispatch(setGitLoading(true));
           await publishHandler();
           await pullPushChangesHandler('push');
-          setSyncPublishLoading(false);
         },
       },
     ],
-    [isPushDisabled, publishHandler, pullPushChangesHandler]
+    [dispatch, isPushDisabled, publishHandler, pullPushChangesHandler]
   );
 
   const syncMenuItems = useMemo(
@@ -145,19 +144,18 @@ const BottomActions: React.FC = () => {
         key: 'fetch',
         label: 'Fetch',
         onClick: async () => {
-          setSyncPublishLoading(true);
+          dispatch(setGitLoading(true));
           await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
           dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
-          setSyncPublishLoading(false);
         },
       },
       {
         key: 'pull',
         label: 'Pull',
         onClick: async () => {
-          setSyncPublishLoading(true);
+          dispatch(setGitLoading(true));
           await pullPushChangesHandler('pull');
-          setSyncPublishLoading(false);
+          dispatch(setGitLoading(false));
         },
       },
       {
@@ -165,9 +163,8 @@ const BottomActions: React.FC = () => {
         key: 'push',
         label: 'Push',
         onClick: async () => {
-          setSyncPublishLoading(true);
+          dispatch(setGitLoading(true));
           await pullPushChangesHandler('push');
-          setSyncPublishLoading(false);
         },
       },
     ],
@@ -179,13 +176,13 @@ const BottomActions: React.FC = () => {
       return;
     }
 
-    setSyncPublishLoading(true);
+    dispatch(setGitLoading(true));
 
     if (gitRepo.commits.behind) {
       const error = await pullPushChangesHandler('pull');
 
       if (error) {
-        setSyncPublishLoading(false);
+        dispatch(setGitLoading(false));
         return;
       }
     }
@@ -194,12 +191,9 @@ const BottomActions: React.FC = () => {
       const error = await pullPushChangesHandler('push');
 
       if (error) {
-        setSyncPublishLoading(false);
-        return;
+        dispatch(setGitLoading(false));
       }
     }
-
-    setSyncPublishLoading(false);
   };
 
   if (!gitRepo) {
@@ -216,7 +210,7 @@ const BottomActions: React.FC = () => {
       >
         <S.CommitButton
           disabled={isCommitDisabled}
-          loading={syncPublishLoading || commitLoading}
+          loading={gitLoading}
           type="primary"
           onClick={() => setShowCommitModal(true)}
         >
@@ -227,7 +221,7 @@ const BottomActions: React.FC = () => {
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
           disabled={!gitRepo.hasRemoteRepo}
-          loading={syncPublishLoading || commitLoading}
+          loading={gitLoading}
           icon={<DownOutlined />}
           placement="topLeft"
           trigger={['click']}
@@ -240,7 +234,7 @@ const BottomActions: React.FC = () => {
       ) : (
         <S.SyncButton
           disabled={!gitRepo.hasRemoteRepo || isSyncDisabled}
-          loading={syncPublishLoading || commitLoading}
+          loading={gitLoading}
           icon={<DownOutlined />}
           overlay={<Menu items={syncMenuItems} />}
           placement="topLeft"
@@ -264,7 +258,7 @@ const BottomActions: React.FC = () => {
 
       <CommitModal
         visible={showCommitModal}
-        setCommitLoading={value => setCommitLoading(value)}
+        setCommitLoading={value => dispatch(setGitLoading(value))}
         setShowModal={value => setShowCommitModal(value)}
       />
     </S.BottomActionsContainer>

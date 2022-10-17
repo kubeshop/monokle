@@ -1,4 +1,4 @@
-import {Dropdown, Button as RawButton} from 'antd';
+import {Dropdown, Button as RawButton, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
@@ -95,6 +95,10 @@ export const NoChangedFilesLabel = styled.div`
 `;
 
 export const RemoteInputContainer = styled.div``;
+
+export const Skeleton = styled(RawSkeleton)`
+  padding: 12px 14px 0px 14px;
+`;
 
 export const StagedFilesActionsButton = styled(Dropdown.Button)`
   margin: 5px 0px 22px 14px;

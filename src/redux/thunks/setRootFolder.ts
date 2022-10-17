@@ -12,7 +12,7 @@ import {
 import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
-import {setChangedFiles, setRepo} from '@redux/git';
+import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
@@ -111,11 +111,13 @@ export const setRootFolder = createAsyncThunk<
       thunkAPI.dispatch(setRepo(repo));
     });
 
+    thunkAPI.dispatch(setGitLoading(true));
     promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
       localPath: rootFolder,
       fileMap,
     }).then(changedFiles => {
       thunkAPI.dispatch(setChangedFiles(changedFiles));
+      thunkAPI.dispatch(setGitLoading(false));
     });
   }
 

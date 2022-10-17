@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {AlertEnum} from '@models/alert';
 import {GitChangedFile} from '@models/git';
 
-import {setSelectedItem} from '@redux/git';
+import {setGitLoading, setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearSelectedPath, selectFile} from '@redux/reducers/main';
@@ -62,6 +62,8 @@ const FileList: React.FC<IProps> = props => {
         key: 'stage_unstage_changes',
         label: item.status === 'staged' ? 'Unstage changes' : 'Stage changes',
         onClick: () => {
+          dispatch(setGitLoading(true));
+
           if (item.status === 'unstaged') {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
@@ -84,6 +86,8 @@ const FileList: React.FC<IProps> = props => {
                 Modal.confirm({
                   title: discardTitle(item),
                   onOk() {
+                    dispatch(setGitLoading(true));
+
                     try {
                       if (item.type === 'modified') {
                         dispatch(updateFileEntry({path: item.path, text: item.originalContent}));
@@ -93,6 +97,7 @@ const FileList: React.FC<IProps> = props => {
                         createFileWithContent(item.fullGitPath, item.originalContent);
                       }
                     } catch (e) {
+                      dispatch(setGitLoading(false));
                       dispatch(setAlert({title: 'Discard changes failed!', message: '', type: AlertEnum.Error}));
                     }
                   },

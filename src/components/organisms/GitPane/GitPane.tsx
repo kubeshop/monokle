@@ -8,7 +8,8 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {GitChangedFile} from '@models/git';
 
-import {useAppSelector} from '@redux/hooks';
+import {setGitLoading} from '@redux/git';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
@@ -20,12 +21,13 @@ import * as S from './GitPane.styled';
 import RemoteInput from './RemoteInput';
 
 const GitPane: React.FC<{height: number}> = ({height}) => {
+  const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
   const hasRemoteRepo = useAppSelector(state => state.git.repo?.hasRemoteRepo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
-  const [loading, setLoading] = useState(false);
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
@@ -80,7 +82,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   };
 
   const handleStageUnstageSelectedFiles = async (type: 'stage' | 'unstage') => {
-    setLoading(true);
+    dispatch(setGitLoading(true));
 
     if (type === 'stage') {
       await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
@@ -97,8 +99,6 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
       setSelectedStagedFiles([]);
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -114,7 +114,9 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
     <S.GitPaneContainer id="GitPane" $height={height}>
       <TitleBar title="Git" closable />
 
-      {changedFiles.length ? (
+      {gitLoading ? (
+        <S.Skeleton active />
+      ) : changedFiles.length ? (
         <>
           {!hasRemoteRepo ? (
             <S.RemoteInputContainer ref={remoteInputRef}>
@@ -145,7 +147,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
                 {selectedStagedFiles.length ? (
                   <S.StageUnstageSelectedButton
-                    loading={loading}
+                    loading={gitLoading}
                     type="primary"
                     onClick={() => {
                       handleStageUnstageSelectedFiles('unstage');
@@ -173,7 +175,7 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
             />
             {selectedUnstagedFiles.length ? (
               <S.StageUnstageSelectedButton
-                loading={loading}
+                loading={gitLoading}
                 type="primary"
                 onClick={() => {
                   handleStageUnstageSelectedFiles('stage');
