@@ -6,12 +6,11 @@ import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoVa
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 export const useInstallDeploy = (resource?: K8sResource) => {
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -32,7 +31,7 @@ export const useInstallDeploy = (resource?: K8sResource) => {
   );
 
   const isDisabled = useMemo(() => {
-    if (isInClusterMode || !isKubeConfigPathValid) {
+    if (!isKubeConfigPathValid) {
       return true;
     }
 
@@ -55,7 +54,7 @@ export const useInstallDeploy = (resource?: K8sResource) => {
     ) {
       return true;
     }
-  }, [currentResource, isInClusterMode, isKubeConfigPathValid, knownResourceKinds, selectedPath]);
+  }, [currentResource, isKubeConfigPathValid, knownResourceKinds, selectedPath]);
 
   const tooltipTitle = useMemo(
     () => (isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid),
