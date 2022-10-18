@@ -302,10 +302,9 @@ const ActionsPane: React.FC<Props> = ({height}) => {
             {isFolderLoading || previewLoader.isLoading ? (
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
-              !isClusterDiffVisible && (selectedResourceId || selectedPath || selectedValuesFileId) ? (
+              !isClusterDiffVisible &&
+              (selectedResourceId || selectedPath || selectedValuesFileId) && (
                 <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
-              ) : (
-                !settings.hideEditorPlaceholder && <MonacoPlaceholder />
               )
             ) : null}
           </>
@@ -383,7 +382,6 @@ const ActionsPane: React.FC<Props> = ({height}) => {
       selectedResourceId,
       selectedValuesFileId,
       userDataDir,
-      settings.hideEditorPlaceholder,
     ]
   );
 
@@ -399,7 +397,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
         <PreviewConfigurationDetails />
       ) : selectedImage ? (
         <ImageDetails />
-      ) : (
+      ) : !isClusterDiffVisible && (selectedResourceId || selectedPath || selectedValuesFileId) ? (
         <S.Tabs
           $height={height - DEFAULT_PANE_TITLE_HEIGHT}
           defaultActiveKey="source"
@@ -452,6 +450,8 @@ const ActionsPane: React.FC<Props> = ({height}) => {
             ) : null
           }
         />
+      ) : (
+        !settings.hideEditorPlaceholder && <MonacoPlaceholder />
       )}
 
       {isApplyModalVisible && (
