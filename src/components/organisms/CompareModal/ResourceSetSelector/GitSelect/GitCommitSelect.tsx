@@ -5,6 +5,8 @@ import invariant from 'tiny-invariant';
 import {CompareSide, PartialResourceSet, resourceSetSelected, selectGitResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {gitCommitDate} from '@utils/git';
+
 import * as S from '../ResourceSetSelectColor.styled';
 
 type IProps = {
@@ -37,7 +39,9 @@ const GitCommitSelect: React.FC<IProps> = ({side}) => {
       >
         {currentGitBranchCommits.map(commit => (
           <Select.Option key={commit.hash} value={commit.hash}>
-            {commit.message} <S.CommitHash>{commit.hash.slice(0, 7)}</S.CommitHash>
+            <S.CommitDate>{gitCommitDate(commit.date)}</S.CommitDate>
+            {commit.message}
+            <S.CommitHash>{commit.hash.slice(0, 7)}</S.CommitHash>
           </Select.Option>
         ))}
       </Select>
