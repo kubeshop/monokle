@@ -28,6 +28,7 @@ import {
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
+  settingsSelector,
 } from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmChartFile} from '@redux/services/helm';
@@ -49,6 +50,8 @@ import {
 } from '@molecules';
 
 import {Icon, TabHeader} from '@atoms';
+
+import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
 
 import {useDiff} from '@hooks/resourceHooks';
 
@@ -95,6 +98,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
+  const settings = useAppSelector(settingsSelector);
 
   const {diffSelectedResource} = useDiff();
 
@@ -298,9 +302,10 @@ const ActionsPane: React.FC<Props> = ({height}) => {
             {isFolderLoading || previewLoader.isLoading ? (
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
-              !isClusterDiffVisible &&
-              (selectedResourceId || selectedPath || selectedValuesFileId) && (
+              !isClusterDiffVisible && (selectedResourceId || selectedPath || selectedValuesFileId) ? (
                 <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+              ) : (
+                !settings.hideEditorPlaceholder && <MonacoPlaceholder />
               )
             ) : null}
           </>
