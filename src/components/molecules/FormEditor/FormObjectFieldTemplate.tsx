@@ -29,7 +29,9 @@ const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
           {properties.map((element: any) => (
             <S.PropertyContainer key={element.content.key || uniqueId()}>{element.content}</S.PropertyContainer>
           ))}
-          <Button onClick={onAddClick(schema)}>Add Item</Button>
+          <Button style={{marginTop: properties.length === 0 ? '1rem' : '0'}} onClick={onAddClick(schema)}>
+            Add Item
+          </Button>
         </>
       )}
     </S.FieldContainer>
