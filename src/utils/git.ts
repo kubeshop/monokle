@@ -24,7 +24,12 @@ export function formatGitChangedFiles(
   projectFolderPath: string,
   gitFolderPath: string
 ): GitChangedFile[] {
-  const changedFiles: GitChangedFile[] = files.map(gitFile => {
+  let changedFiles: GitChangedFile[] = [];
+
+  files.forEach(gitFile => {
+    const workingDirStatus = gitFile.working_dir.trim();
+    const indexStatus = gitFile.index.trim();
+
     const fileType = gitFile.index.trim() ? gitFileType[gitFile.index] : gitFileType[gitFile.working_dir];
 
     const foundFile = Object.values(fileMap).find(
@@ -41,14 +46,11 @@ export function formatGitChangedFiles(
 
     const relativePath = path.dirname(fullGitPath.replace(`${projectFolderPath}${path.sep}`, ''));
     const filePath = relativePath === '.' ? '' : relativePath;
+    const status =
+      workingDirStatus && indexStatus && indexStatus !== '?' ? 'staged' : workingDirStatus ? 'unstaged' : 'staged';
 
-    return {
-      status:
-        gitFile.working_dir.trim() && gitFile.index.trim() && gitFile.index !== '?'
-          ? 'staged'
-          : gitFile.working_dir.trim()
-          ? 'unstaged'
-          : 'staged',
+    changedFiles.push({
+      status,
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
       gitPath: gitFile.path,
@@ -59,7 +61,7 @@ export function formatGitChangedFiles(
         : path.join(gitFolderPath, gitFile.path),
       originalContent: '',
       type: fileType,
-    };
+    });
   });
 
   return changedFiles;

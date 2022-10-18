@@ -19,7 +19,6 @@ export const multiplePathsChanged = createAsyncThunk(
     const userDataDir = String(state.config.userDataDir);
     const projectRootFolder = state.config.selectedProjectRootFolder;
 
-    let shouldUnstageFiles = false;
     let unstageFilesPaths: string[] = [];
 
     const nextMainState = createNextState(state.main, mainState => {
@@ -35,10 +34,6 @@ export const multiplePathsChanged = createAsyncThunk(
           const foundFile = changedFiles.find(file => file.path === fileEntry?.filePath);
           if (foundFile) {
             unstageFilesPaths.push(foundFile.fullGitPath);
-
-            if (!shouldUnstageFiles) {
-              shouldUnstageFiles = true;
-            }
           }
         }
       });
@@ -49,7 +44,7 @@ export const multiplePathsChanged = createAsyncThunk(
         thunkAPI.dispatch(setGitLoading(true));
       }
 
-      if (shouldUnstageFiles && unstageFilesPaths.length) {
+      if (unstageFilesPaths.length) {
         promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
           localPath: projectRootFolder,
           filePaths: unstageFilesPaths,
