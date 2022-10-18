@@ -383,6 +383,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
       selectedResourceId,
       selectedValuesFileId,
       userDataDir,
+      settings.hideEditorPlaceholder,
     ]
   );
 
