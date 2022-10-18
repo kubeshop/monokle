@@ -30,6 +30,7 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
 import FormObjectFieldTemplate from './FormObjectFieldTemplate';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
@@ -196,6 +197,7 @@ const FormEditor: React.FC<IProps> = props => {
           uiSchema={formUiSchema}
           formData={formData}
           ObjectFieldTemplate={FormObjectFieldTemplate}
+          ArrayFieldTemplate={FormArrayFieldTemplate}
           onChange={onFormUpdate}
           widgets={getCustomFormWidgets()}
           fields={getCustomFormFields()}
