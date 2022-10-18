@@ -94,3 +94,13 @@ export function fetchIsGitInstalled() {
     ipcRenderer.send('git.isGitInstalled');
   });
 }
+
+export function gitCommitDate(date: string) {
+  const newDate = new Date(date);
+
+  return `${newDate.toLocaleDateString('en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })} ${newDate.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}`;
+}
