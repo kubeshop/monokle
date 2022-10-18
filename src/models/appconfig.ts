@@ -31,6 +31,7 @@ export type Settings = {
   createDefaultObjects?: boolean;
   setDefaultPrimitiveValues?: boolean;
   allowEditInClusterMode?: boolean;
+  hideEditorPlaceholder?: boolean;
 };
 
 export enum NewVersionCode {
