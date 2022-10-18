@@ -2,6 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import fs from 'fs';
 import path from 'path';
+import {SimpleGit} from 'simple-git';
 
 import {FileMapType} from '@models/appstate';
 import {GitChangedFile, GitChangedFileType} from '@models/git';
@@ -22,11 +23,12 @@ export function formatGitChangedFiles(
   files: {path: string; index: string; working_dir: string}[],
   fileMap: FileMapType,
   projectFolderPath: string,
-  gitFolderPath: string
+  gitFolderPath: string,
+  git: SimpleGit
 ): GitChangedFile[] {
   let changedFiles: GitChangedFile[] = [];
 
-  files.forEach(gitFile => {
+  files.forEach(async gitFile => {
     const workingDirStatus = gitFile.working_dir.trim();
     const indexStatus = gitFile.index.trim();
 
@@ -49,7 +51,7 @@ export function formatGitChangedFiles(
     const status =
       workingDirStatus && indexStatus && indexStatus !== '?' ? 'staged' : workingDirStatus ? 'unstaged' : 'staged';
 
-    changedFiles.push({
+    const newChangedFile: GitChangedFile = {
       status,
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
@@ -61,7 +63,20 @@ export function formatGitChangedFiles(
         : path.join(gitFolderPath, gitFile.path),
       originalContent: '',
       type: fileType,
-    });
+    };
+
+    // both staged/unstaged changes
+    if (workingDirStatus && indexStatus && indexStatus !== '?') {
+      const stagedContent = await git.show(`:${gitFile.path}`);
+
+      // unstaged file
+      changedFiles.push({...newChangedFile, status: 'unstaged', originalContent: stagedContent});
+
+      // staged file
+      changedFiles.push({...newChangedFile, modifiedContent: stagedContent});
+    } else {
+      changedFiles.push(newChangedFile);
+    }
   });
 
   return changedFiles;

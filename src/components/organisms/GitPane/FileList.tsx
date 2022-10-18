@@ -1,7 +1,9 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {Checkbox, Dropdown, List, Menu, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
+
+import {isEqual} from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -34,6 +36,7 @@ const FileList: React.FC<IProps> = props => {
   const {files, selectedFiles, handleSelect} = props;
 
   const dispatch = useAppDispatch();
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const selectedGitFile = useAppSelector(state => state.git.selectedItem);
@@ -112,7 +115,10 @@ const FileList: React.FC<IProps> = props => {
   );
 
   const selectItemHandler = (item: GitChangedFile) => {
-    if (selectedGitFile?.fullGitPath !== item.fullGitPath) {
+    if (
+      selectedGitFile?.fullGitPath !== item.fullGitPath ||
+      (selectedGitFile?.fullGitPath === item.fullGitPath && selectedGitFile?.status !== item.status)
+    ) {
       dispatch(setSelectedItem(item));
     }
 
@@ -129,6 +135,33 @@ const FileList: React.FC<IProps> = props => {
     }
   };
 
+  const isSelected = (item: GitChangedFile) => {
+    return selectedGitFile?.fullGitPath === item.fullGitPath && selectedGitFile?.status === item.status;
+  };
+
+  useEffect(() => {
+    if (!selectedGitFile) {
+      return;
+    }
+
+    const foundFile = changedFiles.find(
+      f => f.fullGitPath === selectedGitFile.fullGitPath && f.status === selectedGitFile.status
+    );
+
+    if (!foundFile) {
+      const foundNewFile = changedFiles.find(f => f.fullGitPath === selectedGitFile.fullGitPath);
+
+      if (foundNewFile) {
+        dispatch(setSelectedItem(foundNewFile));
+      } else {
+        dispatch(setSelectedItem(undefined));
+      }
+    } else if (!isEqual(foundFile, selectedGitFile)) {
+      dispatch(setSelectedItem(foundFile));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [changedFiles]);
+
   return (
     <S.List
       dataSource={files}
@@ -137,12 +170,13 @@ const FileList: React.FC<IProps> = props => {
           onMouseEnter={() => setHovered(item)}
           onMouseLeave={() => setHovered(null)}
           style={{
-            background:
-              selectedGitFile?.fullGitPath === item.fullGitPath
-                ? Colors.selectionGradient
-                : selectedFiles.find(searchItem => searchItem.fullGitPath === item.fullGitPath)
-                ? 'rgba(255, 255, 255, 0.07)'
-                : 'transparent',
+            background: isSelected(item)
+              ? Colors.selectionGradient
+              : selectedFiles.find(
+                  searchItem => searchItem.fullGitPath === item.fullGitPath && searchItem.status === item.status
+                )
+              ? 'rgba(255, 255, 255, 0.07)'
+              : 'transparent',
           }}
           onClick={() => {
             selectItemHandler(item);
@@ -154,18 +188,16 @@ const FileList: React.FC<IProps> = props => {
           />
 
           <S.FileItem>
-            <S.FileItemData $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath}>
+            <S.FileItemData $isSelected={isSelected(item)}>
               <S.FileIcon>
-                <S.FileOutlined $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath} $type={item.status} />
+                <S.FileOutlined $isSelected={isSelected(item)} $type={item.status} />
               </S.FileIcon>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.type.charAt(0).toUpperCase() + item.type.slice(1)}>
                 <S.FileStatus $type={item.type} />
               </Tooltip>
               <S.FileName>{item.name}</S.FileName>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={item.path}>
-                <S.FilePath $isSelected={selectedGitFile?.fullGitPath === item.fullGitPath}>
-                  {item.displayPath}
-                </S.FilePath>
+                <S.FilePath $isSelected={isSelected(item)}>{item.displayPath}</S.FilePath>
               </Tooltip>
             </S.FileItemData>
 
@@ -177,7 +209,7 @@ const FileList: React.FC<IProps> = props => {
               {hovered?.name === item.name && hovered?.path === item.path && (
                 <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
                   <Space>
-                    <Dots color={selectedGitFile?.fullGitPath === item.fullGitPath ? Colors.blackPure : Colors.blue6} />
+                    <Dots color={isSelected(item) ? Colors.blackPure : Colors.blue6} />
                   </Space>
                 </Dropdown>
               )}

@@ -70,7 +70,7 @@ export const gitSlice = createSlice({
       state.repo = action.payload;
     },
 
-    setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile>) => {
+    setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile | undefined>) => {
       state.selectedItem = action.payload;
     },
   },

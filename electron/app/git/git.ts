@@ -183,19 +183,21 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const branchStatus = await git.status({'-z': null, '-uall': null});
   const files = branchStatus.files;
 
-  const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath);
+  const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath, git);
 
   for (let i = 0; i < changedFiles.length; i += 1) {
-    let originalContent: string = '';
+    if (!changedFiles[i].originalContent) {
+      let originalContent: string = '';
 
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
-    } catch (error) {
-      originalContent = '';
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
+      } catch (error) {
+        originalContent = '';
+      }
+
+      changedFiles[i].originalContent = originalContent;
     }
-
-    changedFiles[i].originalContent = originalContent;
   }
 
   return changedFiles;

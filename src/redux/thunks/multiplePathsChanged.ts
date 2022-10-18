@@ -15,11 +15,8 @@ export const multiplePathsChanged = createAsyncThunk(
   async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
-    const changedFiles = state.git.changedFiles;
     const userDataDir = String(state.config.userDataDir);
     const projectRootFolder = state.config.selectedProjectRootFolder;
-
-    let unstageFilesPaths: string[] = [];
 
     const nextMainState = createNextState(state.main, mainState => {
       filePaths.forEach(filePath => {
@@ -29,13 +26,6 @@ export const multiplePathsChanged = createAsyncThunk(
         } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
           addPath(filePath, mainState, projectConfig, userDataDir);
         }
-
-        if (changedFiles.length) {
-          const foundFile = changedFiles.find(file => file.path === fileEntry?.filePath);
-          if (foundFile) {
-            unstageFilesPaths.push(foundFile.fullGitPath);
-          }
-        }
       });
     });
 
@@ -44,20 +34,13 @@ export const multiplePathsChanged = createAsyncThunk(
         thunkAPI.dispatch(setGitLoading(true));
       }
 
-      if (unstageFilesPaths.length) {
-        promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-          localPath: projectRootFolder,
-          filePaths: unstageFilesPaths,
-        });
-      } else {
-        promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-          localPath: projectRootFolder,
-          fileMap: nextMainState.fileMap,
-        }).then(result => {
-          thunkAPI.dispatch(setChangedFiles(result));
-          thunkAPI.dispatch(setGitLoading(false));
-        });
-      }
+      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: projectRootFolder,
+        fileMap: nextMainState.fileMap,
+      }).then(result => {
+        thunkAPI.dispatch(setChangedFiles(result));
+        thunkAPI.dispatch(setGitLoading(false));
+      });
     }
 
     return nextMainState;
