@@ -478,6 +478,10 @@ export function reloadFile(
     return;
   }
 
+  const fileStats = getFileStats(absolutePath);
+  if (fileStats && fileStats.isFile()) {
+    fileEntry.text = fs.readFileSync(absolutePath, 'utf-8');
+  }
   fileEntry.timestamp = absolutePathTimestamp;
   let wasFileSelected = state.selectedPath === fileEntry.filePath;
 

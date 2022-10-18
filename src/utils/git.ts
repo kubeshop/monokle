@@ -2,6 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import fs from 'fs';
 import path from 'path';
+import {SimpleGit} from 'simple-git';
 
 import {FileMapType} from '@models/appstate';
 import {GitChangedFile, GitChangedFileType} from '@models/git';
@@ -22,9 +23,15 @@ export function formatGitChangedFiles(
   files: {path: string; index: string; working_dir: string}[],
   fileMap: FileMapType,
   projectFolderPath: string,
-  gitFolderPath: string
+  gitFolderPath: string,
+  git: SimpleGit
 ): GitChangedFile[] {
-  const changedFiles: GitChangedFile[] = files.map(gitFile => {
+  let changedFiles: GitChangedFile[] = [];
+
+  files.forEach(async gitFile => {
+    const workingDirStatus = gitFile.working_dir.trim();
+    const indexStatus = gitFile.index.trim();
+
     const fileType = gitFile.index.trim() ? gitFileType[gitFile.index] : gitFileType[gitFile.working_dir];
 
     const foundFile = Object.values(fileMap).find(
@@ -41,14 +48,11 @@ export function formatGitChangedFiles(
 
     const relativePath = path.dirname(fullGitPath.replace(`${projectFolderPath}${path.sep}`, ''));
     const filePath = relativePath === '.' ? '' : relativePath;
+    const status =
+      workingDirStatus && indexStatus && indexStatus !== '?' ? 'staged' : workingDirStatus ? 'unstaged' : 'staged';
 
-    return {
-      status:
-        gitFile.working_dir.trim() && gitFile.index.trim() && gitFile.index !== '?'
-          ? 'staged'
-          : gitFile.working_dir.trim()
-          ? 'unstaged'
-          : 'staged',
+    const newChangedFile: GitChangedFile = {
+      status,
       modifiedContent,
       name: foundFile?.name || gitFile.path.split('/').pop() || '',
       gitPath: gitFile.path,
@@ -60,6 +64,19 @@ export function formatGitChangedFiles(
       originalContent: '',
       type: fileType,
     };
+
+    // both staged/unstaged changes
+    if (workingDirStatus && indexStatus && indexStatus !== '?') {
+      const stagedContent = await git.show(`:${gitFile.path}`);
+
+      // unstaged file
+      changedFiles.push({...newChangedFile, status: 'unstaged', originalContent: stagedContent});
+
+      // staged file
+      changedFiles.push({...newChangedFile, modifiedContent: stagedContent});
+    } else {
+      changedFiles.push(newChangedFile);
+    }
   });
 
   return changedFiles;
