@@ -161,7 +161,7 @@
     "shelljs": "0.8.5",
     "simple-git": "3.14.1",
     "strip-ansi": "6.0.1",
-    "styled-components": "5.3.5",
+    "styled-components": "5.3.6",
     "tar": "6.1.11",
     "text-extensions": "2.4.0",
     "tiny-invariant": "1.2.0",
