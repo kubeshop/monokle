@@ -151,29 +151,35 @@ const SettingsManager: React.FC = () => {
     [currentProjectsRootPath]
   );
 
-  return (
-    <>
-      <S.Tabs
-        activeKey={activeTab}
-        onChange={handlePaneCollapse}
-        renderTabBar={(props: any, DefaultTabBar: any) => <DefaultTabBar {...props} style={{padding: '0 1rem'}} />}
-      >
-        {activeProject && (
-          <S.StyledTabPane tab="Active project" key={SettingsPanel.ActiveProjectSettings}>
-            <Settings
-              config={mergedConfig}
-              onConfigChange={changeProjectConfig}
-              showProjectName
-              projectName={activeProject.name}
-              onProjectNameChange={onProjectNameChange}
-              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
-            />
-          </S.StyledTabPane>
-        )}
-        <S.StyledTabPane tab="Default project" key={SettingsPanel.DefaultProjectSettings}>
-          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
-        </S.StyledTabPane>
-        <S.StyledTabPane tab="Global" key={SettingsPanel.GlobalSettings}>
+  const tabItems = [
+    ...(activeProject
+      ? [
+          {
+            key: SettingsPanel.ActiveProjectSettings,
+            label: 'Active project',
+            children: (
+              <Settings
+                config={mergedConfig}
+                onConfigChange={changeProjectConfig}
+                showProjectName
+                projectName={activeProject.name}
+                onProjectNameChange={onProjectNameChange}
+                isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+              />
+            ),
+          },
+        ]
+      : []),
+    {
+      key: SettingsPanel.DefaultProjectSettings,
+      label: 'Default project',
+      children: <Settings config={appConfig} onConfigChange={changeApplicationConfig} />,
+    },
+    {
+      key: SettingsPanel.GlobalSettings,
+      label: 'Global',
+      children: (
+        <>
           <Form
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
@@ -241,8 +247,20 @@ const SettingsManager: React.FC = () => {
               </Checkbox>
             </S.Div>
           </S.Div>
-        </S.StyledTabPane>
-      </S.Tabs>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <S.Tabs
+        activeKey={activeTab}
+        items={tabItems}
+        onChange={handlePaneCollapse}
+        renderTabBar={(props: any, DefaultTabBar: any) => <DefaultTabBar {...props} style={{padding: '0 1rem'}} />}
+      />
+
       <FileExplorer {...fileExplorerProps} />
     </>
   );

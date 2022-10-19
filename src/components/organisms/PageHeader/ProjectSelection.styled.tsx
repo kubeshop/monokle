@@ -7,6 +7,7 @@ import {
   FolderOpenOutlined as RawFolderOpenOutlined,
   FolderOutlined as RawFolderOutlined,
   FormatPainterOutlined as RawFormatPainterOutlined,
+  GithubFilled as RawGithubFilled,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -28,6 +29,12 @@ export const Button = styled(RawButton)`
       color: ${Colors.lightSeaGreen} !important;
     }
   }
+`;
+
+export const GitButtonFilled = styled(RawGithubFilled)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
 `;
 
 export const DeleteOutlined = styled(RawDeleteOutlined)`
@@ -74,6 +81,24 @@ export const GitProjectIcon = styled(Icon)`
   color: ${Colors.grey9};
   transition: all 0.2s ease-in !important;
   padding-top: 2px;
+`;
+
+export const GitRepository = styled.div<{$disabled: boolean}>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+
+  & span {
+    color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  }
+`;
+
+export const GitRepositoryIcon = styled(Icon)`
+  color: ${Colors.blue6};
+  transition: all 0.2s ease-in !important;
+  padding-top: 2px;
+  width: 20px;
 `;
 
 export const ProjectContainer = styled.div`
@@ -172,4 +197,10 @@ export const TableColumnName = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
+
+  & span:nth-child(2) {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;

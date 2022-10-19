@@ -20,6 +20,7 @@ type IProps = {
 const CreateBranchInput: React.FC<IProps> = props => {
   const {hideCreateBranchInputHandler} = props;
 
+  const gitRepoBranches = useAppSelector(state => state.git.repo?.branches || []);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -29,6 +30,11 @@ const CreateBranchInput: React.FC<IProps> = props => {
   const handleCommit = async () => {
     if (!branchName) {
       setErrorMessage('Branch name must not be empty!');
+      return;
+    }
+
+    if (gitRepoBranches.includes(branchName)) {
+      setErrorMessage('Branch name already exists!');
       return;
     }
 

@@ -1,6 +1,5 @@
-import {useState} from 'react';
-
-import {useAppDispatch} from '@redux/hooks';
+import {openGitCloneModal} from '@redux/git';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
 import SelectFolder from '@assets/FromFolder.svg';
@@ -8,20 +7,15 @@ import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import GitCloneModal from '../PageHeader/GitCloneModal';
 import Guide from './Guide';
 import * as S from './StartProjectPage.styled';
 
 const StartProjectPage = () => {
   const dispatch = useAppDispatch();
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
 
   const handleOpenFolderExplorer = () => {
     dispatch(openFolderExplorer());
-  };
-
-  const handleGitCloneRepo = () => {
-    setIsGitCloneModalVisible(true);
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -30,6 +24,7 @@ const StartProjectPage = () => {
 
   const START_PROJECT_OPTIONS = [
     {
+      disabled: false,
       itemId: 'select-existing-folder',
       itemLogo: SelectFolder,
       itemTitle: 'Select a folder',
@@ -37,13 +32,17 @@ const StartProjectPage = () => {
       itemAction: handleOpenFolderExplorer,
     },
     {
+      disabled: !isGitInstalled,
       itemId: 'start-from-git',
       itemLogo: CreateFromGit,
       itemTitle: 'Clone a Git repo',
       itemDescription: 'Explore K8s resources from a public Git repo or one your own',
-      itemAction: handleGitCloneRepo,
+      itemAction: () => {
+        dispatch(openGitCloneModal());
+      },
     },
     {
+      disabled: false,
       itemId: 'start-from-template',
       itemLogo: CreateFromTemplate,
       itemTitle: 'New project from template',
@@ -51,6 +50,7 @@ const StartProjectPage = () => {
       itemAction: () => handleCreateProject(true),
     },
     {
+      disabled: false,
       itemId: 'create-empty-project',
       itemLogo: CreateScratch,
       itemTitle: 'Create a project',
@@ -67,24 +67,26 @@ const StartProjectPage = () => {
 
       <S.StartProjectContainer>
         {START_PROJECT_OPTIONS.map(item => {
-          const {itemId, itemLogo, itemTitle, itemDescription, itemAction} = item;
+          const {disabled, itemId, itemLogo, itemTitle, itemDescription, itemAction} = item;
 
           return (
-            <S.StartProjectItem key={itemId} id={itemId} onClick={itemAction}>
+            <S.StartProjectItem
+              $disabled={disabled}
+              key={itemId}
+              id={itemId}
+              onClick={() => {
+                if (!disabled) {
+                  itemAction();
+                }
+              }}
+            >
               <S.StartProjectItemLogo src={itemLogo} />
-              <S.StartProjectItemTitle>{itemTitle}</S.StartProjectItemTitle>
-              <S.StartProjectItemDescription>{itemDescription}</S.StartProjectItemDescription>
+              <S.StartProjectItemTitle $disabled={disabled}>{itemTitle}</S.StartProjectItemTitle>
+              <S.StartProjectItemDescription $disabled={disabled}>{itemDescription}</S.StartProjectItemDescription>
             </S.StartProjectItem>
           );
         })}
       </S.StartProjectContainer>
-
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
     </S.Container>
   );
 };

@@ -43,7 +43,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import initialState from '../initialState';
-import {toggleStartProjectPane} from './ui';
+import {setLeftMenuSelection, toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -71,6 +71,10 @@ export const setOpenProject = createAsyncThunk(
     const appUi: UiState = thunkAPI.getState().ui;
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
+    }
+
+    if (appUi.leftMenu.selection !== 'file-explorer') {
+      thunkAPI.dispatch(setLeftMenuSelection('file-explorer'));
     }
 
     monitorGitFolder(projectRootPath, thunkAPI);
@@ -471,6 +475,14 @@ export const configSlice = createSlice({
     updateClusterAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
       state.clusterAccess = action.payload;
     },
+    toggleEditorPlaceholderVisiblity: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload !== undefined && state.projectConfig && state.projectConfig.settings) {
+        state.projectConfig.settings.hideEditorPlaceholder = action.payload;
+      } else if (state.projectConfig && state.projectConfig.settings) {
+        state.projectConfig.settings.hideEditorPlaceholder = !state.projectConfig.settings.hideEditorPlaceholder;
+      }
+      electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -541,5 +553,6 @@ export const {
   updateTelemetry,
   updateTextSize,
   updateTheme,
+  toggleEditorPlaceholderVisiblity,
 } = configSlice.actions;
 export default configSlice.reducer;

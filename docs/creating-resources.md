@@ -2,7 +2,7 @@
 
 ## **Add a Resource**
 
-While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **Create Resource** button at the top of the navigator to launch the **Create Resource** dialog.
+While using Monokle Desktop, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **Create Resource** button at the top of the navigator to launch the **Create Resource** dialog.
 
 ![Add Resource](img/add-resource-1.9.png)
 
@@ -20,35 +20,34 @@ These “unsaved” resources will have to be saved by the user to be able to re
 
 ## **Create a Resource from a Template**
 
-Monokle allows the use of templates to start a new project via the **Start from a template** option:
+Monokle Desktop allows the use of templates to start a new project via the **Start from a template** option:
 
-![Start with Template](img/start-with-template-1.9.png)
+![Start with Template](img/start-with-template-1.11.png)
 
 The **Create a Project from a Template** dialog appears:
 
-![Start with Template](img/name-project-1.9.png)
+![Start with Template](img/name-project-1.11.png)
 
 Name your project, select its location and click **Next: Select a Template**.
 
-Monokle includes a default set of templates which are installed automatically when starting Monokle
-for the first time and available in the Templates Explorer when working with your Monokle projects:
+Monokle Desktop includes a default set of templates which are installed automatically when starting Monokle Desktop for the first time and available in the Templates Explorer when working with your Monokle Desktop projects:
 
-![Default Templates](img/template-selection-1.9.png)
+![Default Templates](img/template-selection-1.11.png)
 
-Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
+Check out the [Monokle Desktop Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
 see the complete list of templates that are included along with their corresponding schemas and manifests.
 
 ## **Navigator Resource Options**
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.9.png)
+![Resource Options](img/navigator-resource-options-1.11.png)
 
 ### **Rename a Resource**
 
 You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
 
-![Rename Resource](img/rename-1.9.png)
+![Rename Resource](img/rename-1.11.png)
 
 ### **Clone a Resource**
 

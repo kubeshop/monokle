@@ -1,7 +1,10 @@
-import {GitChangedFile, GitSliceState} from '@models/git';
+import {GitSliceState} from '@models/git';
 
 export const gitInitialState: GitSliceState = {
-  selectedItem: {} as GitChangedFile,
   changedFiles: [],
+  gitCloneModal: {open: false},
+  isGitInstalled: false,
+  loading: false,
+  selectedItem: undefined,
   repo: undefined,
 };

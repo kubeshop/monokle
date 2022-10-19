@@ -33,6 +33,7 @@ const selectQuickActionData = (state: RootState, itemId: string) => {
   const isAnyPreviewing = isDefined(previewingHelmValues) || isDefined(previewingHelmConfig);
   const isThisPreviewing = itemId === previewingHelmValues?.id;
   const isThisSelected = thisValuesFile?.id === selectedValuesFile?.id;
+  const isFiltered = !thisValuesFile.filePath.startsWith(state.main.resourceFilter.fileOrFolderContainedIn || '');
 
   const previewingResourceSet: ResourceSet | undefined = previewingHelmConfig
     ? {
@@ -48,15 +49,14 @@ const selectQuickActionData = (state: RootState, itemId: string) => {
       }
     : undefined;
 
-  return {thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet};
+  return {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet};
 };
 
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
-  const {thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} = useAppSelector(
-    state => selectQuickActionData(state, itemInstance.id)
-  );
+  const {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} =
+    useAppSelector(state => selectQuickActionData(state, itemInstance.id));
 
   const selectAndPreviewHelmValuesFile = useCallback(() => {
     if (!isThisSelected) {
@@ -80,6 +80,10 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
   });
+
+  if (isFiltered) {
+    return null;
+  }
 
   return (
     <S.QuickActionsContainer>

@@ -1,7 +1,6 @@
-import {useState} from 'react';
-
 import {Project} from '@models/appconfig';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -12,16 +11,15 @@ import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import GitCloneModal from '../PageHeader/GitCloneModal';
 import Guide from './Guide';
 import RecentProject from './RecentProject';
 import * as S from './RecentProjectsPage.styled';
 
 const NewRecentProjectsPane = () => {
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(state => state.config.projects);
   const activeProject = useAppSelector(activeProjectSelector);
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const projects = useAppSelector(state => state.config.projects);
 
   const openProject = (project: Project) => {
     dispatch(setOpenProject(project.rootFolder));
@@ -33,10 +31,6 @@ const NewRecentProjectsPane = () => {
       return;
     }
     openProject(project);
-  };
-
-  const handleGitCloneRepo = () => {
-    setIsGitCloneModalVisible(true);
   };
 
   const handleOpenFolderExplorer = () => {
@@ -84,7 +78,15 @@ const NewRecentProjectsPane = () => {
             </S.ActionItemContext>
           </S.ActionItem>
 
-          <S.ActionItem id="start-from-git" onClick={handleGitCloneRepo}>
+          <S.ActionItem
+            $disabled={!isGitInstalled}
+            id="start-from-git"
+            onClick={() => {
+              if (isGitInstalled) {
+                dispatch(openGitCloneModal());
+              }
+            }}
+          >
             <S.ActionItemLogo src={CreateFromGit} />
             <S.ActionItemContext>
               <S.ActionItemText>Clone a Git repo</S.ActionItemText>
@@ -106,13 +108,6 @@ const NewRecentProjectsPane = () => {
           </S.ActionItem>
         </S.ActionItems>
       </S.Actions>
-
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
     </S.Container>
   );
 };

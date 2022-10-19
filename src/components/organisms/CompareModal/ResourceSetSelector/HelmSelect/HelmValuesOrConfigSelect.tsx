@@ -4,13 +4,13 @@ import {Select} from 'antd';
 
 import invariant from 'tiny-invariant';
 
-import {PartialResourceSet, resourceSetSelected, selectHelmResourceSet} from '@redux/compare';
+import {CompareSide, PartialResourceSet, resourceSetSelected, selectHelmResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from '../ResourceSetSelectColor.styled';
 
 type Props = {
-  side: 'left' | 'right';
+  side: CompareSide;
 };
 
 export const HelmValuesOrConfigSelect: React.FC<Props> = ({side}) => {
@@ -42,6 +42,7 @@ export const HelmValuesOrConfigSelect: React.FC<Props> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
+        defaultOpen
         placeholder="Select values…"
         onSelect={handleSelect}
         value={currentHelmValuesOrConfig?.id}

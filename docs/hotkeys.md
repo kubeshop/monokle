@@ -1,6 +1,6 @@
-# Monokle Keyboard Shortcuts
+# Monokle Desktop Keyboard Shortcuts
 
-Monokle currently supports the following keyboard shortcuts:
+Monokle Desktop currently supports the following keyboard shortcuts:
 
 - Cluster Preview: Ctrl/Cmd I
 - Settings: Ctrl/Cmd , (Comma)

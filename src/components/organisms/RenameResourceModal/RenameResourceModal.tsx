@@ -63,7 +63,7 @@ const RenameResourceModel: React.FC = () => {
   return (
     <Modal
       title={`Rename resource - ${resource.name}`}
-      visible={uiState.isOpen}
+      open={uiState.isOpen}
       onOk={handleOk}
       okButtonProps={{disabled: isButtonDisabled}}
       onCancel={handleCancel}

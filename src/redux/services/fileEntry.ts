@@ -478,6 +478,10 @@ export function reloadFile(
     return;
   }
 
+  const fileStats = getFileStats(absolutePath);
+  if (fileStats && fileStats.isFile()) {
+    fileEntry.text = fs.readFileSync(absolutePath, 'utf-8');
+  }
   fileEntry.timestamp = absolutePathTimestamp;
   let wasFileSelected = state.selectedPath === fileEntry.filePath;
 
@@ -490,12 +494,6 @@ export function reloadFile(
   if (wasFileSelected) {
     selectFilePath({filePath: fileEntry.filePath, state});
     state.shouldEditorReloadSelectedPath = true;
-  }
-
-  const fileStats = getFileStats(absolutePath);
-  if (fileStats && fileStats.isFile() && fileIsIncluded(fileEntry.filePath, projectConfig)) {
-    const newText = fs.readFileSync(absolutePath, 'utf8');
-    state.fileMap[fileEntry.filePath].text = newText;
   }
 }
 

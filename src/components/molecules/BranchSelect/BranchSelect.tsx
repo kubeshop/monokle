@@ -4,19 +4,18 @@ import {Modal} from 'antd';
 
 import {BranchesOutlined} from '@ant-design/icons';
 
-import {v4 as uuidv4} from 'uuid';
+import {GIT_ERROR_MODAL_DESCRIPTION} from '@constants/constants';
 
 import {GitBranch} from '@models/git';
 
 import {setCurrentBranch} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
-import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 import {rootFolderSelector} from '@redux/selectors';
 
 import {TableSelect} from '@atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {addDefaultCommandTerminal} from '@utils/terminal';
 
 import BranchTable from './BranchTable';
 
@@ -47,41 +46,31 @@ function BranchSelect() {
         branchName,
       }).then(result => {
         if (result.error) {
-          const addTerminalHandler = () => {
-            // check if there is a terminal with same default command
-            const foundTerminal = Object.values(terminalsMap).find(
-              terminal => terminal.defaultCommand === `git checkout ${branchName}`
-            );
-
-            if (foundTerminal) {
-              dispatch(setSelectedTerminal(foundTerminal.id));
-            } else {
-              const newTerminalId = uuidv4();
-              dispatch(setSelectedTerminal(newTerminalId));
-              dispatch(
-                addTerminal({
-                  id: newTerminalId,
-                  isRunning: false,
-                  defaultCommand: `git checkout ${branchName}`,
-                  shell: defaultShell,
-                })
-              );
-            }
-
-            if (!bottomSelection || bottomSelection !== 'terminal') {
-              dispatch(setLeftBottomMenuSelection('terminal'));
-            }
-          };
-
           Modal.warning({
-            title: 'Checkout not possible',
-            content: <div>Please commit your changes or stash them before you switch branches.</div>,
+            title: 'Checkout failed',
+            content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
             zIndex: 100000,
-            onCancel: addTerminalHandler,
-            onOk: addTerminalHandler,
+            onCancel: () => {
+              addDefaultCommandTerminal(
+                terminalsMap,
+                `git checkout ${branchName}`,
+                defaultShell,
+                bottomSelection,
+                dispatch
+              );
+            },
+            onOk: () => {
+              addDefaultCommandTerminal(
+                terminalsMap,
+                `git checkout ${branchName}`,
+                defaultShell,
+                bottomSelection,
+                dispatch
+              );
+            },
           });
         } else {
-          dispatch(setCurrentBranch(branch.type === 'local' ? branch.name : branch.name.replace('origin/', '')));
+          dispatch(setCurrentBranch(branchName));
           setVisible(false);
         }
       });

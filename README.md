@@ -7,7 +7,7 @@
   <a href="https://monokle.io">Website</a> |
   <a href="https://kubeshop.github.io/monokle/">Documentation</a> |
   <a href="https://discord.gg/uNuhy6GDyn">Discord</a> |
-  <a href="https://kubeshop.io/blog">Blog</a>
+  <a href="https://kubeshop.io/blog-projects/monokle">Blog</a>
 </p>
 
 <p align="center">
@@ -64,19 +64,19 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
   </tr>
   <tr>
     <td>
-      <p align="center">
-        <img src="docs/img/windows.svg" height="50" width="50" /></p>
-      </p>
+      <div align="center">
+        <img src="docs/img/windows.svg" height="50" width="50" />
+      </div>
     </td>
     <td>
-      <p align="center">
+      <div align="center">
         <img src="docs/img/macos.svg" height="50" width="50" />
-      </p>
+      </div>
     </td>
     <td>
-      <p align="center">
+      <div align="center">
         <img src="docs/img/linux.svg" height="50" width="50" />
-      </p>
+      </div>
     </td>
   </tr>
   <tr>
@@ -106,7 +106,6 @@ There is a lot of functionality currently being considered:
 - Advanced creator mode
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
-
 
 ## Getting involved
 

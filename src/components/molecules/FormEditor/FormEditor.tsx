@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
+import {ErrorBoundary} from 'react-error-boundary';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
@@ -24,9 +25,12 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 import {updateResource} from '@redux/thunks/updateResource';
 
+import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
+
 import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
 import FormObjectFieldTemplate from './FormObjectFieldTemplate';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
@@ -185,18 +189,23 @@ const FormEditor: React.FC<IProps> = props => {
 
   return (
     <S.FormContainer>
-      <Form
-        schema={schema}
-        uiSchema={formUiSchema}
-        formData={formData}
-        ObjectFieldTemplate={FormObjectFieldTemplate}
-        onChange={onFormUpdate}
-        widgets={getCustomFormWidgets()}
-        fields={getCustomFormFields()}
-        disabled={isReadOnlyMode}
+      <ErrorBoundary
+        FallbackComponent={({error}) => <ErrorPage error={error} hideBackButton resetErrorBoundary={() => {}} />}
       >
-        <div />
-      </Form>
+        <Form
+          schema={schema}
+          uiSchema={formUiSchema}
+          formData={formData}
+          ObjectFieldTemplate={FormObjectFieldTemplate}
+          ArrayFieldTemplate={FormArrayFieldTemplate}
+          onChange={onFormUpdate}
+          widgets={getCustomFormWidgets()}
+          fields={getCustomFormFields()}
+          disabled={isReadOnlyMode}
+        >
+          <div />
+        </Form>
+      </ErrorBoundary>
     </S.FormContainer>
   );
 };

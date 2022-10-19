@@ -3,6 +3,7 @@ export type IconNames =
   | 'git'
   | 'git-ops'
   | 'git-project'
+  | 'git-repository'
   | 'kubernetes'
   | 'collapse'
   | 'opa-status'

@@ -1,12 +1,27 @@
 import {existsSync, promises as fs} from 'fs';
+import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {FileMapType} from '@models/appstate';
 import {GitRepo} from '@models/git';
+import {K8sResource} from '@models/k8sresource';
+
+import {extractK8sResources} from '@redux/services/resource';
 
 import {formatGitChangedFiles} from '@utils/git';
+
+export async function isGitInstalled(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+
+  try {
+    const result = await git.version();
+    return result.installed;
+  } catch (e) {
+    return false;
+  }
+}
 
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
@@ -47,20 +62,26 @@ export async function cloneGitRepo(payload: {localPath: string; repoPath: string
   try {
     const stat = await fs.stat(localPath);
     if (!stat.isDirectory()) {
-      throw new Error(`${localPath} is ot a directory`);
+      throw new Error(`${localPath} is not a directory`);
     }
   } catch (e: any) {
     if (e.code === 'ENOENT') {
-      fs.mkdir(localPath);
+      await fs.mkdir(localPath);
     } else {
       throw e;
     }
   }
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.clone(repoPath, localPath);
+  try {
+    await git.clone(repoPath, localPath);
+  } catch (e: any) {
+    return {error: e.message};
+  }
+
+  return {};
 }
 
-export async function fetchGitRepo(localPath: string) {
+export async function getGitRepoInfo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   let gitRepo: GitRepo;
@@ -73,6 +94,7 @@ export async function fetchGitRepo(localPath: string) {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
       currentBranch: localBranches.current || remoteBranchSummary.current,
       branchMap: {},
+      commits: {ahead: 0, behind: 0},
       hasRemoteRepo: false,
     };
 
@@ -96,11 +118,38 @@ export async function fetchGitRepo(localPath: string) {
     return undefined;
   }
 
+  const branchMapValues = Object.values(gitRepo.branchMap);
+
+  for (let i = 0; i < branchMapValues.length; i += 1) {
+    const branchName = branchMapValues[i].name;
+
+    // get the list of commits for each branch found
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[branchName]: null})).all,
+    ];
+
+    branchMapValues[i].commits = orderBy(commits, ['date'], ['desc']);
+  }
+
   try {
     await git.remote(['show', 'origin']);
     gitRepo.hasRemoteRepo = true;
   } catch (e) {
     gitRepo.hasRemoteRepo = false;
+  }
+
+  try {
+    const [aheadCommits, behindCommits] = (
+      await git.raw('rev-list', '--left-right', '--count', `${gitRepo.currentBranch}...origin/${gitRepo.currentBranch}`)
+    )
+      .trim()
+      .split('\t');
+
+    gitRepo.commits.ahead = parseInt(aheadCommits, 10);
+    gitRepo.commits.behind = parseInt(behindCommits, 10);
+  } catch (e) {
+    return gitRepo;
   }
 
   return gitRepo;
@@ -134,19 +183,21 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const branchStatus = await git.status({'-z': null, '-uall': null});
   const files = branchStatus.files;
 
-  const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath);
+  const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath, git);
 
   for (let i = 0; i < changedFiles.length; i += 1) {
-    let originalContent: string = '';
+    if (!changedFiles[i].originalContent) {
+      let originalContent: string = '';
 
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
-    } catch (error) {
-      originalContent = '';
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
+      } catch (error) {
+        originalContent = '';
+      }
+
+      changedFiles[i].originalContent = originalContent;
     }
-
-    changedFiles[i].originalContent = originalContent;
   }
 
   return changedFiles;
@@ -197,11 +248,91 @@ export async function publishLocalBranch(localPath: string, branchName: string) 
 
 export async function pushChanges(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.push('origin', branchName);
+
+  try {
+    await git.push('origin', branchName);
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function setRemote(localPath: string, remoteURL: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.addRemote('origin', remoteURL);
   await git.fetch();
+}
+
+export async function getCommitsCount(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    const [aheadCommits, behindCommits] = (
+      await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
+    )
+      .trim()
+      .split('\t');
+
+    return {aheadCommits, behindCommits};
+  } catch (e) {
+    return {aheadCommits: 0, behindCommits: 0};
+  }
+}
+
+export async function fetchRepo(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  await git.fetch();
+}
+
+export async function pullChanges(localPath: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    await git.pull();
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
+}
+
+export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+  let resources: K8sResource[] = [];
+
+  const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
+    .split('\n')
+    .filter(el => el.includes('.yaml') || el.includes('.yml'));
+
+  for (let i = 0; i < filesPaths.length; i += 1) {
+    let content: string;
+
+    // get the content of the file found in current branch
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      content = await git.show(`${branchName}:${filesPaths[i]}`);
+    } catch (e) {
+      content = '';
+    }
+
+    if (content) {
+      resources = [...resources, ...extractK8sResources(content, filesPaths[i])];
+    }
+  }
+
+  return resources;
+}
+
+export async function getBranchCommits(localPath: string, branchName: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    const commits = [
+      // eslint-disable-next-line no-await-in-loop
+      ...(await git.log({[branchName]: null})).all,
+    ];
+
+    return orderBy(commits, ['date'], ['desc']);
+  } catch (e) {
+    return [];
+  }
 }

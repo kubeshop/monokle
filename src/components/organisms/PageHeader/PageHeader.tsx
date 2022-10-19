@@ -10,7 +10,7 @@ import {ReloadOutlined} from '@ant-design/icons';
 import newGithubIssueUrl from 'new-github-issue-url';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {InitializeGitTooltip, NotificationsTooltip} from '@constants/tooltips';
+import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -41,9 +41,11 @@ const PageHeader = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
@@ -109,7 +111,7 @@ const PageHeader = () => {
 
     monitorGitFolder(projectRootFolder, store);
 
-    promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', projectRootFolder).then(result => {
+    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
       dispatch(setCurrentBranch(result.currentBranch));
       setIsInitializingGitRepo(false);
@@ -179,10 +181,15 @@ const PageHeader = () => {
                   <BranchSelect />
                 </S.BranchSelectContainer>
               ) : (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={InitializeGitTooltip}>
+                <Tooltip
+                  mouseEnterDelay={TOOLTIP_DELAY}
+                  placement="bottomRight"
+                  title={isGitInstalled ? InitializeGitTooltip : InstallGitTooltip}
+                >
                   <S.InitButton
+                    disabled={!isGitInstalled}
                     icon={<Icon name="git" />}
-                    loading={isInitializingGitRepo}
+                    loading={isInitializingGitRepo || gitLoading}
                     type="primary"
                     size="small"
                     onClick={initGitRepo}
@@ -234,8 +241,8 @@ const PageHeader = () => {
           </Tooltip>
 
           <Dropdown
-            visible={isHelpMenuOpen}
-            onVisibleChange={() => {
+            open={isHelpMenuOpen}
+            onOpenChange={() => {
               setIsHelpMenuOpen(!isHelpMenuOpen);
             }}
             overlay={

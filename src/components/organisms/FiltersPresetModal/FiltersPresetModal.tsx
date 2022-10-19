@@ -65,6 +65,11 @@ const FiltersPresetModal: React.FC = () => {
       title: `Are you sure you want to delete ${key}?`,
       onOk() {
         dispatch(deleteFilterPreset(key));
+
+        if (key === form.getFieldValue('preset')) {
+          form.setFieldValue('preset', '');
+        }
+
         dispatch(setAlert({type: AlertEnum.Success, title: `Successfully deleted ${key}`, message: ''}));
       },
       onCancel() {},
@@ -74,7 +79,7 @@ const FiltersPresetModal: React.FC = () => {
   return (
     <Modal
       title={`${uiState?.type === 'load' ? 'Load' : 'Save'} filters preset`}
-      visible={uiState.isOpen}
+      open={uiState.isOpen}
       onCancel={onCancel}
       onOk={onOk}
     >
@@ -84,7 +89,7 @@ const FiltersPresetModal: React.FC = () => {
             <S.Select
               autoFocus
               defaultOpen
-              dropdownClassName="filters-preset-dropdown"
+              popupClassName="filters-preset-dropdown"
               placeholder="Select filter preset"
               showSearch
             >

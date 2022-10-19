@@ -17,7 +17,7 @@ const ModalConfirm: React.FC<IProps> = props => {
   return (
     <Modal
       centered
-      visible={isVisible}
+      open={isVisible}
       title={
         <S.TitleContainer>
           <S.TitleIcon />

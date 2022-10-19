@@ -63,6 +63,10 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (isRoot ? ROOT_FILE_ENTRY : helmItem.filePath.replace(path.sep, '')),
     [helmItem.filePath, isRoot]
   );
+  const isFiltered = useMemo(
+    () => !helmItem.filePath.startsWith(fileOrFolderContainedInFilter || ''),
+    [fileOrFolderContainedInFilter, helmItem.filePath]
+  );
 
   const menuItems = useMemo(
     () => [
@@ -189,7 +193,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   );
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={isFiltered} overlay={<Menu items={menuItems} />} triggerOnRightClick>
       {children}
     </ContextMenu>
   );

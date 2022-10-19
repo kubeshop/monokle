@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
-import {setChangedFiles, setCurrentBranch, setRepo} from '@redux/git';
+import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -47,25 +47,24 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         return;
       }
 
-      // file was staged/unstaged
-      if (path === `${absolutePath}${sep}index`) {
-        promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-          localPath: rootFolderPath,
-          fileMap: thunkAPI.getState().main.fileMap,
-        }).then(changedFiles => {
-          thunkAPI.dispatch(setChangedFiles(changedFiles));
-        });
-      }
+      // commit was made/undoed or push was made
+      if (path.startsWith(`${absolutePath}${sep}logs${sep}refs`)) {
+        const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
 
-      // branch was switched
-      if (
-        path === `${absolutePath}${sep}HEAD` ||
-        path === `${absolutePath}${sep}config` ||
-        path === `${absolutePath}${sep}FETCH_HEAD`
-      ) {
-        promiseFromIpcRenderer('git.fetchGitRepo', 'git.fetchGitRepo.result', rootFolderPath).then(result => {
-          thunkAPI.dispatch(setRepo(result));
-          thunkAPI.dispatch(setCurrentBranch(result.currentBranch));
+        promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
+          localPath: rootFolderPath,
+          branchName: gitRepo.currentBranch,
+        }).then(commits => {
+          thunkAPI.dispatch(
+            setCommits({ahead: parseInt(commits.aheadCommits, 10), behind: parseInt(commits.behindCommits, 10)})
+          );
+        });
+
+        promiseFromIpcRenderer('git.getBranchCommits', 'git.getBranchCommits.result', {
+          localPath: rootFolderPath,
+          branchName,
+        }).then(commits => {
+          thunkAPI.dispatch(setBranchCommits({branchName, commits}));
         });
       }
     })

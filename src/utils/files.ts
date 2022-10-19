@@ -192,3 +192,7 @@ export function hasValidExtension(file: string | undefined, extensions: string[]
   if (!file) return false;
   return extensions.some(extension => file.endsWith(extension));
 }
+
+export function createFileWithContent(filePath: string, content: string) {
+  return fs.writeFileSync(filePath, content, {flag: 'wx'});
+}

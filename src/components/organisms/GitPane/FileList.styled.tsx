@@ -5,7 +5,7 @@ import {FileOutlined as RawFileOutlined} from '@ant-design/icons';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {GitChangedFile} from '@models/git';
+import {GitChangedFile, GitChangedFileType} from '@models/git';
 
 import Colors from '@styles/Colors';
 
@@ -56,19 +56,28 @@ export const FileItemOperations = styled.div`
   max-width: 10%;
 `;
 
-export const FileStatus = styled.div<{$type: 'added' | 'deleted' | 'modified' | 'untracked'}>`
+export const FileStatus = styled.div<{$type: GitChangedFileType}>`
   height: 10px;
   width: 10px;
   border: ${({$type}) =>
     `1px solid ${
-      $type === 'added' || $type === 'untracked' ? Colors.cyan8 : $type === 'deleted' ? Colors.volcano6 : Colors.yellow7
+      $type === 'added' || $type === 'untracked'
+        ? Colors.cyan8
+        : $type === 'deleted'
+        ? Colors.volcano6
+        : $type === 'modified'
+        ? Colors.yellow7
+        : Colors.whitePure
     }`};
   background-color: ${({$type}) =>
     $type === 'added' || $type === 'untracked'
       ? rgba(Colors.cyan8, 0.3)
       : $type === 'deleted'
       ? rgba(Colors.volcano6, 0.3)
-      : rgba(Colors.yellow7, 0.3)};
+      : $type === 'modified'
+      ? rgba(Colors.yellow7, 0.3)
+      : rgba(Colors.whitePure, 0.3)};
+
   border-radius: 3px;
   margin-right: 8px;
   margin-top: 1px;

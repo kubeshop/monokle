@@ -5,7 +5,7 @@ export const KeyboardKey = styled.div`
   padding: 2px 4px 0px 4px;
   border-radius: 4px;
   font-size: 12px;
-  font-family: 'Spline Sans Mono', monospace;
+  font-family: 'Source Sans Pro', sans-serif;
 `;
 
 export const CommandsContainer = styled.div`

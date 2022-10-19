@@ -70,6 +70,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
   };
   applicationConfig.k8sVersion = state.projectConfig?.k8sVersion;
   applicationConfig.helm = state.projectConfig?.helm;
+  applicationConfig.savedCommandMap = state.projectConfig?.savedCommandMap;
   return applicationConfig;
 };
 
@@ -99,6 +100,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
   };
   applicationConfig.k8sVersion = state.k8sVersion;
   applicationConfig.helm = state.projectConfig?.helm;
+  applicationConfig.savedCommandMap = state.projectConfig?.savedCommandMap;
   return applicationConfig;
 };
 
@@ -108,8 +110,16 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
   }
 
   try {
-    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth, k8sVersion, helm}: ProjectConfig =
-      JSON.parse(readFileSync(CONFIG_PATH(projectRootPath), 'utf8'));
+    const {
+      settings,
+      kubeConfig,
+      scanExcludes,
+      fileIncludes,
+      folderReadsMaxDepth,
+      k8sVersion,
+      helm,
+      savedCommandMap,
+    }: ProjectConfig = JSON.parse(readFileSync(CONFIG_PATH(projectRootPath), 'utf8'));
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
       ? {
@@ -149,6 +159,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
     projectConfig.folderReadsMaxDepth = _.isNumber(folderReadsMaxDepth) ? folderReadsMaxDepth : undefined;
     projectConfig.k8sVersion = _.includes(K8S_VERSIONS, k8sVersion) ? k8sVersion : PREDEFINED_K8S_VERSION;
     projectConfig.helm = helm;
+    projectConfig.savedCommandMap = savedCommandMap;
 
     return projectConfig;
   } catch (error) {

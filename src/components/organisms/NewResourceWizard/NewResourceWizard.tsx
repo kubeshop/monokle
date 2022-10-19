@@ -451,7 +451,7 @@ const NewResourceWizard = () => {
   return (
     <Modal
       title="Create Resource"
-      visible={newResourceWizardState.isOpen}
+      open={newResourceWizardState.isOpen}
       onOk={onOk}
       onCancel={onCancel}
       okButtonProps={{

@@ -1,8 +1,10 @@
-import {Dropdown, Button as RawButton} from 'antd';
+import {Dropdown, Button as RawButton, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
+
+export const BottomActionsRef = styled.div``;
 
 export const ChangeList = styled.div`
   font-weight: 700;
@@ -81,9 +83,8 @@ export const GitPaneContainer = styled.div<{$height: number}>`
   `}
 
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
 `;
 
 export const NoChangedFilesLabel = styled.div`
@@ -91,6 +92,12 @@ export const NoChangedFilesLabel = styled.div`
   font-weight: 600;
   padding: 20px;
   font-size: 14px;
+`;
+
+export const RemoteInputContainer = styled.div``;
+
+export const Skeleton = styled(RawSkeleton)`
+  padding: 12px 14px 0px 14px;
 `;
 
 export const StagedFilesActionsButton = styled(Dropdown.Button)`

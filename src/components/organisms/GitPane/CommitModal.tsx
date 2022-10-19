@@ -4,7 +4,10 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {useAppSelector} from '@redux/hooks';
+import {AlertEnum} from '@models/alert';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -17,6 +20,7 @@ type IProps = {
 const CommitModal: React.FC<IProps> = props => {
   const {visible, setCommitLoading, setShowModal} = props;
 
+  const dispatch = useAppDispatch();
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
@@ -40,11 +44,12 @@ const CommitModal: React.FC<IProps> = props => {
         message: values.message,
       });
 
+      dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+
       form.resetFields();
     });
 
     setLoading(false);
-    setCommitLoading(false);
     setShowModal(false);
   };
 
@@ -65,7 +70,7 @@ const CommitModal: React.FC<IProps> = props => {
     <Modal
       title={`Commit to ${currentBranch || 'main'}`}
       okText="Commit"
-      visible={visible}
+      open={visible}
       onCancel={() => setShowModal(false)}
       onOk={onOkHandler}
       confirmLoading={loading}

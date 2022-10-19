@@ -6,8 +6,6 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-const {TabPane} = RawTabs;
-
 export const Div = styled.div`
   margin-bottom: 20px;
 `;
@@ -31,12 +29,11 @@ export const Select = styled(RawSelect)`
   width: 100%;
 `;
 
-export const Tabs = styled(RawTabs)``;
-
-export const StyledTabPane = styled(TabPane)`
-  max-height: 100%;
-  overflow-y: auto;
-  padding: 0.5rem 1rem;
+export const Tabs = styled(RawTabs)`
+  .ant-tabs-content {
+    overflow-y: auto;
+    padding: 0.5rem 1rem;
+  }
 `;
 
 export const OptionContainer = styled.div`

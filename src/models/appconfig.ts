@@ -31,6 +31,7 @@ export type Settings = {
   createDefaultObjects?: boolean;
   setDefaultPrimitiveValues?: boolean;
   allowEditInClusterMode?: boolean;
+  hideEditorPlaceholder?: boolean;
 };
 
 export enum NewVersionCode {
@@ -97,6 +98,12 @@ export type HelmPreviewConfiguration = {
   options: Record<string, string | null>;
 };
 
+export type SavedCommand = {
+  id: string;
+  label: string;
+  content: string;
+};
+
 export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
@@ -107,6 +114,7 @@ export type ProjectConfig = {
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
+  savedCommandMap?: Record<string, SavedCommand | null>;
 };
 
 interface AppConfig {

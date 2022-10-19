@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+import {useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -19,6 +20,7 @@ import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
 import {toggleForm} from '@redux/forms';
+import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
@@ -33,7 +35,16 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
+import {
+  GitCloneModal,
+  HotKeysHandler,
+  LazyDrawer,
+  MessageBox,
+  PageFooter,
+  PageHeader,
+  PaneManager,
+  UpdateNotice,
+} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
@@ -43,6 +54,7 @@ import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
+import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
@@ -82,10 +94,11 @@ const App = () => {
 
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-  const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
+
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
+  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
@@ -106,6 +119,7 @@ const App = () => {
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
+  const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -233,6 +247,12 @@ const App = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useMount(() => {
+    fetchIsGitInstalled().then(isGitInstalled => {
+      dispatch(setIsGitInstalled(isGitInstalled));
+    });
+  });
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
@@ -432,6 +452,7 @@ const App = () => {
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isFiltersPresetModalVisible && <FiltersPresetModal />}
+          {isGitCloneModalVisible && <GitCloneModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
@@ -444,7 +465,7 @@ const App = () => {
             <Modal
               width="900px"
               title="New Release"
-              visible={showReleaseNotes}
+              open={showReleaseNotes}
               onCancel={onCloseReleaseNotes}
               centered
               footer={null}

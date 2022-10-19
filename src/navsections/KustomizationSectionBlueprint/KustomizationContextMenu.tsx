@@ -25,6 +25,7 @@ import {Dots} from '@atoms';
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
+import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
@@ -42,6 +43,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const filters = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -69,6 +71,10 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const target = useMemo(
     () => (isRoot ? ROOT_FILE_ENTRY : resource.filePath.replace(path.sep, '')),
     [isRoot, resource.filePath]
+  );
+  const isPassingFilter = useMemo(
+    () => (resource ? isResourcePassingFilter(resource, filters) : false),
+    [filters, resource]
   );
 
   const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
@@ -179,6 +185,10 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       },
     },
   ];
+
+  if (!isPassingFilter) {
+    return null;
+  }
 
   return (
     <ContextMenu overlay={<Menu items={menuItems} />}>

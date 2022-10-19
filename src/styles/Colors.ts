@@ -68,6 +68,7 @@ enum Colors {
   cyan5 = '#138585',
   cyan7 = '#33BCB7',
   cyan8 = '#58D1C9',
+  cyan9 = '#84E2D8',
   lightSeaGreen = '#13a8a8',
 
   blue6 = '#1890FF', // Daybreak Blue
@@ -75,6 +76,8 @@ enum Colors {
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
+  geekblue7 = '#5273E0',
+  blue1000 = '#7F9EF3',
 
   green5 = '#3c8618',
   green6 = '#49AA19',

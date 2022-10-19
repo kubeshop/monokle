@@ -96,14 +96,18 @@ const PaneManagerSplitView: React.FC = () => {
       {leftActiveMenu !== 'git-pane' && <ReflexSplitter propagate={Boolean(leftActiveMenu)} />}
 
       {leftActiveMenu !== 'git-pane' && (
-        <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <ActionsPane height={height} />
+        <ReflexElement
+          id="editPane"
+          minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
+          style={{overflowY: 'hidden'}}
+        >
+          <ActionsPane height={paneHeight} />
         </ReflexElement>
       )}
 
       {leftActiveMenu === 'git-pane' && (
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <GitOpsView height={height} />
+          <GitOpsView height={paneHeight} />
         </ReflexElement>
       )}
     </ReflexContainer>

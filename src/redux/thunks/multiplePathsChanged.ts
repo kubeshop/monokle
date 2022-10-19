@@ -4,7 +4,7 @@ import micromatch from 'micromatch';
 
 import {RootState} from '@models/rootstate';
 
-import {setChangedFiles} from '@redux/git';
+import {setChangedFiles, setGitLoading} from '@redux/git';
 import {currentConfigSelector} from '@redux/selectors';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
@@ -19,7 +19,7 @@ export const multiplePathsChanged = createAsyncThunk(
     const projectRootFolder = state.config.selectedProjectRootFolder;
 
     const nextMainState = createNextState(state.main, mainState => {
-      filePaths.forEach((filePath: string) => {
+      filePaths.forEach(filePath => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
         if (fileEntry) {
           reloadFile(filePath, fileEntry, mainState, projectConfig, userDataDir);
@@ -30,11 +30,16 @@ export const multiplePathsChanged = createAsyncThunk(
     });
 
     if (state.git.repo) {
+      if (!state.git.loading) {
+        thunkAPI.dispatch(setGitLoading(true));
+      }
+
       promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
         localPath: projectRootFolder,
         fileMap: nextMainState.fileMap,
       }).then(result => {
         thunkAPI.dispatch(setChangedFiles(result));
+        thunkAPI.dispatch(setGitLoading(false));
       });
     }
 

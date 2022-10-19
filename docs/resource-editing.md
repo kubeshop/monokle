@@ -1,6 +1,6 @@
 # Editing Resources
 
-Monokle allows you to edit resource manifests either in a Source Editor or a Form-based Editor which hides the underlying YAML complexity.
+Monokle Desktop allows you to edit resource manifests either in a Source Editor or a Form-based Editor which hides the underlying YAML complexity.
 
 <!--- ## **Source Editor**
 
@@ -16,9 +16,9 @@ Right-clicking in the editor shows a list of available commands. Pressing F1 ope
 When editing resources (not files), the editor is schema-aware for all native Kubernetes resources, which provides
 auto-complete (Ctrl-Space) and context-sensitive hover documentation.
 
-![Source Editor Auto Complete](img/source-editor-auto-complete-1.9.png)
+![Source Editor Auto Complete](img/source-editor-auto-complete-1.11.png)
 
-![Source Editor Context Hover](img/source-editor-context-hover-1.9.png)
+![Source Editor Context Hover](img/source-editor-context-hover-1.11.png)
 
 When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding Kubernetes documentation in a browser window:
 
@@ -42,11 +42,11 @@ While hovering over a broken link in the Editor, a pop-up window will allow you 
 
 Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the **Delete** or **Deploy** actions are available for both resources.
 
-![Working with Multiple Resources](img/select-multi-resource-1.9.png) 
+![Working with Multiple Resources](img/select-multi-resource-1.11.png) 
 
 ## **Add a Resource**
 
-While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
+While using Monokle Desktop, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
 ![Add Resource](img/add-resource-1.9.png)
 
@@ -82,23 +82,23 @@ on how to use the Form Editor for ConfigMaps.**-->
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.9.png)
+![Resource Options](img/navigator-resource-options-1.11.png)
 
 Unknown Resources will display in the Navigator but only have the **Rename** and **Delete** options:
 
-![Unknown Resource Options](img/navigator-unknown-resource-options-1.9.png)
+![Unknown Resource Options](img/navigator-unknown-resource-options-1.11.png)
 
 ### **Rename a Resource**
 
 You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
 
-![Rename Resource](img/rename.png)
+![Rename Resource](img/rename-1.11.png)
 
 ### **Clone a Resource**
 
 You can use the Clone action to create a new resource by using existing resources as a template. 
 
-![Clone Resource](img/clone.png)
+![Clone Resource](img/clone .png)
 
 ### **Delete a Resource**
 

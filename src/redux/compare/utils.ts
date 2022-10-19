@@ -14,6 +14,10 @@ export function isCompleteResourceSet(options: PartialResourceSet | undefined): 
       return isDefined(options.chartId) && isDefined(options.valuesId);
     case 'helm-custom':
       return isDefined(options.chartId) && isDefined(options.configId);
+    case 'git':
+      return isDefined(options.branchName) && isDefined(options.commitHash);
+    case 'command':
+      return isDefined(options.commandId);
     default:
       return false;
   }

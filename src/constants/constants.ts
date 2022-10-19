@@ -24,7 +24,7 @@ export const HELM_CHART_HELP_URL = 'https://helm.sh/docs/topics/charts/';
 export const DEPENDENCIES_HELP_URL = 'https://kubeshop.github.io/monokle/getting-started/#install-dependencies';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
-export const DEFAULT_PANE_TITLE_HEIGHT = 40;
+export const DEFAULT_PANE_TITLE_HEIGHT = 50;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
@@ -66,12 +66,23 @@ export const PANE_CONSTRAINT_VALUES = {
   navPane: 330,
 };
 
-export const PREDEFINED_K8S_VERSION = '1.24.2';
+export const PREDEFINED_K8S_VERSION = '1.24.6';
 
 export const K8S_VERSIONS = [
+  '1.25.2',
+  '1.25.1',
+  '1.25.0',
+  '1.24.6',
+  '1.24.5',
+  '1.24.4',
+  '1.24.3',
   '1.24.2',
   '1.24.1',
   '1.24.0',
+  '1.23.12',
+  '1.23.11',
+  '1.23.10',
+  '1.23.9',
   '1.23.8',
   '1.23.7',
   '1.23.6',
@@ -206,3 +217,6 @@ export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
 export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;
+export const GIT_ERROR_MODAL_DESCRIPTION = 'Check terminal for more information.';
+export const VALID_URL_REGEX =
+  /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;

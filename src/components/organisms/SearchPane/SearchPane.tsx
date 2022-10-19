@@ -1,7 +1,7 @@
 import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Input, Modal, Tabs} from 'antd';
+import {Button, Input, Modal} from 'antd';
 
 import {DownOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -84,7 +84,6 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
 
   const treeRef = useRef<any>();
   const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);
-  const {TabPane} = Tabs;
 
   const highlightFilePath = useHighlightNode(decorate(searchTree), treeRef, expandedFiles);
 
@@ -278,135 +277,144 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
     dispatch(setActiveTab(tabKey));
   };
 
+  const tabItems = [
+    {
+      key: 'search',
+      label: 'Search',
+      children: (
+        <S.TreeContainer>
+          <S.Form>
+            <S.SearchBox>
+              <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
+              <QueryMatchParams setFindingMatches={setFindingMatches} />
+            </S.SearchBox>
+          </S.Form>
+          <S.RootFolderText>
+            {Boolean(isReady) && (
+              <S.MatchText id="search-count">
+                <p>
+                  {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
+                </p>
+              </S.MatchText>
+            )}
+
+            {recentSearch.length && !searchQuery && !isFindingMatches ? (
+              <RecentSearch
+                recentSearch={recentSearch}
+                handleClick={query => {
+                  dispatch(updateSearchQuery(query));
+                  findMatches(query);
+                }}
+              />
+            ) : null}
+
+            {searchQuery && !searchTree.length && !isFindingMatches && 'No matches found'}
+          </S.RootFolderText>
+          {isFindingMatches && <S.Skeleton active />}
+
+          {isReady ? (
+            <S.TreeDirectoryTree
+              height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
+              onSelect={onNodeSelect}
+              treeData={[decorate(searchTree)]}
+              ref={treeRef}
+              expandedKeys={expandedFiles}
+              onExpand={onExpand}
+              titleRender={(event: any) => (
+                <TreeItem
+                  treeKey={String(event.key)}
+                  title={event.title}
+                  processingEntity={processingEntity}
+                  setProcessingEntity={setProcessingEntity}
+                  onDelete={onDelete}
+                  onRename={onRename}
+                  onCreateFileFolder={onCreateFileFolder}
+                  onDuplicate={onDuplicate}
+                  onCreateResource={onCreateResource}
+                  onFilterByFileOrFolder={onFilterByFileOrFolder}
+                  onPreview={onPreview}
+                  {...event}
+                />
+              )}
+              autoExpandParent
+              defaultExpandAll
+              selectedKeys={[selectedPath || '-']}
+              filterTreeNode={node => {
+                // @ts-ignore
+                return node.highlight;
+              }}
+              disabled={isInPreviewMode || previewLoader.isLoading}
+              switcherIcon={<DownOutlined />}
+              icon={<></>}
+            />
+          ) : null}
+        </S.TreeContainer>
+      ),
+    },
+    {
+      key: 'findReplace',
+      label: <>Find &#38; Replace</>,
+      children: (
+        <S.TreeContainer>
+          <S.Form>
+            <S.Label>Find:</S.Label>
+            <S.SearchBox>
+              <Input value={searchQuery} onChange={handleSearchQueryChange} />
+              <QueryMatchParams setFindingMatches={setFindingMatches} />
+            </S.SearchBox>
+
+            <S.Label>Replace:</S.Label>
+            <S.SearchBox>
+              <Input value={replaceQuery} onChange={handleReplaceQuery} />
+            </S.SearchBox>
+          </S.Form>
+          <S.RootFolderText>
+            {isReady ? (
+              <>
+                <div>{selectedPath}</div>
+                <S.ResultContainer>
+                  <S.MatchText id="search-count-replace">
+                    <p>
+                      {currentMatchNode?.currentMatchNumber || 0} of {searchCounter.current.totalMatchCount}
+                    </p>
+                    <span> View in Editor</span>
+                  </S.MatchText>
+                  <S.ButtonContainer>
+                    <Button type="primary" onClick={() => handleStep(-1)} disabled={!isPrevEnabled}>
+                      Previous
+                    </Button>
+                    <Button type="primary" onClick={() => handleStep(1)} disabled={!isNextEnabled}>
+                      Next
+                    </Button>
+                  </S.ButtonContainer>
+                </S.ResultContainer>
+              </>
+            ) : (
+              'No matches found'
+            )}
+
+            {replaceQuery && (
+              <S.ButtonContainer>
+                <Button type="primary" onClick={replaceCurrentSelection} disabled={!currentMatchNode}>
+                  Replace Selected
+                </Button>
+                <Button type="primary" onClick={replaceAll}>
+                  Replace All
+                </Button>
+              </S.ButtonContainer>
+            )}
+          </S.RootFolderText>
+
+          {isFindingMatches && <S.Skeleton active />}
+        </S.TreeContainer>
+      ),
+    },
+  ];
+
   return (
     <S.FileTreeContainer id="AdvancedSearch">
       <TitleBar title="Advanced Search" closable />
-      <S.Tabs activeKey={activeTab} onChange={changeTab}>
-        <TabPane key="search" tab="Search">
-          <S.TreeContainer>
-            <S.Form>
-              <S.SearchBox>
-                <Input placeholder="Search anything..." value={searchQuery} onChange={handleSearchQueryChange} />
-                <QueryMatchParams setFindingMatches={setFindingMatches} />
-              </S.SearchBox>
-            </S.Form>
-            <S.RootFolderText>
-              {Boolean(isReady) && (
-                <S.MatchText id="search-count">
-                  <p>
-                    {searchCounter.current.totalMatchCount} matches in {searchCounter.current.filesCount} files
-                  </p>
-                </S.MatchText>
-              )}
-
-              {recentSearch.length && !searchQuery && !isFindingMatches ? (
-                <RecentSearch
-                  recentSearch={recentSearch}
-                  handleClick={query => {
-                    dispatch(updateSearchQuery(query));
-                    findMatches(query);
-                  }}
-                />
-              ) : null}
-
-              {searchQuery && !searchTree.length && !isFindingMatches && 'No matches found'}
-            </S.RootFolderText>
-            {isFindingMatches && <S.Skeleton active />}
-
-            {isReady ? (
-              <S.TreeDirectoryTree
-                height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
-                onSelect={onNodeSelect}
-                treeData={[decorate(searchTree)]}
-                ref={treeRef}
-                expandedKeys={expandedFiles}
-                onExpand={onExpand}
-                titleRender={(event: any) => (
-                  <TreeItem
-                    treeKey={String(event.key)}
-                    title={event.title}
-                    processingEntity={processingEntity}
-                    setProcessingEntity={setProcessingEntity}
-                    onDelete={onDelete}
-                    onRename={onRename}
-                    onCreateFileFolder={onCreateFileFolder}
-                    onDuplicate={onDuplicate}
-                    onCreateResource={onCreateResource}
-                    onFilterByFileOrFolder={onFilterByFileOrFolder}
-                    onPreview={onPreview}
-                    {...event}
-                  />
-                )}
-                autoExpandParent
-                defaultExpandAll
-                selectedKeys={[selectedPath || '-']}
-                filterTreeNode={node => {
-                  // @ts-ignore
-                  return node.highlight;
-                }}
-                disabled={isInPreviewMode || previewLoader.isLoading}
-                switcherIcon={<DownOutlined />}
-                icon={<></>}
-              />
-            ) : null}
-          </S.TreeContainer>
-        </TabPane>
-
-        <TabPane key="findReplace" tab="Find &#38; Replace">
-          <S.TreeContainer>
-            <S.Form>
-              <S.Label>Find:</S.Label>
-              <S.SearchBox>
-                <Input value={searchQuery} onChange={handleSearchQueryChange} />
-                <QueryMatchParams setFindingMatches={setFindingMatches} />
-              </S.SearchBox>
-
-              <S.Label>Replace:</S.Label>
-              <S.SearchBox>
-                <Input value={replaceQuery} onChange={handleReplaceQuery} />
-              </S.SearchBox>
-            </S.Form>
-            <S.RootFolderText>
-              {isReady ? (
-                <>
-                  <div>{selectedPath}</div>
-                  <S.ResultContainer>
-                    <S.MatchText id="search-count-replace">
-                      <p>
-                        {currentMatchNode?.currentMatchNumber || 0} of {searchCounter.current.totalMatchCount}
-                      </p>
-                      <span> View in Editor</span>
-                    </S.MatchText>
-                    <S.ButtonContainer>
-                      <Button type="primary" onClick={() => handleStep(-1)} disabled={!isPrevEnabled}>
-                        Previous
-                      </Button>
-                      <Button type="primary" onClick={() => handleStep(1)} disabled={!isNextEnabled}>
-                        Next
-                      </Button>
-                    </S.ButtonContainer>
-                  </S.ResultContainer>
-                </>
-              ) : (
-                'No matches found'
-              )}
-
-              {replaceQuery && (
-                <S.ButtonContainer>
-                  <Button type="primary" onClick={replaceCurrentSelection} disabled={!currentMatchNode}>
-                    Replace Selected
-                  </Button>
-                  <Button type="primary" onClick={replaceAll}>
-                    Replace All
-                  </Button>
-                </S.ButtonContainer>
-              )}
-            </S.RootFolderText>
-
-            {isFindingMatches && <S.Skeleton active />}
-          </S.TreeContainer>
-        </TabPane>
-      </S.Tabs>
+      <S.Tabs items={tabItems} activeKey={activeTab} onChange={changeTab} />
     </S.FileTreeContainer>
   );
 };

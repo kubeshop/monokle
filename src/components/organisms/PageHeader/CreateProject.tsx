@@ -1,15 +1,14 @@
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 
 import {Dropdown} from 'antd';
 import {ItemType} from 'antd/lib/menu/hooks/useItems';
 
-import {GithubOutlined} from '@ant-design/icons';
-
-import {useAppDispatch} from '@redux/hooks';
+import {openGitCloneModal} from '@redux/git';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 
-import {FileExplorer} from '@atoms';
+import {FileExplorer, Icon} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -19,21 +18,25 @@ import PlusIconSvg from '@assets/PlusIcon.svg';
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
 import * as S from './CreateProject.styled';
-import GitCloneModal from './GitCloneModal';
 
 const CreateProject = () => {
   const dispatch = useAppDispatch();
 
-  const [isGitCloneModalVisible, setIsGitCloneModalVisible] = useState(false);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
 
   const items: ItemType[] = useMemo(
     () => [
       {label: 'New from local folder', key: 'new_from_local_folder', icon: <img src={FolderSmallWhiteSvg} />},
+      {
+        disabled: !isGitInstalled,
+        label: 'New from Git repository',
+        key: 'new_from_git_repo',
+        icon: <Icon style={{width: 16, marginRight: 10, marginLeft: '-2px'}} name="git-repository" />,
+      },
       {label: 'New from scratch', key: 'new_from_scratch', icon: <img src={FolderSmallPlusWhiteSvg} />},
       {label: 'New from template', key: 'new_from_template', icon: <img src={TemplateSmallWhiteSvg} />},
-      {label: 'New from Git repository', key: 'new_from_git_repo', icon: <GithubOutlined />},
     ],
-    []
+    [isGitInstalled]
   );
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -59,7 +62,7 @@ const CreateProject = () => {
     } else if (key === 'new_from_template') {
       handleCreateProject(true);
     } else if (key === 'new_from_git_repo') {
-      setIsGitCloneModalVisible(true);
+      dispatch(openGitCloneModal());
     }
   };
 
@@ -75,12 +78,6 @@ const CreateProject = () => {
         </S.Button>
       </Dropdown>
       <FileExplorer {...fileExplorerProps} />
-      {isGitCloneModalVisible && (
-        <GitCloneModal
-          onComplete={() => setIsGitCloneModalVisible(false)}
-          onCancel={() => setIsGitCloneModalVisible(false)}
-        />
-      )}
     </S.DropdownContainer>
   );
 };

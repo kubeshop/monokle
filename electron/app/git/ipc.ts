@@ -9,13 +9,19 @@ import {
   commitChanges,
   createLocalBranch,
   deleteLocalBranch,
-  fetchGitRepo,
+  fetchRepo,
+  getBranchCommits,
   getChangedFiles,
+  getCommitResources,
+  getCommitsCount,
   getCurrentBranch,
+  getGitRepoInfo,
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,
+  isGitInstalled,
   publishLocalBranch,
+  pullChanges,
   pushChanges,
   setRemote,
   stageChangedFiles,
@@ -32,15 +38,19 @@ ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
   event.sender.send('git.isFolderGitRepo.result', result);
 });
 
-ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
-  // TODO: handle errors
-  await cloneGitRepo(payload);
-  event.sender.send('git.cloneGitRepo.result');
+ipcMain.on('git.isGitInstalled', async (event, path: string) => {
+  const result = await isGitInstalled(path);
+  event.sender.send('git.isGitInstalled.result', result);
 });
 
-ipcMain.on('git.fetchGitRepo', async (event, localPath: string) => {
-  const result = await fetchGitRepo(localPath);
-  event.sender.send('git.fetchGitRepo.result', result);
+ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
+  const result = await cloneGitRepo(payload);
+  event.sender.send('git.cloneGitRepo.result', result);
+});
+
+ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
+  const result = await getGitRepoInfo(localPath);
+  event.sender.send('git.getGitRepoInfo.result', result);
 });
 
 ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; branchName: string}) => {
@@ -98,8 +108,8 @@ ipcMain.on('git.publishLocalBranch', async (event, payload: {localPath: string; 
 });
 
 ipcMain.on('git.pushChanges', async (event, payload: {localPath: string; branchName: string}) => {
-  await pushChanges(payload.localPath, payload.branchName);
-  event.sender.send('git.pushChanges.result');
+  const result = await pushChanges(payload.localPath, payload.branchName);
+  event.sender.send('git.pushChanges.result', result);
 });
 
 ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
@@ -110,4 +120,32 @@ ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL
 ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
   const result = await getRemotePath(localPath);
   event.sender.send('git.getRemotePath.result', result);
+});
+
+ipcMain.on('git.getCommitsCount', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await getCommitsCount(payload.localPath, payload.branchName);
+  event.sender.send('git.getCommitsCount.result', result);
+});
+
+ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
+  await fetchRepo(localPath);
+  event.sender.send('git.fetchRepo.result');
+});
+
+ipcMain.on('git.pullChanges', async (event, localPath: string) => {
+  const result = await pullChanges(localPath);
+  event.sender.send('git.pullChanges.result', result);
+});
+
+ipcMain.on(
+  'git.getCommitResources',
+  async (event, payload: {localPath: string; branchName: string; commitHash: string}) => {
+    const result = await getCommitResources(payload.localPath, payload.branchName, payload.commitHash);
+    event.sender.send('git.getCommitResources.result', result);
+  }
+);
+
+ipcMain.on('git.getBranchCommits', async (event, payload: {localPath: string; branchName: string}) => {
+  const result = await getBranchCommits(payload.localPath, payload.branchName);
+  event.sender.send('git.getBranchCommits.result', result);
 });

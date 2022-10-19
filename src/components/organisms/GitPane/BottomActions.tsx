@@ -1,38 +1,118 @@
 import {useCallback, useMemo, useState} from 'react';
-import {useMeasure} from 'react-use';
 
-import {Button, Menu} from 'antd';
+import {Menu, Modal, Tooltip} from 'antd';
 
-import {DownOutlined} from '@ant-design/icons';
+import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
-import {useAppSelector} from '@redux/hooks';
+import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
+import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
+
+import {AlertEnum} from '@models/alert';
+
+import {setGitLoading} from '@redux/git';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {addDefaultCommandTerminal} from '@utils/terminal';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
+  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
+  const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
-  const [commitLoading, setCommitLoading] = useState(false);
-  const [pushPublishLoading, setPushPublishLoading] = useState(false);
   const [showCommitModal, setShowCommitModal] = useState(false);
 
-  const [bottomActionsRef, {width: bottomActionsWidth}] = useMeasure<HTMLDivElement>();
+  const isCommitDisabled = useMemo(
+    () => Boolean(!changedFiles.filter(file => file.status === 'staged').length),
+    [changedFiles]
+  );
+
+  const isPushDisabled = useMemo(() => {
+    if (!gitRepo) {
+      return true;
+    }
+
+    return Boolean(!gitRepo.commits.ahead);
+  }, [gitRepo]);
+
+  const isSyncDisabled = useMemo(() => {
+    if (!gitRepo) {
+      return true;
+    }
+
+    return false;
+  }, [gitRepo]);
+
+  const pullPushChangesHandler = useCallback(
+    async (type: 'pull' | 'push') => {
+      if (!gitRepo) {
+        return;
+      }
+
+      const result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+        localPath: selectedProjectRootFolder,
+        branchName: currentBranch || 'main',
+      });
+
+      if (result.error) {
+        Modal.warning({
+          title: `${type === 'pull' ? 'Pull' : 'Push'} failed`,
+          content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
+          zIndex: 100000,
+          onCancel: () => {
+            addDefaultCommandTerminal(
+              terminalsMap,
+              `git ${type} origin ${gitRepo.currentBranch}`,
+              defaultShell,
+              bottomSelection,
+              dispatch
+            );
+          },
+          onOk: () => {
+            addDefaultCommandTerminal(
+              terminalsMap,
+              `git ${type} origin ${gitRepo.currentBranch}`,
+              defaultShell,
+              bottomSelection,
+              dispatch
+            );
+          },
+        });
+      } else {
+        dispatch(
+          setAlert({
+            title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
+            message: '',
+            type: AlertEnum.Success,
+          })
+        );
+      }
+
+      return result.error;
+    },
+    [bottomSelection, currentBranch, defaultShell, dispatch, gitRepo, selectedProjectRootFolder, terminalsMap]
+  );
 
   const publishHandler = useCallback(async () => {
-    setPushPublishLoading(true);
+    dispatch(setGitLoading(true));
 
     await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName: currentBranch || 'main',
     });
 
-    setPushPublishLoading(false);
-  }, [currentBranch, selectedProjectRootFolder]);
+    dispatch(setGitLoading(false));
+  }, [currentBranch, dispatch, selectedProjectRootFolder]);
 
   const isBranchOnRemote = useMemo(() => {
     if (!gitRepo) {
@@ -42,71 +122,143 @@ const BottomActions: React.FC = () => {
     return gitRepo.branches.includes(`origin/${gitRepo.currentBranch}`);
   }, [gitRepo]);
 
-  const menuItems = useMemo(
+  const publishMenuItems = useMemo(
     () => [
       {
+        disabled: isPushDisabled,
         key: 'publish_and_push',
         label: 'Publish & Push',
         onClick: async () => {
-          setPushPublishLoading(true);
-
+          dispatch(setGitLoading(true));
           await publishHandler();
-          await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-            localPath: selectedProjectRootFolder,
-            branchName: currentBranch || 'main',
-          });
-
-          setPushPublishLoading(false);
+          await pullPushChangesHandler('push');
         },
       },
     ],
-    [currentBranch, publishHandler, selectedProjectRootFolder]
+    [dispatch, isPushDisabled, publishHandler, pullPushChangesHandler]
   );
 
-  const pushHandler = async () => {
-    setPushPublishLoading(true);
+  const syncMenuItems = useMemo(
+    () => [
+      {
+        key: 'fetch',
+        label: 'Fetch',
+        onClick: async () => {
+          dispatch(setGitLoading(true));
+          await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
+          dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
+        },
+      },
+      {
+        key: 'pull',
+        label: 'Pull',
+        onClick: async () => {
+          dispatch(setGitLoading(true));
+          await pullPushChangesHandler('pull');
+          dispatch(setGitLoading(false));
+        },
+      },
+      {
+        disabled: isPushDisabled,
+        key: 'push',
+        label: 'Push',
+        onClick: async () => {
+          dispatch(setGitLoading(true));
+          await pullPushChangesHandler('push');
+        },
+      },
+    ],
+    [dispatch, isPushDisabled, pullPushChangesHandler, selectedProjectRootFolder]
+  );
 
-    await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-      localPath: selectedProjectRootFolder,
-      branchName: currentBranch || 'main',
-    });
+  const syncHandler = async () => {
+    if (!gitRepo) {
+      return;
+    }
 
-    setPushPublishLoading(false);
+    dispatch(setGitLoading(true));
+
+    if (gitRepo.commits.behind) {
+      const error = await pullPushChangesHandler('pull');
+
+      if (error) {
+        dispatch(setGitLoading(false));
+        return;
+      }
+    }
+
+    if (gitRepo.commits.ahead) {
+      const error = await pullPushChangesHandler('push');
+
+      if (error) {
+        dispatch(setGitLoading(false));
+      }
+    }
   };
 
+  if (!gitRepo) {
+    return null;
+  }
+
   return (
-    <S.BottomActionsContainer ref={bottomActionsRef}>
-      <S.CommitButton
-        $width={bottomActionsWidth / 2 - 48}
-        loading={commitLoading}
-        type="primary"
-        onClick={() => setShowCommitModal(true)}
+    <S.BottomActionsContainer>
+      <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
+        title={
+          isCommitDisabled ? GitCommitDisabledTooltip : <GitCommitEnabledTooltip branchName={currentBranch || 'main'} />
+        }
       >
-        Commit to {currentBranch || 'main'}
-      </S.CommitButton>
+        <S.CommitButton
+          disabled={isCommitDisabled}
+          loading={gitLoading}
+          type="primary"
+          onClick={() => setShowCommitModal(true)}
+        >
+          Commit
+        </S.CommitButton>
+      </Tooltip>
 
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
-          loading={pushPublishLoading}
+          disabled={!gitRepo.hasRemoteRepo}
+          loading={gitLoading}
           icon={<DownOutlined />}
           placement="topLeft"
           trigger={['click']}
           type="primary"
-          overlay={<Menu items={menuItems} />}
+          overlay={<Menu items={publishMenuItems} />}
           onClick={publishHandler}
-          disabled={!gitRepo?.hasRemoteRepo}
         >
           Publish branch
         </S.PublishBranchButton>
       ) : (
-        <Button disabled={!gitRepo?.hasRemoteRepo} loading={pushPublishLoading} type="primary" onClick={pushHandler}>
-          Push
-        </Button>
+        <S.SyncButton
+          disabled={!gitRepo.hasRemoteRepo || isSyncDisabled}
+          loading={gitLoading}
+          icon={<DownOutlined />}
+          overlay={<Menu items={syncMenuItems} />}
+          placement="topLeft"
+          trigger={['click']}
+          type="primary"
+          onClick={syncHandler}
+        >
+          <S.SyncButtonLabel>Sync</S.SyncButtonLabel>
+          {gitRepo.commits.behind > 0 ? (
+            <S.PushPullContainer>
+              {gitRepo.commits.behind} <ArrowDownOutlined />
+            </S.PushPullContainer>
+          ) : null}
+          {gitRepo.commits.ahead > 0 ? (
+            <S.PushPullContainer>
+              {gitRepo.commits.ahead} <ArrowUpOutlined />
+            </S.PushPullContainer>
+          ) : null}
+        </S.SyncButton>
       )}
 
       <CommitModal
         visible={showCommitModal}
-        setCommitLoading={value => setCommitLoading(value)}
+        setCommitLoading={value => dispatch(setGitLoading(value))}
         setShowModal={value => setShowCommitModal(value)}
       />
     </S.BottomActionsContainer>

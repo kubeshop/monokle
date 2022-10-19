@@ -1,4 +1,7 @@
 import hotkeys, {Hotkey} from '@constants/hotkeys';
+import {macOSKeyIcon} from '@constants/tooltips';
+
+import {useAppSelector} from '@redux/hooks';
 
 import {defineHotkey} from '@utils/defineHotkey';
 
@@ -11,8 +14,21 @@ interface IProps {
 
 const HotkeyLabel: React.FC<IProps> = props => {
   const {name, text} = props;
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const hotkey = hotkeys[name];
+
+  const renderKey = (keyboardKey: string) => {
+    if (osPlatform === 'darwin' && macOSKeyIcon[keyboardKey]) {
+      return macOSKeyIcon[keyboardKey];
+    }
+
+    if (keyboardKey === 'command') {
+      return 'Cmd';
+    }
+
+    return keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ',';
+  };
 
   if (!hotkey) {
     return null;
@@ -27,9 +43,7 @@ const HotkeyLabel: React.FC<IProps> = props => {
           .split(',')[0]
           .split('+')
           .map(keyboardKey => (
-            <S.KeyboardKey key={`${keyboardKey}`}>
-              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ','}
-            </S.KeyboardKey>
+            <S.KeyboardKey key={`${keyboardKey}`}>{renderKey(keyboardKey.trim())}</S.KeyboardKey>
           ))}
       </S.CommandsContainer>
     </S.HotkeyLabelContainer>
