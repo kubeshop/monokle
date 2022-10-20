@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 type NameContainerProps = {
   $hasCustomNameDisplay: boolean;
   $indentation: number;
@@ -126,7 +130,7 @@ export const Name = styled.span<NameProps>`
 export const EmptyGroupText = styled.p`
   margin-left: 26px;
   margin-bottom: 12px;
-  font-size: 12px;
+  font-size: 1.2rem;
 `;
 
 export const Collapsible = styled.span`
@@ -141,7 +145,7 @@ export const Skeleton = styled(RawSkeleton)`
 
 export const Counter = styled.span<{selected: boolean}>`
   margin-left: 8px;
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
 `;
