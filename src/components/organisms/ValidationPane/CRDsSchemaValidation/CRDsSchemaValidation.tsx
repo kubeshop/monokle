@@ -54,6 +54,7 @@ const CRDsSchemaValidation: React.FC = () => {
     },
     {
       allowMultiple: true,
+      acceptedFileExtensions: ['yaml', 'yml'],
     }
   );
 
