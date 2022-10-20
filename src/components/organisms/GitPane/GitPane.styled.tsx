@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const BottomActionsRef = styled.div``;
 
 export const ChangeList = styled.div`
@@ -47,7 +51,7 @@ export const FileItemData = styled.div`
   display: flex;
   align-items: center;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 22px;
   color: ${Colors.blue10};
 `;
@@ -60,7 +64,7 @@ export const FilePath = styled.div`
   color: ${Colors.grey9};
   margin-left: 4px;
   font-weight: normal;
-  font-size: 12px;
+  font-size: 1.2rem;
   line-height: 22px;
 `;
 
@@ -125,7 +129,7 @@ export const StageUnstageSelectedButton = styled(RawButton)`
 
 export const StagedUnstagedLabel = styled.span`
   font-weight: 700;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: ${Colors.cyan8};
   margin-left: 6px;
 `;
