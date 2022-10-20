@@ -11,13 +11,17 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const ApiOutlined = styled(RawApiOutlined)`
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
 `;
 
 export const CommentOutlined = styled(RawCommentOutlined)`
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
 `;
 
@@ -33,7 +37,7 @@ export const MenuItem = styled.div`
   background-color: transparent;
   color: ${Colors.grey9};
   font-weight: 700;
-  font-size: 14px;
+  font-size: 1.4rem;
   border-bottom: 1px solid ${Colors.grey5b};
 
   &:last-child {
@@ -74,10 +78,10 @@ export const MenuItemIcon = styled.span`
 
 export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
-  font-size: 14px;
+  font-size: 1.4rem;
   cursor: pointer;
 `;
