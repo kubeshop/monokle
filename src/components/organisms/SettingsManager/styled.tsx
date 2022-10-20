@@ -6,13 +6,17 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+} 
+
 export const Div = styled.div`
   margin-bottom: 20px;
 `;
 
 export const Span = styled.span`
   font-weight: 500;
-  font-size: 20px;
+  font-size: 2rem;
   display: block;
   margin-bottom: 6px;
 `;
@@ -63,7 +67,7 @@ export const WarningOutlined = styled(
 `;
 
 export const Heading = styled.h2`
-  font-size: 16px;
+  font-size: 1.6rem;
   margin-bottom: 7px;
 `;
 
