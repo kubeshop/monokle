@@ -17,7 +17,7 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
-import * as S from '../ActionsPaneHeader.styled';
+import {SecondaryButton} from '@atoms';
 
 const Restart = () => {
   const dispatch = useAppDispatch();
@@ -46,9 +46,9 @@ const Restart = () => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <S.SecondaryButton type="default" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
+      <SecondaryButton type="default" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
         Restart
-      </S.SecondaryButton>
+      </SecondaryButton>
     </Tooltip>
   );
 };

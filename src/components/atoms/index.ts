@@ -8,3 +8,5 @@ export {default as MonoPaneTitle} from './MonoPaneTitle';
 export {default as Spinner} from './Spinner';
 export {default as TabHeader} from './TabHeader';
 export {default as TableSelect} from './TableSelect';
+
+export {PrimaryButton, SecondaryButton} from './StyledComponents';

@@ -9,6 +9,7 @@ import Colors from '@styles/Colors';
 import {
   CRDs,
   Collapse,
+  Compare,
   Git,
   GitOps,
   GitProject,
@@ -72,6 +73,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   terminal: Terminal,
   'split-view': SplitView,
   crds: CRDs,
+  compare: Compare,
 };
 
 const Icon: React.FC<IconProps> = props => {
