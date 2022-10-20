@@ -6,6 +6,10 @@ import StartBackgrojnd from '@assets/StartBackground.svg';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,7 +24,7 @@ export const ActionText = styled.div`
 `;
 
 export const ActionTitle = styled.div`
-  font-size: 22px;
+  font-size: 2.2rem;
   text-align: center;
   margin-bottom: 150px;
 `;
@@ -74,7 +78,7 @@ export const StartProjectPaneContainer = styled.div`
 `;
 
 export const BackToProjectButton = styled(Button)`
-  font-size: 12px;
+  font-size: 1.2rem;
   color: ${Colors.lightSeaGreen};
 `;
 
