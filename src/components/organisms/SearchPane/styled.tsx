@@ -8,6 +8,9 @@ export const NodeContainer = styled.div`
   position: relative;
 `;
 
+html{
+ font-size : 10px;
+}
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -16,7 +19,7 @@ export const FileTreeContainer = styled.div`
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
-    font-size: 12px;
+    font-size: 1.2rem;
     font-style: normal;
     font-weight: normal;
     line-height: 22px;
@@ -120,7 +123,7 @@ export const NodeTitleContainer = styled.div`
 `;
 
 export const RootFolderText = styled.div`
-  font-size: 12px;
+  font-size: 1.2rem;
   color: ${Colors.grey7};
   margin: 15px 15px 0;
 `;
@@ -141,7 +144,7 @@ export const EntryName = styled.span``;
 
 export const MatchCount = styled.span`
   margin-left: 5px;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: ${Colors.yellow11};
 `;
 
@@ -223,7 +226,7 @@ export const RecentSearchTitle = styled.div`
 export const RecentSearchItem = styled.div`
   color: ${Colors.grey9};
   font-weight: 400;
-  font-size: 14px;
+  font-size: 1.4rem;
   padding: 2px 1px;
   margin: 5px 0;
   text-overflow: ellipsis;
@@ -258,7 +261,7 @@ export const Tabs = styled(RawTabs)`
 
 export const Label = styled.p`
   margin: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: ${Colors.grey9};
   margin-bottom: 5px;
 `;
