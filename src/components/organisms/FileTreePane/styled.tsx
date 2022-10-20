@@ -5,6 +5,10 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import Colors, {FontColors} from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -13,7 +17,7 @@ export const FileTreeContainer = styled.div`
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
-    font-size: 12px;
+    font-size: 1.2rem;
     font-style: normal;
     font-weight: normal;
     line-height: 22px;
@@ -143,7 +147,7 @@ export const NumberOfResources = styled.span`
 `;
 
 export const RootFolderText = styled.div`
-  font-size: 12px;
+  font-size: 1.2rem;
   line-height: 22px;
   color: ${Colors.grey7};
   margin-top: 10px;
@@ -220,7 +224,7 @@ export const TreeTitleWrapper = styled.div<{$isDisabled: boolean}>`
 
 export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`
   font-weight: 500;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: ${props => (props.$isItemSelected ? Colors.blackPure : Colors.blue6)}!important;
   margin-left: 5px;
   margin-right: 15px;
