@@ -32,6 +32,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+        with:
+          path: './main'
+          persit-credentials: true
 
       - name: Checkout Homebrew Project
         uses: actions/checkout@master
@@ -39,6 +42,7 @@ jobs:
           repository: kubeshop/homebrew-monokle
           token: ${{ secrets.github_token }}
           path: ./homebrew-monokle
+          persit-credentials: true
 
       # Check memory and cpu
       - name: Verify Runner Resources
@@ -51,6 +55,7 @@ jobs:
           brew install jq
 
       - name: Add MacOS certs
+        working-directory: 'main'
         run: |
           ls -la
           chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
@@ -62,6 +67,7 @@ jobs:
         run: security find-identity -v
 
       - name: Get Node Version
+        working-directory: 'main'
         run: |
           cat .nvmrc
           echo "::set-output name=nodeversion::$(cat .nvmrc)"
@@ -74,6 +80,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
+        working-directory: 'main'
         run: |
           env
           echo "npm: $(npm --version)"
@@ -86,6 +93,7 @@ jobs:
       #     npm list --depth=1
 
       - name: Build
+        working-directory: 'main'
         run: |
           contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
@@ -99,6 +107,7 @@ jobs:
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
       - name: Package
+        working-directory: 'main'
         run: |
           contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
@@ -115,6 +124,7 @@ jobs:
 
       # Check Binary Size
       - name: Build Succeeded
+        working-directory: 'main'
         run: |
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
@@ -123,33 +133,34 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
+          artifacts: 'main/dist/latest-mac.yml,main/dist/*.dmg,main/dist/*.blockmap,main/dist/*.zip'
           draft: false
           prerelease: true
           omitBody: true
           tag: 'test'
           token: ${{ secrets.github_token }}
 
-      - name: Generate and push Cask file
-        run: | 
-          rm -rf homebrew-monokle
-          rm -rf .git
-          git clone https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle
-          ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
-          cd homebrew-monokle
+      - name: Generate Cask file
+        working-directory: 'main'
+        run: |
+          ./generate-cask.sh > ../homebrew-monokle/Casks/monokle.rb
+
+      - name: Push Cask file
+        working-directory: 'homebrew-monokle'
+        run: |
           git config --local user.email "bot-github-ci@kubeshop.io"
           git config --local user.name "github-actions[bot]"
           git add . 
           git commit -m "core: add new Monokle Cask release"
-          git push https://$GITHUB_TOKEN@github.com/kubeshop/homebrew-monokle
-        env: 
+          git push
+        env:
           GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
           name: dist-mac
-          path: dist
+          path: main/dist
         if: ${{ success() }}
 
       - name: Build Failed - Output Build Logs
