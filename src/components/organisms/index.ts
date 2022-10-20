@@ -19,7 +19,6 @@ export {default as MessageBox} from './MessageBox';
 export {default as NavigatorPane} from './NavigatorPane';
 export {default as NewResourceWizard} from './NewResourceWizard';
 export {default as NotificationsManager} from './NotificationsManager';
-export {default as PageFooter} from './PageFooter';
 export {default as PageHeader} from './PageHeader';
 export {default as PaneManager} from './PaneManager';
 export {default as PluginManager} from './PluginManager';
