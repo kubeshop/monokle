@@ -237,22 +237,22 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .table-column-name {
   color: #ffffff;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .projects-table-column-folder {
   color: #7d7d7d;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 .projects-table-column-created {
   color: #7d7d7d;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 .projects-table-column-last-opened {
   color: #acacac;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 .table-column-actions .cluster-actions-container {
@@ -270,7 +270,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .ant-table-header .ant-table-thead .ant-table-cell {
   background-color: transparent;
   border: none !important;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #acacac;
 }
@@ -352,7 +352,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .walkthrough .ant-popover-title {
   position: relative;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.8rem;
   line-height: 24px;
   border: none;
 }
@@ -376,7 +376,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 }
 
 .ant-modal-close-icon {
-  font-size: 14px !important;
+  font-size: 1.4rem !important;
   color: #93989c;
 }
 .ant-modal-body {
