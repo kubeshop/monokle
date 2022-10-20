@@ -146,16 +146,19 @@ jobs:
         run: |
           ./generate-cask.sh > ../homebrew-monokle/Casks/monokle.rb
 
-      - name: Push Cask file
+      - name: Commit Cask file
         working-directory: 'homebrew-monokle'
         run: |
           git config --local user.email "bot-github-ci@kubeshop.io"
           git config --local user.name "github-actions[bot]"
           git add . 
           git commit -m "core: add new Monokle Cask release"
-          git push
-        env:
-          GITHUB_TOKEN: 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
+
+      - name: Push Cask file
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.CI_BOT_TOKEN }}
+          directory: 'homebrew-monokle'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
