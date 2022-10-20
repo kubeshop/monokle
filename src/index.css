@@ -1,7 +1,7 @@
 @import '~xterm/css/xterm.css';
 
 html{
- font size:10px; 
+ font-size : 10px 
 }
 
 body {
