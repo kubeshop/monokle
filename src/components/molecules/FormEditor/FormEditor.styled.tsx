@@ -2,10 +2,6 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-html{
- font-size : 10px;
-}
-
 export const ArrowIconExpanded = styled.span`
   display: flex;
   align-items: center;
