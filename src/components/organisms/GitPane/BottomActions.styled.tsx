@@ -30,7 +30,7 @@ export const PushPullContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 2px;
-  font-size: 12px;
+  font-size: 1.2rem;
   margin-right: 4px;
 `;
 
