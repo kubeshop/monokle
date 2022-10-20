@@ -2,9 +2,13 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const Label = styled.p`
   margin: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: 600;
   color: ${Colors.grey9};
   margin-bottom: 8px;
@@ -17,7 +21,7 @@ export const Field = styled.div`
 
 export const Description = styled.p`
   margin: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: ${Colors.grey7};
 `;
 
