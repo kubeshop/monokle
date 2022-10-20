@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 const {Text} = Typography;
 
 export const LogContainer = styled.div`
@@ -16,7 +20,7 @@ export const LogText = styled(Text)`
     display: block;
     margin-bottom: 0;
     padding: 4px;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-family: '-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';'
     font-variant: tabular-nums;
