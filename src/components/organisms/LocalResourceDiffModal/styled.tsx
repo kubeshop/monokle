@@ -4,6 +4,10 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const StyledModal = styled(Modal)`
   .ant-modal-close {
     color: ${Colors.grey700};
@@ -93,7 +97,7 @@ export const StyledTag = styled.div`
   display: flex;
   gap: 10px;
   padding: 15px 10px;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: ${Colors.grey9};
   background-color: #31393c;
 `;
