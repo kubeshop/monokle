@@ -65,6 +65,8 @@ enum Colors {
   purple8 = '#AB7AE0',
 
   cyan = '#58D1C9',
+  cyan1 = '#112123',
+  cyan2 = '#113536',
   cyan5 = '#138585',
   cyan7 = '#33BCB7',
   cyan8 = '#58D1C9',
@@ -73,6 +75,7 @@ enum Colors {
 
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
+  blue8 = '#65B7F3',
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
@@ -88,10 +91,10 @@ enum Colors {
 
   highlightGreen = '#33BCB7',
 
-  selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
-  selectionGradientHover = 'linear-gradient(90deg, #3C9AE8 50%, #84E2D8 100%)',
-  highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
-  highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
+  selectionColor = blue9,
+  selectionColorHover = blue8,
+  highlightColor = cyan2,
+  highlightColorHover = cyan1,
   diffBackground = '#2B2611',
   diffBackgroundHover = '#27220f',
 }
