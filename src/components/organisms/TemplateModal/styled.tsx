@@ -8,6 +8,10 @@ import TemplateIconSvg from '@assets/TemplateIcon.svg';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const Container = styled.div`
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -23,7 +27,7 @@ export const FormContainer = styled.div`
 `;
 
 export const FormOutlined = styled(RawFormOutlined)`
-  font-size: 22px;
+  font-size: 2.2rem;
   margin-right: 10px;
 `;
 
@@ -96,7 +100,7 @@ export const TableData = styled.td`
 export const TitleContainer = styled.div`
   display: flex;
   align-items: center;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 700;
   margin-bottom: 20px;
 `;
