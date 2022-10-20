@@ -1,6 +1,10 @@
+html{
+ font-size : 10px;
+}
+
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  background-color: black;
+  background-color: black;0
 }
 @keyframes loading-dots-1 {
   from {
@@ -52,7 +56,7 @@ body {
 .kubeshop-text {
   color: white;
   margin-right: 5px;
-  font-size: 14px;
+  font-size: 1.4rem0;
 }
 .kubeshop-logo {
   position: absolute;
