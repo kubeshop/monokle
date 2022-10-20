@@ -45,15 +45,15 @@ export const ItemContainer = styled.span<ItemContainerProps>`
     }
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
-        return `background: ${Colors.highlightGradientHover};`;
+        return `background: ${Colors.highlightColorHover};`;
       }
-      return `background: ${Colors.highlightGradient};`;
+      return `background: ${Colors.highlightColor};`;
     }
     if (props.isSelected) {
       if (props.isHovered) {
-        return `background: ${Colors.selectionGradientHover};`;
+        return `background: ${Colors.selectionColorHover};`;
       }
-      return `background: ${Colors.selectionGradient};`;
+      return `background: ${Colors.selectionColor};`;
     }
     if (props.isHovered) {
       return `background: ${Colors.blackPearl};`;

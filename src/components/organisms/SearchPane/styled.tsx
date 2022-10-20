@@ -57,10 +57,10 @@ export const FileTreeContainer = styled.div`
     border-left: 8px hidden transparent;
     padding-left: 8px;
     padding-bottom: 0px;
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
   }
   & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
   }
   & .file-entry-name {
     color: ${Colors.blue10};
@@ -76,11 +76,11 @@ export const FileTreeContainer = styled.div`
     color: ${Colors.blackPure} !important;
   }
   & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
   }
   & .filter-node {
     font-weight: bold;
-    background: ${Colors.highlightGradient};
+    background: ${Colors.highlightColor};
   }
   & .filter-node .file-entry-name {
     color: ${FontColors.resourceRowHighlight} !important;

@@ -7,7 +7,7 @@ import Colors from '@styles/Colors';
 export const Menu = styled(RawMenu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);
   color: ${Colors.blue6};
-  height: 40px;
+  height: 50px;
   line-height: 1.57;
   display: flex;
   align-items: center;
