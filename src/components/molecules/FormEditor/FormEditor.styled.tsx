@@ -2,6 +2,10 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const ArrowIconExpanded = styled.span`
   display: flex;
   align-items: center;
@@ -100,7 +104,7 @@ export const FormContainer = styled.div`
 
   .ant-form-item-explain {
     color: lightgrey;
-    font-size: 12px;
+    font-size: 1.2rem;
     margin-top: 5px;
   }
 
