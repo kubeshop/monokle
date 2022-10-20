@@ -5,8 +5,12 @@ import {DownOutlined as DownOutlinedBase} from '@ant-design/icons';
 import {motion} from 'framer-motion';
 import styled from 'styled-components';
 
+html{
+ font-size : 10px;
+}
+
 export const DownOutlined = styled(DownOutlinedBase)`
-  font-size: 10px;
+  font-size: 1rem;
 `;
 
 export const ErrorStack = styled.div`
