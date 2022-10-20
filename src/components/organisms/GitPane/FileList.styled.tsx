@@ -9,6 +9,10 @@ import {GitChangedFile, GitChangedFileType} from '@models/git';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const FileIcon = styled.div`
   margin-left: 12.5px;
   margin-right: 7.5px;
@@ -45,7 +49,7 @@ export const FilePath = styled.div<{$isSelected: boolean}>`
   color: ${({$isSelected}) => ($isSelected ? Colors.grey6 : Colors.grey7)};
   max-width: 40%;
   margin-left: 4px;
-  font-size: 12px;
+  font-size: 1.2rem;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
