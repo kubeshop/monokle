@@ -16,7 +16,7 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import scaleDeployment from '@redux/services/scaleDeployment';
 
-import * as S from '../ActionsPaneHeader.styled';
+import {SecondaryButton} from '@atoms';
 
 const Scale = () => {
   const dispatch = useAppDispatch();
@@ -55,7 +55,7 @@ const Scale = () => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <S.SecondaryButton
+        <SecondaryButton
           loading={Boolean(scaling)}
           type="default"
           size="small"
@@ -63,7 +63,7 @@ const Scale = () => {
           disabled={!isBtnEnabled}
         >
           Scale
-        </S.SecondaryButton>
+        </SecondaryButton>
       </Tooltip>
       <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>

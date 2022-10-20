@@ -2,29 +2,9 @@ import {Button} from 'antd';
 
 import {EllipsisOutlined as RawEllipsisOutlined} from '@ant-design/icons';
 
-import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
-
-export const PrimaryButton = styled(Button)`
-  border-radius: 4px;
-  padding: 0px 14px;
-  font-weight: 600;
-`;
-
-export const SecondaryButton = styled(Button)`
-  border-radius: 4px;
-  color: ${Colors.blue6};
-  padding: 0px 14px;
-  background-color: ${Colors.grey3b};
-  border: none;
-  font-weight: 600;
-
-  &:hover {
-    background-color: ${rgba(Colors.grey3b, 0.8)};
-  }
-`;
 
 export const ButtonContainer = styled.div`
   display: flex;
