@@ -4,6 +4,11 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+
+html{
+ font-size : 10px;
+}
+
 export const Container = styled.div<{$singleColumn?: boolean}>`
   display: flex;
   max-height: 600px;
@@ -25,7 +30,7 @@ export const Content = styled.div`
 `;
 
 export const Title = styled.div`
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 700;
   color: ${Colors.yellow6};
 `;
