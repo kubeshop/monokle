@@ -2,6 +2,10 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const ErrorContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -18,7 +22,7 @@ export const Figure = styled.img`
 export const Heading = styled.h1`
   color: ${Colors.red7};
   font-weight: 600;
-  font-size: 32px;
+  font-size: 3.2rem;
   line-height: 39px;
   text-align: center;
 `;
