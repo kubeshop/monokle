@@ -58,6 +58,9 @@ export const FileTreeContainer = styled.div`
   & .ant-tree-treenode-selected::before {
     background: ${Colors.selectionColor} !important;
   }
+  & .ant-tree-treenode::before {
+    bottom: 0px !important;
+  }
   & .file-entry-name {
     color: ${Colors.blue10};
   }
