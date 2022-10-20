@@ -4,7 +4,7 @@ html{
 
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  background-color: black;0
+  background-color: black;
 }
 @keyframes loading-dots-1 {
   from {
@@ -51,12 +51,12 @@ body {
 }
 .loading-text {
   color: white;
-  font-size: 18px;
+  font-size: 1.8rem;
 }
 .kubeshop-text {
   color: white;
   margin-right: 5px;
-  font-size: 1.4rem0;
+  font-size: 1.4rem;
 }
 .kubeshop-logo {
   position: absolute;
