@@ -4,9 +4,13 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const AddTagHelper = styled.span`
   color: ${Colors.grey7};
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 500;
   position: absolute;
   top: -25px;
@@ -46,7 +50,7 @@ export const InputTagsContainer = styled.div<{$disabled: boolean | undefined}>`
 export const Tag = styled(RawTag)`
   background-color: rgba(255, 255, 255, 0.08);
   border-color: rgb(48, 48, 48);
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 22px;
   color: rgba(255, 255, 255, 0.85);
   height: 24px;
