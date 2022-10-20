@@ -2,13 +2,14 @@ import {Badge as RawBadge} from 'antd';
 
 import styled from 'styled-components';
 
-import {BackgroundColors, PanelColors} from '@styles/Colors';
+import Colors, {BackgroundColors, PanelColors} from '@styles/Colors';
 
 export const Badge = styled(RawBadge)`
   & .ant-badge-dot {
     top: 6px;
     right: 6px;
     z-index: 100;
+    background-color: ${Colors.geekblue6} !important;
   }
 
   & .ant-badge-count {
@@ -16,6 +17,7 @@ export const Badge = styled(RawBadge)`
     right: 5px;
     z-index: 100;
     padding: 0px 4px;
+    background-color: ${Colors.geekblue6} !important;
   }
 
   & .ant-badge-count-sm {
