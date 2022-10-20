@@ -66,7 +66,6 @@ export type LeftMenuBottomSelectionType = 'terminal' | null;
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
-  footer: number;
   header: number;
 };
 
