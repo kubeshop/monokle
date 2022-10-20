@@ -159,7 +159,7 @@ jobs:
         with:
           github_token: ${{ secrets.CI_BOT_TOKEN }}
           directory: 'homebrew-monokle'
-          repository: 'kubeshop/homebre-monokle'
+          repository: 'kubeshop/homebrew-monokle'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
