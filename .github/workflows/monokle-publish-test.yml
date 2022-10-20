@@ -157,7 +157,7 @@ jobs:
       - name: Push Cask file
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.CI_BOT_TOKEN }}
+          github_token: ${{ secrets.github_token }}
           directory: 'homebrew-monokle'
           repository: 'kubeshop/homebrew-monokle'
 
@@ -368,6 +368,13 @@ jobs:
         run: |
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
+
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: './dist/Monokle-linux-amd64.snap'
+          release: stable
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1

@@ -265,15 +265,25 @@
             "x64",
             "arm64"
           ]
+        },
+        {
+          "target": "snap"
         }
       ],
       "icon": "build/icon.png",
       "category": "Development",
       "maintainer": "Kubeshop",
       "vendor": "Kubeshop",
-      "executableName": "Monokle",
+      "executableName": "monokle",
       "synopsis": "Your kubernetes best friend!",
-      "description": "A free, open-source tool, to help you navigate kubernetes development. By Kubeshop."
+      "description": "A free, open-source tool, to help you navigate kubernetes development. By Kubeshop.",
+      "desktop": {
+        "Keywords": "kubernetes;helm;kustomize;yaml;yml"
+      }
+    },
+    "snap": {
+      "confinement": "classic",
+      "summary": "Your kubernetes best friend!"
     },
     "appImage": {
       "artifactName": "${productName}-${os}-${version}-${arch}.${ext}"

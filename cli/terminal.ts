@@ -12,7 +12,7 @@ export default (): Promise<void> => {
       reject(new TypeError('Expected a string'));
     }
 
-    if (process.platform !== 'darwin') {
+    if (!(process.platform === 'darwin' || process.platform === 'linux')) {
       reject(new Error('Your platform is not supported'));
     }
 
