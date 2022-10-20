@@ -60,6 +60,7 @@ const SaveCommand = () => {
         onOk={onOkHandler}
         onCancel={() => setIsModalOpen(false)}
         confirmLoading={isLoading}
+        width={800}
       >
         <Form form={form} onFinish={onSaveCommand}>
           <Form.Item
