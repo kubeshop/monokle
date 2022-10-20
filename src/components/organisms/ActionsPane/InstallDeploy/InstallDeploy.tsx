@@ -4,9 +4,9 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {useInstallDeploy} from '@hooks/resourceHooks';
+import {SecondaryButton} from '@atoms';
 
-import * as S from '../ActionsPaneHeader.styled';
+import {useInstallDeploy} from '@hooks/resourceHooks';
 
 interface IProps {
   applySelection: () => void;
@@ -19,7 +19,7 @@ const InstallDeploy = ({applySelection}: IProps) => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <S.SecondaryButton
+      <SecondaryButton
         loading={Boolean(applyingResource)}
         type="default"
         size="small"
@@ -27,7 +27,7 @@ const InstallDeploy = ({applySelection}: IProps) => {
         disabled={isDisabled}
       >
         {buttonText}
-      </S.SecondaryButton>
+      </SecondaryButton>
     </Tooltip>
   );
 };
