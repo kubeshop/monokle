@@ -451,7 +451,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
           }
         />
       ) : (
-        !settings.hideEditorPlaceholder && <MonacoPlaceholder />
+        !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
       )}
 
       {isApplyModalVisible && (
