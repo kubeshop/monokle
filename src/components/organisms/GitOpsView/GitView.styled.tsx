@@ -4,6 +4,10 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import Colors from '@styles/Colors';
 
+html{
+ font-size : 10px;
+}
+
 export const GitPaneContainer = styled.div`
   height: 100%;
   width: 100%;
@@ -78,7 +82,7 @@ export const FileType = styled.div<{type?: string}>`
   background: #1d1d1d;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 10px;
+  font-size: 1rem;
   line-height: 20px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -93,7 +97,7 @@ export const FileEmptyState = styled.div`
 
 export const FileName = styled.div`
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 20px;
   color: ${Colors.blue10};
 `;
@@ -101,7 +105,7 @@ export const FileName = styled.div`
 export const FilePath = styled.div`
   margin-left: 8px;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 1.2rem;
   line-height: 20px;
   color: ${Colors.grey7};
 `;
