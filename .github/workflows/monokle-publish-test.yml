@@ -155,7 +155,7 @@ jobs:
           git commit -m "core: add new Monokle Cask release"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
