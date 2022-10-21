@@ -184,17 +184,30 @@ export const saveInitialK8sSchema = (userDataDir: string) => {
 export function askActionConfirmation({
   action,
   unsavedResourceCount,
+  terminalsCount,
 }: {
   action: string;
   unsavedResourceCount: number;
+  terminalsCount: number;
 }): boolean {
-  if (unsavedResourceCount === 0) {
+  if (!unsavedResourceCount && !terminalsCount) {
     return true;
   }
 
+  let message: string = '';
+
   const shortAction = _.capitalize(action.split(' ')[0]);
-  const message =
-    unsavedResourceCount === 1 ? 'You have an unsaved resource' : `You have ${unsavedResourceCount} unsaved resources`;
+
+  if (unsavedResourceCount) {
+    message +=
+      unsavedResourceCount === 1
+        ? 'You have an unsaved resource\n'
+        : `You have ${unsavedResourceCount} unsaved resources\n`;
+  }
+
+  if (terminalsCount) {
+    message += terminalsCount === 1 ? 'You have a terminal tab open' : `You have ${terminalsCount} terminal tabs open`;
+  }
 
   const choice = dialog.showMessageBoxSync({
     type: 'info',
