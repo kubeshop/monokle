@@ -18,7 +18,13 @@ import scaleDeployment from '@redux/services/scaleDeployment';
 
 import {SecondaryButton} from '@atoms';
 
-const Scale = () => {
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Scale: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useAppSelector(selectedResourceSelector);
@@ -56,8 +62,9 @@ const Scale = () => {
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
         <SecondaryButton
+          $disableHover={isDropdownActive}
           loading={Boolean(scaling)}
-          type="default"
+          type={isDropdownActive ? 'link' : 'default'}
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
