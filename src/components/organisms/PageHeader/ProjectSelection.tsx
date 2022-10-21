@@ -46,7 +46,8 @@ const ProjectSelection = () => {
   const gitRepo = useAppSelector(state => state.git.repo);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const projects: Project[] = useAppSelector(state => state.config.projects);
+  const projects = useAppSelector(state => state.config.projects);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -93,6 +94,7 @@ const ProjectSelection = () => {
       const confirmed = ipcRenderer.sendSync('confirm-action', {
         unsavedResourceCount,
         action: 'change the active project',
+        terminalsCount: Object.keys(terminalsMap).length,
       });
 
       if (!confirmed) {
