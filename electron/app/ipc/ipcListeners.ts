@@ -348,3 +348,9 @@ ipcMain.on('shell.ptyProcessKill', (event, data) => {
 
   killTerminal(terminalId);
 });
+
+ipcMain.on('shell.ptyProcessKillAll', () => {
+  Object.keys(ptyProcessMap).forEach(id => {
+    killTerminal(id);
+  });
+});

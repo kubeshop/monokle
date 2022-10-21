@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -43,7 +45,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import initialState from '../initialState';
-import {setLeftMenuSelection, toggleStartProjectPane} from './ui';
+import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -69,6 +71,16 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: any) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
+    const terminalsIds: string[] = Object.keys(thunkAPI.getState().terminal.terminalsMap);
+
+    if (terminalsIds.length) {
+      thunkAPI.dispatch(setLeftBottomMenuSelection(null));
+
+      terminalsIds.forEach(terminalId => {
+        ipcRenderer.send('shell.ptyProcessKillAll', {terminalId});
+      });
+    }
+
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
     }
@@ -94,6 +106,7 @@ export const setOpenProject = createAsyncThunk(
     ) {
       projectConfig.k8sVersion = PREDEFINED_K8S_VERSION;
     }
+
     // Then set project config by reading .monokle or populating it
     thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
     // Last set rootFolder so function can read the latest projectConfig
