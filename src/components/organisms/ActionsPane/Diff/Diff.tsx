@@ -6,12 +6,23 @@ import {PrimaryButton} from '@atoms';
 
 import {useDiff} from '@hooks/resourceHooks';
 
-const Diff = () => {
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Diff: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const {diffSelectedResource, isDisabled, tooltipTitle} = useDiff();
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <PrimaryButton size="small" type="primary" onClick={diffSelectedResource} disabled={isDisabled}>
+      <PrimaryButton
+        size="small"
+        type={isDropdownActive ? 'link' : 'primary'}
+        onClick={diffSelectedResource}
+        disabled={isDisabled}
+      >
         Diff
       </PrimaryButton>
     </Tooltip>

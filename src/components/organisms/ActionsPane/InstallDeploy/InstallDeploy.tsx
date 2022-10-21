@@ -8,11 +8,14 @@ import {SecondaryButton} from '@atoms';
 
 import {useInstallDeploy} from '@hooks/resourceHooks';
 
-interface IProps {
+type IProps = {
   applySelection: () => void;
-}
+  isDropdownActive?: boolean;
+};
 
-const InstallDeploy = ({applySelection}: IProps) => {
+const InstallDeploy: React.FC<IProps> = props => {
+  const {applySelection, isDropdownActive = false} = props;
+
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
 
   const {buttonText, isDisabled, tooltipTitle} = useInstallDeploy();
@@ -20,8 +23,9 @@ const InstallDeploy = ({applySelection}: IProps) => {
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
       <SecondaryButton
+        $disableHover={isDropdownActive}
         loading={Boolean(applyingResource)}
-        type="default"
+        type={isDropdownActive ? 'link' : 'default'}
         size="small"
         onClick={applySelection}
         disabled={isDisabled}

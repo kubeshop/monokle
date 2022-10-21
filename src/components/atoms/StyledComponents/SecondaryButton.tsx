@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const SecondaryButton = styled(Button)`
+export const SecondaryButton = styled(Button)<{$disableHover?: boolean}>`
   border-radius: 4px;
   color: ${Colors.blue6};
   padding: 0px 14px;
@@ -13,8 +13,14 @@ export const SecondaryButton = styled(Button)`
   border: none;
   font-weight: 600;
 
-  &:hover {
-    color: #165996;
-    background-color: ${rgba(Colors.grey3b, 0.8)};
-  }
+  ${({$disableHover}) => {
+    if (!$disableHover) {
+      return `
+        &:hover {
+          color: #165996;
+          background-color: ${rgba(Colors.grey3b, 0.8)};
+        }
+      `;
+    }
+  }}
 `;
