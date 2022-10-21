@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/kubeshop/monokle/compare/v1.11.2-nightly-2022-10-21.0...v1.12.0) (2022-10-21)
+
+
+### Features
+
+* add check when switching projects ([b2b3214](https://github.com/kubeshop/monokle/commit/b2b321458569208fb5dcd0b629f6ddcd2beb2773))
+* close terminal pane on switching project ([db770cf](https://github.com/kubeshop/monokle/commit/db770cf3603772ffdd0ba0d7ab0cb26107a41c73))
+* kill all terminals when switching projects ([9757bec](https://github.com/kubeshop/monokle/commit/9757bec0904a28fca3620d7f4369673fa3447530))
+
+
+### Bug Fixes
+
+* styling for editor pane actions ([416320c](https://github.com/kubeshop/monokle/commit/416320cfaf304eb1e61e5aa2470d248f85b9d407))
+
 ### [1.11.1](https://github.com/kubeshop/monokle/compare/v1.11.1-nightly-2022-10-13.0...v1.11.1) (2022-10-13)
 
 
