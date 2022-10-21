@@ -201,12 +201,13 @@ export function askActionConfirmation({
   if (unsavedResourceCount) {
     message +=
       unsavedResourceCount === 1
-        ? 'You have an unsaved resource\n'
-        : `You have ${unsavedResourceCount} unsaved resources\n`;
+        ? 'You have an unsaved resource.\n'
+        : `You have ${unsavedResourceCount} unsaved resources.\n`;
   }
 
   if (terminalsCount) {
-    message += terminalsCount === 1 ? 'You have a terminal tab open' : `You have ${terminalsCount} terminal tabs open`;
+    message +=
+      terminalsCount === 1 ? 'You have a terminal tab open.' : `You have ${terminalsCount} terminal tabs open.`;
   }
 
   const choice = dialog.showMessageBoxSync({
