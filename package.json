@@ -107,7 +107,7 @@
     "@types/analytics-node": "3.1.9",
     "ajv": "6.12.6",
     "analytics-node": "6.1.0",
-    "antd": "4.23.3",
+    "antd": "4.23.4",
     "asar": "3.1.0",
     "async": "3.2.4",
     "chokidar": "3.5.3",
@@ -172,7 +172,7 @@
     "xterm": "4.19.0",
     "xterm-addon-fit": "0.6.0",
     "yaml": "2.1.2",
-    "yargs": "17.4.0"
+    "yargs": "17.6.0"
   },
   "scripts": {
     "start": "craco start",
