@@ -71,7 +71,7 @@ export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHei
         />
       </S.InputContainer>
 
-      <S.TableContainer $height={height - descriptionHeight - 83}>
+      <S.TableContainer $height={height - descriptionHeight - 93}>
         <S.Table
           columns={columns}
           dataSource={filteredRules}
