@@ -236,6 +236,7 @@ export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
         {
           resourceIds: [resource.id],
           resourceKinds,
+          policyPlugins: mainState.policies.plugins,
         }
       );
     });
@@ -274,6 +275,7 @@ export const addMultipleResources = createAsyncThunk<AppState, K8sResource[], Th
           {
             resourceIds: [resource.id],
             resourceKinds,
+            policyPlugins: mainState.policies.plugins,
           }
         );
       });
@@ -302,6 +304,7 @@ export const reprocessResource = createAsyncThunk<AppState, K8sResource, ThunkAp
         {
           resourceIds: [resource.id],
           resourceKinds,
+          policyPlugins: mainState.policies.plugins,
         }
       );
     });

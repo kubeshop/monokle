@@ -37,7 +37,8 @@ export const updateMultipleResources = createAsyncThunk(
           resourceIdsToReprocess,
           activeResources,
           mainState.fileMap,
-          mainState.resourceRefsProcessingOptions
+          mainState.resourceRefsProcessingOptions,
+          {policyPlugins: mainState.policies.plugins}
         );
 
         // relaod cluster diff if that's where we are

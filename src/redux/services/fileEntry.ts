@@ -445,7 +445,10 @@ function reloadResourcesFromFileEntry(
       newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
-      state.resourceRefsProcessingOptions
+      state.resourceRefsProcessingOptions,
+      {
+        policyPlugins: state.policies.plugins,
+      }
     );
   }
 
@@ -615,7 +618,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
         resourcesFromFile.map(r => r.id),
         state.resourceMap,
         state.fileMap,
-        state.resourceRefsProcessingOptions
+        state.resourceRefsProcessingOptions,
+        {policyPlugins: state.policies.plugins}
       );
     }
   }
