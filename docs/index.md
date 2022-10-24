@@ -23,6 +23,7 @@ For further details on working with Monokle Desktop, read the [Feature Overview]
 
 Check out the following blog posts with Monokle Desktop-related content:
 
+- 1.12 - [Release blog post](https://kubeshop.io/blog/monokle-1-12-0-release) - October 24, 2022
 - 1.11 - [Release blog post](https://kubeshop.io/blog/monokle-1-11-0-release) - September 30, 2022
 - 1.10 - [Release blog post](https://kubeshop.io/blog/monokle-v1-10-release-notes) - August 10, 2022
 - 1.9 - [Release blog post](https://kubeshop.io/blog/monokle-1-9-0-release-notes) - July 12, 2022
