@@ -44,6 +44,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
+import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -390,8 +391,19 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          <PageHeader />
-          <PaneManager />
+          <FeatureFlag
+            name="TwoZero"
+            fallback={
+              <>
+                <PageHeader />
+                <PaneManager />
+              </>
+            }
+          >
+            <div>
+              <h1>Towards 2.0</h1>
+            </div>
+          </FeatureFlag>
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
