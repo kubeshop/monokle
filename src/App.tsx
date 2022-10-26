@@ -35,7 +35,16 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneManager, UpdateNotice} from '@organisms';
+import {
+  GitCloneModal,
+  HotKeysHandler,
+  LazyDrawer,
+  MessageBox,
+  NewPaneManager,
+  PageHeader,
+  PaneManager,
+  UpdateNotice,
+} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
@@ -391,18 +400,10 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          <FeatureFlag
-            name="TwoZero"
-            fallback={
-              <>
-                <PageHeader />
-                <PaneManager />
-              </>
-            }
-          >
-            <div>
-              <h1>Towards 2.0</h1>
-            </div>
+          <PageHeader />
+
+          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
+            <NewPaneManager />
           </FeatureFlag>
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />

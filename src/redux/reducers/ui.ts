@@ -3,6 +3,7 @@ import {webFrame} from 'electron';
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
+import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -95,8 +96,13 @@ export const uiSlice = createSlice({
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
-    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
-      state.paneConfiguration = action.payload;
+    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<Partial<PaneConfiguration>>) {
+      (Object.entries(action.payload) as Entries<PaneConfiguration>).forEach(([key, value]) => {
+        if (action.payload[key]) {
+          state.paneConfiguration[key] = value;
+        }
+      });
+
       electronStore.set('ui.paneConfiguration', state.paneConfiguration);
     },
     openNewResourceWizard: (
