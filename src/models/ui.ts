@@ -51,6 +51,8 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
+export type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'

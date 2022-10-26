@@ -15,6 +15,7 @@ import BottomPaneManager from '../BottomPaneManager';
 import NavigatorPane from '../NavigatorPane';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import * as S from './NewPaneManager.styled';
+import NewPaneManagerLeftMenu from './NewPaneManagerLeftMenu';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const GitPane = React.lazy(() => import('@organisms/GitPane'));
@@ -90,7 +91,7 @@ const NewPaneManager: React.FC = () => {
         <S.Skeleton />
       ) : activeProject && !isStartProjectPaneVisible ? (
         <>
-          {/* <PaneManagerLeftMenu /> */}
+          <NewPaneManagerLeftMenu />
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
