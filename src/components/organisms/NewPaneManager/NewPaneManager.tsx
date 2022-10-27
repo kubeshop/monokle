@@ -10,6 +10,7 @@ import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
 import ActionsPane from '../ActionsPane';
 import BottomPaneManager from '../BottomPaneManager';
+import GitOpsView from '../GitOpsView';
 import NavigatorPane from '../NavigatorPane';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import * as S from './NewPaneManager.styled';
@@ -79,26 +80,18 @@ const NewPaneManager: React.FC = () => {
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
             top={
-              <ResizableColumnsPanel
-                left={
-                  // <Suspense fallback={<div />}>
-                  //   {leftActiveMenu === 'explorer' && <FileTreePane height={paneHeight} />}
-                  //   {leftActiveMenu === 'helm-pane' && <HelmPane />}
-                  //   {leftActiveMenu === 'git' && <GitPane height={paneHeight} />}
-                  //   {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-                  //   {leftActiveMenu === 'images-pane' && <ImagesPane />}
-                  //   {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
-                  //   {leftActiveMenu === 'validation' && <ValidationPane height={paneHeight} />}
-                  //   {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
-                  // </Suspense>
-                  currentActivity?.component
-                }
-                center={<NavigatorPane />}
-                right={<ActionsPane />}
-                layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
-                width={width}
-                onStopResize={handleColumnResize}
-              />
+              currentActivity?.type === 'fullscreen' ? (
+                currentActivity.component
+              ) : (
+                <ResizableColumnsPanel
+                  left={currentActivity?.component}
+                  center={currentActivity?.name !== 'git' ? <NavigatorPane /> : undefined}
+                  right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
+                  layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
+                  width={width}
+                  onStopResize={handleColumnResize}
+                />
+              )
             }
             bottom={<BottomPaneManager />}
             splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
