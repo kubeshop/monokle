@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftBottomMenuSelection, setLeftMenuSelection} from '@redux/reducers/ui';
+import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import {ActivityBar} from '@monokle/components';
@@ -19,15 +19,30 @@ const NewPaneManagerLeftMenu: React.FC = () => {
 
   return (
     <ActivityBar
+      style={{paddingBottom: 10}}
       activities={activities}
       extraActivities={extraActivities}
       isActive={isActive}
       value={leftMenuSelection}
       extraValue={leftMenuBottomSelection}
       onChange={activityName => {
+        if (activityName === leftMenuSelection && leftActive) {
+          dispatch(setLeftMenuIsActive(false));
+          return;
+        }
+
+        if (!leftActive) {
+          dispatch(setLeftMenuIsActive(true));
+        }
+
         dispatch(setLeftMenuSelection(activityName));
       }}
       onChangeExtra={activityName => {
+        if (leftMenuBottomSelection === activityName) {
+          dispatch(setLeftBottomMenuSelection(undefined));
+          return;
+        }
+
         dispatch(setLeftBottomMenuSelection(activityName));
       }}
     />

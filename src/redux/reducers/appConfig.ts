@@ -74,7 +74,7 @@ export const setOpenProject = createAsyncThunk(
     const terminalsIds: string[] = Object.keys(thunkAPI.getState().terminal.terminalsMap);
 
     if (terminalsIds.length) {
-      thunkAPI.dispatch(setLeftBottomMenuSelection(null));
+      thunkAPI.dispatch(setLeftBottomMenuSelection(undefined));
 
       terminalsIds.forEach(terminalId => {
         ipcRenderer.send('shell.ptyProcessKillAll', {terminalId});

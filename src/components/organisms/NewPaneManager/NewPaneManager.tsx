@@ -9,12 +9,13 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
 import ActionsPane from '../ActionsPane';
+import BottomPaneManager from '../BottomPaneManager';
 import GitOpsView from '../GitOpsView';
 import NavigatorPane from '../NavigatorPane';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import * as S from './NewPaneManager.styled';
 import NewPaneManagerLeftMenu from './NewPaneManagerLeftMenu';
-import {activities, extraActivities} from './activities';
+import {activities} from './activities';
 
 const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ const NewPaneManager: React.FC = () => {
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
+  const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const projects = useAppSelector(state => state.config.projects);
 
@@ -67,7 +69,6 @@ const NewPaneManager: React.FC = () => {
   );
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
-  const currentBottomActivity = useMemo(() => extraActivities.find(a => a.name === bottomSelection), [bottomSelection]);
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
@@ -84,7 +85,7 @@ const NewPaneManager: React.FC = () => {
                 currentActivity.component
               ) : (
                 <ResizableColumnsPanel
-                  left={currentActivity?.component}
+                  left={leftMenuActive ? currentActivity?.component : undefined}
                   center={currentActivity?.name !== 'git' ? <NavigatorPane /> : undefined}
                   right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
@@ -93,7 +94,7 @@ const NewPaneManager: React.FC = () => {
                 />
               )
             }
-            bottom={currentBottomActivity?.component}
+            bottom={<BottomPaneManager />}
             splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
             bottomElementStyle={{
               overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',

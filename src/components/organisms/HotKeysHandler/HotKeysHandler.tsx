@@ -204,7 +204,7 @@ const HotKeysHandler = () => {
     hotkeys.TOGGLE_TERMINAL_PANE.key,
     () => {
       if (uiState.leftMenu.bottomSelection === 'terminal') {
-        dispatch(setLeftBottomMenuSelection(null));
+        dispatch(setLeftBottomMenuSelection(undefined));
       } else {
         dispatch(setLeftBottomMenuSelection('terminal'));
       }

@@ -64,7 +64,7 @@ export type LeftMenuSelectionType =
   | 'search'
   | 'crds';
 
-export type LeftMenuBottomSelectionType = 'terminal' | null;
+export type LeftMenuBottomSelectionType = 'terminal';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
@@ -118,7 +118,7 @@ export type UiState = {
   layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
-    bottomSelection: LeftMenuBottomSelectionType;
+    bottomSelection?: LeftMenuBottomSelectionType;
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
     isActive: boolean;

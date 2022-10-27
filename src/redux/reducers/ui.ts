@@ -65,9 +65,17 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+    setLeftBottomMenuSelection: (
+      state: Draft<UiState>,
+      action: PayloadAction<LeftMenuBottomSelectionType | undefined>
+    ) => {
       state.leftMenu.bottomSelection = action.payload;
-      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+
+      if (!action.payload) {
+        electronStore.delete('ui.leftMenu.bottomSelection');
+      } else {
+        electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+      }
     },
     setLeftMenuSelection: (
       state: Draft<UiState>,

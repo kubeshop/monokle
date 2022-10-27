@@ -74,7 +74,7 @@ export const removedTerminalListener: AppListenerFn = listen => {
       const terminalsMap = getState().terminal.terminalsMap;
 
       if (!Object.keys(terminalsMap).length) {
-        dispatch(setLeftBottomMenuSelection(null));
+        dispatch(setLeftBottomMenuSelection(undefined));
         dispatch(setSelectedTerminal(undefined));
       }
     },
