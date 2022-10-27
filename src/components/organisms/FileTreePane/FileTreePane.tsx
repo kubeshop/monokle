@@ -36,6 +36,7 @@ import {
   useProcessing,
   useRename,
 } from '@hooks/fileTreeHooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -43,11 +44,7 @@ import {TreeNode} from './types';
 
 import * as S from './styled';
 
-type Props = {
-  height: number;
-};
-
-const FileTreePane: React.FC<Props> = ({height}) => {
+const FileTreePane: React.FC = () => {
   const [tree, setTree] = useState<TreeNode | null>(null);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -73,6 +70,8 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const onCreateFileFolder = (absolutePath: string, type: 'file' | 'folder') => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
   };
+
+  const height = usePaneHeight();
 
   const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
 

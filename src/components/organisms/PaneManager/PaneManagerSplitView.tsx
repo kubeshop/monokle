@@ -1,10 +1,6 @@
-import React, {Suspense, useCallback, useMemo} from 'react';
+import React, {Suspense, useCallback} from 'react';
 
-import {
-  DEFAULT_PANE_CONFIGURATION,
-  GUTTER_SPLIT_VIEW_PANE_WIDTH,
-  MIN_SPLIT_VIEW_PANE_WIDTH,
-} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
@@ -30,19 +26,11 @@ const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const bottomPaneHeight =
-    useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight) || DEFAULT_PANE_CONFIGURATION.bottomPaneHeight;
-  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
-  const {height, width} = useMainPaneDimensions();
-
-  const paneHeight = useMemo(
-    () => (bottomSelection ? height - bottomPaneHeight - 2 : height),
-    [bottomPaneHeight, bottomSelection, height]
-  );
+  const {width} = useMainPaneDimensions();
 
   const handleResize = useCallback(
     (position: 'center' | 'right' | 'left', flex: number) => {
@@ -65,14 +53,14 @@ const PaneManagerSplitView: React.FC = () => {
         <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
           <S.LeftPane>
             <Suspense fallback={<div />}>
-              {leftActiveMenu === 'file-explorer' && <FileTreePane height={paneHeight} />}
+              {leftActiveMenu === 'file-explorer' && <FileTreePane />}
               {leftActiveMenu === 'helm-pane' && <HelmPane />}
               {leftActiveMenu === 'git-pane' && <GitPane />}
               {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
               {leftActiveMenu === 'images-pane' && <ImagesPane />}
-              {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
-              {leftActiveMenu === 'validation-pane' && <ValidationPane height={paneHeight} />}
-              {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
+              {leftActiveMenu === 'templates-pane' && <TemplateManagerPane />}
+              {leftActiveMenu === 'validation-pane' && <ValidationPane />}
+              {leftActiveMenu === 'search' && <SearchPane />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>
@@ -90,7 +78,7 @@ const PaneManagerSplitView: React.FC = () => {
             maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
             flex={layout.navPane}
           >
-            <NavigatorPane height={paneHeight} />
+            <NavigatorPane />
           </ReflexElement>
 
           <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
@@ -100,12 +88,12 @@ const PaneManagerSplitView: React.FC = () => {
             minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
             style={{overflowY: 'hidden'}}
           >
-            <ActionsPane height={paneHeight} />
+            <ActionsPane />
           </ReflexElement>
         </>
       ) : (
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <GitOpsView height={paneHeight} />
+          <GitOpsView />
         </ReflexElement>
       )}
     </ReflexContainer>

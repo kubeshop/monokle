@@ -4,17 +4,17 @@ import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './OpenPolicyAgent';
 import ValidationOverView from './ValidationOverview';
 import * as S from './ValidationPane.styled';
 
-interface IProps {
-  height: number;
-}
-
-const ValidationPane: React.FC<IProps> = ({height}) => {
+const ValidationPane: React.FC = () => {
   const integration = useAppSelector(state => state.main.validationIntegration);
+
+  const height = usePaneHeight();
 
   const Panel = useMemo(() => {
     switch (integration?.id) {
