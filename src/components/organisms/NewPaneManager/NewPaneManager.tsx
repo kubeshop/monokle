@@ -1,7 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
@@ -21,8 +19,6 @@ import {activities} from './activities';
 const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const bottomPaneHeight =
-    useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight) || DEFAULT_PANE_CONFIGURATION.bottomPaneHeight;
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -43,11 +39,6 @@ const NewPaneManager: React.FC = () => {
   const topPaneFlex = useMemo(
     () => (bottomSelection ? 1 - layout.bottomPaneHeight / height : 1),
     [bottomSelection, height, layout.bottomPaneHeight]
-  );
-
-  const paneHeight = useMemo(
-    () => (bottomSelection ? height - bottomPaneHeight - 2 : height),
-    [bottomPaneHeight, bottomSelection, height]
   );
 
   const handleColumnResize = useCallback(
@@ -77,8 +68,6 @@ const NewPaneManager: React.FC = () => {
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
 
-  console.log(currentActivity);
-
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
@@ -104,8 +93,8 @@ const NewPaneManager: React.FC = () => {
                   // </Suspense>
                   currentActivity?.component
                 }
-                center={<NavigatorPane height={paneHeight} />}
-                right={<ActionsPane height={paneHeight} />}
+                center={<NavigatorPane />}
+                right={<ActionsPane />}
                 layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                 width={width}
                 onStopResize={handleColumnResize}

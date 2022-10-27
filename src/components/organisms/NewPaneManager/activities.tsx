@@ -4,11 +4,13 @@ import {NewLeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/
 
 import {useAppSelector} from '@redux/hooks';
 
-import {GitPane} from '@organisms';
+import {BottomPaneManager, FileTreePane, GitPane} from '@organisms';
+import ValidationPane from '@organisms/ValidationPane';
 
 import {ActivityType, Icon} from '@monokle/components';
 
 import {SettingsOutlined} from '../PageHeader/HelpMenu.styled';
+import SearchPane from '../SearchPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
@@ -16,7 +18,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'explorer',
     tooltip: <FileExplorerTabTooltip />,
     icon: () => <Icon name="explorer" />,
-    component: <div />,
+    component: <FileTreePane />,
     useBadge: () => undefined,
   },
   {
@@ -32,13 +34,13 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'validation',
     tooltip: <ValidationTabTooltip />,
     icon: () => <Icon name="validation" style={{fontSize: 16}} />,
-    component: <div />,
+    component: <ValidationPane />,
     useBadge: () => undefined,
   },
   {
     type: 'panel',
     name: 'git',
-    tooltip: <ValidationTabTooltip />,
+    tooltip: 'View Git operations',
     icon: () => <Icon name="git-ops" style={{fontSize: 16, marginTop: 4}} />,
     component: <GitPane />,
     useBadge: () => {
@@ -52,7 +54,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'search',
     tooltip: 'Advanced Search',
     icon: () => <Icon name="search" style={{fontSize: 16}} />,
-    component: <div />,
+    component: <SearchPane />,
     useBadge: () => undefined,
   },
   {
@@ -71,7 +73,7 @@ export const extraActivities: ActivityType<NewLeftMenuBottomSelectionType>[] = [
     name: 'terminal',
     tooltip: <TerminalPaneTooltip />,
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
-    component: <div />,
+    component: <BottomPaneManager />,
     useBadge: () => undefined,
   },
 ];

@@ -1,5 +1,7 @@
 import {useMemo} from 'react';
 
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
@@ -28,10 +30,10 @@ const ValidationPane: React.FC = () => {
   }, [integration]);
 
   return (
-    <S.ValidationPaneContainer>
+    <S.ValidationPaneContainer $height={height}>
       <TitleBar title="Validate your resources" closable />
 
-      <Panel height={height} />
+      <Panel height={height - DEFAULT_PANE_TITLE_HEIGHT} />
     </S.ValidationPaneContainer>
   );
 };
