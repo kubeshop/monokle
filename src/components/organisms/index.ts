@@ -8,6 +8,7 @@ export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as FileTreePane} from './FileTreePane';
 export {default as FiltersPresetModal} from './FiltersPresetModal';
 export {default as GitCloneModal} from './GitCloneModal';
+export {default as GitPane} from './GitPane';
 export {default as HelmPane} from './HelmPane';
 export {default as ImagesPane} from './ImagesPane';
 export {default as HotKeysHandler} from './HotKeysHandler';

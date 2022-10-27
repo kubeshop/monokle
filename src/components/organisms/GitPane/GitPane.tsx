@@ -13,6 +13,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@molecules';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import BottomActions from './BottomActions';
@@ -20,7 +22,7 @@ import FileList from './FileList';
 import * as S from './GitPane.styled';
 import RemoteInput from './RemoteInput';
 
-const GitPane: React.FC<{height: number}> = ({height}) => {
+const GitPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const gitLoading = useAppSelector(state => state.git.loading);
@@ -35,6 +37,8 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
   const [remoteInputRef, {height: remoteInputHeight}] = useMeasure<HTMLDivElement>();
   const [bottomActionsRef, {height: bottomActionsHeight}] = useMeasure<HTMLDivElement>();
+
+  const height = usePaneHeight();
 
   const fileContainerHeight = useMemo(() => {
     let h: number = height - DEFAULT_PANE_TITLE_HEIGHT;

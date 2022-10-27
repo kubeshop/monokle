@@ -14,8 +14,6 @@ import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {ResizableColumnsPanel} from '@monokle/components';
-
 import GitOpsView from '../GitOpsView';
 import GitPane from '../GitPane';
 import * as S from './PaneManagerSplitView.styled';
@@ -61,31 +59,6 @@ const PaneManagerSplitView: React.FC = () => {
     []
   );
 
-  // eslint-disable-next-line no-constant-condition, no-self-compare
-  if (1 === 1) {
-    return (
-      <ResizableColumnsPanel
-        layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
-        left={
-          <Suspense fallback={<div />}>
-            {leftActiveMenu === 'file-explorer' && <FileTreePane height={paneHeight} />}
-            {leftActiveMenu === 'helm-pane' && <HelmPane />}
-            {leftActiveMenu === 'git-pane' && <GitPane height={paneHeight} />}
-            {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-            {leftActiveMenu === 'images-pane' && <ImagesPane />}
-            {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
-            {leftActiveMenu === 'validation-pane' && <ValidationPane height={paneHeight} />}
-            {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
-          </Suspense>
-        }
-        center={<NavigatorPane height={paneHeight} />}
-        right={<ActionsPane height={paneHeight} />}
-        width={width}
-        onStopResize={handleResize}
-      />
-    );
-  }
-
   return (
     <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
       {leftActiveMenu && (
@@ -94,7 +67,7 @@ const PaneManagerSplitView: React.FC = () => {
             <Suspense fallback={<div />}>
               {leftActiveMenu === 'file-explorer' && <FileTreePane height={paneHeight} />}
               {leftActiveMenu === 'helm-pane' && <HelmPane />}
-              {leftActiveMenu === 'git-pane' && <GitPane height={paneHeight} />}
+              {leftActiveMenu === 'git-pane' && <GitPane />}
               {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
               {leftActiveMenu === 'images-pane' && <ImagesPane />}
               {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}

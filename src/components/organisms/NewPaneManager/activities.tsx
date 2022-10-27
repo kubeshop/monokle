@@ -4,6 +4,8 @@ import {NewLeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/
 
 import {useAppSelector} from '@redux/hooks';
 
+import {GitPane} from '@organisms';
+
 import {ActivityType, Icon} from '@monokle/components';
 
 import {SettingsOutlined} from '../PageHeader/HelpMenu.styled';
@@ -38,7 +40,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'git',
     tooltip: <ValidationTabTooltip />,
     icon: () => <Icon name="git-ops" style={{fontSize: 16, marginTop: 4}} />,
-    component: <div />,
+    component: <GitPane />,
     useBadge: () => {
       const changedFiles = useAppSelector(state => state.git.changedFiles);
 

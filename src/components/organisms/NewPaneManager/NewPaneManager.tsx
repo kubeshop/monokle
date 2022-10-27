@@ -1,4 +1,4 @@
-import React, {Suspense, useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
@@ -16,15 +16,7 @@ import NavigatorPane from '../NavigatorPane';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import * as S from './NewPaneManager.styled';
 import NewPaneManagerLeftMenu from './NewPaneManagerLeftMenu';
-
-const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
-const GitPane = React.lazy(() => import('@organisms/GitPane'));
-const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
-const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
-const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
-const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
-const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
-const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
+import {activities} from './activities';
 
 const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,9 +27,7 @@ const NewPaneManager: React.FC = () => {
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
-  const leftActiveMenu = useAppSelector(state =>
-    state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
-  );
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const projects = useAppSelector(state => state.config.projects);
 
   const {height, width} = useMainPaneDimensions();
@@ -85,6 +75,10 @@ const NewPaneManager: React.FC = () => {
     [dispatch, height]
   );
 
+  const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
+
+  console.log(currentActivity);
+
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
@@ -98,16 +92,17 @@ const NewPaneManager: React.FC = () => {
             top={
               <ResizableColumnsPanel
                 left={
-                  <Suspense fallback={<div />}>
-                    {leftActiveMenu === 'file-explorer' && <FileTreePane height={paneHeight} />}
-                    {leftActiveMenu === 'helm-pane' && <HelmPane />}
-                    {leftActiveMenu === 'git-pane' && <GitPane height={paneHeight} />}
-                    {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
-                    {leftActiveMenu === 'images-pane' && <ImagesPane />}
-                    {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
-                    {leftActiveMenu === 'validation-pane' && <ValidationPane height={paneHeight} />}
-                    {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
-                  </Suspense>
+                  // <Suspense fallback={<div />}>
+                  //   {leftActiveMenu === 'explorer' && <FileTreePane height={paneHeight} />}
+                  //   {leftActiveMenu === 'helm-pane' && <HelmPane />}
+                  //   {leftActiveMenu === 'git' && <GitPane height={paneHeight} />}
+                  //   {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
+                  //   {leftActiveMenu === 'images-pane' && <ImagesPane />}
+                  //   {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
+                  //   {leftActiveMenu === 'validation' && <ValidationPane height={paneHeight} />}
+                  //   {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
+                  // </Suspense>
+                  currentActivity?.component
                 }
                 center={<NavigatorPane height={paneHeight} />}
                 right={<ActionsPane height={paneHeight} />}
