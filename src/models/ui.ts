@@ -52,6 +52,7 @@ export type MonacoUiState = {
 };
 
 export type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+export type NewLeftMenuBottomSelectionType = 'terminal';
 
 export type LeftMenuSelectionType =
   | 'file-explorer'
