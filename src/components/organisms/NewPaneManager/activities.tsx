@@ -1,6 +1,6 @@
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, ValidationTabTooltip} from '@constants/tooltips';
 
-import {NewLeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/ui';
+import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/ui';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -67,7 +67,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   },
 ];
 
-export const extraActivities: ActivityType<NewLeftMenuBottomSelectionType>[] = [
+export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
   {
     type: 'fullscreen',
     name: 'terminal',

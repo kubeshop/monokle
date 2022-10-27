@@ -9,13 +9,12 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
 import ActionsPane from '../ActionsPane';
-import BottomPaneManager from '../BottomPaneManager';
 import GitOpsView from '../GitOpsView';
 import NavigatorPane from '../NavigatorPane';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
 import * as S from './NewPaneManager.styled';
 import NewPaneManagerLeftMenu from './NewPaneManagerLeftMenu';
-import {activities} from './activities';
+import {activities, extraActivities} from './activities';
 
 const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -68,6 +67,7 @@ const NewPaneManager: React.FC = () => {
   );
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
+  const currentBottomActivity = useMemo(() => extraActivities.find(a => a.name === bottomSelection), [bottomSelection]);
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
@@ -93,7 +93,7 @@ const NewPaneManager: React.FC = () => {
                 />
               )
             }
-            bottom={<BottomPaneManager />}
+            bottom={currentBottomActivity?.component}
             splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
             bottomElementStyle={{
               overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',

@@ -6,5 +6,5 @@
   "CompareEverything": true,
   "Terminal": true,
   "GitOps": true,
-  "TwoZero": false
+  "TwoZero": true
 }
