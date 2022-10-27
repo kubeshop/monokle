@@ -82,7 +82,6 @@ export const GitPaneContainer = styled.div<{$height: number}>`
     height: ${$height}px;
   `}
 
-  min-height: 100%;
   display: grid;
   grid-template-rows: max-content 1fr max-content;
 `;

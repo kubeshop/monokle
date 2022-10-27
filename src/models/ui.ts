@@ -51,6 +51,9 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
+export type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+export type NewLeftMenuBottomSelectionType = 'terminal';
+
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
@@ -116,12 +119,12 @@ export type UiState = {
   layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
-    bottomSelection: LeftMenuBottomSelectionType | null;
+    bottomSelection: LeftMenuBottomSelectionType | NewLeftMenuBottomSelectionType | null;
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
     isActive: boolean;
     isValidationDrawerVisible: boolean;
-    selection: LeftMenuSelectionType;
+    selection: LeftMenuSelectionType | NewLeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {

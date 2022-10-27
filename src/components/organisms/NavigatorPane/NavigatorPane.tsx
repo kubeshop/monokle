@@ -19,6 +19,8 @@ import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@mol
 
 import {MonoPaneTitle} from '@atoms';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import {FeatureFlag} from '@utils/features';
 
 import Colors from '@styles/Colors';
@@ -32,11 +34,7 @@ import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
-type Props = {
-  height: number;
-};
-
-const NavPane: React.FC<Props> = ({height}) => {
+const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
@@ -49,6 +47,8 @@ const NavPane: React.FC<Props> = ({height}) => {
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
   const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
+
+  const height = usePaneHeight();
 
   const appliedFilters = useMemo(
     () =>

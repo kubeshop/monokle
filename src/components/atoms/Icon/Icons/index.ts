@@ -1,6 +1,7 @@
 export {default as Collapse} from './Collapse';
 export {default as Compare} from './Compare';
 export {default as CRDs} from './CRDs';
+export {default as Explorer} from './Explorer';
 export {default as Helm} from './Helm';
 export {default as Git} from './Git';
 export {default as GitOps} from './GitOps';

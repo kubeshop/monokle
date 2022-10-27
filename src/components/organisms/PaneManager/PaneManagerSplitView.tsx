@@ -1,14 +1,11 @@
-import React, {Suspense, useCallback, useMemo} from 'react';
+import React, {Suspense, useCallback} from 'react';
 
-import {
-  DEFAULT_PANE_CONFIGURATION,
-  GUTTER_SPLIT_VIEW_PANE_WIDTH,
-  MIN_SPLIT_VIEW_PANE_WIDTH,
-} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 
+// import {setPaneConfiguration} from '@redux/reducers/ui';
 import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -29,32 +26,25 @@ const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const bottomPaneHeight =
-    useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight) || DEFAULT_PANE_CONFIGURATION.bottomPaneHeight;
-  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
-  const {height, width} = useMainPaneDimensions();
-
-  const paneHeight = useMemo(
-    () => (bottomSelection ? height - bottomPaneHeight - 2 : height),
-    [bottomPaneHeight, bottomSelection, height]
-  );
+  const {width} = useMainPaneDimensions();
 
   const handleResize = useCallback(
-    (elements: any) => {
-      const updates = elements.reduce((obj: any, el: any) => {
-        if (!['leftPane', 'navPane', 'editPane'].includes(el.props.id)) return obj;
-        obj[el.props['id']] = el.props['flex'];
-        return obj;
-      }, {});
-
-      const newLayout = {...layout, ...updates};
-      dispatch(setPaneConfiguration(newLayout));
+    (position: 'center' | 'right' | 'left', flex: number) => {
+      if (position === 'center') {
+        dispatch(setPaneConfiguration({navPane: flex}));
+      } else if (position === 'left') {
+        dispatch(setPaneConfiguration({leftPane: flex}));
+      } else if (position === 'right') {
+        dispatch(setPaneConfiguration({editPane: flex}));
+      }
     },
-    [dispatch, layout]
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   return (
@@ -63,14 +53,14 @@ const PaneManagerSplitView: React.FC = () => {
         <ReflexElement id="leftPane" minSize={MIN_SPLIT_VIEW_PANE_WIDTH} flex={layout.leftPane}>
           <S.LeftPane>
             <Suspense fallback={<div />}>
-              {leftActiveMenu === 'file-explorer' && <FileTreePane height={paneHeight} />}
+              {leftActiveMenu === 'file-explorer' && <FileTreePane />}
               {leftActiveMenu === 'helm-pane' && <HelmPane />}
-              {leftActiveMenu === 'git-pane' && <GitPane height={paneHeight} />}
+              {leftActiveMenu === 'git-pane' && <GitPane />}
               {leftActiveMenu === 'kustomize-pane' && <KustomizePane />}
               {leftActiveMenu === 'images-pane' && <ImagesPane />}
-              {leftActiveMenu === 'templates-pane' && <TemplateManagerPane height={paneHeight} />}
-              {leftActiveMenu === 'validation-pane' && <ValidationPane height={paneHeight} />}
-              {leftActiveMenu === 'search' && <SearchPane height={paneHeight} />}
+              {leftActiveMenu === 'templates-pane' && <TemplateManagerPane />}
+              {leftActiveMenu === 'validation-pane' && <ValidationPane />}
+              {leftActiveMenu === 'search' && <SearchPane />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>
@@ -80,34 +70,30 @@ const PaneManagerSplitView: React.FC = () => {
             use fragments so keep this separate. */}
       {leftActiveMenu && <ReflexSplitter propagate style={{backgroundColor: '#191F21'}} />}
 
-      {leftActiveMenu !== 'git-pane' && (
-        <ReflexElement
-          id="navPane"
-          minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
-          maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
-          flex={layout.navPane}
-        >
-          <NavigatorPane height={paneHeight} />
-        </ReflexElement>
-      )}
+      {leftActiveMenu !== 'git-pane' ? (
+        <>
+          <ReflexElement
+            id="navPane"
+            minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
+            maxSize={MIN_SPLIT_VIEW_PANE_WIDTH + 200}
+            flex={layout.navPane}
+          >
+            <NavigatorPane />
+          </ReflexElement>
 
-      {/* react-reflex does not work as intended when you use propagate
-            without multiple splitters so set is dynamically. */}
-      {leftActiveMenu !== 'git-pane' && <ReflexSplitter propagate={Boolean(leftActiveMenu)} />}
+          <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
 
-      {leftActiveMenu !== 'git-pane' && (
-        <ReflexElement
-          id="editPane"
-          minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
-          style={{overflowY: 'hidden'}}
-        >
-          <ActionsPane height={paneHeight} />
-        </ReflexElement>
-      )}
-
-      {leftActiveMenu === 'git-pane' && (
+          <ReflexElement
+            id="editPane"
+            minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
+            style={{overflowY: 'hidden'}}
+          >
+            <ActionsPane />
+          </ReflexElement>
+        </>
+      ) : (
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
-          <GitOpsView height={paneHeight} />
+          <GitOpsView />
         </ReflexElement>
       )}
     </ReflexContainer>

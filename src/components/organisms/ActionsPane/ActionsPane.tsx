@@ -54,6 +54,7 @@ import {Icon, TabHeader} from '@atoms';
 import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
 
 import {useDiff} from '@hooks/resourceHooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -63,11 +64,7 @@ import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandle
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';
 
-type Props = {
-  height: number;
-};
-
-const ActionsPane: React.FC<Props> = ({height}) => {
+const ActionsPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -101,6 +98,7 @@ const ActionsPane: React.FC<Props> = ({height}) => {
   const settings = useAppSelector(settingsSelector);
 
   const {diffSelectedResource} = useDiff();
+  const height = usePaneHeight();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');

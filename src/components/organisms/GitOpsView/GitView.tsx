@@ -7,6 +7,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@components/molecules';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import GitSelectItem from '@assets/GitSelectItem.svg';
@@ -23,14 +25,10 @@ const options: monaco.editor.IDiffEditorConstructionOptions = {
   },
 };
 
-type IProps = {
-  height: number;
-};
-
-const GitView: React.FC<IProps> = props => {
-  const {height} = props;
-
+const GitView: React.FC = () => {
   const selectedItem = useAppSelector(state => state.git.selectedItem);
+
+  const height = usePaneHeight();
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
