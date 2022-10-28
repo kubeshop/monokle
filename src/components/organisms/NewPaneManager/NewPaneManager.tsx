@@ -24,6 +24,7 @@ const NewPaneManager: React.FC = () => {
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
+  const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const projects = useAppSelector(state => state.config.projects);
 
@@ -84,7 +85,7 @@ const NewPaneManager: React.FC = () => {
                 currentActivity.component
               ) : (
                 <ResizableColumnsPanel
-                  left={currentActivity?.component}
+                  left={leftMenuActive ? currentActivity?.component : undefined}
                   center={currentActivity?.name !== 'git' ? <NavigatorPane /> : undefined}
                   right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
@@ -100,6 +101,8 @@ const NewPaneManager: React.FC = () => {
               display: bottomSelection === 'terminal' ? 'block' : 'none',
             }}
             onStopResize={handleRowResize}
+            height={height}
+            width={width}
           />
         </>
       ) : projects.length > 0 ? (

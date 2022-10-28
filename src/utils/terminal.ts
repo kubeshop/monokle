@@ -11,7 +11,7 @@ export const addDefaultCommandTerminal = (
   terminalsMap: Record<string, TerminalType>,
   defaultCommand: string,
   shell: string,
-  bottomSelection: LeftMenuBottomSelectionType,
+  bottomSelection: LeftMenuBottomSelectionType | undefined,
   dispatch: AppDispatch
 ) => {
   // check if there is a terminal with same default command

@@ -63,7 +63,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     }
 
     if (leftMenuBottomSelection === selectedOption) {
-      dispatch(setLeftBottomMenuSelection(null));
+      dispatch(setLeftBottomMenuSelection(undefined));
     } else {
       trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedOption});
       dispatch(setLeftBottomMenuSelection(selectedOption));
