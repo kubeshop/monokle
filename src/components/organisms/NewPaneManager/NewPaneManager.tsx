@@ -101,6 +101,8 @@ const NewPaneManager: React.FC = () => {
               display: bottomSelection === 'terminal' ? 'block' : 'none',
             }}
             onStopResize={handleRowResize}
+            height={height}
+            width={width}
           />
         </>
       ) : projects.length > 0 ? (
