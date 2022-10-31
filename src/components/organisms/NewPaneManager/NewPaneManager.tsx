@@ -86,7 +86,7 @@ const NewPaneManager: React.FC = () => {
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={currentActivity?.name !== 'git' ? <NavigatorPane /> : undefined}
+                  center={!['git', 'validation'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : undefined}
                   right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                   width={width}
