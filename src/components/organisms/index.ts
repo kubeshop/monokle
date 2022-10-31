@@ -20,6 +20,7 @@ export {default as MessageBox} from './MessageBox';
 export {default as NavigatorPane} from './NavigatorPane';
 export {default as NewPaneManager} from './NewPaneManager';
 export {default as NewResourceWizard} from './NewResourceWizard';
+export {default as NewValidationPane} from './NewValidationPane';
 export {default as NotificationsManager} from './NotificationsManager';
 export {default as PageHeader} from './PageHeader';
 export {default as PaneManager} from './PaneManager';
