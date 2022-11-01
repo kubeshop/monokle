@@ -1,7 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useMount} from 'react-use';
+import {useEffectOnce, useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -34,6 +34,7 @@ import {
   toggleSettings,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {
   GitCloneModal,
@@ -294,6 +295,10 @@ const App = () => {
       });
     });
   }, []);
+
+  useEffectOnce(() => {
+    dispatch(loadValidation());
+  });
 
   useEffect(() => {
     ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);

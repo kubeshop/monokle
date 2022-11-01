@@ -3,6 +3,7 @@ import {useMeasure} from 'react-use';
 
 import {Input, Skeleton} from 'antd';
 
+import {useAppSelector} from '@redux/hooks';
 import {VALIDATOR} from '@redux/validation/validation.services';
 
 import {DEFAULT_TRIVY_PLUGIN} from '@monokle/validation';
@@ -27,6 +28,8 @@ interface IProps {
 }
 
 export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHeight, height}) => {
+  const configRules = useAppSelector(state => state.validation.config.rules);
+
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
   const columns = useOpenPolicyAgentTable(width);
@@ -54,7 +57,9 @@ export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHei
         severity,
       };
     });
-  }, []);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configRules]);
 
   const [filter, setFilter] = useState<string>('');
 
