@@ -1,12 +1,10 @@
 export {default as ChangeFiltersConfirmModal} from './ChangeFiltersConfirmModal';
 export {default as CheckedResourcesActionsMenu} from './CheckedResourcesActionsMenu';
 export {default as ClusterDiff} from './ClusterDiff';
-export {default as ContextMenu} from './ContextMenu';
 export {default as FilePatternList} from './FilePatternList';
 export {default as FormEditor} from './FormEditor';
 export {default as GraphView} from './GraphView';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
-export {default as HotkeyLabel} from './HotkeyLabel';
 export {default as IconWithPopover} from './IconWithPopover';
 export {default as ImageDetails} from './ImageDetails';
 export {default as InputTags} from './InputTags';

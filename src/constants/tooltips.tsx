@@ -1,4 +1,4 @@
-import {HotkeyLabel} from '@components/molecules';
+import {HotkeyLabel} from '@atoms';
 
 export const macOSKeyIcon: Record<string, string> = {
   alt: '⌥',
