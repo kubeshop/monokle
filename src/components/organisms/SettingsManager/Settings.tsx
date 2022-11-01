@@ -7,6 +7,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
+import {existsSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -35,7 +36,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {closeKubeConfigBrowseSetting, openKubeConfigBrowseSetting} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
+import {downloadSchema} from '@redux/services/k8sVersionService';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {FilePatternList} from '@atoms';
@@ -271,7 +272,7 @@ export const Settings = ({
 
   const doesSchemaExist = useCallback(
     (k8sVersion: string) => {
-      return schemaExists(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
+      return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isSchemaDownloading]
