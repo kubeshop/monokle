@@ -5,7 +5,10 @@ import {ValidationSliceState} from '@models/validation';
 
 import electronStore from '@utils/electronStore';
 
+import {DEFAULT_TRIVY_PLUGIN, RuleMap} from '@monokle/validation';
+
 import {validationInitialState} from './validation.initialState';
+import {VALIDATOR} from './validation.services';
 import {loadValidation} from './validation.thunks';
 
 export const validationSlice = createSlice({
@@ -14,6 +17,40 @@ export const validationSlice = createSlice({
   reducers: {
     clearValidation: (state: Draft<ValidationSliceState>) => {
       state.lastResponse = undefined;
+    },
+
+    toggleOPARules: (
+      state: Draft<ValidationSliceState>,
+      action: PayloadAction<{ruleName?: string; enable?: boolean}>
+    ) => {
+      const {payload} = action;
+
+      if (!state.config.rules) {
+        state.config.rules = {};
+      }
+
+      if (payload.ruleName === undefined) {
+        // toggle all rules
+        const enable = payload.enable ?? true;
+
+        const rules: RuleMap = {};
+
+        DEFAULT_TRIVY_PLUGIN.rules.forEach(rule => {
+          const ruleName = `open-policy-agent/${rule.name}`;
+          rules[ruleName] = Boolean(enable);
+        });
+
+        state.config.rules = rules;
+      } else {
+        // toggle given rule
+        const ruleName = payload.ruleName;
+        const shouldToggle = payload.enable === undefined;
+        const isEnabled = VALIDATOR.isRuleEnabled(ruleName);
+        const enable = shouldToggle ? !isEnabled : payload.enable;
+        state.config.rules[ruleName] = Boolean(enable);
+      }
+
+      electronStore.set('validation.config.rules', state.config.rules);
     },
 
     toggleValidation: (state: Draft<ValidationSliceState>, action: PayloadAction<ValidationIntegrationId>) => {
@@ -26,7 +63,7 @@ export const validationSlice = createSlice({
         state.config.plugins[id] = !previousValue;
       }
 
-      electronStore.set('validation.config', state.config);
+      electronStore.set('validation.config.plugins', state.config.plugins);
     },
   },
   extraReducers: builder => {
@@ -49,5 +86,5 @@ export const validationSlice = createSlice({
   },
 });
 
-export const {clearValidation, toggleValidation} = validationSlice.actions;
+export const {clearValidation, toggleOPARules, toggleValidation} = validationSlice.actions;
 export default validationSlice.reducer;

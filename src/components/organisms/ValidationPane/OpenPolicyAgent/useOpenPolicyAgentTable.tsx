@@ -11,6 +11,7 @@ import {IconNames} from '@models/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
+import {toggleOPARules} from '@redux/validation/validation.slice';
 
 import {Icon} from '@atoms';
 
@@ -24,9 +25,12 @@ export function useOpenPolicyAgentTable(width: number) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const handleToggle = useCallback(
-    (ruleId: string) => {
-      dispatch(toggleRule({ruleId}));
+    (rule: Rule) => {
+      dispatch(toggleRule({ruleId: rule.id}));
       dispatch(reprocessAllResources());
+
+      const ruleName = `open-policy-agent/${rule.name}`;
+      dispatch(toggleOPARules({ruleName}));
     },
     [dispatch]
   );
@@ -55,20 +59,21 @@ export function useOpenPolicyAgentTable(width: number) {
         key: 'description',
         title: 'Description',
         dataIndex: 'name',
-        render: (_value, record) => {
-          const {description, learnMoreUrl} = record;
+        render: (_value, rule) => {
+          const {fullDescription, id, learnMoreUrl, shortDescription} = rule;
+
           return (
             <Tooltip
               mouseEnterDelay={TOOLTIP_DELAY}
               title={
                 <p>
-                  {description} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
+                  {fullDescription} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
                 </p>
               }
               placement="bottomLeft"
               overlayStyle={{maxWidth: '500px'}}
             >
-              {record.name} <S.RuleId>{record.id}</S.RuleId>
+              {shortDescription} <S.RuleId>{id}</S.RuleId>
             </Tooltip>
           );
         },
@@ -97,7 +102,7 @@ export function useOpenPolicyAgentTable(width: number) {
         key: 'enabled',
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
-          return <Switch checked={rule.enabled} onChange={() => handleToggle(rule.id)} />;
+          return <Switch checked={rule.enabled} onChange={() => handleToggle(rule)} />;
         },
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
           sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
