@@ -4,13 +4,19 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
-import {ActionsPane, BottomPaneManager, GitOpsView, RecentProjectsPage, StartProjectPage} from '@organisms';
+import {
+  ActionsPane,
+  BottomPaneManager,
+  GitOpsView,
+  NavigatorPane,
+  RecentProjectsPage,
+  StartProjectPage,
+} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
-import NavigatorPane from '../NavigatorPane';
 import * as S from './PaneManager.styled';
 import NewPaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';

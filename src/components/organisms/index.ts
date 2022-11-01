@@ -1,7 +1,6 @@
 export {default as AboutModal} from './AboutModal';
 export {default as ActionsPane} from './ActionsPane';
 export {default as BottomPaneManager} from './BottomPaneManager';
-export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CreateFileFolderModal} from './CreateFileFolderModal';
 export {default as CreateProjectModal} from './CreateProjectModal';

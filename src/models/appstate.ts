@@ -176,16 +176,6 @@ interface AppState {
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  clusterDiff: {
-    hasLoaded: boolean;
-    hasFailed: boolean;
-    shouldReload?: boolean;
-    hideClusterOnlyResources: boolean;
-    clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
-    diffResourceId?: string;
-    refreshDiffResource?: boolean;
-    selectedMatches: string[];
-  };
   policies: {
     plugins: Policy[];
   };

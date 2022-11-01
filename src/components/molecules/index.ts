@@ -1,6 +1,5 @@
 export {default as ChangeFiltersConfirmModal} from './ChangeFiltersConfirmModal';
 export {default as CheckedResourcesActionsMenu} from './CheckedResourcesActionsMenu';
-export {default as ClusterDiff} from './ClusterDiff';
 export {default as FormEditor} from './FormEditor';
 export {default as GraphView} from './GraphView';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
