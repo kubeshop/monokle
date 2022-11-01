@@ -1,13 +1,14 @@
 import {ValidationSliceState} from '@models/validation';
 
+import electronStore from '@utils/electronStore';
+
 export const validationInitialState: ValidationSliceState = {
-  config: {
+  config: electronStore.get('validation.config') || {
     plugins: {
       'kubernetes-schema': true,
       'open-policy-agent': true,
       'yaml-syntax': true,
       'resource-links': true,
-      labels: false,
     },
     settings: {
       'kubernetes-schema': {

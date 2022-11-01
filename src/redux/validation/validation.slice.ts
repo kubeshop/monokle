@@ -3,6 +3,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {ValidationIntegrationId} from '@models/integrations';
 import {ValidationSliceState} from '@models/validation';
 
+import electronStore from '@utils/electronStore';
+
 import {validationInitialState} from './validation.initialState';
 import {loadValidation} from './validation.thunks';
 
@@ -14,8 +16,8 @@ export const validationSlice = createSlice({
       state.lastResponse = undefined;
     },
 
-    toggleValidation: (state: Draft<ValidationSliceState>, action: PayloadAction<{id: ValidationIntegrationId}>) => {
-      const {id} = action.payload;
+    toggleValidation: (state: Draft<ValidationSliceState>, action: PayloadAction<ValidationIntegrationId>) => {
+      const id = action.payload;
 
       if (!state.config.plugins) {
         state.config.plugins = {[id]: true};
@@ -23,6 +25,8 @@ export const validationSlice = createSlice({
         const previousValue = Boolean(state.config.plugins[id]);
         state.config.plugins[id] = !previousValue;
       }
+
+      electronStore.set('validation.config', state.config);
     },
   },
   extraReducers: builder => {

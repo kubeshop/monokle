@@ -18,6 +18,7 @@ import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
+import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
 const middlewares: Middleware[] = [];
@@ -42,6 +43,7 @@ combineListeners([
   imageSelectedListener,
   removedTerminalListener,
   crdsPathChangedListener,
+  ...validationListeners,
 ]);
 
 const appReducer = combineReducers({
