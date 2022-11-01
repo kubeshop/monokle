@@ -100,6 +100,7 @@
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
     "@kubernetes/client-node": "0.17.1",
+    "@monokle/validation": "^0.4.4",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.8.6",
     "@rjsf/antd": "4.2.0",

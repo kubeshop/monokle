@@ -59,7 +59,6 @@ import {
 import {askActionConfirmation} from '../utils';
 import {dispatchToAllWindows} from './ipcMainRedux';
 
-const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');

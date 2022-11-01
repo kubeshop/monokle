@@ -18,6 +18,7 @@ import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
+import {validationSlice} from './validation/validation.slice';
 
 const middlewares: Middleware[] = [];
 
@@ -56,6 +57,7 @@ const appReducer = combineReducers({
   uiCoach: uiCoachSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
+  validation: validationSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
