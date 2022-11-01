@@ -8,6 +8,7 @@ export {default as ImageIcon} from './ImageIcon';
 export {default as InputTags} from './InputTags';
 export {default as KeyValueInput} from './KeyValueInput';
 export {default as MonoPaneTitle} from './MonoPaneTitle';
+export {default as ScrollIntoView} from './ScrollIntoView';
 export {default as Spinner} from './Spinner';
 export {default as TabHeader} from './TabHeader';
 export {default as TableSelect} from './TableSelect';
