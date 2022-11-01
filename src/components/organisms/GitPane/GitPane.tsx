@@ -11,7 +11,7 @@ import {GitChangedFile} from '@models/git';
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 

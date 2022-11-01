@@ -21,7 +21,6 @@ export {default as ResourceRefsIconPopover} from './ResourceRefsIconPopover';
 export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFolderModal';
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
-export {default as TitleBar} from './TitleBar';
 export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
 export {default as Walkthrough} from './Walkthrough';
 export {default as Logs} from './Logs';

@@ -12,7 +12,7 @@ export {default as KeyValueInput} from './KeyValueInput';
 export {default as MonoPaneTitle} from './MonoPaneTitle';
 export {default as ScrollIntoView} from './ScrollIntoView';
 export {default as Spinner} from './Spinner';
+export {PrimaryButton, SecondaryButton} from './StyledComponents';
 export {default as TabHeader} from './TabHeader';
 export {default as TableSelect} from './TableSelect';
-
-export {PrimaryButton, SecondaryButton} from './StyledComponents';
+export {default as TitleBar} from './TitleBar';
