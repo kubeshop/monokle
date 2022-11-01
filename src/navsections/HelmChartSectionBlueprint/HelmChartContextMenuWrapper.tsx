@@ -17,7 +17,7 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {ContextMenu} from '@molecules';
+import {ContextMenu} from '@atoms';
 
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 

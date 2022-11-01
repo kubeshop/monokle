@@ -9,16 +9,6 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
-export function makeResourceNameKindNamespaceIdentifier(partialResource: {
-  name: string;
-  kind: string;
-  namespace?: string;
-}) {
-  return `${partialResource.name}#${partialResource.kind}#${
-    partialResource.namespace ? partialResource.namespace : 'default'
-  }`;
-}
-
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (
     filters.names &&

@@ -11,9 +11,10 @@ import {ResourceFilterType} from '@models/appstate';
 import {useAppSelector} from '@redux/hooks';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
+import {IconWithPopover} from '@atoms';
+
 import Colors from '@styles/Colors';
 
-import IconWithPopover from '../IconWithPopover';
 import ResourceFilter from '../ResourceFilter';
 
 const ResourceFilterIconWithPopover: React.FC = () => {
