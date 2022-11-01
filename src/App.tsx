@@ -35,17 +35,11 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {
-  GitCloneModal,
-  HotKeysHandler,
-  LazyDrawer,
-  MessageBox,
-  NewPaneManager,
-  PageHeader,
-  UpdateNotice,
-} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
+
+import {PaneManager} from '@components/organisms_new';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -399,7 +393,7 @@ const App = () => {
         <MessageBox />
         <S.MainContainer>
           <PageHeader />
-          <NewPaneManager />
+          <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
