@@ -5,6 +5,7 @@ export {default as FileExplorer} from './FileExplorer';
 export {default as HotkeyLabel} from './HotkeyLabel';
 export {default as Icon} from './Icon';
 export {default as ImageIcon} from './ImageIcon';
+export {default as InputTags} from './InputTags';
 export {default as KeyValueInput} from './KeyValueInput';
 export {default as MonoPaneTitle} from './MonoPaneTitle';
 export {default as Spinner} from './Spinner';

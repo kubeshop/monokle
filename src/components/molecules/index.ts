@@ -7,7 +7,6 @@ export {default as GraphView} from './GraphView';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
 export {default as IconWithPopover} from './IconWithPopover';
 export {default as ImageDetails} from './ImageDetails';
-export {default as InputTags} from './InputTags';
 export {default as ModalConfirm} from './ModalConfirm';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
 export {default as Monaco} from './Monaco';
