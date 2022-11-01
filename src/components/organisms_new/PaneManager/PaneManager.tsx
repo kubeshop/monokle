@@ -4,17 +4,21 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
+import {
+  ActionsPane,
+  BottomPaneManager,
+  GitOpsView,
+  NavigatorPane,
+  RecentProjectsPage,
+  StartProjectPage,
+} from '@organisms';
+
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
-import ActionsPane from '../ActionsPane';
-import BottomPaneManager from '../BottomPaneManager';
-import GitOpsView from '../GitOpsView';
-import NavigatorPane from '../NavigatorPane';
-import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';
-import * as S from './NewPaneManager.styled';
-import NewPaneManagerLeftMenu from './NewPaneManagerLeftMenu';
+import * as S from './PaneManager.styled';
+import NewPaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';
 
 const NewPaneManager: React.FC = () => {

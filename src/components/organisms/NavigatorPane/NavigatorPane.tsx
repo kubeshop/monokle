@@ -21,14 +21,11 @@ import {MonoPaneTitle} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {FeatureFlag} from '@utils/features';
-
 import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import ClusterCompareButton from './ClusterCompareButton';
 import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -110,9 +107,7 @@ const NavPane: React.FC = () => {
               </Tooltip>
             </Badge>
 
-            <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
-              <CompareButton width={width} />
-            </FeatureFlag>
+            <CompareButton width={width} />
           </S.TitleBarRightButtons>
         </S.TitleBar>
       )}

@@ -21,9 +21,7 @@ import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/serv
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {TitleBar} from '@molecules';
-
-import {Icon} from '@atoms';
+import {Icon, TitleBar} from '@atoms';
 
 import {
   useCreate,

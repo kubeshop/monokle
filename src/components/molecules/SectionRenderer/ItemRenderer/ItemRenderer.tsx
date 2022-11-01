@@ -4,9 +4,8 @@ import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {ScrollIntoView} from '@molecules';
-
-import {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {ScrollIntoView} from '@atoms';
+import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
 import {useItemCustomization} from './useItemCustomization';
 

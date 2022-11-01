@@ -21,7 +21,7 @@ import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import * as S from './ActionsPaneHeader.styled';
 import Diff from './Diff/Diff';
