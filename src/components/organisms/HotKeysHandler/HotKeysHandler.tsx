@@ -289,6 +289,10 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('validation-pane'));
   });
 
+  useHotkeys(hotkeys.OPEN_GETTING_STARTED_PAGE.key, () => {
+    dispatch(setLeftMenuSelection('validation-pane'));
+  });
+
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
     dispatch(resetResourceFilter());
   });

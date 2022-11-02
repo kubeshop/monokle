@@ -21,6 +21,7 @@ const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
+const GettingStarted = React.lazy(() => import('@organisms/GettingStarted'));
 const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
@@ -60,6 +61,7 @@ const PaneManagerSplitView: React.FC = () => {
               {leftActiveMenu === 'templates-pane' && <TemplateManagerPane />}
               {leftActiveMenu === 'validation-pane' && <ValidationPane />}
               {leftActiveMenu === 'search' && <SearchPane />}
+              {leftActiveMenu === 'getting-started' && <GettingStarted />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>

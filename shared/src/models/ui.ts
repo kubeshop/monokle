@@ -21,6 +21,7 @@ type LeftMenuSelectionType =
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
+  | 'getting-started'
   | 'search'
   | 'crds';
 

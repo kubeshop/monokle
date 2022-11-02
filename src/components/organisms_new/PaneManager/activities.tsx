@@ -1,8 +1,8 @@
-import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, ValidationTabTooltip} from '@constants/tooltips';
+import {FileExplorerTabTooltip, GettingStartedPageTooltip, SettingsTooltip, TerminalPaneTooltip, ValidationTabTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
+import {BottomPaneManager, FileTreePane, GettingStarted, GitPane, SearchPane, ValidationPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@monokle-desktop/shared/models';
@@ -34,6 +34,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: <ValidationTabTooltip />,
     icon: () => <Icon name="validation" style={{fontSize: 16}} />,
     component: <ValidationPane />,
+    useBadge: () => undefined,
+  },
+  {
+    type: 'fullscreen',
+    name: 'getting-started',
+    tooltip: <GettingStartedPageTooltip />,
+    icon: () => <Icon name="getting-started" style={{fontSize: 16}} />,
+    component: <GettingStarted />,
     useBadge: () => undefined,
   },
   {

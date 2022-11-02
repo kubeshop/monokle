@@ -6,6 +6,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {
   FileExplorerTabTooltip,
+  GettingStartedPageTooltip,
   HelmTabTooltip,
   KustomizeTabTooltip,
   TemplatesTabTooltip,
@@ -276,6 +277,22 @@ const PaneManagerLeftMenu: React.FC = () => {
             disabled={!activeProject}
           >
             <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
+          </MenuButton>
+        </PaneTooltip>
+
+        <PaneTooltip
+          show={!leftActive || leftMenuSelection !== 'validation-pane'}
+          title={<GettingStartedPageTooltip />}
+          placement="right"
+        >
+          <MenuButton
+            id="getting-started"
+            isSelected={checkIsTabSelected('getting-started')}
+            isActive={isActive}
+            onClick={() => setLeftActiveMenu('getting-started')}
+            disabled={!activeProject}
+          >
+            <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('getting-started')} />
           </MenuButton>
         </PaneTooltip>
       </S.IconsContainer>

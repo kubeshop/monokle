@@ -5,6 +5,7 @@ export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CreateFileFolderModal} from './CreateFileFolderModal';
 export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as FileTreePane} from './FileTreePane';
+export {default as GettingStarted} from '../organisms_new/GettingStarted';
 export {default as FiltersPresetModal} from './FiltersPresetModal';
 export {default as GitCloneModal} from './GitCloneModal';
 export {default as GitOpsView} from './GitOpsView';

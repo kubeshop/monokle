@@ -26,6 +26,7 @@ type IconNames =
   | 'terminal'
   | 'split-view'
   | 'crds'
-  | 'compare';
+  | 'compare'
+  | 'getting-started';
 
 export type {IconNames};
