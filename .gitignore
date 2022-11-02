@@ -36,3 +36,6 @@ k8sdumps
 
 electron/env.ts
 
+# flatpak
+flatpak/.flatpak-builder
+flatpak/build
