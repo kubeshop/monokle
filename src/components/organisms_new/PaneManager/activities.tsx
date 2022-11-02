@@ -37,14 +37,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     useBadge: () => undefined,
   },
   {
-    type: 'fullscreen',
-    name: 'getting-started',
-    tooltip: <GettingStartedPageTooltip />,
-    icon: () => <Icon name="getting-started" style={{fontSize: 16}} />,
-    component: <GettingStarted />,
-    useBadge: () => undefined,
-  },
-  {
     type: 'panel',
     name: 'git',
     tooltip: 'View Git operations',
@@ -70,6 +62,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
     component: <SettingsPane />,
+    useBadge: () => undefined,
+  },
+  {
+    type: 'fullscreen',
+    name: 'getting-started',
+    tooltip: <GettingStartedPageTooltip />,
+    icon: () => <Icon name="git-ops" style={{fontSize: 16}} />, // to changeit later
+    component: <GettingStarted />,
     useBadge: () => undefined,
   },
 ];

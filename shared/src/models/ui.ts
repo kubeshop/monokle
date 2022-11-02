@@ -57,7 +57,14 @@ type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+export type NewLeftMenuSelectionType =
+  | 'explorer'
+  | 'compare'
+  | 'validation'
+  | 'git'
+  | 'search'
+  | 'settings'
+  | 'getting-started';
 
 type NewResourceWizardInput = {
   name?: string;
