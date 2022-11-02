@@ -92,10 +92,11 @@ export function useOpenPolicyAgentTable(width: number) {
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
-          sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
+          sorter: (a, b) =>
+            SEVERITY_ORDER_MAP[b.severity] - SEVERITY_ORDER_MAP[a.severity] || b.securitySeverity - a.securitySeverity,
         }),
         render: (_value, record) => (
-          <Icon {...SEVERITY_ICON_MAP[record.severity]} style={{height: 15, width: 15, paddingTop: 15}} />
+          <Icon {...severityIconMapper(record.securitySeverity)} style={{height: 15, width: 15, paddingTop: 15}} />
         ),
       },
       {
@@ -115,13 +116,19 @@ export function useOpenPolicyAgentTable(width: number) {
 }
 
 const SEVERITY_ORDER_MAP: Record<Severity, number> = {
-  low: 1,
-  medium: 2,
-  high: 3,
+  recommendation: 1,
+  warning: 2,
+  error: 3,
 };
 
-const SEVERITY_ICON_MAP: Record<Severity, {name: IconNames; color: Colors}> = {
-  high: {name: 'severity-high', color: Colors.red7},
-  medium: {name: 'severity-medium', color: Colors.red7},
-  low: {name: 'severity-low', color: Colors.green7},
+const severityIconMapper = (securitySeverity: number): {name: IconNames; color: Colors} => {
+  if (securitySeverity < 3.9) {
+    return {name: 'severity-low', color: Colors.green7};
+  }
+
+  if (securitySeverity < 6.9) {
+    return {name: 'severity-medium', color: Colors.red7};
+  }
+
+  return {name: 'severity-high', color: Colors.red7};
 };

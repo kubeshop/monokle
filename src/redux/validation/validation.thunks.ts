@@ -6,15 +6,9 @@ import {VALIDATOR} from './validation.services';
 
 export const loadValidation = createAsyncThunk<void, undefined, ThunkApi>(
   'validation/load',
-  async (_action, {getState, requestId}) => {
-    const {loadRequestId, config} = getState().validation;
+  async (_action, {getState}) => {
+    const {config} = getState().validation;
 
-    if (requestId !== loadRequestId) {
-      return;
-    }
-
-    VALIDATOR.configureFile({settings: {debug: true}});
-    VALIDATOR.configureArgs(config);
-    await VALIDATOR.preload();
+    await VALIDATOR.preload(config);
   }
 );

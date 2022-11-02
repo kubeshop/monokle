@@ -11,14 +11,15 @@ import {DEFAULT_TRIVY_PLUGIN} from '@monokle/validation';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
 
-export type Severity = 'high' | 'medium' | 'low';
+export type Severity = 'error' | 'warning' | 'recommendation';
 export type Rule = {
   id: string;
   name: string;
   shortDescription: string;
   fullDescription: string;
   learnMoreUrl?: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: Severity;
+  securitySeverity: number;
   enabled: boolean;
 };
 
@@ -40,12 +41,8 @@ export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHei
     return metadata.rules.map(rule => {
       const ruleName = `open-policy-agent/${rule.name}`;
       const enabled = VALIDATOR.isRuleEnabled(ruleName);
-      const severity =
-        rule.properties === undefined
-          ? 'low'
-          : ['high', 'medium', 'low'].includes(rule.properties.severity ?? '')
-          ? rule.properties.severity
-          : 'low';
+      const severity = rule.properties?.problem?.severity ?? 'recommendation';
+      const securitySeverity = rule.properties?.['security-severity'] ?? 0;
 
       return {
         id: rule.id,
@@ -55,6 +52,7 @@ export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHei
         learnMoreUrl: rule.helpUri,
         enabled,
         severity,
+        securitySeverity,
       };
     });
 
