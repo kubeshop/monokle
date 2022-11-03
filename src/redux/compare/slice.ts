@@ -28,19 +28,12 @@ export const compareSlice = createSlice({
     compareToggled: (
       state: Draft<CompareState>,
       action: PayloadAction<{
-        value: boolean | undefined;
-        initialView?: ComparisonView;
+        initialView: ComparisonView;
         from?: 'compare-button' | 'quick-helm-compare' | 'quick-kustomize-compare';
       }>
     ) => {
-      const {value, initialView} = action.payload;
-      const close = value === undefined ? state.isOpen : value === false;
+      const {initialView} = action.payload;
 
-      if (close) {
-        return initialState;
-      }
-
-      state.isOpen = true;
       if (initialView) {
         state.current.view = initialView;
       }
