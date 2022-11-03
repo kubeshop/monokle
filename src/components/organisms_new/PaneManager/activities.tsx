@@ -10,6 +10,8 @@ import ValidationPane from '@organisms/ValidationPane';
 
 import {ActivityType, Icon} from '@monokle/components';
 
+import CompareSyncPane from '../CompareSyncPane';
+
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
     type: 'panel',
@@ -24,7 +26,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'compare',
     tooltip: 'Compare resources',
     icon: () => <Icon name="compare" />,
-    component: <div />,
+    component: <CompareSyncPane />,
     useBadge: () => undefined,
   },
   {
