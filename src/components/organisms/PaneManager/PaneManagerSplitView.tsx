@@ -101,7 +101,7 @@ const PaneManagerSplitView: React.FC = () => {
           <GitOpsView />
         </ReflexElement>
       )}
-    </ReflexContainer> //changeit later
+    </ReflexContainer>
   );
 };
 
