@@ -176,7 +176,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         defaultInput: {
           name: resource.name,
           kind: resource.kind,
-          apiVersion: resource.version,
+          apiVersion: resource.apiVersion,
           namespace: resource.namespace,
           selectedResourceId: resource.id,
         },

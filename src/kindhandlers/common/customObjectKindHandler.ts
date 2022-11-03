@@ -27,9 +27,9 @@ import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outg
  */
 
 function extractResourceVersion(resource: K8sResource, kindVersion: string, kindGroup: string) {
-  const ix = resource.version.lastIndexOf('/');
-  const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
-  const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+  const ix = resource.apiVersion.lastIndexOf('/');
+  const version = ix > 0 ? resource.apiVersion.substring(ix + 1) : kindVersion;
+  const group = ix > 0 ? resource.apiVersion.substring(0, ix) : kindGroup;
   return {version, group};
 }
 

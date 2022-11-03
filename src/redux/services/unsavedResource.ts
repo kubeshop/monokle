@@ -53,12 +53,14 @@ export function createUnsavedResource(
 
   const newResource: K8sResource = {
     name: input.name,
+    fileId: `${UNSAVED_PREFIX}${newResourceId}`,
     filePath: `${UNSAVED_PREFIX}${newResourceId}`,
+    fileOffset: 0,
     id: newResourceId,
     isHighlighted: false,
     isSelected: false,
     kind: input.kind,
-    version: input.apiVersion,
+    apiVersion: input.apiVersion,
     namespace: input.namespace,
     text: newResourceText,
     content: newResourceContent,
@@ -100,12 +102,14 @@ export function createMultipleUnsavedResources(
 
   const newResources: K8sResource[] = Object.keys(resourceMap).map(resourceId => ({
     name: resourceMap[resourceId].input.name,
+    fileId: `${UNSAVED_PREFIX}${resourceId}`,
     filePath: `${UNSAVED_PREFIX}${resourceId}`,
+    fileOffset: 0,
     id: resourceId,
     isHighlighted: false,
     isSelected: false,
     kind: resourceMap[resourceId].input.kind,
-    version: resourceMap[resourceId].input.apiVersion,
+    apiVersion: resourceMap[resourceId].input.apiVersion,
     namespace: resourceMap[resourceId].input.namespace,
     text: resourceMap[resourceId].text,
     content: resourceMap[resourceId].content,

@@ -55,5 +55,5 @@ export function targetGroupMatcher(
   if (!value && properties && properties['defaultGroup']) {
     value = properties['defaultGroup'];
   }
-  return targetResource.version.startsWith(`${value}/`);
+  return targetResource.apiVersion.startsWith(`${value}/`);
 }
