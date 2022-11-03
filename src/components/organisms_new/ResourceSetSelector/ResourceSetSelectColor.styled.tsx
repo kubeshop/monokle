@@ -13,12 +13,24 @@ export const CommitHash = styled.span`
   margin-left: 10px;
 `;
 
-export const SelectColor = styled.div`
-  .ant-select-selection-placeholder {
-    color: white;
-    font-size: 16px;
-    font-weight: 700;
+export const SelectColor = styled.div<{$isMainSelector?: boolean}>`
+  ${({$isMainSelector}) => {
+    if ($isMainSelector) {
+      return `
+        .ant-select-selection-placeholder {
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+
+        .ant-select-selection-item {
+        font-size: 16px;
+        font-weight: 700;
+        color: ${Colors.whitePure};
+    }
   }
+    `;
+    }
+  }}
 
   .ant-select-selector {
     border: 1px solid ${Colors.grey6} !important;

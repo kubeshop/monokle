@@ -36,7 +36,7 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
   );
 
   return (
-    <S.SelectColor>
+    <S.SelectColor $isMainSelector>
       <Select
         onChange={handleSelectType}
         placeholder="Choose…"
