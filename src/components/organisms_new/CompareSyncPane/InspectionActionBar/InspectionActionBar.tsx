@@ -7,7 +7,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from './InspectionActionBar.styled';
 
-export const InspectionActionBar: React.FC = () => {
+const InspectionActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const inspection = useAppSelector(state => state.compare.current.inspect);
   const comparison = useAppSelector(state => selectComparison(state.compare, inspection?.comparison));
@@ -38,3 +38,5 @@ export const InspectionActionBar: React.FC = () => {
     </S.ActionBarDiv>
   );
 };
+
+export default InspectionActionBar;

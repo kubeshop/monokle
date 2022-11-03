@@ -7,7 +7,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-export const ComparisonInspection = () => {
+const ComparisonInspection = () => {
   const inspection = useAppSelector(state => state.compare.current.inspect);
   const comparison = useAppSelector(state => selectComparison(state.compare, inspection?.comparison));
   invariant(inspection && comparison, 'invalid_state');
@@ -54,3 +54,5 @@ export const ComparisonInspection = () => {
     />
   );
 };
+
+export default ComparisonInspection;

@@ -11,12 +11,12 @@ import CrashFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
 
-import {CompareFigure} from './CompareFigure';
-import {FigureDescription, FigureTitle} from './CompareFigure.styled';
+import CompareFigure from '../CompareFigure';
+import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';
+import ResourceList from '../ResourceList';
 import * as S from './CompareModalSelecting.styled';
-import {ResourceList} from './ResourceList';
 
-export const CompareModalSelecting: React.FC = () => {
+const CompareModalSelecting: React.FC = () => {
   const dispatch = useAppDispatch();
   const {left, right} = useAppSelector(state => state.compare.current);
   const leftSuccess = left && !left.loading && !left.error;
@@ -117,3 +117,5 @@ function ErrorFigure({onRetry}: ErrorFigureProps) {
     </CompareFigure>
   );
 }
+
+export default CompareModalSelecting;

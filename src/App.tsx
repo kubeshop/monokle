@@ -18,7 +18,6 @@ import {NewVersionCode, Project} from '@models/appconfig';
 import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
 
-import {compareToggled} from '@redux/compare';
 import {toggleForm} from '@redux/forms';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -62,6 +61,7 @@ const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterReso
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
@@ -75,8 +75,6 @@ const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceMo
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
-const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -103,7 +101,6 @@ const App = () => {
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
-  const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
@@ -377,10 +374,6 @@ const App = () => {
     dispatch(closeReleaseNotesDrawer());
   }, [dispatch]);
 
-  const onCloseCompareModal = useCallback(() => {
-    dispatch(compareToggled({value: false}));
-  }, [dispatch]);
-
   const onCloseFormModal = useCallback(() => {
     dispatch(toggleForm(false));
   }, [dispatch]);
@@ -436,7 +429,6 @@ const App = () => {
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
-          {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}

@@ -1,6 +1,5 @@
 import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
-import {useMeasure} from 'react-use';
 
 import {Badge, Button, Tooltip} from 'antd';
 
@@ -26,7 +25,6 @@ import Colors from '@styles/Colors';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import {CompareButton} from './CompareButton';
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
@@ -42,8 +40,6 @@ const NavPane: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-
-  const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
 
@@ -68,7 +64,7 @@ const NavPane: React.FC = () => {
   };
 
   return (
-    <S.NavigatorPaneContainer ref={navigatorPaneRef}>
+    <S.NavigatorPaneContainer>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
@@ -106,8 +102,6 @@ const NavPane: React.FC = () => {
                 />
               </Tooltip>
             </Badge>
-
-            <CompareButton width={width} />
           </S.TitleBarRightButtons>
         </S.TitleBar>
       )}

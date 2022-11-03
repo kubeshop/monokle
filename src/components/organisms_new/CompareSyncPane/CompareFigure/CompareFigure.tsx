@@ -5,7 +5,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-export const CompareFigure: React.FC<Props> = ({src, children}) => {
+const CompareFigure: React.FC<Props> = ({src, children}) => {
   return (
     <S.FigureDiv>
       <img src={src} />
@@ -13,3 +13,5 @@ export const CompareFigure: React.FC<Props> = ({src, children}) => {
     </S.FigureDiv>
   );
 };
+
+export default CompareFigure;

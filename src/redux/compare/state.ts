@@ -1,7 +1,6 @@
 import {K8sResource} from '@models/k8sresource';
 
 export const initialState: CompareState = {
-  isOpen: false,
   current: {
     view: {
       operation: 'union',
@@ -16,11 +15,6 @@ export const initialState: CompareState = {
 };
 
 export type CompareState = {
-  /**
-   * Whether the compare everything modal is opened.
-   */
-  isOpen: boolean;
-
   /**
    * The currently viewed comparison.
    */

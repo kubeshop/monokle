@@ -13,7 +13,7 @@ type Props = {
   side: CompareSide;
 };
 
-export const TransferButton: React.FC<Props> = ({side}) => {
+const TransferButton: React.FC<Props> = ({side}) => {
   const dispatch = useAppDispatch();
 
   const direction = side === 'left' ? 'left-to-right' : 'right-to-left';
@@ -56,3 +56,5 @@ export const TransferButton: React.FC<Props> = ({side}) => {
     </Button>
   );
 };
+
+export default TransferButton;

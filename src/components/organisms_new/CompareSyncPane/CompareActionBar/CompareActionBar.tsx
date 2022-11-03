@@ -1,12 +1,11 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {AutoComplete, Checkbox, Input, Select, Space} from 'antd';
+import {Select, Space} from 'antd';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {
-  CompareOperation,
   comparisonAllToggled,
   filterUpdated,
   namespaceUpdated,
@@ -22,7 +21,7 @@ import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 
 import * as S from './CompareActionBar.styled';
 
-export const CompareActionBar: React.FC = () => {
+const CompareActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
@@ -42,11 +41,9 @@ export const CompareActionBar: React.FC = () => {
 
   return (
     <S.ActionBarDiv>
-      <div>
-        <Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
-          Select all
-        </Checkbox>
-      </div>
+      <S.Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
+        Select all
+      </S.Checkbox>
 
       <S.ActionBarRightDiv>
         <Space>
@@ -78,7 +75,7 @@ function SearchInput({disabled}: {disabled: boolean}) {
   );
 
   return (
-    <Input
+    <S.SearchInput
       disabled={disabled}
       prefix={<S.SearchIcon />}
       placeholder="Search"
@@ -107,13 +104,12 @@ function NamespaceInput({disabled}: {disabled: boolean}) {
   );
 
   return (
-    <AutoComplete
-      style={{width: 175}}
+    <S.NamespaceInput
       placeholder="Set default namespace"
       disabled={disabled}
       value={value}
       options={options}
-      onChange={setValue}
+      onSearch={setValue}
     />
   );
 }
@@ -123,17 +119,10 @@ function OperationSelect() {
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const currentOperation = useAppSelector(state => state.compare.current.view.operation);
 
-  const handleSelect = useCallback(
-    (operation: CompareOperation) => {
-      dispatch(operationUpdated({operation}));
-    },
-    [dispatch]
-  );
-
   return (
-    <Select
+    <S.Select
       disabled={status !== 'comparing'}
-      onChange={handleSelect}
+      onChange={(value: any) => dispatch(operationUpdated({operation: value}))}
       defaultValue="union"
       value={currentOperation}
       style={{width: '160px'}}
@@ -143,6 +132,8 @@ function OperationSelect() {
       <Select.Option value="symmetricDifference">Only non-matching</Select.Option>
       <Select.Option value="leftJoin">View left join</Select.Option>
       <Select.Option value="rightJoin">View right join</Select.Option>
-    </Select>
+    </S.Select>
   );
 }
+
+export default CompareActionBar;

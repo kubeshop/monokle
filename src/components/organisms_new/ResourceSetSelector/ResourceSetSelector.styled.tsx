@@ -5,8 +5,7 @@ export const ResourceSetSelectorDiv = styled.div`
   justify-content: space-between;
   padding: 9px 12px;
   border-radius: 2;
-  background-color: #31393c;
-  margin-bottom: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
 `;
 
 export const SelectSpacer = styled.div`

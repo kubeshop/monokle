@@ -2,6 +2,8 @@ import {useCallback} from 'react';
 
 import {Button, Checkbox, Col} from 'antd';
 
+import {ComparisonItemProps, HeaderItemProps} from '@models/compare';
+
 import {
   CompareSide,
   comparisonInspecting,
@@ -13,9 +15,8 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from './ComparisonList.styled';
-import {ComparisonItemProps, HeaderItemProps} from './types';
 
-export const ComparisonList: React.FC = () => {
+const ComparisonList: React.FC = () => {
   const items = useAppSelector(state => selectComparisonListItems(state.compare));
 
   return (
@@ -123,3 +124,5 @@ function ComparisonItem({
     </S.ComparisonRow>
   );
 }
+
+export default ComparisonList;

@@ -32,7 +32,7 @@ type Props = {
   showCheckbox?: boolean;
 };
 
-export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
+const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
     const groups = groupBy(data.resources, r => r.kind);
 
@@ -105,3 +105,5 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
     </S.ResourceListDiv>
   );
 };
+
+export default ResourceList;
