@@ -11,6 +11,7 @@ import ValidationPane from '@organisms/ValidationPane';
 import {ActivityType, Icon} from '@monokle/components';
 
 import CompareSyncPane from '../CompareSyncPane';
+import {SettingsPane} from '../SettingsPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
@@ -62,7 +63,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'settings',
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
-    component: <div />,
+    component: <SettingsPane />,
     useBadge: () => undefined,
   },
 ];
