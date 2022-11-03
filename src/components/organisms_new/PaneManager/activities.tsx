@@ -4,9 +4,8 @@ import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/ui'
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, FileTreePane, GitPane, SearchPane} from '@organisms';
+import {BottomPaneManager, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
-import ValidationPane from '@organisms/ValidationPane';
 
 import {ActivityType, Icon} from '@monokle/components';
 
@@ -28,7 +27,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     useBadge: () => undefined,
   },
   {
-    type: 'fullscreen',
+    type: 'panel',
     name: 'validation',
     tooltip: <ValidationTabTooltip />,
     icon: () => <Icon name="validation" style={{fontSize: 16}} />,

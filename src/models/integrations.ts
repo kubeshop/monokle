@@ -1,7 +1,7 @@
 import {IconNames} from './icons';
 
 export type ValidationIntegrationId =
-  | 'k8s-schema'
+  | 'kubernetes-schema'
   | 'open-policy-agent'
   | 'resource-links'
   | 'yaml-syntax'
@@ -17,7 +17,7 @@ export type ValidationIntegration = {
 };
 
 export const K8S_SCHEMA_INTEGRATION: ValidationIntegration = {
-  id: 'k8s-schema',
+  id: 'kubernetes-schema',
   icon: 'k8s-schema',
   name: 'Kubernetes Schema',
   description:

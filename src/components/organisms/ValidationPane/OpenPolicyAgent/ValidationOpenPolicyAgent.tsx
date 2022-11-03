@@ -5,6 +5,8 @@ import {OPA_INTEGRATION} from '@models/integrations';
 
 import {useAppDispatch} from '@redux/hooks';
 import {reprocessAllResources, toggleAllRules} from '@redux/reducers/main';
+import {toggleOPARules} from '@redux/validation/validation.slice';
+import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {Button} from '@src/App.styled';
 
@@ -25,6 +27,9 @@ const ValidationOpenPolicyAgent: React.FC<IProps> = ({height}) => {
     (enable: boolean) => {
       dispatch(toggleAllRules(enable));
       dispatch(reprocessAllResources());
+
+      dispatch(toggleOPARules({enable}));
+      dispatch(loadValidation());
     },
     [dispatch]
   );
