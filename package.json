@@ -266,6 +266,13 @@
             "x64",
             "arm64"
           ]
+        },
+        {
+          "target": "flatpak",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "icon": "build/icon.png",
@@ -282,6 +289,9 @@
     "deb": {
       "packageCategory": "Kubeshop",
       "priority": "standard"
+    },
+    "flatpak": {
+
     },
     "extends": null,
     "files": [
