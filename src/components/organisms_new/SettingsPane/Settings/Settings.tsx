@@ -103,6 +103,7 @@ export const Settings = ({
   useEffect(() => {
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
+    setSelectedK8SVersion(String(config?.k8sVersion));
     dispatch(openKubeConfigBrowseSetting());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
