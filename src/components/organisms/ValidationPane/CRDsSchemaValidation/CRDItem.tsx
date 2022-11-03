@@ -9,9 +9,7 @@ import {NewResourceWizardInput} from '@models/ui';
 import {useAppDispatch} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
-import {ContextMenu} from '@molecules';
-
-import {Dots} from '@atoms';
+import {ContextMenu, Dots} from '@atoms';
 
 import * as S from './CRDItem.styled';
 

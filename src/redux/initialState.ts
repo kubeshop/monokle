@@ -6,7 +6,6 @@ import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
 import {ExtensionState} from '@models/extension';
-import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
 import {TerminalState} from '@models/terminal';
 import {PaneConfiguration, UiState} from '@models/ui';
@@ -39,13 +38,6 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs',
       false
     ),
-  },
-  clusterDiff: {
-    clusterToLocalResourcesMatches: [],
-    hasLoaded: false,
-    hasFailed: false,
-    hideClusterOnlyResources: true,
-    selectedMatches: [],
   },
   policies: {
     plugins: [],
@@ -126,10 +118,6 @@ const initialAppConfigState: AppConfig = {
 
 const initialAlertState: AlertState = {};
 
-const initialLogsState: LogsState = {
-  logs: [''],
-};
-
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
@@ -151,7 +139,6 @@ const initialUiState: UiState = {
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
   isScaleModalOpen: false,
-  isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
@@ -268,7 +255,6 @@ export default {
   alert: initialAlertState,
   config: initialAppConfigState,
   extension: initialExtensionState,
-  logs: initialLogsState,
   main: initialAppState,
   navigator: initialNavigatorState,
   terminal: initialTerminalState,

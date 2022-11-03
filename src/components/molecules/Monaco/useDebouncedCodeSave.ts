@@ -1,12 +1,13 @@
 import {monaco} from 'react-monaco-editor';
 import {useDebounce} from 'react-use';
 
+import log from 'loglevel';
+
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 
 import {useAppDispatch} from '@redux/hooks';
-import {logMessage} from '@redux/services/log';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
@@ -37,14 +38,14 @@ function useDebouncedCodeSave(
 
         setOrgCode(value);
       } catch (e) {
-        logMessage(`Failed to update file ${e}`, dispatch);
+        log.warn(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResourceId && resourceMap[selectedResourceId]) {
       try {
         dispatch(updateResource({resourceId: selectedResourceId, text: value.toString()}));
         setOrgCode(value);
       } catch (e) {
-        logMessage(`Failed to update resource ${e}`, dispatch);
+        log.warn(`Failed to update resource ${e}`, dispatch);
       }
     }
   };

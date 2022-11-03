@@ -1,6 +1,8 @@
 import React from 'react';
 
-import {SectionRenderer, TitleBar} from '@molecules';
+import {SectionRenderer} from '@molecules';
+
+import {TitleBar} from '@atoms';
 
 import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 

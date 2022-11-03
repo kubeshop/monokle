@@ -30,11 +30,11 @@ import {
   kubeConfigPathSelector,
   settingsSelector,
 } from '@redux/selectors';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
-import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -69,7 +69,6 @@ const ActionsPane: React.FC = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -300,7 +299,6 @@ const ActionsPane: React.FC = () => {
             {isFolderLoading || previewLoader.isLoading ? (
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
-              !isClusterDiffVisible &&
               (selectedResourceId || selectedPath || selectedValuesFileId) && (
                 <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
               )
@@ -366,7 +364,6 @@ const ActionsPane: React.FC = () => {
       activeTabKey,
       applySelection,
       diffSelectedResource,
-      isClusterDiffVisible,
       isFolderLoading,
       isKustomization,
       isPreviewResourceId,
@@ -395,7 +392,7 @@ const ActionsPane: React.FC = () => {
         <PreviewConfigurationDetails />
       ) : selectedImage ? (
         <ImageDetails />
-      ) : !isClusterDiffVisible && (selectedResourceId || selectedPath || selectedValuesFileId) ? (
+      ) : selectedResourceId || selectedPath || selectedValuesFileId ? (
         <S.Tabs
           $height={height - DEFAULT_PANE_TITLE_HEIGHT}
           defaultActiveKey="source"

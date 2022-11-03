@@ -40,11 +40,6 @@ export const updateMultipleResources = createAsyncThunk(
           mainState.resourceRefsProcessingOptions,
           {policyPlugins: mainState.policies.plugins}
         );
-
-        // relaod cluster diff if that's where we are
-        if (state.ui.isClusterDiffVisible) {
-          mainState.clusterDiff.shouldReload = true;
-        }
       } catch (e) {
         log.error(e);
         return original(mainState);

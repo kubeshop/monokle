@@ -15,7 +15,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
-import {FilePatternList} from '@molecules';
+import {FilePatternList} from '@atoms';
 
 import {runCommandInMainThread} from '@utils/commands';
 
