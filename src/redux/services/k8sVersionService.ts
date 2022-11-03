@@ -16,7 +16,3 @@ export const downloadSchema = async (url: string, path: string) => {
     log.error(error.message);
   }
 };
-
-export const schemaExists = (path: string) => {
-  return existsSync(path);
-};

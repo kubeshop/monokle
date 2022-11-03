@@ -9,7 +9,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {stringify} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {AlertEnum, AlertType} from '@models/alert';
@@ -121,11 +121,7 @@ const ClusterResourceDiffModal = () => {
     return Object.fromEntries(
       Object.entries(resourceMap).filter(entry => {
         const value = entry[1];
-        return (
-          !value.filePath.startsWith(PREVIEW_PREFIX) &&
-          !value.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-          value.name === targetResource.name
-        );
+        return !value.filePath.startsWith(PREVIEW_PREFIX) && value.name === targetResource.name;
       })
     );
   }, [isDiffModalVisible, resourceMap, targetResource]);

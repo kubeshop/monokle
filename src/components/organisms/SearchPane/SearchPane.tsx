@@ -30,7 +30,7 @@ import {
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';

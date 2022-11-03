@@ -35,25 +35,17 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {
-  GitCloneModal,
-  HotKeysHandler,
-  LazyDrawer,
-  MessageBox,
-  NewPaneManager,
-  PageHeader,
-  PaneManager,
-  UpdateNotice,
-} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
+
+import {PaneManager} from '@components/organisms_new';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
-import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -66,7 +58,6 @@ import AppContext from './AppContext';
 
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
-const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
@@ -94,7 +85,6 @@ const App = () => {
   const [appVersion, setAppVersion] = useState<string>();
 
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-  const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
 
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
@@ -401,10 +391,7 @@ const App = () => {
         <MessageBox />
         <S.MainContainer>
           <PageHeader />
-
-          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
-            <NewPaneManager />
-          </FeatureFlag>
+          <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
@@ -448,7 +435,6 @@ const App = () => {
         <Suspense fallback={null}>
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
-          {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}

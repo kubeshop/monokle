@@ -4,13 +4,11 @@ import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@models/ui'
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, FileTreePane, GitPane} from '@organisms';
+import {BottomPaneManager, FileTreePane, GitPane, SearchPane} from '@organisms';
+import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 import ValidationPane from '@organisms/ValidationPane';
 
 import {ActivityType, Icon} from '@monokle/components';
-
-import {SettingsOutlined} from '../PageHeader/HelpMenu.styled';
-import SearchPane from '../SearchPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {

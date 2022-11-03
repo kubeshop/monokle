@@ -1,4 +1,6 @@
-import {SectionRenderer, TitleBar} from '@molecules';
+import {SectionRenderer} from '@molecules';
+
+import {TitleBar} from '@atoms';
 
 import ImagesSectionBlueprint from '@src/navsections/ImagesSectionBlueprint';
 

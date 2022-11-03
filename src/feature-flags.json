@@ -5,6 +5,5 @@
   "ImagesPane": true,
   "CompareEverything": true,
   "Terminal": true,
-  "GitOps": true,
-  "TwoZero": false
+  "GitOps": true
 }
