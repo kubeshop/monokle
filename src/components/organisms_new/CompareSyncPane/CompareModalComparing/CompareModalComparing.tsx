@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {ComparisonInspection} from './ComparisonInspection';
-import {ComparisonList} from './ComparisonList';
+import ComparisonInspection from '../ComparisonInspection';
+import ComparisonList from '../ComparisonList';
 
 const CompareModalComparing: React.FC = () => {
   const isComparing = useAppSelector(

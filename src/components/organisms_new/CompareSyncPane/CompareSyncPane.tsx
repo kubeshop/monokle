@@ -9,6 +9,7 @@ import {TitleBar} from '@monokle/components';
 
 import {ResourceSetSelector} from '../ResourceSetSelector';
 import CompareActionBar from './CompareActionBar';
+import CompareModalComparing from './CompareModalComparing';
 import CompareModalSelecting from './CompareModalSelecting';
 import * as S from './CompareSyncPane.styled';
 import InspectionActionBar from './InspectionActionBar';
@@ -33,7 +34,9 @@ const CompareSyncPane: React.FC = () => {
         </Col>
       </Row>
 
-      <S.Content>{status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}</S.Content>
+      <S.Content style={{height: `calc(100% - ${height}px - 97px)`}}>
+        {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
+      </S.Content>
     </S.CompareSyncPaneContainer>
   );
 };
