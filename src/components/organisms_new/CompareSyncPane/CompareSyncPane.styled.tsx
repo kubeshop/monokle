@@ -1,6 +1,13 @@
+import {Row} from 'antd';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
+
+export const ActionsRow = styled(Row)`
+  margin-top: 20px;
+  align-items: center;
+`;
 
 export const CompareSyncPaneContainer = styled.div`
   padding: 10px;

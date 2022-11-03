@@ -13,6 +13,7 @@ import CompareModalComparing from './CompareModalComparing';
 import CompareModalSelecting from './CompareModalSelecting';
 import * as S from './CompareSyncPane.styled';
 import InspectionActionBar from './InspectionActionBar';
+import TransferButton from './TransferButton';
 
 const CompareSyncPane: React.FC = () => {
   const isInspecting = useAppSelector(state => state.compare.current.inspect);
@@ -24,7 +25,7 @@ const CompareSyncPane: React.FC = () => {
     <S.CompareSyncPaneContainer>
       <TitleBar title="Sync & compare" description={isInspecting ? <InspectionActionBar /> : <CompareActionBar />} />
 
-      <Row ref={containerRef}>
+      <Row ref={containerRef} style={{margin: '5px 0px'}}>
         <Col span={10}>
           <ResourceSetSelector side="left" />
         </Col>
@@ -34,9 +35,19 @@ const CompareSyncPane: React.FC = () => {
         </Col>
       </Row>
 
-      <S.Content style={{height: `calc(100% - ${height}px - 97px)`}}>
+      <S.Content style={{height: `calc(100% - ${height}px - 100px - 60px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.Content>
+
+      <S.ActionsRow>
+        <Col span={10}>
+          <TransferButton side="left" />
+        </Col>
+        <Col span={4} />
+        <Col span={10}>
+          <TransferButton side="right" />
+        </Col>
+      </S.ActionsRow>
     </S.CompareSyncPaneContainer>
   );
 };

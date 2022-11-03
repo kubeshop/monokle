@@ -8,14 +8,13 @@ import Colors, {FontColors} from '@styles/Colors';
 
 export const HeaderRow = styled(Row)`
   height: 34px;
-  margin-left: 8px;
   font-size: 16px;
+  margin-top: 10px;
 `;
 
 export const Title = styled.h1<{useCheckboxOffset?: boolean}>`
   padding: 0;
   margin-top: 8px;
-  margin-left: ${props => (props.useCheckboxOffset ? '32px' : 0)};
   margin-bottom: 0px;
   font-size: 18px;
   line-height: 22px;
@@ -23,7 +22,6 @@ export const Title = styled.h1<{useCheckboxOffset?: boolean}>`
 
 export const ComparisonRow = styled(Row)`
   height: 28px;
-  margin-left: 8px;
   font-size: 16px;
   transition: background-color 0.5s;
   padding: 0px 5px;
