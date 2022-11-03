@@ -6,6 +6,7 @@ import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {
   ActionsPane,
   BottomPaneManager,
+  GettingStarted,
   GitOpsView,
   NavigatorPane,
   RecentProjectsPage,
@@ -90,7 +91,7 @@ const NewPaneManager: React.FC = () => {
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={!['git', 'validation'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : undefined}
+                  center={!['git', 'validation'].includes(currentActivity?.name ?? '') ? <NavigatorPane />  : <GettingStarted />}
                   right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                   width={width}

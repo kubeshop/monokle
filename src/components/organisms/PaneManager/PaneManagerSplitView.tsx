@@ -21,7 +21,7 @@ const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
-const GettingStarted = React.lazy(() => import('@organisms/GettingStarted'));
+const GettingStarted = React.lazy(() => import('@organismsNew/GettingStarted'));
 const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 
 const PaneManagerSplitView: React.FC = () => {
