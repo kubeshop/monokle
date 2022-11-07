@@ -131,7 +131,7 @@
     "luxon": "2.5.0",
     "micromatch": "4.0.5",
     "module-alias": "2.2.2",
-    "monaco-editor": "0.28.1",
+    "monaco-editor": "0.34.1",
     "monaco-yaml": "3.2.1",
     "new-github-issue-url": "1.0.0",
     "node-fetch": "2.6.7",
