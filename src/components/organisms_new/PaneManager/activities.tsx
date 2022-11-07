@@ -5,9 +5,9 @@ import {useAppSelector} from '@redux/hooks';
 import {BottomPaneManager, FileTreePane, GettingStarted, GitPane, SearchPane, ValidationPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
+import {Icon as OldIcon} from '@atoms';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {ActivityType, Icon} from '@monokle/components';
-
 import CompareSyncPane from '../CompareSyncPane';
 import {SettingsPane} from '../SettingsPane';
 
@@ -68,7 +68,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     type: 'fullscreen',
     name: 'getting-started',
     tooltip: <GettingStartedPageTooltip />,
-    icon: () => <Icon name="git-ops" style={{fontSize: 16}} />, // to changeit later
+    icon: () => <OldIcon name="getting-started" style={{fontSize: 16}} />, // to changeit later
     component: <GettingStarted />,
     useBadge: () => undefined,
   },

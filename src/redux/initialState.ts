@@ -56,6 +56,7 @@ const initialAppState: AppState = {
   filtersPresets: electronStore.get('main.filtersPresets') || {},
   imagesList: [],
   validationIntegration: undefined,
+  feature: undefined,
   autosaving: {},
   search: {
     searchQuery: '',

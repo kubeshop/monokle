@@ -1,4 +1,5 @@
 import {AlertType} from './alert';
+import {Feature} from './features';
 import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
@@ -99,6 +100,7 @@ type AppState = {
   filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
   validationIntegration: ValidationIntegration | undefined;
+  feature: Feature | undefined;
   autosaving: {
     status?: boolean;
     error?: {
