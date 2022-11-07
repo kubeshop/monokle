@@ -25,3 +25,12 @@ export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
   padding-right: 5px;
   color: ${Colors.blue6};
 `;
+
+export const PluginsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const PluginColumnContainer = styled.div`
+  width: 45%;
+`;

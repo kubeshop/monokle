@@ -6,6 +6,15 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
+export const SettingsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const SettingsColumnContainer = styled.div`
+  width: 45%;
+`;
+
 export const Div = styled.div`
   margin-bottom: 20px;
 `;

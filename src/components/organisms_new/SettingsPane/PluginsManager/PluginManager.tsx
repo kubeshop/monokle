@@ -6,6 +6,8 @@ import {Button, Skeleton, Tooltip, Typography} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import _ from 'lodash';
+
 import {DEFAULT_TEMPLATES_PLUGIN_URL, PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
@@ -30,6 +32,10 @@ export const PluginManager: React.FC = () => {
   const sortedPluginEntries = useMemo(() => {
     return Object.entries(pluginMap).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [pluginMap]);
+
+  const chunckedSortedPluginEntries = useMemo(() => {
+    return _.chunk(sortedPluginEntries, Math.ceil(sortedPluginEntries.length / 2));
+  }, [sortedPluginEntries]);
 
   const onClickReload = useCallback(
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
@@ -94,11 +100,30 @@ export const PluginManager: React.FC = () => {
           </>
         ) : (
           <>
-            {sortedPluginEntries.length > 0 &&
-              sortedPluginEntries.map(([path, activePlugin]) => (
-                <PluginInformation key={activePlugin.name} plugin={activePlugin} pluginPath={path} />
-              ))}
-            {!sortedPluginEntries.length && <S.NotFoundLabel>No plugins found.</S.NotFoundLabel>}
+            {sortedPluginEntries.length > 0 ? (
+              <S.PluginsContainer>
+                {chunckedSortedPluginEntries[0] ? (
+                  chunckedSortedPluginEntries[0].map(([path, activePlugin]: any) => (
+                    <S.PluginColumnContainer key={activePlugin.name}>
+                      <PluginInformation plugin={activePlugin} pluginPath={path} />
+                    </S.PluginColumnContainer>
+                  ))
+                ) : (
+                  <S.PluginColumnContainer />
+                )}
+                {chunckedSortedPluginEntries[1] ? (
+                  chunckedSortedPluginEntries[1].map(([path, activePlugin]: any) => (
+                    <S.PluginColumnContainer key={activePlugin.name}>
+                      <PluginInformation plugin={activePlugin} pluginPath={path} />
+                    </S.PluginColumnContainer>
+                  ))
+                ) : (
+                  <S.PluginColumnContainer />
+                )}
+              </S.PluginsContainer>
+            ) : (
+              <S.NotFoundLabel>No plugins found.</S.NotFoundLabel>
+            )}
           </>
         )}
       </S.Container>

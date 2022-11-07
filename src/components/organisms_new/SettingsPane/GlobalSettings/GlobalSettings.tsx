@@ -80,72 +80,76 @@ export const GlobalSettings = () => {
   );
 
   return (
-    <>
-      <Form
-        form={settingsForm}
-        initialValues={() => ({projectsRootPath})}
-        autoComplete="off"
-        onFieldsChange={(field: any, allFields: any) => {
-          const rootPath = allFields.filter((f: any) => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
-          setCurrentProjectsRootPath(rootPath);
-        }}
-      >
-        <>
-          <S.Heading>Projects Root Path</S.Heading>
-          <Form.Item required tooltip="The local path where your projects will live.">
-            <Input.Group compact>
-              <Form.Item
-                name="projectsRootPath"
-                noStyle
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please provide your projects root path!',
-                  },
-                ]}
-              >
-                <Input style={{width: 'calc(100% - 100px)'}} />
-              </Form.Item>
-              <Button style={{width: '100px'}} onClick={openFileExplorer}>
-                Browse
-              </Button>
-            </Input.Group>
-          </Form.Item>
-        </>
-      </Form>
-      <S.Div>
-        <S.Span>On Startup</S.Span>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
-          <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
-            Automatically load last project
-          </Checkbox>
-        </Tooltip>
-      </S.Div>
-      <S.Div style={{marginTop: 16}}>
-        <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
-          Show Cluster Selector
-        </Checkbox>
-      </S.Div>
-      <S.Div>
-        <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
-        <S.TelemetryInfo>
-          <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
-          <S.TelemetryReadMoreLink onClick={() => openUrlInExternalBrowser(TelemetryDocumentationUrl)}>
-            Read more about it in our documentation.
-          </S.TelemetryReadMoreLink>
-        </S.TelemetryInfo>
-        <S.Div style={{marginBottom: '8px'}}>
-          <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-            Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
-          </Checkbox>
-        </S.Div>
+    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+      <div style={{width: '45%'}}>
+        <Form
+          form={settingsForm}
+          initialValues={() => ({projectsRootPath})}
+          autoComplete="off"
+          onFieldsChange={(field: any, allFields: any) => {
+            const rootPath = allFields.filter((f: any) => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
+            setCurrentProjectsRootPath(rootPath);
+          }}
+        >
+          <>
+            <S.Heading>Projects Root Path</S.Heading>
+            <Form.Item required tooltip="The local path where your projects will live.">
+              <Input.Group compact>
+                <Form.Item
+                  name="projectsRootPath"
+                  noStyle
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please provide your projects root path!',
+                    },
+                  ]}
+                >
+                  <Input style={{width: 'calc(100% - 100px)'}} />
+                </Form.Item>
+                <Button style={{width: '100px'}} onClick={openFileExplorer}>
+                  Browse
+                </Button>
+              </Input.Group>
+            </Form.Item>
+          </>
+        </Form>
         <S.Div>
-          <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-            Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+          <S.Span>On Startup</S.Span>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
+            <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
+              Automatically load last project
+            </Checkbox>
+          </Tooltip>
+        </S.Div>
+        <S.Div style={{marginTop: 16}}>
+          <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
+            Show Cluster Selector
           </Checkbox>
         </S.Div>
-      </S.Div>
+      </div>
+      <div style={{width: '45%'}}>
+        <S.Div>
+          <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
+          <S.TelemetryInfo>
+            <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
+            <S.TelemetryReadMoreLink onClick={() => openUrlInExternalBrowser(TelemetryDocumentationUrl)}>
+              Read more about it in our documentation.
+            </S.TelemetryReadMoreLink>
+          </S.TelemetryInfo>
+          <S.Div style={{marginBottom: '8px'}}>
+            <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+              Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
+            </Checkbox>
+          </S.Div>
+          <S.Div>
+            <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+              Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+            </Checkbox>
+          </S.Div>
+        </S.Div>
+      </div>
       <FileExplorer {...fileExplorerProps} />
-    </>
+    </div>
   );
 };

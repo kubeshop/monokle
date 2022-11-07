@@ -1,4 +1,9 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
+
+import {StepEnum} from '@models/walkthrough';
+
+import {useAppDispatch} from '@redux/hooks';
+import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
 
 import {TabHeader} from '@atoms';
 
@@ -21,10 +26,6 @@ import * as S from './SettingsPane.styled';
 export const SettingsPane = () => {
   const height = usePaneHeight();
   const [activeTabKey, setActiveTabKey] = useState('validation');
-
-  useEffect(() => {
-    console.log('height', height);
-  }, [height]);
 
   const tabItems = useMemo(
     () => [
@@ -97,6 +98,7 @@ export const SettingsPane = () => {
 };
 
 export const TitleCardDescription = () => {
+  const dispatch = useAppDispatch();
   const [selectedLayout, setSelectedLayout] = useState('EDITOR');
   const [selectedTheme, setSelectedTheme] = useState('DARK');
 
@@ -108,7 +110,14 @@ export const TitleCardDescription = () => {
           <S.WalkThroughTitle>Walking you through Monokle</S.WalkThroughTitle>
           <S.WalkThroughContent>
             Let us show you where to start, whereas is to explore, edit, validate or publish your k8s resources.
-            <S.WalkThroughAction>Go &rarr;</S.WalkThroughAction>
+            <S.WalkThroughAction
+              onClick={() => {
+                dispatch(cancelWalkthrough('novice'));
+                dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
+              }}
+            >
+              Go &rarr;
+            </S.WalkThroughAction>
           </S.WalkThroughContent>
         </div>
       </S.WalkThroughContainer>
