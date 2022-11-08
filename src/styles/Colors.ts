@@ -78,6 +78,7 @@ enum Colors {
   blue8 = '#65B7F3',
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
+  blue11 = '#164c7e',
   geekblue4 = '#203175',
   geekblue6 = '#2B4ACB',
   geekblue7 = '#5273E0',
