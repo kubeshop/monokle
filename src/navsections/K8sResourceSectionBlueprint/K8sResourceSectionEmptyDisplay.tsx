@@ -7,7 +7,7 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
@@ -61,7 +61,7 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    dispatch(toggleSettings());
+    // dispatch(toggleSettings());
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);

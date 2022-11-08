@@ -239,7 +239,6 @@ const initialExtensionState: ExtensionState = {
   pluginMap: {},
   templateMap: {},
   templatePackMap: {},
-  isPluginsDrawerVisible: false,
 };
 
 const initialTerminalState: TerminalState = {

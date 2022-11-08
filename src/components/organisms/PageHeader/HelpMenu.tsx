@@ -7,19 +7,17 @@ import {Tooltip} from 'antd';
 import semver from 'semver';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
+import {FeedbackTooltip} from '@constants/tooltips';
 
 import {StepEnum} from '@models/walkthrough';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
   cancelWalkthrough,
   handleWalkthroughStep,
   openAboutModal,
   openKeyboardShortcutsModal,
   openReleaseNotesDrawer,
-  toggleSettings,
 } from '@redux/reducers/ui';
 
 import {useAppVersion} from '@hooks/useAppVersion';
@@ -48,14 +46,6 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
     dispatch(openKeyboardShortcutsModal());
   };
 
-  const toggleSettingsDrawer = () => {
-    dispatch(toggleSettings());
-  };
-
-  const showPluginsDrawer = () => {
-    dispatch(openPluginsDrawer());
-  };
-
   const handleMenuClose = () => {
     if (onMenuClose) {
       onMenuClose();
@@ -64,34 +54,6 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
 
   return (
     <S.MenuContainer id="menu-helpers">
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-        <S.MenuItem
-          onClick={() => {
-            toggleSettingsDrawer();
-            handleMenuClose();
-          }}
-        >
-          <S.MenuItemIcon>
-            <S.SettingsOutlined />
-          </S.MenuItemIcon>
-          <S.MenuItemLabel>Settings</S.MenuItemLabel>
-        </S.MenuItem>
-      </Tooltip>
-
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-        <S.MenuItem
-          onClick={() => {
-            showPluginsDrawer();
-            handleMenuClose();
-          }}
-        >
-          <S.MenuItemIcon>
-            <S.ApiOutlined />
-          </S.MenuItemIcon>
-          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
-        </S.MenuItem>
-      </Tooltip>
-
       <S.MenuItem style={{borderBottom: 'none'}}>
         <S.MenuItemIcon>
           <S.QuestionCircleOutlined />

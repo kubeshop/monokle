@@ -16,7 +16,6 @@ import {
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
-  toggleSettings,
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {
@@ -95,7 +94,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
-    dispatch(toggleSettings());
+    // dispatch(toggleSettings());
   });
 
   const applySelection = useCallback(() => {
