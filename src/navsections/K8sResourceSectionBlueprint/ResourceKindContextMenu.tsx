@@ -39,9 +39,9 @@ import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {applyResource} from '@redux/thunks/applyResource';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import {ContextMenu, ModalConfirmWithNamespaceSelect} from '@molecules';
+import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
-import {Dots} from '@atoms';
+import {ContextMenu, Dots} from '@atoms';
 
 import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 

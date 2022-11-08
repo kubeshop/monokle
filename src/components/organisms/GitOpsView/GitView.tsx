@@ -5,7 +5,7 @@ import {isEmpty} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@components/molecules';
+import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 

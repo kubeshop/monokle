@@ -1,6 +1,8 @@
 import React from 'react';
 
-import {SectionRenderer, TitleBar} from '@molecules';
+import {SectionRenderer} from '@molecules';
+
+import {TitleBar} from '@atoms';
 
 import KustomizationSectionBlueprint from '@src/navsections/KustomizationSectionBlueprint';
 import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';

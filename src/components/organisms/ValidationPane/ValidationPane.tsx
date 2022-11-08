@@ -4,7 +4,7 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
