@@ -58,7 +58,7 @@ export const Header = styled(Layout.Header)`
   min-height: 48px;
   z-index: 1;
   height: 30px;
-  padding: 0 10px;
+  padding: 0 10px 0px 0px;
   margin: 0;
   display: flex;
   align-items: center;
@@ -76,9 +76,15 @@ export const InitButton = styled(RawButton)`
 `;
 
 export const Logo = styled.img`
-  height: 45px;
+  height: 25px;
   cursor: pointer;
-  margin-left: -12px;
+`;
+
+export const LogoContainer = styled.div`
+  height: 100%;
+  width: 50px;
+  display: flex;
+  justify-content: center;
 `;
 
 export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType; $kubeConfigContextColor?: ClusterColors}>`
