@@ -21,7 +21,7 @@ import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/serv
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {Icon, TitleBar} from '@atoms';
+import {Icon} from '@atoms';
 
 import {
   useCreate,
@@ -35,6 +35,8 @@ import {
   useRename,
 } from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
+
+import {TitleBar} from '@monokle/components';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -209,10 +211,11 @@ const FileTreePane: React.FC = () => {
   return (
     <S.FileTreeContainer id="FileExplorer">
       <TitleBar
-        title="File Explorer"
-        closable
-        leftButtons={
-          <>
+        expandable
+        isOpen
+        title="Files"
+        actions={
+          <S.TitleBarActions>
             {isScanExcludesUpdated === 'outdated' && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
                 <ExclamationCircleOutlined />
@@ -236,7 +239,15 @@ const FileTreePane: React.FC = () => {
                 disabled={isButtonDisabled}
               />
             </Tooltip>
-          </>
+          </S.TitleBarActions>
+        }
+        description={
+          <S.RootFolderText>
+            <span id="file-explorer-count">
+              <b>{filesOnly.length || 0} files</b>
+            </span>{' '}
+            in <span id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</span>
+          </S.RootFolderText>
         }
       />
 
@@ -244,10 +255,6 @@ const FileTreePane: React.FC = () => {
         <S.Skeleton active />
       ) : tree ? (
         <S.TreeContainer>
-          <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
-            <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
-            {tree && <div id="file-explorer-count">{filesOnly.length} files</div>}
-          </S.RootFolderText>
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onFileSelect}
