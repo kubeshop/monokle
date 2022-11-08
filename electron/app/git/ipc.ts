@@ -1,6 +1,6 @@
 import {ipcMain} from 'electron';
 
-import {FileMapType} from '@models/appstate';
+import type {FileMapType} from '@models/appstate';
 
 import {
   areFoldersGitRepos,
