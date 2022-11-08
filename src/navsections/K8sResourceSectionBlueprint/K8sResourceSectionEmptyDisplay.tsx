@@ -7,9 +7,11 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, setLeftMenuSelection} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, setActiveSettingsPanel, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
+
+import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 import Colors from '@styles/Colors';
 
@@ -46,7 +48,8 @@ function K8sResourceSectionEmptyDisplay() {
 
     setTimeout(() => {
       if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        dispatch(setLeftMenuSelection('templates-pane'));
+        dispatch(setActiveSettingsPanel(SettingsPanel.Plugins));
+        dispatch(setLeftMenuSelection('settings'));
       } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
         dispatch(openNewResourceWizard());
       } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
@@ -61,7 +64,7 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    // dispatch(toggleSettings());
+    dispatch(setLeftMenuSelection('settings'));
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
