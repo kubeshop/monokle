@@ -2,10 +2,14 @@ import {shell} from 'electron';
 
 import {useCallback} from 'react';
 
+import {Switch} from 'antd';
+
 import {ValidationIntegration} from '@models/integrations';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
+import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
+import {toggleValidation} from '@redux/validation/validation.slice';
 
 import {trackEvent} from '@utils/telemetry';
 
@@ -19,6 +23,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
   const {id, icon, name, description, learnMoreUrl} = integration;
 
   const dispatch = useAppDispatch();
+  const isEnabled = useAppSelector(state => pluginEnabledSelector(state, id));
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
@@ -27,9 +32,17 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
     dispatch(updateValidationIntegration(integration));
   };
 
+  const toggleEnabled = useCallback(() => {
+    dispatch(toggleValidation(id));
+  }, [dispatch, id]);
+
   return (
     <S.Card key={id}>
-      <S.Icon name={icon} key={icon} />
+      <S.ToggleContainer>
+        <S.Icon name={icon} key={icon} />
+        <Switch checked={isEnabled} size="small" onChange={toggleEnabled} />
+      </S.ToggleContainer>
+
       <S.Name>{name}</S.Name>
       <span>
         <S.Description>{description}</S.Description>
