@@ -25,7 +25,7 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {SettingsPanel} from '@organisms/SettingsManager/types';
+import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 import electronStore from '@utils/electronStore';
 

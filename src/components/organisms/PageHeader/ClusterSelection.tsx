@@ -14,7 +14,7 @@ import {HighlightItems} from '@models/ui';
 import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightItem, toggleStartProjectPane} from '@redux/reducers/ui';
+import {highlightItem, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   currentClusterAccessSelector,
@@ -69,7 +69,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    // dispatch(toggleSettings());
+    dispatch(setLeftMenuSelection('settings'));
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);

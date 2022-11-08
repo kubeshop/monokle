@@ -1,8 +1,8 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {StepEnum} from '@models/walkthrough';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
 
 import {TabHeader} from '@atoms';
@@ -22,21 +22,34 @@ import {DefaultProjectSettings} from './DefaultProjectSettings/DefaultProjectSet
 import {GlobalSettings} from './GlobalSettings/GlobalSettings';
 import {PluginManager} from './PluginsManager/PluginManager';
 import * as S from './SettingsPane.styled';
+import {SettingsPanel} from './types';
 
 export const SettingsPane = () => {
   const height = usePaneHeight();
-  const [activeTabKey, setActiveTabKey] = useState('validation');
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const activeSettingsPanel = useAppSelector(state => state.ui.activeSettingsPanel);
+
+  const [activeTab, setActiveTab] = useState<string>(
+    activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
+  );
+
+  useEffect(() => {
+    if (highlightedItems.clusterPaneIcon) {
+      setActiveTab(SettingsPanel.ActiveProjectSettings);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightedItems.clusterPaneIcon]);
 
   const tabItems = useMemo(
     () => [
       {
-        key: 'validation',
+        key: SettingsPanel.Validations,
         label: <TabHeader>Validation</TabHeader>,
         children: <S.TabItemContainer>Validation</S.TabItemContainer>,
         style: {height: '100%'},
       },
       {
-        key: 'plugins-manager',
+        key: SettingsPanel.Plugins,
         label: <TabHeader>Plugins Manager</TabHeader>,
         children: (
           <S.TabItemContainer>
@@ -46,7 +59,7 @@ export const SettingsPane = () => {
         style: {height: '100%'},
       },
       {
-        key: 'current-project-settings',
+        key: SettingsPanel.ActiveProjectSettings,
         label: <TabHeader>Current project settings</TabHeader>,
         children: (
           <S.TabItemContainer>
@@ -56,7 +69,7 @@ export const SettingsPane = () => {
         style: {height: '100%'},
       },
       {
-        key: 'default-project-settings',
+        key: SettingsPanel.DefaultProjectSettings,
         label: <TabHeader>Default project settings</TabHeader>,
         children: (
           <S.TabItemContainer>
@@ -66,7 +79,7 @@ export const SettingsPane = () => {
         style: {height: '100%'},
       },
       {
-        key: 'global-settings',
+        key: SettingsPanel.GlobalSettings,
         label: <TabHeader>Global settings</TabHeader>,
         children: (
           <S.TabItemContainer>
@@ -88,9 +101,9 @@ export const SettingsPane = () => {
         <S.Tabs
           $height={height - 160}
           defaultActiveKey="source"
-          activeKey={activeTabKey}
+          activeKey={activeTab}
           items={tabItems}
-          onChange={(k: string) => setActiveTabKey(k)}
+          onChange={(k: string) => setActiveTab(k)}
         />
       </div>
     </S.SettingsPaneContainer>

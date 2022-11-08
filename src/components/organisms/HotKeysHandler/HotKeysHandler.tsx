@@ -12,6 +12,7 @@ import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   openScaleModal,
+  setActiveSettingsPanel,
   setActiveTab,
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
@@ -37,6 +38,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import FileExplorer from '@atoms/FileExplorer';
+
+import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -94,7 +97,8 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
-    // dispatch(toggleSettings());
+    dispatch(setActiveSettingsPanel(SettingsPanel.ActiveProjectSettings));
+    dispatch(setLeftMenuSelection('settings'));
   });
 
   const applySelection = useCallback(() => {

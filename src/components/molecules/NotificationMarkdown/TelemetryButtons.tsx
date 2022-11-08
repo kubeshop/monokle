@@ -1,8 +1,10 @@
 import {notification} from 'antd';
 
 import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/reducers/appConfig';
-import {toggleNotifications} from '@redux/reducers/ui';
+import {setActiveSettingsPanel, setLeftMenuSelection, toggleNotifications} from '@redux/reducers/ui';
 import store from '@redux/store';
+
+import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 import * as S from './styled';
 
@@ -26,8 +28,11 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
   const handleNotOk = () => {
     disableTelemetryNotification();
 
-    // store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
-    // store.dispatch(toggleSettings());
+    /* 
+    Will not open any where since SettingsPanel is available after opening a project
+    store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
+    store.dispatch(setLeftMenuSelection('settings'));
+    */
     store.dispatch(toggleNotifications());
     store.dispatch(toggleEventTracking(false));
     store.dispatch(toggleErrorReporting(false));

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {SettingsPanel} from '@organisms/SettingsManager/types';
+import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
