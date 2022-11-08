@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setPaneConfiguration} from '@redux/reducers/ui';
+import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import {
@@ -18,7 +18,7 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
 import * as S from './PaneManager.styled';
-import NewPaneManagerLeftMenu from './PaneManagerLeftMenu';
+import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';
 
 const NewPaneManager: React.FC = () => {
@@ -80,7 +80,7 @@ const NewPaneManager: React.FC = () => {
         <S.Skeleton />
       ) : activeProject && !isStartProjectPaneVisible ? (
         <>
-          <NewPaneManagerLeftMenu />
+          <PaneManagerLeftMenu />
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
@@ -95,6 +95,8 @@ const NewPaneManager: React.FC = () => {
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                   width={width}
                   onStopResize={handleColumnResize}
+                  leftClosable
+                  onCloseLeftPane={() => dispatch(toggleLeftMenu())}
                 />
               )
             }

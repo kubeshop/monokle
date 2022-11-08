@@ -28,7 +28,7 @@ import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
+import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
@@ -170,7 +170,9 @@ const PageHeader = () => {
 
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
-          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          <S.LogoContainer>
+            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          </S.LogoContainer>
 
           {activeProject && (
             <>

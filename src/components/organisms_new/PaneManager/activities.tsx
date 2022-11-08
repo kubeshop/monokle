@@ -9,6 +9,9 @@ import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
 
+import CompareSyncPane from '../CompareSyncPane';
+import {SettingsPane} from '../SettingsPane';
+
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
     type: 'panel',
@@ -23,7 +26,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'compare',
     tooltip: 'Compare resources',
     icon: () => <Icon name="compare" />,
-    component: <div />,
+    component: <CompareSyncPane />,
     useBadge: () => undefined,
   },
   {
@@ -59,7 +62,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'settings',
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
-    component: <div />,
+    component: <SettingsPane />,
     useBadge: () => undefined,
   },
 ];

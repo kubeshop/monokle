@@ -28,9 +28,9 @@ import {
   kubeConfigPathValidSelector,
   selectedResourceSelector,
 } from '@redux/selectors';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
-import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';

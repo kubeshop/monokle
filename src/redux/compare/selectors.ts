@@ -2,12 +2,11 @@ import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {SavedCommand} from '@models/appconfig';
+import {ComparisonListItem} from '@models/compare';
 import {RootState} from '@models/rootstate';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
-
-import {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {isDefined} from '@utils/filter';
 
