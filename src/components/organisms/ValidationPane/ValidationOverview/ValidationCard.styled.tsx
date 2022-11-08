@@ -46,3 +46,9 @@ export const Button = styled(AntdButton)`
   margin-top: 10px;
   display: block;
 `;
+
+export const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
