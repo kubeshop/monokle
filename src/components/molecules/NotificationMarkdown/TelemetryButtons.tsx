@@ -1,10 +1,8 @@
 import {notification} from 'antd';
 
 import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/reducers/appConfig';
-import {setActiveSettingsPanel, setLeftMenuSelection, toggleNotifications} from '@redux/reducers/ui';
+import {toggleNotifications} from '@redux/reducers/ui';
 import store from '@redux/store';
-
-import {SettingsPanel} from '@components/organisms_new/SettingsPane/types';
 
 import * as S from './styled';
 
