@@ -11,6 +11,7 @@ import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
 import {UiCoachState} from './uiCoach';
+import {ValidationSliceState} from './validation';
 
 /**
  * This is the redux store root state
@@ -29,4 +30,5 @@ export type RootState = {
   ui: UiState;
   uiCoach: UiCoachState;
   git: GitSliceState;
+  validation: ValidationSliceState;
 };

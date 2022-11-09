@@ -198,6 +198,20 @@ const schema = {
       },
     },
   },
+  validation: {
+    type: 'object',
+    properties: {
+      config: {
+        type: 'object',
+      },
+      rules: {
+        type: 'object',
+      },
+      settings: {
+        type: 'object',
+      },
+    },
+  },
   uiCoach: {
     type: 'object',
     properties: {
