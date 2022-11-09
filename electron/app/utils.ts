@@ -14,14 +14,15 @@ import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {AnyExtension} from '@models/extension';
+import type {AnyExtension} from '@models/extension';
 
 import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
-import {APP_INSTALLED} from '@utils/telemetry';
+
+import {APP_INSTALLED} from './constants/telemetry';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
