@@ -96,11 +96,11 @@
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
-    "@monokle/desktop-shared": "file:./shared",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
     "@kubernetes/client-node": "0.17.1",
+    "@monokle/desktop-shared": "file:./shared",
     "@monokle/validation": "^0.5.0",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.8.6",
@@ -350,5 +350,8 @@
     "development": [
       "last 1 chrome version"
     ]
+  },
+  "overrides": {
+    "react-refresh": "0.11.0"
   }
 }
