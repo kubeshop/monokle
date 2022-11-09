@@ -2,21 +2,16 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {AnyExtension} from '@models/extension';
-import {
-  AnyPlugin,
-  PluginPackageJson,
-  isTemplatePluginModule,
-  validatePluginPackageJson,
-  validateTemplatePluginModule,
-} from '@models/plugin';
-
-import {createFolder, doesPathExist} from '@utils/fileSystem';
+import type {AnyExtension} from '@models/extension';
+import type {AnyPlugin, PluginPackageJson} from '@models/plugin';
+// TODO: plugin models inside electron app
+import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@models/plugin';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from '../utils';
+import {createFolder, doesPathExist} from '../utils/extensions';
 
 const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 

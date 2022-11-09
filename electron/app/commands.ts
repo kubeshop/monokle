@@ -1,20 +1,20 @@
 import {BrowserWindow, dialog} from 'electron';
 
 import {spawn} from 'child_process';
+import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
-import {NewVersionCode} from '@models/appconfig';
-
+// TODO: do not use redux logic
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {InterpolateTemplateOptions} from '@redux/services/templates';
+import type {InterpolateTemplateOptions} from '@redux/services/templates';
 
-import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
+import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions, CommandResult} from '@utils/commands';
-import {ensureMainThread} from '@utils/thread';
+import type {CommandOptions, CommandResult} from '@utils/commands';
 
 import autoUpdater from './autoUpdater';
+import {NewVersionCode} from './models/appconfig';
 
 /**
  * Prompts to select a file using the native dialogs
@@ -122,7 +122,7 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
     try {
       result += vm.run(js);
     } catch (e: any) {
-      console.error(`Failed to interpolate [${js}]`, e.message);
+      log.error(`Failed to interpolate [${js}]`, e.message);
     }
     text = text.substring(ix2 + 2);
 
@@ -139,8 +139,6 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
  * Called by the renderer thread to run a command and capture its output
  */
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
-  ensureMainThread();
-
   const result: CommandResult = {
     commandId: options.commandId,
     exitCode: null,

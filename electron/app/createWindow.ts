@@ -15,7 +15,6 @@ import {
 } from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
-import {NewVersionCode} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
@@ -41,6 +40,7 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
+import {NewVersionCode} from './models/appconfig';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
