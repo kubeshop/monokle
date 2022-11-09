@@ -23,6 +23,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   log.debug('Enabled all log levels');
 }
 
+console.log('test');
+
 ReactDOM.render(
   <Provider store={store}>
     <ErrorBoundary FallbackComponent={ErrorPage}>
