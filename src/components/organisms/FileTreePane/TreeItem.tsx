@@ -73,6 +73,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   } = props;
 
   const [isTitleHovered, setTitleHoverState] = useState(false);
+  const [remotePathUrl, setRemotePathUrl] = useState<undefined | string>();
 
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -89,6 +90,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         : null,
     [selectedProjectRootFolder]
   );
+
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
@@ -123,6 +125,19 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
     return style;
   }, [isMatchItem]);
+
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const res = await remotePath;
+      if (mounted) {
+        setRemotePathUrl(res);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [remotePath]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -313,15 +328,14 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
-    ...(remotePath
+    ...(remotePathUrl && remotePathUrl.includes('github')
       ? [
           {
             key: 'open_in_github',
             label: 'Open on GitHub',
             onClick: async (e: any) => {
               e.domEvent.stopPropagation();
-              const localPath = await remotePath;
-              shell.openExternal(`${localPath}/tree/${git.repo?.currentBranch}${relativePath}`);
+              shell.openExternal(`${remotePathUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
             },
           },
         ]
