@@ -91,15 +91,6 @@ type ResourceRefsProcessingOptions = {
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
 };
 
-type ClusterToLocalResourcesMatch = {
-  id: string;
-  resourceKind: string;
-  resourceName: string;
-  resourceNamespace: string;
-  clusterResourceId?: string;
-  localResourceIds?: string[];
-};
-
 export type MatchParamProps = {
   matchCase: boolean;
   matchWholeWord: boolean;
@@ -233,5 +224,4 @@ export type {
   SelectionHistoryEntry,
   PreviewType,
   ResourceRefsProcessingOptions,
-  ClusterToLocalResourcesMatch,
 };
