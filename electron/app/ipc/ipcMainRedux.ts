@@ -2,9 +2,9 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
 import {AnyAction} from 'redux';
 
-import {RootState} from '@models/rootstate';
+import type {RootState} from '@models/rootstate';
 
-import {promiseTimeout} from '@utils/promises';
+import {promiseTimeout} from '../utils/promises';
 
 const FETCH_STORE_STATE_TIMEOUT = 10000;
 

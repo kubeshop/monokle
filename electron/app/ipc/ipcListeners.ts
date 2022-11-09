@@ -6,37 +6,26 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-import {
-  DOWNLOAD_PLUGIN,
-  DOWNLOAD_PLUGIN_RESULT,
-  DOWNLOAD_TEMPLATE,
-  DOWNLOAD_TEMPLATE_PACK,
-  DOWNLOAD_TEMPLATE_PACK_RESULT,
-  DOWNLOAD_TEMPLATE_RESULT,
-  UPDATE_EXTENSIONS,
-  UPDATE_EXTENSIONS_RESULT,
-} from '@constants/ipcEvents';
-
-import {NewVersionCode} from '@models/appconfig';
-import {
+import type {
   AnyExtension,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
   UpdateExtensionsResult,
 } from '@models/extension';
-import {AnyPlugin} from '@models/plugin';
-import {AnyTemplate, TemplatePack} from '@models/template';
+import type {AnyPlugin} from '@models/plugin';
+import type {AnyTemplate, TemplatePack} from '@models/template';
 
+// TODO: do not use redux logic inside electron
 import {changeCurrentProjectName, updateNewVersion} from '@redux/reducers/appConfig';
-import {InterpolateTemplateOptions} from '@redux/services/templates';
+import type {InterpolateTemplateOptions} from '@redux/services/templates';
 
-import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
+import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {CommandOptions} from '@utils/commands';
-import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
+import type {CommandOptions} from '@utils/commands';
+// TODO: create telemetry just for electron
 import {getSegmentClient} from '@utils/segment';
-import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -47,6 +36,19 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
+import {
+  DOWNLOAD_PLUGIN,
+  DOWNLOAD_PLUGIN_RESULT,
+  DOWNLOAD_TEMPLATE,
+  DOWNLOAD_TEMPLATE_PACK,
+  DOWNLOAD_TEMPLATE_PACK_RESULT,
+  DOWNLOAD_TEMPLATE_RESULT,
+  UPDATE_EXTENSIONS,
+  UPDATE_EXTENSIONS_RESULT,
+} from '../constants/ipcEvents';
+import {UPDATE_APPLICATION} from '../constants/telemetry';
+import {ProjectNameChange, StorePropagation} from '../models';
+import {NewVersionCode} from '../models/appconfig';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -59,7 +61,6 @@ import {
 import {askActionConfirmation} from '../utils';
 import {dispatchToAllWindows} from './ipcMainRedux';
 
-const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
