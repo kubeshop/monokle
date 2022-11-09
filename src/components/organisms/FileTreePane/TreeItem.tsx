@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
@@ -22,6 +24,7 @@ import {Dots, Spinner} from '@atoms';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
+import {promiseFromIpcRenderer} from '@utils/promises';
 import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
@@ -77,6 +80,15 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const git = useAppSelector(state => state.git);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const remotePath = useMemo(
+    async () =>
+      selectedProjectRootFolder
+        ? promiseFromIpcRenderer('git.getGitRemoteUrl', 'git.getGitRemoteUrl.result', selectedProjectRootFolder)
+        : null,
+    [selectedProjectRootFolder]
+  );
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
@@ -301,6 +313,19 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
+    ...(remotePath
+      ? [
+          {
+            key: 'open_in_github',
+            label: 'Open on GitHub',
+            onClick: async (e: any) => {
+              e.domEvent.stopPropagation();
+              const localPath = await remotePath;
+              shell.openExternal(`${localPath}/tree/${git.repo?.currentBranch}${relativePath}`);
+            },
+          },
+        ]
+      : []),
     {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,

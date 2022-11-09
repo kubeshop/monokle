@@ -23,6 +23,12 @@ export async function isGitInstalled(path: string) {
   }
 }
 
+export async function getGitRemoteUrl(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+  const result = await git.raw('config', '--get','remote.origin.url');
+  return result;
+}
+
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
 
