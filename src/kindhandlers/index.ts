@@ -258,5 +258,5 @@ async function* findFiles(dir: string, ext: string): any {
  */
 
 export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
-  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
+  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.apiVersion, kindHandler.apiVersionMatcher);
 }
