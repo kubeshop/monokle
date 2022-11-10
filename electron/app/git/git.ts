@@ -95,6 +95,7 @@ export async function getGitRepoInfo(localPath: string) {
   try {
     const remoteBranchSummary = await git.branch({'-r': null});
     const localBranches = await git.branchLocal();
+    const remoteUrl = await getGitRemoteUrl(localPath);
 
     gitRepo = {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
@@ -102,6 +103,7 @@ export async function getGitRepoInfo(localPath: string) {
       branchMap: {},
       commits: {ahead: 0, behind: 0},
       hasRemoteRepo: false,
+      remoteUrl,
     };
 
     gitRepo.branchMap = Object.fromEntries(

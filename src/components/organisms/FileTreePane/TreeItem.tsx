@@ -24,7 +24,6 @@ import {Dots, Spinner} from '@atoms';
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
@@ -73,7 +72,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   } = props;
 
   const [isTitleHovered, setTitleHoverState] = useState(false);
-  const [remotePathUrl, setRemotePathUrl] = useState<undefined | string>();
 
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -82,14 +80,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const git = useAppSelector(state => state.git);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-  const remotePath = useMemo(
-    async () =>
-      selectedProjectRootFolder
-        ? promiseFromIpcRenderer('git.getGitRemoteUrl', 'git.getGitRemoteUrl.result', selectedProjectRootFolder)
-        : null,
-    [selectedProjectRootFolder]
-  );
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -125,19 +115,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
     return style;
   }, [isMatchItem]);
-
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const res = await remotePath;
-      if (mounted) {
-        setRemotePathUrl(res);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [remotePath]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -328,14 +305,14 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
-    ...(remotePathUrl && remotePathUrl.includes('https://github.com')
+    ...(git.repo
       ? [
           {
             key: 'open_in_github',
             label: 'Open on GitHub',
             onClick: async (e: any) => {
               e.domEvent.stopPropagation();
-              shell.openExternal(`${remotePathUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
+              shell.openExternal(`${git.repo?.remoteUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
             },
           },
         ]
