@@ -4,10 +4,10 @@ import {Popover, PopoverProps} from 'antd';
 
 import {CloseOutlined} from '@ant-design/icons';
 
-import {StepEnum, WalkthroughCollection, WalkthroughContentProps, WalkthroughStep} from '@models/walkthrough';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
+
+import {StepEnum, WalkthroughCollection, WalkthroughContentProps, WalkthroughStep} from '@monokle-desktop/shared';
 
 import * as S from './Walkthrough.styled';
 import {newReleaseFeaturesContent, noviceContent} from './content';

@@ -9,8 +9,6 @@ import semver from 'semver';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
-import {StepEnum} from '@models/walkthrough';
-
 import {useAppDispatch} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
@@ -25,6 +23,8 @@ import {
 import {useAppVersion} from '@hooks/useAppVersion';
 
 import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
+
+import {StepEnum} from '@monokle-desktop/shared';
 
 import * as S from './HelpMenu.styled';
 

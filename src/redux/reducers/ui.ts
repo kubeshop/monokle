@@ -19,7 +19,6 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@models/ui';
-import {WalkthroughCollection} from '@models/walkthrough';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -28,6 +27,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
 import electronStore from '@utils/electronStore';
+
+import {WalkthroughCollection} from '@monokle-desktop/shared';
 
 export const uiSlice = createSlice({
   name: 'ui',
