@@ -1,8 +1,13 @@
 import _ from 'lodash';
 
-import {AnyPlugin, isAnyPlugin} from '@monokle-desktop/shared';
-
-import {AnyTemplate, TemplatePack, isAnyTemplate, isTemplatePack} from './template';
+import {
+  AnyPlugin,
+  AnyTemplate,
+  TemplatePack,
+  isAnyPlugin,
+  isAnyTemplate,
+  isTemplatePack,
+} from '@monokle-desktop/shared';
 
 export interface ExtensionState {
   isLoadingExistingPlugins: boolean;

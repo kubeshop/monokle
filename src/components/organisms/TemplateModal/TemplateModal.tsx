@@ -10,7 +10,6 @@ import {Primitive} from 'type-fest';
 
 import {Project} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
@@ -21,6 +20,8 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 import {TemplateFormRenderer} from '@components/molecules';
 
 import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
+
+import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

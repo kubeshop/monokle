@@ -13,7 +13,6 @@ import type {
   DownloadTemplateResult,
   UpdateExtensionsResult,
 } from '@models/extension';
-import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@models/template';
 
 import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
@@ -22,6 +21,7 @@ import type {CommandOptions} from '@utils/commands';
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
+import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared';
 import type {AnyPlugin} from '@monokle-desktop/shared';
 
 import autoUpdater from '../autoUpdater';

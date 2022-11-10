@@ -1,11 +1,10 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {AnyExtension, ExtensionState} from '@models/extension';
-import {AnyTemplate, TemplatePack} from '@models/template';
 
 import initialState from '@redux/initialState';
 
-import {AnyPlugin} from '@monokle-desktop/shared';
+import {AnyPlugin, AnyTemplate, TemplatePack} from '@monokle-desktop/shared';
 
 export const extensionSlice = createSlice({
   name: 'extension',

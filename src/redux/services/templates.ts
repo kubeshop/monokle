@@ -10,15 +10,21 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 import {AppDispatch} from '@models/appdispatch';
 import {KubernetesObject, isKubernetesObject} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
 import electronStore from '@utils/electronStore';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
-import {AnyPlugin} from '@monokle-desktop/shared';
+import {
+  AlertEnum,
+  AlertType,
+  AnyPlugin,
+  InterpolateTemplateOptions,
+  TemplateManifest,
+  TemplatePack,
+  VanillaTemplate,
+} from '@monokle-desktop/shared';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';
