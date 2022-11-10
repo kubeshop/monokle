@@ -28,7 +28,7 @@ import {
   isKustomizationResource,
   processKustomizations,
 } from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef, processRefs, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
@@ -44,7 +44,6 @@ import {
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {processRefs} from './resourceRefs';
 import {validatePolicies, validateResource} from './validation';
 
 /**

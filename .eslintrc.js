@@ -10,7 +10,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier', 'import'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier'],
   rules: {
     'no-underscore-dangle': 'off',
     'react/jsx-uses-react': 'off',
@@ -22,6 +22,8 @@ module.exports = {
     semi: 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
+    'import/no-named-as-default': 'off',
+    'import/no-cycle': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
     'import/no-restricted-paths': [
