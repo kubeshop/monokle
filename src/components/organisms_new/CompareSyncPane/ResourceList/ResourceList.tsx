@@ -8,9 +8,9 @@ import {groupBy} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceSetData} from '@redux/compare';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ResourceSetData} from '@monokle-desktop/shared';
 
 import * as S from './ResourceList.styled';
 

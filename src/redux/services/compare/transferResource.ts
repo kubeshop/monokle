@@ -8,7 +8,6 @@ import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
-import {ResourceSet} from '@redux/compare';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
@@ -20,7 +19,7 @@ import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, ResourceSet} from '@monokle-desktop/shared';
 
 type Type = ResourceSet['type'];
 

@@ -5,9 +5,6 @@ import log from 'loglevel';
 
 import {trackEvent} from '@utils/telemetry';
 
-import {K8sResource} from '@monokle-desktop/shared';
-
-import {selectIsAllComparisonSelected} from './selectors';
 import {
   CompareFilter,
   CompareOperation,
@@ -15,10 +12,13 @@ import {
   CompareState,
   ComparisonInspection,
   ComparisonView,
+  K8sResource,
   PartialResourceSet,
   ResourceComparison,
-  initialState,
-} from './state';
+} from '@monokle-desktop/shared';
+
+import {initialState} from './initialState';
+import {selectIsAllComparisonSelected} from './selectors';
 import {transferResource} from './thunks';
 
 export const compareSlice = createSlice({

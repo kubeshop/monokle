@@ -4,8 +4,10 @@ import {Select} from 'antd';
 
 import invariant from 'tiny-invariant';
 
-import {PartialResourceSet, resourceSetSelected, selectClusterResourceSet} from '@redux/compare';
+import {resourceSetSelected, selectClusterResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {PartialResourceSet} from '@monokle-desktop/shared';
 
 import * as S from './ResourceSetSelectColor.styled';
 

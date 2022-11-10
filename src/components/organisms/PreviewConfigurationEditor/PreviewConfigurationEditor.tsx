@@ -15,8 +15,7 @@ import {startPreview} from '@redux/services/preview';
 
 import {KeyValueInput} from '@atoms';
 
-import {HelmValuesFile} from '@monokle-desktop/shared';
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
+import {HelmPreviewConfiguration, HelmValuesFile, PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
 
 import ValuesFilesList from './ValuesFilesList';
 

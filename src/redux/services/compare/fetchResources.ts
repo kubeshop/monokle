@@ -15,15 +15,6 @@ import {
 
 import {RootState} from '@models/rootstate';
 
-import {
-  ClusterResourceSet,
-  CommandResourceSet,
-  CustomHelmResourceSet,
-  GitResourceSet,
-  HelmResourceSet,
-  KustomizeResourceSet,
-  ResourceSet,
-} from '@redux/compare';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
@@ -39,7 +30,16 @@ import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {
+  ClusterResourceSet,
+  CommandResourceSet,
+  CustomHelmResourceSet,
+  GitResourceSet,
+  HelmResourceSet,
+  K8sResource,
+  KustomizeResourceSet,
+  ResourceSet,
+} from '@monokle-desktop/shared';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

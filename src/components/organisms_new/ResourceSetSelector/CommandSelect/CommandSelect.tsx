@@ -2,8 +2,10 @@ import {Select} from 'antd';
 
 import invariant from 'tiny-invariant';
 
-import {CompareSide, PartialResourceSet, resourceSetSelected, selectCommandResourceSet} from '@redux/compare';
+import {resourceSetSelected, selectCommandResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {CompareSide, PartialResourceSet} from '@monokle-desktop/shared';
 
 import * as S from '../ResourceSetSelectColor.styled';
 

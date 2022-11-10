@@ -3,7 +3,6 @@ import {useCallback} from 'react';
 import {Button, Checkbox, Col} from 'antd';
 
 import {
-  CompareSide,
   comparisonInspecting,
   comparisonToggled,
   selectComparisonListItems,
@@ -12,7 +11,7 @@ import {
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {ComparisonItemProps, HeaderItemProps} from '@monokle-desktop/shared';
+import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@monokle-desktop/shared';
 
 import * as S from './ComparisonList.styled';
 

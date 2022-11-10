@@ -12,7 +12,6 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
 import {
   AppConfig,
   AppState,
@@ -20,6 +19,7 @@ import {
   HelmValuesFile,
   K8sResource,
   ProjectConfig,
+  ResourceKindHandler,
 } from '@monokle-desktop/shared';
 
 import Colors from '../styles/Colors';

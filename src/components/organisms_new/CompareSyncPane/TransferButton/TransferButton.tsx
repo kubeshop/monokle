@@ -6,8 +6,10 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import invariant from 'tiny-invariant';
 
-import {CompareSide, selectCanTransfer, selectCompareStatus, transferResource} from '@redux/compare';
+import {selectCanTransfer, selectCompareStatus, transferResource} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {CompareSide} from '@monokle-desktop/shared';
 
 type Props = {
   side: CompareSide;

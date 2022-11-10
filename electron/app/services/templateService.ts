@@ -3,17 +3,14 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import type {AnyExtension} from '@monokle-desktop/shared';
-import type {AnyTemplate, TemplatePack} from '@monokle-desktop/shared';
-// TODO: template models inside electron app
+import type {AnyExtension, AnyPlugin, AnyTemplate, TemplatePack} from '@monokle-desktop/shared';
 import {
+  isBundledTemplatePluginModule,
   isHelmChartTemplate,
   isVanillaTemplate,
   validateAnyTemplate,
   validateTemplatePack,
 } from '@monokle-desktop/shared';
-import type {AnyPlugin} from '@monokle-desktop/shared';
-import {isBundledTemplatePluginModule} from '@monokle-desktop/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

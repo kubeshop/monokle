@@ -1,4 +1,4 @@
-import {CompareSide} from '@redux/compare';
+import {CompareSide} from '@monokle-desktop/shared';
 
 import GitBranchSelect from './GitBranchSelect';
 import GitCommitSelect from './GitCommitSelect';

@@ -1,11 +1,10 @@
-import {CompareState} from '@redux/compare';
-import {FormsState} from '@redux/forms';
-
 import {
   AlertState,
   AppConfig,
   AppState,
+  CompareState,
   ExtensionState,
+  FormsState,
   GitSliceState,
   TerminalState,
   UiState,

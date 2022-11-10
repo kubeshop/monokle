@@ -5,6 +5,7 @@ export * from './compare';
 export * from './config';
 export * from './extension';
 export * from './fileEntry';
+export * from './form';
 export * from './git';
 export * from './helm';
 export * from './icons';

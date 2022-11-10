@@ -2,8 +2,7 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import type {AnyExtension} from '@monokle-desktop/shared';
-import type {AnyPlugin, PluginPackageJson} from '@monokle-desktop/shared';
+import type {AnyExtension, AnyPlugin, PluginPackageJson} from '@monokle-desktop/shared';
 import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@monokle-desktop/shared';
 
 import downloadExtension from '../extensions/downloadExtension';

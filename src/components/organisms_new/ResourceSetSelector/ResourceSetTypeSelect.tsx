@@ -4,10 +4,12 @@ import {Select} from 'antd';
 
 import {isEmpty} from 'lodash';
 
-import {ResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compare';
+import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kubeConfigPathValidSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
+
+import {ResourceSet} from '@monokle-desktop/shared';
 
 import * as S from './ResourceSetSelectColor.styled';
 

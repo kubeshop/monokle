@@ -10,16 +10,16 @@ import {isDefined} from '@utils/filter';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ComparisonListItem, SavedCommand} from '@monokle-desktop/shared';
-
 import {
   CompareSide,
   CompareState,
   CompareStatus,
+  ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
+  SavedCommand,
   TransferDirection,
-} from './state';
+} from '@monokle-desktop/shared';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
