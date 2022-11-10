@@ -10,7 +10,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier', 'import'],
   rules: {
     'no-underscore-dangle': 'off',
     'react/jsx-uses-react': 'off',
@@ -23,6 +23,18 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
     'import/no-extraneous-dependencies': 'off',
+    'import/no-unresolved': 'off',
+    'import/no-restricted-paths': [
+      'error',
+      {
+        zones: [
+          // disallow import from electron in src
+          {target: './electron', from: './src'},
+          // disallow import from src in electron
+          {target: './src', from: './electron'},
+        ],
+      },
+    ],
     'prefer-destructuring': 'off',
     'no-param-reassign': 'off',
     'no-use-before-define': 'off',
@@ -39,7 +51,6 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'import/prefer-default-export': 'off', // cannot control what we import from standard libs
-    'import/no-unresolved': 'off', // typescript
     'require-yield': 'off', // don't micromanage sagas or side effects
     'import/extensions': 'off', // don't micromanage pretty imports
     'no-unused-expressions': 'off', // prevents basic use of React exports such as in App.tsx
@@ -88,6 +99,16 @@ module.exports = {
     'react/no-unused-prop-types': 'off',
     'default-param-last': 'off',
     'react/destructuring-assignment': 'off',
+  },
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        project: ['tsconfig.json', 'electron/tsconfig.json'],
+      },
+    },
   },
   ignorePatterns: ['package.json', './node_modules', './dist', '**/dist/*.js'],
 };
