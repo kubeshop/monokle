@@ -26,4 +26,5 @@ export type IconNames =
   | 'terminal'
   | 'split-view'
   | 'crds'
-  | 'compare';
+  | 'compare'
+  | 'dashboard';
