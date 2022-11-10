@@ -16,7 +16,6 @@ import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import type {AnyExtension} from '@models/extension';
 
-import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
@@ -89,7 +88,7 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
 
   if (recentFolders && recentFolders.length > 0) {
     recentFolders.forEach((folder: string) => {
-      dispatch(createProject({rootFolder: folder}));
+      dispatch({type: 'config/createProject', payload: {rootFolder: folder}});
     });
     electronStore.delete('appConfig.recentFolders');
   }
