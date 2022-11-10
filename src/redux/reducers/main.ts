@@ -40,6 +40,7 @@ import {
   AppState,
   CurrentMatch,
   Feature,
+  ResourceLink,
   FileEntry,
   FileMapType,
   HelmChart,
@@ -740,6 +741,9 @@ export const mainSlice = createSlice({
     updateFeature: (state: Draft<AppState>, action: PayloadAction<Feature | undefined>) => {
       state.feature = action.payload;
     },
+    updateResources: (state: Draft<AppState>, action: PayloadAction<ResourceLink | undefined>) => {
+      state.resourceLink = action.payload;
+    },
     updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let newSearchHistory: string[] = [...state.search.searchHistory];
       if (state.search.searchHistory.length >= 5) {
@@ -1192,6 +1196,7 @@ export const {
   updateResourceFilter,
   updateValidationIntegration,
   updateFeature,
+  updateResources,
   highlightFileMatches,
   updateSearchHistory,
   updateSearchQuery,

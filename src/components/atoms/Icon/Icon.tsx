@@ -1,6 +1,12 @@
 import React, {useMemo} from 'react';
 
-import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
+import AntdIcon, {
+  CheckOutlined,
+  CloudUploadOutlined,
+  CodeTwoTone,
+  ExclamationCircleOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
 
 import {IconNames} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
@@ -51,6 +57,10 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   git: Git,
   'git-ops': GitOps,
   'getting-started': GettingStarted,
+  unorderedListOutlined: UnorderedListOutlined,
+  codeTwoTone: CodeTwoTone,
+  checkOutlined: CheckOutlined,
+  cloudUploadOutlined: CloudUploadOutlined,
   'git-project': GitProject,
   'git-repository': GitRepository,
   kubernetes: Kubernetes,

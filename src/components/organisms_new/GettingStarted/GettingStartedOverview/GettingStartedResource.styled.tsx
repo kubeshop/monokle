@@ -6,10 +6,10 @@ import {Icon as BaseIcon} from '@atoms';
 
 import Colors from '@styles/Colors';
 
-export const Card = styled(AntdCard)`
+export const ResourceLink = styled(AntdCard)`
   border: 2px solid #31393c;
   border-radius: 2px;
-  height: 100%;
+  height: 100px;
 
   .ant-card-body {
     background-color: #31393c;
@@ -37,10 +37,6 @@ export const Description = styled.span`
 
 export const Link = styled.a`
   color: ${Colors.blue7};
-  margin-left: 5px;
-  float: left;
-  padding-top: 15px;
-  padding-left: 25px;
 `;
 
 export const Button = styled(AntdButton)`
@@ -48,11 +44,4 @@ export const Button = styled(AntdButton)`
   background-color: ${Colors.blue7};
   margin-top: 10px;
   display: block;
-  float: left;
-`;
-
-export const Span = styled.span`
-  margin-top: 10px;
-  display: inline-block;
-  width: 100%;
 `;

@@ -27,6 +27,10 @@ type IconNames =
   | 'split-view'
   | 'crds'
   | 'compare'
-  | 'getting-started';
+  | 'getting-started'
+  | 'unorderedListOutlined'
+  | 'codeTwoTone'
+  | 'checkOutlined'
+  | 'cloudUploadOutlined';
 
 export type {IconNames};

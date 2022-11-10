@@ -16,13 +16,13 @@ type Props = {
 };
 
 const GettingStartedCard: React.FC<Props> = ({feature}) => {
-  const {id, icon, name, description, learnMoreUrl} = feature;
+  const {id, icon, name, description, learnMoreUrl, CTA} = feature;
 
   const dispatch = useAppDispatch();
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
-  const onConfigureHandler = () => {
+  const onCTAHandler = () => {
     trackEvent('GETTING_STARTED_PAGE_OPENED', {id});
     dispatch(updateFeature(feature));
   };
@@ -31,11 +31,11 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
     <S.Card key={id}>
       <S.Icon name={icon} key={icon} />
       <S.Name>{name}</S.Name>
-      <span>
-        <S.Description>{description}</S.Description>
+      <S.Description>{description}</S.Description>
+      <S.Span>
+        <S.Button onClick={onCTAHandler}>{CTA}</S.Button>
         <S.Link onClick={openLearnMore}>Learn more</S.Link>
-      </span>
-      {feature.isConfigurable && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
+      </S.Span>
     </S.Card>
   );
 };
