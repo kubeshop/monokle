@@ -7,8 +7,6 @@ import {ColumnsType} from 'antd/lib/table';
 
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
-import {IconNames} from '@models/icons';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
 import {toggleOPARules} from '@redux/validation/validation.slice';
@@ -16,6 +14,8 @@ import {toggleOPARules} from '@redux/validation/validation.slice';
 import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
+
+import {IconNames} from '@monokle-desktop/shared';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';

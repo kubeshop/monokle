@@ -2,9 +2,9 @@ import React, {useMemo} from 'react';
 
 import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {IconNames} from '@models/icons';
-
 import Colors from '@styles/Colors';
+
+import {IconNames} from '@monokle-desktop/shared';
 
 import {
   CRDs,

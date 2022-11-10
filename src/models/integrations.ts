@@ -1,4 +1,4 @@
-import {IconNames} from './icons';
+import {IconNames} from '@monokle-desktop/shared';
 
 export type ValidationIntegrationId =
   | 'kubernetes-schema'

@@ -1,4 +1,4 @@
-export type IconNames =
+type IconNames =
   | 'images'
   | 'git'
   | 'git-ops'
@@ -27,3 +27,5 @@ export type IconNames =
   | 'split-view'
   | 'crds'
   | 'compare';
+
+export type {IconNames};
