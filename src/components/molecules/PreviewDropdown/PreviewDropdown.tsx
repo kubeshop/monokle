@@ -6,7 +6,6 @@ import {Dropdown} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
 
 import {HelmChartMenuItem} from '@models/helm';
-import {KustomizationMenuItem} from '@models/kustomize';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
@@ -14,6 +13,8 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
+
+import {KustomizationMenuItem} from '@monokle-desktop/shared';
 
 import * as S from './PreviewDropdown.styled';
 import PreviewMenu from './PreviewMenu';

@@ -13,11 +13,11 @@ export enum ExtraContentType {
   Telemetry = 1,
 }
 
-export type AlertState = {
+type AlertState = {
   alert?: AlertType;
 };
 
-export type AlertType = {
+type AlertType = {
   id?: string;
   title: string;
   message: string;
@@ -28,3 +28,5 @@ export type AlertType = {
   extraContentType?: ExtraContentType;
   silent?: boolean;
 };
+
+export type {AlertState, AlertType};

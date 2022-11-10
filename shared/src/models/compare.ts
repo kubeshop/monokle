@@ -1,12 +1,12 @@
-export type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
+type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
 
-export type HeaderItemProps = {
+type HeaderItemProps = {
   type: 'header';
   kind: string;
   count: number;
 };
 
-export type ComparisonItemProps = {
+type ComparisonItemProps = {
   type: 'comparison';
   id: string;
   namespace: string | undefined;
@@ -17,3 +17,5 @@ export type ComparisonItemProps = {
   rightTransferable: boolean;
   canDiff: boolean;
 };
+
+export type {ComparisonListItem, ComparisonItemProps, HeaderItemProps};
