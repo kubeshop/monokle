@@ -1,11 +1,12 @@
 {
-  "name": "@monokle/shared",
+  "name": "@monokle-desktop/shared",
   "version": "1.0.0",
   "description": "A place to share code between Main and Render processes",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "rimraf build && tsc"
+    "build": "rimraf build && tsc",
+    "dev": "nodemon -e ts -w ./src -x npm run build"
   },
   "devDependencies": {
     "rimraf": "^3.0.2",
@@ -15,6 +16,7 @@
     "build/**/*"
   ],
   "dependencies": {
+    "nodemon": "^2.0.20",
     "runtypes": "^6.6.0"
   }
 }
