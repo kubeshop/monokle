@@ -3,6 +3,7 @@ export * from './cluster';
 export * from './compare';
 export * from './git';
 export * from './icons';
+export * from './image';
 export * from './integrations';
 export * from './kustomize';
 export * from './plugin';

@@ -23,7 +23,6 @@ import {
 } from '@models/appstate';
 import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
-import {ImageType} from '@models/image';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
@@ -54,8 +53,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
-import {ValidationIntegration} from '@monokle-desktop/shared';
-import {AlertType} from '@monokle-desktop/shared';
+import {AlertType, ImageType, ValidationIntegration} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

@@ -2,18 +2,18 @@
  * Image found in K8sResource refs
  */
 
-interface ImageType {
+type ImageType = {
   id: string;
   name: string;
   tag: string;
   resourcesIds: string[];
-}
+};
 
 /**
  * Docker Hub Image info
  */
 
-interface DockerHubImage {
+type DockerHubImage = {
   user: string;
   name: string;
   namespace: string;
@@ -36,9 +36,9 @@ interface DockerHubImage {
     write: boolean;
     admin: boolean;
   };
-}
+};
 
-interface DockerHubTagImage {
+type DockerHubTagImage = {
   architecture: string;
   features: string;
   variant: string | null;
@@ -50,9 +50,9 @@ interface DockerHubTagImage {
   status: string;
   last_pulled: Date;
   last_pushed: Date;
-}
+};
 
-interface DockerHubImageTag {
+type DockerHubImageTag = {
   creator: number;
   id: number;
   image_id: number | null;
@@ -67,13 +67,13 @@ interface DockerHubImageTag {
   tag_status: string;
   tag_last_pulled: Date;
   tag_last_pushed: Date;
-}
+};
 
-interface DockerHubImageTags {
+type DockerHubImageTags = {
   count: number;
   next: string | null;
   previous: string | null;
   results: DockerHubImageTag[];
-}
+};
 
 export type {DockerHubImage, DockerHubImageTag, DockerHubImageTags, ImageType};

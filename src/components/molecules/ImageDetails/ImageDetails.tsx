@@ -4,13 +4,13 @@ import {Skeleton} from 'antd';
 
 import numeral from 'numeral';
 
-import {DockerHubImage, DockerHubImageTags} from '@models/image';
-
 import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
+
+import {DockerHubImage, DockerHubImageTags} from '@monokle-desktop/shared';
 
 import * as S from './ImageDetails.styled';
 import ImageTags from './ImageTags';
