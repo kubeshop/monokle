@@ -3,9 +3,10 @@ import path from 'path';
 import semver from 'semver';
 
 import type {AnyExtension} from '@models/extension';
-import type {AnyPlugin, PluginPackageJson} from '@models/plugin';
+
+import type {AnyPlugin, PluginPackageJson} from '@monokle/shared';
 // TODO: plugin models inside electron app
-import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@models/plugin';
+import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@monokle/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

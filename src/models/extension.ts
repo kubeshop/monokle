@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
-import {AnyPlugin, isAnyPlugin} from './plugin';
+import {AnyPlugin, isAnyPlugin} from '@monokle/shared';
+
 import {AnyTemplate, TemplatePack, isAnyTemplate, isTemplatePack} from './template';
 
 export interface ExtensionState {

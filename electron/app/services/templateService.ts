@@ -4,12 +4,13 @@ import path from 'path';
 import semver from 'semver';
 
 import type {AnyExtension} from '@models/extension';
-import type {AnyPlugin} from '@models/plugin';
-// TODO: plugin models inside electron app
-import {isBundledTemplatePluginModule} from '@models/plugin';
 import type {AnyTemplate, TemplatePack} from '@models/template';
 // TODO: template models inside electron app
 import {isHelmChartTemplate, isVanillaTemplate, validateAnyTemplate, validateTemplatePack} from '@models/template';
+
+import type {AnyPlugin} from '@monokle/shared';
+// TODO: plugin models inside electron app
+import {isBundledTemplatePluginModule} from '@monokle/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

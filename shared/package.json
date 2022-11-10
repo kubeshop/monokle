@@ -8,13 +8,13 @@
     "build": "rimraf build && tsc"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2",
-    "typescript": "^4.8.4"
+    "rimraf": "3.0.2",
+    "typescript": "4.8.4"
   },
   "files": [
     "build/**/*"
   ],
   "dependencies": {
-    "runtypes": "^6.6.0"
+    "runtypes": "6.6.0"
   }
 }

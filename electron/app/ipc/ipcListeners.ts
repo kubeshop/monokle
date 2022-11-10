@@ -13,7 +13,6 @@ import type {
   DownloadTemplateResult,
   UpdateExtensionsResult,
 } from '@models/extension';
-import type {AnyPlugin} from '@models/plugin';
 import type {AnyTemplate, TemplatePack} from '@models/template';
 
 // TODO: do not use redux logic inside electron
@@ -26,6 +25,8 @@ import type {CommandOptions} from '@utils/commands';
 // TODO: create telemetry just for electron
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
+
+import type {AnyPlugin} from '@monokle/shared';
 
 import autoUpdater from '../autoUpdater';
 import {
