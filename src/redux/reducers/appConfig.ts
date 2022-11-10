@@ -9,8 +9,6 @@ import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {UiState} from '@models/ui';
-
 import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
@@ -31,6 +29,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
+import {UiState} from '@monokle-desktop/shared';
 import {
   AppConfig,
   ClusterAccess,

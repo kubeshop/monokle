@@ -1,7 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
-import {MonacoUiState} from '@models/ui';
-
+import {MonacoUiState} from '@monokle-desktop/shared';
 import {
   FileMapType,
   HelmChartMapType,

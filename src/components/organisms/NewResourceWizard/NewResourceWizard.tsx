@@ -13,7 +13,6 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
@@ -27,9 +26,7 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {FileMapType} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
-import {FileEntry} from '@monokle-desktop/shared';
+import {FileEntry, FileMapType, K8sResource, NewResourceWizardInput} from '@monokle-desktop/shared';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

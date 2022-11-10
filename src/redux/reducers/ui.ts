@@ -7,6 +7,12 @@ import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import initialState from '@redux/initialState';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import electronStore from '@utils/electronStore';
+
 import {
   HighlightItems,
   LayoutSizeType,
@@ -17,18 +23,10 @@ import {
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
+  SettingsPanel,
   UiState,
-} from '@models/ui';
-
-import initialState from '@redux/initialState';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import electronStore from '@utils/electronStore';
-
-import {WalkthroughCollection} from '@monokle-desktop/shared';
+  WalkthroughCollection,
+} from '@monokle-desktop/shared';
 
 export const uiSlice = createSlice({
   name: 'ui',

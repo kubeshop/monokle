@@ -27,8 +27,6 @@ import {
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
-import {SettingsPanel} from '@organisms/SettingsManager/types';
-
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -37,7 +35,7 @@ import {openUrlInExternalBrowser} from '@utils/shell';
 
 import Colors from '@styles/Colors';
 
-import {Project, ProjectConfig} from '@monokle-desktop/shared';
+import {Project, ProjectConfig, SettingsPanel} from '@monokle-desktop/shared';
 
 import {Settings} from './Settings';
 

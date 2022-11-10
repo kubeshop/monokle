@@ -9,8 +9,6 @@ import {LoadingOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
-import {HighlightItems} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
@@ -29,8 +27,7 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
 
-import {K8sResource} from '@monokle-desktop/shared';
-import {Size} from '@monokle-desktop/shared';
+import {HighlightItems, K8sResource, Size} from '@monokle-desktop/shared';
 
 import * as S from './ClusterSelection.styled';
 

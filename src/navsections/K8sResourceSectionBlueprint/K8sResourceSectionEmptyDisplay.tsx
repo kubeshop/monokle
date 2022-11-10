@@ -2,8 +2,6 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import {HighlightItems} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
@@ -12,7 +10,7 @@ import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

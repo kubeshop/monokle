@@ -15,6 +15,12 @@ export enum NewVersionCode {
   Downloaded = 4,
 }
 
+export enum SettingsPanel {
+  GlobalSettings = '1',
+  DefaultProjectSettings = '2',
+  ActiveProjectSettings = '3',
+}
+
 export enum TextSizes {
   Large = 'large',
   Medium = 'medium',

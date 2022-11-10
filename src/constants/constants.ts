@@ -1,4 +1,4 @@
-import {PaneConfiguration} from '@models/ui';
+import {PaneConfiguration} from '@monokle-desktop/shared';
 
 import Colors from '../styles/Colors';
 

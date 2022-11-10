@@ -2,8 +2,6 @@ import {monaco} from 'react-monaco-editor';
 
 import {flatten} from 'lodash';
 
-import {MonacoUiState} from '@models/ui';
-
 import {getHelmValueRanges} from '@redux/services/helm';
 
 import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
@@ -17,7 +15,7 @@ import {
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
 
-import {HelmValueMatch} from '@monokle-desktop/shared';
+import {HelmValueMatch, MonacoUiState} from '@monokle-desktop/shared';
 
 interface GoToValuesFileParams {
   helmMatch: HelmValueMatch & {filePath: string};
