@@ -9,7 +9,6 @@ import {ExtensionState} from './extension';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
-import {UiCoachState} from './uiCoach';
 
 /**
  * This is the redux store root state
@@ -25,7 +24,6 @@ export type RootState = {
   navigator: NavigatorState;
   terminal: TerminalState;
   ui: UiState;
-  uiCoach: UiCoachState;
   git: GitSliceState;
   validation: ValidationSliceState;
 };

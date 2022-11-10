@@ -16,7 +16,6 @@ import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './re
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
-import {uiCoachSlice} from './reducers/uiCoach';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
@@ -54,7 +53,6 @@ const appReducer = combineReducers({
   navigator: navigatorSlice.reducer,
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
-  uiCoach: uiCoachSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
   validation: validationSlice.reducer,

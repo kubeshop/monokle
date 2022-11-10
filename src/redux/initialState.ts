@@ -8,7 +8,6 @@ import {ExtensionState} from '@models/extension';
 import {NavigatorState} from '@models/navigator';
 import {TerminalState} from '@models/terminal';
 import {PaneConfiguration, UiState} from '@models/ui';
-import {UiCoachState} from '@models/uiCoach';
 
 import electronStore from '@utils/electronStore';
 
@@ -229,10 +228,6 @@ const initialNavigatorState: NavigatorState = {
   registeredSectionBlueprintIds: [],
 };
 
-const initialUiCoachState: UiCoachState = {
-  hasUserPerformedClickOnClusterIcon: false,
-};
-
 const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
@@ -260,5 +255,4 @@ export default {
   navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  uiCoach: initialUiCoachState,
 };
