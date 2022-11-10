@@ -3,8 +3,7 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import type {AnyExtension} from '@models/extension';
-
+import type {AnyExtension} from '@monokle-desktop/shared';
 import type {AnyTemplate, TemplatePack} from '@monokle-desktop/shared';
 // TODO: template models inside electron app
 import {

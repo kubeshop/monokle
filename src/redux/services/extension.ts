@@ -3,12 +3,16 @@ import {ipcRenderer} from 'electron';
 import {UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 
 import {AppDispatch} from '@models/appdispatch';
-import {UpdateExtensionsPayload, UpdateExtensionsResult, isUpdateExtensionsResult} from '@models/extension';
 
 import {setAlert} from '@redux/reducers/alert';
 import {addMultiplePlugins, addMultipleTemplatePacks, addMultipleTemplates} from '@redux/reducers/extension';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {
+  AlertEnum,
+  UpdateExtensionsPayload,
+  UpdateExtensionsResult,
+  isUpdateExtensionsResult,
+} from '@monokle-desktop/shared';
 
 export const updateExtensions = (payload: UpdateExtensionsPayload) => {
   return new Promise<UpdateExtensionsResult>((resolve, reject) => {

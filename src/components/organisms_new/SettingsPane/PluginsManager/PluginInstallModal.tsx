@@ -8,14 +8,14 @@ import {useForm} from 'antd/lib/form/Form';
 import {PLUGIN_DOCS_URL} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
-import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
-
 import {useAppDispatch} from '@redux/hooks';
 import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
 
 import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
+
+import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared';
 
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<DownloadPluginResult>((resolve, reject) => {

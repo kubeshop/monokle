@@ -6,14 +6,6 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-import type {
-  AnyExtension,
-  DownloadPluginResult,
-  DownloadTemplatePackResult,
-  DownloadTemplateResult,
-  UpdateExtensionsResult,
-} from '@models/extension';
-
 import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 import type {CommandOptions} from '@utils/commands';
@@ -21,6 +13,13 @@ import type {CommandOptions} from '@utils/commands';
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
+import type {
+  AnyExtension,
+  DownloadPluginResult,
+  DownloadTemplatePackResult,
+  DownloadTemplateResult,
+  UpdateExtensionsResult,
+} from '@monokle-desktop/shared';
 import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared';
 import type {AnyPlugin} from '@monokle-desktop/shared';
 

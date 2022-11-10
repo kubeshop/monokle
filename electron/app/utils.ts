@@ -14,12 +14,12 @@ import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import type {AnyExtension} from '@models/extension';
-
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
+
+import type {AnyExtension} from '@monokle-desktop/shared';
 
 import {APP_INSTALLED} from './constants/telemetry';
 
