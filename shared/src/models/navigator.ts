@@ -2,8 +2,8 @@ import React, {ReactNode} from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
+import {AppDispatch} from './appDispatch';
+import {RootState} from './rootState';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;

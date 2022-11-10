@@ -8,8 +8,6 @@ import {
   ReloadKustomizationPreviewTooltip,
 } from '@constants/tooltips';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
@@ -19,6 +17,8 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 import * as S from './KustomizationQuickAction.styled';
 

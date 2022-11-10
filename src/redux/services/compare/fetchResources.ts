@@ -13,8 +13,6 @@ import {
   YAML_DOCUMENT_DELIMITER_NEW_LINE,
 } from '@constants/constants';
 
-import {RootState} from '@models/rootstate';
-
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
@@ -39,6 +37,7 @@ import {
   K8sResource,
   KustomizeResourceSet,
   ResourceSet,
+  RootState,
 } from '@monokle-desktop/shared';
 
 import getClusterObjects from '../getClusterObjects';

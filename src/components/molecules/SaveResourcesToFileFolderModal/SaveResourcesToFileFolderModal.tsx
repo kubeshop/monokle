@@ -28,9 +28,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
-import {FileMapType} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
-import {AlertEnum, FileEntry} from '@monokle-desktop/shared';
+import {AlertEnum, FileEntry, FileMapType, K8sResource} from '@monokle-desktop/shared';
 
 import * as S from './SaveResourcesToFileFolderModal.styled';
 

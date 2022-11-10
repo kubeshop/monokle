@@ -6,8 +6,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resetResourceFilter, selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
@@ -20,7 +18,7 @@ import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared';
 
 import LabelMapper from './LabelMapper';
 

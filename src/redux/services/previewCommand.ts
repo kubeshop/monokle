@@ -2,15 +2,14 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {ERROR_MSG_FALLBACK, PREVIEW_PREFIX} from '@constants/constants';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
 import {isDefined} from '@utils/filter';
+
+import {AppDispatch, RootState} from '@monokle-desktop/shared';
 
 import {extractK8sResources} from './resource';
 

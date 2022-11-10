@@ -1,8 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {NavigatorInstanceState, NavigatorState} from '@models/navigator';
-
 import initialState from '@redux/initialState';
+
+import {NavigatorInstanceState, NavigatorState} from '@monokle-desktop/shared';
 
 export const navigatorSlice = createSlice({
   name: 'navigator',

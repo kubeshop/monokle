@@ -4,14 +4,14 @@ import {Button, Popover, Tag} from 'antd';
 
 import styled from 'styled-components';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter} from '@redux/reducers/main';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
 import Colors from '@styles/Colors';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 const Container = styled.span`
   display: flex;

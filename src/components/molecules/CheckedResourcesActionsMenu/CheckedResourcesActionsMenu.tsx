@@ -6,8 +6,6 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
@@ -24,8 +22,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import Colors from '@styles/Colors';
 
-import {K8sResource} from '@monokle-desktop/shared';
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum, AppDispatch, K8sResource} from '@monokle-desktop/shared';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

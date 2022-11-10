@@ -4,9 +4,9 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 
 import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
-import {RefMapper} from '@monokle-desktop/shared';
 import {
   K8sResource,
+  RefMapper,
   RefNode,
   RefPosition,
   ResourceMapType,

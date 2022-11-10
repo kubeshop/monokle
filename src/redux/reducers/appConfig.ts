@@ -29,7 +29,6 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import {UiState} from '@monokle-desktop/shared';
 import {
   AppConfig,
   ClusterAccess,
@@ -42,6 +41,7 @@ import {
   Settings,
   TextSizes,
   Themes,
+  UiState,
 } from '@monokle-desktop/shared';
 
 import initialState from '../initialState';

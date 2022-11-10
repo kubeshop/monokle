@@ -1,8 +1,8 @@
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 import * as S from './ImagesQuickAction.styled';
 

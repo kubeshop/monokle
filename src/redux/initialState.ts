@@ -2,8 +2,6 @@ import os from 'os';
 
 import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {NavigatorState} from '@models/navigator';
-
 import electronStore from '@utils/electronStore';
 
 import {
@@ -11,6 +9,7 @@ import {
   AppConfig,
   AppState,
   ExtensionState,
+  NavigatorState,
   NewVersionCode,
   PaneConfiguration,
   TerminalState,

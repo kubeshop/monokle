@@ -1,11 +1,11 @@
 import {useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {SectionInstance} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+
+import {SectionInstance} from '@monokle-desktop/shared';
 
 import * as S from './ImagesSectionNameDisplay.styled';
 

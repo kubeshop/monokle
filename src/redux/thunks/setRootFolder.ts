@@ -1,8 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
@@ -18,13 +15,16 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 import {
+  AlertEnum,
+  AppDispatch,
   FileMapType,
+  GitRepo,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
+  RootState,
 } from '@monokle-desktop/shared';
-import {AlertEnum, GitRepo} from '@monokle-desktop/shared';
 
 /**
  * Thunk to set the specified root folder

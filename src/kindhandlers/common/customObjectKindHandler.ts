@@ -19,8 +19,7 @@ import {
 } from '@src/kindhandlers/common/customMatchers';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {RefMapper, ResourceKindHandler} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared';
 
 /**
  * extract the version from the apiVersion string of the specified resource

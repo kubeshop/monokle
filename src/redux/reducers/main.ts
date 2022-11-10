@@ -7,8 +7,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ThunkApi} from '@models/thunk';
-
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
@@ -55,6 +53,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
+  ThunkApi,
   ValidationIntegration,
 } from '@monokle-desktop/shared';
 

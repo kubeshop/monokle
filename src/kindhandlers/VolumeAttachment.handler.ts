@@ -5,8 +5,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
 
 const VolumeAttachmentHandler: ResourceKindHandler = {
   kind: 'VolumeAttachment',

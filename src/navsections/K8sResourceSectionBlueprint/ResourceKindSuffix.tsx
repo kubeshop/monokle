@@ -1,9 +1,9 @@
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppSelector} from '@redux/hooks';
 import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ResourceRefsIconPopover, ValidationErrorsPopover} from '@molecules';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

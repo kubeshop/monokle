@@ -2,11 +2,9 @@ import {BrowserWindow} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import type {RootState} from '@models/rootstate';
-
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 
-import type {HelmChart, HelmValuesFile, K8sResource} from '@monokle-desktop/shared';
+import type {HelmChart, HelmValuesFile, K8sResource, RootState} from '@monokle-desktop/shared';
 
 export const setWindowTitle = (state: RootState, window: BrowserWindow, projectName?: String) => {
   if (window.isDestroyed()) {

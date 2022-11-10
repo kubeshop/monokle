@@ -11,9 +11,6 @@ import {v4 as uuidv4} from 'uuid';
 import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
@@ -47,7 +44,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 
 import Colors from '@styles/Colors';
 
-import {K8sResource, ResourceMapType} from '@monokle-desktop/shared';
+import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

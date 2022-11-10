@@ -2,8 +2,7 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {SimpleGit} from 'simple-git';
 
-import type {FileMapType} from '@monokle-desktop/shared';
-import type {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared';
+import type {FileMapType, GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared';
 
 const gitFileType: {
   [type: string]: GitChangedFileType;

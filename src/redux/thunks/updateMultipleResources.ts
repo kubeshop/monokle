@@ -2,13 +2,13 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {RootState} from '@models/rootstate';
-
 import {UpdateMultipleResourcesPayload, getActiveResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
+
+import {RootState} from '@monokle-desktop/shared';
 
 export const updateMultipleResources = createAsyncThunk(
   'main/updateMultipleResources',

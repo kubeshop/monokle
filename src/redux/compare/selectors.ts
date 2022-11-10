@@ -1,8 +1,6 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {RootState} from '@models/rootstate';
-
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 
@@ -17,6 +15,7 @@ import {
   ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
+  RootState,
   SavedCommand,
   TransferDirection,
 } from '@monokle-desktop/shared';

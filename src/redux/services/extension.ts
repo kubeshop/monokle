@@ -2,13 +2,12 @@ import {ipcRenderer} from 'electron';
 
 import {UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {setAlert} from '@redux/reducers/alert';
 import {addMultiplePlugins, addMultipleTemplatePacks, addMultipleTemplates} from '@redux/reducers/extension';
 
 import {
   AlertEnum,
+  AppDispatch,
   UpdateExtensionsPayload,
   UpdateExtensionsResult,
   isUpdateExtensionsResult,

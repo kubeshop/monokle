@@ -3,8 +3,6 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {RootState} from '@models/rootstate';
-
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {isDefined} from '@utils/filter';
@@ -20,6 +18,7 @@ import {
   K8sResource,
   ProjectConfig,
   ResourceKindHandler,
+  RootState,
 } from '@monokle-desktop/shared';
 
 import Colors from '../styles/Colors';

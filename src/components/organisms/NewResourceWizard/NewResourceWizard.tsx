@@ -24,8 +24,13 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
-import {FileEntry, FileMapType, K8sResource, NewResourceWizardInput} from '@monokle-desktop/shared';
+import {
+  FileEntry,
+  FileMapType,
+  K8sResource,
+  NewResourceWizardInput,
+  ResourceKindHandler,
+} from '@monokle-desktop/shared';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

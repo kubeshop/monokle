@@ -1,5 +1,3 @@
-import {AppDispatch} from '@models/appdispatch';
-
 import {
   clearPreview,
   clearPreviewAndSelectionHistory,
@@ -11,7 +9,7 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-import {PreviewType} from '@monokle-desktop/shared';
+import {AppDispatch, PreviewType} from '@monokle-desktop/shared';
 
 import {previewSavedCommand} from './previewCommand';
 

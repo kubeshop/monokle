@@ -8,8 +8,6 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
@@ -23,6 +21,8 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {children, itemInstance} = props;

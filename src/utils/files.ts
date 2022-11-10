@@ -3,11 +3,9 @@ import {lstat} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {setAlert} from '@redux/reducers/alert';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum, AppDispatch} from '@monokle-desktop/shared';
 
 export function doesPathExist(absolutePath: string) {
   try {

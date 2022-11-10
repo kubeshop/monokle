@@ -18,8 +18,13 @@ import {TemplateFormRenderer} from '@components/molecules';
 
 import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
 
-import {K8sResource} from '@monokle-desktop/shared';
-import {AnyTemplate, Project, isReferencedHelmChartTemplate, isVanillaTemplate} from '@monokle-desktop/shared';
+import {
+  AnyTemplate,
+  K8sResource,
+  Project,
+  isReferencedHelmChartTemplate,
+  isVanillaTemplate,
+} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

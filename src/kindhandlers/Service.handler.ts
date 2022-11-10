@@ -4,8 +4,7 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
 
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',

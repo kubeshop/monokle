@@ -5,13 +5,13 @@ import {createSafePath, getTestResourcePath} from '@redux/services/__test__/util
 import {getK8sResources} from '@redux/services/resource';
 
 import {
+  AppConfig,
   FileMapType,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
 } from '@monokle-desktop/shared';
-import {AppConfig} from '@monokle-desktop/shared';
 
 import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 

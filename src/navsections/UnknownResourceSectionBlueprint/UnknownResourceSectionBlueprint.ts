@@ -1,12 +1,10 @@
-import {SectionBlueprint} from '@models/navigator';
-
 import {selectK8sResource} from '@redux/reducers/main';
 import {unknownResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {K8sResource, ResourceFilterType} from '@monokle-desktop/shared';
+import {K8sResource, ResourceFilterType, SectionBlueprint} from '@monokle-desktop/shared';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from '../K8sResourceSectionBlueprint/ResourceKindContextMenuWrapper';

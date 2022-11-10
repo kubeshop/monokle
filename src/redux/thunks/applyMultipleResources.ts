@@ -4,14 +4,12 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {setAlert} from '@redux/reducers/alert';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {AlertEnum, AlertType, AppConfig, K8sResource} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType, AppConfig, AppDispatch, K8sResource} from '@monokle-desktop/shared';
 
 const applyMultipleResources = async (
   config: AppConfig,

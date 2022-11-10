@@ -4,8 +4,7 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
 
 const RoleBindingHandler: ResourceKindHandler = {
   kind: 'RoleBinding',

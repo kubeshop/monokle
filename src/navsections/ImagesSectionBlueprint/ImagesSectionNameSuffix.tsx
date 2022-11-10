@@ -1,10 +1,10 @@
 import {Popover} from 'antd';
 
-import {ItemInstance} from '@models/navigator';
-
 import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
+
+import {ItemInstance} from '@monokle-desktop/shared';
 
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
 import * as S from './ImagesSectionNameSuffix.styled';

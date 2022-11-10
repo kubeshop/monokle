@@ -1,7 +1,6 @@
-import {AppDispatch} from '@models/appdispatch';
-
 import {UpdateMultipleResourcesPayload, selectImage} from '@redux/reducers/main';
 
+import {AppDispatch} from '@monokle-desktop/shared';
 import {ImageType, ResourceMapType} from '@monokle-desktop/shared';
 
 import {updateMultipleResources} from './updateMultipleResources';

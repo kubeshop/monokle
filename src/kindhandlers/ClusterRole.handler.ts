@@ -2,8 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared';
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
 
 const ClusterRoleHandler: ResourceKindHandler = {
   kind: 'ClusterRole',
