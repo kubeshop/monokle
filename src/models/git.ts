@@ -24,7 +24,7 @@ export type GitRepo = {
     behind: number; // number of commits on remote but not on local ( pull )
   };
   hasRemoteRepo: boolean;
-  remoteUrl: string;
+  remoteUrl?: string;
 };
 
 export type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';
