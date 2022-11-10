@@ -82,7 +82,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const git = useAppSelector(state => state.git);
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -305,7 +304,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
-    ...(git.repo
+    ...(git.repo?.remoteUrl?.includes('https://github.com')
       ? [
           {
             key: 'open_in_github',
