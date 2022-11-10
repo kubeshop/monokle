@@ -129,11 +129,6 @@ export const isInClusterModeSelector = createSelector(
   }
 );
 
-export const logsSelector = createSelector(
-  (state: RootState) => state.logs.logs,
-  logs => logs.join('\n')
-);
-
 export const activeProjectSelector = createSelector(
   (state: RootState) => state.config,
   config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)

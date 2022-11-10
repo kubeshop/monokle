@@ -6,7 +6,6 @@ import {AlertState, GitSliceState} from '@monokle-desktop/shared';
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
 import {ExtensionState} from './extension';
-import {LogsState} from './logs';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
@@ -23,7 +22,6 @@ export type RootState = {
   compare: CompareState;
   config: AppConfig;
   extension: ExtensionState;
-  logs: LogsState;
   main: AppState;
   navigator: NavigatorState;
   terminal: TerminalState;
