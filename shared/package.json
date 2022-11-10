@@ -16,6 +16,7 @@
     "build/**/*"
   ],
   "dependencies": {
+    "@monokle/validation": "^0.7.1",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "nodemon": "2.0.20",
     "runtypes": "6.6.0"

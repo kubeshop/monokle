@@ -1,7 +1,7 @@
 import {CompareState} from '@redux/compare';
 import {FormsState} from '@redux/forms';
 
-import {AlertState, GitSliceState} from '@monokle-desktop/shared';
+import {AlertState, GitSliceState, ValidationSliceState} from '@monokle-desktop/shared';
 
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
@@ -10,7 +10,6 @@ import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
 import {UiCoachState} from './uiCoach';
-import {ValidationSliceState} from './validation';
 
 /**
  * This is the redux store root state
