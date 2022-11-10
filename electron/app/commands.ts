@@ -1,20 +1,18 @@
 import {BrowserWindow, dialog} from 'electron';
 
 import {spawn} from 'child_process';
+import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
-import {NewVersionCode} from '@models/appconfig';
+import type {InterpolateTemplateOptions} from '@models/template';
 
-import {updateNewVersion} from '@redux/reducers/appConfig';
-import {InterpolateTemplateOptions} from '@redux/services/templates';
+import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-
-import {CommandOptions, CommandResult} from '@utils/commands';
-import {ensureMainThread} from '@utils/thread';
+import type {CommandOptions, CommandResult} from '@utils/commands';
 
 import autoUpdater from './autoUpdater';
+import {NewVersionCode} from './models/appconfig';
 
 /**
  * Prompts to select a file using the native dialogs
@@ -84,13 +82,23 @@ export const forceLoad = (event: Electron.IpcMainInvokeEvent) => {
  */
 export const checkNewVersion = async (dispatch: (action: AnyAction) => void, initial?: boolean) => {
   try {
-    dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
+    dispatch({
+      type: 'config/updateNewVersion',
+      payload: {code: NewVersionCode.Checking, data: {initial: Boolean(initial)}},
+    });
+
     await autoUpdater.checkForUpdates();
   } catch (error: any) {
     if (error.errno === -2) {
-      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}}));
+      dispatch({
+        type: 'config/updateNewVersion',
+        payload: {code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}},
+      });
     } else {
-      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}}));
+      dispatch({
+        type: 'config/updateNewVersion',
+        payload: {code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}},
+      });
     }
   }
 };
@@ -122,7 +130,7 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
     try {
       result += vm.run(js);
     } catch (e: any) {
-      console.error(`Failed to interpolate [${js}]`, e.message);
+      log.error(`Failed to interpolate [${js}]`, e.message);
     }
     text = text.substring(ix2 + 2);
 
@@ -139,8 +147,6 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
  * Called by the renderer thread to run a command and capture its output
  */
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
-  ensureMainThread();
-
   const result: CommandResult = {
     commandId: options.commandId,
     exitCode: null,

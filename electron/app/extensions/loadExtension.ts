@@ -1,10 +1,9 @@
 import log from 'loglevel';
 import path from 'path';
 
-import {AnyExtension} from '@models/extension';
+import type {AnyExtension} from '@models/extension';
 
-import {doesPathExist, readFile} from '@utils/fileSystem';
-
+import {doesPathExist, readFile} from '../utils/extensions';
 import {LoadExtensionOptions} from './types';
 
 async function loadExtension<ExtensionEntryType, ExtensionType>(

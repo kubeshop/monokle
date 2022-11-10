@@ -30,6 +30,7 @@ import {
 } from '@redux/services/kustomize';
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
+// import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
@@ -494,7 +495,7 @@ export function reprocessResources(
       const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
 
       resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
-      resource.version =
+      resource.apiVersion =
         resource.content.apiVersion ||
         (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
 
@@ -527,7 +528,7 @@ type ValidationOptions = {
   policyPlugins?: Policy[];
 };
 
-export function processResources(
+export async function processResources(
   schemaVersion: string,
   userHomeDir: string,
   resourceMap: ResourceMapType,
@@ -535,6 +536,9 @@ export function processResources(
   options?: ValidationOptions
 ) {
   const {current, other} = decideResourcesToValidate(resourceMap, options);
+
+  // const response = await VALIDATOR.validate({resources: other});
+  // console.log('Response:', response);
 
   if (current) {
     validateResource(current, schemaVersion, userHomeDir);
@@ -732,12 +736,14 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, content.kind),
+            fileId: relativePath,
             filePath: relativePath,
+            fileOffset: 0,
             id: (content.metadata && content.metadata.uid) || uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: content.kind,
-            version: content.apiVersion,
+            apiVersion: content.apiVersion,
             content,
             text,
             isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
@@ -782,12 +788,14 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         else if (content && isKustomizationFilePath(relativePath) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
+            fileId: relativePath,
             filePath: relativePath,
+            fileOffset: 0,
             id: uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: KUSTOMIZATION_API_VERSION,
+            apiVersion: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
             isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,

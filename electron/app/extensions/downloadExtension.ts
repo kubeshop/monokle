@@ -3,9 +3,14 @@ import log from 'loglevel';
 import path from 'path';
 import tar from 'tar';
 
-import {createOrRecreateFolder, deleteFile, deleteFolder, doesPathExist, getAllFiles} from '@utils/fileSystem';
-import {downloadFile} from '@utils/http';
-
+import {
+  createOrRecreateFolder,
+  deleteFile,
+  deleteFolder,
+  doesPathExist,
+  downloadFile,
+  getAllFiles,
+} from '../utils/extensions';
 import downloadExtensionEntry from './downloadExtensionEntry';
 import {DownloadExtensionOptions} from './types';
 
@@ -44,6 +49,7 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
   if (doesTarballFileExist) {
     await deleteFile(tarballFilePath);
   }
+
   await downloadFile(extensionTarballUrl, tarballFilePath);
 
   await tar.extract({

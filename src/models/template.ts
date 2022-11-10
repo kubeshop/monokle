@@ -1,5 +1,10 @@
 import * as Rt from 'runtypes';
 
+export type InterpolateTemplateOptions = {
+  templateText: string;
+  formsData: any[];
+};
+
 const TemplateFormRuntype = Rt.Record({
   name: Rt.String,
   description: Rt.String,

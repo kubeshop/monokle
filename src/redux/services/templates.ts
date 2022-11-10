@@ -11,13 +11,14 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {KubernetesObject, isKubernetesObject} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {AnyPlugin} from '@models/plugin';
-import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
+import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
 import electronStore from '@utils/electronStore';
+
+import {AnyPlugin} from '@monokle-desktop/shared';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';
@@ -92,11 +93,6 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
   templatePath.startsWith(templatesPacksDir);
 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
-
-export type InterpolateTemplateOptions = {
-  templateText: string;
-  formsData: any[];
-};
 
 export const interpolateTemplate = async (templateText: string, formsData: any[]) => {
   return new Promise<string>(resolve => {

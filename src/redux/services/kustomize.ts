@@ -37,7 +37,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith(KUSTOMIZATION_API_GROUP));
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.apiVersion || r.apiVersion.startsWith(KUSTOMIZATION_API_GROUP));
 }
 
 /**

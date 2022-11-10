@@ -2,15 +2,10 @@ import {existsSync, promises as fs} from 'fs';
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import type {FileMapType} from '@models/appstate';
+import type {GitRepo} from '@models/git';
 
-import {FileMapType} from '@models/appstate';
-import {GitRepo} from '@models/git';
-import {K8sResource} from '@models/k8sresource';
-
-import {extractK8sResources} from '@redux/services/resource';
-
-import {formatGitChangedFiles} from '@utils/git';
+import {formatGitChangedFiles} from '../utils/git';
 
 export async function isGitInstalled(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -176,7 +171,7 @@ export async function initGitRepo(localPath: string) {
 export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
-  const projectFolderPath = fileMap[ROOT_FILE_ENTRY].filePath;
+  const projectFolderPath = fileMap['<root>'].filePath;
   const gitFolderPath = await git.revparse({'--show-toplevel': null});
   const currentBranch = (await git.branch()).current;
 
@@ -297,7 +292,7 @@ export async function pullChanges(localPath: string) {
 
 export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  let resources: K8sResource[] = [];
+  let filesContent: Record<string, string> = {};
 
   const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
     .split('\n')
@@ -315,11 +310,11 @@ export async function getCommitResources(localPath: string, branchName: string, 
     }
 
     if (content) {
-      resources = [...resources, ...extractK8sResources(content, filesPaths[i])];
+      filesContent[filesPaths[i]] = content;
     }
   }
 
-  return resources;
+  return filesContent;
 }
 
 export async function getBranchCommits(localPath: string, branchName: string) {

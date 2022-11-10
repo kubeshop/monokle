@@ -310,7 +310,7 @@ function lazyGetResourceValidator(
     return undefined;
   }
 
-  const validatorCacheKey = `${schemaVersion}-${resource.kind}-${resource.version}`;
+  const validatorCacheKey = `${schemaVersion}-${resource.kind}-${resource.apiVersion}`;
 
   if (!validatorCache.has(validatorCacheKey)) {
     const ajv = new Ajv({

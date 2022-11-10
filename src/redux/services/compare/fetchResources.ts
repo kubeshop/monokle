@@ -72,7 +72,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
   const {branchName, commitHash = ''} = options;
 
-  const resources: K8sResource[] = await promiseFromIpcRenderer(
+  const filesContent: Record<string, string> = await promiseFromIpcRenderer(
     'git.getCommitResources',
     'git.getCommitResources.result',
     {
@@ -82,7 +82,7 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
     }
   );
 
-  return resources;
+  return Object.entries(filesContent).flatMap(([filePath, content]) => extractK8sResources(content, filePath));
 }
 
 async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {

@@ -2,9 +2,9 @@ import {BrowserWindow} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
+import type {HelmChart, HelmValuesFile} from '@models/helm';
+import type {K8sResource} from '@models/k8sresource';
+import type {RootState} from '@models/rootstate';
 
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 
@@ -12,6 +12,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow, projectN
   if (window.isDestroyed()) {
     return;
   }
+
   const isInPreviewMode = isInPreviewModeSelector(state);
   const kubeConfigContext = kubeConfigContextSelector(state);
   const previewType = state.main.previewType;

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 
-import {AnyExtension} from '@models/extension';
+import type {AnyExtension} from '@models/extension';
 
 import loadExtension from './loadExtension';
 import {LoadExtensionOptions} from './types';

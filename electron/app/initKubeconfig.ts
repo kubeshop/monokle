@@ -4,10 +4,7 @@ import path from 'path';
 import {AnyAction} from 'redux';
 
 import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
-import {setAlert} from '@redux/reducers/alert';
-import {setKubeConfig} from '@redux/reducers/appConfig';
+import type {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import electronStore from '@utils/electronStore';
 
@@ -15,29 +12,30 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   if (process.env.KUBECONFIG) {
     const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
-      dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
+      dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(envKubeconfigParts[0])});
 
-      dispatch(
-        setAlert({
+      dispatch({
+        type: 'alert/setAlert',
+        payload: {
           title: 'KUBECONFIG warning',
           message: 'Found multiple configs, selected the first one.',
           type: AlertEnum.Warning,
-        })
-      );
+        },
+      });
     } else {
-      dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
+      dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(process.env.KUBECONFIG)});
     }
     return;
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
-    dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));
+    dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(storedKubeconfig)});
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
-  dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig)));
+  dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(possibleKubeconfig)});
 }
 
 export default initKubeconfig;

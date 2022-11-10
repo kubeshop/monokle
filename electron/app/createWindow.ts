@@ -15,13 +15,7 @@ import {
 } from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
-import {NewVersionCode} from '@models/appconfig';
 
-import {setAlert} from '@redux/reducers/alert';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
-import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} from '@redux/reducers/extension';
-import {setAppRehydrating} from '@redux/reducers/main';
-import {setWebContentsId} from '@redux/reducers/terminal';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
@@ -41,6 +35,7 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
+import {NewVersionCode} from './models/appconfig';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
@@ -128,11 +123,11 @@ export const createWindow = (givenPath?: string) => {
   }
 
   autoUpdater.on('update-available', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Available, data: null}});
   });
 
   autoUpdater.on('update-not-available', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.NotAvailable, data: null}});
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
@@ -140,11 +135,14 @@ export const createWindow = (givenPath?: string) => {
     if (progressObj && progressObj.percent) {
       percent = progressObj.percent;
     }
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
+    dispatchToAllWindows({
+      type: 'config/updateNewVersion',
+      payload: {code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}},
+    });
   });
 
   autoUpdater.on('update-downloaded', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Downloaded, data: null}});
   });
 
   win.webContents.on('dom-ready', async () => {
@@ -174,27 +172,30 @@ export const createWindow = (givenPath?: string) => {
       }
     });
 
-    dispatch(setAppRehydrating(true));
+    dispatch({type: 'main/setAppRehydrating', payload: true});
+
     if (process.argv.includes(StartupFlags.AUTOMATION)) {
       win.webContents.send('set-automation');
     }
 
-    dispatch(
-      setUserDirs({
+    dispatch({
+      type: 'config/setUserDirs',
+      payload: {
         homeDir: userHomeDir,
         tempDir: userTempDir,
         dataDir: userDataDir,
         crdsDir,
-      })
-    );
+      },
+    });
 
-    dispatch(
-      setExtensionsDirs({
+    dispatch({
+      type: 'extension/setExtensionsDirs',
+      payload: {
         templatesDir,
         templatePacksDir,
         pluginsDir,
-      })
-    );
+      },
+    });
 
     await checkNewVersion(dispatch, true);
     setInterval(async () => {
@@ -202,7 +203,7 @@ export const createWindow = (givenPath?: string) => {
     }, NEW_VERSION_CHECK_INTERVAL);
 
     initKubeconfig(dispatch, userHomeDir);
-    dispatch(setAppRehydrating(false));
+    dispatch({type: 'main/setAppRehydrating', payload: false});
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
     const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize --help']);
@@ -218,7 +219,7 @@ export const createWindow = (givenPath?: string) => {
         message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available.
         [Read more](${DEPENDENCIES_HELP_URL})`,
       };
-      dispatchToWindow(win, setAlert(alert));
+      dispatchToWindow(win, {type: 'alert/setAlert', payload: alert});
     }
     win.webContents.send('executed-from', {path: givenPath});
     win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
@@ -250,10 +251,10 @@ export const createWindow = (givenPath?: string) => {
       templatePacks: Object.values(templatePackMap),
     });
 
-    dispatch(setPluginMap(pluginMap));
-    dispatch(setTemplatePackMap(templatePackMap));
-    dispatch(setTemplateMap(templateMap));
-    dispatch(setWebContentsId(win.webContents.id));
+    dispatch({type: 'extension/setPluginMap', payload: pluginMap});
+    dispatch({type: 'extension/setTemplatePackMap', payload: templatePackMap});
+    dispatch({type: 'extension/setTemplateMap', payload: templateMap});
+    dispatch({type: 'terminal/setWebContentsId', payload: win.webContents.id});
     convertRecentFilesToRecentProjects(dispatch);
   });
 

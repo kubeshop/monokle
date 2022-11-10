@@ -28,7 +28,9 @@ interface K8sResource {
   /** the path relative to the root folder to the file containing this resource
    * - set to preview://resourceId for internally generated resources
    * - set to unsaved://resourceId for newly created resoruces */
+  fileId: string;
   filePath: string;
+  fileOffset: number;
   /**
    * name - generated from manifest metadata
    */
@@ -36,7 +38,7 @@ interface K8sResource {
   /** k8s resource kind */
   kind: string;
   /** k8s resource apiVersion value */
-  version: string;
+  apiVersion: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;
   /** if a resource is cluster scoped ( kind is namespaced ) */

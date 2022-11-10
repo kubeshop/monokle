@@ -26,7 +26,7 @@ const CommandSelect: React.FC<IProps> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
-        defaultOpen
+        defaultOpen={!resourceSet}
         onChange={handleSelect}
         placeholder="Choose Command..."
         value={currentCommand?.label}

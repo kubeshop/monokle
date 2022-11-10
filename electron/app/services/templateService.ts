@@ -3,24 +3,20 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {AnyExtension} from '@models/extension';
-import {AnyPlugin, isBundledTemplatePluginModule} from '@models/plugin';
-import {
-  AnyTemplate,
-  TemplatePack,
-  isHelmChartTemplate,
-  isVanillaTemplate,
-  validateAnyTemplate,
-  validateTemplatePack,
-} from '@models/template';
+import type {AnyExtension} from '@models/extension';
+import type {AnyTemplate, TemplatePack} from '@models/template';
+// TODO: template models inside electron app
+import {isHelmChartTemplate, isVanillaTemplate, validateAnyTemplate, validateTemplatePack} from '@models/template';
 
-import {createFolder, doesPathExist} from '@utils/fileSystem';
+import type {AnyPlugin} from '@monokle-desktop/shared';
+import {isBundledTemplatePluginModule} from '@monokle-desktop/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
 import loadExtension from '../extensions/loadExtension';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, makeExtensionDownloadData} from '../utils';
+import {createFolder, doesPathExist} from '../utils/extensions';
 
 const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
 const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';
