@@ -1,6 +1,6 @@
 import {KustomizeCommandType} from '@models/kustomize';
 
-import {ClusterColors} from './cluster';
+import {ClusterColors} from '@monokle-desktop/shared';
 
 export enum Themes {
   Dark = 'dark',

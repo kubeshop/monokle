@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-import {ClusterColors} from '@models/cluster';
-
 import Colors, {BackgroundColors} from '@styles/Colors';
+
+import {ClusterColors} from '@monokle-desktop/shared';
 
 export const ClusterName = styled.div<{$kubeConfigContextColor?: ClusterColors}>`
   display: inline;
