@@ -7,7 +7,6 @@ import {v4 as uuid} from 'uuid';
 
 import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
 import {ClusterColors} from '@models/cluster';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -20,6 +19,8 @@ import {FilePatternList} from '@atoms';
 import {runCommandInMainThread} from '@utils/commands';
 
 import {BackgroundColors} from '@styles/Colors';
+
+import {AlertEnum} from '@monokle-desktop/shared';
 
 import * as S from './ClusterSelectionTable.styled';
 

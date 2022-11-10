@@ -7,7 +7,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AlertType} from '@models/alert';
 import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
@@ -55,6 +54,8 @@ import electronStore from '@utils/electronStore';
 import {isResourcePassingFilter} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {AlertType} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

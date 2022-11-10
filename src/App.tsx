@@ -13,7 +13,6 @@ import semver from 'semver';
 
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {AlertEnum, ExtraContentType} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
@@ -52,6 +51,8 @@ import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
+
+import {AlertEnum, ExtraContentType} from '@monokle-desktop/shared';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

@@ -20,5 +20,5 @@
     "outDir": "./build",
     "declaration": true
   },
-  "include": ["src/*.ts"]
+  "include": ["src/*.ts", "src/models/repository.ts", "src/models/plugin.ts"]
 }

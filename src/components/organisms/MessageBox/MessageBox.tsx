@@ -2,12 +2,12 @@ import {useEffect, useMemo} from 'react';
 
 import {notification} from 'antd';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
 
 import {NotificationMarkdown} from '@molecules';
+
+import {AlertEnum} from '@monokle-desktop/shared';
 
 const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();

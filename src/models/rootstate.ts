@@ -1,7 +1,8 @@
 import {CompareState} from '@redux/compare';
 import {FormsState} from '@redux/forms';
 
-import {AlertState} from './alert';
+import {AlertState} from '@monokle-desktop/shared';
+
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
 import {ExtensionState} from './extension';

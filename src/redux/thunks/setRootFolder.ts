@@ -1,6 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {
   FileMapType,
@@ -25,6 +24,8 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
+
+import {AlertEnum} from '@monokle-desktop/shared';
 
 /**
  * Thunk to set the specified root folder

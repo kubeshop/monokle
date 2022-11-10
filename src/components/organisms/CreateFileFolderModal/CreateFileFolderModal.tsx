@@ -5,14 +5,14 @@ import {useForm} from 'antd/lib/form/Form';
 
 import path from 'path';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeCreateFileFolderModal} from '@redux/reducers/ui';
 
 import {CreateFileFolderCallback, createFile, createFolder, doesPathExist} from '@utils/files';
 import {useFocus} from '@utils/hooks';
+
+import {AlertEnum} from '@monokle-desktop/shared';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 

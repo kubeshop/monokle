@@ -1,2 +1,1 @@
-export * from './plugin';
-export * from './repository';
+export * from './models';

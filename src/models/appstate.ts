@@ -1,6 +1,7 @@
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
-import {AlertType} from './alert';
+import {AlertType} from '@monokle-desktop/shared';
+
 import {CurrentMatch, FileEntry} from './fileentry';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';

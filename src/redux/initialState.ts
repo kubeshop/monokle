@@ -2,7 +2,6 @@ import os from 'os';
 
 import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
 import {ExtensionState} from '@models/extension';
@@ -12,6 +11,8 @@ import {PaneConfiguration, UiState} from '@models/ui';
 import {UiCoachState} from '@models/uiCoach';
 
 import electronStore from '@utils/electronStore';
+
+import {AlertState} from '@monokle-desktop/shared';
 
 const initialAppState: AppState = {
   isRehydrating: false,
