@@ -7,8 +7,6 @@ import {isEqual} from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {GitChangedFile} from '@models/git';
-
 import {setGitLoading, setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -23,7 +21,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import Colors from '@styles/Colors';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared';
 
 import * as S from './FileList.styled';
 

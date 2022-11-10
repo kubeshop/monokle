@@ -3,7 +3,8 @@ import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
 import type {FileMapType} from '@models/appstate';
-import type {GitRepo} from '@models/git';
+
+import type {GitRepo} from '@monokle-desktop/shared';
 
 import {formatGitChangedFiles} from '../utils/git';
 

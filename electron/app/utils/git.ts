@@ -3,7 +3,8 @@ import path from 'path';
 import {SimpleGit} from 'simple-git';
 
 import type {FileMapType} from '@models/appstate';
-import type {GitChangedFile, GitChangedFileType} from '@models/git';
+
+import type {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared';
 
 const gitFileType: {
   [type: string]: GitChangedFileType;

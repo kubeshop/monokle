@@ -8,7 +8,6 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
-import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
@@ -25,7 +24,7 @@ import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum, GitRepo} from '@monokle-desktop/shared';
 
 /**
  * Thunk to set the specified root folder
