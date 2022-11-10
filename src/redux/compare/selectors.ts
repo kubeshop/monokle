@@ -2,7 +2,6 @@ import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {SavedCommand} from '@models/appconfig';
-import {ComparisonListItem} from '@models/compare';
 import {RootState} from '@models/rootstate';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
@@ -11,6 +10,8 @@ import {canTransfer} from '@redux/services/compare/transferResource';
 import {isDefined} from '@utils/filter';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ComparisonListItem} from '@monokle-desktop/shared';
 
 import {
   CompareSide,

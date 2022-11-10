@@ -2,8 +2,6 @@ import {useCallback} from 'react';
 
 import {Button, Checkbox, Col} from 'antd';
 
-import {ComparisonItemProps, HeaderItemProps} from '@models/compare';
-
 import {
   CompareSide,
   comparisonInspecting,
@@ -13,6 +11,8 @@ import {
   transferResource,
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {ComparisonItemProps, HeaderItemProps} from '@monokle-desktop/shared';
 
 import * as S from './ComparisonList.styled';
 
