@@ -1,7 +1,8 @@
 import {Scalar} from 'yaml';
 
+import {SarifRule} from '@monokle-desktop/shared';
+
 import {KubernetesObject} from './appstate';
-import {SarifRule} from './policy';
 
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 

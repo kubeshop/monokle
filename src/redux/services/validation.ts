@@ -3,10 +3,11 @@ import {get} from 'lodash';
 import {Document, LineCounter, Node, ParsedNode, isCollection, isNode} from 'yaml';
 
 import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
-import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@models/policy';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
+
+import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@monokle-desktop/shared';
 
 import {getResourceSchema} from './schema';
 
