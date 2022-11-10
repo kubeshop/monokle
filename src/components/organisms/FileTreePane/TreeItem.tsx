@@ -328,7 +328,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
-    ...(remotePathUrl && remotePathUrl.includes('github')
+    ...(remotePathUrl && remotePathUrl.includes('https://github.com')
       ? [
           {
             key: 'open_in_github',
