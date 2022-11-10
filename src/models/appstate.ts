@@ -1,8 +1,7 @@
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 
-import {AlertType, ImageType, Policy, ValidationIntegration} from '@monokle-desktop/shared';
+import {AlertType, CurrentMatch, FileEntry, ImageType, Policy, ValidationIntegration} from '@monokle-desktop/shared';
 
-import {CurrentMatch, FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
 
 /**

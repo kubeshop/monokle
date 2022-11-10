@@ -13,7 +13,6 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
-import {CurrentMatch} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -23,6 +22,8 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
 import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
 import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
+
+import {CurrentMatch} from '@monokle-desktop/shared';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 

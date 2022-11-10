@@ -2,22 +2,22 @@
  * A file or folder in the file system.
  */
 
-export interface MatchNode {
+type MatchNode = {
   lineNumber: number;
   start: number;
   end: number;
   currentMatchNumber: number;
   wholeLine: string;
   matchesInLine: string[];
-}
+};
 
-export interface CurrentMatch {
+type CurrentMatch = {
   matchesInFile: MatchNode[];
   currentMatchIdx: number;
   replaceWith?: string;
-}
+};
 
-interface FileEntry {
+type FileEntry = {
   /** the name of the file */
   name: string;
   /** the path of the file relative to the root folder - used as key in the fileMap */
@@ -40,6 +40,6 @@ interface FileEntry {
   matchCount?: number;
   /** lines containing matches */
   matchLines?: MatchNode[][];
-}
+};
 
-export type {FileEntry};
+export type {CurrentMatch, FileEntry, MatchNode};

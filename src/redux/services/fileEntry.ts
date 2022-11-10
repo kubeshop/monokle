@@ -14,7 +14,6 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
@@ -43,6 +42,8 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
+
+import {FileEntry} from '@monokle-desktop/shared';
 
 import {
   deleteResource,

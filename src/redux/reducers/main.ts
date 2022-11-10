@@ -21,7 +21,6 @@ import {
   ResourceMapType,
   SelectionHistoryEntry,
 } from '@models/appstate';
-import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {HelmChart} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
@@ -53,7 +52,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
-import {AlertType, ImageType, ValidationIntegration} from '@monokle-desktop/shared';
+import {AlertType, CurrentMatch, FileEntry, ImageType, ValidationIntegration} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

@@ -13,7 +13,6 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {FileMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
@@ -29,6 +28,8 @@ import {useNamespaces} from '@hooks/useNamespaces';
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {FileEntry} from '@monokle-desktop/shared';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

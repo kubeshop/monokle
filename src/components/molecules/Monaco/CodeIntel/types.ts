@@ -8,9 +8,10 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
-import {CurrentMatch, FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import {MonacoUiState} from '@models/ui';
+
+import {CurrentMatch, FileEntry} from '@monokle-desktop/shared';
 
 export interface CodeIntelResponse {
   newDecorations: monaco.editor.IModelDeltaDecoration[];

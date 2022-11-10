@@ -16,7 +16,6 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
 
 import {
@@ -31,6 +30,8 @@ import {NodeWrapper} from '@redux/services/resource';
 
 import {getFileStats} from '@utils/files';
 import {parseAllYamlDocuments} from '@utils/yaml';
+
+import {FileEntry} from '@monokle-desktop/shared';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

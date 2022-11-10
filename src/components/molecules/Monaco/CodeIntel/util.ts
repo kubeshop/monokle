@@ -1,13 +1,14 @@
 import {monaco} from 'react-monaco-editor';
 
 import {HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {MonacoRange, MonacoSelectionFile, MonacoUiState} from '@models/ui';
 
 import {createCompletionProvider, getSymbolsBeforePosition} from '@molecules/Monaco/editorHelpers';
 
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
+
+import {FileEntry} from '@monokle-desktop/shared';
 
 export function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMapType) {
   const helmChartId = currentFile?.helmChartId;
