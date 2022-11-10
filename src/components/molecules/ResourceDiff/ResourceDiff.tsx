@@ -12,8 +12,6 @@ import {parse, stringify} from 'yaml';
 import {PREVIEW_PREFIX} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -27,6 +25,8 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';

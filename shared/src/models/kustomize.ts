@@ -1,8 +1,8 @@
 type KustomizeCommandType = 'kubectl' | 'kustomize';
 
-interface KustomizationMenuItem {
+type KustomizationMenuItem = {
   id: string;
   name: string;
-}
+};
 
 export type {KustomizationMenuItem, KustomizeCommandType};

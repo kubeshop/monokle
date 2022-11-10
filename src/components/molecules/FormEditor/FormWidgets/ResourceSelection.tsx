@@ -4,9 +4,9 @@ import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

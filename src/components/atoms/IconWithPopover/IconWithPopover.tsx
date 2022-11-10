@@ -2,9 +2,9 @@ import React from 'react';
 
 import {Button, Popover} from 'antd';
 
-import {IconNames} from '@models/icons';
-
 import {Icon} from '@atoms';
+
+import {IconNames} from '@monokle-desktop/shared';
 
 interface IconWithPopoverProps {
   popoverContent: React.ReactNode | (() => React.ReactNode);

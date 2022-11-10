@@ -12,8 +12,6 @@ import {stringify} from 'yaml';
 import {PREVIEW_PREFIX} from '@constants/constants';
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
@@ -31,6 +29,8 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared';
 
 import * as S from './ClusterResourceDiffModal.styled';
 

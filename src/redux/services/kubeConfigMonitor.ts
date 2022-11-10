@@ -7,8 +7,6 @@ import fs from 'fs';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
-import {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
 import {
   addNamespaceToContext,
   removeNamespaceFromContext,
@@ -18,6 +16,8 @@ import {
 
 import {watchFunctions} from '@utils/helpers';
 import {getKubeAccess} from '@utils/kubeclient';
+
+import {KubeConfig, KubeConfigContext} from '@monokle-desktop/shared';
 
 let watcher: FSWatcher;
 let tempFilePath: string | undefined;

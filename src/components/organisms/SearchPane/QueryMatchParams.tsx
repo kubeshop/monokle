@@ -1,7 +1,7 @@
-import {MatchParamProps} from '@models/appstate';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleMatchParams} from '@redux/reducers/main';
+
+import {MatchParamProps} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

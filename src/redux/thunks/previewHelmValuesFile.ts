@@ -1,8 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {fetchResources} from '@redux/services/compare/fetchResources';
@@ -11,6 +8,8 @@ import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux
 
 import {errorMsg} from '@utils/error';
 import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
+
+import {AppDispatch, RootState} from '@monokle-desktop/shared';
 
 export const previewHelmValuesFile = createAsyncThunk<
   SetPreviewDataPayload,

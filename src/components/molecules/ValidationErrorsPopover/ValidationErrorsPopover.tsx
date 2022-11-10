@@ -2,13 +2,13 @@ import {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
-import {K8sResource} from '@models/k8sresource';
-
 import Icon from '@atoms/Icon';
 
 import {countResourceErrors} from '@utils/resources';
 
 import Colors from '@styles/Colors';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import ErrorsPopoverContent from './ErrorsPopoverContent';
 

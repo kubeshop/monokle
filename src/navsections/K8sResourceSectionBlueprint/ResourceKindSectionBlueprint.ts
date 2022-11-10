@@ -1,11 +1,5 @@
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
 import {
   checkMultipleResourceIds,
   checkResourceId,
@@ -19,6 +13,14 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
+
+import {
+  K8sResource,
+  ResourceFilterType,
+  ResourceKindHandler,
+  RootState,
+  SectionBlueprint,
+} from '@monokle-desktop/shared';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';

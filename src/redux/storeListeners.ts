@@ -1,10 +1,9 @@
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {registerSectionBlueprint, removeSectionBlueprint} from '@redux/reducers/navigator';
 
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
+
+import {ResourceKindHandler, SectionBlueprint} from '@monokle-desktop/shared';
 
 import {addKindHandler, addMultipleKindHandlers} from './reducers/main';
 import store from './store';

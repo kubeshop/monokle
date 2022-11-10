@@ -1,32 +1,32 @@
-import {RefPosition} from '@models/k8sresource';
+import {RefPosition} from './k8sResource';
 
 /**
  * Corresponds to a found folder containing a Chart.yaml file
  */
-interface HelmChart {
+type HelmChart = {
   id: string;
   filePath: string;
   name: string;
   valueFileIds: string[]; // ids of contained Helm value files
   templateIds: string[]; // ids of contained Helm templates
-}
+};
 
-interface HelmChartMenuItem {
+type HelmChartMenuItem = {
   id: string;
   name: string;
   subItems: {id: string; name: string}[];
-}
+};
 
-interface HelmValueMatch {
+type HelmValueMatch = {
   keyPath: string;
   value: any;
   linePosition: RefPosition;
-}
+};
 
 /**
  * A file named *values.yaml found in a Helm chart folder
  */
-interface HelmValuesFile {
+type HelmValuesFile = {
   id: string;
   filePath: string;
   name: string;
@@ -34,9 +34,9 @@ interface HelmValuesFile {
   /** the id of the containing helm chart */
   helmChartId: string;
   values: HelmValueMatch[];
-}
+};
 
-interface RangeAndValue {
+type RangeAndValue = {
   range: {
     startLineNumber: number;
     startColumn: number;
@@ -44,14 +44,14 @@ interface RangeAndValue {
     endColumn: number;
   };
   value: string;
-}
+};
 
-interface HelmTemplate {
+type HelmTemplate = {
   id: string;
   filePath: string;
   name: string;
   values: RangeAndValue[];
   helmChartId: string;
-}
+};
 
 export type {HelmChart, HelmChartMenuItem, HelmValuesFile, RangeAndValue, HelmValueMatch, HelmTemplate};

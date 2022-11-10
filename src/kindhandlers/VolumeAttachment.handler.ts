@@ -2,11 +2,10 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
+
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
 
 const VolumeAttachmentHandler: ResourceKindHandler = {
   kind: 'VolumeAttachment',

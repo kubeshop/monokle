@@ -3,11 +3,10 @@ import _ from 'lodash';
 
 import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource, ResourceRefType} from '@models/k8sresource';
-
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
+
+import {K8sResource, ResourceFilterType, ResourceRefType} from '@monokle-desktop/shared';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (

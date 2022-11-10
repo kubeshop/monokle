@@ -5,11 +5,11 @@ import log from 'loglevel';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import {ResourceMapType} from '@models/appstate';
-
 import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
+
+import {ResourceMapType} from '@monokle-desktop/shared';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,

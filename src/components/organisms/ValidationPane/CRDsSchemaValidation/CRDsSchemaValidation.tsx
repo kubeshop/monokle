@@ -8,9 +8,6 @@ import {groupBy} from 'lodash';
 import log from 'loglevel';
 import {parse} from 'yaml';
 
-import {AlertEnum} from '@models/alert';
-import {CRD_SCHEMA_INTEGRATION} from '@models/integrations';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {registeredKindHandlersSelector} from '@redux/selectors';
@@ -25,6 +22,8 @@ import {isValidUrl} from '@utils/urls';
 
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {AlertEnum, CRD_SCHEMA_INTEGRATION} from '@monokle-desktop/shared';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import CRDItem from './CRDItem';

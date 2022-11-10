@@ -1,10 +1,10 @@
 import React, {useMemo} from 'react';
 
-import {SectionCustomComponentProps} from '@models/navigator';
-
 import {useAppSelector} from '@redux/hooks';
 
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
+
+import {SectionCustomComponentProps} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

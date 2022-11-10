@@ -6,15 +6,6 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-import type {
-  AnyExtension,
-  DownloadPluginResult,
-  DownloadTemplatePackResult,
-  DownloadTemplateResult,
-  UpdateExtensionsResult,
-} from '@models/extension';
-import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@models/template';
-
 import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 import type {CommandOptions} from '@utils/commands';
@@ -22,7 +13,18 @@ import type {CommandOptions} from '@utils/commands';
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
-import type {AnyPlugin} from '@monokle-desktop/shared';
+import {
+  AnyExtension,
+  AnyPlugin,
+  AnyTemplate,
+  DownloadPluginResult,
+  DownloadTemplatePackResult,
+  DownloadTemplateResult,
+  InterpolateTemplateOptions,
+  NewVersionCode,
+  TemplatePack,
+  UpdateExtensionsResult,
+} from '@monokle-desktop/shared';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -45,7 +47,6 @@ import {
 } from '../constants/ipcEvents';
 import {UPDATE_APPLICATION} from '../constants/telemetry';
 import {ProjectNameChange, StorePropagation} from '../models';
-import {NewVersionCode} from '../models/appconfig';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,

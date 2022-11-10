@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ThunkApi} from '@models/thunk';
+import {ThunkApi} from '@monokle-desktop/shared';
 
 import {VALIDATOR} from './validation.services';
 

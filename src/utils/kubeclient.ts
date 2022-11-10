@@ -4,9 +4,9 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
-import {ClusterAccess, KubePermissions} from '@models/appconfig';
-
 import {getMainProcessEnv} from '@utils/env';
+
+import {ClusterAccess, KubePermissions} from '@monokle-desktop/shared';
 
 import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
 import {isRendererThread} from './thread';

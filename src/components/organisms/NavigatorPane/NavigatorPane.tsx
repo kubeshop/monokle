@@ -8,8 +8,6 @@ import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
-import {ResourceFilterType} from '@models/appstate';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
@@ -24,6 +22,8 @@ import Colors from '@styles/Colors';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
+
+import {ResourceFilterType} from '@monokle-desktop/shared';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';

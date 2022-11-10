@@ -6,8 +6,6 @@ import {Popconfirm} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {AnyTemplate} from '@models/template';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
 
@@ -17,7 +15,7 @@ import PluginIcon from '@assets/PluginIcon.svg';
 
 import Colors from '@styles/Colors';
 
-import {AnyPlugin, isTemplatePluginModule} from '@monokle-desktop/shared';
+import {AnyPlugin, AnyTemplate, isTemplatePluginModule} from '@monokle-desktop/shared';
 
 import * as S from './PluginInformation.styled';
 

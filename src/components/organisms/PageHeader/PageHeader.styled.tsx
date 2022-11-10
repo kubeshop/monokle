@@ -4,10 +4,9 @@ import {BellOutlined as RawBellOutlined, EllipsisOutlined as RawEllipsisOutlined
 
 import styled from 'styled-components';
 
-import {PreviewType} from '@models/appstate';
-import {ClusterColors} from '@models/cluster';
-
 import Colors, {FontColors, PanelColors} from '@styles/Colors';
+
+import {ClusterColors, PreviewType} from '@monokle-desktop/shared';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
 

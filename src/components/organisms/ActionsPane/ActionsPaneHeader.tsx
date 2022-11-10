@@ -11,8 +11,6 @@ import {
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
@@ -22,6 +20,8 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {TitleBar} from '@atoms';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import * as S from './ActionsPaneHeader.styled';
 import Diff from './Diff/Diff';

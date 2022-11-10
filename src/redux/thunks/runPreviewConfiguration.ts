@@ -7,16 +7,14 @@ import {v4 as uuid} from 'uuid';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
+
+import {AppDispatch, HelmPreviewConfiguration, PreviewConfigValuesFileItem, RootState} from '@monokle-desktop/shared';
 
 /**
  * Thunk to preview a Helm Chart

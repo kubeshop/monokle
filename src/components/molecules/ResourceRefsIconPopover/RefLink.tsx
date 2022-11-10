@@ -2,10 +2,9 @@ import React, {useMemo} from 'react';
 
 import path from 'path';
 
-import {ResourceMapType} from '@models/appstate';
-import {ResourceRef} from '@models/k8sresource';
-
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
+
+import {ResourceMapType, ResourceRef} from '@monokle-desktop/shared';
 
 import RefIcon from './RefIcon';
 import * as S from './RefLink.styled';

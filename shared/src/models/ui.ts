@@ -1,6 +1,4 @@
-import React from 'react';
-
-import {SettingsPanel} from '@organisms/SettingsManager/types';
+import {SettingsPanel} from './config';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -9,51 +7,13 @@ export enum HighlightItems {
   CONNECT_TO_CLUSTER = 'CONNECT_TO_CLUSTER',
 }
 
-export type NewResourceWizardInput = {
-  name?: string;
-  kind?: string;
-  apiVersion?: string;
-  namespace?: string;
-  selectedResourceId?: string;
-  targetFolder?: string;
-  targetFile?: string;
+type LayoutSizeType = {
+  header: number;
 };
 
-export type MonacoRange = {
-  startLineNumber: number;
-  endLineNumber: number;
-  startColumn: number;
-  endColumn: number;
-};
+type LeftMenuBottomSelectionType = 'terminal';
 
-export type MonacoSelectionResource = {
-  type: 'resource';
-  resourceId: string;
-  range: MonacoRange;
-};
-
-export type MonacoSelectionFile = {
-  type: 'file';
-  filePath: string;
-  range: MonacoRange;
-};
-
-export type MonacoUiSelection = MonacoSelectionResource | MonacoSelectionFile;
-
-export type MonacoUiState = {
-  focused: boolean;
-  undo: boolean;
-  redo: boolean;
-  find: boolean;
-  replace: boolean;
-  apply: boolean;
-  diff: boolean;
-  selection?: MonacoUiSelection;
-};
-
-export type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
-
-export type LeftMenuSelectionType =
+type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
   | 'git-pane'
@@ -64,14 +24,61 @@ export type LeftMenuSelectionType =
   | 'search'
   | 'crds';
 
-export type LeftMenuBottomSelectionType = 'terminal';
-export type RightMenuSelectionType = 'logs' | 'graph';
-
-export type LayoutSizeType = {
-  header: number;
+type MonacoRange = {
+  startLineNumber: number;
+  endLineNumber: number;
+  startColumn: number;
+  endColumn: number;
 };
 
-export type UiState = {
+type MonacoSelectionFile = {
+  type: 'file';
+  filePath: string;
+  range: MonacoRange;
+};
+
+type MonacoSelectionResource = {
+  type: 'resource';
+  resourceId: string;
+  range: MonacoRange;
+};
+
+type MonacoUiSelection = MonacoSelectionResource | MonacoSelectionFile;
+
+type MonacoUiState = {
+  focused: boolean;
+  undo: boolean;
+  redo: boolean;
+  find: boolean;
+  replace: boolean;
+  apply: boolean;
+  diff: boolean;
+  selection?: MonacoUiSelection;
+};
+
+type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+
+type NewResourceWizardInput = {
+  name?: string;
+  kind?: string;
+  apiVersion?: string;
+  namespace?: string;
+  selectedResourceId?: string;
+  targetFolder?: string;
+  targetFile?: string;
+};
+
+type PaneConfiguration = {
+  leftPane: number;
+  navPane: number;
+  editPane: number;
+  bottomPaneHeight: number;
+  recentProjectsPaneWidth: number;
+};
+
+type RightMenuSelectionType = 'logs' | 'graph';
+
+type UiState = {
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;
@@ -162,10 +169,18 @@ export type UiState = {
   };
 };
 
-export type PaneConfiguration = {
-  leftPane: number;
-  navPane: number;
-  editPane: number;
-  bottomPaneHeight: number;
-  recentProjectsPaneWidth: number;
+export type {
+  LayoutSizeType,
+  LeftMenuBottomSelectionType,
+  LeftMenuSelectionType,
+  MonacoRange,
+  MonacoSelectionFile,
+  MonacoSelectionResource,
+  MonacoUiSelection,
+  MonacoUiState,
+  NewLeftMenuSelectionType,
+  NewResourceWizardInput,
+  PaneConfiguration,
+  RightMenuSelectionType,
+  UiState,
 };

@@ -17,8 +17,6 @@ import {
   makeReplaceResourceText,
 } from '@constants/makeApplyText';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
@@ -44,6 +42,8 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

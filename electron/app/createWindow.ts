@@ -14,8 +14,6 @@ import {
   NEW_VERSION_CHECK_INTERVAL,
 } from '@constants/constants';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import utilsElectronStore from '@utils/electronStore';
@@ -23,6 +21,7 @@ import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
 import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
+import {AlertEnum, AlertType, NewVersionCode} from '@monokle-desktop/shared';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -35,7 +34,6 @@ import {
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
 import {createMenu} from './menu';
-import {NewVersionCode} from './models/appconfig';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';

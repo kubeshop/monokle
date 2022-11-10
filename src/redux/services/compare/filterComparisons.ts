@@ -1,10 +1,8 @@
-import {K8sResource} from '@models/k8sresource';
-
-import {CompareFilter, ResourceComparison} from '@redux/compare';
-
 import {isPassingKeyValueFilter} from '@utils/filter';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {CompareFilter, K8sResource, ResourceComparison} from '@monokle-desktop/shared';
 
 type FilterOptions = {
   search?: string;

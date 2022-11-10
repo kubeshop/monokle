@@ -1,10 +1,10 @@
-import {ResourceMapType} from '@models/appstate';
-
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
 
 import {awaitKindHandlersLoading} from '@src/kindhandlers';
+
+import {ResourceMapType} from '@monokle-desktop/shared';
 
 test('array-optional-resource-refs', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/arrayOptionalResourceRefs'));

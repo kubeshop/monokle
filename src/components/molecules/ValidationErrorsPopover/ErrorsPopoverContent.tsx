@@ -1,13 +1,12 @@
 import {useMemo} from 'react';
 
-import {K8sResource, ResourceValidationError} from '@models/k8sresource';
-import {MonacoRange} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
+
+import {K8sResource, MonacoRange, ResourceValidationError} from '@monokle-desktop/shared';
 
 import * as S from './ErrorsPopoverContent.styled';
 

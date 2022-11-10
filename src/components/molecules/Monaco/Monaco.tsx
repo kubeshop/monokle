@@ -19,10 +19,6 @@ import {Document, ParsedNode, isMap} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ResourceFilterType} from '@models/appstate';
-import {ResourceRef} from '@models/k8sresource';
-import {NewResourceWizardInput} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -45,6 +41,8 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

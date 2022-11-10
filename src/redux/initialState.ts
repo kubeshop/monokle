@@ -2,16 +2,19 @@ import os from 'os';
 
 import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {AlertState} from '@models/alert';
-import {AppConfig, NewVersionCode} from '@models/appconfig';
-import {AppState} from '@models/appstate';
-import {ExtensionState} from '@models/extension';
-import {NavigatorState} from '@models/navigator';
-import {TerminalState} from '@models/terminal';
-import {PaneConfiguration, UiState} from '@models/ui';
-import {UiCoachState} from '@models/uiCoach';
-
 import electronStore from '@utils/electronStore';
+
+import {
+  AlertState,
+  AppConfig,
+  AppState,
+  ExtensionState,
+  NavigatorState,
+  NewVersionCode,
+  PaneConfiguration,
+  TerminalState,
+  UiState,
+} from '@monokle-desktop/shared';
 
 const initialAppState: AppState = {
   isRehydrating: false,
@@ -228,10 +231,6 @@ const initialNavigatorState: NavigatorState = {
   registeredSectionBlueprintIds: [],
 };
 
-const initialUiCoachState: UiCoachState = {
-  hasUserPerformedClickOnClusterIcon: false,
-};
-
 const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
@@ -259,5 +258,4 @@ export default {
   navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  uiCoach: initialUiCoachState,
 };

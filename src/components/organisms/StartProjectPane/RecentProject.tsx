@@ -7,12 +7,12 @@ import {ExclamationCircleOutlined, PushpinFilled, PushpinOutlined} from '@ant-de
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {Project} from '@models/appconfig';
-
 import {useAppDispatch} from '@redux/hooks';
 import {setDeleteProject} from '@redux/reducers/appConfig';
 
 import {getRelativeDate} from '@utils';
+
+import {Project} from '@monokle-desktop/shared';
 
 import * as S from './RecentProject.styled';
 

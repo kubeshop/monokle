@@ -1,13 +1,13 @@
 import {IconNames} from './icons';
 
-export type ValidationIntegrationId =
+type ValidationIntegrationId =
   | 'kubernetes-schema'
   | 'open-policy-agent'
   | 'resource-links'
   | 'yaml-syntax'
   | 'crd-schema';
 
-export type ValidationIntegration = {
+type ValidationIntegration = {
   id: ValidationIntegrationId;
   icon: IconNames;
   name: string;
@@ -60,3 +60,5 @@ export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-crds/',
   isConfigurable: true,
 };
+
+export type {ValidationIntegration, ValidationIntegrationId};

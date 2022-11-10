@@ -13,18 +13,6 @@ import {
   YAML_DOCUMENT_DELIMITER_NEW_LINE,
 } from '@constants/constants';
 
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
-import {
-  ClusterResourceSet,
-  CommandResourceSet,
-  CustomHelmResourceSet,
-  GitResourceSet,
-  HelmResourceSet,
-  KustomizeResourceSet,
-  ResourceSet,
-} from '@redux/compare';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
@@ -39,6 +27,18 @@ import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {
+  ClusterResourceSet,
+  CommandResourceSet,
+  CustomHelmResourceSet,
+  GitResourceSet,
+  HelmResourceSet,
+  K8sResource,
+  KustomizeResourceSet,
+  ResourceSet,
+  RootState,
+} from '@monokle-desktop/shared';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

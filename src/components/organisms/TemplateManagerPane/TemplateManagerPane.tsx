@@ -9,8 +9,6 @@ import {ReloadOutlined} from '@ant-design/icons';
 import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
-import {AnyTemplate} from '@models/template';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
@@ -18,6 +16,8 @@ import {checkForExtensionsUpdates} from '@redux/services/extension';
 import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
+
+import {AnyTemplate} from '@monokle-desktop/shared';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';

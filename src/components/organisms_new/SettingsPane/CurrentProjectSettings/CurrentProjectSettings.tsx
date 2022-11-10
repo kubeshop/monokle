@@ -1,8 +1,8 @@
-import {Project, ProjectConfig} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {changeCurrentProjectName, updateProjectConfig} from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
+
+import {Project, ProjectConfig} from '@monokle-desktop/shared';
 
 import {Settings} from '../Settings/Settings';
 

@@ -7,28 +7,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AlertType} from '@models/alert';
-import {ProjectConfig} from '@models/appconfig';
-import {
-  AppState,
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ImagesListType,
-  MatchParamProps,
-  PreviewType,
-  ResourceFilterType,
-  ResourceMapType,
-  SelectionHistoryEntry,
-} from '@models/appstate';
-import {CurrentMatch, FileEntry} from '@models/fileentry';
-import {HelmChart} from '@models/helm';
-import {ImageType} from '@models/image';
-import {ValidationIntegration} from '@models/integrations';
-import {K8sResource} from '@models/k8sresource';
-import {ThunkApi} from '@models/thunk';
-
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
@@ -55,6 +33,29 @@ import electronStore from '@utils/electronStore';
 import {isResourcePassingFilter} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {
+  AlertType,
+  AppState,
+  CurrentMatch,
+  FileEntry,
+  FileMapType,
+  HelmChart,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ImageType,
+  ImagesListType,
+  K8sResource,
+  MatchParamProps,
+  PreviewType,
+  ProjectConfig,
+  ResourceFilterType,
+  ResourceMapType,
+  SelectionHistoryEntry,
+  ThunkApi,
+  ValidationIntegration,
+} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
@@ -1070,21 +1071,21 @@ export const mainSlice = createSlice({
   },
 });
 
-function groupResourcesByIdentifier(
-  resources: K8sResource[],
-  makeIdentifier: (resource: K8sResource) => string
-): Record<string, K8sResource[]> {
-  const groupedResources: Record<string, K8sResource[]> = {};
-  resources.forEach(resource => {
-    const identifier = makeIdentifier(resource);
-    if (groupedResources[identifier]) {
-      groupedResources[identifier].push(resource);
-    } else {
-      groupedResources[identifier] = [resource];
-    }
-  });
-  return groupedResources;
-}
+// function groupResourcesByIdentifier(
+//   resources: K8sResource[],
+//   makeIdentifier: (resource: K8sResource) => string
+// ): Record<string, K8sResource[]> {
+//   const groupedResources: Record<string, K8sResource[]> = {};
+//   resources.forEach(resource => {
+//     const identifier = makeIdentifier(resource);
+//     if (groupedResources[identifier]) {
+//       groupedResources[identifier].push(resource);
+//     } else {
+//       groupedResources[identifier] = [resource];
+//     }
+//   });
+//   return groupedResources;
+// }
 
 /**
  * Sets/clears preview resources

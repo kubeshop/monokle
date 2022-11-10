@@ -5,16 +5,20 @@ import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
-import {KubernetesObject, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {Policy} from '@models/policy';
-
 import {extractK8sResources, processResources} from '@redux/services/resource';
 
 import {createKubeClient} from '@utils/kubeclient';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {
+  AlertEnum,
+  K8sResource,
+  KubernetesObject,
+  Policy,
+  ResourceMapType,
+  ResourceRefsProcessingOptions,
+} from '@monokle-desktop/shared';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document

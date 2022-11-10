@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {ItemCustomization} from '@models/navigator';
+import {ItemCustomization} from '@monokle-desktop/shared';
 
 export function useItemCustomization(customization: ItemCustomization = {}) {
   const Prefix = useMemo(

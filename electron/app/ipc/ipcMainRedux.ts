@@ -2,7 +2,7 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
 import {AnyAction} from 'redux';
 
-import type {RootState} from '@models/rootstate';
+import type {RootState} from '@monokle-desktop/shared';
 
 import {promiseTimeout} from '../utils/promises';
 

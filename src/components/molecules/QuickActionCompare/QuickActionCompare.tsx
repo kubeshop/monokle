@@ -1,8 +1,10 @@
 import React, {useCallback} from 'react';
 
-import {ComparisonView, compareToggled} from '@redux/compare';
+import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
+
+import {ComparisonView} from '@monokle-desktop/shared';
 
 import * as S from './QuickActionCompare.styled';
 

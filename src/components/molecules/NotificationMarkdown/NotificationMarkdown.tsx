@@ -6,13 +6,13 @@ import {Modal} from 'antd';
 
 import _ from 'lodash';
 
-import {AlertType, ExtraContentType} from '@models/alert';
-
 import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
+
+import {AlertType, ExtraContentType} from '@monokle-desktop/shared';
 
 import NotificationModalTitle from './NotificationModalTitle';
 

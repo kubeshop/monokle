@@ -1,10 +1,10 @@
-export type WalkthroughCollection = 'novice' | 'release';
+type WalkthroughCollection = 'novice' | 'release';
 
-export type WalkthroughStep<C extends WalkthroughCollection = WalkthroughCollection> = C extends 'novice'
+type WalkthroughStep<C extends WalkthroughCollection = WalkthroughCollection> = C extends 'novice'
   ? 'template' | 'resource' | 'syntax' | 'kustomizeHelm'
   : 'compare' | 'images';
 
-export type WalkthroughContentProps = {
+type WalkthroughContentProps = {
   data: {
     step: WalkthroughStep;
     title: string;
@@ -18,3 +18,5 @@ export enum StepEnum {
   Previous = -1,
   Next = 1,
 }
+
+export type {WalkthroughCollection, WalkthroughContentProps, WalkthroughStep};

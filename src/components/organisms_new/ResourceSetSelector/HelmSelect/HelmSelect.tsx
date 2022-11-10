@@ -1,6 +1,6 @@
 import {Space} from 'antd';
 
-import {CompareSide} from '@redux/compare';
+import {CompareSide} from '@monokle-desktop/shared';
 
 import {HelmChartSelect} from './HelmChartSelect';
 import {HelmValuesOrConfigSelect} from './HelmValuesOrConfigSelect';

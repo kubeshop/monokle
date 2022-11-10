@@ -1,10 +1,10 @@
 import log from 'loglevel';
 import {replaceInFile} from 'replace-in-file';
 
-import {AppDispatch} from '@models/appdispatch';
-
 import {getRelativeFilePath} from '@redux/services/fileEntry';
 import {updateFileEntries} from '@redux/thunks/updateFileEntry';
+
+import {AppDispatch} from '@monokle-desktop/shared';
 
 export async function replaceInFiles(files: string[], query: RegExp, replaceQuery: string, dispatch: AppDispatch) {
   const options = {

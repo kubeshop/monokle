@@ -8,12 +8,12 @@ import {Row} from 'antd';
 
 import dagre from 'dagre';
 
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {activeResourcesSelector} from '@redux/selectors';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared';
 
 import Sidebar from './Sidebar';
 

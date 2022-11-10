@@ -5,12 +5,17 @@ import _ from 'lodash';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
-import {RootState} from '@models/rootstate';
-
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import {setPaneConfiguration, toggleLeftMenu, toggleResourceFilters} from '@redux/reducers/ui';
+
+import {
+  AppDispatch,
+  ItemInstance,
+  NavigatorInstanceState,
+  RootState,
+  SectionBlueprint,
+  SectionInstance,
+} from '@monokle-desktop/shared';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 

@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {SectionCustomization} from '@models/navigator';
+import {SectionCustomization} from '@monokle-desktop/shared';
 
 export function useSectionCustomization(customization: SectionCustomization = {}) {
   const NameDisplay = useMemo(() => ({Component: customization.nameDisplay?.component}), [customization.nameDisplay]);

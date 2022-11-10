@@ -4,14 +4,14 @@ import {useCallback} from 'react';
 
 import {Switch} from 'antd';
 
-import {ValidationIntegration} from '@models/integrations';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation} from '@redux/validation/validation.slice';
 
 import {trackEvent} from '@utils/telemetry';
+
+import {ValidationIntegration} from '@monokle-desktop/shared';
 
 import * as S from './ValidationCard.styled';
 

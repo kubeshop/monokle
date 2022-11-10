@@ -14,8 +14,6 @@ import {
   ValidationTabTooltip,
 } from '@constants/tooltips';
 
-import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
@@ -27,6 +25,8 @@ import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
+
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

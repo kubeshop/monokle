@@ -1,4 +1,4 @@
-export type GitBranchCommit = {
+type GitBranchCommit = {
   author_email: string;
   author_name: string;
   body: string;
@@ -8,14 +8,14 @@ export type GitBranchCommit = {
   refs: string;
 };
 
-export type GitBranch = {
+type GitBranch = {
   name: string;
   commitSha: string;
   type: 'local' | 'remote';
   commits?: GitBranchCommit[];
 };
 
-export type GitRepo = {
+type GitRepo = {
   currentBranch: string;
   branches: string[];
   branchMap: Record<string, GitBranch>;
@@ -26,9 +26,9 @@ export type GitRepo = {
   hasRemoteRepo: boolean;
 };
 
-export type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';
+type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';
 
-export type GitChangedFile = {
+type GitChangedFile = {
   modifiedContent: string;
   name: string;
   originalContent: string;
@@ -40,7 +40,7 @@ export type GitChangedFile = {
   type: GitChangedFileType;
 };
 
-export type GitSliceState = {
+type GitSliceState = {
   changedFiles: GitChangedFile[];
   gitCloneModal: {
     open: boolean;
@@ -50,3 +50,5 @@ export type GitSliceState = {
   selectedItem?: GitChangedFile;
   repo?: GitRepo;
 };
+
+export type {GitBranch, GitBranchCommit, GitChangedFile, GitChangedFileType, GitRepo, GitSliceState};

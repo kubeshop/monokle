@@ -8,9 +8,6 @@ import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
-import {SectionCustomComponentProps} from '@models/navigator';
-import {NewResourceWizardInput} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -18,6 +15,8 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import Colors from '@styles/Colors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared';
 
 const SuffixContainer = styled.span`
   display: inline-block;

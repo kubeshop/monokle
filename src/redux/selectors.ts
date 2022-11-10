@@ -3,19 +3,23 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@models/appconfig';
-import {AppState} from '@models/appstate';
-import {HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {
+  AppConfig,
+  AppState,
+  HelmPreviewConfiguration,
+  HelmValuesFile,
+  K8sResource,
+  ProjectConfig,
+  ResourceKindHandler,
+  RootState,
+} from '@monokle-desktop/shared';
 
 import Colors from '../styles/Colors';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
@@ -127,11 +131,6 @@ export const isInClusterModeSelector = createSelector(
     const previewId = state.main.previewResourceId;
     return kubeConfig && isDefined(previewId) && previewId === kubeConfig.currentContext;
   }
-);
-
-export const logsSelector = createSelector(
-  (state: RootState) => state.logs.logs,
-  logs => logs.join('\n')
 );
 
 export const activeProjectSelector = createSelector(

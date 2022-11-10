@@ -1,7 +1,5 @@
 import {useMemo, useState} from 'react';
 
-import {StepEnum} from '@models/walkthrough';
-
 import {useAppDispatch} from '@redux/hooks';
 import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
 
@@ -15,6 +13,7 @@ import EditorLayout from '@assets/EditorLayout.svg';
 import LayoutDark from '@assets/LayoutDark.svg';
 import LayoutWhite from '@assets/LayoutWhite.svg';
 
+import {StepEnum} from '@monokle-desktop/shared';
 import {TitleBar} from '@monokle/components';
 
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';

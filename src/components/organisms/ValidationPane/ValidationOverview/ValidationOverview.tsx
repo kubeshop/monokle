@@ -1,14 +1,14 @@
 import React from 'react';
 
+import ValidationFigure from '@assets/ValidationFigure.svg';
+
 import {
   CRD_SCHEMA_INTEGRATION,
   K8S_SCHEMA_INTEGRATION,
   OPA_INTEGRATION,
   RESOURCE_LINKS_INTEGRATION,
   YAML_SYNTAX_INTEGRATION,
-} from '@models/integrations';
-
-import ValidationFigure from '@assets/ValidationFigure.svg';
+} from '@monokle-desktop/shared';
 
 import ValidationCard from './ValidationCard';
 import ValidationCardUpNext from './ValidationCardUpNext';

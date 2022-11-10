@@ -1,16 +1,18 @@
 import {monaco} from 'react-monaco-editor';
 
 import {
+  CurrentMatch,
+  FileEntry,
   FileMapType,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
+  K8sResource,
+  MonacoUiState,
   ResourceFilterType,
   ResourceMapType,
-} from '@models/appstate';
-import {CurrentMatch, FileEntry} from '@models/fileentry';
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-import {MonacoUiState} from '@models/ui';
+  ResourceRef,
+} from '@monokle-desktop/shared';
 
 export interface CodeIntelResponse {
   newDecorations: monaco.editor.IModelDeltaDecoration[];

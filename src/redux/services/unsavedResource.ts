@@ -3,14 +3,13 @@ import {stringify} from 'yaml';
 
 import {UNSAVED_PREFIX} from '@constants/constants';
 
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-
 import {addMultipleResources, addResource} from '@redux/reducers/main';
 
 import {parseYamlDocument} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {AppDispatch, K8sResource} from '@monokle-desktop/shared';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `

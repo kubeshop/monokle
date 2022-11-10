@@ -1,10 +1,9 @@
 import _ from 'lodash';
 
-import {AnyPlugin, isAnyPlugin} from '@monokle-desktop/shared';
-
+import {AnyPlugin, isAnyPlugin} from './plugin';
 import {AnyTemplate, TemplatePack, isAnyTemplate, isTemplatePack} from './template';
 
-export interface ExtensionState {
+export type ExtensionState = {
   isLoadingExistingPlugins: boolean;
   pluginMap: Record<string, AnyPlugin>;
   isLoadingExistingTemplates: boolean;
@@ -15,7 +14,7 @@ export interface ExtensionState {
   templatePacksDir?: string;
   pluginsDir?: string;
   isPluginsDrawerVisible: boolean;
-}
+};
 
 export type AnyExtension<ExtensionType> = {
   extension: ExtensionType;

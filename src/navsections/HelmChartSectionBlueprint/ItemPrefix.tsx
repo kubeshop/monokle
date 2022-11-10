@@ -2,11 +2,11 @@ import {useMemo} from 'react';
 
 import {EyeOutlined, FileOutlined} from '@ant-design/icons';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 const ItemPrefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

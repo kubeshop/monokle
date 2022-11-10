@@ -1,4 +1,4 @@
-import {ResourceRef} from '@models/k8sresource';
+import {ResourceRef} from '@monokle-desktop/shared';
 
 export const getRefRange = (ref: ResourceRef) => {
   if (!ref.position) {

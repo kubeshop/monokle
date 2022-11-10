@@ -4,13 +4,13 @@ import {monaco} from 'react-monaco-editor';
 
 import {JsonObject} from 'type-fest';
 
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource} from './k8sResource';
 
-interface SymbolMatcher {
+type SymbolMatcher = {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
-}
+};
 
-interface RefMapper {
+type RefMapper = {
   source: {
     pathParts: string[];
 
@@ -46,20 +46,18 @@ interface RefMapper {
     sourceResource: K8sResource,
     siblingValues: Record<string, string>
   ) => boolean;
-}
+};
 
-export type ResourceKind = string;
-
-export type ClusterResourceOptions = {
+type ClusterResourceOptions = {
   namespace?: string;
 };
 
-interface ResourceKindHandler {
+type ResourceKindHandler = {
   /**
    * The kubernetes kind of this resource
    */
 
-  kind: ResourceKind;
+  kind: string;
 
   /**
    * a micromatch matcher for selecting resources of this kind
@@ -151,6 +149,6 @@ interface ResourceKindHandler {
    */
 
   validationSchemaPrefix?: string;
-}
+};
 
-export type {ResourceKindHandler, RefMapper, SymbolMatcher};
+export type {ClusterResourceOptions, ResourceKindHandler, RefMapper, SymbolMatcher};

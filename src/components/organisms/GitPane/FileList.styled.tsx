@@ -5,9 +5,9 @@ import {FileOutlined as RawFileOutlined} from '@ant-design/icons';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {GitChangedFile, GitChangedFileType} from '@models/git';
-
 import Colors from '@styles/Colors';
+
+import {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared';
 
 export const FileIcon = styled.div`
   margin-left: 12.5px;

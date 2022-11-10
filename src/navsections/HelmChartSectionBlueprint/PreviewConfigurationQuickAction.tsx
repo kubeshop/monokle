@@ -8,14 +8,14 @@ import styled from 'styled-components';
 
 import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
 import Colors from '@styles/Colors';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared';
 
 const StyledButton = styled.span<{isItemSelected: boolean}>`
   margin-right: 15px;

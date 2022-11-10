@@ -1,14 +1,14 @@
 import {useCallback} from 'react';
 import {useMeasure} from 'react-use';
 
-import {OPA_INTEGRATION} from '@models/integrations';
-
 import {useAppDispatch} from '@redux/hooks';
 import {reprocessAllResources, toggleAllRules} from '@redux/reducers/main';
 import {toggleOPARules} from '@redux/validation/validation.slice';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {Button} from '@src/App.styled';
+
+import {OPA_INTEGRATION} from '@monokle-desktop/shared';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import * as S from './ValidationOpenPolicyAgent.styled';

@@ -30,8 +30,6 @@ import {
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
 
-import {ProjectConfig} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {closeKubeConfigBrowseSetting, openKubeConfigBrowseSetting} from '@redux/reducers/ui';
@@ -42,6 +40,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
+
+import {ProjectConfig} from '@monokle-desktop/shared';
 
 import * as S from './styled';
 

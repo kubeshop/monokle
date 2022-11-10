@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 
 import {Col, Row, Skeleton} from 'antd';
 
-import {CompareSide, resourceSetRefreshed} from '@redux/compare';
+import {resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
@@ -10,6 +10,8 @@ import CompareSingleFigure from '@assets/figures/compareSingle.svg';
 import CrashFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
+
+import {CompareSide} from '@monokle-desktop/shared';
 
 import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';

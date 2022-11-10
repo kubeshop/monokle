@@ -1,6 +1,6 @@
 import {ipcMain} from 'electron';
 
-import type {FileMapType} from '@models/appstate';
+import type {FileMapType} from '@monokle-desktop/shared';
 
 import {
   areFoldersGitRepos,
