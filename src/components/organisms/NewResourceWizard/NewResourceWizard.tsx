@@ -12,8 +12,6 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors';
@@ -26,6 +24,7 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ResourceKindHandler} from '@monokle-desktop/shared';
 import {FileEntry, FileMapType, K8sResource, NewResourceWizardInput} from '@monokle-desktop/shared';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';

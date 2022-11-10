@@ -2,7 +2,6 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
@@ -13,6 +12,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
+import {ResourceKindHandler} from '@monokle-desktop/shared';
 import {K8sResource, ResourceFilterType} from '@monokle-desktop/shared';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';

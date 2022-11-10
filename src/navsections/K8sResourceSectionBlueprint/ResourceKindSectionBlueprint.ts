@@ -1,7 +1,6 @@
 import navSectionNames from '@constants/navSectionNames';
 
 import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
 
 import {
@@ -18,6 +17,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
+import {ResourceKindHandler} from '@monokle-desktop/shared';
 import {K8sResource, ResourceFilterType} from '@monokle-desktop/shared';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';

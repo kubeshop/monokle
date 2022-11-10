@@ -1,11 +1,10 @@
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 
-import {RefMapper} from '@models/resourcekindhandler';
-
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
+import {RefMapper} from '@monokle-desktop/shared';
 import {
   K8sResource,
   RefNode,

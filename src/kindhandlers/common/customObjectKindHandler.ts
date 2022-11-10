@@ -6,8 +6,6 @@ import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {loadResource} from '@redux/services';
 import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
@@ -21,6 +19,7 @@ import {
 } from '@src/kindhandlers/common/customMatchers';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
+import {RefMapper, ResourceKindHandler} from '@monokle-desktop/shared';
 import {K8sResource} from '@monokle-desktop/shared';
 
 /**

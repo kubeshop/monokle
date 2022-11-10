@@ -15,6 +15,7 @@ export * from './kustomize';
 export * from './plugin';
 export * from './policy';
 export * from './repository';
+export * from './resourceKindHandler';
 export * from './template';
 export * from './terminal';
 export * from './ui';
