@@ -1,0 +1,17 @@
+name: Add bugs to bugs project
+
+on:
+  issues:
+    types:
+      - opened
+      - labeled
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@RELEASE_VERSION
+        with:
+          project-url: https://github.com/orgs/kubeshop/projects/29
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
