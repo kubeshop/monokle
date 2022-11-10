@@ -4,16 +4,6 @@ import {monaco} from 'react-monaco-editor';
 import {debounce} from 'lodash';
 
 import {AppDispatch} from '@models/appdispatch';
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ImagesListType,
-  ResourceFilterType,
-  ResourceMapType,
-} from '@models/appstate';
-import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightFileMatches} from '@redux/reducers/main';
@@ -23,6 +13,16 @@ import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
 import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
 import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
 
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ImagesListType,
+  ResourceFilterType,
+  ResourceMapType,
+} from '@monokle-desktop/shared';
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared';
 import {CurrentMatch} from '@monokle-desktop/shared';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';

@@ -1,10 +1,9 @@
 import {Scalar} from 'yaml';
 
-import {SarifRule} from '@monokle-desktop/shared';
+import {KubernetesObject} from './appState';
+import {SarifRule} from './policy';
 
-import {KubernetesObject} from './appstate';
-
-export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
+type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
 type ResourceValidationError = {
   property: string;
@@ -22,7 +21,7 @@ type ResourceValidation = {
 /**
  * A k8s resource manifest, either extracted from a file or generated internally (for example when previewing kustomizations or helm charts)
  */
-interface K8sResource {
+type K8sResource = {
   /** an internally generated UUID
    * - used for references/lookups in resourceMap */
   id: string;
@@ -64,7 +63,7 @@ interface K8sResource {
 
   /** result of policy validation */
   issues?: ResourceValidation;
-}
+};
 
 export enum ResourceRefType {
   Incoming = 'incoming',
@@ -91,7 +90,7 @@ type RefTargetImage = {
 
 type RefTarget = RefTargetResource | RefTargetFile | RefTargetImage;
 
-interface ResourceRef {
+type ResourceRef = {
   /** the type of ref (see enum) */
   type: ResourceRefType;
   /** the ref value - for example the name of a configmap */
@@ -100,14 +99,14 @@ interface ResourceRef {
   target?: RefTarget;
   /** the position in the document of the refName (undefined for incoming file refs) */
   position?: RefPosition;
-}
+};
 
-interface RefPosition {
+type RefPosition = {
   line: number;
   column: number;
   length: number;
   endLine?: number;
   endColumn?: number;
-}
+};
 
-export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};
+export type {K8sResource, ResourceRef, RefPosition, RefNode, ResourceValidation, ResourceValidationError};

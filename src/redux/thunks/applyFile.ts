@@ -2,7 +2,6 @@ import fs from 'fs';
 import log from 'loglevel';
 
 import {AppDispatch} from '@models/appdispatch';
-import {FileMapType} from '@models/appstate';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
@@ -12,7 +11,7 @@ import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {errorAlert} from '@utils/alert';
 import {APPLY_FILE, trackEvent} from '@utils/telemetry';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType, FileMapType} from '@monokle-desktop/shared';
 
 /**
  * Invokes kubectl for the content of the specified resource

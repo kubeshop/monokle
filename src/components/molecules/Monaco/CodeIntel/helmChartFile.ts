@@ -2,7 +2,6 @@ import {monaco} from 'react-monaco-editor';
 
 import {flatten} from 'lodash';
 
-import {HelmValueMatch} from '@models/helm';
 import {MonacoUiState} from '@models/ui';
 
 import {getHelmValueRanges} from '@redux/services/helm';
@@ -17,6 +16,8 @@ import {
   createLinkProvider,
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
+
+import {HelmValueMatch} from '@monokle-desktop/shared';
 
 interface GoToValuesFileParams {
   helmMatch: HelmValueMatch & {filePath: string};

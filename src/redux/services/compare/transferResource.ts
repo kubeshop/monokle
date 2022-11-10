@@ -6,7 +6,6 @@ import {v4 as uuid} from 'uuid';
 import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {ResourceSet} from '@redux/compare';
@@ -20,6 +19,8 @@ import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 type Type = ResourceSet['type'];
 

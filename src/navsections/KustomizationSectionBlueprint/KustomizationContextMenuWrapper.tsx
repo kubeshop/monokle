@@ -8,7 +8,6 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -25,6 +24,8 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;

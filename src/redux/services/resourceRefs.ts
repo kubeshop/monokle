@@ -1,12 +1,20 @@
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 
-import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {RefMapper} from '@models/resourcekindhandler';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+
+import {
+  K8sResource,
+  RefNode,
+  RefPosition,
+  ResourceMapType,
+  ResourceRef,
+  ResourceRefType,
+  ResourceRefsProcessingOptions,
+} from '@monokle-desktop/shared';
 
 import {traverseDocument} from './manifest-utils';
 import {

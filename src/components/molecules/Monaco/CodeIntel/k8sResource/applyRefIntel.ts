@@ -1,8 +1,5 @@
 import {monaco} from 'react-monaco-editor';
 
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
-
 import {getResourceFolder} from '@redux/services/fileEntry';
 import {areRefPosEqual, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
@@ -16,6 +13,9 @@ import {
   createLinkProvider,
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
+
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared';
+import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@monokle-desktop/shared';
 
 function applyRefIntel(
   resource: K8sResource,

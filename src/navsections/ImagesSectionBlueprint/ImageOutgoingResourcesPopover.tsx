@@ -1,12 +1,12 @@
 import {useMemo} from 'react';
 
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
 import {getRefRange} from '@utils/refs';
+
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared';
 
 import * as S from './ImageOutgoingResourcesPopover.styled';
 

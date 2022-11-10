@@ -2,7 +2,6 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import {ResourceFilterType} from '@models/appstate';
 import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -12,6 +11,8 @@ import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidS
 import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
+
+import {ResourceFilterType} from '@monokle-desktop/shared';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

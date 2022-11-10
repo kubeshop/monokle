@@ -4,11 +4,11 @@ import {Checkbox, Form, Input, Modal} from 'antd';
 
 import styled from 'styled-components';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
 import {renameResource} from '@redux/thunks/renameResource';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;

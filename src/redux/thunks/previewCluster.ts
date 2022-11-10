@@ -9,7 +9,6 @@ import log from 'loglevel';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
@@ -23,7 +22,7 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {ClusterAccess} from '@monokle-desktop/shared';
+import {ClusterAccess, K8sResource} from '@monokle-desktop/shared';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(

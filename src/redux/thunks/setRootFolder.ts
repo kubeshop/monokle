@@ -1,13 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {AppDispatch} from '@models/appdispatch';
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
@@ -24,6 +17,13 @@ import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@monokle-desktop/shared';
 import {AlertEnum, GitRepo} from '@monokle-desktop/shared';
 
 /**

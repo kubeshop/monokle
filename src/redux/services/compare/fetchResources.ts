@@ -13,7 +13,6 @@ import {
   YAML_DOCUMENT_DELIMITER_NEW_LINE,
 } from '@constants/constants';
 
-import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {
@@ -39,6 +38,8 @@ import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

@@ -4,10 +4,9 @@ import textExtensions from 'text-extensions';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {FileMapType, ResourceMapType} from '@models/appstate';
-
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared';
 import {FileEntry} from '@monokle-desktop/shared';
 
 import {TreeNode} from './types';

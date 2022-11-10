@@ -4,8 +4,6 @@ import {Dropdown, Tag} from 'antd';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
-import {ResourceRefType} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {filteredResourceSelector, isInPreviewModeSelector} from '@redux/selectors';
@@ -14,6 +12,8 @@ import {Icon} from '@atoms';
 
 import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
+
+import {ResourceRefType} from '@monokle-desktop/shared';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 

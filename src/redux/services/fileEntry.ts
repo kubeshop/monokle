@@ -6,17 +6,6 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {
-  AppState,
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-
-import {
   HelmChartEventEmitter,
   createHelmChart,
   createHelmTemplate,
@@ -42,7 +31,19 @@ import {
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
 
-import {FileEntry, ProjectConfig} from '@monokle-desktop/shared';
+import {
+  AppState,
+  FileEntry,
+  FileMapType,
+  HelmChart,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesFile,
+  HelmValuesMapType,
+  K8sResource,
+  ProjectConfig,
+  ResourceMapType,
+} from '@monokle-desktop/shared';
 
 import {
   deleteResource,

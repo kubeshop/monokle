@@ -1,100 +1,15 @@
-import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
+import {AlertType} from './alert';
+import {CurrentMatch, FileEntry} from './fileEntry';
+import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
+import {ImageType} from './image';
+import {ValidationIntegration} from './integrations';
+import {K8sResource} from './k8sResource';
+import {Policy} from './policy';
 
-import {AlertType, CurrentMatch, FileEntry, ImageType, Policy, ValidationIntegration} from '@monokle-desktop/shared';
+export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
+  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
 
-import {K8sResource} from './k8sresource';
-
-/**
- * Maps uuid:s to K8sResources
- */
-type ResourceMapType = {
-  [id: string]: K8sResource;
-};
-
-/**
- * Maps relative paths to FileEntries. The root folder FileEntry is mapped to "<root>"
- */
-type FileMapType = {
-  [id: string]: FileEntry;
-};
-
-/**
- * List of images from current project
- */
-
-type ImagesListType = ImageType[];
-
-/**
- * Maps ids to Helm charts
- */
-type HelmChartMapType = {
-  [id: string]: HelmChart;
-};
-
-/**
- * Maps ids to Helm values files
- */
-type HelmValuesMapType = {
-  [id: string]: HelmValuesFile;
-};
-
-type HelmTemplatesMapType = {
-  [id: string]: HelmTemplate;
-};
-
-type PreviewLoaderType = {
-  isLoading: boolean;
-  targetId?: string;
-};
-
-type FiltersPresetsType = {
-  [name: string]: ResourceFilterType;
-};
-
-type ResourceDiffType = {
-  targetResourceId?: string;
-};
-
-type ResourceSelectionHistoryEntry = {
-  type: 'resource';
-  selectedResourceId: string;
-};
-
-type ImageSelectionHistoryEntry = {
-  type: 'image';
-  selectedImage: ImageType;
-};
-
-type PathSelectionHistoryEntry = {
-  type: 'path';
-  selectedPath: string;
-};
-
-type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
-
-type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config' | 'command';
-
-type ResourceFilterType = {
-  names?: string[];
-  kinds?: string[];
-  namespace?: string;
-  labels: Record<string, string | null>;
-  annotations: Record<string, string | null>;
-  fileOrFolderContainedIn?: string;
-};
-
-type ResourceRefsProcessingOptions = {
-  /** if ref processing should ignore optional unsatisfied ref  */
-  shouldIgnoreOptionalUnsatisfiedRefs: boolean;
-};
-
-export type MatchParamProps = {
-  matchCase: boolean;
-  matchWholeWord: boolean;
-  regExp: boolean;
-};
-
-interface AppState {
+type AppState = {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
    * - fileMap[**ROOT_FILE_ENTRY**] is the FileEntry for the rootFolder and it's **filePath is absolute**
@@ -192,9 +107,48 @@ interface AppState {
     };
   };
   lastChangedLine: number;
-}
+};
 
-export interface KubernetesObject {
+/**
+ * Maps relative paths to FileEntries. The root folder FileEntry is mapped to "<root>"
+ */
+type FileMapType = {
+  [id: string]: FileEntry;
+};
+
+type FiltersPresetsType = {
+  [name: string]: ResourceFilterType;
+};
+
+/**
+ * Maps ids to Helm charts
+ */
+type HelmChartMapType = {
+  [id: string]: HelmChart;
+};
+
+type HelmTemplatesMapType = {
+  [id: string]: HelmTemplate;
+};
+
+/**
+ * Maps ids to Helm values files
+ */
+type HelmValuesMapType = {
+  [id: string]: HelmValuesFile;
+};
+
+/**
+ * List of images from current project
+ */
+type ImagesListType = ImageType[];
+
+type ImageSelectionHistoryEntry = {
+  type: 'image';
+  selectedImage: ImageType;
+};
+
+type KubernetesObject = {
   apiVersion: string;
   kind: string;
   metadata: {
@@ -202,10 +156,57 @@ export interface KubernetesObject {
     [x: string]: any;
   };
   [x: string]: any;
-}
+};
 
-export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
-  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
+type MatchParamProps = {
+  matchCase: boolean;
+  matchWholeWord: boolean;
+  regExp: boolean;
+};
+
+type PathSelectionHistoryEntry = {
+  type: 'path';
+  selectedPath: string;
+};
+
+type PreviewLoaderType = {
+  isLoading: boolean;
+  targetId?: string;
+};
+
+type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config' | 'command';
+
+type ResourceDiffType = {
+  targetResourceId?: string;
+};
+
+type ResourceFilterType = {
+  names?: string[];
+  kinds?: string[];
+  namespace?: string;
+  labels: Record<string, string | null>;
+  annotations: Record<string, string | null>;
+  fileOrFolderContainedIn?: string;
+};
+
+/**
+ * Maps uuid:s to K8sResources
+ */
+type ResourceMapType = {
+  [id: string]: K8sResource;
+};
+
+type ResourceRefsProcessingOptions = {
+  /** if ref processing should ignore optional unsatisfied ref  */
+  shouldIgnoreOptionalUnsatisfiedRefs: boolean;
+};
+
+type ResourceSelectionHistoryEntry = {
+  type: 'resource';
+  selectedResourceId: string;
+};
+
+type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
 
 export type {
   AppState,
@@ -213,10 +214,12 @@ export type {
   ResourceFilterType,
   FiltersPresetsType,
   FileMapType,
-  ImagesListType,
   HelmChartMapType,
   HelmValuesMapType,
   HelmTemplatesMapType,
+  ImagesListType,
+  KubernetesObject,
+  MatchParamProps,
   PreviewLoaderType,
   SelectionHistoryEntry,
   PreviewType,

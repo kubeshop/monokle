@@ -1,4 +1,4 @@
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource} from '@monokle-desktop/shared';
 
 export const initialState: CompareState = {
   current: {

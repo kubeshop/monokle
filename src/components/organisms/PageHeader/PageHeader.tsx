@@ -12,8 +12,6 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
@@ -29,6 +27,8 @@ import BranchSelect from '@components/molecules/BranchSelect';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';

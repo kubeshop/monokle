@@ -9,15 +9,6 @@ import {LineCounter, Scalar, parse} from 'yaml';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
-import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@models/helm';
-
-import {
   createFileEntry,
   extractResourcesForFileEntry,
   fileIsExcluded,
@@ -30,7 +21,20 @@ import {NodeWrapper} from '@redux/services/resource';
 import {getFileStats} from '@utils/files';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
-import {FileEntry, ProjectConfig} from '@monokle-desktop/shared';
+import {
+  FileEntry,
+  FileMapType,
+  HelmChart,
+  HelmChartMapType,
+  HelmTemplate,
+  HelmTemplatesMapType,
+  HelmValueMatch,
+  HelmValuesFile,
+  HelmValuesMapType,
+  ProjectConfig,
+  RangeAndValue,
+  ResourceMapType,
+} from '@monokle-desktop/shared';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

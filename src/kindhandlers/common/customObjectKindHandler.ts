@@ -6,7 +6,6 @@ import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {loadResource} from '@redux/services';
@@ -21,6 +20,8 @@ import {
   targetKindMatcher,
 } from '@src/kindhandlers/common/customMatchers';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 /**
  * extract the version from the apiVersion string of the specified resource

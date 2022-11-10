@@ -7,21 +7,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {
-  AppState,
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ImagesListType,
-  MatchParamProps,
-  PreviewType,
-  ResourceFilterType,
-  ResourceMapType,
-  SelectionHistoryEntry,
-} from '@models/appstate';
-import {HelmChart} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
 import {ThunkApi} from '@models/thunk';
 
 import {transferResource} from '@redux/compare';
@@ -53,10 +38,23 @@ import {parseYamlDocument} from '@utils/yaml';
 
 import {
   AlertType,
+  AppState,
   CurrentMatch,
   FileEntry,
+  FileMapType,
+  HelmChart,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
   ImageType,
+  ImagesListType,
+  K8sResource,
+  MatchParamProps,
+  PreviewType,
   ProjectConfig,
+  ResourceFilterType,
+  ResourceMapType,
+  SelectionHistoryEntry,
   ValidationIntegration,
 } from '@monokle-desktop/shared';
 

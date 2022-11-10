@@ -4,9 +4,9 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {ThunkDispatch} from 'redux-thunk';
 
-import {FileMapType} from '@models/appstate';
-
 import {applyFile} from '@redux/thunks/applyFile';
+
+import {FileMapType} from '@monokle-desktop/shared';
 
 export function applyFileWithConfirm(
   selectedPath: string,

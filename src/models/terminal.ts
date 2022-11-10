@@ -1,4 +1,4 @@
-import {K8sResource} from './k8sresource';
+import {K8sResource} from '@monokle-desktop/shared';
 
 interface ShellType {
   name: string;

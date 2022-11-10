@@ -5,7 +5,6 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
@@ -21,6 +20,8 @@ import ResourceQuotaHandler from '@src/kindhandlers/ResourceQuota.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';

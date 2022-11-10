@@ -7,8 +7,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {v4 as uuidv4} from 'uuid';
 
 import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -25,6 +23,8 @@ import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {ContextMenu} from '@atoms';
+
+import {K8sResource, ResourceMapType} from '@monokle-desktop/shared';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;

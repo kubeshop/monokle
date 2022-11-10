@@ -3,9 +3,9 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {trackEvent} from '@utils/telemetry';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import {selectIsAllComparisonSelected} from './selectors';
 import {

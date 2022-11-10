@@ -1,7 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -12,6 +10,9 @@ import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
 import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+
+import {ResourceMapType} from '@monokle-desktop/shared';
+import {K8sResource, ResourceRef, ResourceRefType} from '@monokle-desktop/shared';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';

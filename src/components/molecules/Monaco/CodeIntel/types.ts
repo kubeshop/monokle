@@ -1,5 +1,7 @@
 import {monaco} from 'react-monaco-editor';
 
+import {MonacoUiState} from '@models/ui';
+
 import {
   FileMapType,
   HelmChartMapType,
@@ -7,10 +9,8 @@ import {
   HelmValuesMapType,
   ResourceFilterType,
   ResourceMapType,
-} from '@models/appstate';
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-import {MonacoUiState} from '@models/ui';
-
+} from '@monokle-desktop/shared';
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared';
 import {CurrentMatch, FileEntry} from '@monokle-desktop/shared';
 
 export interface CodeIntelResponse {

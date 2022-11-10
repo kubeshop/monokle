@@ -16,9 +16,6 @@ import {
   OpenKustomizeDocumentationTooltip,
 } from '@constants/tooltips';
 
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-
 import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal} from '@redux/reducers/main';
@@ -60,6 +57,9 @@ import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';

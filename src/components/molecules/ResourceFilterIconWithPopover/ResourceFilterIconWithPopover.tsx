@@ -6,14 +6,14 @@ import {FilterOutlined} from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ResourceFilterType} from '@models/appstate';
-
 import {useAppSelector} from '@redux/hooks';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {IconWithPopover} from '@atoms';
 
 import Colors from '@styles/Colors';
+
+import {ResourceFilterType} from '@monokle-desktop/shared';
 
 import ResourceFilter from '../ResourceFilter';
 

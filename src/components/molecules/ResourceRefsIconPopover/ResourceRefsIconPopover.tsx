@@ -2,13 +2,13 @@ import {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 import RefsPopoverContent from './RefsPopoverContent';
 import * as S from './ResourceRefsIconPopover.styled';

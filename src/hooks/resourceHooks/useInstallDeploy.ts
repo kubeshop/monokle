@@ -3,12 +3,12 @@ import {useMemo} from 'react';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
 import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
+import {K8sResource} from '@monokle-desktop/shared';
 
 export const useInstallDeploy = (resource?: K8sResource) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);

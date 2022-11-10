@@ -8,8 +8,6 @@ import log from 'loglevel';
 import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
-import {KubernetesObject, isKubernetesObject} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
@@ -21,9 +19,12 @@ import {
   AlertType,
   AnyPlugin,
   InterpolateTemplateOptions,
+  K8sResource,
+  KubernetesObject,
   TemplateManifest,
   TemplatePack,
   VanillaTemplate,
+  isKubernetesObject,
 } from '@monokle-desktop/shared';
 
 import {extractObjectsFromYaml} from './manifest-utils';

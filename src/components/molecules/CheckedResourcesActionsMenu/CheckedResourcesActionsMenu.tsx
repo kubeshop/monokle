@@ -7,7 +7,6 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
 import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -25,6 +24,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import Colors from '@styles/Colors';
 
+import {K8sResource} from '@monokle-desktop/shared';
 import {AlertEnum} from '@monokle-desktop/shared';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';

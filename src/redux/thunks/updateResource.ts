@@ -2,7 +2,6 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {AppState} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 import {ThunkApi} from '@models/thunk';
 
@@ -14,6 +13,8 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
+
+import {AppState} from '@monokle-desktop/shared';
 
 type UpdateResourcePayload = {
   resourceId: string;

@@ -12,8 +12,6 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -48,6 +46,8 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 import {defineHotkey} from '@utils/defineHotkey';
 
 import Colors from '@styles/Colors';
+
+import {K8sResource, ResourceMapType} from '@monokle-desktop/shared';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

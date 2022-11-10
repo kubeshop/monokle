@@ -2,12 +2,11 @@ import {useEffect} from 'react';
 
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 
-import {FileMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {hasSupportedResourceContent} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
+
+import {FileMapType, K8sResource} from '@monokle-desktop/shared';
 
 function useResourceYamlSchema(
   yaml: typeof languages.yaml,

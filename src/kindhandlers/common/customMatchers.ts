@@ -1,4 +1,4 @@
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource} from '@monokle-desktop/shared';
 
 /**
  * Matcher that ensures the source and target namespace are the same

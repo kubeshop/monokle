@@ -4,7 +4,7 @@ import {monaco} from 'react-monaco-editor';
 
 import {JsonObject} from 'type-fest';
 
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource} from '@monokle-desktop/shared';
 
 interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;

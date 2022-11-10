@@ -3,9 +3,6 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppState} from '@models/appstate';
-import {HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
 
@@ -16,7 +13,14 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@monokle-desktop/shared';
+import {
+  AppConfig,
+  AppState,
+  HelmPreviewConfiguration,
+  HelmValuesFile,
+  K8sResource,
+  ProjectConfig,
+} from '@monokle-desktop/shared';
 
 import Colors from '../styles/Colors';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';

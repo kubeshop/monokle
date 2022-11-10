@@ -1,7 +1,5 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@models/appstate';
-import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
@@ -10,6 +8,8 @@ import {isDefined} from '@utils/filter';
 
 import Colors from '@styles/Colors';
 
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@monokle-desktop/shared';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@monokle-desktop/shared';
 import {HelmPreviewConfiguration} from '@monokle-desktop/shared';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';

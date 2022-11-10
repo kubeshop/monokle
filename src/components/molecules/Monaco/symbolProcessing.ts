@@ -2,9 +2,6 @@ import {clipboard} from 'electron';
 
 import {monaco} from 'react-monaco-editor';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-
 import {
   createCommandMarkdownLink,
   createHoverProvider,
@@ -13,6 +10,9 @@ import {
 } from '@molecules/Monaco/editorHelpers';
 
 import SecretHandler from '@src/kindhandlers/Secret.handler';
+
+import {ResourceFilterType} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared';
 
 function getSymbolValue(lines: string[], symbol: monaco.languages.DocumentSymbol, includeName?: boolean) {
   const line = lines[symbol.range.startLineNumber - 1];
