@@ -9,7 +9,6 @@ import type {AnyTemplate, TemplatePack} from '@models/template';
 import {isHelmChartTemplate, isVanillaTemplate, validateAnyTemplate, validateTemplatePack} from '@models/template';
 
 import type {AnyPlugin} from '@monokle/shared';
-// TODO: plugin models inside electron app
 import {isBundledTemplatePluginModule} from '@monokle/shared';
 
 import downloadExtension from '../extensions/downloadExtension';

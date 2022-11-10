@@ -13,11 +13,7 @@ import type {
   DownloadTemplateResult,
   UpdateExtensionsResult,
 } from '@models/extension';
-import type {AnyTemplate, TemplatePack} from '@models/template';
-
-// TODO: do not use redux logic inside electron
-import {changeCurrentProjectName, updateNewVersion} from '@redux/reducers/appConfig';
-import type {InterpolateTemplateOptions} from '@redux/services/templates';
+import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@models/template';
 
 import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
@@ -262,7 +258,7 @@ ipcMain.on('check-update-available', async () => {
 ipcMain.on('quit-and-install', () => {
   trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
-  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Idle, data: null}});
 });
 
 ipcMain.on('force-reload', async (event: any) => {
@@ -276,7 +272,7 @@ ipcMain.on('confirm-action', (event: any, args) => {
 ipcMain.on('global-electron-store-update', (event, args: any) => {
   if (args.eventType === StorePropagation.ChangeProjectName) {
     const payload: ProjectNameChange = args.payload;
-    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+    dispatchToAllWindows({type: 'config/changeCurrentProjectName', payload: payload.newName});
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
   }

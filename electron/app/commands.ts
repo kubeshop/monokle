@@ -5,9 +5,7 @@ import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
-// TODO: do not use redux logic
-import {updateNewVersion} from '@redux/reducers/appConfig';
-import type {InterpolateTemplateOptions} from '@redux/services/templates';
+import type {InterpolateTemplateOptions} from '@models/template';
 
 import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
@@ -84,13 +82,23 @@ export const forceLoad = (event: Electron.IpcMainInvokeEvent) => {
  */
 export const checkNewVersion = async (dispatch: (action: AnyAction) => void, initial?: boolean) => {
   try {
-    dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
+    dispatch({
+      type: 'config/updateNewVersion',
+      payload: {code: NewVersionCode.Checking, data: {initial: Boolean(initial)}},
+    });
+
     await autoUpdater.checkForUpdates();
   } catch (error: any) {
     if (error.errno === -2) {
-      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}}));
+      dispatch({
+        type: 'config/updateNewVersion',
+        payload: {code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}},
+      });
     } else {
-      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}}));
+      dispatch({
+        type: 'config/updateNewVersion',
+        payload: {code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}},
+      });
     }
   }
 };
