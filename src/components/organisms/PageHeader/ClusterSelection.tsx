@@ -11,7 +11,6 @@ import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
-import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -30,6 +29,8 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 
 import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
+
+import {Size} from '@monokle-desktop/shared';
 
 import * as S from './ClusterSelection.styled';
 
