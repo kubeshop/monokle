@@ -4,8 +4,8 @@ import semver from 'semver';
 
 import type {AnyExtension} from '@models/extension';
 
-import type {AnyPlugin, PluginPackageJson} from '@monokle/shared';
-import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@monokle/shared';
+import type {AnyPlugin, PluginPackageJson} from '@monokle-desktop/shared';
+import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@monokle-desktop/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

@@ -17,7 +17,7 @@ import PluginIcon from '@assets/PluginIcon.svg';
 
 import Colors from '@styles/Colors';
 
-import {AnyPlugin, isTemplatePluginModule} from '@monokle/shared';
+import {AnyPlugin, isTemplatePluginModule} from '@monokle-desktop/shared';
 
 import * as S from './PluginInformation.styled';
 

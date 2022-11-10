@@ -8,8 +8,8 @@ import type {AnyTemplate, TemplatePack} from '@models/template';
 // TODO: template models inside electron app
 import {isHelmChartTemplate, isVanillaTemplate, validateAnyTemplate, validateTemplatePack} from '@models/template';
 
-import type {AnyPlugin} from '@monokle/shared';
-import {isBundledTemplatePluginModule} from '@monokle/shared';
+import type {AnyPlugin} from '@monokle-desktop/shared';
+import {isBundledTemplatePluginModule} from '@monokle-desktop/shared';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

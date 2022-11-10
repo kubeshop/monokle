@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {AnyPlugin, isAnyPlugin} from '@monokle/shared';
+import {AnyPlugin, isAnyPlugin} from '@monokle-desktop/shared';
 
 import {AnyTemplate, TemplatePack, isAnyTemplate, isTemplatePack} from './template';
 

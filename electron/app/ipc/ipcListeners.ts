@@ -22,7 +22,7 @@ import type {CommandOptions} from '@utils/commands';
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
-import type {AnyPlugin} from '@monokle/shared';
+import type {AnyPlugin} from '@monokle-desktop/shared';
 
 import autoUpdater from '../autoUpdater';
 import {

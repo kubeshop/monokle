@@ -5,7 +5,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 
 import initialState from '@redux/initialState';
 
-import {AnyPlugin} from '@monokle/shared';
+import {AnyPlugin} from '@monokle-desktop/shared';
 
 export const extensionSlice = createSlice({
   name: 'extension',

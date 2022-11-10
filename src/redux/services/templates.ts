@@ -18,7 +18,7 @@ import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/
 
 import electronStore from '@utils/electronStore';
 
-import {AnyPlugin} from '@monokle/shared';
+import {AnyPlugin} from '@monokle-desktop/shared';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';
