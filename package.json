@@ -184,7 +184,7 @@
     "shared:dev": "cd shared && npm run dev",
     "shared:build": "cd shared && npm run build",
     "build": "npm run shared:build && craco --max_old_space_size=4096 build",
-    "test": "craco test --watchAll=false",
+    "test": "npm run shared:build && craco test --watchAll=false",
     "postinstall": "npm run shared:install && patch-package && electron-builder install-app-deps",
     "electron:dev": "concurrently \"npm run shared:dev\" \"cross-env BROWSER=none npm run start\" \"node ./scripts/wait.js && tsc -p electron -w\" \"node ./scripts/wait.js && tsc -p electron && cross-env NODE_ENV=development electron .\"",
     "electron:debug": "concurrently \"npm run shared:dev\" \"cross-env BROWSER=none npm run start\" \"node ./scripts/wait.js && tsc -p electron -w\" \"node ./scripts/wait.js && tsc -p electron && cross-env NODE_ENV=development electron --remote-debugging-port=9223 .\"",
