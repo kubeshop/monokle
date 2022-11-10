@@ -21,7 +21,6 @@ import {
   TextSizes,
   Themes,
 } from '@models/appconfig';
-import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
 import {AppListenerFn} from '@redux/listeners/base';
@@ -43,6 +42,8 @@ import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
+
+import {ClusterColors} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
