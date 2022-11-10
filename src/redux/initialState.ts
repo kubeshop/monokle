@@ -3,7 +3,6 @@ import os from 'os';
 import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {NavigatorState} from '@models/navigator';
-import {TerminalState} from '@models/terminal';
 
 import electronStore from '@utils/electronStore';
 
@@ -14,6 +13,7 @@ import {
   ExtensionState,
   NewVersionCode,
   PaneConfiguration,
+  TerminalState,
   UiState,
 } from '@monokle-desktop/shared';
 

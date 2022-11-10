@@ -7,12 +7,12 @@ import {FitAddon} from 'xterm-addon-fit';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {TerminalType} from '@models/terminal';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
+
+import {TerminalType} from '@monokle-desktop/shared';
 
 import * as S from './TerminalPane.styled';
 

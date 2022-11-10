@@ -4,10 +4,10 @@ import {Form, Radio} from 'antd';
 
 import {debounce} from 'lodash';
 
-import {TerminalSettingsType} from '@models/terminal';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setTerminalSettings} from '@redux/reducers/terminal';
+
+import {TerminalSettingsType} from '@monokle-desktop/shared';
 
 import * as S from './TerminalOptions.styled';
 

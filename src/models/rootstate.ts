@@ -7,12 +7,12 @@ import {
   AppState,
   ExtensionState,
   GitSliceState,
+  TerminalState,
   UiState,
   ValidationSliceState,
 } from '@monokle-desktop/shared';
 
 import {NavigatorState} from './navigator';
-import {TerminalState} from './terminal';
 
 /**
  * This is the redux store root state
