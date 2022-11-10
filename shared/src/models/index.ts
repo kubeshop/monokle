@@ -1,6 +1,7 @@
 export * from './alert';
 export * from './cluster';
 export * from './compare';
+export * from './config';
 export * from './extension';
 export * from './fileEntry';
 export * from './git';

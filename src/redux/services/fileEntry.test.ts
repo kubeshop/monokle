@@ -1,6 +1,5 @@
 import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
 import {
   FileMapType,
   HelmChartMapType,
@@ -12,6 +11,8 @@ import {
 import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
 import {getK8sResources} from '@redux/services/resource';
+
+import {AppConfig} from '@monokle-desktop/shared';
 
 import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 

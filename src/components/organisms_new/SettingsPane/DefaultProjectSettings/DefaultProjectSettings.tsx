@@ -2,8 +2,6 @@ import _ from 'lodash';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setKubeConfig,
@@ -13,6 +11,8 @@ import {
   updateK8sVersion,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
+
+import {ProjectConfig} from '@monokle-desktop/shared';
 
 import {Settings} from '../Settings/Settings';
 

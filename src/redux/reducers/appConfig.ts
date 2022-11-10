@@ -9,18 +9,6 @@ import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {
-  AppConfig,
-  ClusterAccess,
-  KubeConfig,
-  Languages,
-  NewVersionCode,
-  Project,
-  ProjectConfig,
-  Settings,
-  TextSizes,
-  Themes,
-} from '@models/appconfig';
 import {UiState} from '@models/ui';
 
 import {AppListenerFn} from '@redux/listeners/base';
@@ -43,7 +31,19 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import {ClusterColors} from '@monokle-desktop/shared';
+import {
+  AppConfig,
+  ClusterAccess,
+  ClusterColors,
+  KubeConfig,
+  Languages,
+  NewVersionCode,
+  Project,
+  ProjectConfig,
+  Settings,
+  TextSizes,
+  Themes,
+} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

@@ -7,9 +7,9 @@ import invariant from 'tiny-invariant';
 
 import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
-import {AppConfig, ProjectConfig} from '@models/appconfig';
-
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+
+import {AppConfig, ProjectConfig} from '@monokle-desktop/shared';
 
 import {monitorKubeConfig} from './kubeConfigMonitor';
 

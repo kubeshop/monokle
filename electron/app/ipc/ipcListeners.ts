@@ -13,15 +13,18 @@ import type {CommandOptions} from '@utils/commands';
 import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
-import type {
+import {
   AnyExtension,
+  AnyPlugin,
+  AnyTemplate,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
+  InterpolateTemplateOptions,
+  NewVersionCode,
+  TemplatePack,
   UpdateExtensionsResult,
 } from '@monokle-desktop/shared';
-import type {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared';
-import type {AnyPlugin} from '@monokle-desktop/shared';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -44,7 +47,6 @@ import {
 } from '../constants/ipcEvents';
 import {UPDATE_APPLICATION} from '../constants/telemetry';
 import {ProjectNameChange, StorePropagation} from '../models';
-import {NewVersionCode} from '../models/appconfig';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,

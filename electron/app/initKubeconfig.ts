@@ -3,10 +3,9 @@ import * as k8s from '@kubernetes/client-node';
 import path from 'path';
 import {AnyAction} from 'redux';
 
-import type {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
 import electronStore from '@utils/electronStore';
 
+import type {KubeConfig, KubeConfigContext} from '@monokle-desktop/shared';
 import {AlertEnum} from '@monokle-desktop/shared';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {

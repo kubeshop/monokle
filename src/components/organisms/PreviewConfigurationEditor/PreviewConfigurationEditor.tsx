@@ -8,7 +8,6 @@ import {v4 as uuidv4} from 'uuid';
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
 import {HelmValuesFile} from '@models/helm';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,6 +16,8 @@ import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 
 import {KeyValueInput} from '@atoms';
+
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
 
 import ValuesFilesList from './ValuesFilesList';
 

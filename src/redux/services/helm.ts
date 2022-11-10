@@ -8,7 +8,6 @@ import {LineCounter, Scalar, parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
 import {
   FileMapType,
   HelmChartMapType,
@@ -31,7 +30,7 @@ import {NodeWrapper} from '@redux/services/resource';
 import {getFileStats} from '@utils/files';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
-import {FileEntry} from '@monokle-desktop/shared';
+import {FileEntry, ProjectConfig} from '@monokle-desktop/shared';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

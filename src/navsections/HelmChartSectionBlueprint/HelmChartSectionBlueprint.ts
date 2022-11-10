@@ -1,6 +1,5 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmPreviewConfiguration} from '@models/appconfig';
 import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
@@ -10,6 +9,8 @@ import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@red
 import {isDefined} from '@utils/filter';
 
 import Colors from '@styles/Colors';
+
+import {HelmPreviewConfiguration} from '@monokle-desktop/shared';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';

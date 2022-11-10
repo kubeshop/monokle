@@ -7,7 +7,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   FileMapType,
@@ -52,7 +51,14 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
-import {AlertType, CurrentMatch, FileEntry, ImageType, ValidationIntegration} from '@monokle-desktop/shared';
+import {
+  AlertType,
+  CurrentMatch,
+  FileEntry,
+  ImageType,
+  ProjectConfig,
+  ValidationIntegration,
+} from '@monokle-desktop/shared';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
@@ -1068,21 +1074,21 @@ export const mainSlice = createSlice({
   },
 });
 
-function groupResourcesByIdentifier(
-  resources: K8sResource[],
-  makeIdentifier: (resource: K8sResource) => string
-): Record<string, K8sResource[]> {
-  const groupedResources: Record<string, K8sResource[]> = {};
-  resources.forEach(resource => {
-    const identifier = makeIdentifier(resource);
-    if (groupedResources[identifier]) {
-      groupedResources[identifier].push(resource);
-    } else {
-      groupedResources[identifier] = [resource];
-    }
-  });
-  return groupedResources;
-}
+// function groupResourcesByIdentifier(
+//   resources: K8sResource[],
+//   makeIdentifier: (resource: K8sResource) => string
+// ): Record<string, K8sResource[]> {
+//   const groupedResources: Record<string, K8sResource[]> = {};
+//   resources.forEach(resource => {
+//     const identifier = makeIdentifier(resource);
+//     if (groupedResources[identifier]) {
+//       groupedResources[identifier].push(resource);
+//     } else {
+//       groupedResources[identifier] = [resource];
+//     }
+//   });
+//   return groupedResources;
+// }
 
 /**
  * Sets/clears preview resources

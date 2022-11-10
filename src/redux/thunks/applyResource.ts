@@ -4,7 +4,6 @@ import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -22,7 +21,7 @@ import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/
 import {errorAlert, successAlert} from '@utils/alert';
 import {APPLY, trackEvent} from '@utils/telemetry';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType, ProjectConfig} from '@monokle-desktop/shared';
 
 /**
  * Invokes kubectl for the content of the specified resource

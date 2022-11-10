@@ -1,9 +1,8 @@
 import {CompareState} from '@redux/compare';
 import {FormsState} from '@redux/forms';
 
-import {AlertState, ExtensionState, GitSliceState, ValidationSliceState} from '@monokle-desktop/shared';
+import {AlertState, AppConfig, ExtensionState, GitSliceState, ValidationSliceState} from '@monokle-desktop/shared';
 
-import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';

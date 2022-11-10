@@ -16,7 +16,6 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {ClusterAccess} from '@models/appconfig';
 import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
@@ -44,7 +43,7 @@ import {
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {Policy} from '@monokle-desktop/shared';
+import {ClusterAccess, Policy} from '@monokle-desktop/shared';
 
 import {processRefs} from './resourceRefs';
 import {validatePolicies, validateResource} from './validation';

@@ -10,9 +10,9 @@ import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExp
 import type {CommandOptions, CommandResult} from '@utils/commands';
 
 import type {InterpolateTemplateOptions} from '@monokle-desktop/shared';
+import {NewVersionCode} from '@monokle-desktop/shared';
 
 import autoUpdater from './autoUpdater';
-import {NewVersionCode} from './models/appconfig';
 
 /**
  * Prompts to select a file using the native dialogs

@@ -9,8 +9,6 @@ import _ from 'lodash';
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {Project, ProjectConfig} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   changeCurrentProjectName,
@@ -38,6 +36,8 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {openUrlInExternalBrowser} from '@utils/shell';
 
 import Colors from '@styles/Colors';
+
+import {Project, ProjectConfig} from '@monokle-desktop/shared';
 
 import {Settings} from './Settings';
 

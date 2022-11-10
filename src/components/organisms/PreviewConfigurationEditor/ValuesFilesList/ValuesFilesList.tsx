@@ -2,8 +2,6 @@ import {useCallback, useMemo} from 'react';
 
 import {isObjectLike, orderBy} from 'lodash';
 
-import {PreviewConfigValuesFileItem} from '@models/appconfig';
-
 import {arrayMove} from '@utils/array';
 
 import {
@@ -16,6 +14,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
 
 import {SortableItem} from './SortableItem';
 

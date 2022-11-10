@@ -13,8 +13,6 @@ import semver from 'semver';
 
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {NewVersionCode, Project} from '@models/appconfig';
-
 import {toggleForm} from '@redux/forms';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -50,7 +48,7 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {AlertEnum, ExtraContentType, Size, StepEnum} from '@monokle-desktop/shared';
+import {AlertEnum, ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

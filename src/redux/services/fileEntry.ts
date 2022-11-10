@@ -5,7 +5,6 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   FileMapType,
@@ -43,7 +42,7 @@ import {
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
 
-import {FileEntry} from '@monokle-desktop/shared';
+import {FileEntry, ProjectConfig} from '@monokle-desktop/shared';
 
 import {
   deleteResource,

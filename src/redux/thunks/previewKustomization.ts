@@ -6,7 +6,6 @@ import {v4 as uuid} from 'uuid';
 
 import {ERROR_MSG_FALLBACK, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
@@ -17,6 +16,8 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 
 import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
+
+import {ProjectConfig} from '@monokle-desktop/shared';
 
 /**
  * Thunk to preview kustomizations

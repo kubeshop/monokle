@@ -6,12 +6,12 @@ import {sortBy} from 'lodash';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {PreviewConfigValuesFileItem} from '@models/appconfig';
-
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector} from '@redux/selectors';
 
 import {buildHelmCommand} from '@utils/helm';
+
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
 
 import * as S from './PreviewConfigurationDetails.styled';
 
