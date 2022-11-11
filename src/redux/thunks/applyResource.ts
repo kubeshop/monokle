@@ -15,8 +15,9 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
-import {APPLY, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {APPLY} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AlertEnum,
   AlertType,

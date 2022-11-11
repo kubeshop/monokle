@@ -7,8 +7,9 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {FOLLOW_LINK} from '@monokle-desktop/shared/constants/telemetry';
 import {K8sResource, MonacoRange, ResourceMapType, ResourceRef, ResourceRefType} from '@monokle-desktop/shared/models';
 
 import RefLink from './RefLink';

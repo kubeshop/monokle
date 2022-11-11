@@ -12,8 +12,9 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
-import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {DO_KUSTOMIZE_PREVIEW} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
 
 /**

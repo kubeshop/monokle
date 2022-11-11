@@ -14,8 +14,9 @@ import {knownResourceKindsSelector} from '@redux/selectors';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
-import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {QUICK_SEARCH} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 

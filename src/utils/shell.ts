@@ -2,7 +2,9 @@ import {app, shell} from 'electron';
 
 import * as os from 'os';
 
-import {WINDOW_HELP_LINK, trackEvent} from './telemetry';
+import {WINDOW_HELP_LINK} from '@monokle-desktop/shared/constants/telemetry';
+
+import {trackEvent} from './telemetry';
 
 export function showItemInFolder(fullPath: string) {
   shell.showItemInFolder(fullPath);

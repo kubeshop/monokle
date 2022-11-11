@@ -23,6 +23,7 @@ import {
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
 } from '@monokle-desktop/shared/constants/ipcEvents';
+import {UPDATE_APPLICATION} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AnyExtension,
   AnyPlugin,
@@ -45,7 +46,6 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
-import {UPDATE_APPLICATION} from '../constants/telemetry';
 import {ProjectNameChange, StorePropagation} from '../models';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {

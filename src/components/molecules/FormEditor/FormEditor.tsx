@@ -27,8 +27,10 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
-import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {CHANGES_BY_FORM_EDITOR} from '@monokle-desktop/shared/constants/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
