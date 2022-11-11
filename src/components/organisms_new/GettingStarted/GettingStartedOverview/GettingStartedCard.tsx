@@ -16,7 +16,7 @@ type Props = {
 };
 
 const GettingStartedCard: React.FC<Props> = ({feature}) => {
-  const {id, icon, name, description, learnMoreUrl, CTA} = feature;
+  const {id, icon, name, description, learnMoreUrl, callToAction} = feature;
 
   const dispatch = useAppDispatch();
 
@@ -33,7 +33,7 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
       <S.Name>{name}</S.Name>
       <S.Description>{description}</S.Description>
       <S.Span>
-        <S.Button onClick={onCTAHandler}>{CTA}</S.Button>
+        <S.Button onClick={onCTAHandler}>{callToAction}</S.Button>
         <S.Link onClick={openLearnMore}>Learn more</S.Link>
       </S.Span>
     </S.Card>

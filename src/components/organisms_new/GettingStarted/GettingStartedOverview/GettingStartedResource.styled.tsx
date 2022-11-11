@@ -7,12 +7,12 @@ import {Icon as BaseIcon} from '@atoms';
 import Colors from '@styles/Colors';
 
 export const ResourceLink = styled(AntdCard)`
-  border: 2px solid #31393c;
+  border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
   height: 100px;
 
   .ant-card-body {
-    background-color: #31393c;
+    background-color: ${Colors.coldGrey};
     height: 100%;
   }
 `;

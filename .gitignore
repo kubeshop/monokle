@@ -35,5 +35,3 @@ k8sdumps
 /site
 
 electron/env.ts
-
-get_helm.sh

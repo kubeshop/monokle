@@ -8,7 +8,7 @@ export type Feature = {
   name: string;
   description: string;
   learnMoreUrl: string;
-  CTA: string;
+  callToAction: string;
 };
 
 export const EXPLORE: Feature = {
@@ -17,7 +17,7 @@ export const EXPLORE: Feature = {
   name: 'Explore',
   description: 'Configure your resources workspace, whereas it’s local, on a Git, a cluster or from scratch.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
-  CTA: 'Your Workspace',
+  callToAction: 'Your Workspace',
 };
 
 export const EDIT: Feature = {
@@ -26,7 +26,7 @@ export const EDIT: Feature = {
   name: 'Edit',
   description: 'Fix errors in your resources, compare them, learn about yaml best practices and much more.',
   learnMoreUrl: 'https://github.com/edit/opa',
-  CTA: 'Edit & fix',
+  callToAction: 'Edit & fix',
 };
 
 export const VALIDATE: Feature = {
@@ -35,7 +35,7 @@ export const VALIDATE: Feature = {
   name: 'Validate',
   description: 'Configure your policies & validation rules, create your own. See & fix validation errors.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
-  CTA: 'Validate',
+  callToAction: 'Validate',
 };
 
 export const PUBLISH: Feature = {
@@ -44,5 +44,5 @@ export const PUBLISH: Feature = {
   name: 'Publish',
   description: 'Save locally, get into Git (Github, Gitlab), create PRs, deploy to a cluster...',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
-  CTA: 'Publish & Git',
+  callToAction: 'Publish & Git',
 };
