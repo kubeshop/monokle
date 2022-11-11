@@ -2,7 +2,7 @@ import {Input, Pagination as RawPagination, Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ImageTagsContainer = styled.div`
   display: flex;

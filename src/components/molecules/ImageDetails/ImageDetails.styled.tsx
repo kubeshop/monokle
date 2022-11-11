@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ImageDetailsContainer = styled.div`
   display: flex;

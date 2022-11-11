@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const CreateBranchInputContainer = styled.div`
   margin: 5px 14px 0px 14px;

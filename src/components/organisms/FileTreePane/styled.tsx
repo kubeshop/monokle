@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const FileTreeContainer = styled.div`
   width: 100%;

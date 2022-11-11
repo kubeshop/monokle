@@ -12,7 +12,7 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 import {IconWithPopover} from '@atoms';
 
 import {ResourceFilterType} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import ResourceFilter from '../ResourceFilter';
 

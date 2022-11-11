@@ -1,4 +1,4 @@
-import {BackgroundColors, Colors} from '../styles/Colors';
+import {BackgroundColors, Colors} from '../styles/colors';
 
 type ClusterColors = Colors | BackgroundColors;
 

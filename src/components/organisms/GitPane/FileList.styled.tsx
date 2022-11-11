@@ -6,7 +6,7 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const FileIcon = styled.div`
   margin-left: 12.5px;

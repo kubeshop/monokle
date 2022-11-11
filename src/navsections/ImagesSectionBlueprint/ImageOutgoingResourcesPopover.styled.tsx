@@ -2,7 +2,7 @@ import {Divider as RawDivider, Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`
   margin: 0;

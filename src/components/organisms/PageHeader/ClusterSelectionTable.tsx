@@ -17,7 +17,7 @@ import {FilePatternList} from '@atoms';
 import {runCommandInMainThread} from '@utils/commands';
 
 import {AlertEnum, ClusterColors} from '@monokle-desktop/shared/models';
-import {BackgroundColors} from '@monokle-desktop/shared/styles/Colors';
+import {BackgroundColors} from '@monokle-desktop/shared/styles/colors';
 
 import * as S from './ClusterSelectionTable.styled';
 

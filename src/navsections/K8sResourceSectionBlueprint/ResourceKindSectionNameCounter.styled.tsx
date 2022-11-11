@@ -2,7 +2,7 @@ import {Badge as RawBadge} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Badge = styled(RawBadge)<{$type: 'error' | 'warning'}>`
   padding-left: 6px;

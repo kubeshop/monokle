@@ -19,7 +19,7 @@ import {useFocus} from '@utils/hooks';
 import {CREATE_EMPTY_PROJECT, trackEvent} from '@utils/telemetry';
 
 import {AnyTemplate} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';

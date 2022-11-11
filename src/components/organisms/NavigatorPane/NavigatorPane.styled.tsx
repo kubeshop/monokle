@@ -6,7 +6,7 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {AppBorders} from '@styles/Borders';
 
-import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/Colors';
+import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const FiltersNumber = styled.div`
   margin-left: 5px;

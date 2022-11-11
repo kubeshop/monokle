@@ -2,7 +2,7 @@ import {Modal as RawModal} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ActionButtonsContainer = styled.div`
   display: flex;

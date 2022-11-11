@@ -2,7 +2,7 @@ import {Tag} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const ResourceListDiv = styled.div`
   display: flex;

@@ -14,7 +14,7 @@ import styled from 'styled-components';
 
 import {Icon} from '@components/atoms';
 
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Button = styled(RawButton)`
   display: flex;

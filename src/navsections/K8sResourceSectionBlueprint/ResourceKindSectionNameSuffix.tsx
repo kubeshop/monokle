@@ -15,7 +15,7 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

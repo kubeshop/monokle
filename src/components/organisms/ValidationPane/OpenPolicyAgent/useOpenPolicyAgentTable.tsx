@@ -14,7 +14,7 @@ import {toggleOPARules} from '@redux/validation/validation.slice';
 import {Icon} from '@atoms';
 
 import {IconNames} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';

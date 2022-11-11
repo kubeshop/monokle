@@ -4,7 +4,7 @@ import {LeftCircleFilled, RightCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const HeaderRow = styled(Row)`
   height: 34px;
