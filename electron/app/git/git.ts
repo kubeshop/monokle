@@ -105,8 +105,8 @@ export async function getGitRepoInfo(localPath: string) {
       hasRemoteRepo: false,
     };
 
-    if(remoteUrl!==""){
-      gitRepo.remoteUrl=remoteUrl;
+    if(remoteUrl){
+      gitRepo.remoteUrl = remoteUrl;
     }
 
     gitRepo.branchMap = Object.fromEntries(
