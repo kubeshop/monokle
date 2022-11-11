@@ -14,6 +14,16 @@ import {getSegmentClient} from '@utils/segment';
 import {trackEvent} from '@utils/telemetry';
 
 import {
+  DOWNLOAD_PLUGIN,
+  DOWNLOAD_PLUGIN_RESULT,
+  DOWNLOAD_TEMPLATE,
+  DOWNLOAD_TEMPLATE_PACK,
+  DOWNLOAD_TEMPLATE_PACK_RESULT,
+  DOWNLOAD_TEMPLATE_RESULT,
+  UPDATE_EXTENSIONS,
+  UPDATE_EXTENSIONS_RESULT,
+} from '@monokle-desktop/shared/constants/ipcEvents';
+import {
   AnyExtension,
   AnyPlugin,
   AnyTemplate,
@@ -35,16 +45,6 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
-import {
-  DOWNLOAD_PLUGIN,
-  DOWNLOAD_PLUGIN_RESULT,
-  DOWNLOAD_TEMPLATE,
-  DOWNLOAD_TEMPLATE_PACK,
-  DOWNLOAD_TEMPLATE_PACK_RESULT,
-  DOWNLOAD_TEMPLATE_RESULT,
-  UPDATE_EXTENSIONS,
-  UPDATE_EXTENSIONS_RESULT,
-} from '../constants/ipcEvents';
 import {UPDATE_APPLICATION} from '../constants/telemetry';
 import {ProjectNameChange, StorePropagation} from '../models';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';

@@ -6,13 +6,13 @@ import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import {PLUGIN_DOCS_URL} from '@constants/constants';
-import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
 import {useAppDispatch} from '@redux/hooks';
 import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
 
 import {useFocus} from '@utils/hooks';
 
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@monokle-desktop/shared/constants/ipcEvents';
 import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
