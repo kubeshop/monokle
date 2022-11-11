@@ -103,8 +103,11 @@ export async function getGitRepoInfo(localPath: string) {
       branchMap: {},
       commits: {ahead: 0, behind: 0},
       hasRemoteRepo: false,
-      remoteUrl,
     };
+
+    if(remoteUrl!==""){
+      gitRepo.remoteUrl=remoteUrl;
+    }
 
     gitRepo.branchMap = Object.fromEntries(
       Object.entries({...localBranches.branches}).map(([key, value]) => [
