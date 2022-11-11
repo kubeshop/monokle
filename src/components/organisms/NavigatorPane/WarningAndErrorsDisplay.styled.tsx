@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {Icon as RawIcon} from '@atoms';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ErrorWarningContainer = styled.div<{$type: 'warning' | 'error'}>`
   ${({$type}) => `color: ${$type === 'warning' ? Colors.yellowWarning : Colors.redError};`}

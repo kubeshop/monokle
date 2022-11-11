@@ -22,7 +22,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import {TreeItemProps} from './types';
 

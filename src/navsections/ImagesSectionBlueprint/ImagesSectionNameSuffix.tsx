@@ -3,7 +3,7 @@ import {Popover} from 'antd';
 import {Icon} from '@atoms';
 
 import {ItemInstance} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
 import * as S from './ImagesSectionNameSuffix.styled';

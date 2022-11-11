@@ -1,1 +1,4 @@
-export * from './Colors';
+export * from './animations';
+export * from './borders';
+export * from './colors';
+export * from './device';

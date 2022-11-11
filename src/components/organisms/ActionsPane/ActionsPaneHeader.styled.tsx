@@ -4,7 +4,7 @@ import {EllipsisOutlined as RawEllipsisOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ButtonContainer = styled.div`
   display: flex;

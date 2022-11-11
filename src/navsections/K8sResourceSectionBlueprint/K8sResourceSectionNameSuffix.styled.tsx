@@ -2,7 +2,7 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {ClusterColors} from '@monokle-desktop/shared/models';
-import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles';
+import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/colors';
 
 const OutputTag = styled.div`
   font-size: 12px;

@@ -2,7 +2,7 @@ import {Row} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ActionsRow = styled(Row)`
   margin-top: 20px;

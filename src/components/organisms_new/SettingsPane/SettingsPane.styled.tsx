@@ -2,7 +2,7 @@ import {Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const SettingsPaneContainer = styled.div`
   padding: 10px;

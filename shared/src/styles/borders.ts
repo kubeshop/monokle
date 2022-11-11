@@ -1,4 +1,4 @@
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from './colors';
 
 export enum BorderRadius {
   pill = '1000px',

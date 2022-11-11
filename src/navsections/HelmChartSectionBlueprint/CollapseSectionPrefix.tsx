@@ -5,7 +5,7 @@ import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import {useAppSelector} from '@redux/hooks';
 
 import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const CollapseSectionPrefix = (props: SectionCustomComponentProps) => {
   const {sectionInstance, onClick} = props;

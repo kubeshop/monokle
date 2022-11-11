@@ -2,9 +2,8 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-import {AnimationDurations} from '@styles/Animations';
-
-import {Colors} from '@monokle-desktop/shared/styles';
+import {AnimationDurations} from '@monokle-desktop/shared/styles/animations';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ActionItem = styled.div<{$disabled?: boolean}>`
   height: 100%;

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`
   display: flex;

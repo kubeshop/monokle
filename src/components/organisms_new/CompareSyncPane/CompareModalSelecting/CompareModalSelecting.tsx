@@ -10,7 +10,7 @@ import CompareSingleFigure from '@assets/figures/compareSingle.svg';
 import CrashFigure from '@assets/figures/crash.svg';
 
 import {CompareSide} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';

@@ -4,7 +4,7 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {GitBranch} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`
   background-color: ${Colors.warmGrey};
