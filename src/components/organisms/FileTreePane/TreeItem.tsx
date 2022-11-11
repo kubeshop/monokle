@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
@@ -77,8 +79,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const git = useAppSelector(state => state.git);
 
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -301,6 +304,18 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
+    ...(git.repo?.remoteUrl?.includes('https://github.com')
+      ? [
+          {
+            key: 'open_in_github',
+            label: 'Open on GitHub',
+            onClick: async (e: any) => {
+              e.domEvent.stopPropagation();
+              shell.openExternal(`${git.repo?.remoteUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
+            },
+          },
+        ]
+      : []),
     {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,
