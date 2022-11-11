@@ -2,9 +2,8 @@ import {Popover} from 'antd';
 
 import {Icon} from '@atoms';
 
-import Colors from '@styles/Colors';
-
 import {ItemInstance} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
 import * as S from './ImagesSectionNameSuffix.styled';

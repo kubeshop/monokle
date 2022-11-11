@@ -4,7 +4,7 @@ import {QuestionCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Card = styled(AntdCard)`
   border: 2px dashed #31393c;

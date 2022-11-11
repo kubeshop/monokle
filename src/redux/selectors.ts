@@ -20,8 +20,8 @@ import {
   ResourceKindHandler,
   RootState,
 } from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
-import Colors from '../styles/Colors';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 import {isUnsavedResource} from './services/resource';
 

@@ -2,7 +2,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const ErrorMessageLabel = styled.div`
   color: ${Colors.redError};

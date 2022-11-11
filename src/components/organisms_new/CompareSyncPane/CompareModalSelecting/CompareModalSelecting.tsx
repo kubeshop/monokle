@@ -9,9 +9,8 @@ import CompareDoubleFigure from '@assets/figures/compareDouble.svg';
 import CompareSingleFigure from '@assets/figures/compareSingle.svg';
 import CrashFigure from '@assets/figures/crash.svg';
 
-import Colors from '@styles/Colors';
-
 import {CompareSide} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';

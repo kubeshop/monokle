@@ -2,7 +2,7 @@ import {Divider as RawDivider, Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 const {Text} = Typography;
 

@@ -10,9 +10,8 @@ import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
-import Colors, {BackgroundColors} from '@styles/Colors';
-
 import {HelmChartMenuItem, KustomizationMenuItem} from '@monokle-desktop/shared/models';
+import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles';
 
 import * as S from './PreviewDropdown.styled';
 import PreviewMenu from './PreviewMenu';

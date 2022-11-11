@@ -23,9 +23,8 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-import Colors from '@styles/Colors';
-
 import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

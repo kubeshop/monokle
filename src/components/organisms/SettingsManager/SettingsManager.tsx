@@ -33,9 +33,8 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import Colors from '@styles/Colors';
-
 import {Project, ProjectConfig, SettingsPanel} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import {Settings} from './Settings';
 

@@ -12,9 +12,8 @@ import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
-import Colors from '@styles/Colors';
-
 import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 const SuffixContainer = styled.span`
   display: inline-block;

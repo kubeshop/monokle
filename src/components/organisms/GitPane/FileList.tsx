@@ -19,9 +19,8 @@ import {deleteFile} from '@utils/fileSystem';
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import Colors from '@styles/Colors';
-
 import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import * as S from './FileList.styled';
 

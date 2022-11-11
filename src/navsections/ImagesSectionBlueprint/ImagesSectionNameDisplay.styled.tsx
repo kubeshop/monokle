@@ -3,9 +3,8 @@ import {Input} from 'antd';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import Colors, {BackgroundColors} from '@styles/Colors';
-
 import {ClusterColors} from '@monokle-desktop/shared/models';
+import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles';
 
 const OutputTag = styled.div`
   font-size: 12px;

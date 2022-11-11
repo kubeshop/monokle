@@ -3,9 +3,8 @@ import {Input, Button as RawButton, Select as RawSelect, Table as RawTable, Tabl
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
-
 import {GitBranch} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Container = styled.div`
   background-color: ${Colors.warmGrey};

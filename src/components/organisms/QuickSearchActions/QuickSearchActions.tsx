@@ -16,9 +16,8 @@ import {useNamespaces} from '@hooks/useNamespaces';
 import {isResourcePassingFilter} from '@utils/resources';
 import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
-import Colors from '@styles/Colors';
-
 import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import LabelMapper from './LabelMapper';
 
