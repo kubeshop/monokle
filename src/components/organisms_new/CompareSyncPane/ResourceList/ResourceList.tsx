@@ -10,7 +10,7 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceSetData} from '@monokle-desktop/shared';
+import {ResourceSetData} from '@monokle-desktop/shared/models';
 
 import * as S from './ResourceList.styled';
 

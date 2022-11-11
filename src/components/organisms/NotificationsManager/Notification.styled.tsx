@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 export const Span = styled.span`
   font-weight: 500;

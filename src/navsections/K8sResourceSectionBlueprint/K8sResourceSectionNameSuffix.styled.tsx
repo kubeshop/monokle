@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-import {ClusterColors} from '@monokle-desktop/shared';
+import {ClusterColors} from '@monokle-desktop/shared/models';
 
 const OutputTag = styled.div`
   font-size: 12px;

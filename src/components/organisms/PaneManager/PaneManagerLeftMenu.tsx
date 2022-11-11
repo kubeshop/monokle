@@ -26,7 +26,7 @@ import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
-import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared';
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

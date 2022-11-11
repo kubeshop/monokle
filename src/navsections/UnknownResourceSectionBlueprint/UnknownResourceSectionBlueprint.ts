@@ -4,7 +4,7 @@ import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {K8sResource, ResourceFilterType, SectionBlueprint} from '@monokle-desktop/shared';
+import {K8sResource, ResourceFilterType, SectionBlueprint} from '@monokle-desktop/shared/models';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from '../K8sResourceSectionBlueprint/ResourceKindContextMenuWrapper';

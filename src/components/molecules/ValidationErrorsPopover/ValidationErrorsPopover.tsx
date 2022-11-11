@@ -8,7 +8,7 @@ import {countResourceErrors} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 import ErrorsPopoverContent from './ErrorsPopoverContent';
 

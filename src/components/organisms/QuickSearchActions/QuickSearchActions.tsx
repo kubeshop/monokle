@@ -18,7 +18,7 @@ import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
-import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared';
+import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared/models';
 
 import LabelMapper from './LabelMapper';
 

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-import {ClusterColors} from '@monokle-desktop/shared';
+import {ClusterColors} from '@monokle-desktop/shared/models';
 
 export const ActionsContainer = styled.div`
   display: flex;

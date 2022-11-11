@@ -22,7 +22,7 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {children, itemInstance} = props;

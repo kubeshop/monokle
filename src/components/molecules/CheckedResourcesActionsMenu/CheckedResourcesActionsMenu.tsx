@@ -22,7 +22,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import Colors from '@styles/Colors';
 
-import {AlertEnum, AppDispatch, K8sResource} from '@monokle-desktop/shared';
+import {AlertEnum, AppDispatch, K8sResource} from '@monokle-desktop/shared/models';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

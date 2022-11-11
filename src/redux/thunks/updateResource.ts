@@ -11,7 +11,7 @@ import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 
-import {AppState, RootState, ThunkApi} from '@monokle-desktop/shared';
+import {AppState, RootState, ThunkApi} from '@monokle-desktop/shared/models';
 
 type UpdateResourcePayload = {
   resourceId: string;

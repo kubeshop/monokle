@@ -27,7 +27,7 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
 
-import {HighlightItems, K8sResource, Size} from '@monokle-desktop/shared';
+import {HighlightItems, K8sResource, Size} from '@monokle-desktop/shared/models';
 
 import * as S from './ClusterSelection.styled';
 

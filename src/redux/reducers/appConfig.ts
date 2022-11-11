@@ -42,7 +42,7 @@ import {
   TextSizes,
   Themes,
   UiState,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

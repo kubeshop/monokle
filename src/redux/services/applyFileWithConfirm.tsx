@@ -6,7 +6,7 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {applyFile} from '@redux/thunks/applyFile';
 
-import {FileMapType} from '@monokle-desktop/shared';
+import {FileMapType} from '@monokle-desktop/shared/models';
 
 export function applyFileWithConfirm(
   selectedPath: string,

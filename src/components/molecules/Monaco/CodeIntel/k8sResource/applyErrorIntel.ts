@@ -2,7 +2,7 @@ import {monaco} from 'react-monaco-editor';
 
 import {createGlyphDecoration} from '@molecules/Monaco/editorHelpers';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 import {GlyphDecorationTypes} from '../../editorConstants';
 

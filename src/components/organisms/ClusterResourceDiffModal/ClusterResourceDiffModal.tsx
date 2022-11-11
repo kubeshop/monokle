@@ -30,7 +30,7 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models';
 
 import * as S from './ClusterResourceDiffModal.styled';
 

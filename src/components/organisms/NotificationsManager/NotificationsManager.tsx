@@ -5,7 +5,7 @@ import {seenNotifications} from '@redux/reducers/main';
 
 import {sleep} from '@utils/sleep';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 import Notification from './Notification';
 

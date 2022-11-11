@@ -23,7 +23,7 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
-import {ItemCustomComponentProps, K8sResource} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps, K8sResource} from '@monokle-desktop/shared/models';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;

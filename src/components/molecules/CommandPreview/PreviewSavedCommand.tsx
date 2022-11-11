@@ -9,7 +9,7 @@ import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
 
-import {SavedCommand} from '@monokle-desktop/shared';
+import {SavedCommand} from '@monokle-desktop/shared/models';
 
 import CommandLabel from './CommandLabel';
 

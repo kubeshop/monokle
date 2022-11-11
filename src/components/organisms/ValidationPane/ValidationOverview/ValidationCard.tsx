@@ -11,7 +11,7 @@ import {toggleValidation} from '@redux/validation/validation.slice';
 
 import {trackEvent} from '@utils/telemetry';
 
-import {ValidationIntegration} from '@monokle-desktop/shared';
+import {ValidationIntegration} from '@monokle-desktop/shared/models';
 
 import * as S from './ValidationCard.styled';
 

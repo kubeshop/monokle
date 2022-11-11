@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 
-import type {AnyExtension} from '@monokle-desktop/shared';
+import type {AnyExtension} from '@monokle-desktop/shared/models';
 
 import loadExtension from './loadExtension';
 import {LoadExtensionOptions} from './types';

@@ -23,7 +23,7 @@ import Colors from '@styles/Colors';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {ResourceFilterType} from '@monokle-desktop/shared/models';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';

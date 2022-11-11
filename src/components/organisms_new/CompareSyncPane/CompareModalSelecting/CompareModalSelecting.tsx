@@ -11,7 +11,7 @@ import CrashFigure from '@assets/figures/crash.svg';
 
 import Colors from '@styles/Colors';
 
-import {CompareSide} from '@monokle-desktop/shared';
+import {CompareSide} from '@monokle-desktop/shared/models';
 
 import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';

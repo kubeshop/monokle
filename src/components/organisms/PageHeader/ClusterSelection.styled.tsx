@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 import {Device} from '@styles/Device';
 
-import {ClusterColors, PreviewType} from '@monokle-desktop/shared';
+import {ClusterColors, PreviewType} from '@monokle-desktop/shared/models';
 
 interface RawButtonProps extends ButtonProps {
   $kubeConfigContextColor?: ClusterColors;

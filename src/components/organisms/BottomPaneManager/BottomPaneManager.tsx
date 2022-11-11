@@ -17,7 +17,7 @@ import {Icon} from '@atoms';
 
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
 
-import {TerminalType} from '@monokle-desktop/shared';
+import {TerminalType} from '@monokle-desktop/shared/models';
 
 import TerminalPane from '../TerminalPane';
 import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';

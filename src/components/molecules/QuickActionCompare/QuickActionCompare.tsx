@@ -4,7 +4,7 @@ import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
-import {ComparisonView} from '@monokle-desktop/shared';
+import {ComparisonView} from '@monokle-desktop/shared/models';
 
 import * as S from './QuickActionCompare.styled';
 

@@ -1,4 +1,4 @@
-import {FileEntry, MatchParamProps} from '@monokle-desktop/shared';
+import {FileEntry, MatchParamProps} from '@monokle-desktop/shared/models';
 
 /* based on matching params we change the way we find matches in file */
 export function getRegexp(query: string, params: MatchParamProps): RegExp {

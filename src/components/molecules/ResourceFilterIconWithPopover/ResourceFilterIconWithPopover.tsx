@@ -13,7 +13,7 @@ import {IconWithPopover} from '@atoms';
 
 import Colors from '@styles/Colors';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {ResourceFilterType} from '@monokle-desktop/shared/models';
 
 import ResourceFilter from '../ResourceFilter';
 

@@ -24,7 +24,7 @@ import {
   TemplatePack,
   VanillaTemplate,
   isKubernetesObject,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';

@@ -48,7 +48,7 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {AlertEnum, ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared';
+import {AlertEnum, ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared/models';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

@@ -21,7 +21,7 @@ import {
   ResourceMapType,
   ResourceRef,
   ResourceRefType,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 function applyRefIntel(
   resource: K8sResource,

@@ -6,7 +6,7 @@ import {DateTime} from 'luxon';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 import * as S from './ResourceKindInformation.styled';
 

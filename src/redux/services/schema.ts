@@ -12,7 +12,7 @@ import {getFileStats} from '@utils/files';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {FileMapType, K8sResource} from '@monokle-desktop/shared';
+import {FileMapType, K8sResource} from '@monokle-desktop/shared/models';
 
 // @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));

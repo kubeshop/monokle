@@ -14,7 +14,7 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
 
-import {AppDispatch, ProjectConfig, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
 
 /**
  * Thunk to preview kustomizations

@@ -30,7 +30,7 @@ import {
   K8sResource,
   NewResourceWizardInput,
   ResourceKindHandler,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

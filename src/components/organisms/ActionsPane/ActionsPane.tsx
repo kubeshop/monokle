@@ -58,7 +58,7 @@ import {openExternalResourceKindDocumentation} from '@utils/shell';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {HelmChart, HelmValuesFile, K8sResource} from '@monokle-desktop/shared';
+import {HelmChart, HelmValuesFile, K8sResource} from '@monokle-desktop/shared/models';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';

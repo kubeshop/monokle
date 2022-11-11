@@ -4,7 +4,7 @@ import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/reso
 
 import {awaitKindHandlersLoading} from '@src/kindhandlers';
 
-import {ResourceMapType} from '@monokle-desktop/shared';
+import {ResourceMapType} from '@monokle-desktop/shared/models';
 
 test('array-optional-resource-refs', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/arrayOptionalResourceRefs'));

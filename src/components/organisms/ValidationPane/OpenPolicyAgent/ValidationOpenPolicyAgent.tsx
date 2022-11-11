@@ -8,7 +8,7 @@ import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {Button} from '@src/App.styled';
 
-import {OPA_INTEGRATION} from '@monokle-desktop/shared';
+import {OPA_INTEGRATION} from '@monokle-desktop/shared/models';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import * as S from './ValidationOpenPolicyAgent.styled';

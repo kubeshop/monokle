@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import applyMultipleResources from '@redux/thunks/applyMultipleResources';
 
-import {AppDispatch, K8sResource, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, K8sResource, RootState} from '@monokle-desktop/shared/models';
 
 export const applyCheckedResources = createAsyncThunk<
   void,

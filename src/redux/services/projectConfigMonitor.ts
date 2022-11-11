@@ -1,7 +1,7 @@
 import {FSWatcher, watch} from 'chokidar';
 import log from 'loglevel';
 
-import {AppDispatch} from '@monokle-desktop/shared';
+import {AppDispatch} from '@monokle-desktop/shared/models';
 
 import {CONFIG_PATH, updateProjectSettings} from './projectConfig';
 

@@ -8,7 +8,7 @@ import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/se
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 export const useInstallDeploy = (resource?: K8sResource) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);

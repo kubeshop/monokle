@@ -12,7 +12,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
   ResourceRef,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export interface CodeIntelResponse {
   newDecorations: monaco.editor.IModelDeltaDecoration[];

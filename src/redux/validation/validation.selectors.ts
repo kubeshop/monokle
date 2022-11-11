@@ -1,6 +1,6 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import {RootState} from '@monokle-desktop/shared';
+import {RootState} from '@monokle-desktop/shared/models';
 
 import {VALIDATOR} from './validation.services';
 

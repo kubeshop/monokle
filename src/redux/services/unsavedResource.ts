@@ -9,7 +9,7 @@ import {parseYamlDocument} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch, K8sResource} from '@monokle-desktop/shared';
+import {AppDispatch, K8sResource} from '@monokle-desktop/shared/models';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `

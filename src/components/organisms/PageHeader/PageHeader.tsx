@@ -28,7 +28,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';

@@ -20,7 +20,7 @@ import {CREATE_EMPTY_PROJECT, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
-import {AnyTemplate} from '@monokle-desktop/shared';
+import {AnyTemplate} from '@monokle-desktop/shared/models';
 
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';

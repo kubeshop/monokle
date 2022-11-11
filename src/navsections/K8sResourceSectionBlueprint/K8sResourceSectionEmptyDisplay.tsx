@@ -10,7 +10,7 @@ import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
 
-import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared';
+import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared/models';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

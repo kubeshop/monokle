@@ -6,7 +6,7 @@ import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 const ItemPrefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

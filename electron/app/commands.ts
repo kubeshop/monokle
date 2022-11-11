@@ -9,8 +9,8 @@ import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExp
 
 import type {CommandOptions, CommandResult} from '@utils/commands';
 
-import type {InterpolateTemplateOptions} from '@monokle-desktop/shared';
-import {NewVersionCode} from '@monokle-desktop/shared';
+import type {InterpolateTemplateOptions} from '@monokle-desktop/shared/models';
+import {NewVersionCode} from '@monokle-desktop/shared/models';
 
 import autoUpdater from './autoUpdater';
 

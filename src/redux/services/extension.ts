@@ -11,7 +11,7 @@ import {
   UpdateExtensionsPayload,
   UpdateExtensionsResult,
   isUpdateExtensionsResult,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export const updateExtensions = (payload: UpdateExtensionsPayload) => {
   return new Promise<UpdateExtensionsResult>((resolve, reject) => {

@@ -2,7 +2,7 @@ import {isPassingKeyValueFilter} from '@utils/filter';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {CompareFilter, K8sResource, ResourceComparison} from '@monokle-desktop/shared';
+import {CompareFilter, K8sResource, ResourceComparison} from '@monokle-desktop/shared/models';
 
 type FilterOptions = {
   search?: string;

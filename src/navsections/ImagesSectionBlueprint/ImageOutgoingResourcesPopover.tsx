@@ -6,7 +6,7 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import {getRefRange} from '@utils/refs';
 
-import {K8sResource, ResourceRef} from '@monokle-desktop/shared';
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models';
 
 import * as S from './ImageOutgoingResourcesPopover.styled';
 

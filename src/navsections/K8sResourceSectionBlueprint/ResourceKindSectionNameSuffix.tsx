@@ -16,7 +16,7 @@ import Colors from '@styles/Colors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared';
+import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared/models';
 
 const SuffixContainer = styled.span`
   display: inline-block;

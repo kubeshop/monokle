@@ -41,7 +41,7 @@ import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
 
-import {ProjectConfig} from '@monokle-desktop/shared';
+import {ProjectConfig} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

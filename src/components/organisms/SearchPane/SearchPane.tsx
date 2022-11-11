@@ -36,7 +36,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
 
-import {CurrentMatch, FileEntry, MatchNode} from '@monokle-desktop/shared';
+import {CurrentMatch, FileEntry, MatchNode} from '@monokle-desktop/shared/models';
 
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode, TreeNode} from '../FileTreePane/types';

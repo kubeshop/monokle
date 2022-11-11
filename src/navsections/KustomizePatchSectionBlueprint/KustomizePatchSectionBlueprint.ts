@@ -1,6 +1,6 @@
 import {selectK8sResource} from '@redux/reducers/main';
 
-import {K8sResource, ResourceFilterType, ResourceMapType, SectionBlueprint} from '@monokle-desktop/shared';
+import {K8sResource, ResourceFilterType, ResourceMapType, SectionBlueprint} from '@monokle-desktop/shared/models';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizePatchPrefix from './KustomizePatchPrefix';

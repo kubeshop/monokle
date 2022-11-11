@@ -26,7 +26,7 @@ import {
   SettingsPanel,
   UiState,
   WalkthroughCollection,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export const uiSlice = createSlice({
   name: 'ui',

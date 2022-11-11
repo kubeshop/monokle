@@ -14,7 +14,7 @@ import {
   PaneConfiguration,
   TerminalState,
   UiState,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 const initialAppState: AppState = {
   isRehydrating: false,

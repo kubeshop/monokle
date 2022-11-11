@@ -9,7 +9,7 @@ import {createResourceFilters, filterComparisons} from '@redux/services/compare/
 import {errorAlert} from '@utils/alert';
 import {errorMsg} from '@utils/error';
 
-import {CompareSide} from '@monokle-desktop/shared';
+import {CompareSide} from '@monokle-desktop/shared/models';
 
 import {selectCompareStatus, selectResourceSet} from './selectors';
 import {

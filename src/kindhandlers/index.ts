@@ -19,7 +19,7 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared';
+import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';

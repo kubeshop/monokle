@@ -5,8 +5,8 @@ import {AnyAction} from 'redux';
 
 import electronStore from '@utils/electronStore';
 
-import type {KubeConfig, KubeConfigContext} from '@monokle-desktop/shared';
-import {AlertEnum} from '@monokle-desktop/shared';
+import type {KubeConfig, KubeConfigContext} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string) {
   if (process.env.KUBECONFIG) {

@@ -2,7 +2,7 @@ import {AnyAction} from '@reduxjs/toolkit';
 
 import {selectFile, selectImage, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
 
-import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '@monokle-desktop/shared';
+import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '@monokle-desktop/shared/models';
 
 export const selectFromHistory = async (
   direction: 'left' | 'right',

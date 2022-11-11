@@ -9,7 +9,7 @@ import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {defineHotkey} from '@utils/defineHotkey';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
 
-import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared';
+import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';

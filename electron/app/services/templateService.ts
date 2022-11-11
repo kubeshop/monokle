@@ -3,14 +3,14 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import type {AnyExtension, AnyPlugin, AnyTemplate, TemplatePack} from '@monokle-desktop/shared';
+import type {AnyExtension, AnyPlugin, AnyTemplate, TemplatePack} from '@monokle-desktop/shared/models';
 import {
   isBundledTemplatePluginModule,
   isHelmChartTemplate,
   isVanillaTemplate,
   validateAnyTemplate,
   validateTemplatePack,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

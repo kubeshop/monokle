@@ -16,7 +16,7 @@ import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch, K8sResource, ResourceSet, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, K8sResource, ResourceSet, RootState} from '@monokle-desktop/shared/models';
 
 type Type = ResourceSet['type'];
 

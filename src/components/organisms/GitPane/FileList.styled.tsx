@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-import {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared';
+import {GitChangedFile, GitChangedFileType} from '@monokle-desktop/shared/models';
 
 export const FileIcon = styled.div`
   margin-left: 12.5px;

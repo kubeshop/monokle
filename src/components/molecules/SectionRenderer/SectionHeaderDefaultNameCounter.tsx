@@ -4,7 +4,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
-import {SectionCustomComponentProps} from '@monokle-desktop/shared';
+import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

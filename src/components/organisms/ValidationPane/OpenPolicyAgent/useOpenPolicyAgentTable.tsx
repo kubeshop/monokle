@@ -15,7 +15,7 @@ import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 
-import {IconNames} from '@monokle-desktop/shared';
+import {IconNames} from '@monokle-desktop/shared/models';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';

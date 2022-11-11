@@ -15,7 +15,7 @@ import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
-import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared';
+import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared/models';
 
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<DownloadPluginResult>((resolve, reject) => {

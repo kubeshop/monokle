@@ -8,7 +8,7 @@ import {
   targetKindMatcher,
 } from '@src/kindhandlers/common/customMatchers';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
 
 const EndpointSliceHandler: ResourceKindHandler = {
   kind: 'EndpointSlice',

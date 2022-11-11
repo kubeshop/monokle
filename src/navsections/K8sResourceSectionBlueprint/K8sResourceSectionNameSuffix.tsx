@@ -6,7 +6,7 @@ import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextColor
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
-import {ClusterColors} from '@monokle-desktop/shared';
+import {ClusterColors} from '@monokle-desktop/shared/models';
 
 const S = {
   PreviewOutputTag: styled.div`

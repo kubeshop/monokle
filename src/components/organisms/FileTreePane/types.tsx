@@ -4,7 +4,7 @@ import {DataNode} from 'antd/lib/tree';
 
 import {DeleteEntityCallback} from '@utils/files';
 
-import {MatchNode} from '@monokle-desktop/shared';
+import {MatchNode} from '@monokle-desktop/shared/models';
 
 export interface ProcessingEntity {
   processingEntityID?: string;

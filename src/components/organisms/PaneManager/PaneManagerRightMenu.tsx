@@ -7,7 +7,7 @@ import {setRightMenuSelection, toggleRightMenu} from '@redux/reducers/ui';
 
 import {useFeatureFlags} from '@utils/features';
 
-import {RightMenuSelectionType} from '@monokle-desktop/shared';
+import {RightMenuSelectionType} from '@monokle-desktop/shared/models';
 
 import MenuIcon from './MenuIcon';
 import * as S from './PaneManagerRightMenu.styled';

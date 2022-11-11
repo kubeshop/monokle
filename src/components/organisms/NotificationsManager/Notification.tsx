@@ -10,7 +10,7 @@ import {NotificationMarkdown} from '@molecules';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models';
 
 import * as S from './Notification.styled';
 

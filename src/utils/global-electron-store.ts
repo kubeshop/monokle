@@ -1,4 +1,4 @@
-import {Project} from '@monokle-desktop/shared';
+import {Project} from '@monokle-desktop/shared/models';
 
 export interface ProjectNameChange {
   newName: string;

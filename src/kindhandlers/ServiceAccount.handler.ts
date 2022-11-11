@@ -5,7 +5,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {implicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
 
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',

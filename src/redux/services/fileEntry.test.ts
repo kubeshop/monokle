@@ -11,7 +11,7 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 

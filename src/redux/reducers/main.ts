@@ -55,7 +55,7 @@ import {
   SelectionHistoryEntry,
   ThunkApi,
   ValidationIntegration,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

@@ -21,7 +21,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import Colors from '@styles/Colors';
 
-import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared';
+import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared/models';
 
 import * as S from './FileList.styled';
 

@@ -14,7 +14,7 @@ import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
 import Colors from '@styles/Colors';
 
-import {TemplateForm} from '@monokle-desktop/shared';
+import {TemplateForm} from '@monokle-desktop/shared/models';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 

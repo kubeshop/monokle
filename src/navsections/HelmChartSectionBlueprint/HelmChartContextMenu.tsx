@@ -25,7 +25,7 @@ import {showItemInFolder} from '@utils/shell';
 
 import Colors from '@styles/Colors';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

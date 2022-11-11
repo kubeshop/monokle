@@ -23,7 +23,7 @@ import {isValidUrl} from '@utils/urls';
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {AlertEnum, CRD_SCHEMA_INTEGRATION} from '@monokle-desktop/shared';
+import {AlertEnum, CRD_SCHEMA_INTEGRATION} from '@monokle-desktop/shared/models';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import CRDItem from './CRDItem';

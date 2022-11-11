@@ -15,7 +15,7 @@ import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
 import Colors from '@styles/Colors';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 const StyledButton = styled.span<{isItemSelected: boolean}>`
   margin-right: 15px;

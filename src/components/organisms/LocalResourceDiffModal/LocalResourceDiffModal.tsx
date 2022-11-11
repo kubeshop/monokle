@@ -43,7 +43,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

@@ -5,7 +5,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 
 import electronStore from '@utils/electronStore';
 
-import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@monokle-desktop/shared';
+import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@monokle-desktop/shared/models';
 
 import {setLeftBottomMenuSelection} from './ui';
 

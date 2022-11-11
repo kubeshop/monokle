@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {HelmChart} from '@monokle-desktop/shared';
+import {HelmChart} from '@monokle-desktop/shared/models';
 
 export function buildHelmCommand(
   helmChart: HelmChart,

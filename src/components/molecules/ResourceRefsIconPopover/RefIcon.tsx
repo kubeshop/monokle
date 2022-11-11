@@ -6,7 +6,7 @@ import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 
-import {ResourceRef} from '@monokle-desktop/shared';
+import {ResourceRef} from '@monokle-desktop/shared/models';
 
 interface IProps {
   resourceRef: ResourceRef;

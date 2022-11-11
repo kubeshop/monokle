@@ -19,7 +19,7 @@ import {
   ProjectConfig,
   ResourceKindHandler,
   RootState,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import Colors from '../styles/Colors';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';

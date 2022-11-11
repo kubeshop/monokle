@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Colors, {FontColors, PanelColors} from '@styles/Colors';
 
-import {ClusterColors, PreviewType} from '@monokle-desktop/shared';
+import {ClusterColors, PreviewType} from '@monokle-desktop/shared/models';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
 

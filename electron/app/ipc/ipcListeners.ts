@@ -24,7 +24,7 @@ import {
   NewVersionCode,
   TemplatePack,
   UpdateExtensionsResult,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import autoUpdater from '../autoUpdater';
 import {

@@ -21,7 +21,7 @@ import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
 import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
-import {AlertEnum, AlertType, NewVersionCode} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType, NewVersionCode} from '@monokle-desktop/shared/models';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';

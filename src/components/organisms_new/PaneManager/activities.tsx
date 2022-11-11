@@ -5,7 +5,7 @@ import {useAppSelector} from '@redux/hooks';
 import {BottomPaneManager, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
-import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@monokle-desktop/shared';
+import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {ActivityType, Icon} from '@monokle/components';
 
 import CompareSyncPane from '../CompareSyncPane';
