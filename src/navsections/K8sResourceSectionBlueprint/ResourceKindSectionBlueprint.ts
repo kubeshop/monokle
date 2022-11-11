@@ -20,7 +20,7 @@ import {
   ResourceKindHandler,
   RootState,
   SectionBlueprint,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';

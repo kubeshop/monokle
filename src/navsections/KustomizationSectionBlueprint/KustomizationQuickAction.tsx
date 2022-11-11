@@ -18,7 +18,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 import * as S from './KustomizationQuickAction.styled';
 

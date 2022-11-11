@@ -2,7 +2,7 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs, Tree} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors, {FontColors} from '@styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles';
 
 export const NodeContainer = styled.div`
   position: relative;

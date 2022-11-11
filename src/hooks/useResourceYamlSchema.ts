@@ -6,7 +6,7 @@ import {isKustomizationPatch} from '@redux/services/kustomize';
 import {hasSupportedResourceContent} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
-import {FileMapType, K8sResource} from '@monokle-desktop/shared';
+import {FileMapType, K8sResource} from '@monokle-desktop/shared/models';
 
 function useResourceYamlSchema(
   yaml: typeof languages.yaml,

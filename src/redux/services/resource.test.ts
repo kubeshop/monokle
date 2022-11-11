@@ -1,6 +1,6 @@
 import {loadTestResource} from '@redux/services/__test__/utils';
 
-import {ResourceMapType} from '@monokle-desktop/shared';
+import {ResourceMapType} from '@monokle-desktop/shared/models';
 
 import {extractK8sResources, getNamespaces, getScalarNode, getScalarNodes} from './resource';
 

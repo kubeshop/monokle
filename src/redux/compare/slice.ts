@@ -15,7 +15,7 @@ import {
   K8sResource,
   PartialResourceSet,
   ResourceComparison,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {initialState} from './initialState';
 import {selectIsAllComparisonSelected} from './selectors';

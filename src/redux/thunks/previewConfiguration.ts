@@ -5,7 +5,7 @@ import {cloneDeep} from 'lodash';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {clearSelected, selectFile} from '@redux/reducers/main';
 
-import {AppDispatch, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, RootState} from '@monokle-desktop/shared/models';
 
 export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'main/deletePreviewConfiguration',

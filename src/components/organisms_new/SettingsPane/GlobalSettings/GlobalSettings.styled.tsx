@@ -2,7 +2,7 @@ import {Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Div = styled.div`
   margin-bottom: 20px;

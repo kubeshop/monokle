@@ -4,7 +4,7 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
 
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',

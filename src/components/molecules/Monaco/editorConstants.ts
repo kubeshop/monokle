@@ -1,6 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const MODEL_OWNER = 'monokle';
 

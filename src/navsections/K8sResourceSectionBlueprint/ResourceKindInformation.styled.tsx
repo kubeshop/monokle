@@ -4,7 +4,7 @@ import {InfoCircleFilled as RawInfoCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const InfoCircleFilled = styled(RawInfoCircleFilled)<{$isSelected: boolean}>`
   color: ${props => (props.$isSelected ? Colors.blackPure : Colors.blue9)};

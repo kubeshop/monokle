@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import _ from 'lodash';
 import log from 'loglevel';
 
-import {SectionBlueprint} from '@monokle-desktop/shared';
+import {SectionBlueprint} from '@monokle-desktop/shared/models';
 
 const SectionBlueprintMap: Record<string, SectionBlueprint<any, any>> = {};
 

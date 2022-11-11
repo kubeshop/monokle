@@ -11,9 +11,8 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 
 import {IconWithPopover} from '@atoms';
 
-import Colors from '@styles/Colors';
-
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {ResourceFilterType} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import ResourceFilter from '../ResourceFilter';
 

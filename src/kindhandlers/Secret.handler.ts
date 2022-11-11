@@ -2,7 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared';
+import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
 
 const SecretHandler: ResourceKindHandler = {
   kind: 'Secret',

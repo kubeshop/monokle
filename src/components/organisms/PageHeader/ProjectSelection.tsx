@@ -36,7 +36,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {getRelativeDate} from '@utils';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {Project} from '@monokle-desktop/shared';
+import {Project} from '@monokle-desktop/shared/models';
 
 import * as S from './ProjectSelection.styled';
 

@@ -1,4 +1,4 @@
-import {ResourceRef} from '@monokle-desktop/shared';
+import {ResourceRef} from '@monokle-desktop/shared/models';
 
 export const getRefRange = (ref: ResourceRef) => {
   if (!ref.position) {

@@ -18,7 +18,7 @@ import {
   RootState,
   SavedCommand,
   TransferDirection,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;

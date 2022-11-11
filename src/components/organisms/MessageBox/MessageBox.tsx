@@ -7,7 +7,7 @@ import {clearAlert} from '@redux/reducers/alert';
 
 import {NotificationMarkdown} from '@molecules';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();

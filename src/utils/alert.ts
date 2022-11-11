@@ -1,4 +1,4 @@
-import {AlertEnum, AlertType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models';
 
 export function errorAlert(title: string, message?: string): AlertType {
   return createAlert(AlertEnum.Error, title, message);

@@ -9,7 +9,7 @@ import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {errorAlert} from '@utils/alert';
 import {APPLY_FILE, trackEvent} from '@utils/telemetry';
 
-import {AlertEnum, AlertType, AppDispatch, FileMapType} from '@monokle-desktop/shared';
+import {AlertEnum, AlertType, AppDispatch, FileMapType} from '@monokle-desktop/shared/models';
 
 /**
  * Invokes kubectl for the content of the specified resource

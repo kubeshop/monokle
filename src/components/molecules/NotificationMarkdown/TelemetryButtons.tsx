@@ -4,7 +4,7 @@ import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux
 import {setActiveSettingsPanel, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import store from '@redux/store';
 
-import {SettingsPanel} from '@monokle-desktop/shared';
+import {SettingsPanel} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

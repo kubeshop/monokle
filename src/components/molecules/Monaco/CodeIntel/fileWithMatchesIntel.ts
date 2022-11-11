@@ -4,7 +4,7 @@ import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {createInlineDecoration} from '@molecules/Monaco/editorHelpers';
 
-import {MatchNode} from '@monokle-desktop/shared';
+import {MatchNode} from '@monokle-desktop/shared/models';
 
 export const fileWithMatchesIntel: CodeIntelApply = {
   name: 'fileMatches',

@@ -8,9 +8,8 @@ import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettin
 import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
-import Colors from '@styles/Colors';
-
-import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared';
+import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

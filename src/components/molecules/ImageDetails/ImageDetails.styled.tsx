@@ -3,7 +3,8 @@ import {PullRequestOutlined as RawPullRequestOutlined, StarFilled as RawStarFill
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
-import Colors from '@styles/Colors';
+
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const ImageDetailsContainer = styled.div`
   display: flex;

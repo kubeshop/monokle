@@ -18,12 +18,11 @@ import {MonoPaneTitle} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import Colors from '@styles/Colors';
-
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {ResourceFilterType} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';

@@ -13,9 +13,8 @@ import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
 
 import {useFocus} from '@utils/hooks';
 
-import Colors from '@styles/Colors';
-
-import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared';
+import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<DownloadPluginResult>((resolve, reject) => {

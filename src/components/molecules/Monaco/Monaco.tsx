@@ -42,7 +42,7 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared';
+import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared/models';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

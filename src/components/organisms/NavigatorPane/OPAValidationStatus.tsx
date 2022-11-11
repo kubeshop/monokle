@@ -10,7 +10,7 @@ import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 
 import {Icon} from '@atoms';
 
-import {OPA_INTEGRATION} from '@monokle-desktop/shared';
+import {OPA_INTEGRATION} from '@monokle-desktop/shared/models';
 
 import * as S from './OPAValidationStatus.styled';
 

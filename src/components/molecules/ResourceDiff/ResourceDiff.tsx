@@ -26,7 +26,7 @@ import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';

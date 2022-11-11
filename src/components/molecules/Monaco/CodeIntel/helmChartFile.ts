@@ -15,7 +15,7 @@ import {
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
 
-import {HelmValueMatch, MonacoUiState} from '@monokle-desktop/shared';
+import {HelmValueMatch, MonacoUiState} from '@monokle-desktop/shared/models';
 
 interface GoToValuesFileParams {
   helmMatch: HelmValueMatch & {filePath: string};

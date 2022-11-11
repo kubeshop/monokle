@@ -34,7 +34,7 @@ import {
   ProjectConfig,
   RangeAndValue,
   ResourceMapType,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

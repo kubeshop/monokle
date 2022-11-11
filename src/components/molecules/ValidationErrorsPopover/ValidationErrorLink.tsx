@@ -1,4 +1,4 @@
-import {ResourceValidationError} from '@monokle-desktop/shared';
+import {ResourceValidationError} from '@monokle-desktop/shared/models';
 
 import * as S from './ValidationErrorLink.styled';
 

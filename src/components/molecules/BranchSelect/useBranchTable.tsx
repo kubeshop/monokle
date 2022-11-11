@@ -4,9 +4,8 @@ import {ColumnsType} from 'antd/lib/table';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
-
-import {GitBranch} from '@monokle-desktop/shared';
+import {GitBranch} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import BranchCell from './BranchCell';
 

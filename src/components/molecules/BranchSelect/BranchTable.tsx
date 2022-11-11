@@ -4,7 +4,7 @@ import {PlusCircleFilled, SearchOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {GitBranch} from '@monokle-desktop/shared';
+import {GitBranch} from '@monokle-desktop/shared/models';
 
 import * as S from './BranchTable.styled';
 import CreateBranchInput from './CreateBranchInput';

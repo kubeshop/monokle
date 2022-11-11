@@ -2,7 +2,8 @@
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
-import Colors from '@styles/Colors';
+
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const GitPaneContainer = styled.div`
   height: 100%;

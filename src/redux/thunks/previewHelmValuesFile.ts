@@ -9,7 +9,7 @@ import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux
 import {errorMsg} from '@utils/error';
 import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
 
-import {AppDispatch, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, RootState} from '@monokle-desktop/shared/models';
 
 export const previewHelmValuesFile = createAsyncThunk<
   SetPreviewDataPayload,

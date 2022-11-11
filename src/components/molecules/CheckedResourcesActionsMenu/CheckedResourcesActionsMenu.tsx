@@ -20,9 +20,8 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import Colors from '@styles/Colors';
-
-import {AlertEnum, AppDispatch, K8sResource} from '@monokle-desktop/shared';
+import {AlertEnum, AppDispatch, K8sResource} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

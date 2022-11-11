@@ -38,7 +38,7 @@ import {
   KustomizeResourceSet,
   ResourceSet,
   RootState,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

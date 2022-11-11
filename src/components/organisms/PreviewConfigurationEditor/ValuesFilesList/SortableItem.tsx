@@ -8,7 +8,7 @@ import path from 'path';
 
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
-import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

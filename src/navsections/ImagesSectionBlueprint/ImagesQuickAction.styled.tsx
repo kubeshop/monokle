@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const ReplaceSpan = styled.span<{$isDisabled: boolean; $isSelected: boolean}>`
   font-weight: 500;

@@ -2,7 +2,7 @@ import {Checkbox as RawCheckbox} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 type ItemContainerProps = {
   isSelected: boolean;

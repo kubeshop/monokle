@@ -8,7 +8,7 @@ import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
 import {ADD_NEW_RESOURCE, trackEvent} from '@utils/telemetry';
 
-import {AppDispatch, FileEntry, K8sResource, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, FileEntry, K8sResource, RootState} from '@monokle-desktop/shared/models';
 
 import {createRejectionWithAlert} from './utils';
 

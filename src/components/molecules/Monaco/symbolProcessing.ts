@@ -11,7 +11,7 @@ import {
 
 import SecretHandler from '@src/kindhandlers/Secret.handler';
 
-import {K8sResource, ResourceFilterType} from '@monokle-desktop/shared';
+import {K8sResource, ResourceFilterType} from '@monokle-desktop/shared/models';
 
 function getSymbolValue(lines: string[], symbol: monaco.languages.DocumentSymbol, includeName?: boolean) {
   const line = lines[symbol.range.startLineNumber - 1];

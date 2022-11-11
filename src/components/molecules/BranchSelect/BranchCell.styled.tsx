@@ -6,7 +6,7 @@ import {
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Box = styled.div`
   display: flex;

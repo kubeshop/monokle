@@ -4,7 +4,7 @@ import {Select} from 'antd';
 
 import {MinusOutlined} from '@ant-design/icons';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import * as S from './KeyValueEntryRenderer.styled';
 import ValueInput from './ValueInput';

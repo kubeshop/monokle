@@ -19,7 +19,7 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch, ClusterAccess, K8sResource, RootState} from '@monokle-desktop/shared';
+import {AppDispatch, ClusterAccess, K8sResource, RootState} from '@monokle-desktop/shared/models';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(

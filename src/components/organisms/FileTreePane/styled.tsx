@@ -3,7 +3,8 @@ import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
-import Colors, {FontColors} from '@styles/Colors';
+
+import {Colors, FontColors} from '@monokle-desktop/shared/styles';
 
 export const FileTreeContainer = styled.div`
   width: 100%;

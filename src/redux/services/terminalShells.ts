@@ -6,7 +6,7 @@ import {SUPPORTED_SHELLS} from '@constants/terminal';
 
 import {setShells, setTerminalSettings} from '@redux/reducers/terminal';
 
-import {AppDispatch, ShellsMapType, TerminalSettingsType} from '@monokle-desktop/shared';
+import {AppDispatch, ShellsMapType, TerminalSettingsType} from '@monokle-desktop/shared/models';
 
 // get available shells for mac/linux
 const detectAvailableUnixShells = (osPlatform: NodeJS.Platform): ShellsMapType => {

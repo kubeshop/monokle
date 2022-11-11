@@ -15,7 +15,7 @@ import {
   ResourceKindHandler,
   RootState,
   SectionBlueprint,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';

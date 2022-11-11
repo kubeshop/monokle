@@ -2,7 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import electronStore from '@utils/electronStore';
 
-import {ValidationIntegrationId, ValidationSliceState} from '@monokle-desktop/shared';
+import {ValidationIntegrationId, ValidationSliceState} from '@monokle-desktop/shared/models';
 import {DEFAULT_TRIVY_PLUGIN, RuleMap} from '@monokle/validation';
 
 import {validationInitialState} from './validation.initialState';

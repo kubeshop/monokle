@@ -8,7 +8,7 @@ import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {RootState} from '@monokle-desktop/shared';
+import {RootState} from '@monokle-desktop/shared/models';
 
 export const multiplePathsChanged = createAsyncThunk(
   'main/multiplePathsChanged',

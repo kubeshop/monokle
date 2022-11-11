@@ -12,7 +12,7 @@ import {setDeleteProject} from '@redux/reducers/appConfig';
 
 import {getRelativeDate} from '@utils';
 
-import {Project} from '@monokle-desktop/shared';
+import {Project} from '@monokle-desktop/shared/models';
 
 import * as S from './RecentProject.styled';
 

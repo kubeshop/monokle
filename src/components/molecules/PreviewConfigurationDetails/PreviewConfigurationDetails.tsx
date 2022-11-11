@@ -11,7 +11,7 @@ import {kubeConfigContextSelector} from '@redux/selectors';
 
 import {buildHelmCommand} from '@utils/helm';
 
-import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared';
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models';
 
 import * as S from './PreviewConfigurationDetails.styled';
 

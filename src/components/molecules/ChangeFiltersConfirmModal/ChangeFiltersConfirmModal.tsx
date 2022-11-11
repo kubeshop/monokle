@@ -11,7 +11,7 @@ import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds}
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ResourceFilterType} from '@monokle-desktop/shared';
+import {ResourceFilterType} from '@monokle-desktop/shared/models';
 
 const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();

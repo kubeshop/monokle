@@ -14,7 +14,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';

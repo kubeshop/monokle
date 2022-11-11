@@ -15,7 +15,7 @@ import {
   RootState,
   SectionBlueprint,
   SectionInstance,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 

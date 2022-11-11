@@ -12,7 +12,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 
-import {ProjectConfig} from '@monokle-desktop/shared';
+import {ProjectConfig} from '@monokle-desktop/shared/models';
 
 import {Settings} from '../Settings/Settings';
 

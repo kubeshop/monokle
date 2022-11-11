@@ -19,7 +19,7 @@ import {loadResource} from '@redux/services';
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
 
-import type {AnyExtension} from '@monokle-desktop/shared';
+import type {AnyExtension} from '@monokle-desktop/shared/models';
 
 import {APP_INSTALLED} from './constants/telemetry';
 

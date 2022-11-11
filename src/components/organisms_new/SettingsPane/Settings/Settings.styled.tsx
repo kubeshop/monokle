@@ -4,7 +4,7 @@ import {WarningOutlined as RawWarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const SettingsContainer = styled.div`
   display: flex;

@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import * as S from './Dots.styled';
 

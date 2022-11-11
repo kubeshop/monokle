@@ -21,7 +21,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import {ContextMenu} from '@atoms';
 
-import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared';
+import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;

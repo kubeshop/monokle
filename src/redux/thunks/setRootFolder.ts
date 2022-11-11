@@ -24,7 +24,7 @@ import {
   HelmValuesMapType,
   ResourceMapType,
   RootState,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 /**
  * Thunk to set the specified root folder

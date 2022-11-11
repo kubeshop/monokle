@@ -7,7 +7,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {gitCommitDate} from '@utils/git';
 
-import {CompareSide, PartialResourceSet} from '@monokle-desktop/shared';
+import {CompareSide, PartialResourceSet} from '@monokle-desktop/shared/models';
 
 import * as S from '../ResourceSetSelectColor.styled';
 

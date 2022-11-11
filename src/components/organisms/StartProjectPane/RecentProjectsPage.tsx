@@ -9,7 +9,7 @@ import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import {Project} from '@monokle-desktop/shared';
+import {Project} from '@monokle-desktop/shared/models';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';

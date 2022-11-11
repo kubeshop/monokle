@@ -24,7 +24,7 @@ import {
   Project,
   isReferencedHelmChartTemplate,
   isVanillaTemplate,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import * as S from './styled';
 

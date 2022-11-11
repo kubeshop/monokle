@@ -9,7 +9,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kubeConfigPathValidSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {ResourceSet} from '@monokle-desktop/shared';
+import {ResourceSet} from '@monokle-desktop/shared/models';
 
 import * as S from './ResourceSetSelectColor.styled';
 

@@ -6,7 +6,7 @@ import {
 
 import styled from 'styled-components';
 
-import Colors, {FontColors} from '@styles/Colors';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles';
 
 export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
   color: ${Colors.polarGreen};

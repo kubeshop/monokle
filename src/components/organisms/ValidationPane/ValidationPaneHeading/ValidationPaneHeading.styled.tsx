@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {Icon as BaseIcon} from '@atoms';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Heading = styled.div`
   display: flex;

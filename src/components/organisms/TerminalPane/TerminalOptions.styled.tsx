@@ -2,7 +2,7 @@ import {Divider as RawDivider, Form as RawForm, InputNumber as RawInputNumber} f
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const Divider = styled(RawDivider)`
   margin: 10px 0px 16px 0px;

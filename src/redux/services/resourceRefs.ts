@@ -13,7 +13,7 @@ import {
   ResourceRef,
   ResourceRefType,
   ResourceRefsProcessingOptions,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {traverseDocument} from './manifest-utils';
 import {

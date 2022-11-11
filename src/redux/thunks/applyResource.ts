@@ -25,7 +25,7 @@ import {
   K8sResource,
   ProjectConfig,
   ResourceMapType,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 /**
  * Invokes kubectl for the content of the specified resource

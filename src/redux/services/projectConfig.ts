@@ -9,7 +9,7 @@ import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 
-import {AppConfig, ProjectConfig} from '@monokle-desktop/shared';
+import {AppConfig, ProjectConfig} from '@monokle-desktop/shared/models';
 
 import {monitorKubeConfig} from './kubeConfigMonitor';
 

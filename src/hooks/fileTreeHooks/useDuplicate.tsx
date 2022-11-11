@@ -3,7 +3,7 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {duplicateEntity} from '@utils/files';
 
-import {AlertEnum} from '@monokle-desktop/shared';
+import {AlertEnum} from '@monokle-desktop/shared/models';
 
 export const useDuplicate = () => {
   const dispatch = useAppDispatch();

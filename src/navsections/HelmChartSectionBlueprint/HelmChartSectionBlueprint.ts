@@ -4,8 +4,6 @@ import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@red
 
 import {isDefined} from '@utils/filter';
 
-import Colors from '@styles/Colors';
-
 import {
   FileMapType,
   HelmChart,
@@ -15,7 +13,8 @@ import {
   HelmValuesFile,
   HelmValuesMapType,
   SectionBlueprint,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';

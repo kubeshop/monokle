@@ -4,7 +4,7 @@ import {createGlyphDecoration, createMarkdownString, createMarker} from '@molecu
 
 import {isDefined} from '@utils/filter';
 
-import {K8sResource} from '@monokle-desktop/shared';
+import {K8sResource} from '@monokle-desktop/shared/models';
 
 import {GlyphDecorationTypes} from '../../editorConstants';
 

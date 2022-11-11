@@ -10,7 +10,7 @@ import {createKubeClient} from '@utils/kubeclient';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {RootState} from '@monokle-desktop/shared';
+import {RootState} from '@monokle-desktop/shared/models';
 
 export const removeResources = createAsyncThunk(
   'main/removeResources',

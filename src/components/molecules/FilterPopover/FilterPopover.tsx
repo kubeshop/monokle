@@ -5,7 +5,7 @@ import {Badge, Button, Col, Input, Popover, Row, Space, Tabs} from 'antd';
 
 import {FilterOutlined} from '@ant-design/icons';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 import {KeyValueInput, NewKeyValueInput} from './keyValueInput';
 

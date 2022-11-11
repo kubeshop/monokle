@@ -18,7 +18,7 @@ import {
   Policy,
   ResourceMapType,
   ResourceRefsProcessingOptions,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document

@@ -14,7 +14,12 @@ import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
 
-import {AppDispatch, HelmPreviewConfiguration, PreviewConfigValuesFileItem, RootState} from '@monokle-desktop/shared';
+import {
+  AppDispatch,
+  HelmPreviewConfiguration,
+  PreviewConfigValuesFileItem,
+  RootState,
+} from '@monokle-desktop/shared/models';
 
 /**
  * Thunk to preview a Helm Chart

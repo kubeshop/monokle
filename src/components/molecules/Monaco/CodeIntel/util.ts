@@ -12,7 +12,7 @@ import {
   MonacoSelectionFile,
   MonacoUiState,
   ResourceMapType,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 export function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMapType) {
   const helmChartId = currentFile?.helmChartId;

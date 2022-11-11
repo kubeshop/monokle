@@ -49,7 +49,7 @@ import {
   ResourceMapType,
   ResourceRefType,
   ResourceRefsProcessingOptions,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {processRefs} from './resourceRefs';
 import {validatePolicies, validateResource} from './validation';

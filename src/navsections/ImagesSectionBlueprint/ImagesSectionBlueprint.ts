@@ -2,7 +2,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {selectImage} from '@redux/reducers/main';
 
-import {ImageType, ImagesListType, ResourceMapType, SectionBlueprint} from '@monokle-desktop/shared';
+import {ImageType, ImagesListType, ResourceMapType, SectionBlueprint} from '@monokle-desktop/shared/models';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import ImagesQuickAction from './ImagesQuickAction';

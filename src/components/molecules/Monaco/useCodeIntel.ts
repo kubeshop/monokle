@@ -23,7 +23,7 @@ import {
   ResourceFilterType,
   ResourceMapType,
   ResourceRef,
-} from '@monokle-desktop/shared';
+} from '@monokle-desktop/shared/models';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 

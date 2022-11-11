@@ -2,7 +2,7 @@ import {DeleteOutlined as RawDeleteOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles';
 
 export const LabelContainer = styled.div`
   position: relative;
