@@ -18,8 +18,6 @@
       "@redux": ["src/redux/"],
       "@actions/*": ["src/actions/*"],
       "@actions": ["src/actions/"],
-      "@styles/*": ["src/styles/*"],
-      "@styles": ["src/styles/"],
       "@assets/*": ["src/assets/*"],
       "@assets": ["src/assets/"],
       "@utils/*": ["src/utils/*"],
