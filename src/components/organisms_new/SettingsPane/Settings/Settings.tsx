@@ -15,7 +15,6 @@ import path from 'path';
 import {
   DEFAULT_EDITOR_DEBOUNCE,
   DEFAULT_KUBECONFIG_DEBOUNCE,
-  K8S_VERSIONS,
   ROOT_FILE_ENTRY,
   TOOLTIP_DELAY,
   TOOLTIP_K8S_SELECTION,
@@ -40,6 +39,7 @@ import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
 
+import {K8S_VERSIONS} from '@monokle-desktop/shared/constants/k8s';
 import {ProjectConfig} from '@monokle-desktop/shared/models';
 
 import * as S from './Settings.styled';

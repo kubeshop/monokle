@@ -1,4 +1,4 @@
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 
 const ElectronStore = require('electron-store');
 
