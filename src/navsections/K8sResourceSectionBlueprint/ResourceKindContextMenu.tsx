@@ -8,7 +8,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
 
-import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -42,6 +41,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {defineHotkey} from '@utils/defineHotkey';
 
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 

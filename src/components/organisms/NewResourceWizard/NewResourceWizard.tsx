@@ -10,7 +10,6 @@ import fs from 'fs';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
@@ -24,6 +23,7 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {
   FileEntry,
   FileMapType,

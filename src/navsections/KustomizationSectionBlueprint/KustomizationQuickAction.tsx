@@ -1,7 +1,6 @@
 import {useCallback, useMemo} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import hotkeys from '@constants/hotkeys';
 import {
   ExitKustomizationPreviewTooltip,
   KustomizationPreviewTooltip,
@@ -18,6 +17,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
 
 import * as S from './KustomizationQuickAction.styled';
