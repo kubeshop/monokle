@@ -96,7 +96,7 @@
     "xvfb-maybe": "0.2.1"
   },
   "dependencies": {
-    "@monokle-desktop/shared": "file:./shared",
+    "@monokle-desktop/shared": "file:./shared/build",
     "@ant-design/icons": "4.7.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
