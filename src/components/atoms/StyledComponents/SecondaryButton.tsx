@@ -3,7 +3,7 @@ import {Button} from 'antd';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const SecondaryButton = styled(Button)<{$disableHover?: boolean}>`
   border-radius: 4px;

@@ -5,7 +5,7 @@ import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/re
 import {Icon} from '@atoms';
 
 import {ResourceRef} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 interface IProps {
   resourceRef: ResourceRef;

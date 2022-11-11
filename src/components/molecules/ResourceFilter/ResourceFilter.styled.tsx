@@ -4,7 +4,7 @@ import {CaretUpOutlined as RawCaretUpOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const CaretUpOutlined = styled(RawCaretUpOutlined)`
   color: ${Colors.whitePure};

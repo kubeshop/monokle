@@ -2,7 +2,7 @@ import {Modal} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const StyledModal = styled(Modal)`
   .ant-modal-close {

@@ -7,7 +7,7 @@ import Icon from '@atoms/Icon';
 import {countResourceErrors} from '@utils/resources';
 
 import {K8sResource} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import ErrorsPopoverContent from './ErrorsPopoverContent';
 

@@ -2,7 +2,7 @@ import {Menu as RawMenu} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const Menu = styled(RawMenu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);

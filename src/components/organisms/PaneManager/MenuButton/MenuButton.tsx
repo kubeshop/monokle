@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ButtonProps} from 'antd';
 
-import {PanelColors} from '@monokle-desktop/shared/styles';
+import {PanelColors} from '@monokle-desktop/shared/styles/Colors';
 
 import * as S from './MenuButton.styled';
 

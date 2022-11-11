@@ -2,7 +2,7 @@ import {Checkbox, Input, Select} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const FileCategoryLabel = styled.div`
   color: ${Colors.grey7};

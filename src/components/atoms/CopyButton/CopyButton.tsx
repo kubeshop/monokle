@@ -7,7 +7,7 @@ import {CopyOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 function CopyButton({content}: {content: string}) {
   const [isCopiedRecently, setIsCopiedRecently] = useState(false);

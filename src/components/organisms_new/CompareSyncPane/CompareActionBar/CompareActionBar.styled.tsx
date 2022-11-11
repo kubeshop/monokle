@@ -4,7 +4,7 @@ import {SearchOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const ActionBarDiv = styled.div`
   display: flex;

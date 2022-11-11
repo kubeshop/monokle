@@ -2,7 +2,7 @@ import {Button} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const FlexContainer = styled.div`
   display: flex;

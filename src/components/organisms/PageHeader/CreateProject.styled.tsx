@@ -2,7 +2,7 @@ import {Button as RawButton, Menu as RawMenu} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const Button = styled(RawButton)`
   display: flex;

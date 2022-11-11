@@ -2,7 +2,7 @@ import {Badge as RawBadge} from 'antd';
 
 import styled from 'styled-components';
 
-import {BackgroundColors, Colors, PanelColors} from '@monokle-desktop/shared/styles';
+import {BackgroundColors, Colors, PanelColors} from '@monokle-desktop/shared/styles/Colors';
 
 export const Badge = styled(RawBadge)`
   & .ant-badge-dot {

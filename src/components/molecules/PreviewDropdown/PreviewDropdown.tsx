@@ -11,7 +11,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
 import {HelmChartMenuItem, KustomizationMenuItem} from '@monokle-desktop/shared/models';
-import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles';
+import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import * as S from './PreviewDropdown.styled';
 import PreviewMenu from './PreviewMenu';

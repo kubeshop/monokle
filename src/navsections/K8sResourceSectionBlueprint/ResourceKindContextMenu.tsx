@@ -43,7 +43,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 import {defineHotkey} from '@utils/defineHotkey';
 
 import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

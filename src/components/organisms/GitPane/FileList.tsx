@@ -20,7 +20,7 @@ import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import * as S from './FileList.styled';
 

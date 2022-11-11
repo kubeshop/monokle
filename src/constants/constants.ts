@@ -1,5 +1,5 @@
 import {PaneConfiguration} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const PREVIEW_PREFIX = 'preview://';
 export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';

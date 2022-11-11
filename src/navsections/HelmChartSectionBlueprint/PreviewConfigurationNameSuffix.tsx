@@ -13,7 +13,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
 import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

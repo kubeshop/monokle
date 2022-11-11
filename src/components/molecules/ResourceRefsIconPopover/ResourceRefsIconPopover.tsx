@@ -7,7 +7,7 @@ import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/re
 import {Icon} from '@atoms';
 
 import {K8sResource} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import RefsPopoverContent from './RefsPopoverContent';
 import * as S from './ResourceRefsIconPopover.styled';

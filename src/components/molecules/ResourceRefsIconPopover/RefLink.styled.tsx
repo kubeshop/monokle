@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/Colors';
 
 export const PositionText = styled.span`
   margin-left: 5px;

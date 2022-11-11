@@ -2,7 +2,7 @@ import {Input as RawInput, Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const AddTagHelper = styled.span`
   color: ${Colors.grey7};

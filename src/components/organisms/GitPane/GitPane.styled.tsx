@@ -2,7 +2,7 @@ import {Dropdown, Button as RawButton, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const BottomActionsRef = styled.div``;
 

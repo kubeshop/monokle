@@ -4,7 +4,7 @@ import {QuestionCircleOutlined as RawQuestionCircleOutlined} from '@ant-design/i
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const Container = styled.div``;
 

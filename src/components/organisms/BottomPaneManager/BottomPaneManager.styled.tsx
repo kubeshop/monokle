@@ -13,7 +13,7 @@ import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
 
-import {Colors, PanelColors} from '@monokle-desktop/shared/styles';
+import {Colors, PanelColors} from '@monokle-desktop/shared/styles/Colors';
 
 export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean}>`
   height: 100%;

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 type Props = {
   value: string;

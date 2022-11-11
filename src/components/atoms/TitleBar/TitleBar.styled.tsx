@@ -4,7 +4,7 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {AppBorders} from '@styles/Borders';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const Container = styled.div`
   display: flex;

@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {startPreview} from '@redux/services/preview';
 
 import {SavedCommand} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import CommandLabel from './CommandLabel';
 

@@ -14,7 +14,7 @@ import {
   HelmValuesMapType,
   SectionBlueprint,
 } from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';

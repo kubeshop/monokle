@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {AnimationDurations} from '@styles/Animations';
 
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 export const ActionItem = styled.div<{$disabled?: boolean}>`
   height: 100%;

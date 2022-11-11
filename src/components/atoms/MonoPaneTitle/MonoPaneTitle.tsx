@@ -2,7 +2,7 @@ import {Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import {FontColors} from '@monokle-desktop/shared/styles';
+import {FontColors} from '@monokle-desktop/shared/styles/Colors';
 
 const {Text} = Typography;
 

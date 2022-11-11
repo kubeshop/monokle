@@ -9,7 +9,7 @@ import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidS
 import {startPreview} from '@redux/services/preview';
 
 import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared/models';
-import {Colors} from '@monokle-desktop/shared/styles';
+import {Colors} from '@monokle-desktop/shared/styles/Colors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;
