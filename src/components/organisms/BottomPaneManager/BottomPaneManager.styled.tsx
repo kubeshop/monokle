@@ -11,8 +11,7 @@ import {
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
 import {Colors, PanelColors} from '@monokle-desktop/shared/styles/colors';
 
 export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean}>`

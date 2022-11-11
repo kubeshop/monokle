@@ -2,8 +2,7 @@ import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
 import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const FileTreeContainer = styled.div`

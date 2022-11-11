@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
 
 export const Container = styled.div`
   height: 100%;

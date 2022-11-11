@@ -2,8 +2,7 @@ import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {AppBorders} from '@styles/Borders';
-
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`
