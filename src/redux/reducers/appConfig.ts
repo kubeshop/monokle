@@ -367,6 +367,10 @@ export const configSlice = createSlice({
         }
       });
 
+      if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
+        state.kubeConfig.path = action.payload.config.kubeConfig.path;
+      }
+
       if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
         writeProjectConfigFile(state);
       }

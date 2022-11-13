@@ -31,7 +31,7 @@ export const Dashboard = () => {
         <TitleBar
           type="secondary"
           title="Inventory & Info"
-          actions={<span>See all</span>}
+          actions={<S.ActionWrapper>See all</S.ActionWrapper>}
           description={<p>See all</p>}
         />
       </S.TitleBarContainer>
@@ -39,7 +39,11 @@ export const Dashboard = () => {
         <TitleBar
           type="secondary"
           title="Activity"
-          actions={<span>Pause See all</span>}
+          actions={
+            <div>
+              <S.ActionWrapper>See all</S.ActionWrapper>
+            </div>
+          }
           description={<p>Pause See all</p>}
         />
       </S.TitleBarContainer>

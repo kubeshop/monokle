@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 export const Container = styled.div`
   padding: 12px;
   display: grid;
@@ -27,5 +29,16 @@ export const TitleBarContainer = styled.div`
   }
   & > div:nth-child(2) {
     height: calc(100% - 32px);
+  }
+`;
+
+export const ActionWrapper = styled.span`
+  color: ${Colors.blue7};
+  font-weight: 400;
+  font-size: 12px;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
   }
 `;

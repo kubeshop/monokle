@@ -240,9 +240,6 @@ export const kubeConfigPathSelector = createSelector(
 export const kubeConfigPathValidSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (_.isBoolean(config.projectConfig?.kubeConfig?.isPathValid)) {
-      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
-    }
     if (_.isBoolean(config.kubeConfig.isPathValid)) {
       return Boolean(config.kubeConfig.isPathValid);
     }
