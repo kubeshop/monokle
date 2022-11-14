@@ -28,11 +28,11 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(
     getRegisteredKindHandlers()
       .filter(handler => !handler.isCustom)
-      .map(resourceKindHandler => {
-        return resourceKindHandler
+      .map(resourceKindHandler =>
+        resourceKindHandler
           .listResourcesInCluster(kc, {namespace})
-          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion));
-      })
+          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+      )
   );
 };
 
