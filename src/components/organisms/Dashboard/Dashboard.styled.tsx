@@ -21,6 +21,7 @@ export const Container = styled.div`
 export const OverviewContainer = styled.div`
   & > div:nth-child(1) {
     height: 100%;
+    background-color: ${Colors.grey3b};
   }
 `;
 
