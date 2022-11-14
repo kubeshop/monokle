@@ -207,11 +207,7 @@ const createNamespacedCustomObjectKindHandler = (
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
     isNamespaced: true,
-    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName] as [
-      navigatorName: string,
-      sectionName: string,
-      subsectionName: string
-    ],
+    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
     helpLink,
@@ -306,11 +302,7 @@ const createClusterCustomObjectKindHandler = (
     kind,
     apiVersionMatcher: `${kindGroup}/*`,
     isNamespaced: false,
-    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName] as [
-      navigatorName: string,
-      sectionName: string,
-      subsectionName: string
-    ],
+    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,
     outgoingRefMappers,
