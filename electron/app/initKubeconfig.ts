@@ -164,6 +164,7 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
   const kc = new k8s.KubeConfig();
   kc.loadFromFile(kubeConfigPath);
   kc.setCurrentContext(key);
+
   kubeConfigList[key].watcher = new k8s.Watch(kc);
   kubeConfigList[key].watcher
     ?.watch(

@@ -1,8 +1,40 @@
+import {useEffect, useState} from 'react';
+
+import {ClusterEvent, getClusterEvents} from '@redux/services/clusterDashboard';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+
 import {TitleBar} from '@monokle/components';
 
+import {Activity} from './Activity';
 import * as S from './Dashboard.styled';
+import {InventoryInfo, InventoryInfoData} from './InventoryInfo';
 
 export const Dashboard = () => {
+  const [inventoryData, setInventoryData] = useState<InventoryInfoData>({nodesCount: 0, podsCapacity: 0, podsCount: 0});
+  const [activityData, setActivityData] = useState<ClusterEvent[]>([]);
+
+  useEffect(() => {
+    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+
+    if (k8sApiClient) {
+      // k8sApiClient.listNode().then(data => {
+      //   console.log('data', data.body.items);
+      //   setInventoryData({
+      //     nodesCount: data.body.items.length,
+      //     podsCapacity: data.body.items.reduce((sum, item) => sum + Number(item?.status?.capacity?.pods), 0),
+      //     podsCount: 0,
+      //   });
+      // });
+
+      getClusterEvents(k8sApiClient)
+        .then(events => {
+          setActivityData(events);
+        })
+        .catch(_error => [setActivityData([])]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [new KubeConfigManager().kubeConfig]);
+
   return (
     <S.Container>
       <S.OverviewContainer style={{gridArea: 'overview'}}>
@@ -32,7 +64,7 @@ export const Dashboard = () => {
           type="secondary"
           title="Inventory & Info"
           actions={<S.ActionWrapper>See all</S.ActionWrapper>}
-          description={<p>See all</p>}
+          description={<InventoryInfo inventoryData={inventoryData} />}
         />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'activity'}}>
@@ -44,7 +76,7 @@ export const Dashboard = () => {
               <S.ActionWrapper>See all</S.ActionWrapper>
             </div>
           }
-          description={<p>Pause See all</p>}
+          description={<Activity events={activityData} />}
         />
       </S.TitleBarContainer>
     </S.Container>

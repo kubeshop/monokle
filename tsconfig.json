@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
@@ -19,10 +15,9 @@
     "jsx": "react-jsx",
     "strict": true,
     "baseUrl": "./",
-    "outDir": "./build"
+    "outDir": "./build",
+    "strictPropertyInitialization": false
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "extends": "./paths.json"
 }
