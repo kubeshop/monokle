@@ -11,13 +11,13 @@ import {
   validateAnyTemplate,
   validateTemplatePack,
 } from '@monokle-desktop/shared/models';
+import {createFolder, doesPathExist} from '@monokle-desktop/shared/utils/fileSystem';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
 import loadExtension from '../extensions/loadExtension';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, makeExtensionDownloadData} from '../utils';
-import {createFolder, doesPathExist} from '../utils/extensions';
 
 const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
 const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';

@@ -15,12 +15,12 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 
 import {Dots} from '@components/atoms';
 
-import {deleteFile} from '@utils/fileSystem';
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {AlertEnum, GitChangedFile} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {deleteFile} from '@monokle-desktop/shared/utils/fileSystem';
 
 import * as S from './FileList.styled';
 
