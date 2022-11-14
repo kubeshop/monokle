@@ -5,7 +5,6 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {clusterResourceWatcher} from '.';
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const ReplicaSetHandler: ResourceKindHandler = {
@@ -33,22 +32,6 @@ const ReplicaSetHandler: ResourceKindHandler = {
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      ReplicaSetHandler.watcherReq.abort();
-      ReplicaSetHandler.watcherReq = undefined;
-    } catch (e: any) {
-      ReplicaSetHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = args[2]?.namespace
-      ? `/apis/apps/v1/namespaces/${args[2].namespace}/replicasets`
-      : `/apis/apps/v1/replicasets`;
-    clusterResourceWatcher(ReplicaSetHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return ReplicaSetHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default ReplicaSetHandler;

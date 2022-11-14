@@ -7,8 +7,6 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
 
-import {clusterResourceWatcher} from '.';
-
 const ClusterRoleBindingHandler: ResourceKindHandler = {
   kind: 'ClusterRoleBinding',
   apiVersionMatcher: '**',
@@ -88,20 +86,6 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      ClusterRoleBindingHandler.watcherReq.abort();
-      ClusterRoleBindingHandler.watcherReq = undefined;
-    } catch (e: any) {
-      ClusterRoleBindingHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = `/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`;
-    clusterResourceWatcher(ClusterRoleBindingHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return ClusterRoleBindingHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default ClusterRoleBindingHandler;

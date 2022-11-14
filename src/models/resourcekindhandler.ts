@@ -55,7 +55,6 @@ export type ClusterResourceOptions = {
 };
 
 interface ResourceKindHandler {
-  watcherReq?: any;
   /**
    * The kubernetes kind of this resource
    */
@@ -107,23 +106,6 @@ interface ResourceKindHandler {
     options: ClusterResourceOptions,
     crd?: K8sResource
   ): Promise<any[]>;
-
-  /**
-   * Watch all resources of this type using the provided kubeconfig and dispatch to store
-   */
-
-  watchResources(
-    dispatch: any,
-    kubeconfig: k8s.KubeConfig,
-    options: ClusterResourceOptions,
-    crd?: K8sResource
-  ): Promise<any[]>;
-
-  /**
-   * Delete listeners on stop preview
-   */
-
-  disconnectFromCluster(): void;
 
   /**
    * Delete the specified resource from the cluster

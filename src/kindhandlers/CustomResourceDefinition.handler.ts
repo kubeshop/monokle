@@ -5,8 +5,6 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {clusterResourceWatcher} from '.';
-
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
   apiVersionMatcher: '**',
@@ -29,20 +27,6 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     await k8sExtensionsV1Api.deleteCustomResourceDefinition(resource.name);
   },
   helpLink: 'https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      CustomResourceDefinitionHandler.watcherReq.abort();
-      CustomResourceDefinitionHandler.watcherReq = undefined;
-    } catch (e: any) {
-      CustomResourceDefinitionHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`;
-    clusterResourceWatcher(CustomResourceDefinitionHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return CustomResourceDefinitionHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default CustomResourceDefinitionHandler;

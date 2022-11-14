@@ -5,8 +5,6 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {clusterResourceWatcher} from '.';
-
 const IngressHandler: ResourceKindHandler = {
   kind: 'Ingress',
   apiVersionMatcher: '**',
@@ -42,22 +40,6 @@ const IngressHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/ingress/',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      IngressHandler.watcherReq.abort();
-      IngressHandler.watcherReq = undefined;
-    } catch (e: any) {
-      IngressHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = args[2]?.namespace
-      ? `/apis/networking.k8s.io/v1/namespaces/${args[2].namespace}/ingresses`
-      : `/apis/networking.k8s.io/v1/ingresses`;
-    clusterResourceWatcher(IngressHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return IngressHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default IngressHandler;

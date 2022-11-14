@@ -5,8 +5,6 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {clusterResourceWatcher} from '.';
-
 const StorageClassHandler: ResourceKindHandler = {
   kind: 'StorageClass',
   apiVersionMatcher: '**',
@@ -29,20 +27,6 @@ const StorageClassHandler: ResourceKindHandler = {
     await storageV1Api.deleteStorageClass(resource.name);
   },
   helpLink: 'https://kubernetes.io/docs/concepts/storage/storage-classes/',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      StorageClassHandler.watcherReq.abort();
-      StorageClassHandler.watcherReq = undefined;
-    } catch (e: any) {
-      StorageClassHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = `/apis/storage.k8s.io/v1/storageclasses`;
-    clusterResourceWatcher(StorageClassHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return StorageClassHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default StorageClassHandler;

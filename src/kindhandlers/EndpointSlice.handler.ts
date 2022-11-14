@@ -11,8 +11,6 @@ import {
   targetKindMatcher,
 } from '@src/kindhandlers/common/customMatchers';
 
-import {clusterResourceWatcher} from '.';
-
 const EndpointSliceHandler: ResourceKindHandler = {
   kind: 'EndpointSlice',
   apiVersionMatcher: '**',
@@ -64,22 +62,6 @@ const EndpointSliceHandler: ResourceKindHandler = {
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpointslice-v1-discovery-k8s-io',
-  watcherReq: undefined,
-  disconnectFromCluster() {
-    try {
-      EndpointSliceHandler.watcherReq.abort();
-      EndpointSliceHandler.watcherReq = undefined;
-    } catch (e: any) {
-      EndpointSliceHandler.watcherReq = undefined;
-    }
-  },
-  async watchResources(...args) {
-    const requestPath: string = args[2]?.namespace
-      ? `/apis/discovery.k8s.io/v1/namespaces/${args[2].namespace}/endpointslices`
-      : `/apis/discovery.k8s.io/v1/endpointslices`;
-    clusterResourceWatcher(EndpointSliceHandler, requestPath, args[0], args[1], args[2], args[3]);
-    return EndpointSliceHandler.listResourcesInCluster(args[1], args[2], args[3]);
-  },
 };
 
 export default EndpointSliceHandler;

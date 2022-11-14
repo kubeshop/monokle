@@ -8,13 +8,11 @@ import micromatch from 'micromatch';
 import path from 'path';
 
 import {K8sResource} from '@models/k8sresource';
-import {ClusterResourceOptions, RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
+import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
-import electronStore from '@utils/electronStore';
 import {getSubfolders, readFiles} from '@utils/fileSystem';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -263,34 +261,4 @@ async function* findFiles(dir: string, ext: string): any {
 
 export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
   return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
-}
-
-export async function clusterResourceWatcher(
-  kindHandler: ResourceKindHandler,
-  requestPath: string,
-  dispatch: any,
-  kubeconfig: k8s.KubeConfig,
-  options: ClusterResourceOptions,
-  crds?: K8sResource
-) {
-  kindHandler.disconnectFromCluster && kindHandler.disconnectFromCluster();
-
-  kindHandler.watcherReq = await new k8s.Watch(kubeconfig).watch(
-    requestPath,
-    {allowWatchBookmarks: false},
-    (type: string, apiObj: any) => {
-      const isPreviewLoaderLoading = Boolean(electronStore.get('main.previewLoader.isLoading'));
-
-      if (!isPreviewLoaderLoading && (type === 'ADDED' || type === 'MODIFIED')) {
-        dispatch(updateClusterResource(apiObj));
-      }
-      if (!isPreviewLoaderLoading && type === 'DELETED') {
-        dispatch(deleteClusterResource(apiObj));
-      }
-    },
-    () => {
-      kindHandler.disconnectFromCluster && kindHandler.disconnectFromCluster();
-      kindHandler.watchResources && kindHandler.watchResources(dispatch, kubeconfig, options, crds);
-    }
-  );
 }
