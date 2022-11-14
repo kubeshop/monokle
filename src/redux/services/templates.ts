@@ -10,8 +10,6 @@ import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
-import electronStore from '@utils/electronStore';
-
 import {
   AlertEnum,
   AlertType,
@@ -25,6 +23,7 @@ import {
   VanillaTemplate,
   isKubernetesObject,
 } from '@monokle-desktop/shared/models';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';

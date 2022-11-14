@@ -11,8 +11,6 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import electronStore from '@utils/electronStore';
-
 import {
   HighlightItems,
   LayoutSizeType,
@@ -27,6 +25,7 @@ import {
   UiState,
   WalkthroughCollection,
 } from '@monokle-desktop/shared/models';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',

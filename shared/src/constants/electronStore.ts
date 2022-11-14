@@ -1,8 +1,6 @@
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {PREDEFINED_K8S_VERSION} from './k8s';
 
-const ElectronStore = require('electron-store');
-
-const schema = {
+export const electronStoreSchema = {
   main: {
     type: 'object',
     properties: {
@@ -288,7 +286,7 @@ const schema = {
   },
 };
 
-const defaults = {
+export const electronStoreDefaults = {
   main: {
     filtersPresets: {},
   },
@@ -346,10 +344,3 @@ const defaults = {
     },
   },
 };
-
-const electronStore = new ElectronStore({
-  schema,
-  defaults,
-});
-
-export default electronStore;

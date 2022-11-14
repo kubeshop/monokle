@@ -1,6 +1,5 @@
-import electronStore from '@utils/electronStore';
-
 import {ValidationSliceState} from '@monokle-desktop/shared/models';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 export const validationInitialState: ValidationSliceState = {
   config: electronStore.get('validation.config') || {

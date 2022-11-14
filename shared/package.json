@@ -20,6 +20,7 @@
     "@monokle/validation": "0.7.1",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.9.0",
+    "electron-store": "^8.1.0",
     "lodash": "4.17.21",
     "nodemon": "2.0.20",
     "react": "18.2.0",
@@ -32,6 +33,6 @@
     "./constants/*": "./build/constants/*.js",
     "./models": "./build/models/index.js",
     "./styles/*": "./build/styles/*.js",
-    "./utils": "./build/utils/index.js"
+    "./utils/*": "./build/utils/*.js"
   }
 }
