@@ -6,8 +6,6 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-
 import type {CommandOptions} from '@utils/commands';
 // TODO: create telemetry just for electron
 import {getSegmentClient} from '@utils/segment';
@@ -24,6 +22,7 @@ import {
   UPDATE_EXTENSIONS_RESULT,
 } from '@monokle-desktop/shared/constants/ipcEvents';
 import {UPDATE_APPLICATION} from '@monokle-desktop/shared/constants/telemetry';
+import type {FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models';
 import {
   AnyExtension,
   AnyPlugin,

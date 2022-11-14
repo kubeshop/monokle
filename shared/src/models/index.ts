@@ -6,6 +6,7 @@ export * from './compare';
 export * from './config';
 export * from './extension';
 export * from './fileEntry';
+export * from './fileExplorer';
 export * from './form';
 export * from './git';
 export * from './helm';
