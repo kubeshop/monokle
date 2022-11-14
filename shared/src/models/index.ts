@@ -9,6 +9,7 @@ export * from './fileEntry';
 export * from './form';
 export * from './git';
 export * from './helm';
+export * from './hotkeys';
 export * from './icons';
 export * from './image';
 export * from './integrations';

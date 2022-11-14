@@ -16,8 +16,9 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AnyTemplate,
   K8sResource,

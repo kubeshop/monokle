@@ -12,8 +12,9 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {OPEN_EXISTING_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AlertEnum,
   AppDispatch,

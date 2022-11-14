@@ -31,9 +31,10 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
 import {isResourcePassingFilter} from '@utils/resources';
-import {DIFF, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {DIFF} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AlertType,
   AppState,

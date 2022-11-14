@@ -19,8 +19,8 @@ import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors'
 import utilsElectronStore from '@utils/electronStore';
 import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
-import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
+import {DISABLED_TELEMETRY} from '@monokle-desktop/shared/constants/telemetry';
 import {AlertEnum, AlertType, NewVersionCode} from '@monokle-desktop/shared/models';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 

@@ -9,7 +9,6 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 import path from 'path';
 
 import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -22,6 +21,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import {TreeItemProps} from './types';

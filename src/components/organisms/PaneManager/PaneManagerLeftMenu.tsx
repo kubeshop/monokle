@@ -22,8 +22,9 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
-import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
+import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 

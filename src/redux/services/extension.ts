@@ -1,10 +1,9 @@
 import {ipcRenderer} from 'electron';
 
-import {UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
-
 import {setAlert} from '@redux/reducers/alert';
 import {addMultiplePlugins, addMultipleTemplatePacks, addMultipleTemplates} from '@redux/reducers/extension';
 
+import {UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@monokle-desktop/shared/constants/ipcEvents';
 import {
   AlertEnum,
   AppDispatch,

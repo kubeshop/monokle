@@ -1,6 +1,6 @@
 import {join, sep} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';

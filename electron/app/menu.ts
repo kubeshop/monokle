@@ -1,7 +1,6 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 
 import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -9,6 +8,7 @@ import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {defineHotkey} from '@utils/defineHotkey';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
 
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
 
 import {checkNewVersion} from './commands';

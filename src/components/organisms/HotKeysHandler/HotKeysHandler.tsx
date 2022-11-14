@@ -3,7 +3,6 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -42,6 +41,8 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
+
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();

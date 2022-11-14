@@ -1,10 +1,4 @@
-export type Hotkey = keyof typeof hotkeys;
-
-type HotkeyConf = {
-  name: string;
-  key: string;
-  category: 'navigation' | 'tool';
-};
+import {HotkeyConf} from '../models/hotkeys';
 
 export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
@@ -167,5 +161,3 @@ export const hotkeys = createHotkeys({
 function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {
   return config;
 }
-
-export default hotkeys;

@@ -1,9 +1,10 @@
 import os from 'os';
 
-import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import electronStore from '@utils/electronStore';
 
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {
   AlertState,
   AppConfig,

@@ -7,8 +7,6 @@ import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
 import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
@@ -29,6 +27,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {
   AppConfig,
   ClusterAccess,
