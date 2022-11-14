@@ -33,7 +33,7 @@ import {ThunkApi} from '@models/thunk';
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
-import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
+import {ResourceWatcher} from '@redux/services/clusterResourceWatcher';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {previewSavedCommand} from '@redux/services/previewCommand';
@@ -502,7 +502,6 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = true;
       state.previewLoader.targetId = action.payload.targetId;
       state.previewType = action.payload.previewType;
-      electronStore.set('main.previewLoader.isLoading', true);
     },
     stopPreviewLoader: (state: Draft<AppState>) => {
       state.previewLoader.isLoading = false;
@@ -900,7 +899,9 @@ export const mainSlice = createSlice({
         state.previousSelectionHistory = [];
 
         if (state.previewType === 'cluster') {
-          startWatchingResources(state);
+          const resourceWatcher = new ResourceWatcher();
+          resourceWatcher.initializeKubeConfig(state.previewKubeConfigPath, state.previewKubeConfigContext);
+          resourceWatcher.startWatchingResources(state);
         }
       })
       .addCase(previewCluster.rejected, state => {
@@ -925,7 +926,11 @@ export const mainSlice = createSlice({
         }
 
         if (state.previewType === 'cluster') {
-          startWatchingResources(state);
+          if (state.previewType === 'cluster') {
+            const resourceWatcher = new ResourceWatcher();
+            resourceWatcher.initializeKubeConfig(state.previewKubeConfigPath, state.previewKubeConfigContext);
+            resourceWatcher.startWatchingResources(state);
+          }
         }
       })
       .addCase(repreviewCluster.rejected, state => {

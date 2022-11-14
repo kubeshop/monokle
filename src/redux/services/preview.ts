@@ -14,7 +14,7 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
-import {disconnectFromCluster} from './clusterResourceWatcher';
+import {ResourceWatcher} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
@@ -55,7 +55,8 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
-  getRegisteredKindHandlers().map(kindHandler => disconnectFromCluster(kindHandler));
+  const resourceWatcher = new ResourceWatcher();
+  getRegisteredKindHandlers().map(kindHandler => resourceWatcher.disconnectResourceFromCluster(kindHandler));
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
 };

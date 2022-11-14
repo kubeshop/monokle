@@ -1,3 +1,4 @@
+/* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
@@ -6,67 +7,12 @@ import {AppState} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {extractK8sResources} from './resource';
-
-const watchers: {[resourceKind: string]: any} = {};
-
-export const startWatchingResources = (state: AppState) => {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(state.previewKubeConfigPath as string);
-  kc.setCurrentContext(state.previewKubeConfigContext as string);
-  getRegisteredKindHandlers().map((handler: ResourceKindHandler) => clusterResourceWatcher(state, handler, kc));
-};
-
-export async function clusterResourceWatcher(
-  state: AppState,
-  kindHandler: ResourceKindHandler,
-  kubeconfig: k8s.KubeConfig
-) {
-  disconnectFromCluster(kindHandler);
-  watchers[kindHandler.kind] = await new k8s.Watch(kubeconfig).watch(
-    resourceKindRequestURLs[kindHandler.kind],
-    {allowWatchBookmarks: false},
-    (type: string, apiObj: any) => {
-      if (type === 'MODIFIED' || type === 'DELETED') {
-        console.log('apiObj', apiObj);
-      }
-
-      if (type === 'ADDED' || type === 'MODIFIED') {
-        const [resource]: K8sResource[] = extractK8sResources(
-          jsonToYaml(apiObj),
-          PREVIEW_PREFIX + kubeconfig.getCurrentContext()
-        );
-        state.resourceMap[resource.id] = resource;
-      }
-      if (type === 'DELETED') {
-        const [resource]: K8sResource[] = extractK8sResources(
-          jsonToYaml(apiObj),
-          PREVIEW_PREFIX + kubeconfig.getCurrentContext()
-        );
-        delete state.resourceMap[resource.id];
-      }
-    },
-    () => {
-      disconnectFromCluster(kindHandler);
-      clusterResourceWatcher(state, kindHandler, kubeconfig);
-    }
-  );
-}
-
-export const disconnectFromCluster = (kindHandler: ResourceKindHandler) => {
-  try {
-    watchers[kindHandler.kind].abort();
-    watchers[kindHandler.kind] = undefined;
-    delete watchers[kindHandler.kind];
-  } catch (error) {
-    watchers[kindHandler.kind] = undefined;
-    delete watchers[kindHandler.kind];
-  }
-};
 
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   ClusterRole: `/apis/rbac.authorization.k8s.io/v1/clusterroles`,
@@ -99,3 +45,90 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   StorageClass: `/apis/storage.k8s.io/v1/storageclasses`,
   VolumeAttachment: `/apis/storage.k8s.io/v1/volumeattachments`,
 };
+
+export class ResourceWatcher {
+  private static instance: ResourceWatcher;
+  public kubeConfig?: k8s.KubeConfig;
+  private kubeConfigPath?: string;
+  private kubeConfigContext?: string;
+  private watchers: {[resourceKind: string]: any} = {};
+
+  constructor() {
+    if (ResourceWatcher.instance) {
+      return ResourceWatcher.instance;
+    }
+    ResourceWatcher.instance = this;
+  }
+
+  initializeKubeConfig(kubeConfigPath?: string, context?: string) {
+    try {
+      this.kubeConfigPath = kubeConfigPath;
+      this.kubeConfigContext = context;
+      const kc = createKubeClient(this.kubeConfigPath as string, this.kubeConfigContext);
+      this.kubeConfig = kc;
+    } catch (error) {
+      this.kubeConfigPath = undefined;
+      this.kubeConfigContext = undefined;
+      this.kubeConfig = undefined;
+    }
+  }
+
+  setKubeConfigContext(context: string) {
+    this.getKubeConfig().setCurrentContext(context);
+  }
+
+  getKubeConfig(): k8s.KubeConfig {
+    return this.kubeConfig as k8s.KubeConfig;
+  }
+
+  setKubeConfig(kubeConfig: k8s.KubeConfig) {
+    this.kubeConfig = kubeConfig;
+  }
+
+  disconnectResourceFromCluster(kindHandler: ResourceKindHandler) {
+    try {
+      this.watchers[kindHandler.kind].abort();
+      this.watchers[kindHandler.kind] = undefined;
+      delete this.watchers[kindHandler.kind];
+    } catch (error) {
+      this.watchers[kindHandler.kind] = undefined;
+      delete this.watchers[kindHandler.kind];
+    }
+  }
+
+  async watchResource(state: AppState, kindHandler: ResourceKindHandler) {
+    this.disconnectResourceFromCluster(kindHandler);
+    if (this.kubeConfig) {
+      this.watchers[kindHandler.kind] = await new k8s.Watch(this.kubeConfig).watch(
+        resourceKindRequestURLs[kindHandler.kind],
+        {allowWatchBookmarks: false},
+        (type: string, apiObj: any) => {
+          console.log('apiObj', type, apiObj);
+
+          if (type === 'ADDED' || type === 'MODIFIED') {
+            const [resource]: K8sResource[] = extractK8sResources(
+              jsonToYaml(apiObj),
+              PREVIEW_PREFIX + this.kubeConfigContext
+            );
+            state.resourceMap[resource.id] = resource;
+          }
+          if (type === 'DELETED') {
+            const [resource]: K8sResource[] = extractK8sResources(
+              jsonToYaml(apiObj),
+              PREVIEW_PREFIX + this.kubeConfigContext
+            );
+            delete state.resourceMap[resource.id];
+          }
+        },
+        () => {
+          this.disconnectResourceFromCluster(kindHandler);
+          this.watchResource(state, kindHandler);
+        }
+      );
+    }
+  }
+
+  startWatchingResources(state: AppState) {
+    getRegisteredKindHandlers().map((handler: ResourceKindHandler) => this.watchResource(state, handler));
+  }
+}
