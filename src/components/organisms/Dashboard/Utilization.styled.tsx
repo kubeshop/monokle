@@ -9,7 +9,6 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0 16px;
 `;
 
 export const Utilization = styled.div`
@@ -55,6 +54,6 @@ export const InfoTitle = styled.h3`
 
 export const InfoDescription = styled.h3`
   font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
   color: ${Colors.grey9};
 `;

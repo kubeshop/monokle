@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {NodeMetric} from '@redux/services/clusterDashboard';
 
-import {formatBytes} from '@utils/unit-converter';
+import {convertBytesToGigabyte} from '@utils/unit-converter';
 
 import Colors from '@styles/Colors';
 
@@ -37,7 +37,9 @@ export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
         <S.InformationContainer>
           <S.InfoTitle>CPU</S.InfoTitle>
           <S.InfoDescription>
-            {(averageCpuUsage / 1000).toFixed(2)} / {(totalCpu / 1000).toFixed(2)}
+            <span>{(averageCpuUsage / 1000).toFixed(2)}</span>
+            <span> / </span>
+            <span>{(totalCpu / 1000).toFixed(2)}</span>
           </S.InfoDescription>
         </S.InformationContainer>
       </S.Utilization>
@@ -55,7 +57,9 @@ export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
         <S.InformationContainer>
           <S.InfoTitle>Memory</S.InfoTitle>
           <S.InfoDescription>
-            {formatBytes(averageMemoryUsage)} / {formatBytes(totalMemory)}
+            <span>{convertBytesToGigabyte(averageMemoryUsage) || '0.01'}</span>
+            <span> / </span>
+            <span>{convertBytesToGigabyte(totalMemory)} GB</span>
           </S.InfoDescription>
         </S.InformationContainer>
       </S.Utilization>

@@ -41,16 +41,13 @@ export const memoryParser = (input: string) => {
   return Number(input);
 };
 
-export const formatBytes = (bytes: number, decimals = 2) => {
+export const convertBytesToGigabyte = (bytes: number, decimals = 2): number => {
   // eslint-disable-next-line no-implicit-coercion
-  if (!+bytes) return '0 Bytes';
+  if (!+bytes) return 0;
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   // eslint-disable-next-line prefer-exponentiation-operator, no-restricted-properties
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return parseFloat((bytes / Math.pow(k, 3)).toFixed(dm));
 };
