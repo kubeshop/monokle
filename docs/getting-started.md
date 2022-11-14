@@ -45,6 +45,6 @@ Check out one of our tutorials to get started:
 
 ## **Get in Touch!**
 
-Have problems? Suggestions? Feature requests? Please join our [Discord Server](https://discord.gg/uNuhy6GDyn) and let us know - or 
+Have problems? Suggestions? Feature requests? Please join our [Discord Server](https://discord.com/invite/6zupCZFQbe) and let us know - or 
 open an issue on [GitHub](https://github.com/kubeshop/monokle/issues/new/choose). 
 
