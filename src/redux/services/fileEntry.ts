@@ -3,8 +3,6 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {
   HelmChartEventEmitter,
   createHelmChart,
@@ -31,6 +29,7 @@ import {
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   AppState,
   FileEntry,

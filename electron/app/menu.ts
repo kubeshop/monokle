@@ -1,9 +1,8 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';

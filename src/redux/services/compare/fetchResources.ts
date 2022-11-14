@@ -9,7 +9,6 @@ import {
   CLUSTER_DIFF_PREFIX,
   ERROR_MSG_FALLBACK,
   PREVIEW_PREFIX,
-  ROOT_FILE_ENTRY,
   YAML_DOCUMENT_DELIMITER_NEW_LINE,
 } from '@constants/constants';
 
@@ -27,6 +26,7 @@ import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   ClusterResourceSet,
   CommandOptions,

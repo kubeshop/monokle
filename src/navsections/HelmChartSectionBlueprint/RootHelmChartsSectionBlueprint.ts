@@ -1,7 +1,8 @@
-import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {HelmChartEventEmitter} from '@redux/services/helm';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {HelmValuesFile, SectionBlueprint} from '@monokle-desktop/shared/models';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';

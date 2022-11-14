@@ -1,9 +1,8 @@
 import {BrowserWindow} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {kubeConfigContextSelector} from '@redux/selectors';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import type {HelmChart, HelmValuesFile, K8sResource, RootState} from '@monokle-desktop/shared/models';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

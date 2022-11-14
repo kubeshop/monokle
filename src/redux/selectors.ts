@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
@@ -10,6 +10,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   AppConfig,
   AppState,

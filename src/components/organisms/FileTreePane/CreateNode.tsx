@@ -2,10 +2,9 @@ import {Tooltip} from 'antd';
 
 import textExtensions from 'text-extensions';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {FileEntry, FileMapType, ResourceMapType} from '@monokle-desktop/shared/models';
 
 import {TreeNode} from './types';

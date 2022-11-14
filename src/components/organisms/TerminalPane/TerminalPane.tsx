@@ -5,13 +5,12 @@ import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {TerminalType} from '@monokle-desktop/shared/models';
 
 import * as S from './TerminalPane.styled';

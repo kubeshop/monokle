@@ -10,7 +10,7 @@ import path from 'path';
 import util from 'util';
 import {stringify} from 'yaml';
 
-import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -26,6 +26,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {isDefined} from '@utils/filter';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {AlertEnum, FileEntry, FileMapType, K8sResource} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 

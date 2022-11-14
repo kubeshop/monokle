@@ -4,7 +4,6 @@ import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-de
 
 import {v4 as uuidv4} from 'uuid';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
   FileExplorerTabTooltip,
   HelmTabTooltip,
@@ -24,6 +23,7 @@ import {Walkthrough} from '@molecules';
 import {FeatureFlag} from '@utils/features';
 import {trackEvent} from '@utils/telemetry';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';

@@ -6,8 +6,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
@@ -22,6 +20,7 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {ItemCustomComponentProps, K8sResource} from '@monokle-desktop/shared/models';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

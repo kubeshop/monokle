@@ -1,7 +1,6 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {selectImage} from '@redux/reducers/main';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {ImageType, ImagesListType, ResourceMapType, SectionBlueprint} from '@monokle-desktop/shared/models';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';

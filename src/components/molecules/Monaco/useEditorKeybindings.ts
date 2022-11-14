@@ -1,13 +1,12 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducers/ui';
 
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {FileMapType} from '@monokle-desktop/shared/models';
 
 function useEditorKeybindings(

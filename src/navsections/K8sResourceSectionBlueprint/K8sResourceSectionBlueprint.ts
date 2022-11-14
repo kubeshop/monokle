@@ -1,4 +1,3 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
@@ -9,6 +8,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   K8sResource,
   ResourceFilterType,

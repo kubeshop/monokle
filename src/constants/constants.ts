@@ -6,7 +6,6 @@ export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
 export const YAML_DOCUMENT_DELIMITER = '---';
 export const YAML_DOCUMENT_DELIMITER_NEW_LINE = '---\n';
-export const ROOT_FILE_ENTRY = '<root>';
 export const TOOLTIP_DELAY = 1.0;
 export const LONGER_TOOLTIP_DELAY = 2.0;
 export const TOOLTIP_K8S_SELECTION = 'Select which kubernetes schema version to use for validation';

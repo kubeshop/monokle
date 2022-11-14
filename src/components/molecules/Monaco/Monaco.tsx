@@ -17,8 +17,6 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -42,6 +40,7 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared/models';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

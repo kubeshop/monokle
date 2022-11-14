@@ -1,9 +1,10 @@
-import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
 import {isDefined} from '@utils/filter';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   FileMapType,
   HelmChart,
