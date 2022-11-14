@@ -4,12 +4,11 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
-
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@monokle-desktop/shared/utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';

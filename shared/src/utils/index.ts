@@ -3,3 +3,4 @@ export * from './env';
 export * from './fileSystem';
 export * from './hotkey';
 export * from './selectors';
+export * from './shell';
