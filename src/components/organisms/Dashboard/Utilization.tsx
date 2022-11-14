@@ -57,7 +57,7 @@ export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
         <S.InformationContainer>
           <S.InfoTitle>Memory</S.InfoTitle>
           <S.InfoDescription>
-            <span>{convertBytesToGigabyte(averageMemoryUsage) || '0.01'}</span>
+            <span>{convertBytesToGigabyte(averageMemoryUsage)}</span>
             <span> / </span>
             <span>{convertBytesToGigabyte(totalMemory)} GB</span>
           </S.InfoDescription>
