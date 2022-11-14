@@ -24,7 +24,7 @@ export const EventRow = styled.div<{$type: string}>`
 `;
 
 export const TimeInfo = styled.div`
-  flex: 2;
+  flex: 4;
   display: flex;
   flex-direction: column;
   display: flex;
@@ -32,7 +32,7 @@ export const TimeInfo = styled.div`
 `;
 
 export const MessageInfo = styled.div`
-  flex: 6;
+  flex: 12;
   margin: 0 20px;
   display: flex;
   flex-direction: column;
@@ -41,7 +41,7 @@ export const MessageInfo = styled.div`
 `;
 
 export const NamespaceInfo = styled.div`
-  flex: 1;
+  flex: 3;
   font-size: 12px;
   color: ${Colors.whitePure};
   display: flex;

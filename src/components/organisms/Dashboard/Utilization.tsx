@@ -4,6 +4,8 @@ import {NodeMetric} from '@redux/services/clusterDashboard';
 
 import {convertBytesToGigabyte} from '@utils/unit-converter';
 
+import InfoCircle from '@assets/InfoCircle.svg';
+
 import Colors from '@styles/Colors';
 
 import * as S from './Utilization.styled';
@@ -35,7 +37,10 @@ export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
           />
         </S.ProgressContainer>
         <S.InformationContainer>
-          <S.InfoTitle>CPU</S.InfoTitle>
+          <S.InfoTitle>
+            <span>CPU</span>
+            <S.InfoIcon src={InfoCircle} width={14} />
+          </S.InfoTitle>
           <S.InfoDescription>
             <span>{(averageCpuUsage / 1000).toFixed(2)}</span>
             <span> / </span>
@@ -55,7 +60,10 @@ export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
           />
         </S.ProgressContainer>
         <S.InformationContainer>
-          <S.InfoTitle>Memory</S.InfoTitle>
+          <S.InfoTitle>
+            <span>Memory</span>
+            <S.InfoIcon src={InfoCircle} width={14} />
+          </S.InfoTitle>
           <S.InfoDescription>
             <span>{convertBytesToGigabyte(averageMemoryUsage)}</span>
             <span> / </span>

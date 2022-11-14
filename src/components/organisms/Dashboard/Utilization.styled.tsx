@@ -57,3 +57,11 @@ export const InfoDescription = styled.h3`
   font-size: 14px;
   color: ${Colors.grey9};
 `;
+
+export const InfoIcon = styled.img`
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  margin-bottom: 1px;
+  cursor: pointer;
+`;
