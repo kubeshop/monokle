@@ -8,11 +8,13 @@ import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL, PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
+import {PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
+
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
