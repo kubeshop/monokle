@@ -12,9 +12,7 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-import {getRegisteredKindHandlers} from '@src/kindhandlers';
-
-import {ResourceWatcher} from './clusterResourceWatcher';
+import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
@@ -55,8 +53,7 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
-  const resourceWatcher = new ResourceWatcher();
-  getRegisteredKindHandlers().map(kindHandler => resourceWatcher.disconnectResourceFromCluster(kindHandler));
+  disconnectFromCluster();
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
 };

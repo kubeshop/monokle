@@ -33,7 +33,6 @@ import {ThunkApi} from '@models/thunk';
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
 import {currentConfigSelector} from '@redux/selectors';
-import {ResourceWatcher} from '@redux/services/clusterResourceWatcher';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {previewSavedCommand} from '@redux/services/previewCommand';
@@ -778,6 +777,12 @@ export const mainSlice = createSlice({
       electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
       state.search.searchHistory = [...newSearchHistory, action.payload];
     },
+    updateClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      state.resourceMap[action.payload.id] = action.payload;
+    },
+    deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      delete state.resourceMap[action.payload.id];
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -897,12 +902,6 @@ export const mainSlice = createSlice({
           resource.isHighlighted = false;
         });
         state.previousSelectionHistory = [];
-
-        if (state.previewType === 'cluster') {
-          const resourceWatcher = new ResourceWatcher();
-          resourceWatcher.initializeKubeConfig(state.previewKubeConfigPath, state.previewKubeConfigContext);
-          resourceWatcher.startWatchingResources(state);
-        }
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -923,14 +922,6 @@ export const mainSlice = createSlice({
         }
         if (resource) {
           updateSelectionAndHighlights(state, resource);
-        }
-
-        if (state.previewType === 'cluster') {
-          if (state.previewType === 'cluster') {
-            const resourceWatcher = new ResourceWatcher();
-            resourceWatcher.initializeKubeConfig(state.previewKubeConfigPath, state.previewKubeConfigContext);
-            resourceWatcher.startWatchingResources(state);
-          }
         }
       })
       .addCase(repreviewCluster.rejected, state => {
@@ -1421,6 +1412,8 @@ export const {
   updateSearchQuery,
   updateReplaceQuery,
   setLastChangedLine,
+  updateClusterResource,
+  deleteClusterResource,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
