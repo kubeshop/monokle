@@ -32,7 +32,7 @@ export const TimeInfo = styled.div`
 `;
 
 export const MessageInfo = styled.div`
-  flex: 3;
+  flex: 6;
   margin: 0 20px;
   display: flex;
   flex-direction: column;
@@ -62,6 +62,9 @@ export const MessageCount = styled.div`
 export const MessageText = styled.div`
   font-size: 12px;
   color: ${Colors.whitePure};
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+  word-break: break-word;
 `;
 
 export const MessageHost = styled.div`

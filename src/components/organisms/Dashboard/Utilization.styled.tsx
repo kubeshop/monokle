@@ -12,6 +12,13 @@ export const Container = styled.div`
   padding: 0 16px;
 `;
 
+export const Utilization = styled.div`
+  height: 100%;
+  display: flex;
+  flex: 1;
+  align-items: center;
+`;
+
 export const ProgressContainer = styled.div`
   display: flex;
   align-items: center;
@@ -37,12 +44,6 @@ export const InformationContainer = styled.div`
   margin-bottom: 50px;
   flex-direction: column;
   justify-content: end;
-`;
-
-export const Utilization = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
 `;
 
 export const InfoTitle = styled.h3`
