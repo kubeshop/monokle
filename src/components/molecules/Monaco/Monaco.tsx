@@ -30,7 +30,7 @@ import {
   setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
@@ -43,6 +43,7 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared/models';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

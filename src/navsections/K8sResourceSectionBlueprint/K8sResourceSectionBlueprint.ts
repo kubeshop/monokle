@@ -2,7 +2,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -16,6 +16,7 @@ import {
   RootState,
   SectionBlueprint,
 } from '@monokle-desktop/shared/models';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';

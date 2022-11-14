@@ -20,11 +20,9 @@ import {
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
-  isInPreviewModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  kubeConfigPathValidSelector,
   selectedResourceSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
@@ -43,6 +41,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {useFeatureFlags} from '@utils/features';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();

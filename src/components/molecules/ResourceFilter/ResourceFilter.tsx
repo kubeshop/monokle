@@ -13,13 +13,15 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
+
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 

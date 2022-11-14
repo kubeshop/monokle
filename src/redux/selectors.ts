@@ -21,9 +21,9 @@ import {
   RootState,
 } from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
-import {isUnsavedResource} from './services/resource';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -65,11 +65,6 @@ export const unknownResourcesSelector = (state: RootState) => {
   );
   return unknownResources;
 };
-
-export const unsavedResourcesSelector = createSelector(
-  (state: RootState) => state.main.resourceMap,
-  resourceMap => Object.values(resourceMap).filter(isUnsavedResource)
-);
 
 export const selectedResourceSelector = createSelector(
   (state: RootState) => state.main.resourceMap,
@@ -118,12 +113,6 @@ export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConf
   return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
 };
 
-export const isInPreviewModeSelector = (state: RootState) =>
-  Boolean(state.main.previewResourceId) ||
-  Boolean(state.main.previewValuesFileId) ||
-  Boolean(state.main.previewConfigurationId) ||
-  Boolean(state.main.previewCommandId);
-
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
   state => {
@@ -131,11 +120,6 @@ export const isInClusterModeSelector = createSelector(
     const previewId = state.main.previewResourceId;
     return kubeConfig && isDefined(previewId) && previewId === kubeConfig.currentContext;
   }
-);
-
-export const activeProjectSelector = createSelector(
-  (state: RootState) => state.config,
-  config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
 );
 
 export const currentConfigSelector = createSelector(
@@ -233,19 +217,6 @@ export const kubeConfigPathSelector = createSelector(
       return config.kubeConfig.path;
     }
     return '';
-  }
-);
-
-export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (_.isBoolean(config.projectConfig?.kubeConfig?.isPathValid)) {
-      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
-    }
-    if (_.isBoolean(config.kubeConfig.isPathValid)) {
-      return Boolean(config.kubeConfig.isPathValid);
-    }
-    return false;
   }
 );
 

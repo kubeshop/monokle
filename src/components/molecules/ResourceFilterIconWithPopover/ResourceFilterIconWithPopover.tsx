@@ -7,12 +7,13 @@ import {FilterOutlined} from '@ant-design/icons';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
 
 import {IconWithPopover} from '@atoms';
 
 import {ResourceFilterType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ResourceFilter from '../ResourceFilter';
 

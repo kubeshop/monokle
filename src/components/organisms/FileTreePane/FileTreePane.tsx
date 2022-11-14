@@ -16,7 +16,7 @@ import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolde
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {settingsSelector} from '@redux/selectors';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -36,6 +36,7 @@ import {
 } from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 import {TitleBar} from '@monokle/components';
 
 import {createNode} from './CreateNode';

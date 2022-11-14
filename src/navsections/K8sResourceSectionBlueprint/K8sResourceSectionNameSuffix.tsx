@@ -2,10 +2,11 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import {ClusterColors} from '@monokle-desktop/shared/models';
 import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const S = {
   PreviewOutputTag: styled.div`

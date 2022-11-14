@@ -17,7 +17,7 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
-import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
+import {kustomizationsSelector} from '@redux/selectors';
 
 import {Walkthrough} from '@molecules';
 
@@ -27,6 +27,7 @@ import {trackEvent} from '@utils/telemetry';
 import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

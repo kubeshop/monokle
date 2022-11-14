@@ -25,7 +25,7 @@ import {
   updateProjectConfig,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
-import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
+import {currentConfigSelector} from '@redux/selectors';
 
 import {FileExplorer} from '@atoms';
 
@@ -36,6 +36,7 @@ import {openUrlInExternalBrowser} from '@utils/shell';
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {Project, ProjectConfig, SettingsPanel} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {Settings} from './Settings';
 

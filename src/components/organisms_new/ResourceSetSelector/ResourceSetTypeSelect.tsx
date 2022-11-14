@@ -6,10 +6,10 @@ import {isEmpty} from 'lodash';
 
 import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {kubeConfigPathValidSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {ResourceSet} from '@monokle-desktop/shared/models';
+import {kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ResourceSetSelectColor.styled';
 

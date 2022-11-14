@@ -2,9 +2,10 @@ import {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
+
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import BottomPaneManager from '../BottomPaneManager';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';

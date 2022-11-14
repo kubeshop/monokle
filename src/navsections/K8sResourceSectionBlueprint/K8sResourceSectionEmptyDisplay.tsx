@@ -5,11 +5,12 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {activeResourcesSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
 import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

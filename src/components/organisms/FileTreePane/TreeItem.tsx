@@ -11,7 +11,6 @@ import path from 'path';
 import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelector} from '@redux/selectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
@@ -23,6 +22,7 @@ import {showItemInFolder} from '@utils/shell';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {TreeItemProps} from './types';
 

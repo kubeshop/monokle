@@ -6,7 +6,7 @@ import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
-import {filteredResourceSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {filteredResourceSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
 
@@ -14,6 +14,7 @@ import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
 import {ResourceRefType} from '@monokle-desktop/shared/models';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 

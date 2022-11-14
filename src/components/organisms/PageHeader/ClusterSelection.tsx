@@ -11,13 +11,10 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
-  activeProjectSelector,
   currentClusterAccessSelector,
-  isInPreviewModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  kubeConfigPathValidSelector,
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
@@ -28,6 +25,11 @@ import {sleep} from '@utils/sleep';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {HighlightItems, K8sResource, Size} from '@monokle-desktop/shared/models';
+import {
+  activeProjectSelector,
+  isInPreviewModeSelector,
+  kubeConfigPathValidSelector,
+} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 

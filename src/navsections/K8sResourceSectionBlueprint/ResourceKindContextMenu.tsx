@@ -22,7 +22,6 @@ import {
 import {
   currentConfigSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelector,
   knownResourceKindsSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -44,6 +43,7 @@ import {defineHotkey} from '@utils/defineHotkey';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
