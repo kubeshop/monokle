@@ -73,8 +73,6 @@ export const watchResource = async (
     resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
-      console.log('apiObj', type, apiObj);
-
       if (type === 'ADDED') {
         const [resource]: K8sResource[] = extractK8sResources(
           jsonToYaml(apiObj),
@@ -101,9 +99,11 @@ export const watchResource = async (
         dispatch(deleteClusterResource(resource));
       }
     },
-    () => {
-      disconnectResourceFromCluster(kindHandler);
-      watchResource(dispatch, kindHandler, kubeConfig, previewResources);
+    (error: any) => {
+      if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
+        disconnectResourceFromCluster(kindHandler);
+        watchResource(dispatch, kindHandler, kubeConfig, previewResources);
+      }
     }
   );
 };

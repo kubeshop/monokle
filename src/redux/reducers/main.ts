@@ -886,7 +886,6 @@ export const mainSlice = createSlice({
 
     builder
       .addCase(previewCluster.fulfilled, (state, action) => {
-        console.log('action.payload', action.payload);
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
