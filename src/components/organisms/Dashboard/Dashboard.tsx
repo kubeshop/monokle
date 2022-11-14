@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react';
+import {useInterval} from 'react-use';
 
 import {
   ClusterEvent,
   ClusterInformation,
+  NodeMetric,
   getClusterEvents,
   getClusterInformation,
+  getClusterUtilization,
 } from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -13,14 +16,22 @@ import {TitleBar} from '@monokle/components';
 import {Activity} from './Activity';
 import * as S from './Dashboard.styled';
 import {InventoryInfo} from './InventoryInfo';
+import {Utilization} from './Utilization';
 
 export const Dashboard = () => {
   const [clusterInformation, setClusterInformation] = useState<ClusterInformation | null>(null);
   const [activityData, setActivityData] = useState<ClusterEvent[]>([]);
+  const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
+  const [hearbeat, setHearbeat] = useState(0);
+
+  useInterval(() => {
+    setHearbeat(hearbeat + 1);
+  }, 5000);
 
   useEffect(() => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
     const storageApiClient = new KubeConfigManager().getStorageApiClient();
+    const metricClient = new KubeConfigManager().getMetricsClient();
 
     if (storageApiClient && k8sApiClient) {
       getClusterInformation(k8sApiClient, storageApiClient)
@@ -33,10 +44,16 @@ export const Dashboard = () => {
         .then(events => {
           setActivityData(events);
         })
-        .catch(() => [setActivityData([])]);
+        .catch(() => setActivityData([]));
+    }
+
+    if (metricClient && k8sApiClient) {
+      getClusterUtilization(k8sApiClient, metricClient)
+        .then(data => setUtilizationData(data))
+        .catch(() => setUtilizationData([]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [new KubeConfigManager().kubeConfig]);
+  }, [new KubeConfigManager().kubeConfig, hearbeat]);
 
   return (
     <S.Container>
@@ -59,7 +76,7 @@ export const Dashboard = () => {
           type="secondary"
           title="Utilization"
           actions={<span>Default view</span>}
-          description={<p>Utilization</p>}
+          description={<Utilization utilizations={utilizationData} />}
         />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'inventory-info'}}>

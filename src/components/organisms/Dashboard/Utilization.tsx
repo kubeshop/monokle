@@ -1,0 +1,64 @@
+import {useEffect, useState} from 'react';
+
+import {NodeMetric} from '@redux/services/clusterDashboard';
+
+import {formatBytes} from '@utils/unit-converter';
+
+import Colors from '@styles/Colors';
+
+import * as S from './Utilization.styled';
+
+export const Utilization = ({utilizations}: {utilizations: NodeMetric[]}) => {
+  const [averageCpuUsage, setAverageCpuUsage] = useState(0);
+  const [totalCpu, setTotalCpu] = useState(0);
+  const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
+  const [totalMemory, setTotalMemory] = useState(0);
+
+  useEffect(() => {
+    setTotalCpu(utilizations.reduce((total, u) => u.cpuCapacity + total, 0));
+    setAverageCpuUsage(utilizations.reduce((total, u) => u.cpuUsage + total, 0));
+    setTotalMemory(utilizations.reduce((total, u) => u.memoryCapacity + total, 0));
+    setAverageMemoryUsage(utilizations.reduce((total, u) => u.memoryUsage + total, 0));
+  }, [utilizations]);
+
+  return (
+    <S.Container>
+      <S.Utilization>
+        <S.ProgressContainer>
+          <S.Progress
+            strokeColor={Colors.geekblue7}
+            percent={(averageCpuUsage / totalCpu) * 100}
+            status="active"
+            strokeWidth={20}
+            showInfo={false}
+            strokeLinecap="round"
+          />
+        </S.ProgressContainer>
+        <S.InformationContainer>
+          <S.InfoTitle>CPU</S.InfoTitle>
+          <S.InfoDescription>
+            {(averageCpuUsage / 1000).toFixed(2)} / {(totalCpu / 1000).toFixed(2)}
+          </S.InfoDescription>
+        </S.InformationContainer>
+      </S.Utilization>
+      <S.Utilization>
+        <S.ProgressContainer>
+          <S.Progress
+            strokeColor={Colors.geekblue7}
+            percent={(averageMemoryUsage / totalMemory) * 100}
+            status="active"
+            strokeWidth={20}
+            showInfo={false}
+            strokeLinecap="round"
+          />
+        </S.ProgressContainer>
+        <S.InformationContainer>
+          <S.InfoTitle>Memory</S.InfoTitle>
+          <S.InfoDescription>
+            {formatBytes(averageMemoryUsage)} / {formatBytes(totalMemory)}
+          </S.InfoDescription>
+        </S.InformationContainer>
+      </S.Utilization>
+    </S.Container>
+  );
+};

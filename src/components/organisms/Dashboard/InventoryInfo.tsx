@@ -15,8 +15,8 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
           </S.PercentageText>
           <S.PercentageText>&#x25;</S.PercentageText>
         </S.NodesInformationRow>
-        <S.NodesInformationRow>{info.storageClassCount} Storage Classes</S.NodesInformationRow>
-        <S.NodesInformationRow>{info.persistentVolumeClaimCount} Persistent Volume Claims</S.NodesInformationRow>
+        <S.NodesInformationRow>{info.storageClassCount} StorageClasses</S.NodesInformationRow>
+        <S.NodesInformationRow>{info.persistentVolumeClaimCount} PersistentVolumeClaims</S.NodesInformationRow>
       </S.NodesInformation>
       <S.HorizontalLine />
       <div>

@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import _ from 'lodash';
 
+import {cpuParser, memoryParser} from '@utils/unit-converter';
+
 export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: string): Promise<ClusterEvent[]> => {
   const events: k8s.CoreV1Event[] | undefined = namespace
     ? (await k8sApiClient?.listNamespacedEvent(namespace))?.body.items
@@ -55,8 +57,6 @@ export const getClusterInformation = async (
   const storageClasses: k8s.V1StorageClass[] = responses[2].body.items;
   const persistentVolumeClaims: k8s.V1PersistentVolumeClaim[] = responses[3].body.items;
 
-  console.log(responses.map(response => response.body.items));
-
   return {
     clusterApiAddress: k8sApiClient.basePath,
     nodesCount: nodes.length,
@@ -65,6 +65,38 @@ export const getClusterInformation = async (
     storageClassCount: storageClasses.length,
     persistentVolumeClaimCount: persistentVolumeClaims.length,
   };
+};
+
+export const getClusterUtilization = async (
+  k8sApiClient: k8s.CoreV1Api,
+  metricClient: k8s.Metrics
+): Promise<NodeMetric[]> => {
+  const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
+  const nodes = await k8s.topNodes(k8sApiClient);
+
+  return nodeMetrics.map(m => ({
+    nodeName: m.metadata.name,
+    cpuUsage: cpuParser(m.usage.cpu),
+    memoryUsage: memoryParser(m.usage.memory),
+    cpuCapacity: cpuParser(
+      nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.Node.status?.capacity?.cpu || '0'
+    ),
+    memoryCapacity: memoryParser(
+      nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.Node.status?.capacity?.memory || '0'
+    ),
+    cpuLimitTotal: cpuParser(
+      String(Number(nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.CPU?.LimitTotal))
+    ),
+    cpuRequestTotal: cpuParser(
+      String(Number(nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.CPU?.RequestTotal))
+    ),
+    memoryLimitTotal: memoryParser(
+      String(Number(nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.Memory?.LimitTotal))
+    ),
+    memoryRequestTotal: memoryParser(
+      String(Number(nodes.find(n => n?.Node?.metadata?.name === m.metadata.name)?.Memory?.RequestTotal))
+    ),
+  }));
 };
 
 export interface ClusterEvent {
@@ -90,4 +122,16 @@ export interface ClusterInformation {
   podsCapacity: number;
   storageClassCount: number;
   persistentVolumeClaimCount: number;
+}
+
+export interface NodeMetric {
+  nodeName: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  cpuCapacity: number;
+  memoryCapacity: number;
+  cpuLimitTotal: number;
+  cpuRequestTotal: number;
+  memoryLimitTotal: number;
+  memoryRequestTotal: number;
 }
