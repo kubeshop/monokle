@@ -25,7 +25,7 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
       </div>
       <S.HorizontalLine />
       <div>
-        <S.Title>Usefull links</S.Title>
+        <S.Title>Useful links</S.Title>
         <S.Link>Getting started</S.Link>
         <S.Link>Documentation</S.Link>
       </div>

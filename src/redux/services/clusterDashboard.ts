@@ -32,7 +32,7 @@ export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: 
     })),
     'lastTimestamp'
   )
-    .filter(i => Boolean(i.count))
+    .filter(i => Boolean(i.count) && Boolean(i.source.host))
     .reverse();
 };
 

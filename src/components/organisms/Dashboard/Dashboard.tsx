@@ -25,7 +25,7 @@ export const Dashboard = () => {
     if (storageApiClient && k8sApiClient) {
       getClusterInformation(k8sApiClient, storageApiClient)
         .then(data => setClusterInformation(data))
-        .catch(_error => setClusterInformation(null));
+        .catch(() => setClusterInformation(null));
     }
 
     if (k8sApiClient) {
@@ -33,7 +33,7 @@ export const Dashboard = () => {
         .then(events => {
           setActivityData(events);
         })
-        .catch(_error => [setActivityData([])]);
+        .catch(() => [setActivityData([])]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [new KubeConfigManager().kubeConfig]);

@@ -32,7 +32,7 @@ export const Activity = ({events}: {events: ClusterEvent[]}) => {
           <S.MessageInfo>
             <S.MessageText>{event.message}</S.MessageText>
             <S.MessageHost>
-              {event.source.host || '-'}: {event.metadata.name}
+              {event.source.host || '- '}: {event.metadata.name}
             </S.MessageHost>
           </S.MessageInfo>
           <S.NamespaceInfo>{event.metadata.namespace || '-'}</S.NamespaceInfo>
