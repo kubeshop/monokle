@@ -1,5 +1,3 @@
-import * as k8s from '@kubernetes/client-node';
-
 import EventEmitter from 'events';
 import fs from 'fs';
 import {readdir} from 'fs/promises';
