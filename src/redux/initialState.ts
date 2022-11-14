@@ -2,8 +2,6 @@ import os from 'os';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import electronStore from '@utils/electronStore';
-
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {
   AlertState,
@@ -16,6 +14,7 @@ import {
   TerminalState,
   UiState,
 } from '@monokle-desktop/shared/models';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 const initialAppState: AppState = {
   isRehydrating: false,

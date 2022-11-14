@@ -21,7 +21,6 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -42,6 +41,7 @@ import {
   Themes,
   UiState,
 } from '@monokle-desktop/shared/models';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

@@ -1,8 +1,9 @@
 import Analytics from 'analytics-node';
 import log from 'loglevel';
 
-import electronStore from '@utils/electronStore';
 import {isRendererThread} from '@utils/thread';
+
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 let client: Analytics | undefined;
 
