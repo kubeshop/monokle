@@ -17,7 +17,6 @@ import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {
-  CommandOptions,
   createHelmInstallCommand,
   createHelmTemplateCommand,
   hasCommandFailed,
@@ -30,6 +29,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {
   ClusterResourceSet,
+  CommandOptions,
   CommandResourceSet,
   CustomHelmResourceSet,
   GitResourceSet,

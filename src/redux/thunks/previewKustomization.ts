@@ -11,11 +11,11 @@ import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
+import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {trackEvent} from '@utils/telemetry';
 
 import {DO_KUSTOMIZE_PREVIEW} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch, CommandResult, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
 
 /**
  * Thunk to preview kustomizations

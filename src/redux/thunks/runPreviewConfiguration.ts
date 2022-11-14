@@ -10,13 +10,14 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/commands';
+import {runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 import {trackEvent} from '@utils/telemetry';
 
 import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AppDispatch,
+  CommandOptions,
   HelmPreviewConfiguration,
   PreviewConfigValuesFileItem,
   RootState,

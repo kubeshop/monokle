@@ -2,6 +2,7 @@ export * from './alert';
 export * from './appDispatch';
 export * from './appState';
 export * from './cluster';
+export * from './commands';
 export * from './compare';
 export * from './config';
 export * from './extension';
