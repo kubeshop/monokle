@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Button, Modal, Tooltip} from 'antd';
+import {Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -9,7 +9,7 @@ import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  isInPreviewModeSelector,
+  isInClusterModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   selectedResourceSelector,
@@ -17,15 +17,24 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
-const Restart = () => {
-  const currentResource = useAppSelector(selectedResourceSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const currentContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+import {SecondaryButton} from '@atoms';
+
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Restart: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const dispatch = useAppDispatch();
+  const currentContext = useAppSelector(kubeConfigContextSelector);
+  const currentResource = useAppSelector(selectedResourceSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+
   const {name, namespace, kind} = currentResource || {};
 
-  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInPreviewMode, [kind, isInPreviewMode]);
+  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInClusterMode, [kind, isInClusterMode]);
 
   const handleClick = () => {
     Modal.confirm({
@@ -43,9 +52,15 @@ const Restart = () => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <Button type="primary" size="small" ghost onClick={handleClick} disabled={!isBtnEnabled}>
+      <SecondaryButton
+        $disableHover={isDropdownActive}
+        type={isDropdownActive ? 'link' : 'default'}
+        size="small"
+        onClick={handleClick}
+        disabled={!isBtnEnabled}
+      >
         Restart
-      </Button>
+      </SecondaryButton>
     </Tooltip>
   );
 };

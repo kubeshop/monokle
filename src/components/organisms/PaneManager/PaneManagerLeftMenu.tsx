@@ -23,16 +23,10 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {Walkthrough} from '@molecules';
 
-import Icon from '@atoms/Icon';
-
 import {FeatureFlag} from '@utils/features';
 import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
-
-import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
-import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
-import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
@@ -44,6 +38,7 @@ const PaneManagerLeftMenu: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const changedFiles = useAppSelector(state => state.git.changedFiles);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -56,7 +51,10 @@ const PaneManagerLeftMenu: React.FC = () => {
   const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
 
   const isActive = useMemo(() => Boolean(activeProject) && leftActive, [activeProject, leftActive]);
-  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
+  const isFolderOpen = useMemo(
+    () => Boolean(activeProject && leftActive && leftMenuSelection === 'file-explorer'),
+    [activeProject, leftActive, leftMenuSelection]
+  );
   const rootFileEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
 
   const handleLeftBottomMenuSelection = (selectedOption: LeftMenuBottomSelectionType) => {
@@ -65,7 +63,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     }
 
     if (leftMenuBottomSelection === selectedOption) {
-      dispatch(setLeftBottomMenuSelection(null));
+      dispatch(setLeftBottomMenuSelection(undefined));
     } else {
       trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedOption});
       dispatch(setLeftBottomMenuSelection(selectedOption));
@@ -132,18 +130,38 @@ const PaneManagerLeftMenu: React.FC = () => {
             id="file-explorer"
             isSelected={checkIsTabSelected('file-explorer')}
             isActive={isActive}
-            shouldWatchSelectedPath
             onClick={() => setLeftActiveMenu('file-explorer')}
             disabled={!activeProject}
           >
             <MenuIcon
-              style={{marginLeft: 4}}
               icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
               active={isActive}
               isSelected={checkIsTabSelected('file-explorer')}
             />
           </MenuButton>
         </PaneTooltip>
+
+        <FeatureFlag name="GitOps">
+          <Walkthrough placement="leftTop" collection="release" step="images">
+            <PaneTooltip
+              show={!leftActive || leftMenuSelection !== 'git-pane'}
+              title="View Git operations"
+              placement="right"
+            >
+              <MenuButton
+                id="git-pane"
+                isSelected={checkIsTabSelected('git-pane')}
+                isActive={isActive}
+                onClick={() => setLeftActiveMenu('git-pane')}
+                disabled={!activeProject}
+              >
+                <S.Badge color={Colors.blue6} count={changedFiles.length} size="small">
+                  <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+                </S.Badge>
+              </MenuButton>
+            </PaneTooltip>
+          </Walkthrough>
+        </FeatureFlag>
 
         <PaneTooltip
           show={!leftActive || leftMenuSelection !== 'kustomize-pane'}
@@ -155,13 +173,11 @@ const PaneManagerLeftMenu: React.FC = () => {
             isSelected={checkIsTabSelected('kustomize-pane')}
             isActive={isActive}
             onClick={() => setLeftActiveMenu('kustomize-pane')}
-            sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
             disabled={!activeProject}
           >
             <S.Badge
               count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
               color={Colors.blue6}
-              size="default"
               dot
             >
               <MenuIcon
@@ -184,7 +200,6 @@ const PaneManagerLeftMenu: React.FC = () => {
               isSelected={checkIsTabSelected('helm-pane')}
               isActive={isActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
-              sectionNames={[HELM_CHART_SECTION_NAME]}
               disabled={!activeProject}
             >
               <S.Badge
@@ -258,7 +273,6 @@ const PaneManagerLeftMenu: React.FC = () => {
             isActive={isActive}
             onClick={() => setLeftActiveMenu('search')}
             disabled={!activeProject}
-            icon={<Icon name="search" style={{opacity: leftMenuSelection === 'search' ? '1' : '0.5'}} />}
           >
             <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
           </MenuButton>
@@ -279,7 +293,7 @@ const PaneManagerLeftMenu: React.FC = () => {
               onClick={onTerminalSelectionHandler}
               disabled={!activeProject}
             >
-              <MenuIcon iconName="terminal" active={isActive} isSelected />
+              <MenuIcon iconName="terminal" active={isActive} isSelected={checkIsBottomTabSelected('terminal')} />
             </MenuButton>
           </PaneTooltip>
         </FeatureFlag>

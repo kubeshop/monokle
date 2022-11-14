@@ -1,6 +1,6 @@
 import {useSelector} from 'react-redux';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
@@ -8,11 +8,17 @@ import {stopPreview} from '@redux/services/preview';
 export const useFileSelect = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
 
   const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
-    const {isExcluded, isSupported, isTextExtension} = info.node;
-    if ((isExcluded || !isSupported) && !isTextExtension) {
+    const {isExcluded, isSupported, isTextExtension, isLine} = info.node;
+
+    if (!nodeKey.startsWith(fileOrFolderContainedInFilter || '')) {
+      return;
+    }
+
+    if (!isLine && (isExcluded || !isSupported) && !isTextExtension) {
       return;
     }
 

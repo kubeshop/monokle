@@ -39,14 +39,14 @@ export const createFilteredNode = (filteredFileMap: FileEntry[]): FilterTreeNode
           parentKey: item.filePath,
           title: (
             <Highlighter
-              highlightClassName="match-higlight"
+              highlightClassName="match-highlight"
               searchWords={line[0].matchesInLine}
               autoEscape
               textToHighlight={line[0].wholeLine}
             />
           ),
           isFolder: false,
-          isLeaf: true,
+          isLine: true,
           matchItemArr: line,
         })) || [],
     };

@@ -73,6 +73,7 @@ const initialAppState: AppState = {
     searchHistory: electronStore.get('appConfig.recentSearch') || [],
     currentMatch: null,
   },
+  lastChangedLine: 0,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -214,10 +215,7 @@ const initialUiState: UiState = {
     collapsedNavSectionNames: [],
   },
   paneConfiguration,
-  layoutSize: {
-    footer: 0,
-    header: 0,
-  },
+  layoutSize: {header: 0},
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
   highlightedItems: {

@@ -14,6 +14,8 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
+import {previewSavedCommand} from './previewCommand';
+
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());
   dispatch(startPreviewLoader({previewType: type, targetId}));
@@ -28,6 +30,9 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
   }
   if (type === 'helm-preview-config') {
     dispatch(runPreviewConfiguration(targetId));
+  }
+  if (type === 'command') {
+    dispatch(previewSavedCommand(targetId));
   }
 };
 

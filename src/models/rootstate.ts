@@ -1,9 +1,11 @@
 import {CompareState} from '@redux/compare';
+import {FormsState} from '@redux/forms';
 
 import {AlertState} from './alert';
 import {AppConfig} from './appconfig';
 import {AppState} from './appstate';
 import {ExtensionState} from './extension';
+import {GitSliceState} from './git';
 import {LogsState} from './logs';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
@@ -15,6 +17,7 @@ import {UiCoachState} from './uiCoach';
  * Exported to a separate file so we can use the RootState type in the main process without importing the store
  */
 export type RootState = {
+  form: FormsState;
   alert: AlertState;
   compare: CompareState;
   config: AppConfig;
@@ -25,4 +28,5 @@ export type RootState = {
   terminal: TerminalState;
   ui: UiState;
   uiCoach: UiCoachState;
+  git: GitSliceState;
 };

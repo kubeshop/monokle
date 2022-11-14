@@ -18,12 +18,12 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 export function useMainPaneDimensions(): {height: number; width: number} {
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
 
-  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.footer - layoutSize.header);
+  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.header);
   const [width, setWidth] = useState<number>(window.innerWidth - 50);
 
   useEffect(() => {
     const handleResize = () => {
-      setHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
+      setHeight(window.innerHeight - layoutSize.header);
       setWidth(window.innerWidth - 50);
     };
 

@@ -1,11 +1,13 @@
 import {Project} from '@models/appconfig';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import SelectFolder from '@assets/FromFolder.svg';
+import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
@@ -15,8 +17,9 @@ import * as S from './RecentProjectsPage.styled';
 
 const NewRecentProjectsPane = () => {
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(state => state.config.projects);
   const activeProject = useAppSelector(activeProjectSelector);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const projects = useAppSelector(state => state.config.projects);
 
   const openProject = (project: Project) => {
     dispatch(setOpenProject(project.rootFolder));
@@ -47,7 +50,7 @@ const NewRecentProjectsPane = () => {
       <Guide />
 
       <S.Projects>
-        <S.ProjectsTitle id="recent-project-title">Recent Projects</S.ProjectsTitle>
+        <S.ProjectsTitle id="recent-project-title">Select a project...</S.ProjectsTitle>
 
         <S.ProjectsContainerWrapper>
           <S.ProjectsContainer id="recent-projects-container">
@@ -65,36 +68,42 @@ const NewRecentProjectsPane = () => {
       </S.Projects>
 
       <S.Actions>
-        <S.ActionsTitle>Start a new project</S.ActionsTitle>
+        <S.ActionsTitle>... or create a new one</S.ActionsTitle>
 
         <S.ActionItems>
-          <S.ActionItem>
+          <S.ActionItem id="select-existing-folder" onClick={handleOpenFolderExplorer}>
             <S.ActionItemLogo src={SelectFolder} />
             <S.ActionItemContext>
-              <S.ActionItemText>Select a folder with k8s resources</S.ActionItemText>
-              <S.ActionItemButton id="select-existing-folder" type="link" onClick={handleOpenFolderExplorer}>
-                Open
-              </S.ActionItemButton>
+              <S.ActionItemText>Select a local folder</S.ActionItemText>
             </S.ActionItemContext>
           </S.ActionItem>
 
-          <S.ActionItem>
-            <S.ActionItemLogo src={CreateScratch} />
+          <S.ActionItem
+            $disabled={!isGitInstalled}
+            id="start-from-git"
+            onClick={() => {
+              if (isGitInstalled) {
+                dispatch(openGitCloneModal());
+              }
+            }}
+          >
+            <S.ActionItemLogo src={CreateFromGit} />
             <S.ActionItemContext>
-              <S.ActionItemText>Create a project from scratch</S.ActionItemText>
-              <S.ActionItemButton id="create-empty-project" type="link" onClick={() => handleCreateProject(false)}>
-                Create
-              </S.ActionItemButton>
+              <S.ActionItemText>Clone a Git repo</S.ActionItemText>
             </S.ActionItemContext>
           </S.ActionItem>
 
-          <S.ActionItem>
+          <S.ActionItem id="start-from-template" onClick={() => handleCreateProject(true)}>
             <S.ActionItemLogo src={CreateFromTemplate} />
             <S.ActionItemContext>
-              <S.ActionItemText>Start from a template</S.ActionItemText>
-              <S.ActionItemButton id="start-from-template" type="link" onClick={() => handleCreateProject(true)}>
-                Select template
-              </S.ActionItemButton>
+              <S.ActionItemText>New project from template</S.ActionItemText>
+            </S.ActionItemContext>
+          </S.ActionItem>
+
+          <S.ActionItem id="create-empty-project" onClick={() => handleCreateProject(false)}>
+            <S.ActionItemLogo src={CreateScratch} />
+            <S.ActionItemContext>
+              <S.ActionItemText>New project from scratch</S.ActionItemText>
             </S.ActionItemContext>
           </S.ActionItem>
         </S.ActionItems>

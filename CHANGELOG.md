@@ -2,6 +2,92 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/kubeshop/monokle/compare/v1.11.2-nightly-2022-10-21.0...v1.12.0) (2022-10-21)
+
+
+### Features
+
+* add check when switching projects ([b2b3214](https://github.com/kubeshop/monokle/commit/b2b321458569208fb5dcd0b629f6ddcd2beb2773))
+* close terminal pane on switching project ([db770cf](https://github.com/kubeshop/monokle/commit/db770cf3603772ffdd0ba0d7ab0cb26107a41c73))
+* kill all terminals when switching projects ([9757bec](https://github.com/kubeshop/monokle/commit/9757bec0904a28fca3620d7f4369673fa3447530))
+
+
+### Bug Fixes
+
+* styling for editor pane actions ([416320c](https://github.com/kubeshop/monokle/commit/416320cfaf304eb1e61e5aa2470d248f85b9d407))
+
+### [1.11.1](https://github.com/kubeshop/monokle/compare/v1.11.1-nightly-2022-10-13.0...v1.11.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* is folder icon open/closed ([f74e04f](https://github.com/kubeshop/monokle/commit/f74e04f13a0bfa66fd01ec401b3de13df309aa1c))
+* remove unused ([22581fd](https://github.com/kubeshop/monokle/commit/22581fda0f287a289f97bfab5a76056bb866c4b4))
+* set repo/changed files to initial ([ea2d767](https://github.com/kubeshop/monokle/commit/ea2d76763a8229a5ee98949e4ef7f7e4dbfbc33e))
+
+## [1.11.0](https://github.com/kubeshop/monokle/compare/v1.10.4-nightly-2022-09-30.0...v1.11.0) (2022-09-30)
+
+
+### Features
+
+* add error modal for push/pull ([b28a065](https://github.com/kubeshop/monokle/commit/b28a065ef8e34b06f97a39afd1f446c6f5cc946c))
+* fetch/pull actions ([04147fa](https://github.com/kubeshop/monokle/commit/04147fabceb21851d48a3925b08f24ad14a8d0be))
+* get ahead/behind commits and show count ([78a5365](https://github.com/kubeshop/monokle/commit/78a5365059af18fa0e42c63353c0641d44405e16))
+* sync handler + fetch/pull/push options ([59d5932](https://github.com/kubeshop/monokle/commit/59d5932a0eb4c90976ef2d013d4ec30b512a3b8a))
+
+
+### Bug Fixes
+
+* add error boundry for form ([4fb0628](https://github.com/kubeshop/monokle/commit/4fb062883d36d3623d07ce9ba4b681936d071dfd))
+* add missing git changed file types ([ffac7f8](https://github.com/kubeshop/monokle/commit/ffac7f889dae2dc7809d6f9cffb1526a35f32f1c))
+* conditional button back error boundry ([e50df30](https://github.com/kubeshop/monokle/commit/e50df3071c19fddcd390462981ebc329ebdf24a6))
+* error handling for creating local branch ([53283c0](https://github.com/kubeshop/monokle/commit/53283c0109ffa6a878bd40b294b065ae93e8ea8c))
+* save crds based on group & name ([b64b762](https://github.com/kubeshop/monokle/commit/b64b762022c6d9c728cb014ee04efcfd519f6c69))
+
+### [1.10.3](https://github.com/kubeshop/monokle/compare/v1.10.3-nightly-2022-08-26.0...v1.10.3) (2022-08-26)
+
+
+### Features
+
+* start project by cloning git repo ([b28f1c1](https://github.com/kubeshop/monokle/commit/b28f1c11d2ef5586f6e529f4ad9aefeb3cf04cfc))
+
+
+### Bug Fixes
+
+* downgrade electron version ([50ff222](https://github.com/kubeshop/monokle/commit/50ff222330cb360e7f7356deb85695cfff3647b2))
+
+### [1.10.2](https://github.com/kubeshop/monokle/compare/v1.10.2-nightly-2022-08-24.0...v1.10.2) (2022-08-24)
+
+
+### Bug Fixes
+
+* auto-updater issue ([096e49e](https://github.com/kubeshop/monokle/commit/096e49ec94726382801b4b3ed87e062540175731))
+* improved handling of invalid Chart.yaml ([4cc41e6](https://github.com/kubeshop/monokle/commit/4cc41e68f16f7cb92e0ce7b6d579c1bc79a7c231))
+* preview configuration details crashing ([8d9c60a](https://github.com/kubeshop/monokle/commit/8d9c60a5885cf33c19af7bbabd4cf0fd775f04cf))
+* select file on match line click ([e5ab3ad](https://github.com/kubeshop/monokle/commit/e5ab3ada17f96a7505aff9701e1de701b8e644d5))
+* upgrade type-fest from 2.17.0 to 2.18.0 ([372514d](https://github.com/kubeshop/monokle/commit/372514ded0fb5ec425dcbf0082baa045088a043d))
+
+### [1.10.1](https://github.com/kubeshop/monokle/compare/v1.10.1-nightly-2022-08-19.0...v1.10.1) (2022-08-19)
+
+
+### Bug Fixes
+
+* upgrade antd from 4.22.1 to 4.22.2 ([1854211](https://github.com/kubeshop/monokle/commit/185421156321ab40879804b2fdcc6f2c13400bac))
+
+## [1.10.0](https://github.com/kubeshop/monokle/compare/v1.9.2-nightly-2022-08-10.0...v1.10.0) (2022-08-10)
+
+
+### Features
+
+* call to action in release notes ([0263f31](https://github.com/kubeshop/monokle/commit/0263f3150068286d4e8b9ea4a7577fd316e2f8b3))
+
+
+### Bug Fixes
+
+* ignore file/folder contained in filter when in preview mode ([dfc0b22](https://github.com/kubeshop/monokle/commit/dfc0b22240c57dab48f6306dad491c8f66a219d9))
+* select and highlight first created resource from templates ([0946e14](https://github.com/kubeshop/monokle/commit/0946e14adb2543ff9ea8e61286ddceab5ace6fb6))
+* upgrade antd from 4.21.6 to 4.21.7 ([0506e8b](https://github.com/kubeshop/monokle/commit/0506e8b3e534ea49cb82c7d061061c93c9e69d06))
+
 ### [1.9.1](https://github.com/kubeshop/monokle/compare/v1.9.1-nightly-2022-07-14.0...v1.9.1) (2022-07-14)
 
 

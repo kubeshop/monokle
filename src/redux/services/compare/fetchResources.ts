@@ -18,7 +18,9 @@ import {RootState} from '@models/rootstate';
 
 import {
   ClusterResourceSet,
+  CommandResourceSet,
   CustomHelmResourceSet,
+  GitResourceSet,
   HelmResourceSet,
   KustomizeResourceSet,
   ResourceSet,
@@ -36,6 +38,7 @@ import {
 import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';
@@ -55,9 +58,53 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
       return previewCustomHelmResources(state, options);
     case 'kustomize':
       return previewKustomizeResources(state, options);
+    case 'git': {
+      return fetchGitResources(state, options);
+    }
+    case 'command': {
+      return fetchCommandResources(state, options);
+    }
     default:
       throw new Error('Not yet implemented');
   }
+}
+
+async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
+  const {branchName, commitHash = ''} = options;
+
+  const resources: K8sResource[] = await promiseFromIpcRenderer(
+    'git.getCommitResources',
+    'git.getCommitResources.result',
+    {
+      localPath: state.config.selectedProjectRootFolder,
+      branchName,
+      commitHash,
+    }
+  );
+
+  return resources;
+}
+
+async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {
+  const command = state.config.projectConfig?.savedCommandMap?.[options.commandId];
+
+  if (!command) {
+    return [];
+  }
+
+  const result = await runCommandInMainThread({
+    commandId: command.id,
+    cmd: command.content,
+    args: [],
+  });
+
+  if (hasCommandFailed(result) || !isDefined(result.stdout)) {
+    const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+    throw new Error(msg);
+  }
+
+  const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
+  return resources;
 }
 
 function fetchLocalResources(state: RootState): K8sResource[] {

@@ -1,11 +1,13 @@
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ResourceMapType} from '@models/appstate';
+import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
+
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -19,6 +21,7 @@ import KustomizationSuffix from './KustomizationSuffix';
 export type KustomizationScopeType = {
   resourceMap: ResourceMapType;
   previewResourceId: string | undefined;
+  resourceFilters: ResourceFilterType;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
@@ -40,6 +43,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     return {
       resourceMap: state.main.resourceMap,
       previewResourceId: state.main.previewResourceId,
+      resourceFilters: state.main.resourceFilter,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
       isInClusterMode: kubeConfigPath
@@ -85,7 +89,11 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,
       isDisabled: (rawItem, scope) =>
-        Boolean((scope.previewResourceId && scope.previewResourceId !== rawItem.id) || scope.isInClusterMode),
+        Boolean(
+          (scope.previewResourceId && scope.previewResourceId !== rawItem.id) ||
+            scope.isInClusterMode ||
+            !isResourcePassingFilter(scope.resourceMap[rawItem.id], scope.resourceFilters)
+        ),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

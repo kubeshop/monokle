@@ -29,6 +29,7 @@ export interface TreeItemProps {
   isExcluded?: boolean;
   isSupported?: boolean;
   isFolder?: boolean;
+  isTextExtension?: boolean;
 }
 
 export interface MatchLine {
@@ -54,6 +55,7 @@ export interface TreeNode {
   isExcluded?: boolean;
   isSupported?: boolean;
   filePath: string;
+  className?: string;
 }
 
 export interface FilterTreeNode extends Omit<TreeNode, 'children'> {

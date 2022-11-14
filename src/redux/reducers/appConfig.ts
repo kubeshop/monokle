@@ -1,4 +1,5 @@
-// import * as k8s from '@kubernetes/client-node';
+import {ipcRenderer} from 'electron';
+
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -23,7 +24,9 @@ import {
 import {ClusterColors} from '@models/cluster';
 import {UiState} from '@models/ui';
 
+import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
+import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -37,12 +40,21 @@ import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
+import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import initialState from '../initialState';
-import {toggleStartProjectPane} from './ui';
+import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  thunkAPI.dispatch(configSlice.actions.createProject(project));
+  const isGitRepo = await promiseFromIpcRenderer(
+    'git.isFolderGitRepo',
+    'git.isFolderGitRepo.result',
+    project.rootFolder
+  );
+
+  thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
@@ -59,9 +71,25 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: any) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
+    const terminalsIds: string[] = Object.keys(thunkAPI.getState().terminal.terminalsMap);
+
+    if (terminalsIds.length) {
+      thunkAPI.dispatch(setLeftBottomMenuSelection(undefined));
+
+      terminalsIds.forEach(terminalId => {
+        ipcRenderer.send('shell.ptyProcessKillAll', {terminalId});
+      });
+    }
+
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
     }
+
+    if (appUi.leftMenu.selection !== 'file-explorer') {
+      thunkAPI.dispatch(setLeftMenuSelection('file-explorer'));
+    }
+
+    monitorGitFolder(projectRootPath, thunkAPI);
 
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
@@ -78,6 +106,7 @@ export const setOpenProject = createAsyncThunk(
     ) {
       projectConfig.k8sVersion = PREDEFINED_K8S_VERSION;
     }
+
     // Then set project config by reading .monokle or populating it
     thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
     // Last set rootFolder so function can read the latest projectConfig
@@ -235,6 +264,19 @@ export const configSlice = createSlice({
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
+    updateProjectsGitRepo: (state: Draft<AppConfig>, action: PayloadAction<{path: string; isGitRepo: boolean}[]>) => {
+      action.payload.forEach(project => {
+        const foundProject = state.projects.find(p => p.rootFolder === project.path);
+
+        if (!foundProject) {
+          return;
+        }
+
+        foundProject.isGitRepo = project.isGitRepo;
+      });
+
+      electronStore.set('appConfig.projects', state.projects);
+    },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
       const projectRootPath: string | null = action.payload;
 
@@ -331,12 +373,13 @@ export const configSlice = createSlice({
     },
     setUserDirs: (
       state: Draft<AppConfig>,
-      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
+      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string; crdsDir: string}>
     ) => {
-      const {homeDir, tempDir, dataDir} = action.payload;
+      const {homeDir, tempDir, dataDir, crdsDir} = action.payload;
       state.userHomeDir = homeDir;
       state.userTempDir = tempDir;
       state.userDataDir = dataDir;
+      state.userCrdsDir = crdsDir;
     },
     changeCurrentProjectName: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       if (!state.selectedProjectRootFolder) {
@@ -445,6 +488,14 @@ export const configSlice = createSlice({
     updateClusterAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
       state.clusterAccess = action.payload;
     },
+    toggleEditorPlaceholderVisiblity: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
+      if (action.payload !== undefined && state.projectConfig && state.projectConfig.settings) {
+        state.projectConfig.settings.hideEditorPlaceholder = action.payload;
+      } else if (state.projectConfig && state.projectConfig.settings) {
+        state.projectConfig.settings.hideEditorPlaceholder = !state.projectConfig.settings.hideEditorPlaceholder;
+      }
+      electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -466,6 +517,21 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
 
   const [lastOpened, ...rest] = sortedProjects;
   return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
+};
+
+export const crdsPathChangedListener: AppListenerFn = listen => {
+  listen({
+    type: setUserDirs.type,
+    effect: async (action, {getState}) => {
+      const crdsDir = getState().config.userCrdsDir;
+
+      if (crdsDir) {
+        // TODO: can we avoid having this property on the window object?
+        (window as any).monokleUserCrdsDir = crdsDir;
+        readSavedCrdKindHandlers(crdsDir);
+      }
+    },
+  });
 };
 
 export const {
@@ -495,9 +561,11 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectKubeConfig,
+  updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
   updateTextSize,
   updateTheme,
+  toggleEditorPlaceholderVisiblity,
 } = configSlice.actions;
 export default configSlice.reducer;

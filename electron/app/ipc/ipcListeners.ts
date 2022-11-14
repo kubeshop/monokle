@@ -4,7 +4,6 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
-import os from 'os';
 import * as path from 'path';
 
 import {
@@ -98,10 +97,6 @@ ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
       properties: payload,
     });
   }
-});
-
-ipcMain.on('get-user-home-dir', (event: any) => {
-  event.returnValue = userHomeDir;
 });
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event: any, pluginUrl: string) => {
@@ -352,4 +347,10 @@ ipcMain.on('shell.ptyProcessKill', (event, data) => {
   const {terminalId} = data;
 
   killTerminal(terminalId);
+});
+
+ipcMain.on('shell.ptyProcessKillAll', () => {
+  Object.keys(ptyProcessMap).forEach(id => {
+    killTerminal(id);
+  });
 });

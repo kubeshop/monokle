@@ -9,6 +9,8 @@ const FEATURES = createFeatureFlags(featureJson, {
   ImagesPane: true,
   CompareEverything: false,
   Terminal: true,
+  GitOps: false,
+  TwoZero: false,
 });
 
 function createFeatureFlags<TFeature extends string>(

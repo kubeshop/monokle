@@ -39,6 +39,10 @@ const SecretHandler: ResourceKindHandler = {
         kind: 'ServiceAccount',
       },
       type: 'name',
+
+      shouldCreateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+        return values['kubernetes.io/service-account.name'] !== 'default';
+      },
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/configuration/secret/',

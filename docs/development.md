@@ -1,6 +1,6 @@
 # Development
 
-Monokle is an Electron desktop application built with React & TypeScript.  
+Monokle Desktop is an Electron desktop application built with React & TypeScript.  
 
 This project was bootstrapped from <https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder>, 
 which provides:

@@ -47,7 +47,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           {title}
         </S.TitleContainer>
       }
-      visible={isVisible}
+      open={isVisible}
       onCancel={onCancel}
       onOk={onClickOk}
     >

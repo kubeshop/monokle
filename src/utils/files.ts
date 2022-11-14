@@ -18,6 +18,10 @@ export function doesPathExist(absolutePath: string) {
   }
 }
 
+export function isEmptyDir(dirPath: string) {
+  return fs.readdirSync(dirPath).length === 0;
+}
+
 export function isSubDirectory(parentDir: string, dir: string) {
   const relative = path.relative(parentDir, dir);
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
@@ -187,4 +191,8 @@ export function createFile(rootDir: string, fileName: string, callback: (args: C
 export function hasValidExtension(file: string | undefined, extensions: string[]): boolean {
   if (!file) return false;
   return extensions.some(extension => file.endsWith(extension));
+}
+
+export function createFileWithContent(filePath: string, content: string) {
+  return fs.writeFileSync(filePath, content, {flag: 'wx'});
 }

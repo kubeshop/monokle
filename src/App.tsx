@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+import {useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -18,6 +19,8 @@ import {StepEnum} from '@models/walkthrough';
 import {Size} from '@models/window';
 
 import {compareToggled} from '@redux/compare';
+import {toggleForm} from '@redux/forms';
+import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
@@ -32,7 +35,16 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager, UpdateNotice} from '@organisms';
+import {
+  GitCloneModal,
+  HotKeysHandler,
+  LazyDrawer,
+  MessageBox,
+  NewPaneManager,
+  PageHeader,
+  PaneManager,
+  UpdateNotice,
+} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
@@ -41,7 +53,9 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
+import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
+import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
@@ -71,6 +85,7 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
+const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -80,10 +95,11 @@ const App = () => {
 
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-  const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
+
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
+  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
@@ -98,11 +114,13 @@ const App = () => {
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
   const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
+  const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
+  const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -161,6 +179,7 @@ const App = () => {
     if (!shouldTriggerTelemetryNotification) {
       return;
     }
+
     dispatch(
       setAlert({
         title: 'Monokle telemetry',
@@ -168,6 +187,7 @@ const App = () => {
         type: AlertEnum.Info,
         extraContentType: ExtraContentType.Telemetry,
         duration: 5,
+        id: 'monokle_telemetry_alert',
       })
     );
   }, [shouldTriggerTelemetryNotification, dispatch]);
@@ -228,6 +248,12 @@ const App = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useMount(() => {
+    fetchIsGitInstalled().then(isGitInstalled => {
+      dispatch(setIsGitInstalled(isGitInstalled));
+    });
+  });
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
@@ -365,14 +391,20 @@ const App = () => {
     dispatch(compareToggled({value: false}));
   }, [dispatch]);
 
+  const onCloseFormModal = useCallback(() => {
+    dispatch(toggleForm(false));
+  }, [dispatch]);
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
           <PageHeader />
-          <PaneManager />
-          <PageFooter />
+
+          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
+            <NewPaneManager />
+          </FeatureFlag>
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
@@ -419,9 +451,11 @@ const App = () => {
           {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
           {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
+          {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isFiltersPresetModalVisible && <FiltersPresetModal />}
+          {isGitCloneModalVisible && <GitCloneModal />}
           {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
@@ -434,7 +468,7 @@ const App = () => {
             <Modal
               width="900px"
               title="New Release"
-              visible={showReleaseNotes}
+              open={showReleaseNotes}
               onCancel={onCloseReleaseNotes}
               centered
               footer={null}

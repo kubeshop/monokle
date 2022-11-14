@@ -12,8 +12,10 @@ import _ from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {
+  InstallGitTooltip,
   NewEmptyProjectTooltip,
   NewProjectFromFolderTooltip,
+  NewProjectFromGitTooltip,
   NewProjectFromTemplateTooltip,
   ProjectManagementTooltip,
   SearchProjectTooltip,
@@ -21,8 +23,9 @@ import {
 
 import {Project} from '@models/appconfig';
 
+import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
@@ -33,14 +36,18 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getRelativeDate} from '@utils';
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const gitRepo = useAppSelector(state => state.git.repo);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const projects: Project[] = useAppSelector(state => state.config.projects);
+  const projects = useAppSelector(state => state.config.projects);
+  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -87,6 +94,7 @@ const ProjectSelection = () => {
       const confirmed = ipcRenderer.sendSync('confirm-action', {
         unsavedResourceCount,
         action: 'change the active project',
+        terminalsCount: Object.keys(terminalsMap).length,
       });
 
       if (!confirmed) {
@@ -100,6 +108,11 @@ const ProjectSelection = () => {
   const handleCreateProject = (fromTemplate: boolean) => {
     setIsDropdownMenuVisible(false);
     dispatch(openCreateProjectModal({fromTemplate}));
+  };
+
+  const handleGitProject = () => {
+    setIsDropdownMenuVisible(false);
+    dispatch(openGitCloneModal());
   };
 
   const handleDeleteProject = (project: Project) => {
@@ -150,6 +163,22 @@ const ProjectSelection = () => {
                 }}
               />
             </Tooltip>
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={isGitInstalled ? NewProjectFromGitTooltip : InstallGitTooltip}
+              placement="bottomRight"
+            >
+              <S.GitRepository
+                $disabled={!isGitInstalled}
+                onClick={() => {
+                  if (isGitInstalled) {
+                    handleGitProject();
+                  }
+                }}
+              >
+                <S.GitRepositoryIcon name="git-repository" />
+              </S.GitRepository>
+            </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
               <S.FolderAddOutlined onClick={() => handleCreateProject(false)} />
             </Tooltip>
@@ -185,6 +214,16 @@ const ProjectSelection = () => {
             sorter={(a: Project, b: Project) =>
               a.name && b.name ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : 0
             }
+            render={(name, project) => {
+              let isGitRepo = project.isGitRepo;
+
+              return (
+                <S.TableColumnName>
+                  {isGitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+                  <span title={name}>{name}</span>
+                </S.TableColumnName>
+              );
+            }}
             width={4}
             ellipsis
           />
@@ -242,6 +281,24 @@ const ProjectSelection = () => {
     );
   };
 
+  useEffect(() => {
+    const foundProjects = projects.filter(p => _.isUndefined(p.isGitRepo));
+
+    if (!foundProjects?.length) {
+      return;
+    }
+
+    promiseFromIpcRenderer(
+      'git.areFoldersGitRepos',
+      'git.areFoldersGitRepos.result',
+      foundProjects.map(p => p.rootFolder)
+    ).then(result => {
+      dispatch(updateProjectsGitRepo(result));
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!activeProject) {
     return null;
   }
@@ -254,13 +311,16 @@ const ProjectSelection = () => {
           overlay={projectMenu}
           placement="bottomRight"
           trigger={['click']}
-          visible={isDropdownMenuVisible}
-          onVisibleChange={onDropdownVisibleChange}
+          open={isDropdownMenuVisible}
+          onOpenChange={onDropdownVisibleChange}
         >
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
               <S.ProjectLabel>Project</S.ProjectLabel>
+
               <S.ProjectContent>
+                {gitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+
                 <S.ProjectName>{activeProject.name}</S.ProjectName>
                 <S.DownOutlined />
               </S.ProjectContent>

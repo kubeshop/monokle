@@ -1,14 +1,14 @@
 # What is a Plugin?
 
-Simply, any GitHub repository that contains a `package.json` file (the plugin entry file) can be installed as a plugin if the entry file follows the structure of a Monokle plugin.
+Simply, any GitHub repository that contains a `package.json` file (the plugin entry file) can be installed as a plugin if the entry file follows the structure of a Monokle Desktop plugin.
 
-## **What is the structure of `package.json` for a valid Monokle plugin?**
+## **What is the structure of `package.json` for a valid Monokle Desktop plugin?**
 
-Monokle uses the following properties: `name`, `author`, `version` `repository`, `description`, and `monoklePlugin`.
+Monokle Desktop uses the following properties: `name`, `author`, `version` `repository`, `description`, and `monoklePlugin`.
 
 The `monoklePlugin` property should be an object containing an array named `modules`.
 
-Here’s an example of a `package.json` for a Monokle plugin:
+Here’s an example of a `package.json` for a Monokle Desktop plugin:
 
 ```json
 {
@@ -49,12 +49,12 @@ Here is how you can reference a template module:
 
 Open the Plugins manager from the top right icon:
 
-![Open Plugin Manager](img/open-plugin-manager-1.9.png)
+![Open Plugin Manager](img/open-plugin-manager-1.11.png)
 
 
-1. Click on the '+' button:
+1. Click on the **+ Install** button:
 
-![Add New Plugin](img/add-new-plugin-1.9.png)
+![Add New Plugin](img/add-new-plugin-1.11.png)
 
 2. A modal will appear asking for the Plugin URL:
 
@@ -71,9 +71,9 @@ This should be used only as a workaround for developing plugins.
 On Mac:
 
 - Copy your plugin folder to `/Users/<YourUser>/Libray/Application Support/monokle/monoklePlugins`.
-- Reopen or reload Monokle (from Window -> Reload).
+- Reopen or reload Monokle Desktop (from Window -> Reload).
 
 On Windows:
 
 - Copy your plugin folder to `C:\Users\<YourUser>\AppData\Roaming\monokle\monoklePlugins`.
-- Reopen or reload Monokle (from Window -> Reload).
+- Reopen or reload Monokle Desktop (from Window -> Reload).

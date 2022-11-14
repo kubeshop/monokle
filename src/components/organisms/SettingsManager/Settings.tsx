@@ -192,6 +192,13 @@ export const Settings = ({
     });
   };
 
+  const onChangeHideEditorPlaceholder = (e: any) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, hideEditorPlaceholder: e.target.checked},
+    });
+  };
+
   const openFileSelect = () => {
     if (isEditingDisabled) {
       return;
@@ -441,7 +448,13 @@ export const Settings = ({
         <InputNumber
           min={1}
           value={localConfig?.folderReadsMaxDepth}
-          onChange={(value: number) => setLocalConfig({...localConfig, folderReadsMaxDepth: value})}
+          onChange={(value: number | null) => {
+            if (!value) {
+              return;
+            }
+
+            setLocalConfig({...localConfig, folderReadsMaxDepth: value});
+          }}
         />
       </S.Div>
       <S.Div>
@@ -480,6 +493,12 @@ export const Settings = ({
         <S.Span>Cluster Mode</S.Span>
         <Checkbox checked={localConfig?.settings?.allowEditInClusterMode} onChange={onChangeAllowEditInClusterMode}>
           Allow editing resources
+        </Checkbox>
+      </S.Div>
+      <S.Div>
+        <S.Span>UI Preferences</S.Span>
+        <Checkbox checked={localConfig?.settings?.hideEditorPlaceholder} onChange={onChangeHideEditorPlaceholder}>
+          Hide Editor Placeholder
         </Checkbox>
       </S.Div>
     </>

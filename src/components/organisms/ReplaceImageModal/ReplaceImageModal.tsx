@@ -40,12 +40,7 @@ const ReplaceImageModal: React.FC = () => {
   };
 
   return (
-    <Modal
-      title={`Replace ${image.name}:${image.tag}`}
-      visible={uiState.isOpen}
-      onCancel={handleCancel}
-      onOk={handleOk}
-    >
+    <Modal title={`Replace ${image.name}:${image.tag}`} open={uiState.isOpen} onCancel={handleCancel} onOk={handleOk}>
       <Form form={form} layout="vertical">
         <Form.Item
           name="tag"

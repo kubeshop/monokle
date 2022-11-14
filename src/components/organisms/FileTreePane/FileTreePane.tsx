@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {Button, Tooltip} from 'antd';
 
-import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FileOutlined, FolderOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 import path from 'path';
@@ -17,6 +17,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
+import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {TitleBar} from '@molecules';
@@ -34,6 +36,7 @@ import {
   useProcessing,
   useRename,
 } from '@hooks/fileTreeHooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -41,11 +44,7 @@ import {TreeNode} from './types';
 
 import * as S from './styled';
 
-type Props = {
-  height: number;
-};
-
-const FileTreePane: React.FC<Props> = ({height}) => {
+const FileTreePane: React.FC = () => {
   const [tree, setTree] = useState<TreeNode | null>(null);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -72,13 +71,15 @@ const FileTreePane: React.FC<Props> = ({height}) => {
     dispatch(openCreateFileFolderModal({rootDir: absolutePath, type}));
   };
 
+  const height = usePaneHeight();
+
   const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
   const treeRef = useRef<any>();
   const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
-  const isCollapsed = expandedFolders.length === 0;
+  const isCollapsed = expandedFolders.length === 0 || expandedFolders.length === 1;
 
   const rootFolderName = useMemo(() => {
     return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
@@ -143,7 +144,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, tree]);
+  }, [tree]);
 
   useEffect(() => {
     if (isSelectingFile) {
@@ -204,7 +205,7 @@ const FileTreePane: React.FC<Props> = ({height}) => {
   const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
 
   const onToggleTree = () => {
-    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : []));
+    dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : tree ? [tree.key] : []));
   };
 
   return (
@@ -281,6 +282,25 @@ const FileTreePane: React.FC<Props> = ({height}) => {
               return node.highlight;
             }}
             disabled={isInPreviewMode || previewLoader.isLoading}
+            icon={(props: any) => {
+              if (props.isFolder) {
+                return <FolderOutlined />;
+              }
+
+              if (isKustomizationFilePath(props.filePath)) {
+                return <Icon name="kustomize" style={{fontSize: 15}} />;
+              }
+
+              if (
+                isHelmChartFile(props.filePath) ||
+                isHelmTemplateFile(props.filePath) ||
+                isHelmValuesFile(props.filePath)
+              ) {
+                return <Icon name="helm" style={{fontSize: 18, paddingTop: '3px'}} />;
+              }
+
+              return <FileOutlined />;
+            }}
             showIcon
             showLine={{showLeafIcon: false}}
           />

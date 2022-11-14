@@ -36,6 +36,7 @@ const ImagesSectionNameDisplay: React.FC<IProps> = props => {
     }
 
     if (isInPreviewMode) {
+      // TODO: this should take the background of the current type of preview, but it won't be needed anymore in 2.0
       return <S.PreviewOutputTag>Filtered By Preview Mode</S.PreviewOutputTag>;
     }
 

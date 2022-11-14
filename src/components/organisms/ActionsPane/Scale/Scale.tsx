@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
-import {Button, Col, InputNumber, Modal, Row, Tooltip} from 'antd';
+import {Col, InputNumber, Modal, Row, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ScaleTooltip} from '@constants/tooltips';
@@ -8,7 +8,7 @@ import {ScaleTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
 import {
-  isInPreviewModeSelector,
+  isInClusterModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   selectedResourceSelector,
@@ -16,23 +16,33 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import scaleDeployment from '@redux/services/scaleDeployment';
 
-const Scale = () => {
+import {SecondaryButton} from '@atoms';
+
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Scale: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const dispatch = useAppDispatch();
-  const currentResource = useAppSelector(selectedResourceSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
-  const defaultReplica = currentResource?.content?.spec?.replicas;
-  const [replicas, setReplicas] = useState<number>(defaultReplica);
-  const [scaling, toggleScaling] = useState(false);
   const currentContext = useAppSelector(kubeConfigContextSelector);
+  const currentResource = useAppSelector(selectedResourceSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
+
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {name, namespace, kind} = currentResource || {};
 
-  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInPreviewMode, [kind, isInPreviewMode]);
+  const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInClusterMode, [kind, isInClusterMode]);
+  const defaultReplica = useMemo(() => currentResource?.content?.spec?.replicas, [currentResource]);
 
-  useEffect(() => {
-    setReplicas(defaultReplica);
-  }, [currentResource, defaultReplica]);
+  const [replicas, setReplicas] = useState<number>(defaultReplica);
+  const [scaling, toggleScaling] = useState(false);
+
+  const handleCancel = () => {
+    dispatch(closeScaleModal());
+  };
 
   const handleScaleOk = async () => {
     if (name && namespace) {
@@ -44,31 +54,42 @@ const Scale = () => {
     dispatch(closeScaleModal());
   };
 
-  const handleCancel = () => {
-    dispatch(closeScaleModal());
-  };
+  useEffect(() => {
+    setReplicas(defaultReplica);
+  }, [defaultReplica]);
 
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <Button
+        <SecondaryButton
+          $disableHover={isDropdownActive}
           loading={Boolean(scaling)}
-          type="primary"
+          type={isDropdownActive ? 'link' : 'default'}
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
-          ghost
         >
           Scale
-        </Button>
+        </SecondaryButton>
       </Tooltip>
-      <Modal title="Set number of replicas" visible={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
+      <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>
           <Col span={8}>
             <span>Number of replicas</span>
           </Col>
           <Col span={16}>
-            <InputNumber controls={false} type="number" value={replicas} onChange={val => setReplicas(val)} />
+            <InputNumber
+              controls={false}
+              type="number"
+              value={replicas}
+              onChange={val => {
+                if (!val) {
+                  return;
+                }
+
+                setReplicas(val);
+              }}
+            />
           </Col>
         </Row>
       </Modal>

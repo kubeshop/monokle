@@ -88,6 +88,51 @@ test('Validate notifications drawer', async () => {
   expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
 });
 
+test('Validate accept Telemetry', async () => {
+  await appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+    noWaitAfter: true,
+    force: true,
+  });
+
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'notifications-drawer-telemetry-accept.png')});
+  await waitForDrawerToShow(appWindow, 'Notifications', 5000);
+  const buttonAccept = appWindow.locator('#accept-telemetry');
+  expect(await buttonAccept.count()).toBe(1);
+  await appWindow.click("#accept-telemetry", {noWaitAfter: true, force: true});
+  expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
+});
+
+test('Validate decline Telemetry', async () => {
+  await appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+    noWaitAfter: true,
+    force: true,
+  });
+
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'notifications-drawer-telemetry-decline.png')});
+  await waitForDrawerToShow(appWindow, 'Notifications', 5000);
+  const buttonDecline = appWindow.locator('#decline-telemetry');
+  expect(await buttonDecline.count()).toBe(1);
+  await appWindow.click('#decline-telemetry', {noWaitAfter: true, force: true});
+  let drawer = await findDrawer(appWindow, 'Settings');
+  expect(drawer).toBeTruthy();
+});
+
+test('Validate Walk Through Tooltip', async () => {
+  await appWindow.hover("//span[@aria-label='ellipsis' and contains(@class,'anticon')]");
+
+  const tooltipInvisible = appWindow.locator("//div[@role='tooltip']");
+  expect(tooltipInvisible).toBeHidden();
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'settings-popover.png')});
+  const popover = appWindow.locator('#menu-helpers');
+
+  const buttonGuide = await popover.locator('button >> text=Re-play Quick Guide');
+  expect(buttonGuide).toBeTruthy();
+  await appWindow.click('button >> text=Re-play Quick Guide', {noWaitAfter: true, force: true});
+  const tooltip = appWindow.locator("//div[@role='tooltip']");
+  expect(tooltip).toBeTruthy();
+
+});
+
 test.afterAll(async () => {
   await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
   await appWindow.close();

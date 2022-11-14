@@ -1,8 +1,6 @@
 import React from 'react';
 
-import {Button, Tooltip} from 'antd';
-
-import {SwapOutlined} from '@ant-design/icons';
+import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -11,7 +9,9 @@ import {useAppDispatch} from '@redux/hooks';
 
 import {Walkthrough} from '@molecules';
 
-export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}) => {
+import {Icon, SecondaryButton} from '@atoms';
+
+export const CompareButton: React.FC<{width: number; children?: React.ReactNode}> = ({children, width}) => {
   const dispatch = useAppDispatch();
   const onClickClusterComparison = () => {
     dispatch(compareToggled({value: true}));
@@ -20,16 +20,21 @@ export const CompareButton: React.FC<{children?: React.ReactNode}> = ({children}
   return (
     <Walkthrough collection="release" step="compare">
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Compare resources" placement="bottom">
-        <Button
-          onClick={onClickClusterComparison}
-          icon={<SwapOutlined />}
-          type="primary"
-          ghost
-          size="small"
-          style={{marginLeft: 8}}
-        >
-          {children}
-        </Button>
+        {width > 410 ? (
+          <SecondaryButton style={{marginLeft: 10}} type="primary" size="small" onClick={onClickClusterComparison}>
+            Compare & Sync
+          </SecondaryButton>
+        ) : (
+          <SecondaryButton
+            onClick={onClickClusterComparison}
+            icon={<Icon name="compare" style={{fontSize: '16px'}} />}
+            type="primary"
+            size="small"
+            style={{marginLeft: 10}}
+          >
+            {children}
+          </SecondaryButton>
+        )}
       </Tooltip>
     </Walkthrough>
   );

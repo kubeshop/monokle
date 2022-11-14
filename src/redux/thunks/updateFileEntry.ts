@@ -114,6 +114,7 @@ export const updateFileEntry = createAsyncThunk(
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
+
     return nextMainState;
   }
 );

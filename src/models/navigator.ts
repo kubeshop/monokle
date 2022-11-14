@@ -95,7 +95,6 @@ export interface SectionCustomization {
   nameSize?: number;
   nameVerticalPadding?: number;
   nameWeight?: number;
-  sectionMarginBottom?: number;
   showHeader?: boolean;
 }
 

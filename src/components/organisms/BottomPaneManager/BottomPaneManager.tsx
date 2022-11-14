@@ -17,6 +17,8 @@ import {setTerminalShells} from '@redux/services/terminalShells';
 
 import {Icon} from '@atoms';
 
+import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
+
 import TerminalPane from '../TerminalPane';
 import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';
 import TerminalOptions from '../TerminalPane/TerminalOptions';
@@ -136,11 +138,15 @@ const BottomPaneManager: React.FC = () => {
         </S.Tabs>
 
         <S.TabsActions>
+          <SaveCommand />
+
+          <PreviewSavedCommand />
+
           <Dropdown mouseEnterDelay={0.5} placement="bottomRight" overlay={<TerminalOptions />}>
             <S.EllipsisOutlined />
           </Dropdown>
 
-          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
+          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(undefined))} />
         </S.TabsActions>
       </S.TabsContainer>
 

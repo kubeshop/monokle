@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Col, Row} from 'antd';
+import {Col, Row, Skeleton} from 'antd';
 
 import {CompareSide, resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -35,7 +35,7 @@ export const CompareModalSelecting: React.FC = () => {
         <S.ListRow>
           <Col span={10}>
             {left.loading ? (
-              <div>loading...</div>
+              <Skeleton />
             ) : left.error ? (
               <ErrorFigure onRetry={() => handleRetry('left')} />
             ) : (
@@ -52,7 +52,7 @@ export const CompareModalSelecting: React.FC = () => {
           ) : right.error ? (
             <ErrorFigure onRetry={() => handleRetry('right')} />
           ) : (
-            <p>loading..</p>
+            <Skeleton />
           )}
         </S.FloatingFigure>
       </>

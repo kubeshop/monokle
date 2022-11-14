@@ -47,6 +47,10 @@ export const Image = styled.img`
   width: 100%;
 `;
 
+export const CallToActionButton = styled(Button)`
+  margin: 0 auto;
+`;
+
 export const Actions = styled.div`
   display: flex;
   justify-content: flex-end;

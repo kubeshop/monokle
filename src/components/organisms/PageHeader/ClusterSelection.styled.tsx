@@ -50,7 +50,9 @@ export const getPreviewTheme = (
   if (previewType === 'kustomization') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
   }
-
+  if (previewType === 'command') {
+    color = rgbaRatio ? rgba(Colors.purple8, rgbaRatio) : Colors.purple8;
+  }
   return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
 };
 
@@ -143,7 +145,7 @@ export const ClusterContainer = styled.div`
   border: none;
   border-radius: 4px;
   line-height: 28px !important;
-  min-width: 340px;
+  min-width: 250px;
 
   & .ant-btn[disabled] {
     background: transparent !important;
@@ -191,8 +193,12 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
   background: ${Colors.grey3b};
   border: none;
 
-  @media ${Device.laptop} {
-    min-width: 340px;
+  @media ${Device.laptopM} {
+    min-width: 220px;
+  }
+
+  @media ${Device.laptopL} {
+    min-width: 280px;
   }
 `;
 
@@ -240,6 +246,7 @@ export const PreviewMode = styled.div<{
   $previewType?: PreviewType;
   $kubeConfigContextColor: ClusterColors;
 }>`
+  white-space: nowrap;
   border-radius: 4px 0 0 4px;
   padding: 0 0.5rem;
   color: ${props =>

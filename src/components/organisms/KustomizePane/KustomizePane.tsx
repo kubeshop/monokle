@@ -5,7 +5,7 @@ import {SectionRenderer, TitleBar} from '@molecules';
 import KustomizationSectionBlueprint from '@src/navsections/KustomizationSectionBlueprint';
 import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';
 
-import * as S from './styled';
+import * as S from './KustomizePane.styled';
 
 const KustomizePane: React.FC = () => {
   return (

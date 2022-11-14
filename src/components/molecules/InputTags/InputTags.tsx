@@ -23,9 +23,8 @@ const InputTags: React.FC<IProps> = props => {
 
   const inputRef = useRef<InputRef>(null);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && e.preventDefault();
-  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter' || !inputValue) {
+  const addTag = () => {
+    if (!inputValue) {
       return;
     }
 
@@ -36,6 +35,21 @@ const InputTags: React.FC<IProps> = props => {
 
     onTagAdd(inputValue);
     setInputValue('');
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && e.preventDefault();
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // delete last tag on backspace
+    if (e.key === 'Backspace' && !inputValue && tags.length) {
+      onTagRemove(tags[tags.length - 1]);
+      return;
+    }
+
+    if (e.key !== 'Enter' && e.key !== ',') {
+      return;
+    }
+
+    addTag();
   };
 
   return (
@@ -60,7 +74,14 @@ const InputTags: React.FC<IProps> = props => {
           bordered={false}
           ref={inputRef}
           value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
+          onBlur={addTag}
+          onChange={e => {
+            if ((e.nativeEvent as InputEvent)?.data === ',') {
+              return;
+            }
+
+            setInputValue(e.target.value);
+          }}
           onKeyPress={handleKeyPress}
           onKeyUp={handleKeyUp}
         />

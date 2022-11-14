@@ -51,19 +51,23 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
+export type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
+
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
+  | 'git-pane'
   | 'kustomize-pane'
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
-  | 'search';
-export type LeftMenuBottomSelectionType = 'terminal' | null;
+  | 'search'
+  | 'crds';
+
+export type LeftMenuBottomSelectionType = 'terminal';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
-  footer: number;
   header: number;
 };
 
@@ -114,12 +118,12 @@ export type UiState = {
   layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
-    bottomSelection: LeftMenuBottomSelectionType | null;
+    bottomSelection?: LeftMenuBottomSelectionType;
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
     isActive: boolean;
     isValidationDrawerVisible: boolean;
-    selection: LeftMenuSelectionType;
+    selection: LeftMenuSelectionType | NewLeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -162,7 +166,7 @@ export type UiState = {
 export type PaneConfiguration = {
   leftPane: number;
   navPane: number;
-  rightPane: number;
+  editPane: number;
   bottomPaneHeight: number;
   recentProjectsPaneWidth: number;
 };

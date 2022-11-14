@@ -17,6 +17,8 @@ import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@molecules';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
 import * as S from './TemplateManagerPane.styled';
@@ -40,11 +42,7 @@ const filterTemplateBySearchedValue = (searchedValue: string, name: string, auth
   return shouldBeFiltered;
 };
 
-type Props = {
-  height: number;
-};
-
-const TemplatesManagerPane: React.FC<Props> = ({height}) => {
+const TemplatesManagerPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
@@ -58,6 +56,8 @@ const TemplatesManagerPane: React.FC<Props> = ({height}) => {
 
   const [searchedValue, setSearchedValue] = useState<string>();
   const [visibleTemplateEntries, setVisibleTemplateEntries] = useState<[string, AnyTemplate][]>();
+
+  const height = usePaneHeight();
 
   const isLoading = useMemo(() => {
     return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;

@@ -75,7 +75,7 @@ type PathSelectionHistoryEntry = {
 
 type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
 
-type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
+type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config' | 'command';
 
 type ResourceFilterType = {
   names?: string[];
@@ -171,6 +171,8 @@ interface AppState {
   previewValuesFileId?: string;
   /** the preview configuration currently being previewed */
   previewConfigurationId?: string;
+  /** the id of the currently being previewed command */
+  previewCommandId?: string;
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
@@ -211,6 +213,7 @@ interface AppState {
       stack: string;
     };
   };
+  lastChangedLine: number;
 }
 
 export interface KubernetesObject {

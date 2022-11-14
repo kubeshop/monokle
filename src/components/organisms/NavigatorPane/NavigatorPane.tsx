@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import {useMeasure} from 'react-use';
 
 import {Badge, Button, Tooltip} from 'antd';
 
@@ -18,6 +19,8 @@ import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@mol
 
 import {MonoPaneTitle} from '@atoms';
 
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import {FeatureFlag} from '@utils/features';
 
 import Colors from '@styles/Colors';
@@ -31,11 +34,7 @@ import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
-type Props = {
-  height: number;
-};
-
-const NavPane: React.FC<Props> = ({height}) => {
+const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
@@ -46,6 +45,10 @@ const NavPane: React.FC<Props> = ({height}) => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
+
+  const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
+
+  const height = usePaneHeight();
 
   const appliedFilters = useMemo(
     () =>
@@ -68,7 +71,7 @@ const NavPane: React.FC<Props> = ({height}) => {
   };
 
   return (
-    <S.NavigatorPaneContainer>
+    <S.NavigatorPaneContainer ref={navigatorPaneRef}>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
@@ -108,7 +111,7 @@ const NavPane: React.FC<Props> = ({height}) => {
             </Badge>
 
             <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
-              <CompareButton />
+              <CompareButton width={width} />
             </FeatureFlag>
           </S.TitleBarRightButtons>
         </S.TitleBar>

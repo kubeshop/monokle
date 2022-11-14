@@ -1,19 +1,25 @@
 {
   "ui:title": "ClusterRole Properties",
+  "level": 0,
   "rules": {
     "ui:title": "Object Rules",
+    "level": 1,
     "items": {
       "apiGroups": {
-        "ui:title": "API Groups"
+        "ui:title": "API Groups",
+        "level": 2
       },
       "resources": {
-        "ui:title": "Resources"
+        "ui:title": "Resources",
+        "level": 2
       },
       "verbs": {
+        "level": 2,
         "ui:title": "Verbs",
         "ui:widget": "checkboxes",
         "ui:options": {
-          "inline": true
+          "inline": true,
+          "level": 3
         }
       }
     }

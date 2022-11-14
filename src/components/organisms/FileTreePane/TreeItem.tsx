@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
@@ -46,7 +48,16 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey, parentKey: isMatchItem} = props;
+  const {
+    isTextExtension,
+    isExcluded,
+    isFolder,
+    isSupported,
+    processingEntity,
+    title,
+    treeKey,
+    parentKey: isMatchItem,
+  } = props;
   const {
     setProcessingEntity,
     onDuplicate,
@@ -68,8 +79,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const git = useAppSelector(state => state.git);
 
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -81,6 +93,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
   const absolutePath = isRoot ? root.filePath : path.join(root.filePath, treeKey);
+
+  const isDisabled = useMemo(
+    () =>
+      (!isFolder && !isSupported && !isTextExtension) ||
+      !fileMap[relativePath]?.filePath.startsWith(fileOrFolderContainedInFilter || ''),
+    [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
+  );
 
   const tooltipOverlayStyle = useMemo(() => {
     const style: Record<string, string> = {
@@ -172,6 +191,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       label: isFolder ? 'New Resource' : 'Add Resource',
       disabled:
         isInPreviewMode ||
+        isKustomizationFile(fileMap[relativePath], resourceMap) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
@@ -284,6 +304,18 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
+    ...(git.repo?.remoteUrl?.includes('https://github.com')
+      ? [
+          {
+            key: 'open_in_github',
+            label: 'Open on GitHub',
+            onClick: async (e: any) => {
+              e.domEvent.stopPropagation();
+              shell.openExternal(`${git.repo?.remoteUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
+            },
+          },
+        ]
+      : []),
     {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,
@@ -295,8 +327,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
-      <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+    <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+      <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <Tooltip
           overlayStyle={tooltipOverlayStyle}
           mouseEnterDelay={LONGER_TOOLTIP_DELAY}
@@ -317,26 +349,31 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         )}
         {isTitleHovered && !processingEntity.processingType ? (
           <S.ActionsWrapper>
-            {canPreview(relativePath) && (
+            {canPreview(relativePath) && !isDisabled && (
               <S.PreviewButton
                 type="text"
                 size="small"
-                disabled={isInPreviewMode}
+                disabled={
+                  isInPreviewMode || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')
+                }
                 $isItemSelected={isFileSelected}
                 onClick={handlePreview}
               >
                 Preview
               </S.PreviewButton>
             )}
-            <ContextMenu overlay={<Menu items={menuItems} />}>
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                }}
-              >
-                {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
-              </div>
-            </ContextMenu>
+
+            {!isDisabled && (
+              <ContextMenu overlay={<Menu items={menuItems} />}>
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {!isMatchItem && <Dots color={isFileSelected ? Colors.blackPure : undefined} />}
+                </div>
+              </ContextMenu>
+            )}
           </S.ActionsWrapper>
         ) : null}
       </S.TreeTitleWrapper>

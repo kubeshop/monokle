@@ -9,8 +9,10 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
+import {GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
+import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
@@ -21,6 +23,7 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
+import {promiseFromIpcRenderer} from '@utils/promises';
 import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 /**
@@ -82,7 +85,7 @@ export const setRootFolder = createAsyncThunk<
     policyPlugins,
   });
 
-  monitorRootFolder(rootFolder, thunkAPI.dispatch);
+  monitorRootFolder(rootFolder, thunkAPI);
 
   const generatedAlert = {
     title: 'Folder Import',
@@ -97,6 +100,27 @@ export const setRootFolder = createAsyncThunk<
     numberOfResources: Object.values(resourceMap).length,
   });
 
+  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
+    'git.isFolderGitRepo',
+    'git.isFolderGitRepo.result',
+    rootFolder
+  );
+
+  if (isFolderGitRepo) {
+    promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder).then(repo => {
+      thunkAPI.dispatch(setRepo(repo));
+    });
+
+    thunkAPI.dispatch(setGitLoading(true));
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: rootFolder,
+      fileMap,
+    }).then(changedFiles => {
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
+      thunkAPI.dispatch(setGitLoading(false));
+    });
+  }
+
   return {
     projectConfig,
     fileMap,
@@ -107,5 +131,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
+    isGitRepo: isFolderGitRepo,
   };
 });

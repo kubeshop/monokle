@@ -28,7 +28,13 @@ export const HelmChartSelect: React.FC<Props> = ({side}) => {
   );
   return (
     <S.SelectColor>
-      <Select onChange={handleSelect} placeholder="Choose Chart…" value={currentHelmChart?.id} style={{width: 160}}>
+      <Select
+        defaultOpen
+        onChange={handleSelect}
+        placeholder="Choose Chart…"
+        value={currentHelmChart?.id}
+        style={{width: 160}}
+      >
         {allHelmCharts.map(chart => {
           return (
             <Select.Option key={chart.id} value={chart.id}>

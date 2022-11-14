@@ -7,7 +7,13 @@ import {IconNames} from '@models/icons';
 import Colors from '@styles/Colors';
 
 import {
+  CRDs,
   Collapse,
+  Compare,
+  Git,
+  GitOps,
+  GitProject,
+  GitRepository,
   Helm,
   Images,
   IncomingRefs,
@@ -23,6 +29,7 @@ import {
   SeverityLow,
   SeverityMedium,
   Shortcuts,
+  SplitView,
   Terminal,
   Validation,
   Warning,
@@ -41,6 +48,10 @@ type IconProps = {
 const icons: Record<IconNames, React.ComponentType<any>> = {
   'opa-status': OPAStatus,
   images: Images,
+  git: Git,
+  'git-ops': GitOps,
+  'git-project': GitProject,
+  'git-repository': GitRepository,
   kubernetes: Kubernetes,
   collapse: Collapse,
   helm: Helm,
@@ -60,6 +71,9 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'k8s-schema': K8sSchema,
   search: Search,
   terminal: Terminal,
+  'split-view': SplitView,
+  crds: CRDs,
+  compare: Compare,
 };
 
 const Icon: React.FC<IconProps> = props => {

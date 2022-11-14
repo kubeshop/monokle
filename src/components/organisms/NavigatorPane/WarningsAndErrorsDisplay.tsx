@@ -52,20 +52,25 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
 
   const dispatch = useAppDispatch();
 
-  return (
-    <S.StyledMenu>
-      {warnings.map(warning => (
-        <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
-          {warning.namespace && <Tag>{warning.namespace}</Tag>}
-          <span>{warning.name}</span>
-          <S.WarningCountContainer $type={type}>
-            <S.Icon $type={type} name={type} /> {warning.count}
-          </S.WarningCountContainer>
-          <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
-        </S.StyledMenuItem>
-      ))}
-    </S.StyledMenu>
+  const menuItems = useMemo(
+    () =>
+      warnings.map(warning => ({
+        key: warning.id,
+        label: (
+          <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
+            {warning.namespace && <Tag>{warning.namespace}</Tag>}
+            <span>{warning.name}</span>
+            <S.WarningCountContainer $type={type}>
+              <S.Icon $type={type} name={type} /> {warning.count}
+            </S.WarningCountContainer>
+            <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
+          </S.StyledMenuItem>
+        ),
+      })),
+    [dispatch, type, warnings]
   );
+
+  return <S.StyledMenu items={menuItems} />;
 };
 
 function WarningsAndErrorsDisplay() {

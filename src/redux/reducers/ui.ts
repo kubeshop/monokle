@@ -3,6 +3,7 @@ import {webFrame} from 'electron';
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
+import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -12,6 +13,7 @@ import {
   LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
+  NewLeftMenuSelectionType,
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
@@ -35,10 +37,16 @@ export const uiSlice = createSlice({
       state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
     },
     zoomIn: () => {
-      webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+      const newZoomFactor = webFrame.getZoomFactor() + 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     zoomOut: () => {
-      webFrame.setZoomFactor(Number(webFrame.getZoomFactor() - 0.1));
+      const newZoomFactor = webFrame.getZoomFactor() - 0.1;
+
+      electronStore.set('ui.zoomFactor', newZoomFactor);
+      webFrame.setZoomFactor(newZoomFactor);
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
@@ -57,11 +65,22 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+    setLeftBottomMenuSelection: (
+      state: Draft<UiState>,
+      action: PayloadAction<LeftMenuBottomSelectionType | undefined>
+    ) => {
       state.leftMenu.bottomSelection = action.payload;
-      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+
+      if (!action.payload) {
+        electronStore.delete('ui.leftMenu.bottomSelection');
+      } else {
+        electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+      }
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
+    setLeftMenuSelection: (
+      state: Draft<UiState>,
+      action: PayloadAction<LeftMenuSelectionType | NewLeftMenuSelectionType>
+    ) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -89,8 +108,13 @@ export const uiSlice = createSlice({
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
-    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
-      state.paneConfiguration = action.payload;
+    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<Partial<PaneConfiguration>>) {
+      (Object.entries(action.payload) as Entries<PaneConfiguration>).forEach(([key, value]) => {
+        if (action.payload[key]) {
+          state.paneConfiguration[key] = value;
+        }
+      });
+
       electronStore.set('ui.paneConfiguration', state.paneConfiguration);
     },
     openNewResourceWizard: (

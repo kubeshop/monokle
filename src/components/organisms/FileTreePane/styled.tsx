@@ -35,6 +35,10 @@ export const FileTreeContainer = styled.div`
     background: transparent;
   }
 
+  & .ant-tree-treenode-not-supported:hover::before {
+    background: transparent !important;
+  }
+
   & .ant-tree-switcher-leaf-line::before {
     border-right: 1px solid #434343;
   }
@@ -49,10 +53,13 @@ export const FileTreeContainer = styled.div`
     border-left: 8px hidden transparent;
     padding-left: 8px;
     padding-bottom: 0px;
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
   }
   & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
+  }
+  & .ant-tree-treenode::before {
+    bottom: 0px !important;
   }
   & .file-entry-name {
     color: ${Colors.blue10};
@@ -67,11 +74,11 @@ export const FileTreeContainer = styled.div`
     color: ${Colors.blackPure} !important;
   }
   & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient} !important;
+    background: ${Colors.selectionColor} !important;
   }
   & .filter-node {
     font-weight: bold;
-    background: ${Colors.highlightGradient};
+    background: ${Colors.highlightColor};
   }
   & .filter-node .file-entry-name {
     color: ${FontColors.resourceRowHighlight} !important;
@@ -200,10 +207,11 @@ export const TreeTitleText = styled.span`
   position: relative;
 `;
 
-export const TreeTitleWrapper = styled.div`
+export const TreeTitleWrapper = styled.div<{$isDisabled: boolean}>`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
 
   height: 100%;
 

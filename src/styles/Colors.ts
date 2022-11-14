@@ -24,6 +24,9 @@ enum Colors {
   grey3 = '#262626', // gray, gray 3
   grey1 = '#141414', // gray, gray 1
 
+  coldGrey = '#31393C',
+  warmGrey = '#222222',
+
   // Notifications
   greenOkay = '#09b89d',
   polarGreen = '#6ABE39',
@@ -39,6 +42,7 @@ enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
 
+  volcano6 = '#D84A1B',
   volcano7 = '#E87040',
   volcano8 = '#F3956A',
 
@@ -61,15 +65,23 @@ enum Colors {
   purple8 = '#AB7AE0',
 
   cyan = '#58D1C9',
-  cyan7 = '#33BCB7',
+  cyan1 = '#112123',
+  cyan2 = '#113536',
   cyan5 = '#138585',
+  cyan7 = '#33BCB7',
+  cyan8 = '#58D1C9',
+  cyan9 = '#84E2D8',
   lightSeaGreen = '#13a8a8',
 
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
+  blue8 = '#65B7F3',
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
+  geekblue6 = '#2B4ACB',
+  geekblue7 = '#5273E0',
+  blue1000 = '#7F9EF3',
 
   green5 = '#3c8618',
   green6 = '#49AA19',
@@ -80,10 +92,10 @@ enum Colors {
 
   highlightGreen = '#33BCB7',
 
-  selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
-  selectionGradientHover = 'linear-gradient(90deg, #3C9AE8 50%, #84E2D8 100%)',
-  highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
-  highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
+  selectionColor = blue9,
+  selectionColorHover = blue8,
+  highlightColor = cyan2,
+  highlightColorHover = cyan1,
   diffBackground = '#2B2611',
   diffBackgroundHover = '#27220f',
 }
