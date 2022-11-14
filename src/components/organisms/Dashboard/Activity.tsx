@@ -30,10 +30,10 @@ export const Activity = ({events}: {events: ClusterEvent[]}) => {
             </S.MessageCount>
           </S.TimeInfo>
           <S.MessageInfo>
-            <div style={{fontSize: '12px', color: '#FFFFFF'}}>{event.message}</div>
-            <div style={{fontSize: '11px', color: '#177DDC'}}>
+            <S.MessageText>{event.message}</S.MessageText>
+            <S.MessageHost>
               {event.source.host || '-'}: {event.metadata.name}
-            </div>
+            </S.MessageHost>
           </S.MessageInfo>
           <S.NamespaceInfo>{event.metadata.namespace || '-'}</S.NamespaceInfo>
         </S.EventRow>

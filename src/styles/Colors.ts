@@ -1,5 +1,6 @@
 enum Colors {
   // Greys
+  grey5000 = '#2A385A',
   grey4000 = '#1F1F1F',
   grey3000 = '#191F21',
   grey2000 = '#081A20',
@@ -41,6 +42,7 @@ enum Colors {
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
+  yellow12 = '#E8B339',
 
   volcano6 = '#D84A1B',
   volcano7 = '#E87040',

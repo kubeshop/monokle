@@ -48,6 +48,13 @@ export class KubeConfigManager {
     return undefined;
   }
 
+  getStorageApiClient(): k8s.StorageV1Api | undefined {
+    if (this.kubeConfig) {
+      return this.kubeConfig.makeApiClient(k8s.StorageV1Api);
+    }
+    return undefined;
+  }
+
   getMetricsClient(): k8s.Metrics | undefined {
     if (this.kubeConfig) {
       return new k8s.Metrics(this.kubeConfig);

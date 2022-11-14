@@ -10,11 +10,12 @@ export const Container = styled.div`
   column-gap: 8px;
   row-gap: 8px;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 5fr 12fr;
+  grid-template-rows: 6.5% 26.5% 65%;
   grid-template-areas:
     'overview overview overview'
     'status performance utilization'
     'inventory-info activity activity';
+  overflow: hidden;
 `;
 
 export const OverviewContainer = styled.div`
@@ -25,10 +26,15 @@ export const OverviewContainer = styled.div`
 
 export const TitleBarContainer = styled.div`
   & > div:nth-child(1) {
-    height: 32px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
   & > div:nth-child(2) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     height: calc(100% - 32px);
+    overflow: auto;
+    margin-top: 4px;
   }
 `;
 

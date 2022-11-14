@@ -1,31 +1,34 @@
 import {useEffect, useState} from 'react';
 
-import {ClusterEvent, getClusterEvents} from '@redux/services/clusterDashboard';
+import {
+  ClusterEvent,
+  ClusterInformation,
+  getClusterEvents,
+  getClusterInformation,
+} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {TitleBar} from '@monokle/components';
 
 import {Activity} from './Activity';
 import * as S from './Dashboard.styled';
-import {InventoryInfo, InventoryInfoData} from './InventoryInfo';
+import {InventoryInfo} from './InventoryInfo';
 
 export const Dashboard = () => {
-  const [inventoryData, setInventoryData] = useState<InventoryInfoData>({nodesCount: 0, podsCapacity: 0, podsCount: 0});
+  const [clusterInformation, setClusterInformation] = useState<ClusterInformation | null>(null);
   const [activityData, setActivityData] = useState<ClusterEvent[]>([]);
 
   useEffect(() => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+    const storageApiClient = new KubeConfigManager().getStorageApiClient();
+
+    if (storageApiClient && k8sApiClient) {
+      getClusterInformation(k8sApiClient, storageApiClient)
+        .then(data => setClusterInformation(data))
+        .catch(_error => setClusterInformation(null));
+    }
 
     if (k8sApiClient) {
-      // k8sApiClient.listNode().then(data => {
-      //   console.log('data', data.body.items);
-      //   setInventoryData({
-      //     nodesCount: data.body.items.length,
-      //     podsCapacity: data.body.items.reduce((sum, item) => sum + Number(item?.status?.capacity?.pods), 0),
-      //     podsCount: 0,
-      //   });
-      // });
-
       getClusterEvents(k8sApiClient)
         .then(events => {
           setActivityData(events);
@@ -64,7 +67,7 @@ export const Dashboard = () => {
           type="secondary"
           title="Inventory & Info"
           actions={<S.ActionWrapper>See all</S.ActionWrapper>}
-          description={<InventoryInfo inventoryData={inventoryData} />}
+          description={<InventoryInfo info={clusterInformation || ({} as ClusterInformation)} />}
         />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'activity'}}>

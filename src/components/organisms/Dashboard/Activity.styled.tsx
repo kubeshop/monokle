@@ -1,22 +1,25 @@
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 export const Container = styled.div`
-  padding: 12px 8px;
+  padding: 12px 8px 3px 8px;
+  overflow-y: auto;
 `;
 
 export const EventRow = styled.div<{$type: string}>`
   display: flex;
   justify-content: space-between;
   border-radius: 4px;
-  border: 1px solid #303030;
+  border: 1px solid ${Colors.grey4};
 
   margin-bottom: 10px;
   padding: 10px;
   ${props =>
     `border-left: 4px solid ${
-      (props.$type === 'Warning' && '#E8B339') ||
-      (props.$type === 'Error' && '#E84749') ||
-      (props.$type === 'Normal' && '#2A385A')
+      (props.$type === 'Warning' && Colors.yellow12) ||
+      (props.$type === 'Error' && Colors.red7) ||
+      (props.$type === 'Normal' && Colors.grey5000)
     };`}
 `;
 
@@ -40,7 +43,7 @@ export const MessageInfo = styled.div`
 export const NamespaceInfo = styled.div`
   flex: 1;
   font-size: 12px;
-  color: #ffffff;
+  color: ${Colors.whitePure};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,10 +51,20 @@ export const NamespaceInfo = styled.div`
 
 export const MessageTime = styled.div`
   font-size: 12px;
-  color: #acacac;
+  color: ${Colors.grey8};
 `;
 
 export const MessageCount = styled.div`
   font-size: 11px;
-  color: #5a5a5a;
+  color: ${Colors.grey6};
+`;
+
+export const MessageText = styled.div`
+  font-size: 12px;
+  color: ${Colors.whitePure};
+`;
+
+export const MessageHost = styled.div`
+  font-size: 11px;
+  color: ${Colors.blue7};
 `;
