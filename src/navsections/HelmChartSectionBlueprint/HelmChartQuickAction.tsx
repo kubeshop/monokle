@@ -12,11 +12,11 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {ItemCustomComponentProps, ResourceSet, RootState} from '@monokle-desktop/shared/models';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 
 import * as S from './HelmChartQuickAction.styled';
 

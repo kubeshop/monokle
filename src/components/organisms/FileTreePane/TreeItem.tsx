@@ -16,12 +16,12 @@ import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {ContextMenu, Dots, Spinner} from '@atoms';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {TreeItemProps} from './types';

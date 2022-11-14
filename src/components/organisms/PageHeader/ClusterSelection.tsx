@@ -20,11 +20,11 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {HighlightItems, K8sResource, Size} from '@monokle-desktop/shared/models';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {
   activeProjectSelector,
   isInPreviewModeSelector,
