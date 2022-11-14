@@ -367,11 +367,6 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       await customObjectsApi.deleteClusterCustomObject(group, version, kindPlural, resource.name);
     },
-    watcherReq: undefined,
-    disconnectFromCluster() {},
-    async watchResources(...args: any[]) {
-      return customKindHandler.listResourcesInCluster(args[1], args[2], args[3]);
-    },
   };
 
   return customKindHandler;
