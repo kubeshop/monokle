@@ -1,46 +1,58 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {PREVIEW_PREFIX} from '@constants/constants';
+
+import {AppState} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {ClusterResourceOptions, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
-
-import electronStore from '@utils/electronStore';
+import {jsonToYaml} from '@utils/yaml';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
+import {extractK8sResources} from './resource';
+
 const watchers: {[resourceKind: string]: any} = {};
 
-export const startWatching = () => {
-  getRegisteredKindHandlers().forEach((handler: ResourceKindHandler) => {});
+export const startWatchingResources = (state: AppState) => {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromFile(state.previewKubeConfigPath as string);
+  kc.setCurrentContext(state.previewKubeConfigContext as string);
+  getRegisteredKindHandlers().map((handler: ResourceKindHandler) => clusterResourceWatcher(state, handler, kc));
 };
 
 export async function clusterResourceWatcher(
+  state: AppState,
   kindHandler: ResourceKindHandler,
-  requestPath: string,
-  dispatch: any,
-  kubeconfig: k8s.KubeConfig,
-  options: ClusterResourceOptions,
-  crds?: K8sResource
+  kubeconfig: k8s.KubeConfig
 ) {
   disconnectFromCluster(kindHandler);
   watchers[kindHandler.kind] = await new k8s.Watch(kubeconfig).watch(
-    requestPath,
+    resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
-      const isPreviewLoaderLoading = Boolean(electronStore.get('main.previewLoader.isLoading'));
-
-      if (!isPreviewLoaderLoading && (type === 'ADDED' || type === 'MODIFIED')) {
-        dispatch(updateClusterResource(apiObj));
+      if (type === 'MODIFIED' || type === 'DELETED') {
+        console.log('apiObj', apiObj);
       }
-      if (!isPreviewLoaderLoading && type === 'DELETED') {
-        dispatch(deleteClusterResource(apiObj));
+
+      if (type === 'ADDED' || type === 'MODIFIED') {
+        const [resource]: K8sResource[] = extractK8sResources(
+          jsonToYaml(apiObj),
+          PREVIEW_PREFIX + kubeconfig.getCurrentContext()
+        );
+        state.resourceMap[resource.id] = resource;
+      }
+      if (type === 'DELETED') {
+        const [resource]: K8sResource[] = extractK8sResources(
+          jsonToYaml(apiObj),
+          PREVIEW_PREFIX + kubeconfig.getCurrentContext()
+        );
+        delete state.resourceMap[resource.id];
       }
     },
     () => {
       disconnectFromCluster(kindHandler);
-      kindHandler.watchResources && kindHandler.watchResources(dispatch, kubeconfig, options, crds);
-      clusterResourceWatcher(kindHandler, requestPath, dispatch, kubeconfig, options, crds);
+      clusterResourceWatcher(state, kindHandler, kubeconfig);
     }
   );
 }
@@ -48,8 +60,10 @@ export async function clusterResourceWatcher(
 export const disconnectFromCluster = (kindHandler: ResourceKindHandler) => {
   try {
     watchers[kindHandler.kind].abort();
+    watchers[kindHandler.kind] = undefined;
     delete watchers[kindHandler.kind];
   } catch (error) {
+    watchers[kindHandler.kind] = undefined;
     delete watchers[kindHandler.kind];
   }
 };
