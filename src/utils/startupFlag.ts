@@ -1,7 +1,3 @@
-export enum StartupFlags {
-  AUTOMATION = 'automation',
-}
-
 export class StartupFlag {
   private static _instance: StartupFlag;
 

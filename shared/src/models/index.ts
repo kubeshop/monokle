@@ -23,6 +23,7 @@ export * from './policy';
 export * from './repository';
 export * from './resourceKindHandler';
 export * from './rootState';
+export * from './startupFlag';
 export * from './template';
 export * from './terminal';
 export * from './thunk';
