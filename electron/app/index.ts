@@ -7,8 +7,7 @@ import Nucleus from 'nucleus-nodejs';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
-import '@utils/segment';
-
+import '@monokle-desktop/shared/utils/segment';
 import terminal from '@root/cli/terminal';
 
 import './git/ipc';

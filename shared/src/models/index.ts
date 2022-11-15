@@ -26,6 +26,7 @@ export * from './repository';
 export * from './resourceKindHandler';
 export * from './rootState';
 export * from './startupFlag';
+export * from './telemetry';
 export * from './template';
 export * from './terminal';
 export * from './thunk';

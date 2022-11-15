@@ -7,7 +7,6 @@ import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
 import {runCommandInMainThread} from '@utils/commands';
-import {trackEvent} from '@utils/telemetry';
 
 import {APPLY_HELM_CHART} from '@monokle-desktop/shared/constants/telemetry';
 import {
@@ -18,6 +17,7 @@ import {
   HelmChart,
   HelmValuesFile,
 } from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Invokes helm install for the specified helm chart and values file

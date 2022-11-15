@@ -15,7 +15,6 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
-import {trackEvent} from '@utils/telemetry';
 
 import {APPLY} from '@monokle-desktop/shared/constants/telemetry';
 import {
@@ -27,6 +26,7 @@ import {
   ProjectConfig,
   ResourceMapType,
 } from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource

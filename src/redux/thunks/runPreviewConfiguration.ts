@@ -10,7 +10,6 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 
 import {runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
-import {trackEvent} from '@utils/telemetry';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
@@ -21,6 +20,7 @@ import {
   PreviewConfigValuesFileItem,
   RootState,
 } from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart

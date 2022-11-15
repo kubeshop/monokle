@@ -7,10 +7,10 @@ import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {errorAlert} from '@utils/alert';
-import {trackEvent} from '@utils/telemetry';
 
 import {APPLY_FILE} from '@monokle-desktop/shared/constants/telemetry';
 import {AlertEnum, AlertType, AppDispatch, FileMapType} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource

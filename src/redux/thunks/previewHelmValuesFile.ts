@@ -7,10 +7,10 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
-import {trackEvent} from '@utils/telemetry';
 
 import {DO_HELM_PREVIEW} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, RootState} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 export const previewHelmValuesFile = createAsyncThunk<
   SetPreviewDataPayload,
