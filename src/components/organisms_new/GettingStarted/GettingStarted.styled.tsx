@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 export const GettingStartedContainer = styled.div<{$height: number}>`
   height: ${({$height}) => $height}px;
-  overflow-y: auto;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
