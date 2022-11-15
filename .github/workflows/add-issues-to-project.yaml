@@ -13,4 +13,4 @@ jobs:
       - uses: actions/add-to-project@v0.3.0
         with:
           project-url: https://github.com/orgs/kubeshop/projects/29
-          github-token: ${{ secrets.PROJECT_TOKEN }}
+          github-token: ${{ secrets.CREATE_ISSUE_TOKEN }}
