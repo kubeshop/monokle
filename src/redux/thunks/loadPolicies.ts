@@ -3,7 +3,6 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {v4 as uuid} from 'uuid';
 
 import {setAlert} from '@redux/reducers/alert';
-import {loadBinaryResource} from '@redux/services';
 
 import {
   AlertEnum,
@@ -14,6 +13,7 @@ import {
   ValidatorId,
 } from '@monokle-desktop/shared/models';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {loadBinaryResource} from '@monokle-desktop/shared/utils/resource';
 import {loadPolicy} from '@open-policy-agent/opa-wasm';
 
 export const loadPolicies = createAsyncThunk<Policy[]>('main/loadPolicies', async (_, {dispatch}) => {

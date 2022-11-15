@@ -6,7 +6,6 @@ import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {loadResource} from '@redux/services';
 import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
 
@@ -20,6 +19,7 @@ import {
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
 import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
 
 /**
  * extract the version from the apiVersion string of the specified resource

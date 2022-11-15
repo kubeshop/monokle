@@ -39,7 +39,6 @@ import {PaneManager} from '@components/organisms_new';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {fetchAppVersion} from '@utils/appVersion';
-import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -49,6 +48,7 @@ import {StartupFlag} from '@utils/startupFlag';
 
 import {AlertEnum, ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared/models';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {setMainProcessEnv} from '@monokle-desktop/shared/utils/env';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
