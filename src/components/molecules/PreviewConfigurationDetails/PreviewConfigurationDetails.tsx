@@ -5,12 +5,12 @@ import {Breadcrumb, Typography} from 'antd';
 import {sortBy} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigContextSelector} from '@redux/selectors';
 
 import {buildHelmCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './PreviewConfigurationDetails.styled';
 

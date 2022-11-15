@@ -10,7 +10,7 @@ import {Primitive} from 'type-fest';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
 
@@ -26,6 +26,7 @@ import {
   isReferencedHelmChartTemplate,
   isVanillaTemplate,
 } from '@monokle-desktop/shared/models';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './styled';
 

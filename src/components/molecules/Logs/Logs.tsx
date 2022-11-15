@@ -7,9 +7,11 @@ import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 
 import {createKubeClient} from '@utils/kubeclient';
+
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './Logs.styled';
 

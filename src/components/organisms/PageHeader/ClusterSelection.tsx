@@ -10,12 +10,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
-import {
-  currentClusterAccessSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigContextColorSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
@@ -28,6 +23,7 @@ import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {
   activeProjectSelector,
   isInPreviewModeSelector,
+  kubeConfigContextSelector,
   kubeConfigPathValidSelector,
 } from '@monokle-desktop/shared/utils/selectors';
 

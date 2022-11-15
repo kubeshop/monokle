@@ -175,13 +175,6 @@ export const currentKubeContext = (configState: AppConfig) => {
   return '';
 };
 
-export const kubeConfigContextSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    return currentKubeContext(config);
-  }
-);
-
 export const kubeConfigContextsSelector = createSelector(
   (state: RootState) => state.config,
   config => {

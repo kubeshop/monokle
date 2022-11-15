@@ -5,11 +5,11 @@ import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {knownResourceKindsSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {AlertEnum, AlertType, K8sResource} from '@monokle-desktop/shared/models';
-import {kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 export const useDiff = (resource?: K8sResource) => {
   const dispatch = useAppDispatch();

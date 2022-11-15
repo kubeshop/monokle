@@ -25,7 +25,6 @@ import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -44,6 +43,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum, AlertType} from '@monokle-desktop/shared/models';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './styled';
 

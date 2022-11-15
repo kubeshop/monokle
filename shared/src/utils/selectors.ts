@@ -17,6 +17,17 @@ export const isInPreviewModeSelector = createSelector(
     Boolean(state.main.previewCommandId)
 );
 
+export const kubeConfigContextSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    if (config.kubeConfig.currentContext) {
+      return config.kubeConfig.currentContext;
+    }
+
+    return '';
+  }
+);
+
 export const kubeConfigPathValidSelector = createSelector(
   (state: RootState) => state.config,
   config => {

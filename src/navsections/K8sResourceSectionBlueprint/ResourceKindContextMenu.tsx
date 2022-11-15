@@ -24,7 +24,6 @@ import {
   isInClusterModeSelector,
   knownResourceKindsSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
 } from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -42,7 +41,7 @@ import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
