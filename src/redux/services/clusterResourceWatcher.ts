@@ -49,7 +49,7 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
 
 const watchers: {[resourceKind: string]: any} = {};
 
-export const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
+const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
   try {
     watchers[kindHandler.kind].abort();
     watchers[kindHandler.kind] = undefined;
@@ -58,11 +58,7 @@ export const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) 
   }
 };
 
-export const disconnectFromCluster = () => {
-  Object.values(watchers).forEach(req => req.abort());
-};
-
-export const watchResource = async (
+const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
@@ -74,29 +70,19 @@ export const watchResource = async (
     {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
       if (type === 'ADDED') {
-        const [resource]: K8sResource[] = extractK8sResources(
-          jsonToYaml(apiObj),
-          PREVIEW_PREFIX + kubeConfig.currentContext
-        );
+        const resource: K8sResource = processResource(apiObj, kubeConfig);
         if (!previewResources[resource.id]) {
           dispatch(updateClusterResource(resource));
         }
+        return;
       }
 
       if (type === 'MODIFIED') {
-        const [resource]: K8sResource[] = extractK8sResources(
-          jsonToYaml(apiObj),
-          PREVIEW_PREFIX + kubeConfig.currentContext
-        );
-
-        dispatch(updateClusterResource(resource));
+        dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
+        return;
       }
       if (type === 'DELETED') {
-        const [resource]: K8sResource[] = extractK8sResources(
-          jsonToYaml(apiObj),
-          PREVIEW_PREFIX + kubeConfig.currentContext
-        );
-        dispatch(deleteClusterResource(resource));
+        dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
       }
     },
     (error: any) => {
@@ -108,6 +94,11 @@ export const watchResource = async (
   );
 };
 
+export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
+  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), PREVIEW_PREFIX + kubeConfig.currentContext);
+  return resource;
+};
+
 export const startWatchingResources = (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
@@ -116,4 +107,8 @@ export const startWatchingResources = (
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
     watchResource(dispatch, handler, kubeConfig, previewResources)
   );
+};
+
+export const disconnectFromCluster = () => {
+  Object.values(watchers).forEach(req => req.abort());
 };
