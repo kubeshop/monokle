@@ -411,3 +411,8 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
   display: block;
 }
+
+/*temporary*/
+.libes__A6-dev__sc-akj29i-8.gOklpn:last-child {
+  display: none;
+}
