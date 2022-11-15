@@ -1,10 +1,8 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {selectFile, selectImage, selectK8sResource, setSelectionHistory} from '@redux/reducers/main';
+import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '../models';
 
-import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '@monokle-desktop/shared/models';
-
-export const selectFromHistory = async (
+export const selectFromHistory = (
   direction: 'left' | 'right',
   currentSelectionHistoryIndex: number | undefined,
   selectionHistory: SelectionHistoryEntry[],
@@ -54,7 +52,11 @@ export const selectFromHistory = async (
     (direction === 'left' && !canNavigateLeft) ||
     (direction === 'right' && !canNavigateRight)
   ) {
-    dispatch(setSelectionHistory({newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex}));
+    dispatch({
+      type: 'main/setSelectionHistory',
+      payload: {newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex},
+    });
+
     return;
   }
 
@@ -75,20 +77,36 @@ export const selectFromHistory = async (
   }
 
   if (nextSelectionHistoryIndex === null) {
-    dispatch(setSelectionHistory({newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex}));
+    dispatch({
+      type: 'main/setSelectionHistory',
+      payload: {newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex},
+    });
+
     return;
   }
 
   const selectionHistoryEntry = newSelectionHistory[nextSelectionHistoryIndex];
   if (selectionHistoryEntry.type === 'resource') {
-    dispatch(selectK8sResource({resourceId: selectionHistoryEntry.selectedResourceId, isVirtualSelection: true}));
+    dispatch({
+      type: 'main/selectK8sResource',
+      payload: {resourceId: selectionHistoryEntry.selectedResourceId, isVirtualSelection: true},
+    });
   }
   if (selectionHistoryEntry.type === 'path') {
-    dispatch(selectFile({filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true}));
+    dispatch({
+      type: 'main/selectFile',
+      payload: {filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true},
+    });
   }
   if (selectionHistoryEntry.type === 'image') {
-    dispatch(selectImage({image: selectionHistoryEntry.selectedImage, isVirtualSelection: true}));
+    dispatch({
+      type: 'main/selectImage',
+      payload: {image: selectionHistoryEntry.selectedImage, isVirtualSelection: true},
+    });
   }
 
-  dispatch(setSelectionHistory({newSelectionHistory, nextSelectionHistoryIndex}));
+  dispatch({
+    type: 'main/setSelectionHistory',
+    payload: {newSelectionHistory, nextSelectionHistoryIndex},
+  });
 };

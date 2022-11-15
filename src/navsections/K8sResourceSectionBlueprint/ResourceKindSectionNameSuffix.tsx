@@ -6,16 +6,17 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

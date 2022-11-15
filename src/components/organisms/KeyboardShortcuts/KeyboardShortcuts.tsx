@@ -3,11 +3,10 @@ import {Modal, Typography} from 'antd';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeKeyboardShortcutsModal} from '@redux/reducers/ui';
 
-import {defineHotkey} from '@utils/defineHotkey';
-
 import Keyboard from '@assets/Keyboard.svg';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 
 import BoardKeys from './BoardKeys';
 import * as S from './KeyboardShortcuts.styled';

@@ -10,7 +10,7 @@ import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/reducers/appConfig';
-import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
+import {kubeConfigContextsSelector} from '@redux/selectors';
 
 import {FilePatternList} from '@atoms';
 
@@ -18,6 +18,7 @@ import {runCommandInMainThread} from '@utils/commands';
 
 import {AlertEnum, ClusterColors} from '@monokle-desktop/shared/models';
 import {BackgroundColors} from '@monokle-desktop/shared/styles/colors';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ClusterSelectionTable.styled';
 

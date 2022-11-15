@@ -14,7 +14,7 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -22,6 +22,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 import {ContextMenu} from '@atoms';
 
 import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;

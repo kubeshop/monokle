@@ -5,11 +5,10 @@ import asyncLib from 'async';
 import fs from 'fs';
 import log from 'loglevel';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
-
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
 import {
   AlertEnum,
   AlertType,

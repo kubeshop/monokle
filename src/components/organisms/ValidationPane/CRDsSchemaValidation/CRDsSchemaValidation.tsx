@@ -17,13 +17,13 @@ import {FileExplorer} from '@components/atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {saveCRD} from '@utils/crds';
-import {readFile} from '@utils/fileSystem';
 import {isValidUrl} from '@utils/urls';
 
 import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {AlertEnum, CRD_SCHEMA_INTEGRATION} from '@monokle-desktop/shared/models';
+import {readFile} from '@monokle-desktop/shared/utils/fileSystem';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import CRDItem from './CRDItem';

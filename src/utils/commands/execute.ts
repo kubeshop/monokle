@@ -7,22 +7,7 @@ import {ERROR_MSG_FALLBACK} from '@constants/constants';
 import {isDefined} from '@utils/filter';
 import {ensureRendererThread} from '@utils/thread';
 
-export type CommandOptions = {
-  commandId: string;
-  cmd: string;
-  args: string[];
-  env?: any;
-  input?: string;
-};
-
-export type CommandResult = {
-  commandId: string;
-  exitCode: null | number;
-  signal: null | string;
-  stderr?: string;
-  stdout?: string;
-  error?: string;
-};
+import {CommandOptions, CommandResult} from '@monokle-desktop/shared/models';
 
 export function runCommandInMainThread(options: CommandOptions): Promise<CommandResult> {
   ensureRendererThread();

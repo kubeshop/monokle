@@ -5,11 +5,13 @@ import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
-import type {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-
-import type {CommandOptions, CommandResult} from '@utils/commands';
-
-import type {InterpolateTemplateOptions} from '@monokle-desktop/shared/models';
+import type {
+  CommandOptions,
+  CommandResult,
+  FileExplorerOptions,
+  FileOptions,
+  InterpolateTemplateOptions,
+} from '@monokle-desktop/shared/models';
 import {NewVersionCode} from '@monokle-desktop/shared/models';
 
 import autoUpdater from './autoUpdater';

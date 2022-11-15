@@ -5,7 +5,7 @@ import log from 'loglevel';
 import path from 'path';
 import {parse} from 'yaml';
 
-import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
@@ -16,6 +16,7 @@ import {deleteResource, extractK8sResources, reprocessResources} from '@redux/se
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {RootState} from '@monokle-desktop/shared/models';
 
 export const updateFileEntry = createAsyncThunk(

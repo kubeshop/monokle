@@ -9,7 +9,8 @@ import * as path from 'path';
 import {Page} from 'playwright';
 import {ElectronApplication, _electron as electron} from 'playwright-core';
 
-import {StartupFlags} from '../src/utils/startupFlag';
+import {StartupFlags} from '@monokle-desktop/shared/models';
+
 import {closeModal, closeNotification, waitForModalToHide, waitForModalToShow} from './antdHelpers';
 import {getRecordingPath, pause} from './utils';
 

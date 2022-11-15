@@ -6,9 +6,6 @@ export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
 export const UNSAVED_PREFIX = 'unsaved://';
 export const YAML_DOCUMENT_DELIMITER = '---';
 export const YAML_DOCUMENT_DELIMITER_NEW_LINE = '---\n';
-export const ROOT_FILE_ENTRY = '<root>';
-export const APP_MIN_WIDTH = 800;
-export const APP_MIN_HEIGHT = 600;
 export const TOOLTIP_DELAY = 1.0;
 export const LONGER_TOOLTIP_DELAY = 2.0;
 export const TOOLTIP_K8S_SELECTION = 'Select which kubernetes schema version to use for validation';
@@ -20,24 +17,16 @@ export const KUSTOMIZATION_API_GROUP = 'kustomize.config.k8s.io';
 export const KUSTOMIZATION_API_VERSION = `${KUSTOMIZATION_API_GROUP}/v1beta1`;
 export const KUSTOMIZE_HELP_URL = 'https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/';
 export const HELM_CHART_HELP_URL = 'https://helm.sh/docs/topics/charts/';
-export const DEPENDENCIES_HELP_URL = 'https://kubeshop.github.io/monokle/getting-started/#install-dependencies';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const DEFAULT_PANE_TITLE_HEIGHT = 50;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
-export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
 export const DEFAULT_GIT_REPO_PLACEHOLDER = 'https://github.com/kubeshop/monokle/';
 export const TEMPLATES_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/templates.md';
 export const PLUGINS_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/plugins.md';
-export const DEFAULT_PLUGINS = [
-  {
-    owner: 'kubeshop',
-    name: 'monokle-default-templates-plugin',
-    url: DEFAULT_TEMPLATES_PLUGIN_URL,
-  },
-];
+
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
 export const CLUSTER_AVAILABLE_COLORS = [
@@ -69,7 +58,7 @@ export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
 export const HELM_CHART_SECTION_NAME = 'Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
-export const NEW_VERSION_CHECK_INTERVAL = 24 * 60 * 60 * 1000;
+
 export const GIT_ERROR_MODAL_DESCRIPTION = 'Check terminal for more information.';
 export const VALID_URL_REGEX =
   /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;

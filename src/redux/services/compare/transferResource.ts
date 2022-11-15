@@ -5,7 +5,7 @@ import {v4 as uuid} from 'uuid';
 
 import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
 
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
@@ -17,6 +17,7 @@ import {jsonToYaml} from '@utils/yaml';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AppDispatch, K8sResource, ResourceSet, RootState} from '@monokle-desktop/shared/models';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 type Type = ResourceSet['type'];
 

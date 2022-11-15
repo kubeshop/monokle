@@ -2,7 +2,6 @@ import React, {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -15,6 +14,7 @@ import {
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
 import * as S from './PaneManager.styled';

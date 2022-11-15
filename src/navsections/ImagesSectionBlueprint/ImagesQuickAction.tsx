@@ -1,8 +1,8 @@
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ImagesQuickAction.styled';
 

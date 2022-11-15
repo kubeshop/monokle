@@ -5,7 +5,7 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
@@ -33,6 +33,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {DIFF} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AlertType,

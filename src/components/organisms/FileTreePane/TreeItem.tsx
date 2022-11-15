@@ -8,21 +8,22 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
+import {LONGER_TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelector} from '@redux/selectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {ContextMenu, Dots, Spinner} from '@atoms';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {TreeItemProps} from './types';
 

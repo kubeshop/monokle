@@ -2,8 +2,8 @@ import {useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
 
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 import {ActivityBar} from '@monokle/components';
 
 import {activities, extraActivities} from './activities';

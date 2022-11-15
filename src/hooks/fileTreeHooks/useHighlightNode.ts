@@ -5,14 +5,14 @@ import {TreeNodeProps} from 'antd';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExpandedFolders} from '@redux/reducers/ui';
 
 import {TreeNode} from '@components/organisms/FileTreePane/types';
 
 import {uniqueArr} from '@utils/index';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 
 export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, expandedFolders: React.Key[]) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();

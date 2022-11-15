@@ -3,11 +3,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import fs from 'fs';
 import util from 'util';
 
-import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
 import {trackEvent} from '@utils/telemetry';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {ADD_NEW_RESOURCE} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, FileEntry, K8sResource, RootState} from '@monokle-desktop/shared/models';
 

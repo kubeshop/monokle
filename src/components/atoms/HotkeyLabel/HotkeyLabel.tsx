@@ -2,10 +2,9 @@ import {macOSKeyIcon} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {defineHotkey} from '@utils/defineHotkey';
-
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {Hotkey} from '@monokle-desktop/shared/models/hotkeys';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 
 import * as S from './HotkeyLabel.styled';
 

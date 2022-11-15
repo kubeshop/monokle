@@ -8,12 +8,12 @@ import {
   validatePluginPackageJson,
   validateTemplatePluginModule,
 } from '@monokle-desktop/shared/models';
+import {createFolder, doesPathExist} from '@monokle-desktop/shared/utils/fileSystem';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';
 import loadMultipleExtensions from '../extensions/loadMultipleExtensions';
 import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from '../utils';
-import {createFolder, doesPathExist} from '../utils/extensions';
 
 const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 

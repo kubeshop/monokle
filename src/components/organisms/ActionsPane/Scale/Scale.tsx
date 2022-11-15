@@ -7,16 +7,13 @@ import {ScaleTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
-import {
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigPathSelector, selectedResourceSelector} from '@redux/selectors';
 import {restartPreview} from '@redux/services/preview';
 import scaleDeployment from '@redux/services/scaleDeployment';
 
 import {SecondaryButton} from '@atoms';
+
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 type IProps = {
   isDropdownActive?: boolean;

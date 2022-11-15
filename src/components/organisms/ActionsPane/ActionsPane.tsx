@@ -23,7 +23,6 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {
   currentConfigSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
   kubeConfigPathSelector,
   settingsSelector,
 } from '@redux/selectors';
@@ -59,6 +58,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {HelmChart, HelmValuesFile, K8sResource} from '@monokle-desktop/shared/models';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';

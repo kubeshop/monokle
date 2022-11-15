@@ -1,4 +1,4 @@
-import {shellEnvSync} from '@utils/env';
+import {shellEnvSync} from '@monokle-desktop/shared/utils/env';
 
 export function fixPath() {
   if (process.platform === 'win32') {

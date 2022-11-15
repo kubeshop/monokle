@@ -9,8 +9,6 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import fs from 'fs';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors';
@@ -23,6 +21,7 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {
   FileEntry,

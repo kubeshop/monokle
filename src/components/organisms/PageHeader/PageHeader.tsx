@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {kubeConfigContextColorSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import store from '@redux/store';
 
@@ -29,6 +29,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {K8sResource} from '@monokle-desktop/shared/models';
+import {activeProjectSelector, isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';

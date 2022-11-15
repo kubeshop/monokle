@@ -5,12 +5,13 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import path from 'path';
 import {Entries} from 'type-fest';
 
-import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   HighlightItems,
   LayoutSizeType,

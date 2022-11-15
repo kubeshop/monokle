@@ -1,15 +1,12 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@redux/selectors';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-
-import {defineHotkey} from '@utils/defineHotkey';
-import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
-
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
 import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
+import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@monokle-desktop/shared/utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';

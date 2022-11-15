@@ -4,18 +4,19 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {ERROR_MSG_FALLBACK, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ERROR_MSG_FALLBACK} from '@constants/constants';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
+import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {trackEvent} from '@utils/telemetry';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {DO_KUSTOMIZE_PREVIEW} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch, CommandResult, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
 
 /**
  * Thunk to preview kustomizations

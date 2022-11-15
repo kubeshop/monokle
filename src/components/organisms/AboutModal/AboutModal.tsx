@@ -7,7 +7,6 @@ import semver from 'semver';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeAboutModal} from '@redux/reducers/ui';
-import {loadResource} from '@redux/services';
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
@@ -15,6 +14,7 @@ import {fetchAppVersion} from '@utils/appVersion';
 
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
 import packageJson from '@root/package.json';
 
 import * as S from './AboutModal.styled';

@@ -5,10 +5,8 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
-import {getSubfolders, readFiles} from '@utils/fileSystem';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -20,6 +18,8 @@ import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler'
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {getSubfolders, readFiles} from '@monokle-desktop/shared/utils/fileSystem';
+import {getStaticResourcePath} from '@monokle-desktop/shared/utils/resource';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';

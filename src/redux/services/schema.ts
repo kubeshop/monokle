@@ -3,7 +3,6 @@ import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
-import {loadResource} from '@redux/services';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -13,6 +12,7 @@ import {getFileStats} from '@utils/files';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {FileMapType, K8sResource} from '@monokle-desktop/shared/models';
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
 
 // @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));

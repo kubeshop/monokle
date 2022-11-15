@@ -10,13 +10,13 @@ import {ExclamationCircleOutlined, FileOutlined, FolderOutlined, ReloadOutlined}
 import log from 'loglevel';
 import path from 'path';
 
-import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {settingsSelector} from '@redux/selectors';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -36,6 +36,8 @@ import {
 } from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 import {TitleBar} from '@monokle/components';
 
 import {createNode} from './CreateNode';
