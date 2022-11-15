@@ -6,7 +6,7 @@ import {Icon as BaseIcon} from '@atoms';
 
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
-export const ResourceLink = styled(AntdCard)`
+export const ReferenceLink = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
   height: 100px;

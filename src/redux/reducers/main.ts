@@ -51,8 +51,8 @@ import {
   MatchParamProps,
   PreviewType,
   ProjectConfig,
+  ReferenceLink,
   ResourceFilterType,
-  ResourceLink,
   ResourceMapType,
   SelectionHistoryEntry,
   ThunkApi,
@@ -741,8 +741,8 @@ export const mainSlice = createSlice({
     updateFeature: (state: Draft<AppState>, action: PayloadAction<Feature | undefined>) => {
       state.feature = action.payload;
     },
-    updateResourceLink: (state: Draft<AppState>, action: PayloadAction<ResourceLink | undefined>) => {
-      state.resourceLink = action.payload;
+    updateReferenceLink: (state: Draft<AppState>, action: PayloadAction<ReferenceLink | undefined>) => {
+      state.referenceLink = action.payload;
     },
     updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let newSearchHistory: string[] = [...state.search.searchHistory];
@@ -1196,7 +1196,7 @@ export const {
   updateResourceFilter,
   updateValidationIntegration,
   updateFeature,
-  updateResourceLink,
+  updateReferenceLink,
   highlightFileMatches,
   updateSearchHistory,
   updateSearchQuery,

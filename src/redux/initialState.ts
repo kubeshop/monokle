@@ -57,7 +57,7 @@ const initialAppState: AppState = {
   imagesList: [],
   validationIntegration: undefined,
   feature: undefined,
-  resourceLink: undefined,
+  referenceLink: undefined,
   autosaving: {},
   search: {
     searchQuery: '',

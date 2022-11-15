@@ -6,7 +6,7 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sResource';
 import {Policy} from './policy';
-import {ResourceLink} from './resources';
+import {ReferenceLink} from './referenceLinks';
 
 export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
@@ -102,7 +102,7 @@ type AppState = {
   imagesList: ImagesListType;
   validationIntegration: ValidationIntegration | undefined;
   feature: Feature | undefined;
-  resourceLink: ResourceLink | undefined;
+  referenceLink: ReferenceLink | undefined;
   autosaving: {
     status?: boolean;
     error?: {

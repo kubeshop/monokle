@@ -15,7 +15,7 @@ export * from './hotkeys';
 export * from './icons';
 export * from './image';
 export * from './integrations';
-export * from './resources';
+export * from './referenceLinks';
 export * from './features';
 export * from './k8sResource';
 export * from './kustomize';

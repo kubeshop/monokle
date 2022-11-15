@@ -35,12 +35,12 @@ const GettingStartedOverview: React.FC = () => {
 
       <S.GettingStartedTitle>Helpful Resources</S.GettingStartedTitle>
       <S.GettingStartedResources>
-        <GettingStartedResource resourceLink={GUIDE} />
-        <GettingStartedResource resourceLink={TUTORIAL} />
-        <GettingStartedResource resourceLink={DOCUMENTATION} />
-        <GettingStartedResource resourceLink={DISCORD} />
-        <GettingStartedResource resourceLink={WHATSNEW} />
-        <GettingStartedResource resourceLink={FEEDBACK} />
+        <GettingStartedResource referenceLink={GUIDE} />
+        <GettingStartedResource referenceLink={TUTORIAL} />
+        <GettingStartedResource referenceLink={DOCUMENTATION} />
+        <GettingStartedResource referenceLink={DISCORD} />
+        <GettingStartedResource referenceLink={WHATSNEW} />
+        <GettingStartedResource referenceLink={FEEDBACK} />
       </S.GettingStartedResources>
     </S.GettingStartedOverviewContainer>
   );

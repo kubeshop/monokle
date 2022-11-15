@@ -15,7 +15,7 @@ export {default as IncomingRefs} from './IncomingRefs';
 export {default as OPAStatus} from './OPAStatus';
 export {default as OpenPolicyAgent} from './OpenPolicyAgent';
 export {default as OutgoingRefs} from './OutgoingRefs';
-export {default as ResourceLinks} from './ResourceLinks';
+export {default as ReferenceLinks} from './ReferenceLinks';
 export {default as SeverityHigh} from './SeverityHigh';
 export {default as SeverityLow} from './SeverityLow';
 export {default as SeverityMedium} from './SeverityMedium';
