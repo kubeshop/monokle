@@ -16,8 +16,6 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {trackEvent} from '@utils/telemetry';
-
 import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@monokle-desktop/shared/constants/telemetry';
 import {
   AnyTemplate,
@@ -27,6 +25,7 @@ import {
   isVanillaTemplate,
 } from '@monokle-desktop/shared/models';
 import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import * as S from './styled';
 

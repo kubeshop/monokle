@@ -14,11 +14,11 @@ import {knownResourceKindsSelector} from '@redux/selectors';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
-import {trackEvent} from '@utils/telemetry';
 
 import {QUICK_SEARCH} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, ResourceFilterType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import LabelMapper from './LabelMapper';
 

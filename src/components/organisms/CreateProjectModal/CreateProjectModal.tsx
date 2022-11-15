@@ -16,11 +16,11 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
-import {trackEvent} from '@utils/telemetry';
 
 import {CREATE_EMPTY_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
 import {AnyTemplate} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';

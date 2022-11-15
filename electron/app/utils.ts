@@ -12,13 +12,12 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
-import {getSegmentClient} from '@utils/segment';
-
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {APP_INSTALLED} from '@monokle-desktop/shared/constants/telemetry';
 import type {AnyExtension} from '@monokle-desktop/shared/models';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 import {loadResource} from '@monokle-desktop/shared/utils/resource';
+import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 

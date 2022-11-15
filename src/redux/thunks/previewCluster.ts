@@ -15,12 +15,12 @@ import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
-import {trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {CLUSTER_VIEW} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, ClusterAccess, K8sResource, RootState} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(

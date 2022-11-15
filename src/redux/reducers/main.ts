@@ -30,7 +30,6 @@ import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {isResourcePassingFilter} from '@utils/resources';
-import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
@@ -58,6 +57,7 @@ import {
   ValidationIntegration,
 } from '@monokle-desktop/shared/models';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

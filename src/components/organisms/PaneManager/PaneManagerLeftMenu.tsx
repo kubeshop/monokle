@@ -21,13 +21,13 @@ import {kustomizationsSelector} from '@redux/selectors';
 import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
-import {trackEvent} from '@utils/telemetry';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
