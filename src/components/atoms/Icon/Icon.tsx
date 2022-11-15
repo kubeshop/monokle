@@ -8,7 +8,7 @@ import AntdIcon, {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 
-import {IconNames} from '@monokle-desktop/shared/models';
+import {IconNames} from '@monokle-desktop/shared';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import {

@@ -11,7 +11,7 @@ import {isBoolean} from 'lodash';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {ClusterColors, PreviewType} from '@monokle-desktop/shared/models';
+import {ClusterColors, PreviewType} from '@monokle-desktop/shared';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {Device} from '@monokle-desktop/shared/styles/device';
 

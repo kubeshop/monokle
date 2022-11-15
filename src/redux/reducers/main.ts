@@ -741,7 +741,7 @@ export const mainSlice = createSlice({
     updateFeature: (state: Draft<AppState>, action: PayloadAction<Feature | undefined>) => {
       state.feature = action.payload;
     },
-    updateResources: (state: Draft<AppState>, action: PayloadAction<ResourceLink | undefined>) => {
+    updateResourceLink: (state: Draft<AppState>, action: PayloadAction<ResourceLink | undefined>) => {
       state.resourceLink = action.payload;
     },
     updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
@@ -1196,7 +1196,7 @@ export const {
   updateResourceFilter,
   updateValidationIntegration,
   updateFeature,
-  updateResources,
+  updateResourceLink,
   highlightFileMatches,
   updateSearchHistory,
   updateSearchQuery,

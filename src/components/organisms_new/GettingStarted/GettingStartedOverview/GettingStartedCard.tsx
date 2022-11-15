@@ -2,12 +2,12 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {Feature} from '@models/features';
-
 import {useAppDispatch} from '@redux/hooks';
 import {updateFeature} from '@redux/reducers/main';
 
 import {trackEvent} from '@utils/telemetry';
+
+import {Feature} from '@monokle-desktop/shared/models';
 
 import * as S from './GettingStartedCard.styled';
 
@@ -19,7 +19,6 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
   const {id, icon, name, description, learnMoreUrl, callToAction} = feature;
 
   const dispatch = useAppDispatch();
-
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const onCTAHandler = () => {

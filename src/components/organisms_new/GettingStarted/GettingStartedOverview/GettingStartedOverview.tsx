@@ -1,11 +1,21 @@
 import React from 'react';
 
-import {EDIT, EXPLORE, PUBLISH, VALIDATE} from '@models/features';
-import {DISCORD, DOCUMENTATION, FEEDBACK, GUIDE, TUTORIAL, WHATSNEW} from '@models/resources';
+import {
+  DISCORD,
+  DOCUMENTATION,
+  EDIT,
+  EXPLORE,
+  FEEDBACK,
+  GUIDE,
+  PUBLISH,
+  TUTORIAL,
+  VALIDATE,
+  WHATSNEW,
+} from '@monokle-desktop/shared/models';
 
 import GettingStartedCard from './GettingStartedCard';
 import * as S from './GettingStartedOverview.styled';
-import GettingStartedResouce from './GettingStartedResource';
+import GettingStartedResource from './GettingStartedResource';
 
 const GettingStartedOverview: React.FC = () => {
   return (
@@ -25,12 +35,12 @@ const GettingStartedOverview: React.FC = () => {
 
       <S.GettingStartedTitle>Helpful Resources</S.GettingStartedTitle>
       <S.GettingStartedResources>
-        <GettingStartedResouce resourceLink={GUIDE} />
-        <GettingStartedResouce resourceLink={TUTORIAL} />
-        <GettingStartedResouce resourceLink={DOCUMENTATION} />
-        <GettingStartedResouce resourceLink={DISCORD} />
-        <GettingStartedResouce resourceLink={WHATSNEW} />
-        <GettingStartedResouce resourceLink={FEEDBACK} />
+        <GettingStartedResource resourceLink={GUIDE} />
+        <GettingStartedResource resourceLink={TUTORIAL} />
+        <GettingStartedResource resourceLink={DOCUMENTATION} />
+        <GettingStartedResource resourceLink={DISCORD} />
+        <GettingStartedResource resourceLink={WHATSNEW} />
+        <GettingStartedResource resourceLink={FEEDBACK} />
       </S.GettingStartedResources>
     </S.GettingStartedOverviewContainer>
   );

@@ -2,7 +2,7 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {ResourceLink} from '@models/resources';
+import {ResourceLink} from '@monokle-desktop/shared/models';
 
 import * as S from './GettingStartedResource.styled';
 

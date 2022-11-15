@@ -1,8 +1,8 @@
 import {IconNames} from './icons';
 
-export type FeatureId = 'explore' | 'edit' | 'validate' | 'publish';
+type FeatureId = 'explore' | 'edit' | 'validate' | 'publish';
 
-export type Feature = {
+type Feature = {
   id: FeatureId;
   icon: IconNames;
   name: string;
@@ -46,3 +46,5 @@ export const PUBLISH: Feature = {
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
   callToAction: 'Publish & Git',
 };
+
+export type {Feature, FeatureId};

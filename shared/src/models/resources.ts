@@ -1,6 +1,6 @@
-export type ResourceLinkId = 'guide' | 'tutorial' | 'documentation' | 'discord' | 'whatsnew' | 'feedback';
+type ResourceLinkId = 'guide' | 'tutorial' | 'documentation' | 'discord' | 'whatsnew' | 'feedback';
 
-export type ResourceLink = {
+type ResourceLink = {
   id: ResourceLinkId;
   name: string;
   description: string;
@@ -50,3 +50,5 @@ export const FEEDBACK: ResourceLink = {
   description: 'Share your thoughts',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
 };
+
+export type {ResourceLink, ResourceLinkId};
