@@ -27,7 +27,6 @@ import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {applyResource} from '@redux/thunks/applyResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
@@ -40,6 +39,7 @@ import {useFeatureFlags} from '@utils/features';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
 import {
   isInPreviewModeSelector,
   kubeConfigContextSelector,
