@@ -15,6 +15,7 @@ import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
@@ -112,6 +113,9 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       }
     }
     trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
+
+    startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);
+
     return previewResult;
   } catch (e: any) {
     log.error(e);

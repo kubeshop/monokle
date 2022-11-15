@@ -777,6 +777,12 @@ export const mainSlice = createSlice({
       electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
       state.search.searchHistory = [...newSearchHistory, action.payload];
     },
+    updateClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      state.resourceMap[action.payload.id] = action.payload;
+    },
+    deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      delete state.resourceMap[action.payload.id];
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1405,6 +1411,8 @@ export const {
   updateSearchQuery,
   updateReplaceQuery,
   setLastChangedLine,
+  updateClusterResource,
+  deleteClusterResource,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
