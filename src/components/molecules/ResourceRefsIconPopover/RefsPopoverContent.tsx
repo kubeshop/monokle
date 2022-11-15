@@ -7,10 +7,10 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {trackEvent} from '@utils/telemetry';
 
 import {FOLLOW_LINK} from '@monokle-desktop/shared/constants/telemetry';
 import {K8sResource, MonacoRange, ResourceMapType, ResourceRef, ResourceRefType} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';

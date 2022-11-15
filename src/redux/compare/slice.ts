@@ -3,8 +3,6 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
-import {trackEvent} from '@utils/telemetry';
-
 import {
   CompareFilter,
   CompareOperation,
@@ -16,6 +14,7 @@ import {
   PartialResourceSet,
   ResourceComparison,
 } from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import {initialState} from './initialState';
 import {selectIsAllComparisonSelected} from './selectors';

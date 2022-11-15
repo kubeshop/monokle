@@ -6,9 +6,9 @@ import {v4 as uuid} from 'uuid';
 
 import {ClusterAccess, CommandOptions, CommandResult, KubePermissions} from '@monokle-desktop/shared/models';
 import {getMainProcessEnv} from '@monokle-desktop/shared/utils/env';
+import {isRendererThread} from '@monokle-desktop/shared/utils/thread';
 
 import {runCommandInMainThread} from './commands/execute';
-import {isRendererThread} from './thread';
 
 export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();

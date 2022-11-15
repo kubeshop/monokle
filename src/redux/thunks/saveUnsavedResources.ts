@@ -6,11 +6,11 @@ import util from 'util';
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
-import {trackEvent} from '@utils/telemetry';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {ADD_NEW_RESOURCE} from '@monokle-desktop/shared/constants/telemetry';
 import {AppDispatch, FileEntry, K8sResource, RootState} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 

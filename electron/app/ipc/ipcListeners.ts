@@ -6,10 +6,6 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-// TODO: create telemetry just for electron
-import {getSegmentClient} from '@utils/segment';
-import {trackEvent} from '@utils/telemetry';
-
 import {
   DOWNLOAD_PLUGIN,
   DOWNLOAD_PLUGIN_RESULT,
@@ -34,6 +30,8 @@ import {
   TemplatePack,
   UpdateExtensionsResult,
 } from '@monokle-desktop/shared/models';
+import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {

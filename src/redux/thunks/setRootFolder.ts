@@ -12,7 +12,6 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {trackEvent} from '@utils/telemetry';
 
 import {OPEN_EXISTING_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
 import {
@@ -26,6 +25,7 @@ import {
   ResourceMapType,
   RootState,
 } from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Thunk to set the specified root folder
