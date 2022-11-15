@@ -57,7 +57,7 @@ type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type NewLeftMenuSelectionType =
+type NewLeftMenuSelectionType =
   | 'explorer'
   | 'compare'
   | 'validation'
