@@ -4,6 +4,7 @@ import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constant
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {ActionsPane, NavigatorPane} from '@organisms';
 
@@ -33,6 +34,7 @@ const PaneManagerSplitView: React.FC = () => {
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
   const {width} = useMainPaneDimensions();
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const handleResize = useCallback(
     (elements: any) => {
@@ -47,6 +49,10 @@ const PaneManagerSplitView: React.FC = () => {
     },
     [dispatch, layout]
   );
+
+  if (!isInClusterMode && leftActiveMenu === 'dashboard') {
+    return <p>Open Cluster Mode</p>;
+  }
 
   return (
     <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>

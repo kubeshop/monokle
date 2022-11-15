@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import _ from 'lodash';
 
+import {K8sResource} from '@models/k8sresource';
+
 import {cpuParser, memoryParser} from '@utils/unit-converter';
 
 export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: string): Promise<ClusterEvent[]> => {
@@ -40,22 +42,13 @@ export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: 
 
 export const getClusterInformation = async (
   k8sApiClient: k8s.CoreV1Api,
-  storageApiClient: k8s.StorageV1Api,
-  namespace?: string
+  pods: K8sResource[],
+  storageClasses: K8sResource[],
+  persistentVolumeClaims: K8sResource[]
 ): Promise<ClusterInformation> => {
-  const responses = await Promise.all([
-    k8sApiClient.listNode(),
-    namespace ? k8sApiClient.listNamespacedPod(namespace) : k8sApiClient.listPodForAllNamespaces(),
-    storageApiClient.listStorageClass(),
-    namespace
-      ? k8sApiClient.listNamespacedPersistentVolumeClaim(namespace)
-      : k8sApiClient.listPersistentVolumeClaimForAllNamespaces(),
-  ]);
+  const responses = await Promise.all([k8sApiClient.listNode()]);
 
   const nodes: k8s.V1Node[] = responses[0].body.items;
-  const pods: k8s.V1Pod[] = responses[1].body.items;
-  const storageClasses: k8s.V1StorageClass[] = responses[2].body.items;
-  const persistentVolumeClaims: k8s.V1PersistentVolumeClaim[] = responses[3].body.items;
 
   return {
     clusterApiAddress: k8sApiClient.basePath,
