@@ -5,9 +5,8 @@ import React, {useCallback} from 'react';
 import {useAppDispatch} from '@redux/hooks';
 import {updateFeature} from '@redux/reducers/main';
 
-import {trackEvent} from '@utils/telemetry';
-
 import {Feature} from '@monokle-desktop/shared/models';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import * as S from './GettingStartedCard.styled';
 
