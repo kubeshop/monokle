@@ -7,7 +7,7 @@ import {DownOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {startPreview} from '@redux/services/preview';
 
-import {SavedCommand} from '@monokle-desktop/shared/models';
+import {SavedCommand} from '@monokle-desktop/shared/models/config';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import CommandLabel from './CommandLabel';

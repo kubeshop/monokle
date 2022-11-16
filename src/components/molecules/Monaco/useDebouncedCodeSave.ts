@@ -9,7 +9,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {ResourceMapType} from '@monokle-desktop/shared/models';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,

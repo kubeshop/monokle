@@ -40,7 +40,7 @@ import {useFocus} from '@utils/hooks';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@monokle-desktop/shared/constants/k8s';
-import {ProjectConfig} from '@monokle-desktop/shared/models';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
 
 import * as S from './Settings.styled';
 

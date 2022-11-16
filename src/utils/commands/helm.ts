@@ -1,6 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-import {CommandOptions, HelmEnv, HelmInstallArgs, HelmTemplateArgs} from '@monokle-desktop/shared/models';
+import {CommandOptions, HelmEnv, HelmInstallArgs, HelmTemplateArgs} from '@monokle-desktop/shared/models/commands';
 
 export function createHelmInstallCommand(
   {kubeContext, values, name, chart}: HelmInstallArgs,

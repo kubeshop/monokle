@@ -15,7 +15,9 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {isDefined} from '@utils/filter';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {ItemCustomComponentProps, ResourceSet, RootState} from '@monokle-desktop/shared/models';
+import {ResourceSet} from '@monokle-desktop/shared/models/compare';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 
 import * as S from './HelmChartQuickAction.styled';

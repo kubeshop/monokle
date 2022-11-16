@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon} from '@atoms';
 
-import {IconNames} from '@monokle-desktop/shared/models';
+import {IconNames} from '@monokle-desktop/shared/models/icons';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const MenuIcon = (props: {

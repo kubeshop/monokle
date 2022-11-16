@@ -3,7 +3,7 @@ import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSe
 
 import {parseAllYamlDocuments} from '@utils/yaml';
 
-import {KubernetesObject} from '@monokle-desktop/shared/models';
+import {KubernetesObject} from '@monokle-desktop/shared/models/appState';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
   const templateNode = findValueNode(templateDoc, path);

@@ -9,7 +9,7 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {AlertEnum} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 type IProps = {
   visible: boolean;

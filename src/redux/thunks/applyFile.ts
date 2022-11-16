@@ -9,7 +9,9 @@ import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {errorAlert} from '@utils/alert';
 
 import {APPLY_FILE} from '@monokle-desktop/shared/constants/telemetry';
-import {AlertEnum, AlertType, AppDispatch, FileMapType} from '@monokle-desktop/shared/models';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**

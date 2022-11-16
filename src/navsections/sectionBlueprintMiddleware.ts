@@ -8,14 +8,14 @@ import {Middleware} from 'redux';
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import {setPaneConfiguration, toggleLeftMenu, toggleResourceFilters} from '@redux/reducers/ui';
 
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
 import {
-  AppDispatch,
   ItemInstance,
   NavigatorInstanceState,
-  RootState,
   SectionBlueprint,
   SectionInstance,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/navigator';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 

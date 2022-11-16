@@ -5,7 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',

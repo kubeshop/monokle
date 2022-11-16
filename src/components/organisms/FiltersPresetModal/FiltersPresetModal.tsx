@@ -7,7 +7,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {deleteFilterPreset, loadFilterPreset, saveFilterPreset} from '@redux/reducers/main';
 import {closeFiltersPresetModal} from '@redux/reducers/ui';
 
-import {AlertEnum} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 import * as S from './FiltersPresetModal.styled';
 

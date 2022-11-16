@@ -4,14 +4,14 @@ import {v4 as uuid} from 'uuid';
 
 import {setAlert} from '@redux/reducers/alert';
 
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 import {
-  AlertEnum,
   BasicPolicy,
   POLICY_VALIDATOR_MAP,
   Policy,
   PolicyConfig,
   ValidatorId,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/policy';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 import {loadBinaryResource} from '@monokle-desktop/shared/utils/resource';
 import {loadPolicy} from '@open-policy-agent/opa-wasm';

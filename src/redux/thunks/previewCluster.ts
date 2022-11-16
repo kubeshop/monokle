@@ -19,7 +19,10 @@ import {createKubeClient} from '@utils/kubeclient';
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {CLUSTER_VIEW} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch, ClusterAccess, K8sResource, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ClusterAccess} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {

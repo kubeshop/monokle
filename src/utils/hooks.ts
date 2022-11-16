@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {Size} from '@monokle-desktop/shared/models';
+import {Size} from '@monokle-desktop/shared/models/window';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);

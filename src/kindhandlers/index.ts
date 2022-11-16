@@ -17,7 +17,8 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {K8sResource, RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 import {getSubfolders, readFiles} from '@monokle-desktop/shared/utils/fileSystem';
 import {getStaticResourcePath} from '@monokle-desktop/shared/utils/resource';
 

@@ -9,7 +9,9 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 
 import {runCommandInMainThread} from '@utils/commands';
 
-import {AppDispatch, CommandOptions, K8sResource} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
 const fsReadFilePromise = promisify(fs.readFile);

@@ -4,7 +4,7 @@ import {
   optionalExplicitNamespaceMatcher,
 } from '@src/kindhandlers/common/customMatchers';
 
-import {RefMapper} from '@monokle-desktop/shared/models';
+import {RefMapper} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 export const ConfigMapTarget = {
   target: {

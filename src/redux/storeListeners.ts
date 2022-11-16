@@ -3,7 +3,8 @@ import {registerSectionBlueprint, removeSectionBlueprint} from '@redux/reducers/
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
-import {ResourceKindHandler, SectionBlueprint} from '@monokle-desktop/shared/models';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 import {addKindHandler, addMultipleKindHandlers} from './reducers/main';
 import store from './store';

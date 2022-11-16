@@ -8,7 +8,7 @@ import {
   OPA_INTEGRATION,
   RESOURCE_LINKS_INTEGRATION,
   YAML_SYNTAX_INTEGRATION,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/integrations';
 
 import ValidationCard from './ValidationCard';
 import ValidationCardUpNext from './ValidationCardUpNext';

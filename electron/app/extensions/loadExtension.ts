@@ -1,7 +1,7 @@
 import log from 'loglevel';
 import path from 'path';
 
-import type {AnyExtension} from '@monokle-desktop/shared/models';
+import type {AnyExtension} from '@monokle-desktop/shared/models/extension';
 import {doesPathExist, readFile} from '@monokle-desktop/shared/utils/fileSystem';
 
 import {LoadExtensionOptions} from './types';

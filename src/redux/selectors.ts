@@ -11,16 +11,12 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {
-  AppConfig,
-  AppState,
-  HelmPreviewConfiguration,
-  HelmValuesFile,
-  K8sResource,
-  ProjectConfig,
-  ResourceKindHandler,
-  RootState,
-} from '@monokle-desktop/shared/models';
+import {AppState} from '@monokle-desktop/shared/models/appState';
+import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

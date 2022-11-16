@@ -17,15 +17,11 @@ import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/
 import {errorAlert, successAlert} from '@utils/alert';
 
 import {APPLY} from '@monokle-desktop/shared/constants/telemetry';
-import {
-  AlertEnum,
-  AlertType,
-  AppDispatch,
-  FileMapType,
-  K8sResource,
-  ProjectConfig,
-  ResourceMapType,
-} from '@monokle-desktop/shared/models';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**

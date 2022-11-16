@@ -27,10 +27,10 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
 import {
   AppConfig,
   ClusterAccess,
-  ClusterColors,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -39,8 +39,8 @@ import {
   Settings,
   TextSizes,
   Themes,
-  UiState,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/config';
+import {UiState} from '@monokle-desktop/shared/models/ui';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import initialState from '../initialState';

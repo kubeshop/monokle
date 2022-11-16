@@ -5,7 +5,8 @@ import path from 'path';
 
 import {setAlert} from '@redux/reducers/alert';
 
-import {AlertEnum, AppDispatch} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
 
 export function doesPathExist(absolutePath: string) {
   try {
