@@ -728,7 +728,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         const content = doc.toJS();
 
         if (content && content.apiVersion && content.kind) {
-          const text = fileContent.slice(doc.range[0], doc.range[1]);
+          const startRange = doc.commentBefore ? doc.range[0] - doc.commentBefore.length : doc.range[0];
+          const text = fileContent.slice(startRange, doc.range[1]);
 
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, content.kind),
