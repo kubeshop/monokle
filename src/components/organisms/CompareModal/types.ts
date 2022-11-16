@@ -18,4 +18,5 @@ export type ComparisonItemProps = {
   rightActive: boolean;
   rightTransferable: boolean;
   canDiff: boolean;
+  kind: string;
 };

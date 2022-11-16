@@ -212,6 +212,7 @@ export const selectComparisonListItems = createSelector(
             leftTransferable: leftTransferable && comparison.isDifferent,
             rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
+            kind,
           });
         } else {
           result.push({
@@ -226,6 +227,7 @@ export const selectComparisonListItems = createSelector(
             leftTransferable: leftTransferable && isDefined(comparison.left),
             rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
+            kind,
           });
         }
       });

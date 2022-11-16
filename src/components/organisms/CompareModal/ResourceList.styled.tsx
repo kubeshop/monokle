@@ -50,6 +50,12 @@ export const ResourceNamespace = styled(Tag)`
   white-space: nowrap;
 `;
 
+export const ResourceNamespacePlaceholder = styled.div`
+  height: 22px;
+  width: 72px;
+  margin-right: 8px;
+`;
+
 export const ResourceName = styled.span<{$isActive?: boolean}>`
   font-size: 14px;
   font-weight: 400;

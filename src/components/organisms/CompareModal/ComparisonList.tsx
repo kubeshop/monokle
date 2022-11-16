@@ -55,6 +55,7 @@ function ComparisonItem({
   id,
   namespace,
   name,
+  kind,
   leftActive,
   rightActive,
   leftTransferable,
@@ -87,8 +88,10 @@ function ComparisonItem({
       <Col span={10}>
         <S.ResourceDiv>
           <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
-          {(leftNamespace || namespace) && (
+          {leftNamespace || namespace ? (
             <S.ResourceNamespace $isActive={leftActive}>{leftNamespace || namespace}</S.ResourceNamespace>
+          ) : (
+            kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
           )}
           <S.ResourceName $isActive={leftActive} onClick={leftActive ? () => handleInspect('left') : undefined}>
             {name}
@@ -118,8 +121,10 @@ function ComparisonItem({
 
       <Col span={10}>
         <S.ResourceDiv>
-          {(rightNamespace || namespace) && (
+          {rightNamespace || namespace ? (
             <S.ResourceNamespace $isActive={rightActive}>{rightNamespace || namespace}</S.ResourceNamespace>
+          ) : (
+            kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
           )}
           <S.ResourceName $isActive={rightActive} onClick={rightActive ? () => handleInspect('right') : undefined}>
             {name}
