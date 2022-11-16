@@ -728,8 +728,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         const content = doc.toJS();
 
         if (content && content.apiVersion && content.kind) {
-          const startRange = doc.commentBefore ? doc.range[0] - doc.commentBefore.length : doc.range[0];
-          const text = fileContent.slice(startRange, doc.range[1]);
+          const text = fileContent.slice(doc.range[0], doc.range[1]);
 
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, content.kind),
@@ -771,7 +770,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           } else {
             // for multi-resource files we just save the range - the parsedDoc and lineCounter will
             // be created on demand (since they are incorrect in this context)
-            resource.range = {start: startRange, length: doc.range[1] - doc.range[0]};
+            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
           }
 
           // set the namespace if available
