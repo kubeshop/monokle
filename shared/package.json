@@ -38,7 +38,7 @@
   },
   "exports": {
     "./constants/*": "./build/constants/*.js",
-    "./models": "./build/models/index.js",
+    "./models/*": "./build/models/*.js",
     "./styles/*": "./build/styles/*.js",
     "./utils/*": "./build/utils/*.js"
   }

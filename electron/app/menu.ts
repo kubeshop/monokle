@@ -2,7 +2,8 @@ import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {NewVersionCode, Project, RootState} from '@monokle-desktop/shared/models';
+import {NewVersionCode, Project} from '@monokle-desktop/shared/models/config';
+import type {RootState} from '@monokle-desktop/shared/models/rootState';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
 import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';

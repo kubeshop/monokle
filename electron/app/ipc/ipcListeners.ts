@@ -17,19 +17,18 @@ import {
   UPDATE_EXTENSIONS_RESULT,
 } from '@monokle-desktop/shared/constants/ipcEvents';
 import {UPDATE_APPLICATION} from '@monokle-desktop/shared/constants/telemetry';
-import type {CommandOptions, FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models';
+import type {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {NewVersionCode} from '@monokle-desktop/shared/models/config';
 import {
   AnyExtension,
-  AnyPlugin,
-  AnyTemplate,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
-  InterpolateTemplateOptions,
-  NewVersionCode,
-  TemplatePack,
   UpdateExtensionsResult,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/extension';
+import type {FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models/fileExplorer';
+import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
+import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared/models/template';
 import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 

@@ -14,7 +14,7 @@ import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {APP_INSTALLED} from '@monokle-desktop/shared/constants/telemetry';
-import type {AnyExtension} from '@monokle-desktop/shared/models';
+import type {AnyExtension} from '@monokle-desktop/shared/models/extension';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 import {loadResource} from '@monokle-desktop/shared/utils/resource';
 import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';

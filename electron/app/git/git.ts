@@ -2,7 +2,8 @@ import {existsSync, promises as fs} from 'fs';
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
-import type {FileMapType, GitRepo} from '@monokle-desktop/shared/models';
+import type {FileMapType} from '@monokle-desktop/shared/models/appState';
+import type {GitRepo} from '@monokle-desktop/shared/models/git';
 
 import {formatGitChangedFiles} from '../utils/git';
 
