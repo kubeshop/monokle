@@ -44,19 +44,40 @@ function compareResourcesAsUnion(
   const result: ResourceComparison[] = [];
 
   for (const [id, leftResource] of leftMap.entries()) {
-    const matchingRightResource = rightMap.get(id);
+    const namespaceMatchingRightResource = rightMap.get(id);
 
-    if (matchingRightResource) {
+    const otherMatchingRightResources = [...rightMap.entries()]
+      .filter(
+        ([matchingResourceId, resource]) =>
+          id !== matchingResourceId &&
+          resource.kind !== 'Namespace' &&
+          resource.name === leftResource.name &&
+          resource.kind === leftResource.kind &&
+          resource.version === leftResource.version
+      )
+      .map(entry => entry[1]);
+
+    for (const matchingResource of otherMatchingRightResources) {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
         isMatch: true,
-        isDifferent: leftResource.text !== matchingRightResource.text,
+        isDifferent: leftResource.text !== matchingResource.text,
         left: leftResource,
-        right: matchingRightResource,
+        right: matchingResource,
+      });
+    }
+
+    if (namespaceMatchingRightResource) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== namespaceMatchingRightResource.text,
+        left: leftResource,
+        right: namespaceMatchingRightResource,
       });
     } else {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
         isMatch: false,
         left: leftResource,
         right: undefined,
@@ -65,14 +86,14 @@ function compareResourcesAsUnion(
   }
 
   for (const [id, rightResource] of rightMap.entries()) {
-    const matchingLeftResource = leftMap.get(id);
+    const namespaceMatchingLeftResource = leftMap.get(id);
 
-    if (matchingLeftResource) {
+    if (namespaceMatchingLeftResource) {
       // eslint-disable-next-line no-continue
       continue; // already had these in previous loop.
     } else {
       result.push({
-        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        id: createStableComparisonIdentifier(namespaceMatchingLeftResource, rightResource),
         isMatch: false,
         left: undefined,
         right: rightResource,
