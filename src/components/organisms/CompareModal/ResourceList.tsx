@@ -67,7 +67,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
-        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace ?? 'default' : undefined});
+        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace : undefined});
       }
     }
 

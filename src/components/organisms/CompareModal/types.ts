@@ -9,7 +9,9 @@ export type HeaderItemProps = {
 export type ComparisonItemProps = {
   type: 'comparison';
   id: string;
-  namespace: string | undefined;
+  leftNamespace?: string | undefined;
+  rightNamespace?: string | undefined;
+  namespace?: string | undefined;
   name: string;
   leftActive: boolean;
   leftTransferable: boolean;
