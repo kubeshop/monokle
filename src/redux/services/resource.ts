@@ -771,7 +771,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           } else {
             // for multi-resource files we just save the range - the parsedDoc and lineCounter will
             // be created on demand (since they are incorrect in this context)
-            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
+            resource.range = {start: startRange, length: doc.range[1] - doc.range[0]};
           }
 
           // set the namespace if available
