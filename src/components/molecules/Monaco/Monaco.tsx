@@ -5,7 +5,9 @@ import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
+// eslint-disable-next-line import/no-duplicates
 import 'monaco-editor';
+// eslint-disable-next-line import/no-duplicates
 import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
