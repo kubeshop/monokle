@@ -15,7 +15,10 @@ import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {DO_KUSTOMIZE_PREVIEW} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch, CommandResult, ProjectConfig, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {CommandResult} from '@monokle-desktop/shared/models/commands';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**

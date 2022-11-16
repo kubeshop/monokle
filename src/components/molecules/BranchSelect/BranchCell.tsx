@@ -6,7 +6,7 @@ import {CopyButton} from '@components/atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {GitBranch} from '@monokle-desktop/shared/models';
+import {GitBranch} from '@monokle-desktop/shared/models/git';
 
 import * as S from './BranchCell.styled';
 

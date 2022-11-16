@@ -2,7 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {GitBranchCommit, GitChangedFile, GitRepo, GitSliceState} from '@monokle-desktop/shared/models';
+import {GitBranchCommit, GitChangedFile, GitRepo, GitSliceState} from '@monokle-desktop/shared/models/git';
 
 import {gitInitialState} from './git.initialState';
 

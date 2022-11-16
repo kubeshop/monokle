@@ -1,4 +1,4 @@
-import {CompareSide} from '@monokle-desktop/shared/models';
+import {CompareSide} from '@monokle-desktop/shared/models/compare';
 
 import GitBranchSelect from './GitBranchSelect';
 import GitCommitSelect from './GitCommitSelect';

@@ -4,7 +4,8 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 const ClusterRoleBindingHandler: ResourceKindHandler = {
   kind: 'ClusterRoleBinding',

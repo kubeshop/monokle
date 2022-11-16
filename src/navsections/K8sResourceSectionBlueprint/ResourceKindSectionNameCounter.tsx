@@ -6,7 +6,7 @@ import {filteredResourceMapSelector} from '@redux/selectors';
 import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
-import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
+import {SectionCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 
 import * as S from './ResourceKindSectionNameCounter.styled';
 

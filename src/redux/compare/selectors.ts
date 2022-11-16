@@ -15,10 +15,10 @@ import {
   ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
-  RootState,
-  SavedCommand,
   TransferDirection,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/compare';
+import {SavedCommand} from '@monokle-desktop/shared/models/config';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;

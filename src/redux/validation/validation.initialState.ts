@@ -1,4 +1,4 @@
-import {ValidationSliceState} from '@monokle-desktop/shared/models';
+import {ValidationSliceState} from '@monokle-desktop/shared/models/validation';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 export const validationInitialState: ValidationSliceState = {

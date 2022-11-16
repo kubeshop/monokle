@@ -8,7 +8,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 
-import {AlertEnum, SavedCommand} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {SavedCommand} from '@monokle-desktop/shared/models/config';
 
 import * as S from './CommandLabel.styled';
 

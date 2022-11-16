@@ -3,7 +3,7 @@ import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ResourceRefsIconPopover, ValidationErrorsPopover} from '@molecules';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

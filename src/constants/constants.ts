@@ -1,4 +1,4 @@
-import {PaneConfiguration} from '@monokle-desktop/shared/models';
+import {PaneConfiguration} from '@monokle-desktop/shared/models/ui';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const PREVIEW_PREFIX = 'preview://';

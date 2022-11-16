@@ -1,4 +1,4 @@
-import {GitSliceState} from '@monokle-desktop/shared/models';
+import {GitSliceState} from '@monokle-desktop/shared/models/git';
 
 export const gitInitialState: GitSliceState = {
   changedFiles: [],

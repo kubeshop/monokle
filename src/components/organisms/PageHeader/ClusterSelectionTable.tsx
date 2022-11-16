@@ -16,7 +16,8 @@ import {FilePatternList} from '@atoms';
 
 import {runCommandInMainThread} from '@utils/commands';
 
-import {AlertEnum, ClusterColors} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
 import {BackgroundColors} from '@monokle-desktop/shared/styles/colors';
 import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 

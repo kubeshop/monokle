@@ -6,7 +6,8 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
-import {K8sResource, ResourceFilterType, ResourceRefType} from '@monokle-desktop/shared/models';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (

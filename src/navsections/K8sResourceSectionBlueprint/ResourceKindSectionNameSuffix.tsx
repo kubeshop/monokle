@@ -14,7 +14,8 @@ import {openNewResourceWizard} from '@redux/reducers/ui';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {NewResourceWizardInput, SectionCustomComponentProps} from '@monokle-desktop/shared/models';
+import {SectionCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

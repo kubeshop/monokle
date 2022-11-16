@@ -8,7 +8,7 @@ import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {ResourceSet} from '@monokle-desktop/shared/models';
+import {ResourceSet} from '@monokle-desktop/shared/models/compare';
 import {kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ResourceSetSelectColor.styled';

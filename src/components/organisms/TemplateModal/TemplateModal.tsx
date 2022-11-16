@@ -17,13 +17,9 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 import {TemplateFormRenderer} from '@components/molecules';
 
 import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@monokle-desktop/shared/constants/telemetry';
-import {
-  AnyTemplate,
-  K8sResource,
-  Project,
-  isReferencedHelmChartTemplate,
-  isVanillaTemplate,
-} from '@monokle-desktop/shared/models';
+import {Project} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@monokle-desktop/shared/models/template';
 import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 

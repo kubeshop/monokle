@@ -8,7 +8,8 @@ import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettin
 import {activeResourcesSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
-import {HighlightItems, ResourceFilterType} from '@monokle-desktop/shared/models';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {HighlightItems} from '@monokle-desktop/shared/models/ui';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 

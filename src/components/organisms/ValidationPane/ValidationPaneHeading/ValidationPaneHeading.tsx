@@ -5,7 +5,7 @@ import React, {useCallback} from 'react';
 import {useAppDispatch} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 
-import {ValidationIntegration} from '@monokle-desktop/shared/models';
+import {ValidationIntegration} from '@monokle-desktop/shared/models/integrations';
 
 import * as S from './ValidationPaneHeading.styled';
 

@@ -11,14 +11,14 @@ import {createKubeClient} from '@utils/kubeclient';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 import {
-  AlertEnum,
-  K8sResource,
   KubernetesObject,
-  Policy,
   ResourceMapType,
   ResourceRefsProcessingOptions,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {Policy} from '@monokle-desktop/shared/models/policy';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document

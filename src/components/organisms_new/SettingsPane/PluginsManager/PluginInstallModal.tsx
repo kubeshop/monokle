@@ -13,7 +13,7 @@ import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
 import {useFocus} from '@utils/hooks';
 
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@monokle-desktop/shared/constants/ipcEvents';
-import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared/models';
+import {DownloadPluginResult, isDownloadPluginResult} from '@monokle-desktop/shared/models/extension';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const downloadPlugin = (pluginUrl: string) => {

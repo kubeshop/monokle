@@ -2,7 +2,8 @@ import {Menu} from 'antd';
 
 import {MenuClickEventHandler} from 'rc-menu/lib/interface';
 
-import {HelmChartMenuItem, KustomizationMenuItem} from '@monokle-desktop/shared/models';
+import {HelmChartMenuItem} from '@monokle-desktop/shared/models/helm';
+import {KustomizationMenuItem} from '@monokle-desktop/shared/models/kustomize';
 
 const {SubMenu} = Menu;
 

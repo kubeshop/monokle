@@ -21,7 +21,8 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ItemCustomComponentProps, K8sResource} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {

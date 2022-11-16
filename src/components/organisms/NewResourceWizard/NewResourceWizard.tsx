@@ -23,13 +23,11 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {
-  FileEntry,
-  FileMapType,
-  K8sResource,
-  NewResourceWizardInput,
-  ResourceKindHandler,
-} from '@monokle-desktop/shared/models';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

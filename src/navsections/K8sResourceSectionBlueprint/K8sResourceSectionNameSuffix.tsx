@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
-import {ClusterColors} from '@monokle-desktop/shared/models';
+import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
 import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/colors';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

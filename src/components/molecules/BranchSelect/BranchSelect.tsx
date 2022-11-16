@@ -15,7 +15,7 @@ import {TableSelect} from '@atoms';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
 
-import {GitBranch} from '@monokle-desktop/shared/models';
+import {GitBranch} from '@monokle-desktop/shared/models/git';
 
 import BranchTable from './BranchTable';
 

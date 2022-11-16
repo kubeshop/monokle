@@ -4,7 +4,7 @@ import {EyeOutlined, FileOutlined} from '@ant-design/icons';
 
 import {Icon} from '@atoms';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const ItemPrefix = (props: ItemCustomComponentProps) => {

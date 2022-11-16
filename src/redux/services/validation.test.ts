@@ -5,7 +5,7 @@ import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {validateResource} from '@redux/services/validation';
-import { K8sResource } from '@monokle-desktop/shared/models';
+import { K8sResource } from '@monokle-desktop/shared/models/k8sResource';
 
 test('validate-resource', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/invalid-deployment'));

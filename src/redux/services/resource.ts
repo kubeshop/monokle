@@ -40,16 +40,10 @@ import {
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {
-  ClusterAccess,
-  FileMapType,
-  K8sResource,
-  Policy,
-  RefPosition,
-  ResourceMapType,
-  ResourceRefType,
-  ResourceRefsProcessingOptions,
-} from '@monokle-desktop/shared/models';
+import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@monokle-desktop/shared/models/appState';
+import {ClusterAccess} from '@monokle-desktop/shared/models/config';
+import {K8sResource, RefPosition, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
+import {Policy} from '@monokle-desktop/shared/models/policy';
 
 import {processRefs} from './resourceRefs';
 import {validatePolicies, validateResource} from './validation';

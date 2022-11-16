@@ -5,14 +5,8 @@ import {Document, LineCounter, Node, ParsedNode, isCollection, isNode} from 'yam
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
 
-import {
-  K8sResource,
-  POLICY_VALIDATOR_MAP,
-  Policy,
-  RefPosition,
-  ResourceValidationError,
-  SarifRule,
-} from '@monokle-desktop/shared/models';
+import {K8sResource, RefPosition, ResourceValidationError} from '@monokle-desktop/shared/models/k8sResource';
+import {POLICY_VALIDATOR_MAP, Policy, SarifRule} from '@monokle-desktop/shared/models/policy';
 
 import {getResourceSchema} from './schema';
 

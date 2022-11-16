@@ -34,28 +34,27 @@ import {parseYamlDocument} from '@utils/yaml';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {DIFF} from '@monokle-desktop/shared/constants/telemetry';
+import {AlertType} from '@monokle-desktop/shared/models/alert';
 import {
-  AlertType,
   AppState,
-  CurrentMatch,
-  FileEntry,
   FileMapType,
-  HelmChart,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ImageType,
   ImagesListType,
-  K8sResource,
   MatchParamProps,
   PreviewType,
-  ProjectConfig,
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
-  ThunkApi,
-  ValidationIntegration,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {CurrentMatch, FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {HelmChart} from '@monokle-desktop/shared/models/helm';
+import {ImageType} from '@monokle-desktop/shared/models/image';
+import {ValidationIntegration} from '@monokle-desktop/shared/models/integrations';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ThunkApi} from '@monokle-desktop/shared/models/thunk';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 

@@ -12,7 +12,7 @@ import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
-import {SectionCustomComponentProps} from '@monokle-desktop/shared/models';
+import {SectionCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const SuffixContainer = styled.span`

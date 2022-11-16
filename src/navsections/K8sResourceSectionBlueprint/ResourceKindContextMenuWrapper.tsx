@@ -21,7 +21,10 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import {ContextMenu} from '@atoms';
 
-import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
