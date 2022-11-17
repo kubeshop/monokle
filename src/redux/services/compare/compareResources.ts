@@ -46,27 +46,6 @@ function compareResourcesAsUnion(
   for (const [id, leftResource] of leftMap.entries()) {
     const namespaceMatchingRightResource = rightMap.get(id);
 
-    const otherMatchingRightResources = [...rightMap.entries()]
-      .filter(
-        ([matchingResourceId, resource]) =>
-          id !== matchingResourceId &&
-          resource.kind !== 'Namespace' &&
-          resource.name === leftResource.name &&
-          resource.kind === leftResource.kind &&
-          resource.version === leftResource.version
-      )
-      .map(entry => entry[1]);
-
-    for (const matchingResource of otherMatchingRightResources) {
-      result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingResource),
-        isMatch: true,
-        isDifferent: leftResource.text !== matchingResource.text,
-        left: leftResource,
-        right: matchingResource,
-      });
-    }
-
     if (namespaceMatchingRightResource) {
       result.push({
         id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
@@ -81,6 +60,18 @@ function compareResourcesAsUnion(
         isMatch: false,
         left: leftResource,
         right: undefined,
+      });
+    }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
       });
     }
   }
@@ -120,6 +111,18 @@ function compareResourcesAsIntersection(
         isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
+      });
+    }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
       });
     }
   }
@@ -187,6 +190,18 @@ function compareResourcesAsLeftJoin(
         right: undefined,
       });
     }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
+      });
+    }
   }
 
   return result;
@@ -214,6 +229,18 @@ function compareResourcesAsRightJoin(
         id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
         isMatch: false,
         left: undefined,
+        right: rightResource,
+      });
+    }
+
+    const otherMatchingLeftResources = getOtherMatchingResources(rightResource, id, leftMap.entries());
+
+    for (const matchingResource of otherMatchingLeftResources) {
+      result.push({
+        id: createStableComparisonIdentifier(rightResource, matchingResource),
+        isMatch: true,
+        isDifferent: rightResource.text !== matchingResource.text,
+        left: matchingResource,
         right: rightResource,
       });
     }
@@ -246,4 +273,21 @@ function createStableComparisonIdentifier(left: K8sResource | undefined, right: 
   ].join();
 
   return uuid(id, UUID_V5_NAMESPACE);
+}
+
+function getOtherMatchingResources(
+  resource: K8sResource,
+  resourceId: string,
+  resourcesMap: IterableIterator<[string, K8sResource]>
+) {
+  return [...resourcesMap]
+    .filter(
+      ([currentResourceId, currentResource]) =>
+        currentResourceId !== resourceId &&
+        resource.kind !== 'Namespace' &&
+        currentResource.name === resource.name &&
+        currentResource.kind === resource.kind &&
+        currentResource.version === resource.version
+    )
+    .map(entry => entry[1]);
 }
