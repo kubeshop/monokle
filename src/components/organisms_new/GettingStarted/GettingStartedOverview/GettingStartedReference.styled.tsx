@@ -9,11 +9,11 @@ import {Colors} from '@monokle-desktop/shared/styles/colors';
 export const ReferenceLink = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
-  height: 100px;
-
+  min-height: 100px;
   .ant-card-body {
     background-color: ${Colors.coldGrey};
     height: 100%;
+    font-size: 14px;
   }
 `;
 

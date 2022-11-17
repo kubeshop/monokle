@@ -31,6 +31,7 @@ type IconNames =
   | 'unorderedListOutlined'
   | 'codeTwoTone'
   | 'checkOutlined'
-  | 'cloudUploadOutlined';
+  | 'cloudUploadOutlined'
+  | 'rightOutlined';
 
 export type {IconNames};

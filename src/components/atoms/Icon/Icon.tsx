@@ -5,17 +5,17 @@ import AntdIcon, {
   CloudUploadOutlined,
   CodeTwoTone,
   ExclamationCircleOutlined,
+  RightOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
 
-import {IconNames} from '@monokle-desktop/shared';
+import {IconNames} from '@monokle-desktop/shared/models';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import {
   CRDs,
   Collapse,
   Compare,
-  GettingStarted,
   Git,
   GitOps,
   GitProject,
@@ -56,8 +56,9 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   images: Images,
   git: Git,
   'git-ops': GitOps,
-  'getting-started': GettingStarted,
+  'getting-started': Kubernetes,
   unorderedListOutlined: UnorderedListOutlined,
+  rightOutlined: RightOutlined,
   codeTwoTone: CodeTwoTone,
   checkOutlined: CheckOutlined,
   cloudUploadOutlined: CloudUploadOutlined,

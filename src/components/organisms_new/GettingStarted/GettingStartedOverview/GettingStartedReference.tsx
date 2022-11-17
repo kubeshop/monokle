@@ -4,13 +4,13 @@ import React, {useCallback} from 'react';
 
 import {ReferenceLink} from '@monokle-desktop/shared/models';
 
-import * as S from './GettingStartedResource.styled';
+import * as S from './GettingStartedReference.styled';
 
 type Props = {
   referenceLink: ReferenceLink;
 };
 
-const GettingStartedResource: React.FC<Props> = ({referenceLink}) => {
+const GettingStartedReference: React.FC<Props> = ({referenceLink}) => {
   const {id, name, description, learnMoreUrl} = referenceLink;
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
@@ -26,4 +26,4 @@ const GettingStartedResource: React.FC<Props> = ({referenceLink}) => {
   );
 };
 
-export default GettingStartedResource;
+export default GettingStartedReference;

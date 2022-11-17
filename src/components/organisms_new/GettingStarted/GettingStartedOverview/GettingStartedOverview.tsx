@@ -1,21 +1,18 @@
 import React from 'react';
 
+import {EDIT, EXPLORE, PUBLISH, VALIDATE} from '@monokle-desktop/shared/constants/features';
 import {
   DISCORD,
   DOCUMENTATION,
-  EDIT,
-  EXPLORE,
   FEEDBACK,
   GUIDE,
-  PUBLISH,
   TUTORIAL,
-  VALIDATE,
   WHATSNEW,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/constants/referenceLinks';
 
 import GettingStartedCard from './GettingStartedCard';
 import * as S from './GettingStartedOverview.styled';
-import GettingStartedResource from './GettingStartedResource';
+import GettingStartedReference from './GettingStartedReference';
 
 const GettingStartedOverview: React.FC = () => {
   return (
@@ -28,20 +25,24 @@ const GettingStartedOverview: React.FC = () => {
 
       <S.GettingStartedCards>
         <GettingStartedCard feature={EXPLORE} />
+        <S.Arrow />
         <GettingStartedCard feature={EDIT} />
+        <S.Arrow />
         <GettingStartedCard feature={VALIDATE} />
+        <S.Arrow />
         <GettingStartedCard feature={PUBLISH} />
+        <S.Arrow />
       </S.GettingStartedCards>
 
       <S.GettingStartedTitle>Helpful Resources</S.GettingStartedTitle>
-      <S.GettingStartedResources>
-        <GettingStartedResource referenceLink={GUIDE} />
-        <GettingStartedResource referenceLink={TUTORIAL} />
-        <GettingStartedResource referenceLink={DOCUMENTATION} />
-        <GettingStartedResource referenceLink={DISCORD} />
-        <GettingStartedResource referenceLink={WHATSNEW} />
-        <GettingStartedResource referenceLink={FEEDBACK} />
-      </S.GettingStartedResources>
+      <S.GettingStartedReferences>
+        <GettingStartedReference referenceLink={GUIDE} />
+        <GettingStartedReference referenceLink={TUTORIAL} />
+        <GettingStartedReference referenceLink={DOCUMENTATION} />
+        <GettingStartedReference referenceLink={DISCORD} />
+        <GettingStartedReference referenceLink={WHATSNEW} />
+        <GettingStartedReference referenceLink={FEEDBACK} />
+      </S.GettingStartedReferences>
     </S.GettingStartedOverviewContainer>
   );
 };

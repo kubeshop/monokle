@@ -38,7 +38,6 @@ import {
   AlertType,
   AppState,
   CurrentMatch,
-  Feature,
   FileEntry,
   FileMapType,
   HelmChart,
@@ -51,7 +50,6 @@ import {
   MatchParamProps,
   PreviewType,
   ProjectConfig,
-  ReferenceLink,
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
@@ -738,12 +736,6 @@ export const mainSlice = createSlice({
     updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
       state.validationIntegration = action.payload;
     },
-    updateFeature: (state: Draft<AppState>, action: PayloadAction<Feature | undefined>) => {
-      state.feature = action.payload;
-    },
-    updateReferenceLink: (state: Draft<AppState>, action: PayloadAction<ReferenceLink | undefined>) => {
-      state.referenceLink = action.payload;
-    },
     updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let newSearchHistory: string[] = [...state.search.searchHistory];
       if (state.search.searchHistory.length >= 5) {
@@ -1195,8 +1187,6 @@ export const {
   uncheckResourceId,
   updateResourceFilter,
   updateValidationIntegration,
-  updateFeature,
-  updateReferenceLink,
   highlightFileMatches,
   updateSearchHistory,
   updateSearchQuery,

@@ -1,12 +1,10 @@
 import {AlertType} from './alert';
-import {Feature} from './features';
 import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource} from './k8sResource';
 import {Policy} from './policy';
-import {ReferenceLink} from './referenceLinks';
 
 export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
@@ -101,8 +99,6 @@ type AppState = {
   filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
   validationIntegration: ValidationIntegration | undefined;
-  feature: Feature | undefined;
-  referenceLink: ReferenceLink | undefined;
   autosaving: {
     status?: boolean;
     error?: {

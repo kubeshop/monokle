@@ -9,16 +9,17 @@ import {Colors} from '@monokle-desktop/shared/styles/colors';
 export const Card = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
-  height: 100%;
-
+  display: flex;
+  min-height: 275px;
   .ant-card-body {
-    background-color: ${Colors.coldGrey};
+    background-color: ${Colors.blueBgColor};
     height: 100%;
   }
 `;
 
 export const Icon = styled(BaseIcon)`
-  font-size: 32px;
+  font-size: 14px;
+  margin: 8px;
 `;
 
 export const Name = styled.h1`
@@ -27,7 +28,7 @@ export const Name = styled.h1`
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
   font-size: 16px;
 `;
 
@@ -39,14 +40,14 @@ export const Link = styled.a`
   color: ${Colors.blue7};
   margin-left: 5px;
   float: left;
-  padding-top: 15px;
-  padding-left: 25px;
+  padding-top: 19px;
+  padding-left: 19px;
 `;
 
 export const Button = styled(AntdButton)`
   color: ${Colors.whitePure};
   background-color: ${Colors.blue7};
-  margin-top: 10px;
+  margin-top: 16px;
   display: block;
   float: left;
 `;
@@ -55,4 +56,12 @@ export const Span = styled.span`
   margin-top: 10px;
   display: inline-block;
   width: 100%;
+`;
+
+export const ElipseWrapper = styled.div`
+  width: 32px;
+  height: 32px;
+  background: #2b3759;
+  border-radius: 50%;
+  margin-bottom: 12px;
 `;
