@@ -1,6 +1,5 @@
-import {useState} from 'react';
-
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setActiveDashboardMenu} from '@redux/reducers/ui';
 
 import ClusterRoleHandler from '@src/kindhandlers/ClusterRole.handler';
 import ClusterRoleBindingHandler from '@src/kindhandlers/ClusterRoleBinding.handler';
@@ -25,22 +24,26 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import * as S from './DashboardPane.style';
 
 export const DashboardPane = () => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [selectedSection, setSelectedSection] = useState('Overview');
+  const dispatch = useAppDispatch();
+  const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
 
   return (
     <S.Container>
       {Object.keys(SECTIONS).map(section => (
-        <>
-          <S.MainSection $active={selectedSection === section} onClick={() => setSelectedSection(section)}>
+        <div key={section}>
+          <S.MainSection $active={activeMenu === section} onClick={() => dispatch(setActiveDashboardMenu(section))}>
             {section}
           </S.MainSection>
           {SECTIONS[section].map((subsection: any) => (
-            <S.SubSection $active={selectedSection === subsection} onClick={() => setSelectedSection(subsection)}>
+            <S.SubSection
+              key={subsection}
+              $active={activeMenu === subsection}
+              onClick={() => dispatch(setActiveDashboardMenu(subsection))}
+            >
               {subsection}
             </S.SubSection>
           ))}
-        </>
+        </div>
       ))}
     </S.Container>
   );

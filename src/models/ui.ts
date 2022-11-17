@@ -169,6 +169,9 @@ export type UiState = {
       currentStep: number;
     };
   };
+  dashboard: {
+    activeMenu: string;
+  };
 };
 
 export type PaneConfiguration = {
