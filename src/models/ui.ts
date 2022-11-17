@@ -171,6 +171,7 @@ export type UiState = {
   };
   dashboard: {
     activeMenu: string;
+    selectedNamespace: string;
   };
 };
 

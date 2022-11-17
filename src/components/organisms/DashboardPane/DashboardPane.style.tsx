@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
-  padding: 16px 16px 16px 0;
+  padding: 16px 0px 16px 0;
 `;
 
 export const MainSection = styled.div<{$active: boolean}>`

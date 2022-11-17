@@ -8,11 +8,11 @@ export const CellStatus = {
   title: 'Status',
   dataIndex: 'content',
   key: 'status',
-  width: '160px',
-  render: ({status: {phase}}: any) => (
+  width: '120px',
+  render: (content: any) => (
     <div>
-      {phase === 'Running' && <S.StatusCell>{phase}</S.StatusCell>}
-      {phase !== 'Running' && <Tag color="magenta">{phase}</Tag>}
+      {content?.status?.phase === 'Running' && <S.StatusCell>{content?.status?.phase}</S.StatusCell>}
+      {content?.status?.phase !== 'Running' && <Tag color="magenta">{content?.status?.phase}</Tag>}
     </div>
   ),
 };
@@ -23,7 +23,7 @@ export const CellAge = {
   key: 'age',
   width: '120px',
   render: ({metadata: {creationTimestamp}}: any) => (
-    <div>{DateTime.fromISO(creationTimestamp).toRelative({style: 'short'})}</div>
+    <div>{DateTime.fromISO(creationTimestamp).toRelative({style: 'short', unit: 'days'})}</div>
   ),
 };
 

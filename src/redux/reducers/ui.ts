@@ -324,6 +324,9 @@ export const uiSlice = createSlice({
     setActiveDashboardMenu: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.dashboard.activeMenu = action.payload;
     },
+    setSelectedNamespace: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.dashboard.selectedNamespace = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -416,5 +419,6 @@ export const {
   openScaleModal,
   closeScaleModal,
   setActiveDashboardMenu,
+  setSelectedNamespace,
 } = uiSlice.actions;
 export default uiSlice.reducer;

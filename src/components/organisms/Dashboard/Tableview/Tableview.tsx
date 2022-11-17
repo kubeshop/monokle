@@ -1,6 +1,9 @@
 import {useEffect} from 'react';
 
+import {Button} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
+
+import {SearchOutlined} from '@ant-design/icons';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -11,14 +14,22 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
     console.log(dataSource);
   }, [dataSource]);
   return (
-    <S.Table
-      dataSource={dataSource}
-      columns={columns}
-      rowKey="id"
-      scroll={{y: 700}}
-      rowSelection={{}}
-      pagination={false}
-      sticky
-    />
+    <S.Container>
+      <S.FilterContainer>
+        <S.Input size="large" placeholder="Search and filter" prefix={<SearchOutlined />} />
+        <Button size="large" disabled>
+          Bulk action
+        </Button>
+      </S.FilterContainer>
+      <S.Table
+        dataSource={dataSource}
+        columns={columns}
+        rowKey="id"
+        scroll={{y: 650}}
+        rowSelection={{}}
+        pagination={false}
+        sticky
+      />
+    </S.Container>
   );
 };

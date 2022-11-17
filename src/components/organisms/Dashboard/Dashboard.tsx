@@ -10,9 +10,13 @@ import {Tableview} from './Tableview/Tableview';
 export const Dashboard = () => {
   const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
 
-  const filterResourcesByKind = (kind: string) => {
-    return Object.values(resourceMap).filter(resource => resource.kind === kind);
+  const filterResources = (kind: string) => {
+    return Object.values(resourceMap).filter(
+      resource =>
+        resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+    );
   };
 
   return (
@@ -22,7 +26,7 @@ export const Dashboard = () => {
         {activeMenu === 'Overview' && <Overview />}
         {activeMenu !== 'Overview' && (
           <Tableview
-            dataSource={filterResourcesByKind(activeMenu)}
+            dataSource={filterResources(activeMenu)}
             columns={resourceKindColumns[activeMenu] || [CellName, CellNamespace, CellAge]}
           />
         )}

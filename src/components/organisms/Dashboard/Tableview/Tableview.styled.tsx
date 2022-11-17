@@ -1,6 +1,20 @@
-import {Table as RawTable} from 'antd';
+import {Input as RawInput, Table as RawTable} from 'antd';
 
 import styled from 'styled-components';
+
+export const Container = styled.div``;
+
+export const FilterContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 16px;
+`;
+
+export const Input = styled(RawInput)`
+  background: #141414;
+  width: 360px;
+`;
 
 export const Table = styled(RawTable)`
   .ant-table-container {
@@ -8,11 +22,13 @@ export const Table = styled(RawTable)`
     border-bottom-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
+    border: 1px solid #303030;
   }
 
   .ant-table-header {
     background-color: #1d1d1d;
     border-radius: 4px 4px 0 0;
+    margin: 0;
     .ant-table-thead {
       .ant-table-cell {
         color: #dbdbdb;
@@ -27,5 +43,13 @@ export const Table = styled(RawTable)`
     font-size: 14px;
     font-weight: 400;
     border-radius: 0 0 4px 4px;
+
+    .ant-table-row {
+      border-top: 1px solid #303030;
+      height: 54px;
+      :hover {
+        background-color: #1d1d1d;
+      }
+    }
   }
 `;

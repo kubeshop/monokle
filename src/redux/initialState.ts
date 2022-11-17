@@ -234,6 +234,7 @@ const initialUiState: UiState = {
   },
   dashboard: {
     activeMenu: 'Overview',
+    selectedNamespace: 'ALL',
   },
 };
 

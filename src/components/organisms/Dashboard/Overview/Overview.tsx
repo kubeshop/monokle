@@ -31,18 +31,19 @@ export const Overview = () => {
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
   const [hearbeat, setHearbeat] = useState(0);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
 
   useInterval(() => {
     setHearbeat(hearbeat + 1);
   }, 5000);
 
   const filterResource = useCallback(
-    (kindHandler: ResourceKindHandler, namespace?: string) => {
-      return Object.values(resourceMap).filter(r =>
-        namespace ? r.kind === PodHandler.kind && namespace === r.namespace : r.kind === kindHandler.kind
+    (kindHandler: ResourceKindHandler) => {
+      return Object.values(resourceMap).filter(
+        r => r.kind === kindHandler.kind && (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true)
       );
     },
-    [resourceMap]
+    [resourceMap, selectedNamespace]
   );
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export const Overview = () => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
 
     if (k8sApiClient) {
-      getClusterEvents(k8sApiClient)
+      getClusterEvents(k8sApiClient, selectedNamespace === 'ALL' ? undefined : selectedNamespace)
         .then(events => {
           setActivityData(events);
         })
@@ -73,7 +74,7 @@ export const Overview = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [new KubeConfigManager().kubeConfig, hearbeat]);
+  }, [new KubeConfigManager().kubeConfig, hearbeat, selectedNamespace]);
 
   useEffect(() => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
