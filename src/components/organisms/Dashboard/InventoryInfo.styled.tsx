@@ -22,6 +22,7 @@ export const NodesInformationRow = styled.div`
 
 export const PercentageText = styled.span`
   color: ${Colors.grey6};
+  font-weight: 600;
 `;
 
 export const Title = styled.h3`

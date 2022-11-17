@@ -203,10 +203,6 @@ export const createWindow = (givenPath?: string) => {
 
     initKubeconfig(dispatch, userHomeDir);
 
-    ipcMain.on('restart-kubeconfig-monitor', (_event, kubeConfigPath) => {
-      initKubeconfig(dispatch, userHomeDir, kubeConfigPath);
-    });
-
     dispatch(setAppRehydrating(false));
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);

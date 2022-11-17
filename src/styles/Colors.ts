@@ -1,5 +1,6 @@
 enum Colors {
   // Greys
+  grey6000 = '#1D1D1D',
   grey5000 = '#2A385A',
   grey4000 = '#1F1F1F',
   grey3000 = '#191F21',

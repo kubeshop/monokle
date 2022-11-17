@@ -126,7 +126,6 @@ const App = () => {
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
-  const kubeConfigPath = useAppSelector(state => state.config.kubeConfig.path);
 
   const size: Size = useWindowSize();
 
@@ -395,10 +394,6 @@ const App = () => {
   const onCloseFormModal = useCallback(() => {
     dispatch(toggleForm(false));
   }, [dispatch]);
-
-  useEffect(() => {
-    ipcRenderer.send('restart-kubeconfig-monitor', kubeConfigPath);
-  }, [kubeConfigPath]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
