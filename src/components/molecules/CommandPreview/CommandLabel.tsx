@@ -40,10 +40,19 @@ const CommandLabel: React.FC<{command: SavedCommand; isPreviewed: boolean}> = pr
     });
   };
 
+  const onClickEdit: React.MouseEventHandler<HTMLSpanElement> = e => {
+    e.stopPropagation();
+  };
+
   return (
     <S.LabelContainer onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {isPreviewed ? <S.PreviewedLabel>{command.label}</S.PreviewedLabel> : <span>{command.label}</span>}
-      {isHovered && <S.DeleteOutlined onClick={onClickDelete} />}
+      {isHovered && (
+        <S.ActionsContainer>
+          <S.EditOutlined onClick={onClickEdit} />
+          <S.DeleteOutlined onClick={onClickDelete} />
+        </S.ActionsContainer>
+      )}
     </S.LabelContainer>
   );
 };
