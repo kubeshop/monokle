@@ -1,3 +1,5 @@
+import {K8sResource} from '@models/k8sresource';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setActiveDashboardMenu} from '@redux/reducers/ui';
 
@@ -21,11 +23,40 @@ import ServiceAccountHandler from '@src/kindhandlers/ServiceAccount.handler';
 import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
+import {ErrorCell, Warning} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 export const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+
+  const getErrorCount = (kind: string) => {
+    return Object.values(resourceMap)
+      .filter(
+        resource =>
+          resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+      )
+      .reduce(
+        (total: number, resource: K8sResource) =>
+          total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
+        0
+      );
+  };
+
+  const getWarningCount = (kind: string) => {
+    return Object.values(resourceMap)
+      .filter(
+        resource =>
+          resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+      )
+      .reduce(
+        (total: number, resource: K8sResource) =>
+          total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
+        0
+      );
+  };
 
   return (
     <S.Container>
@@ -40,7 +71,11 @@ export const DashboardPane = () => {
               $active={activeMenu === subsection}
               onClick={() => dispatch(setActiveDashboardMenu(subsection))}
             >
-              {subsection}
+              <span style={{marginRight: '12px'}}>{subsection}</span>
+              {getErrorCount(subsection) ? (
+                <ErrorCell style={{marginRight: '12px'}}>{getErrorCount(subsection)}</ErrorCell>
+              ) : null}
+              {getWarningCount(subsection) ? <Warning>{getWarningCount(subsection)}</Warning> : null}
             </S.SubSection>
           ))}
         </div>

@@ -27,6 +27,8 @@ export const SubSection = styled.div<{$active: boolean}>`
   font-size: 14px;
   line-height: 36px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 
   :hover {
     background-color: ${Colors.blue9}88;

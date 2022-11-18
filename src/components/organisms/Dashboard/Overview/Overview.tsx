@@ -20,10 +20,11 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
 import {TitleBar} from '@monokle/components';
 
-import {Activity} from '../Activity';
-import {InventoryInfo} from '../InventoryInfo';
-import {Utilization} from '../Utilization';
+import {Activity} from './Activity';
+import {InventoryInfo} from './InventoryInfo';
 import * as S from './Overview.styled';
+import {Status} from './Status';
+import {Utilization} from './Utilization';
 
 export const Overview = () => {
   const [clusterInformation, setClusterInformation] = useState<ClusterInformation | null>(null);
@@ -89,7 +90,7 @@ export const Overview = () => {
   return (
     <S.Container>
       <S.TitleBarContainer style={{gridArea: 'status'}}>
-        <TitleBar type="secondary" title="Status" description={<p>Status</p>} />
+        <TitleBar type="secondary" title="Status" description={<Status />} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'performance'}}>
         <TitleBar

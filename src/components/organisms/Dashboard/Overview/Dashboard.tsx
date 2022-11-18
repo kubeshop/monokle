@@ -1,11 +1,12 @@
 import {useAppSelector} from '@redux/hooks';
 
+import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 
+import {CellAge, CellError, CellName, CellNamespace, CellNode, CellStatus} from '../Tableview/TableCells';
+import {Tableview} from '../Tableview/Tableview';
 import * as S from './Dashboard.styled';
-import {Overview} from './Overview/Overview';
-import {CellAge, CellName, CellNamespace, CellNode, CellStatus} from './Tableview/TableCells';
-import {Tableview} from './Tableview/Tableview';
+import {Overview} from './Overview';
 
 export const Dashboard = () => {
   const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
@@ -27,7 +28,7 @@ export const Dashboard = () => {
         {activeMenu !== 'Overview' && (
           <Tableview
             dataSource={filterResources(activeMenu)}
-            columns={resourceKindColumns[activeMenu] || [CellName, CellNamespace, CellAge]}
+            columns={resourceKindColumns[activeMenu] || [CellName, CellError, CellNamespace, CellAge]}
           />
         )}
       </S.Content>
@@ -37,4 +38,5 @@ export const Dashboard = () => {
 
 export const resourceKindColumns = {
   [PodHandler.kind]: [CellStatus, CellName, CellNamespace, CellNode, CellAge],
+  [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
 };

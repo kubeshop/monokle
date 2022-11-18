@@ -47,3 +47,15 @@ export const CellNode = {
   key: 'node',
   render: (content: any) => <S.NodeCell>{content?.spec?.nodeName}</S.NodeCell>,
 };
+
+export const CellError = {
+  title: 'Errors',
+  dataIndex: 'validation',
+  key: 'error',
+  render: (validation: any) =>
+    !(validation && !validation?.isValid && validation?.errors && validation?.errors.length > 0) ? (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ) : (
+      <S.ErrorCell>{validation?.errors.length}</S.ErrorCell>
+    ),
+};

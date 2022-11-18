@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {Header as RawHeader} from './Header/Header';
+import {Header as RawHeader} from '../Header/Header';
 
 export const Container = styled.div`
   background-color: #0a0d0e;
