@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
+  padding: 0 16px 16px 16px;
   display: grid;
   height: 100%;
   width: 100%;

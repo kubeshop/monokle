@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
+  padding: 16px 16px 0 16px;
   & > div:first-child {
     height: 100%;
     background-color: ${Colors.grey3b};

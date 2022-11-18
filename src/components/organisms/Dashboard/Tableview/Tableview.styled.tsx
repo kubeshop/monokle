@@ -2,13 +2,19 @@ import {Input as RawInput, Table as RawTable} from 'antd';
 
 import styled from 'styled-components';
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  padding: 8px 16px 0px 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+`;
 
 export const FilterContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
   margin-bottom: 16px;
+  grid-area: filter;
 `;
 
 export const Input = styled(RawInput)`
@@ -17,6 +23,8 @@ export const Input = styled(RawInput)`
 `;
 
 export const Table = styled(RawTable)`
+  grid-area: table;
+
   .ant-table-container {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;

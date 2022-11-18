@@ -1,20 +1,18 @@
 import styled from 'styled-components';
 
-import {Header as RawHeader} from '../Header/Header';
+import {Header as RawHeader} from './Header/Header';
 
-export const Container = styled.div`
+export const Container = styled.div<{$paneHeight: number}>`
   background-color: #0a0d0e;
-  padding: 12px;
   display: grid;
-  height: 100%;
   width: 100%;
+  height: 100%;
   row-gap: 8px;
   grid-template-columns: 1fr;
-  grid-template-rows: 6.5% 91.5%;
+  grid-template-rows: 70px calc(100% - 78px);
   grid-template-areas:
     'header header'
     'content content';
-  overflow: hidden;
 `;
 
 export const Header = styled(RawHeader)`
