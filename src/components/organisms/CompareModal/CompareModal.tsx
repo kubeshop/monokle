@@ -45,15 +45,17 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.ContentDiv>
 
-      <S.ActionsRow>
-        <Col span={10}>
-          <TransferButton side="left" />
-        </Col>
-        <Col span={4} />
-        <Col span={10}>
-          <TransferButton side="right" />
-        </Col>
-      </S.ActionsRow>
+      {!inspection || inspection?.type === 'diff' ? (
+        <S.ActionsRow>
+          <Col span={10}>
+            <TransferButton side="left" />
+          </Col>
+          <Col span={4} />
+          <Col span={10}>
+            <TransferButton side="right" />
+          </Col>
+        </S.ActionsRow>
+      ) : null}
     </Modal>
   );
 };
