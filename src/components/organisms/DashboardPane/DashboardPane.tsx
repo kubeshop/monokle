@@ -1,3 +1,5 @@
+import {useCallback} from 'react';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -23,7 +25,7 @@ import ServiceAccountHandler from '@src/kindhandlers/ServiceAccount.handler';
 import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
-import {ErrorCell, Warning} from '../Dashboard/Tableview/TableCells.styled';
+import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 export const DashboardPane = () => {
@@ -31,6 +33,15 @@ export const DashboardPane = () => {
   const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+
+  const getResourceCount = useCallback(
+    (kind: string) => {
+      return Object.values(resourceMap).filter(
+        r => r.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true)
+      ).length;
+    },
+    [resourceMap, selectedNamespace]
+  );
 
   const getErrorCount = (kind: string) => {
     return Object.values(resourceMap)
@@ -72,6 +83,9 @@ export const DashboardPane = () => {
               onClick={() => dispatch(setActiveDashboardMenu(subsection))}
             >
               <span style={{marginRight: '12px'}}>{subsection}</span>
+              {getResourceCount(subsection) ? (
+                <Resource style={{marginRight: '12px'}}>{getResourceCount(subsection)}</Resource>
+              ) : null}
               {getErrorCount(subsection) ? (
                 <ErrorCell style={{marginRight: '12px'}}>{getErrorCount(subsection)}</ErrorCell>
               ) : null}

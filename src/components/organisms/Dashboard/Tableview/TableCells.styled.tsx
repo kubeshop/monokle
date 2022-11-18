@@ -26,8 +26,8 @@ export const ErrorCell = styled.div`
   font-weight: 700;
   font-size: 11px;
   border-radius: 100%;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,8 +41,24 @@ export const Warning = styled.span`
   font-weight: 700;
   font-size: 11px;
   border-radius: 100%;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  letter-spacing: -1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: -2px;
+  padding: 0 3px 0 0;
+`;
+
+export const Resource = styled.span`
+  color: #ffffff;
+  background-color: ${Colors.geekblue7};
+  font-weight: 700;
+  font-size: 11px;
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
   letter-spacing: -1px;
   display: flex;
   justify-content: center;

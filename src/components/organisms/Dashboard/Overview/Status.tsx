@@ -10,10 +10,10 @@ export const Status = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
 
-  const filterResource = useCallback(() => {
+  const getResourceCount = useCallback(() => {
     return Object.values(resourceMap).filter(r =>
       selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true
-    );
+    ).length;
   }, [resourceMap, selectedNamespace]);
 
   const getErrorCount = () => {
@@ -39,7 +39,7 @@ export const Status = () => {
   return (
     <S.Container>
       <S.KindRow $type="resource">
-        <S.Count>{filterResource().length}</S.Count>
+        <S.Count>{getResourceCount()}</S.Count>
         <span>resources</span>
       </S.KindRow>
       <S.InnerContainer>
