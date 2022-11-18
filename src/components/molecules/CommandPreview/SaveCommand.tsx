@@ -1,17 +1,14 @@
-import {useState} from 'react';
-
 import {Button} from 'antd';
 
-import SaveEditModal from './SaveEditModal';
+import {useAppDispatch} from '@redux/hooks';
+import {openSaveEditCommandModal} from '@redux/reducers/ui';
 
 const SaveCommand = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
   return (
     <>
-      <SaveEditModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} />
-
-      <Button type="link" onClick={() => setIsModalOpen(true)}>
+      <Button type="link" onClick={() => dispatch(openSaveEditCommandModal({}))}>
         Save command
       </Button>
     </>

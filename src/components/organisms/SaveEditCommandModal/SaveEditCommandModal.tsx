@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
@@ -6,22 +6,17 @@ import {useForm} from 'antd/lib/form/Form';
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import {SavedCommand} from '@models/appconfig';
+import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {closeSaveEditCommandModal} from '@redux/reducers/ui';
 
-type IProps = {
-  isOpen: boolean;
-  onCancel: () => void;
-  command?: SavedCommand;
-};
-
-const SaveEditModal: React.FC<IProps> = props => {
-  const {isOpen, command, onCancel} = props;
-
+const SaveEditCommandModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const savedCommandMap = useAppSelector(state => state.config.projectConfig?.savedCommandMap || {});
+  const {isOpen, command} = useAppSelector(state => state.ui.saveEditCommandModal);
 
   const [isLoading, setIsLoading] = useState(false);
   const [form] = useForm();
@@ -35,7 +30,7 @@ const SaveEditModal: React.FC<IProps> = props => {
 
       // editing command
       if (command) {
-        console.log('Update...');
+        updatedSavedCommandMap[command.id] = {id: command.id, label, content};
       } else {
         const newCommandId = uuid();
         updatedSavedCommandMap[newCommandId] = {
@@ -43,30 +38,42 @@ const SaveEditModal: React.FC<IProps> = props => {
           label,
           content,
         };
-
-        dispatch(
-          updateProjectConfig({
-            config: {
-              savedCommandMap: updatedSavedCommandMap,
-            },
-            fromConfigFile: false,
-          })
-        );
-        form.resetFields();
-
-        setIsLoading(false);
-        onCancel();
       }
+
+      dispatch(
+        updateProjectConfig({
+          config: {
+            savedCommandMap: updatedSavedCommandMap,
+          },
+          fromConfigFile: false,
+        })
+      );
+      form.resetFields();
+
+      setIsLoading(false);
+      dispatch(closeSaveEditCommandModal());
+
+      dispatch(
+        setAlert({title: `Command ${command ? 'updated' : 'saved'} successfully`, message: '', type: AlertEnum.Success})
+      );
     });
   };
 
+  useEffect(() => {
+    if (command) {
+      form.setFieldsValue({label: command.label, content: command.content});
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Modal
-      title="Save command"
+      title={`${command ? 'Edit' : 'Save'} command`}
       open={isOpen}
-      okText="Save"
+      okText={command ? 'Update' : 'Save'}
       onOk={onOkHandler}
-      onCancel={onCancel}
+      onCancel={() => dispatch(closeSaveEditCommandModal())}
       confirmLoading={isLoading}
       width={800}
     >
@@ -89,4 +96,4 @@ const SaveEditModal: React.FC<IProps> = props => {
   );
 };
 
-export default SaveEditModal;
+export default SaveEditCommandModal;
