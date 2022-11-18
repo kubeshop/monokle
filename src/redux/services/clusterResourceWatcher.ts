@@ -86,6 +86,7 @@ const watchResource = async (
       }
     },
     (error: any) => {
+      console.log('error', error);
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
         disconnectResourceFromCluster(kindHandler);
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
