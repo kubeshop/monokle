@@ -54,7 +54,11 @@ const SaveEditCommandModal: React.FC = () => {
       dispatch(closeSaveEditCommandModal());
 
       dispatch(
-        setAlert({title: `Command ${command ? 'updated' : 'saved'} successfully`, message: '', type: AlertEnum.Success})
+        setAlert({
+          title: `Command ${label} ${command ? 'updated' : 'saved'} successfully`,
+          message: '',
+          type: AlertEnum.Success,
+        })
       );
     });
   };
@@ -81,11 +85,29 @@ const SaveEditCommandModal: React.FC = () => {
         <Form.Item
           name="label"
           label="Label"
-          rules={[{required: true, message: 'Please provide a label for the command.'}]}
+          rules={[
+            ({getFieldValue}) => ({
+              validator: () => {
+                return new Promise((resolve: (value?: any) => void, reject) => {
+                  const label: string = getFieldValue('label');
+
+                  if (!label) {
+                    reject(new Error('Please provide a label'));
+                  }
+
+                  if (Object.values(savedCommandMap).find(c => c?.label === label)) {
+                    reject(new Error('This label is already used for another command'));
+                  }
+
+                  resolve();
+                });
+              },
+            }),
+          ]}
         >
           <Input />
         </Form.Item>
-        <Form.Item name="content" label="Command" rules={[{required: true, message: 'Please provide a command.'}]}>
+        <Form.Item name="content" label="Command" rules={[{required: true, message: 'Please provide a command'}]}>
           <Input.TextArea
             autoSize
             placeholder="Write your shell command here. The command should have YAML output containing k8s resources."
