@@ -62,7 +62,7 @@ enum Colors {
   blackPure = '#000000',
   blackPearl = '#111d2c',
   black9 = '#0C0D0E',
-  black10 = '131629',
+  black10 = '#131629',
 
   lime8 = '#C9E75D',
 
