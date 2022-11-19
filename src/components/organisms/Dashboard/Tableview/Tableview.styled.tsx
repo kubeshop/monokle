@@ -32,7 +32,7 @@ export const TableContainer = styled.div`
 export const Table = styled(RawTable)`
   grid-area: table;
 
-  .ant-table-container {
+  & .ant-table-container {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -40,7 +40,7 @@ export const Table = styled(RawTable)`
     border: 1px solid ${Colors.grey4};
   }
 
-  .ant-table-header {
+  & .ant-table-header {
     background-color: ${Colors.grey6000};
     border-radius: 4px 4px 0 0;
     margin: 0;
@@ -52,7 +52,7 @@ export const Table = styled(RawTable)`
       }
     }
   }
-  .ant-table-body {
+  & .ant-table-body {
     background-color: #141414;
     color: ${Colors.grey9};
     font-size: 14px;

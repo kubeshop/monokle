@@ -1,3 +1,7 @@
+import {useEffect, useState} from 'react';
+
+import {K8sResource} from '@models/k8sresource';
+
 import {setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -6,6 +10,16 @@ import * as S from './Drawer.styled';
 export const Drawer = () => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const [localResource, setLocalResource] = useState<K8sResource | undefined>();
+
+  useEffect(() => {
+    if (selectedResourceId && resourceMap[selectedResourceId]) {
+      setLocalResource(resourceMap[selectedResourceId]);
+      return;
+    }
+    setLocalResource(undefined);
+  }, [resourceMap, selectedResourceId]);
 
   return (
     <S.Drawer
@@ -13,38 +27,67 @@ export const Drawer = () => {
       size="large"
       open={Boolean(selectedResourceId)}
       getContainer={false}
-      title="sadfdf"
+      title={<S.DrawerTitle>{localResource?.name}</S.DrawerTitle>}
       onClose={() => {
         dispatch(setSelectedResourceId());
       }}
     >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
+      <S.TabsContainer>
+        <S.Tabs defaultActiveKey="1">
+          <S.Tabs.TabPane tab="Info" key="1">
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>{' '}
+          </S.Tabs.TabPane>
+          <S.Tabs.TabPane tab="Code" key="2">
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+            <p>Some contents1...</p>
+          </S.Tabs.TabPane>
+        </S.Tabs>
+        <S.TabsFooter>Navigation Buttons</S.TabsFooter>
+      </S.TabsContainer>
     </S.Drawer>
   );
 };
