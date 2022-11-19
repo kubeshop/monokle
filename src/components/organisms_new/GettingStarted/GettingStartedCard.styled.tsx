@@ -1,8 +1,8 @@
 import {Button as AntdButton, Card as AntdCard} from 'antd';
 
-import styled from 'styled-components';
+import AntdIcon from '@ant-design/icons';
 
-import {Icon as BaseIcon} from '@atoms';
+import styled from 'styled-components';
 
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
@@ -17,7 +17,7 @@ export const Card = styled(AntdCard)`
   }
 `;
 
-export const Icon = styled(BaseIcon)`
+export const Icon = styled(AntdIcon)`
   font-size: 14px;
   margin: 8px;
 `;

@@ -1,8 +1,15 @@
 import {Feature} from "../models";
 
+import {
+  CheckOutlined,
+  CloudUploadOutlined,
+  CodeTwoTone,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
+
 export const EXPLORE: Feature = {
   id: 'explore',
-  icon: 'unorderedListOutlined',
+  icon: UnorderedListOutlined,
   name: 'Explore',
   description: 'Configure your resources workspace, whereas it’s local, on a Git, a cluster or from scratch.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
@@ -11,7 +18,7 @@ export const EXPLORE: Feature = {
 
 export const EDIT: Feature = {
   id: 'edit',
-  icon: 'codeTwoTone',
+  icon: CodeTwoTone,
   name: 'Edit',
   description: 'Fix errors in your resources, compare them, learn about yaml best practices and much more.',
   learnMoreUrl: 'https://github.com/edit/opa',
@@ -20,7 +27,7 @@ export const EDIT: Feature = {
 
 export const VALIDATE: Feature = {
   id: 'validate',
-  icon: 'checkOutlined',
+  icon: CheckOutlined,
   name: 'Validate',
   description: 'Configure your policies & validation rules, create your own. See & fix validation errors.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
@@ -29,7 +36,7 @@ export const VALIDATE: Feature = {
 
 export const PUBLISH: Feature = {
   id: 'publish',
-  icon: 'cloudUploadOutlined',
+  icon: CloudUploadOutlined,
   name: 'Publish',
   description: 'Save locally, get into Git (Github, Gitlab), create PRs, deploy to a cluster...',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',

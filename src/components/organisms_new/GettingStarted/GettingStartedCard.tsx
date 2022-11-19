@@ -23,7 +23,7 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
   return (
     <S.Card key={id}>
       <S.ElipseWrapper>
-        <S.Icon name={icon} key={icon} />
+        <S.Icon className={icon} component={icon} />
       </S.ElipseWrapper>
       <S.Name>{name}</S.Name>
       <S.Description>{description}</S.Description>

@@ -26,12 +26,6 @@ type IconNames =
   | 'terminal'
   | 'split-view'
   | 'crds'
-  | 'compare'
-  | 'getting-started'
-  | 'unorderedListOutlined'
-  | 'codeTwoTone'
-  | 'checkOutlined'
-  | 'cloudUploadOutlined'
-  | 'rightOutlined';
+  | 'compare';
 
 export type {IconNames};
