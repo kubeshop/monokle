@@ -205,12 +205,14 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
+            leftNamespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace : undefined,
+            rightNamespace: isNamespaced ? comparison.right.namespace ?? defaultNamespace : undefined,
             leftActive: true,
             rightActive: true,
             leftTransferable: leftTransferable && comparison.isDifferent,
             rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
+            kind,
           });
         } else {
           result.push({
@@ -218,13 +220,14 @@ export const selectComparisonListItems = createSelector(
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
             namespace: isNamespaced
-              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace
               : undefined,
             leftActive: isDefined(comparison.left),
             rightActive: isDefined(comparison.right),
             leftTransferable: leftTransferable && isDefined(comparison.left),
             rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
+            kind,
           });
         }
       });

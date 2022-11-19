@@ -25,6 +25,7 @@ type ResourceItem = {
   id: string;
   namespace?: string;
   name: string;
+  kind: string;
 };
 
 type Props = {
@@ -67,7 +68,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
-        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace ?? 'default' : undefined});
+        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace : undefined, kind});
       }
     }
 
@@ -92,10 +93,12 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         return (
           <S.ResourceDiv key={id}>
             {showCheckbox ? <Checkbox style={{marginRight: 16}} disabled /> : null}
-            {namespace && (
+            {namespace ? (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={namespace}>
                 <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
               </Tooltip>
+            ) : (
+              row.kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
             )}
 
             <S.ResourceName>{name}</S.ResourceName>
