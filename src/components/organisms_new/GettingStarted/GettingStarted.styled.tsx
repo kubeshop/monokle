@@ -21,16 +21,13 @@ export const GettingStartedCards = styled.div`
 
 export const GettingStartedReferences = styled.div`
   margin-top: 40px;
-  display: grid;
+  display: flex;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  grid-auto-rows: 180px;
 `;
 
 export const GettingStartedTitle = styled.h1`
   font-size: 16px;
   font-weight: 700;
-  //font-family: 'Inter';
   line-height: 22px;
   letter-spacing: 0;
   text-align: left;
