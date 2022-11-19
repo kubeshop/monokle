@@ -4,9 +4,11 @@ import {LeftOutlined as RawLeftOutlined, RightOutlined as RawRightOutlined} from
 
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 export const Drawer = styled(RawDrawer)`
   & .ant-drawer-content {
-    background: #141414;
+    background: ${Colors.grey1};
   }
   z-index: 100;
 
@@ -31,7 +33,7 @@ export const Drawer = styled(RawDrawer)`
 
 export const DrawerTitle = styled.div`
   font-size: 16px;
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   font-weight: 700;
 `;
 
@@ -55,7 +57,7 @@ export const Tabs = styled(RawTabs)`
     .ant-tabs-nav-list {
       font-weight: 400;
       font-size: 14px;
-      color: #dbdbdb;
+      color: ${Colors.grey9};
 
       .ant-tabs-tab {
         padding: 16px 0 24px 0;
@@ -79,7 +81,7 @@ export const TabsFooter = styled.div`
   display: flex;
   align-items: center;
   padding: 0 24px;
-  border-top: 1px solid #303030;
+  border-top: 1px solid ${Colors.grey4};
 
   & > button:first-child {
     margin-right: 8px;
@@ -87,22 +89,22 @@ export const TabsFooter = styled.div`
 `;
 
 export const NavigationButton = styled(Button)`
-  background-color: #177ddc;
+  background-color: ${Colors.blue7};
   border-radius: 2px;
   padding: 0px 10px;
   height: 40px;
 
   &:hover,
   &:focus {
-    background-color: #177ddc88;
+    background-color: ${Colors.blue7}88;
   }
 `;
 
 export const LeftOutlined = styled(RawLeftOutlined)`
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   font-size: 18px;
 `;
 export const RightOutlined = styled(RawRightOutlined)`
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   font-size: 18px;
 `;
