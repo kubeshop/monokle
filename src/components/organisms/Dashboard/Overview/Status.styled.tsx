@@ -43,9 +43,9 @@ export const KindRow = styled.div<{$type: string}>`
       (props.$type === 'resource' && 'rgba(82, 115, 224, 0.1)')
     };
     color: ${
-      (props.$type === 'warning' && '#E8B339') ||
-      (props.$type === 'error' && '#E84749') ||
-      (props.$type === 'resource' && '#5273E0')
+      (props.$type === 'warning' && Colors.yellow12) ||
+      (props.$type === 'error' && Colors.red7) ||
+      (props.$type === 'resource' && Colors.geekblue7)
     };
     font-size: ${
       (props.$type === 'warning' && '14px') ||

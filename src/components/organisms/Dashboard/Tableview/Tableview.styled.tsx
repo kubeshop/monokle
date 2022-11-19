@@ -2,6 +2,8 @@ import {Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 export const Container = styled.div`
   padding: 8px 16px 0px 16px;
   display: flex;
@@ -35,16 +37,16 @@ export const Table = styled(RawTable)`
     border-bottom-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
-    border: 1px solid #303030;
+    border: 1px solid ${Colors.grey4};
   }
 
   .ant-table-header {
-    background-color: #1d1d1d;
+    background-color: ${Colors.grey6000};
     border-radius: 4px 4px 0 0;
     margin: 0;
     .ant-table-thead {
       .ant-table-cell {
-        color: #dbdbdb;
+        color: ${Colors.grey9};
         font-size: 14px;
         font-weight: 700;
       }
@@ -52,16 +54,16 @@ export const Table = styled(RawTable)`
   }
   .ant-table-body {
     background-color: #141414;
-    color: #dbdbdb;
+    color: ${Colors.grey9};
     font-size: 14px;
     font-weight: 400;
     border-radius: 0 0 4px 4px;
 
     .ant-table-row {
-      border-top: 1px solid #303030;
+      border-top: 1px solid ${Colors.grey4};
       height: 54px;
       :hover {
-        background-color: #1d1d1d;
+        background-color: ${Colors.grey6000};
       }
     }
   }

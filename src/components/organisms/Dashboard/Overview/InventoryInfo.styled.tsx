@@ -38,7 +38,7 @@ export const Description = styled.div`
 `;
 
 export const HorizontalLine = styled.div`
-  border: 1px solid #303030;
+  border: 1px solid ${Colors.grey4};
   width: 100%;
   height: 0;
 `;

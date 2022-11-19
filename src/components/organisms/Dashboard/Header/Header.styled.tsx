@@ -22,8 +22,8 @@ export const Select = styled(RawSelect)`
     padding: 0 16px;
     .ant-select-selection-search-input,
     .ant-select-selection-placeholder {
-      color: #ffffff;
-      border-color: #5a5a5a;
+      color: ${Colors.whitePure};
+      border-color: ${Colors.grey6};
       font-weight: 400;
       font-size: 14px;
       padding-left: 16px;
