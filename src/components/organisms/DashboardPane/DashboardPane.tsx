@@ -2,8 +2,8 @@ import {useCallback} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 
+import {setActiveDashboardMenu} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setActiveDashboardMenu} from '@redux/reducers/ui';
 
 import ClusterRoleHandler from '@src/kindhandlers/ClusterRole.handler';
 import ClusterRoleBindingHandler from '@src/kindhandlers/ClusterRoleBinding.handler';
@@ -30,9 +30,9 @@ import * as S from './DashboardPane.style';
 
 export const DashboardPane = () => {
   const dispatch = useAppDispatch();
-  const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
+  const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   const getResourceCount = useCallback(
     (kind: string) => {

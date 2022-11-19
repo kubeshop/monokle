@@ -11,9 +11,9 @@ import {CellAge, CellError, CellName, CellNamespace, CellNode, CellStatus} from 
 import {Tableview} from './Tableview/Tableview';
 
 export const Dashboard = () => {
-  const activeMenu = useAppSelector(state => state.ui.dashboard.activeMenu);
+  const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const {height} = useMainPaneDimensions();
 
   const filterResources = (kind: string) => {

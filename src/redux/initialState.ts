@@ -232,10 +232,6 @@ const initialUiState: UiState = {
       currentStep: -1,
     },
   },
-  dashboard: {
-    activeMenu: 'Overview',
-    selectedNamespace: 'ALL',
-  },
 };
 
 const initialNavigatorState: NavigatorState = {

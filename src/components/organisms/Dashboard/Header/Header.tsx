@@ -1,7 +1,7 @@
 import {K8sResource} from '@models/k8sresource';
 
+import {setSelectedNamespace} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectedNamespace} from '@redux/reducers/ui';
 
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
@@ -12,7 +12,7 @@ import * as S from './Header.styled';
 export const Header = ({title}: {title: string}) => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   const getNamespaces = (): K8sResource[] => {
     return Object.values(resourceMap).filter(resource => resource.kind === NamespaceHandler.kind);

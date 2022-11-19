@@ -32,7 +32,7 @@ export const Overview = () => {
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
   const [hearbeat, setHearbeat] = useState(0);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   useInterval(() => {
     setHearbeat(hearbeat + 1);

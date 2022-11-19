@@ -8,7 +8,7 @@ import * as S from './Status.styled';
 
 export const Status = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.ui.dashboard.selectedNamespace);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   const getResourceCount = useCallback(() => {
     return Object.values(resourceMap).filter(r =>

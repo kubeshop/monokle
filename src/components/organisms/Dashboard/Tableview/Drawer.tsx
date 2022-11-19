@@ -1,19 +1,21 @@
-import {useState} from 'react';
+import {setSelectedResourceId} from '@redux/dashboard';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import * as S from './Drawer.styled';
 
 export const Drawer = () => {
-  const [open, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
 
   return (
     <S.Drawer
       placement="right"
       size="large"
-      open={open}
+      open={Boolean(selectedResourceId)}
       getContainer={false}
       title="sadfdf"
       onClose={() => {
-        setOpen(false);
+        dispatch(setSelectedResourceId());
       }}
     >
       <p>Some contents...</p>

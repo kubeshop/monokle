@@ -169,10 +169,6 @@ export type UiState = {
       currentStep: number;
     };
   };
-  dashboard: {
-    activeMenu: string;
-    selectedNamespace: string;
-  };
 };
 
 export type PaneConfiguration = {

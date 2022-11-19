@@ -6,12 +6,16 @@ import {SearchOutlined} from '@ant-design/icons';
 
 import {K8sResource} from '@models/k8sresource';
 
+import {setSelectedResourceId} from '@redux/dashboard';
+import {useAppDispatch} from '@redux/hooks';
+
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {Drawer} from './Drawer.styled';
+import {Drawer} from './Drawer';
 import * as S from './Tableview.styled';
 
 export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; columns: ColumnsType<any>}) => {
+  const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
 
   useEffect(() => {
@@ -35,9 +39,13 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           rowSelection={{}}
           pagination={false}
           sticky
-          onRow={(record, rowIndex) => {
+          onRow={(record: K8sResource | any, rowIndex) => {
             return {
-              onClick: event => {}, // click row
+              onClick: event => {
+                console.log(record);
+                console.log(rowIndex);
+                dispatch(setSelectedResourceId(record.id));
+              }, // click row
               onDoubleClick: event => {}, // double click row
               onContextMenu: event => {}, // right button click row
               onMouseEnter: event => {}, // mouse enter row

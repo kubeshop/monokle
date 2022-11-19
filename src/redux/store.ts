@@ -6,6 +6,7 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
+import {dashboardSlice} from './dashboard';
 import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
@@ -56,6 +57,7 @@ const appReducer = combineReducers({
   uiCoach: uiCoachSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
+  dashboard: dashboardSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

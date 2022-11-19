@@ -321,12 +321,6 @@ export const uiSlice = createSlice({
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
     },
-    setActiveDashboardMenu: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.dashboard.activeMenu = action.payload;
-    },
-    setSelectedNamespace: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.dashboard.selectedNamespace = action.payload;
-    },
   },
   extraReducers: builder => {
     builder
@@ -418,7 +412,5 @@ export const {
   setActiveTab,
   openScaleModal,
   closeScaleModal,
-  setActiveDashboardMenu,
-  setSelectedNamespace,
 } = uiSlice.actions;
 export default uiSlice.reducer;
