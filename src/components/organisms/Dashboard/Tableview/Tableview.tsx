@@ -1,6 +1,5 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
-import {Button, Drawer, DrawerProps} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
 import {SearchOutlined} from '@ant-design/icons';
@@ -9,6 +8,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {Drawer} from './Drawer.styled';
 import * as S from './Tableview.styled';
 
 export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; columns: ColumnsType<any>}) => {
@@ -18,23 +18,15 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
     console.log(dataSource);
   }, [dataSource]);
 
-  const [open, setOpen] = useState(false);
-  const [size, setSize] = useState<DrawerProps['size']>();
-
-  const showLargeDrawer = () => {
-    setSize('large');
-    setOpen(true);
-  };
-
   return (
     <S.Container>
       <S.FilterContainer>
         <S.Input size="large" placeholder="Search and filter" prefix={<SearchOutlined />} />
-        <Button size="large" disabled>
+        <S.BulkAction size="large" disabled>
           Bulk action
-        </Button>
+        </S.BulkAction>
       </S.FilterContainer>
-      <div style={{position: 'relative', height: '100%'}}>
+      <S.TableContainer>
         <S.Table
           dataSource={dataSource}
           columns={columns}
@@ -45,9 +37,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           sticky
           onRow={(record, rowIndex) => {
             return {
-              onClick: event => {
-                showLargeDrawer();
-              }, // click row
+              onClick: event => {}, // click row
               onDoubleClick: event => {}, // double click row
               onContextMenu: event => {}, // right button click row
               onMouseEnter: event => {}, // mouse enter row
@@ -55,44 +45,8 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
             };
           }}
         />
-        <Drawer
-          placement="right"
-          size={size}
-          open={open}
-          getContainer={false}
-          onClose={() => {
-            setOpen(false);
-          }}
-        >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Drawer>
-      </div>
+        <Drawer />
+      </S.TableContainer>
     </S.Container>
   );
 };

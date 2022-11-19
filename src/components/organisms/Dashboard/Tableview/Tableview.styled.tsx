@@ -1,4 +1,4 @@
-import {Input as RawInput, Table as RawTable} from 'antd';
+import {Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
 import styled from 'styled-components';
 
@@ -20,6 +20,11 @@ export const FilterContainer = styled.div`
 export const Input = styled(RawInput)`
   background: #141414;
   width: 360px;
+`;
+
+export const TableContainer = styled.div`
+  position: relative;
+  height: 100%;
 `;
 
 export const Table = styled(RawTable)`
@@ -61,3 +66,5 @@ export const Table = styled(RawTable)`
     }
   }
 `;
+
+export const BulkAction = styled(RawButton)``;
