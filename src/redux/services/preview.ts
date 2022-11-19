@@ -9,7 +9,8 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-import {AppDispatch, PreviewType} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {PreviewType} from '@monokle-desktop/shared/models/appState';
 
 import {previewSavedCommand} from './previewCommand';
 

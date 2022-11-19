@@ -12,7 +12,7 @@ import {
   WalkthroughCollection,
   WalkthroughContentProps,
   WalkthroughStep,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/walkthrough';
 
 import * as S from './Walkthrough.styled';
 import {newReleaseFeaturesContent, noviceContent} from './content';

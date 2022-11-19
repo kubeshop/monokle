@@ -9,19 +9,17 @@ import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
 import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {KubernetesObject, isKubernetesObject} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
 import {
-  AlertEnum,
-  AlertType,
-  AnyPlugin,
-  AppDispatch,
   InterpolateTemplateOptions,
-  K8sResource,
-  KubernetesObject,
   TemplateManifest,
   TemplatePack,
   VanillaTemplate,
-  isKubernetesObject,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/template';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';

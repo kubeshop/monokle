@@ -13,13 +13,10 @@ import {buildHelmCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
-import {
-  AppDispatch,
-  CommandOptions,
-  HelmPreviewConfiguration,
-  PreviewConfigValuesFileItem,
-  RootState,
-} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**

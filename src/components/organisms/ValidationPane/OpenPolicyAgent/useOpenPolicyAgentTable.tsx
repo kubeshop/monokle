@@ -13,7 +13,7 @@ import {toggleOPARules} from '@redux/validation/validation.slice';
 
 import {Icon} from '@atoms';
 
-import {IconNames} from '@monokle-desktop/shared/models';
+import {IconNames} from '@monokle-desktop/shared/models/icons';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';

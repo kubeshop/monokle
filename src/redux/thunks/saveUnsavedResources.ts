@@ -9,7 +9,10 @@ import {getFileTimestamp, hasValidExtension} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {ADD_NEW_RESOURCE} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch, FileEntry, K8sResource, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';

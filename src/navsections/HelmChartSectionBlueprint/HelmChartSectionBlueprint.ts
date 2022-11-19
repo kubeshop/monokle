@@ -5,16 +5,10 @@ import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@red
 import {isDefined} from '@utils/filter';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {
-  FileMapType,
-  HelmChart,
-  HelmPreviewConfiguration,
-  HelmTemplate,
-  HelmTemplatesMapType,
-  HelmValuesFile,
-  HelmValuesMapType,
-  SectionBlueprint,
-} from '@monokle-desktop/shared/models';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@monokle-desktop/shared/models/appState';
+import {HelmPreviewConfiguration} from '@monokle-desktop/shared/models/config';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';

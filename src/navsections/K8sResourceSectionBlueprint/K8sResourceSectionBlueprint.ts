@@ -9,13 +9,11 @@ import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers'
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {
-  K8sResource,
-  ResourceFilterType,
-  ResourceKindHandler,
-  RootState,
-  SectionBlueprint,
-} from '@monokle-desktop/shared/models';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';

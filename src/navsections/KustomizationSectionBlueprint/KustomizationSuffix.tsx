@@ -2,7 +2,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

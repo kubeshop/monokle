@@ -22,7 +22,7 @@ import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlue
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 

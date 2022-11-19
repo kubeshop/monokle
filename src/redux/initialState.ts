@@ -3,17 +3,13 @@ import os from 'os';
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {
-  AlertState,
-  AppConfig,
-  AppState,
-  ExtensionState,
-  NavigatorState,
-  NewVersionCode,
-  PaneConfiguration,
-  TerminalState,
-  UiState,
-} from '@monokle-desktop/shared/models';
+import {AlertState} from '@monokle-desktop/shared/models/alert';
+import {AppState} from '@monokle-desktop/shared/models/appState';
+import {AppConfig, NewVersionCode} from '@monokle-desktop/shared/models/config';
+import {ExtensionState} from '@monokle-desktop/shared/models/extension';
+import {NavigatorState} from '@monokle-desktop/shared/models/navigator';
+import {TerminalState} from '@monokle-desktop/shared/models/terminal';
+import {PaneConfiguration, UiState} from '@monokle-desktop/shared/models/ui';
 import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 const initialAppState: AppState = {

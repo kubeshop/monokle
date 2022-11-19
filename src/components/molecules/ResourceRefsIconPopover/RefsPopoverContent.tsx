@@ -9,7 +9,9 @@ import {areRefPosEqual} from '@redux/services/resource';
 import {getRefRange} from '@utils/refs';
 
 import {FOLLOW_LINK} from '@monokle-desktop/shared/constants/telemetry';
-import {K8sResource, MonacoRange, ResourceMapType, ResourceRef, ResourceRefType} from '@monokle-desktop/shared/models';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource, ResourceRef, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
+import {MonacoRange} from '@monokle-desktop/shared/models/ui';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import RefLink from './RefLink';

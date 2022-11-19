@@ -13,7 +13,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {activeResourcesSelector} from '@redux/selectors';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models';
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
 
 import Sidebar from './Sidebar';
 

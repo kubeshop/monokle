@@ -4,7 +4,9 @@ import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getKustomizationRefs, isKustomizationResource} from '@redux/services/kustomize';
 import {getLinkedResources} from '@redux/services/resource';
 
-import {AppState, FileEntry, FileMapType, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
+import {AppState, FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 /**
  * Clears all resource highlights and selections except selection for the specified item

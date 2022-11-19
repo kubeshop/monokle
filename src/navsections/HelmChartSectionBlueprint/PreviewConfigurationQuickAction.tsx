@@ -13,7 +13,7 @@ import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 const StyledButton = styled.span<{isItemSelected: boolean}>`

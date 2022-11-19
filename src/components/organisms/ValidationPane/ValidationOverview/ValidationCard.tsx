@@ -9,7 +9,7 @@ import {updateValidationIntegration} from '@redux/reducers/main';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation} from '@redux/validation/validation.slice';
 
-import {ValidationIntegration} from '@monokle-desktop/shared/models';
+import {ValidationIntegration} from '@monokle-desktop/shared/models/integrations';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import * as S from './ValidationCard.styled';

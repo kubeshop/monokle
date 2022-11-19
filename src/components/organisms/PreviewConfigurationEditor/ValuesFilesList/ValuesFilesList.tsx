@@ -14,7 +14,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
-import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models';
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
 
 import {SortableItem} from './SortableItem';
 

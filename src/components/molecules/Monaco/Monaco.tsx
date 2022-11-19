@@ -5,7 +5,9 @@ import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
+// eslint-disable-next-line import/no-duplicates
 import 'monaco-editor';
+// eslint-disable-next-line import/no-duplicates
 import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
@@ -41,7 +43,9 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {NewResourceWizardInput, ResourceFilterType, ResourceRef} from '@monokle-desktop/shared/models';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './Monaco.styled';

@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import {v5 as uuid} from 'uuid';
 
-import {CompareOperation, K8sResource, ResourceComparison} from '@monokle-desktop/shared/models';
+import {CompareOperation, ResourceComparison} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 

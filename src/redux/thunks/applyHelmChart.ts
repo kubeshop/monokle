@@ -9,14 +9,10 @@ import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/servic
 import {runCommandInMainThread} from '@utils/commands';
 
 import {APPLY_HELM_CHART} from '@monokle-desktop/shared/constants/telemetry';
-import {
-  AlertEnum,
-  AlertType,
-  AppDispatch,
-  FileMapType,
-  HelmChart,
-  HelmValuesFile,
-} from '@monokle-desktop/shared/models';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
 import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**

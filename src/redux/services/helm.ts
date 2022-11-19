@@ -22,19 +22,21 @@ import {getFileStats} from '@utils/files';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {
-  FileEntry,
   FileMapType,
-  HelmChart,
   HelmChartMapType,
-  HelmTemplate,
   HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {
+  HelmChart,
+  HelmTemplate,
   HelmValueMatch,
   HelmValuesFile,
-  HelmValuesMapType,
-  ProjectConfig,
   RangeAndValue,
-  ResourceMapType,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/helm';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

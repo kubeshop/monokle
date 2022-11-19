@@ -38,7 +38,10 @@ import {ContextMenu, Dots} from '@atoms';
 import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {AppDispatch, ItemCustomComponentProps, K8sResource, ResourceMapType} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';

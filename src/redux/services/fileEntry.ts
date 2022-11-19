@@ -32,17 +32,16 @@ import {filterGitFolder} from '@utils/git';
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {
   AppState,
-  FileEntry,
   FileMapType,
-  HelmChart,
   HelmChartMapType,
   HelmTemplatesMapType,
-  HelmValuesFile,
   HelmValuesMapType,
-  K8sResource,
-  ProjectConfig,
   ResourceMapType,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 import {
   deleteResource,

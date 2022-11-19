@@ -2,7 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource, ResourceKindHandler} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 const NamespaceHandler: ResourceKindHandler = {
   kind: 'Namespace',

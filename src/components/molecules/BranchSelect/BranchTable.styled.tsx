@@ -3,7 +3,7 @@ import {Input, Button as RawButton, Select as RawSelect, Table as RawTable, Tabl
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {GitBranch} from '@monokle-desktop/shared/models';
+import {GitBranch} from '@monokle-desktop/shared/models/git';
 import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`

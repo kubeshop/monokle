@@ -13,7 +13,7 @@ import {Icon} from '@atoms';
 import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
-import {ResourceRefType} from '@monokle-desktop/shared/models';
+import {ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './WarningAndErrorsDisplay.styled';

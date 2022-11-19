@@ -7,7 +7,7 @@ import {debounce} from 'lodash';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setTerminalSettings} from '@redux/reducers/terminal';
 
-import {TerminalSettingsType} from '@monokle-desktop/shared/models';
+import {TerminalSettingsType} from '@monokle-desktop/shared/models/terminal';
 
 import * as S from './TerminalOptions.styled';
 

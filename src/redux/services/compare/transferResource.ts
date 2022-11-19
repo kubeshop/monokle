@@ -16,7 +16,10 @@ import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch, K8sResource, ResourceSet, RootState} from '@monokle-desktop/shared/models';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceSet} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 type Type = ResourceSet['type'];

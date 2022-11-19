@@ -5,7 +5,9 @@ import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants'
 
 import {getResourcesForPath} from '@redux/services/fileEntry';
 
-import {FileEntry, FileMapType, K8sResource, ResourceMapType, ResourceRefType} from '@monokle-desktop/shared/models';
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 
 import {NodeWrapper, createFileRef, getScalarNodes, linkResources} from './resource';
 

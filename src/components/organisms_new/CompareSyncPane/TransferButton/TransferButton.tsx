@@ -9,7 +9,7 @@ import invariant from 'tiny-invariant';
 import {selectCanTransfer, selectCompareStatus, transferResource} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {CompareSide} from '@monokle-desktop/shared/models';
+import {CompareSide} from '@monokle-desktop/shared/models/compare';
 
 type Props = {
   side: CompareSide;

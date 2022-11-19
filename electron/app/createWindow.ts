@@ -9,8 +9,10 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@monokl
 import {DEFAULT_PLUGINS} from '@monokle-desktop/shared/constants/plugin';
 import {DISABLED_TELEMETRY} from '@monokle-desktop/shared/constants/telemetry';
 import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@monokle-desktop/shared/constants/urls';
-import {AlertEnum, NewVersionCode, StartupFlags} from '@monokle-desktop/shared/models';
-import type {AlertType} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import type {AlertType} from '@monokle-desktop/shared/models/alert';
+import {NewVersionCode} from '@monokle-desktop/shared/models/config';
+import {StartupFlags} from '@monokle-desktop/shared/models/startupFlag';
 import utilsElectronStore from '@monokle-desktop/shared/utils/electronStore';
 import {disableSegment, enableSegment, getSegmentClient} from '@monokle-desktop/shared/utils/segment';
 import {activeProjectSelector, unsavedResourcesSelector} from '@monokle-desktop/shared/utils/selectors';
@@ -108,10 +110,6 @@ export const createWindow = (givenPath?: string) => {
     });
   }
 
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
-
   autoUpdater.on('update-available', () => {
     dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Available, data: null}});
   });
@@ -136,6 +134,10 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('dom-ready', async () => {
+    if (isDev) {
+      win.webContents.openDevTools();
+    }
+
     const dispatch = createDispatchForWindow(win);
 
     subscribeToStoreStateChanges(win.webContents, storeState => {

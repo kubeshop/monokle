@@ -12,7 +12,7 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 import {createKubeClient} from '@utils/kubeclient';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
-import {K8sResource} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';

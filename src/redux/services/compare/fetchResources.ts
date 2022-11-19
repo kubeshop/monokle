@@ -27,18 +27,18 @@ import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {CommandOptions} from '@monokle-desktop/shared/models/commands';
 import {
   ClusterResourceSet,
-  CommandOptions,
   CommandResourceSet,
   CustomHelmResourceSet,
   GitResourceSet,
   HelmResourceSet,
-  K8sResource,
   KustomizeResourceSet,
   ResourceSet,
-  RootState,
-} from '@monokle-desktop/shared/models';
+} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

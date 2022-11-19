@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
 import {renameResource} from '@redux/thunks/renameResource';
 
-import {K8sResource} from '@monokle-desktop/shared/models';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;

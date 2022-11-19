@@ -9,7 +9,10 @@ import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {AlertEnum, AlertType, AppConfig, AppDispatch, K8sResource} from '@monokle-desktop/shared/models';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {AppConfig} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 const applyMultipleResources = async (
   config: AppConfig,

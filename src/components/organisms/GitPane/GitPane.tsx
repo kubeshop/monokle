@@ -15,7 +15,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {GitChangedFile} from '@monokle-desktop/shared/models';
+import {GitChangedFile} from '@monokle-desktop/shared/models/git';
 
 import BottomActions from './BottomActions';
 import FileList from './FileList';

@@ -4,7 +4,7 @@ import {useAppDispatch} from '@redux/hooks';
 
 import {Walkthrough} from '@molecules';
 
-import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@monokle-desktop/shared/models';
+import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@monokle-desktop/shared/models/navigator';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';

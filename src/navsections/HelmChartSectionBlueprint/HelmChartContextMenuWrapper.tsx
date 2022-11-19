@@ -20,7 +20,7 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {

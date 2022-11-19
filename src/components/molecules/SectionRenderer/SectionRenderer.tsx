@@ -5,7 +5,7 @@ import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@monokle-desktop/shared/models';
+import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@monokle-desktop/shared/models/navigator';
 
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
