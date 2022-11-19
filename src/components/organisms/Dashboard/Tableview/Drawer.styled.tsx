@@ -1,4 +1,6 @@
-import {Drawer as RawDrawer, Tabs as RawTabs} from 'antd';
+import {Button, Drawer as RawDrawer, Tabs as RawTabs} from 'antd';
+
+import {LeftOutlined as RawLeftOutlined, RightOutlined as RawRightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -74,4 +76,33 @@ export const Tabs = styled(RawTabs)`
 
 export const TabsFooter = styled.div`
   grid-area: footer;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-top: 1px solid #303030;
+
+  & > button:first-child {
+    margin-right: 8px;
+  }
+`;
+
+export const NavigationButton = styled(Button)`
+  background-color: #177ddc;
+  border-radius: 2px;
+  padding: 0px 10px;
+  height: 40px;
+
+  &:hover,
+  &:focus {
+    background-color: #177ddc88;
+  }
+`;
+
+export const LeftOutlined = styled(RawLeftOutlined)`
+  color: #dbdbdb;
+  font-size: 18px;
+`;
+export const RightOutlined = styled(RawRightOutlined)`
+  color: #dbdbdb;
+  font-size: 18px;
 `;

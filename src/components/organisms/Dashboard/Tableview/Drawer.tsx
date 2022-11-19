@@ -86,7 +86,14 @@ export const Drawer = () => {
             <p>Some contents1...</p>
           </S.Tabs.TabPane>
         </S.Tabs>
-        <S.TabsFooter>Navigation Buttons</S.TabsFooter>
+        <S.TabsFooter>
+          <S.NavigationButton>
+            <S.LeftOutlined />
+          </S.NavigationButton>
+          <S.NavigationButton>
+            <S.RightOutlined />
+          </S.NavigationButton>
+        </S.TabsFooter>
       </S.TabsContainer>
     </S.Drawer>
   );
