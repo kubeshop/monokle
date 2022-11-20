@@ -4,7 +4,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {SecondaryButton} from '@atoms';
+import {LinkButton} from '@atoms';
 
 import {useInstallDeploy} from '@hooks/resourceHooks';
 
@@ -22,7 +22,7 @@ const InstallDeploy: React.FC<IProps> = props => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <SecondaryButton
+      <LinkButton
         $disableHover={isDropdownActive}
         loading={Boolean(applyingResource)}
         type={isDropdownActive ? 'link' : 'default'}
@@ -31,7 +31,7 @@ const InstallDeploy: React.FC<IProps> = props => {
         disabled={isDisabled}
       >
         {buttonText}
-      </SecondaryButton>
+      </LinkButton>
     </Tooltip>
   );
 };

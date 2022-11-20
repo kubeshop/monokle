@@ -21,7 +21,7 @@ import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {TitleBar} from '@molecules';
+import {EditorTitleBar, TitleBar} from '@molecules';
 
 import * as S from './ActionsPaneHeader.styled';
 import Diff from './Diff/Diff';
@@ -182,7 +182,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }
 
   return (
-    <TitleBar title="Editor">
+    <EditorTitleBar title="Editor">
       <>
         <S.LeftArrowButton
           onClick={onClickLeftArrow}
@@ -211,7 +211,6 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         <S.ButtonContainer>
           {showActionsDropdown ? (
             <>
-              <Diff />
               {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                 <>
                   <Scale />
@@ -219,6 +218,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                 </>
               )}
               <InstallDeploy applySelection={applySelection} />
+              <Diff />
             </>
           ) : (
             <Dropdown
@@ -241,7 +241,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           )}
         </S.ButtonContainer>
       </>
-    </TitleBar>
+    </EditorTitleBar>
   );
 };
 
