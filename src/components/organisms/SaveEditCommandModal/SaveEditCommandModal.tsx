@@ -6,6 +6,8 @@ import {useForm} from 'antd/lib/form/Form';
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -15,6 +17,7 @@ import {closeSaveEditCommandModal} from '@redux/reducers/ui';
 
 const SaveEditCommandModal: React.FC = () => {
   const dispatch = useAppDispatch();
+  const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const savedCommandMap = useAppSelector(state => state.config.projectConfig?.savedCommandMap || {});
   const {isOpen, command} = useAppSelector(state => state.ui.saveEditCommandModal);
 
@@ -114,6 +117,7 @@ const SaveEditCommandModal: React.FC = () => {
           />
         </Form.Item>
       </Form>
+      <p>Current working directory: {rootFolderPath}</p>
     </Modal>
   );
 };

@@ -155,6 +155,7 @@ export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent
       },
       shell: true,
       windowsHide: true,
+      cwd: options.cwd,
     });
 
     if (options.input) {
