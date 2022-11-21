@@ -43,35 +43,47 @@ function compareResourcesAsUnion(
   const result: ResourceComparison[] = [];
 
   for (const [id, leftResource] of leftMap.entries()) {
-    const matchingRightResource = rightMap.get(id);
+    const namespaceMatchingRightResource = rightMap.get(id);
 
-    if (matchingRightResource) {
+    if (namespaceMatchingRightResource) {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text !== matchingRightResource.text,
+        isDifferent: leftResource.text !== namespaceMatchingRightResource.text,
         left: leftResource,
-        right: matchingRightResource,
+        right: namespaceMatchingRightResource,
       });
     } else {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
         isMatch: false,
         left: leftResource,
         right: undefined,
       });
     }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
+      });
+    }
   }
 
   for (const [id, rightResource] of rightMap.entries()) {
-    const matchingLeftResource = leftMap.get(id);
+    const namespaceMatchingLeftResource = leftMap.get(id);
 
-    if (matchingLeftResource) {
+    if (namespaceMatchingLeftResource) {
       // eslint-disable-next-line no-continue
       continue; // already had these in previous loop.
     } else {
       result.push({
-        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        id: createStableComparisonIdentifier(namespaceMatchingLeftResource, rightResource),
         isMatch: false,
         left: undefined,
         right: rightResource,
@@ -98,6 +110,18 @@ function compareResourcesAsIntersection(
         isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
+      });
+    }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
       });
     }
   }
@@ -165,6 +189,18 @@ function compareResourcesAsLeftJoin(
         right: undefined,
       });
     }
+
+    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
+
+    for (const matchingResource of otherMatchingRightResources) {
+      result.push({
+        id: createStableComparisonIdentifier(leftResource, matchingResource),
+        isMatch: true,
+        isDifferent: leftResource.text !== matchingResource.text,
+        left: leftResource,
+        right: matchingResource,
+      });
+    }
   }
 
   return result;
@@ -192,6 +228,18 @@ function compareResourcesAsRightJoin(
         id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
         isMatch: false,
         left: undefined,
+        right: rightResource,
+      });
+    }
+
+    const otherMatchingLeftResources = getOtherMatchingResources(rightResource, id, leftMap.entries());
+
+    for (const matchingResource of otherMatchingLeftResources) {
+      result.push({
+        id: createStableComparisonIdentifier(rightResource, matchingResource),
+        isMatch: true,
+        isDifferent: rightResource.text !== matchingResource.text,
+        left: matchingResource,
         right: rightResource,
       });
     }
@@ -224,4 +272,21 @@ function createStableComparisonIdentifier(left: K8sResource | undefined, right: 
   ].join();
 
   return uuid(id, UUID_V5_NAMESPACE);
+}
+
+function getOtherMatchingResources(
+  resource: K8sResource,
+  resourceId: string,
+  resourcesMap: IterableIterator<[string, K8sResource]>
+) {
+  return [...resourcesMap]
+    .filter(
+      ([currentResourceId, currentResource]) =>
+        currentResourceId !== resourceId &&
+        resource.kind !== 'Namespace' &&
+        currentResource.name === resource.name &&
+        currentResource.kind === resource.kind &&
+        currentResource.apiVersion === resource.apiVersion
+    )
+    .map(entry => entry[1]);
 }

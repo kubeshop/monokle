@@ -13,7 +13,11 @@ export const useFileSelect = () => {
 
   const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
-    const {isExcluded, isSupported, isTextExtension, isLine} = info.node;
+    const {isExcluded, isFolder, isSupported, isTextExtension, isLine} = info.node;
+
+    if (isFolder) {
+      return;
+    }
 
     if (!nodeKey.startsWith(fileOrFolderContainedInFilter || '')) {
       return;

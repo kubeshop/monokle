@@ -28,6 +28,7 @@ export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as ReplaceImageModal} from './ReplaceImageModal';
+export {default as SaveEditCommandModal} from './SaveEditCommandModal';
 export {default as SearchPane} from './SearchPane';
 export {default as SettingsManager} from './SettingsManager';
 export {default as TemplateManagerPane} from './TemplateManagerPane';

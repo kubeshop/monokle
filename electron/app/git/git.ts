@@ -18,6 +18,12 @@ export async function isGitInstalled(path: string) {
   }
 }
 
+export async function getGitRemoteUrl(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+  const result = await git.raw('config', '--get','remote.origin.url');
+  return result;
+}
+
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
 
@@ -84,6 +90,7 @@ export async function getGitRepoInfo(localPath: string) {
   try {
     const remoteBranchSummary = await git.branch({'-r': null});
     const localBranches = await git.branchLocal();
+    const remoteUrl = await getGitRemoteUrl(localPath);
 
     gitRepo = {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
@@ -92,6 +99,10 @@ export async function getGitRepoInfo(localPath: string) {
       commits: {ahead: 0, behind: 0},
       hasRemoteRepo: false,
     };
+
+    if(remoteUrl){
+      gitRepo.remoteUrl = remoteUrl;
+    }
 
     gitRepo.branchMap = Object.fromEntries(
       Object.entries({...localBranches.branches}).map(([key, value]) => [

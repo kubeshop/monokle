@@ -9,7 +9,7 @@ import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appSt
 import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
 import {K8sResource, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 
-import {NodeWrapper, createFileRef, getScalarNodes, linkResources} from './resource';
+import {NodeWrapper, getScalarNodes, linkResources} from './resource';
 
 /**
  * Creates kustomization refs between a kustomization and its resources
@@ -75,8 +75,8 @@ function processKustomizationResourceRef(
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ) {
-  let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
-  const fileEntry = fileMap[kpath];
+  let resourcePath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+  const fileEntry = fileMap[resourcePath];
   if (fileEntry) {
     if (fileEntry.children) {
       // resource is folder -> find contained kustomizations and link...
@@ -89,10 +89,15 @@ function processKustomizationResourceRef(
         });
     } else {
       // resource is file -> check for contained resources
-      linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+      let result = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+
+      // no resources found in file? - create a fileref instead
+      if (result.length === 0) {
+        createKustomizationFileRef(kustomization, refNode, resourcePath, fileMap);
+      }
     }
   } else {
-    createFileRef(kustomization, refNode, kpath, fileMap);
+    createKustomizationFileRef(kustomization, refNode, resourcePath, fileMap);
   }
 }
 
@@ -106,8 +111,8 @@ function extractPatches(
   resourceMap: ResourceMapType,
   patchPath: string
 ) {
-  let strategicMergePatches = getScalarNodes(kustomization, patchPath);
-  strategicMergePatches
+  let patches = getScalarNodes(kustomization, patchPath);
+  patches
     .filter(refNode => refNode.node.type === 'PLAIN')
     .forEach((refNode: NodeWrapper) => {
       let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
@@ -121,13 +126,32 @@ function extractPatches(
             }
           });
         } else {
-          createFileRef(kustomization, refNode, kpath, fileMap);
+          createKustomizationFileRef(kustomization, refNode, kpath, fileMap);
         }
       } else {
         // this will create an unsatisfied file ref
-        createFileRef(kustomization, refNode, kpath, fileMap);
+        createKustomizationFileRef(kustomization, refNode, kpath, fileMap);
       }
     });
+}
+
+// as specified by https://github.com/hashicorp/go-getter#url-format
+function isExternalResourceRef(refNode: NodeWrapper) {
+  const externalPrefixes: string[] = [
+    'http://',
+    'https://',
+    'github.com/',
+    'gitlab.com/',
+    'bitbucket.org/',
+    'git::',
+    'hg::',
+    's3::',
+    'gcs::',
+    'file:',
+  ];
+
+  let value = refNode.nodeValue().toLowerCase();
+  return externalPrefixes.findIndex(v => value.startsWith(v)) >= 0;
 }
 
 /**
@@ -145,7 +169,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       }
 
       resources
-        .filter(refNode => !refNode.nodeValue().startsWith('http'))
+        .filter(refNode => !isExternalResourceRef(refNode))
         .forEach((refNode: NodeWrapper) => {
           processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
         });
@@ -188,4 +212,33 @@ export function getKustomizationRefs(
   }
 
   return linkedResourceIds;
+}
+
+/**
+ * Adds a file ref to the specified file to the specified resource
+ */
+
+function createKustomizationFileRef(
+  resource: K8sResource,
+  refNode: NodeWrapper,
+  filePath: string,
+  fileMap: FileMapType
+) {
+  if (filePath.endsWith(path.sep)) {
+    filePath = filePath.substring(0, filePath.length - 1);
+  }
+
+  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
+  resource.refs = resource.refs || [];
+  const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
+
+  resource.refs.push({
+    type: refType,
+    name: refName,
+    position: refNode?.getNodePosition(),
+    target: {
+      type: 'file',
+      filePath,
+    },
+  });
 }

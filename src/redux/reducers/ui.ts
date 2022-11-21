@@ -12,7 +12,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {SettingsPanel} from '@monokle-desktop/shared/models/config';
+import {SavedCommand, SettingsPanel} from '@monokle-desktop/shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -175,6 +175,17 @@ export const uiSlice = createSlice({
         resourcesIds: action.payload,
       };
     },
+    closeSaveEditCommandModal: (state: Draft<UiState>) => {
+      state.saveEditCommandModal = {isOpen: false};
+    },
+    openSaveEditCommandModal: (state: Draft<UiState>, action: PayloadAction<{command?: SavedCommand}>) => {
+      state.saveEditCommandModal.isOpen = true;
+
+      if (action.payload.command) {
+        state.saveEditCommandModal.command = action.payload.command;
+      }
+    },
+
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
@@ -359,6 +370,7 @@ export const {
   closeRenameEntityModal,
   closeRenameResourceModal,
   closeReplaceImageModal,
+  closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -376,6 +388,7 @@ export const {
   openRenameEntityModal,
   openRenameResourceModal,
   openReplaceImageModal,
+  openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,
