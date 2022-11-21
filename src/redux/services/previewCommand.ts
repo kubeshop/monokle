@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ERROR_MSG_FALLBACK, PREVIEW_PREFIX} from '@constants/constants';
+import {ERROR_MSG_FALLBACK, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
@@ -25,14 +25,21 @@ export const previewSavedCommand = createAsyncThunk<
   try {
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
+    const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
+
     if (!command) {
       throw new Error('Saved command not found!');
+    }
+
+    if (!rootFolderPath) {
+      throw new Error("Couldn't find current working directory.");
     }
 
     const result = await runCommandInMainThread({
       commandId: command.id,
       cmd: command.content,
       args: [],
+      cwd: rootFolderPath,
     });
 
     if (hasCommandFailed(result) || !isDefined(result.stdout)) {
