@@ -180,13 +180,11 @@ export const saveInitialK8sSchema = (userDataDir: string) => {
 export function askActionConfirmation({
   action,
   unsavedResourceCount,
-  terminalsCount,
 }: {
   action: string;
   unsavedResourceCount: number;
-  terminalsCount: number;
 }): boolean {
-  if (!unsavedResourceCount && !terminalsCount) {
+  if (!unsavedResourceCount) {
     return true;
   }
 
@@ -199,11 +197,6 @@ export function askActionConfirmation({
       unsavedResourceCount === 1
         ? 'You have an unsaved resource.\n'
         : `You have ${unsavedResourceCount} unsaved resources.\n`;
-  }
-
-  if (terminalsCount) {
-    message +=
-      terminalsCount === 1 ? 'You have a terminal tab open.' : `You have ${terminalsCount} terminal tabs open.`;
   }
 
   const choice = dialog.showMessageBoxSync({

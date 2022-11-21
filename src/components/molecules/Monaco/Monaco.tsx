@@ -244,7 +244,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   useEffect(() => {
-    if (!firstCodeLoadedOnEditor && code) {
+    if (!firstCodeLoadedOnEditor) {
       setFirstCodeLoadedOnEditor(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

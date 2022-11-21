@@ -104,3 +104,9 @@ export const ResourceNamespace = styled((props: Props) => <Tag {...props} />)`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+
+export const ResourceNamespacePlaceholder = styled.div`
+  height: 22px;
+  width: 72px;
+  margin-right: 8px;
+`;

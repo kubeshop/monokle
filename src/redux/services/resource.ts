@@ -352,26 +352,6 @@ export function createResourceName(filePath: string, content: any, kind: string)
 }
 
 /**
- * Adds a file ref to the specified file to the specified resource
- */
-
-export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string, fileMap: FileMapType) {
-  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
-  resource.refs = resource.refs || [];
-  const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
-
-  resource.refs.push({
-    type: refType,
-    name: refName,
-    position: refNode?.getNodePosition(),
-    target: {
-      type: 'file',
-      filePath,
-    },
-  });
-}
-
-/**
  * Checks if this specified resource is from a file (and not a virtual one)
  */
 

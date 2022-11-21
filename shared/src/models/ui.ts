@@ -1,4 +1,4 @@
-import {SettingsPanel} from './config';
+import {SavedCommand, SettingsPanel} from './config';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -106,6 +106,10 @@ type UiState = {
   replaceImageModal?: {
     isOpen: boolean;
     imageId: string;
+  };
+  saveEditCommandModal: {
+    isOpen: boolean;
+    command?: SavedCommand;
   };
   filtersPresetModal?: {
     isOpen: boolean;
