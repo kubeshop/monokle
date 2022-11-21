@@ -41,7 +41,7 @@ const CommandLabel: React.FC<{command: SavedCommand; isPreviewed: boolean}> = pr
     });
   };
 
-  const onClickEdit: React.MouseEventHandler<HTMLSpanElement> = e => {
+  const onClickEdit: React.MouseEventHandler<HTMLSpanElement> = () => {
     dispatch(openSaveEditCommandModal({command}));
   };
 

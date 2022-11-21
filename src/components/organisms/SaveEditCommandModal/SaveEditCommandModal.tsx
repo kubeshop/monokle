@@ -6,12 +6,12 @@ import {useForm} from 'antd/lib/form/Form';
 import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closeSaveEditCommandModal} from '@redux/reducers/ui';
+
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 const SaveEditCommandModal: React.FC = () => {
   const dispatch = useAppDispatch();

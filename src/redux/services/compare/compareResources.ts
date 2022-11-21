@@ -286,7 +286,7 @@ function getOtherMatchingResources(
         resource.kind !== 'Namespace' &&
         currentResource.name === resource.name &&
         currentResource.kind === resource.kind &&
-        currentResource.version === resource.version
+        currentResource.apiVersion === resource.apiVersion
     )
     .map(entry => entry[1]);
 }

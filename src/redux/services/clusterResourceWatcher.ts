@@ -3,15 +3,15 @@ import * as k8s from '@kubernetes/client-node';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
+
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 import {extractK8sResources} from './resource';
 
