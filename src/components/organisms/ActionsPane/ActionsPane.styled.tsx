@@ -68,4 +68,29 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     display: flex;
     align-items: center;
   }
+
+  & .ant-tabs-tab {
+    padding: 2px 8px;
+    margin-left: 8px;
+    background: black;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid #363636;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  & .ant-tabs-tab-active {
+    border-bottom: 1px solid #363636;
+    background: black;
+  }
+
+  & .ant-tabs-ink-bar {
+    background: #363636;
+  }
+`;
+
+export const HeaderWrapper = styled.div`
+  background: ${Colors.grey1000};
+  margin: 10px;
+  border-radius: 10px;
 `;

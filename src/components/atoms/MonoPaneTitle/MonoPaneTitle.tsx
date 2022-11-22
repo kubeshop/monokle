@@ -12,8 +12,7 @@ const MonoPaneTitle = styled(Text)`
     display: flex;
     justify-content: space-between;
     margin-bottom: 0;
-    padding: 13px 4px 13px 16px;
-    text-transform: uppercase;
+    padding: 8px 16px 8px 16px;
     font-size: 14px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
