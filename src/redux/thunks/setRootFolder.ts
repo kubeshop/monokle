@@ -59,12 +59,15 @@ export const setRootFolder = createAsyncThunk<
   }
 
   const stats = getFileStats(rootFolder);
+
   if (!stats) {
     return createRejectionWithAlert(thunkAPI, 'Missing folder', `Folder ${rootFolder} does not exist`);
   }
+
   if (!stats.isDirectory()) {
     return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
   }
+
   const rootEntry = createRootFileEntry(rootFolder, fileMap);
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
