@@ -23,7 +23,6 @@ const InstallDeploy: React.FC<IProps> = props => {
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
       <PrimaryButton
-        $disableHover={isDropdownActive}
         loading={Boolean(applyingResource)}
         type={isDropdownActive ? 'link' : 'default'}
         size="small"
