@@ -20,7 +20,6 @@ export const RightButtons = styled.div`
 export const TitleBarContainer = styled.div`
   height: ${DEFAULT_PANE_TITLE_HEIGHT}px;
   width: 100%;
-  border-bottom: ${AppBorders.sectionDivider};
   position: relative;
 `;
 
