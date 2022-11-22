@@ -31,12 +31,12 @@ export const ComparisonList: React.FC = () => {
   );
 };
 
-function HeaderItem({kind, count}: HeaderItemProps) {
+function HeaderItem({kind, countLeft, countRight}: HeaderItemProps) {
   return (
     <S.HeaderRow key={kind}>
       <Col span={10}>
         <S.Title useCheckboxOffset>
-          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+          {kind} <S.ResourceCount>{countLeft}</S.ResourceCount>
         </S.Title>
       </Col>
 
@@ -44,7 +44,7 @@ function HeaderItem({kind, count}: HeaderItemProps) {
 
       <Col span={10}>
         <S.Title>
-          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+          {kind} <S.ResourceCount>{countRight}</S.ResourceCount>
         </S.Title>
       </Col>
     </S.HeaderRow>

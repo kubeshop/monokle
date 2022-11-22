@@ -3,7 +3,8 @@ export type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
 export type HeaderItemProps = {
   type: 'header';
   kind: string;
-  count: number;
+  countLeft: number;
+  countRight: number;
 };
 
 export type ComparisonItemProps = {

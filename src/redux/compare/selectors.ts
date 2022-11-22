@@ -196,7 +196,12 @@ export const selectComparisonListItems = createSelector(
     });
 
     Object.entries(groups).forEach(([kind, comps]) => {
-      result.push({type: 'header', kind, count: comps.length});
+      result.push({
+        type: 'header',
+        kind,
+        countLeft: comps.filter(c => c.left).length,
+        countRight: comps.filter(c => c.right).length,
+      });
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
