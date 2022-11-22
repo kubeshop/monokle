@@ -36,10 +36,7 @@ function HeaderItem({kind, countLeft, countRight, apiVersionGroup}: HeaderItemPr
     <S.HeaderRow key={kind}>
       <Col span={10}>
         <S.Title useCheckboxOffset>
-          {kind} <S.ResourceCount>{countLeft}</S.ResourceCount>
-          <S.ApiVersion>
-            API version: <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
-          </S.ApiVersion>
+          {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup> <S.ResourceCount>{countLeft}</S.ResourceCount>
         </S.Title>
       </Col>
 
@@ -47,10 +44,8 @@ function HeaderItem({kind, countLeft, countRight, apiVersionGroup}: HeaderItemPr
 
       <Col span={10}>
         <S.Title>
-          {kind} <S.ResourceCount>{countRight}</S.ResourceCount>
-          <S.ApiVersion>
-            API version: <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
-          </S.ApiVersion>
+          {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+          <S.ResourceCount>{countRight}</S.ResourceCount>
         </S.Title>
       </Col>
     </S.HeaderRow>
