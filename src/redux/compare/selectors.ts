@@ -10,6 +10,7 @@ import {canTransfer} from '@redux/services/compare/transferResource';
 import {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {isDefined} from '@utils/filter';
+import {getApiVersionGroup} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -191,14 +192,19 @@ export const selectComparisonListItems = createSelector(
     const rightTransferable = canTransfer(rightType, leftType);
 
     const groups = groupBy(comparisons, r => {
-      if (r.isMatch) return r.left.kind;
-      return r.left ? r.left.kind : r.right.kind;
+      if (r.isMatch) return `${r.left.kind}--${getApiVersionGroup(r.left)}`;
+      return r.left
+        ? `${r.left.kind}--${getApiVersionGroup(r.left)}`
+        : `${r.right.kind}--${getApiVersionGroup(r.right)}`;
     });
 
-    Object.entries(groups).forEach(([kind, comps]) => {
+    Object.entries(groups).forEach(([key, comps]) => {
+      const [kind, apiVersionGroup] = key.split('--');
+
       result.push({
         type: 'header',
         kind,
+        apiVersionGroup,
         countLeft: comps.filter(c => c.left).length,
         countRight: comps.filter(c => c.right).length,
       });

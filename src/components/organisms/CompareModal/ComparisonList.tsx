@@ -31,12 +31,15 @@ export const ComparisonList: React.FC = () => {
   );
 };
 
-function HeaderItem({kind, countLeft, countRight}: HeaderItemProps) {
+function HeaderItem({kind, countLeft, countRight, apiVersionGroup}: HeaderItemProps) {
   return (
     <S.HeaderRow key={kind}>
       <Col span={10}>
         <S.Title useCheckboxOffset>
           {kind} <S.ResourceCount>{countLeft}</S.ResourceCount>
+          <S.ApiVersion>
+            API version: <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+          </S.ApiVersion>
         </S.Title>
       </Col>
 
@@ -45,6 +48,9 @@ function HeaderItem({kind, countLeft, countRight}: HeaderItemProps) {
       <Col span={10}>
         <S.Title>
           {kind} <S.ResourceCount>{countRight}</S.ResourceCount>
+          <S.ApiVersion>
+            API version: <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+          </S.ApiVersion>
         </S.Title>
       </Col>
     </S.HeaderRow>

@@ -5,6 +5,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {CompareOperation, ResourceComparison} from '@redux/compare';
 
+import {getApiVersionGroup} from '@utils/resources';
+
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 
 export type CompareOptions = {
@@ -214,9 +216,7 @@ function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map
 
 function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
   const namespace = !resource.namespace || resource.namespace === 'default' ? defaultNamespace : resource.namespace;
-  return `${resource.name}.${resource.kind}.${namespace}.${
-    resource.version.includes('/') ? resource.version.split('/')[0] : 'kubernetes'
-  }`;
+  return `${resource.name}.${resource.kind}.${namespace}.${getApiVersionGroup(resource)}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {

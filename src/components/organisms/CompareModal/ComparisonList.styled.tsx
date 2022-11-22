@@ -6,6 +6,16 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+export const ApiVersion = styled.span`
+  color: ${Colors.grey6};
+  font-size: 12px;
+  margin-left: 10px;
+`;
+
+export const ApiVersionGroup = styled.span`
+  color: ${Colors.grey7};
+`;
+
 export const HeaderRow = styled(Row)`
   height: 34px;
   margin-left: 8px;
