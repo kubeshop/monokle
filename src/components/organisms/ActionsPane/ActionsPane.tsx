@@ -382,92 +382,94 @@ const ActionsPane: React.FC = () => {
 
   return (
     <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height}>
-      <ActionsPaneHeader
-        actionsPaneWidth={actionsPaneWidth}
-        applySelection={applySelection}
-        selectedResource={selectedResource}
-      />
+      <S.EditorHeaderWrapper>
+        <ActionsPaneHeader
+          actionsPaneWidth={actionsPaneWidth}
+          applySelection={applySelection}
+          selectedResource={selectedResource}
+        />
 
-      {selectedPreviewConfigurationId ? (
-        <PreviewConfigurationDetails />
-      ) : selectedImage ? (
-        <ImageDetails />
-      ) : selectedResourceId || selectedPath || selectedValuesFileId ? (
-        <S.Tabs
-          $height={height - DEFAULT_PANE_TITLE_HEIGHT}
-          defaultActiveKey="source"
-          activeKey={activeTabKey}
-          items={tabItems}
-          onChange={k => setActiveTabKey(k)}
-          tabBarExtraContent={
-            selectedResource && resourceKindHandler?.helpLink ? (
-              <>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
+        {selectedPreviewConfigurationId ? (
+          <PreviewConfigurationDetails />
+        ) : selectedImage ? (
+          <ImageDetails />
+        ) : selectedResourceId || selectedPath || selectedValuesFileId ? (
+          <S.Tabs
+            $height={height - DEFAULT_PANE_TITLE_HEIGHT}
+            defaultActiveKey="source"
+            activeKey={activeTabKey}
+            items={tabItems}
+            onChange={k => setActiveTabKey(k)}
+            tabBarExtraContent={
+              selectedResource && resourceKindHandler?.helpLink ? (
+                <>
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditWithFormTooltip}>
+                    <S.ExtraRightButton
+                      disabled={!isSchemaAvailable}
+                      type="link"
+                      onClick={() => dispatch(toggleForm(true))}
+                      ref={extraButton}
+                    >
+                      <Icon name="split-view" />
+                    </S.ExtraRightButton>
+                  </Tooltip>
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                    <S.ExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                      type="link"
+                      ref={extraButton}
+                    >
+                      <BookOutlined />
+                    </S.ExtraRightButton>
+                  </Tooltip>
+                </>
+              ) : isKustomization ? (
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
                   <S.ExtraRightButton
-                    disabled={!isSchemaAvailable}
+                    onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
                     type="link"
-                    onClick={() => dispatch(toggleForm(true))}
                     ref={extraButton}
                   >
-                    <Icon name="split-view" />
+                    {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
                   </S.ExtraRightButton>
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+              ) : selectedPath && isHelmChartFile(selectedPath) ? (
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
                   <S.ExtraRightButton
-                    onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                    onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
                     type="link"
                     ref={extraButton}
                   >
-                    <BookOutlined />
+                    {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
                   </S.ExtraRightButton>
                 </Tooltip>
-              </>
-            ) : isKustomization ? (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
-                <S.ExtraRightButton
-                  onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
-                  type="link"
-                  ref={extraButton}
-                >
-                  {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
-                </S.ExtraRightButton>
-              </Tooltip>
-            ) : selectedPath && isHelmChartFile(selectedPath) ? (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
-                <S.ExtraRightButton
-                  onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
-                  type="link"
-                  ref={extraButton}
-                >
-                  {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
-                </S.ExtraRightButton>
-              </Tooltip>
-            ) : null
-          }
-        />
-      ) : (
-        !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
-      )}
+              ) : null
+            }
+          />
+        ) : (
+          !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
+        )}
 
-      {isApplyModalVisible && (
-        <ModalConfirmWithNamespaceSelect
-          isVisible={isApplyModalVisible}
-          resources={selectedResource ? [selectedResource] : []}
-          title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-          onCancel={() => setIsApplyModalVisible(false)}
-        />
-      )}
-      {isHelmChartApplyModalVisible && (
-        <HelmChartModalConfirmWithNamespaceSelect
-          isVisible={isHelmChartApplyModalVisible}
-          title={helmChartConfirmModalTitle}
-          onCancel={() => setIsHelmChartApplyModalVisible(false)}
-          onOk={(selectedNamespace, shouldCreateNamespace) =>
-            onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
-          }
-        />
-      )}
+        {isApplyModalVisible && (
+          <ModalConfirmWithNamespaceSelect
+            isVisible={isApplyModalVisible}
+            resources={selectedResource ? [selectedResource] : []}
+            title={confirmModalTitle}
+            onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+            onCancel={() => setIsApplyModalVisible(false)}
+          />
+        )}
+        {isHelmChartApplyModalVisible && (
+          <HelmChartModalConfirmWithNamespaceSelect
+            isVisible={isHelmChartApplyModalVisible}
+            title={helmChartConfirmModalTitle}
+            onCancel={() => setIsHelmChartApplyModalVisible(false)}
+            onOk={(selectedNamespace, shouldCreateNamespace) =>
+              onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
+            }
+          />
+        )}
+      </S.EditorHeaderWrapper>
     </S.ActionsPaneMainContainer>
   );
 };
