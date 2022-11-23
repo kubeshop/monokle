@@ -1,10 +1,12 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {setActiveDashboardMenu} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {getRegisteredKindHandlers} from '@src/kindhandlers';
 import ClusterRoleHandler from '@src/kindhandlers/ClusterRole.handler';
 import ClusterRoleBindingHandler from '@src/kindhandlers/ClusterRoleBinding.handler';
 import ConfigMapHandler from '@src/kindhandlers/ConfigMap.handler';
@@ -33,6 +35,23 @@ export const DashboardPane = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const [menu, setMenu] = useState<any>({});
+
+  useEffect(() => {
+    setMenu(
+      getRegisteredKindHandlers().reduce((output: any, kindHandler: ResourceKindHandler) => {
+        if (output[kindHandler.navigatorPath[1]]) {
+          output[kindHandler.navigatorPath[1]] = {
+            ...output[kindHandler.navigatorPath[1]],
+            [kindHandler.kind]: kindHandler,
+          };
+        } else {
+          output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: kindHandler};
+        }
+        return output;
+      }, menu)
+    );
+  }, [getRegisteredKindHandlers()]);
 
   const getResourceCount = useCallback(
     (kind: string) => {
@@ -71,12 +90,12 @@ export const DashboardPane = () => {
 
   return (
     <S.Container>
-      {Object.keys(SECTIONS).map(section => (
+      {Object.keys(menu).map(section => (
         <div key={section}>
           <S.MainSection $active={activeMenu === section} onClick={() => dispatch(setActiveDashboardMenu(section))}>
             {section}
           </S.MainSection>
-          {SECTIONS[section].map((subsection: any) => (
+          {Object.keys(menu[section]).map((subsection: any) => (
             <S.SubSection
               key={subsection}
               $active={activeMenu === subsection}
