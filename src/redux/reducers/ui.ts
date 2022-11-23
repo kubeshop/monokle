@@ -7,6 +7,7 @@ import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {SavedCommand} from '@models/appconfig';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -182,6 +183,17 @@ export const uiSlice = createSlice({
         resourcesIds: action.payload,
       };
     },
+    closeSaveEditCommandModal: (state: Draft<UiState>) => {
+      state.saveEditCommandModal = {isOpen: false};
+    },
+    openSaveEditCommandModal: (state: Draft<UiState>, action: PayloadAction<{command?: SavedCommand}>) => {
+      state.saveEditCommandModal.isOpen = true;
+
+      if (action.payload.command) {
+        state.saveEditCommandModal.command = action.payload.command;
+      }
+    },
+
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
@@ -367,6 +379,7 @@ export const {
   closeRenameEntityModal,
   closeRenameResourceModal,
   closeReplaceImageModal,
+  closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -385,6 +398,7 @@ export const {
   openRenameEntityModal,
   openRenameResourceModal,
   openReplaceImageModal,
+  openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,

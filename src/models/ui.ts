@@ -2,6 +2,8 @@ import React from 'react';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
+import {SavedCommand} from './appconfig';
+
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -108,6 +110,10 @@ export type UiState = {
   replaceImageModal?: {
     isOpen: boolean;
     imageId: string;
+  };
+  saveEditCommandModal: {
+    isOpen: boolean;
+    command?: SavedCommand;
   };
   filtersPresetModal?: {
     isOpen: boolean;
