@@ -161,7 +161,9 @@ type GitResourceSet = {
 type HeaderItemProps = {
   type: 'header';
   kind: string;
-  count: number;
+  apiVersionGroup: string;
+  countLeft: number;
+  countRight: number;
 };
 
 type HelmResourceSet = {
@@ -179,6 +181,7 @@ type KustomizeResourceSet = {
 
 type LocalResourceSet = {
   type: 'local';
+  folder: string;
   defaultNamespace?: string;
 };
 

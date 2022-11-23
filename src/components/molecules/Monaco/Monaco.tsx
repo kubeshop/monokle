@@ -111,9 +111,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
   const [isEditorMounted, setEditorMounted] = useState(false);
 
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [editor, setEditor] = useState(editorRef.current);
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const selectedResource = useMemo(() => {
     return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
@@ -215,7 +214,6 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
 
-    editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});

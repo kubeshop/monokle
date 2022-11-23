@@ -9,6 +9,7 @@ import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
 import {isDefined} from '@utils/filter';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
 import {RootState} from '@monokle-desktop/shared/models/rootState';
 
@@ -25,14 +26,21 @@ export const previewSavedCommand = createAsyncThunk<
   try {
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
+    const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
+
     if (!command) {
       throw new Error('Saved command not found!');
+    }
+
+    if (!rootFolderPath) {
+      throw new Error("Couldn't find current working directory.");
     }
 
     const result = await runCommandInMainThread({
       commandId: command.id,
       cmd: command.content,
       args: [],
+      cwd: rootFolderPath,
     });
 
     if (hasCommandFailed(result) || !isDefined(result.stdout)) {

@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import {v5 as uuid} from 'uuid';
 
+import {getApiVersionGroup} from '@utils/resources';
+
 import {CompareOperation, ResourceComparison} from '@monokle-desktop/shared/models/compare';
 import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
@@ -61,18 +63,6 @@ function compareResourcesAsUnion(
         right: undefined,
       });
     }
-
-    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
-
-    for (const matchingResource of otherMatchingRightResources) {
-      result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingResource),
-        isMatch: true,
-        isDifferent: leftResource.text !== matchingResource.text,
-        left: leftResource,
-        right: matchingResource,
-      });
-    }
   }
 
   for (const [id, rightResource] of rightMap.entries()) {
@@ -110,18 +100,6 @@ function compareResourcesAsIntersection(
         isDifferent: leftResource.text !== matchingRightResource.text,
         left: leftResource,
         right: matchingRightResource,
-      });
-    }
-
-    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
-
-    for (const matchingResource of otherMatchingRightResources) {
-      result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingResource),
-        isMatch: true,
-        isDifferent: leftResource.text !== matchingResource.text,
-        left: leftResource,
-        right: matchingResource,
       });
     }
   }
@@ -189,18 +167,6 @@ function compareResourcesAsLeftJoin(
         right: undefined,
       });
     }
-
-    const otherMatchingRightResources = getOtherMatchingResources(leftResource, id, rightMap.entries());
-
-    for (const matchingResource of otherMatchingRightResources) {
-      result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingResource),
-        isMatch: true,
-        isDifferent: leftResource.text !== matchingResource.text,
-        left: leftResource,
-        right: matchingResource,
-      });
-    }
   }
 
   return result;
@@ -231,18 +197,6 @@ function compareResourcesAsRightJoin(
         right: rightResource,
       });
     }
-
-    const otherMatchingLeftResources = getOtherMatchingResources(rightResource, id, leftMap.entries());
-
-    for (const matchingResource of otherMatchingLeftResources) {
-      result.push({
-        id: createStableComparisonIdentifier(rightResource, matchingResource),
-        isMatch: true,
-        isDifferent: rightResource.text !== matchingResource.text,
-        left: matchingResource,
-        right: rightResource,
-      });
-    }
   }
 
   return result;
@@ -261,7 +215,7 @@ function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map
 
 function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
   const namespace = !resource.namespace || resource.namespace === 'default' ? defaultNamespace : resource.namespace;
-  return `${resource.name}.${resource.kind}.${namespace}.${resource.apiVersion}`;
+  return `${resource.name}.${resource.kind}.${namespace}.${getApiVersionGroup(resource)}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {
@@ -272,21 +226,4 @@ function createStableComparisonIdentifier(left: K8sResource | undefined, right: 
   ].join();
 
   return uuid(id, UUID_V5_NAMESPACE);
-}
-
-function getOtherMatchingResources(
-  resource: K8sResource,
-  resourceId: string,
-  resourcesMap: IterableIterator<[string, K8sResource]>
-) {
-  return [...resourcesMap]
-    .filter(
-      ([currentResourceId, currentResource]) =>
-        currentResourceId !== resourceId &&
-        resource.kind !== 'Namespace' &&
-        currentResource.name === resource.name &&
-        currentResource.kind === resource.kind &&
-        currentResource.apiVersion === resource.apiVersion
-    )
-    .map(entry => entry[1]);
 }

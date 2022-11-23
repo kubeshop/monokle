@@ -1,7 +1,11 @@
 import {monaco} from 'react-monaco-editor';
 
 // @ts-ignore
-import {getDocumentSymbols} from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/documentSymbols';
+import {ILanguageFeaturesService} from 'monaco-editor/esm/vs/editor/common/services/languageFeatures.js';
+// @ts-ignore
+import {OutlineModel} from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/browser/outlineModel.js';
+// @ts-ignore
+import {StandaloneServices} from 'monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js';
 // @ts-ignore
 import {CommandsRegistry} from 'monaco-editor/esm/vs/platform/commands/common/commands';
 import {v4 as uuidv4} from 'uuid';
@@ -142,14 +146,9 @@ const isPositionAfterRange = (position: monaco.IPosition, range: monaco.IRange) 
 };
 
 export const getSymbols = async (model: monaco.editor.IModel) => {
-  const symbols = await getDocumentSymbols(model, false, {
-    isCancellationRequested: false,
-    onCancellationRequested: () => {
-      return {
-        dispose() {},
-      };
-    },
-  });
+  const {documentSymbolProvider} = StandaloneServices.get(ILanguageFeaturesService);
+  const outline = await OutlineModel.create(documentSymbolProvider, model);
+  const symbols = outline.asListOfDocumentSymbols();
   return symbols;
 };
 

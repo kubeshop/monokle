@@ -11,10 +11,12 @@ import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closeSaveEditCommandModal} from '@redux/reducers/ui';
 
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
 import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 const SaveEditCommandModal: React.FC = () => {
   const dispatch = useAppDispatch();
+  const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const savedCommandMap = useAppSelector(state => state.config.projectConfig?.savedCommandMap || {});
   const {isOpen, command} = useAppSelector(state => state.ui.saveEditCommandModal);
 
@@ -114,6 +116,7 @@ const SaveEditCommandModal: React.FC = () => {
           />
         </Form.Item>
       </Form>
+      <p>Current working directory: {rootFolderPath}</p>
     </Modal>
   );
 };

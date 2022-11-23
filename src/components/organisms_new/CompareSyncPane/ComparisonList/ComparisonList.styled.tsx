@@ -6,6 +6,12 @@ import styled from 'styled-components';
 
 import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
+export const ApiVersionGroup = styled.span`
+  font-size: 12px;
+  color: ${Colors.grey7};
+  margin-left: 6px;
+`;
+
 export const HeaderRow = styled(Row)`
   height: 34px;
   font-size: 16px;

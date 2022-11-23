@@ -1,23 +1,21 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Select, Space} from 'antd';
-
-import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+import {Checkbox, Input, Select, Space} from 'antd';
 
 import {
   comparisonAllToggled,
   filterUpdated,
-  namespaceUpdated,
   operationUpdated,
   searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
-  selectKnownNamespaces,
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
+
+import {CompareOperation} from '@monokle-desktop/shared/models/compare';
 
 import * as S from './CompareActionBar.styled';
 
@@ -41,15 +39,17 @@ const CompareActionBar: React.FC = () => {
 
   return (
     <S.ActionBarDiv>
-      <S.Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
-        Select all
-      </S.Checkbox>
+      <div>
+        <Checkbox disabled={disabled} checked={isAllSelected} onChange={handleSelectAll}>
+          Select all
+        </Checkbox>
+      </div>
 
       <S.ActionBarRightDiv>
         <Space>
           <SearchInput disabled={disabled} />
 
-          <NamespaceInput disabled={disabled} />
+          {/* <NamespaceInput disabled={disabled} /> */}
 
           <OperationSelect />
 
@@ -75,7 +75,7 @@ function SearchInput({disabled}: {disabled: boolean}) {
   );
 
   return (
-    <S.SearchInput
+    <Input
       disabled={disabled}
       prefix={<S.SearchIcon />}
       placeholder="Search"
@@ -85,44 +85,52 @@ function SearchInput({disabled}: {disabled: boolean}) {
   );
 }
 
-function NamespaceInput({disabled}: {disabled: boolean}) {
-  const dispatch = useAppDispatch();
-  const knownNamespaces = useAppSelector(state => selectKnownNamespaces(state.compare));
-  const options = useMemo(() => knownNamespaces.map(n => ({value: n})), [knownNamespaces]);
+// function NamespaceInput({disabled}: {disabled: boolean}) {
+//   const dispatch = useAppDispatch();
+//   const knownNamespaces = useAppSelector(state => selectKnownNamespaces(state.compare));
+//   const options = useMemo(() => knownNamespaces.map(n => ({value: n})), [knownNamespaces]);
 
-  const namespace = useAppSelector(state => state.compare.current.view.namespace);
-  const [value, setValue] = useState(namespace);
+//   const namespace = useAppSelector(state => state.compare.current.view.namespace);
+//   const [value, setValue] = useState(namespace);
 
-  useDebounce(
-    () => {
-      const newNamespace = value === '' ? undefined : value;
-      if (newNamespace === namespace) return;
-      dispatch(namespaceUpdated({namespace: newNamespace}));
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [value]
-  );
+//   useDebounce(
+//     () => {
+//       const newNamespace = value === '' ? undefined : value;
+//       if (newNamespace === namespace) return;
+//       dispatch(namespaceUpdated({namespace: newNamespace}));
+//     },
+//     DEFAULT_EDITOR_DEBOUNCE,
+//     [value]
+//   );
 
-  return (
-    <S.NamespaceInput
-      placeholder="Set default namespace"
-      disabled={disabled}
-      value={value}
-      options={options}
-      onSearch={setValue}
-    />
-  );
-}
+//   return (
+//     <AutoComplete
+//       style={{width: 175}}
+//       placeholder="Set default namespace"
+//       disabled={disabled}
+//       value={value}
+//       options={options}
+//       onChange={setValue}
+//     />
+//   );
+// }
 
 function OperationSelect() {
   const dispatch = useAppDispatch();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const currentOperation = useAppSelector(state => state.compare.current.view.operation);
 
+  const handleSelect = useCallback(
+    (operation: CompareOperation) => {
+      dispatch(operationUpdated({operation}));
+    },
+    [dispatch]
+  );
+
   return (
-    <S.Select
+    <Select
       disabled={status !== 'comparing'}
-      onChange={(value: any) => dispatch(operationUpdated({operation: value}))}
+      onChange={handleSelect}
       defaultValue="union"
       value={currentOperation}
       style={{width: '160px'}}
@@ -132,7 +140,7 @@ function OperationSelect() {
       <Select.Option value="symmetricDifference">Only non-matching</Select.Option>
       <Select.Option value="leftJoin">View left join</Select.Option>
       <Select.Option value="rightJoin">View right join</Select.Option>
-    </S.Select>
+    </Select>
   );
 }
 
