@@ -2,7 +2,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Checkbox, Form, Input, Modal, Select} from 'antd';
+import {Checkbox, Form, Input, Modal, Select, TreeSelect} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
