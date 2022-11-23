@@ -13,3 +13,7 @@ export const ActionsRow = styled(Row)`
   margin-top: 20px;
   align-items: center;
 `;
+
+export const ResourceSetSelectorsContainer = styled.div<{$show: boolean}>`
+  display: ${({$show}) => ($show ? 'block' : 'none')};
+`;

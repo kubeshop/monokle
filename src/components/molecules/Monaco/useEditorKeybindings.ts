@@ -29,7 +29,7 @@ function useEditorKeybindings(
         id: 'monokle-apply-selection',
         label: 'Apply Selection',
         // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_S],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyS],
         run: () => {
           applySelection();
         },
@@ -44,7 +44,7 @@ function useEditorKeybindings(
         id: 'monokle-diff-selected-resource',
         label: 'Diff Selected Resource',
         // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_D],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyD],
         run: () => {
           diffSelectedResource();
         },
@@ -68,7 +68,7 @@ function useEditorKeybindings(
       id: 'monokle-open-new-resource-wizard',
       label: 'Open New Resource Wizard',
       // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN],
       run: () => {
         if (fileMap[ROOT_FILE_ENTRY]) {
           dispatch(openNewResourceWizard());
@@ -80,7 +80,7 @@ function useEditorKeybindings(
       id: 'monokle-reload-file-preview',
       label: 'Reload Preview',
       // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_R],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyR],
       run: () => {
         restartEditorPreview();
       },
@@ -90,7 +90,7 @@ function useEditorKeybindings(
       id: 'open-quick-search',
       label: 'Open Quick Search',
       // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_P],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP],
       run: () => {
         if (!uiState.quickSearchActionsPopup.isOpen) {
           dispatch(openQuickSearchActionsPopup());

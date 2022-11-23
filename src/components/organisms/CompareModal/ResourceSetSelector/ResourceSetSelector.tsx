@@ -14,6 +14,7 @@ import CommandSelect from './CommandSelect';
 import GitSelect from './GitSelect';
 import {HelmSelect} from './HelmSelect';
 import {KustomizeSelect} from './KustomizeSelect';
+import LocalSelect from './LocalSelect';
 import * as S from './ResourceSetSelector.styled';
 import {ResourceSetTypeSelect} from './ResourceSetTypeSelect';
 
@@ -38,6 +39,7 @@ export const ResourceSetSelector: React.FC<Props> = ({side}: Props) => {
     <S.ResourceSetSelectorDiv>
       <S.SelectSpacer>
         <ResourceSetTypeSelect side={side} />
+        {resourceSet?.type === 'local' && <LocalSelect side={side} />}
         {resourceSet?.type === 'git' && <GitSelect side={side} />}
         {resourceSet && ['helm', 'helm-custom'].includes(resourceSet.type) && <HelmSelect side={side} />}
         {resourceSet?.type === 'kustomize' && (

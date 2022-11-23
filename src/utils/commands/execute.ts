@@ -13,6 +13,7 @@ export type CommandOptions = {
   args: string[];
   env?: any;
   input?: string;
+  cwd?: string;
 };
 
 export type CommandResult = {
