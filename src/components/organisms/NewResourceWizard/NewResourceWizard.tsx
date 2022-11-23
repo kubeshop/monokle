@@ -582,6 +582,8 @@ const NewResourceWizard = () => {
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
             <TreeSelect
+              treeDefaultExpandedKeys={['<root>']}
+              dropdownMatchSelectWidth={false}
               value={selectedFolder}
               onChange={value => setSelectedFolder(value)}
               showSearch
