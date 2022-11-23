@@ -173,6 +173,9 @@ const initialUiState: UiState = {
     isOpen: false,
     resourceId: '',
   },
+  saveEditCommandModal: {
+    isOpen: false,
+  },
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
