@@ -11,16 +11,18 @@ import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main
 
 import {jsonToYaml} from '@utils/yaml';
 
-import {getRegisteredKindHandlers} from '@src/kindhandlers';
+import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandlers';
+import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {extractK8sResources} from './resource';
 
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
+  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   ClusterRole: `/apis/rbac.authorization.k8s.io/v1/clusterroles`,
   ClusterRoleBinding: `/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`,
   ConfigMap: `/api/v1/configmaps`,
   CronJob: `/apis/batch/v1/cronjobs`,
-  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   DaemonSet: `/apis/apps/v1/daemonsets`,
   Deployment: `/apis/apps/v1/deployments`,
   EndpointSlice: `/apis/discovery.k8s.io/v1/endpointslices`,
@@ -47,14 +49,18 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   VolumeAttachment: `/apis/storage.k8s.io/v1/volumeattachments`,
 };
 
+const crdRequestURLGenerator = (clusterApiVersion: string, plural: string) => {
+  return `/apis/${clusterApiVersion}/${plural}`;
+};
+
 const watchers: {[resourceKind: string]: any} = {};
 
 const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
   try {
-    watchers[kindHandler.kind].abort();
-    watchers[kindHandler.kind] = undefined;
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].abort();
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = undefined;
   } catch (error) {
-    watchers[kindHandler.kind] = undefined;
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = undefined;
   }
 };
 
@@ -64,25 +70,46 @@ const watchResource = async (
   kubeConfig: k8s.KubeConfig,
   previewResources: ResourceMapType
 ) => {
+  console.log('watchResource', kindHandler.isCustom, kindHandler.clusterApiVersion);
+
   disconnectResourceFromCluster(kindHandler);
-  watchers[kindHandler.kind] = await new k8s.Watch(kubeConfig).watch(
-    resourceKindRequestURLs[kindHandler.kind],
+  watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = await new k8s.Watch(kubeConfig).watch(
+    kindHandler.isCustom
+      ? crdRequestURLGenerator(kindHandler.clusterApiVersion, kindHandler.kind)
+      : resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
-      if (type === 'ADDED') {
-        const resource: K8sResource = processResource(apiObj, kubeConfig);
-        if (!previewResources[resource.id]) {
-          dispatch(updateClusterResource(resource));
+      if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
+        if (type === 'ADDED') {
+          registerCrdKindHandlers(JSON.stringify(apiObj));
+          const handler = extractKindHandler(JSON.stringify(apiObj));
+          if (handler) {
+            watchResource(dispatch, handler, kubeConfig, previewResources);
+          }
+          return;
         }
-        return;
-      }
-
-      if (type === 'MODIFIED') {
-        dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
-        return;
-      }
-      if (type === 'DELETED') {
-        dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
+        if (type === 'MODIFIED') {
+          registerCrdKindHandlers(JSON.stringify(apiObj), undefined, true);
+          const handler = extractKindHandler(JSON.stringify(apiObj));
+          if (handler) {
+            watchResource(dispatch, handler, kubeConfig, previewResources);
+          }
+        }
+      } else {
+        if (type === 'ADDED') {
+          const resource: K8sResource = processResource(apiObj, kubeConfig);
+          if (!previewResources[resource.id]) {
+            dispatch(updateClusterResource(resource));
+          }
+          return;
+        }
+        if (type === 'MODIFIED') {
+          dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
+          return;
+        }
+        if (type === 'DELETED') {
+          dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
+        }
       }
     },
     (error: any) => {
@@ -107,6 +134,7 @@ export const startWatchingResources = (
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
     watchResource(dispatch, handler, kubeConfig, previewResources)
   );
+  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
 };
 
 export const disconnectFromCluster = () => {
