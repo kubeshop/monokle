@@ -2,7 +2,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Form, Input, Modal, Select} from 'antd';
+import {Form, Input, Modal, Select, TreeSelect} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
@@ -24,6 +24,7 @@ import {registeredKindHandlersSelector} from '@redux/selectors';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
+import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
@@ -85,6 +86,8 @@ const NewResourceWizard = () => {
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [exportFileName, setExportFileName] = useState<string | undefined>('');
+
+  const treeData = useFolderTreeSelectData();
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -398,22 +401,17 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
-    const folders: string[] = [];
+  const filesList: string[] = useMemo(() => {
     const files: string[] = [];
 
     Object.entries(fileMap).forEach(([key, value]) => {
-      if (value.children) {
-        folders.push(key.replace(path.sep, ''));
-      } else {
-        if (!value.isSupported || value.isExcluded) {
-          return;
-        }
-        files.push(key.replace(path.sep, ''));
+      if (value.children || !value.isSupported || value.isExcluded) {
+        return;
       }
+      files.push(key.replace(path.sep, ''));
     });
 
-    return [folders, files];
+    return files;
   }, [fileMap]);
 
   const renderFileSelectOptions = useCallback(() => {
@@ -423,14 +421,6 @@ const NewResourceWizard = () => {
       </Option>
     ));
   }, [filesList]);
-
-  const renderFolderSelectOptions = useCallback(() => {
-    return foldersList.map(folderName => (
-      <Option key={folderName} value={folderName}>
-        {folderName}
-      </Option>
-    ));
-  }, [foldersList]);
 
   const onSelectChange = () => {
     setInputValue('');
@@ -591,14 +581,15 @@ const NewResourceWizard = () => {
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
-            <StyledSelect
-              showSearch
-              onChange={(value: any) => setSelectedFolder(value)}
+            <TreeSelect
               value={selectedFolder}
+              onChange={value => setSelectedFolder(value)}
+              showSearch
+              treeDefaultExpandAll
+              treeData={[treeData]}
               style={{flex: 2}}
-            >
-              {renderFolderSelectOptions()}
-            </StyledSelect>
+              treeNodeLabelProp="label"
+            />
           )}
           {savingDestination === 'saveToFile' && (
             <StyledSelect
