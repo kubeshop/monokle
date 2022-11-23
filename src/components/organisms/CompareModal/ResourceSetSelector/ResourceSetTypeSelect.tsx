@@ -30,7 +30,11 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
 
   const handleSelectType = useCallback(
     (type: ResourceSet['type']) => {
-      dispatch(resourceSetSelected({side, value: {type}}));
+      if (type === 'local') {
+        dispatch(resourceSetSelected({side, value: {type, folder: '<root>'}}));
+      } else {
+        dispatch(resourceSetSelected({side, value: {type}}));
+      }
     },
     [dispatch, side]
   );

@@ -28,7 +28,6 @@ const LocalSelect: React.FC<IProps> = ({side}) => {
         treeDefaultExpandedKeys={['<root>']}
         dropdownMatchSelectWidth={false}
         onChange={handleSelect}
-        defaultOpen
         placeholder="Choose Folder..."
         style={{width: 180}}
         treeData={[treeData]}
