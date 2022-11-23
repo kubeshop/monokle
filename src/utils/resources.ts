@@ -147,5 +147,5 @@ export function countResourceErrors(resources: K8sResource[]): number {
 }
 
 export function getApiVersionGroup(resource: K8sResource) {
-  return resource.version.includes('/') ? resource.version.split('/')[0] : 'kubernetes';
+  return resource.apiVersion.includes('/') ? resource.apiVersion.split('/')[0] : 'kubernetes';
 }

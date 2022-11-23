@@ -19,7 +19,7 @@ import {CompareOperation} from '@monokle-desktop/shared/models/compare';
 
 import * as S from './CompareActionBar.styled';
 
-export const CompareActionBar: React.FC = () => {
+const CompareActionBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
   const isAllSelected = useAppSelector(state => selectIsAllComparisonSelected(state.compare));
@@ -143,3 +143,5 @@ function OperationSelect() {
     </Select>
   );
 }
+
+export default CompareActionBar;

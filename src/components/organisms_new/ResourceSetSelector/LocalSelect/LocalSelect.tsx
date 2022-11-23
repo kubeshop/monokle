@@ -1,9 +1,11 @@
 import {TreeSelect} from 'antd';
 
-import {CompareSide, PartialResourceSet, resourceSetSelected, selectResourceSet} from '@redux/compare';
+import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+
+import {CompareSide, PartialResourceSet} from '@monokle-desktop/shared/models/compare';
 
 import * as S from '../ResourceSetSelectColor.styled';
 
