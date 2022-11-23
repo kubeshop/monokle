@@ -161,6 +161,7 @@ export type ResourceSet =
 
 export type LocalResourceSet = {
   type: 'local';
+  folder: string;
   defaultNamespace?: string;
 };
 
