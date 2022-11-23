@@ -609,7 +609,7 @@ const NewResourceWizard = () => {
           label="Select existing resource as template"
           initialValue={SELECT_OPTION_NONE}
         >
-          <Select showSearch disabled={generateRandom === true}>
+          <Select showSearch disabled={generateRandom}>
             <Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
               {SELECT_OPTION_NONE}
             </Option>
