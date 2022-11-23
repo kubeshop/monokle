@@ -5,6 +5,8 @@ import {K8sResource} from '@models/k8sresource';
 import {setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {ResourceRefsIconPopover} from '@components/molecules';
+
 import * as S from './Drawer.styled';
 
 export const Drawer = () => {
@@ -27,65 +29,90 @@ export const Drawer = () => {
       size="large"
       open={Boolean(selectedResourceId)}
       getContainer={false}
-      title={<S.DrawerTitle>{localResource?.name}</S.DrawerTitle>}
+      title={
+        localResource ? (
+          <div style={{display: 'flex'}}>
+            <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="incoming" />
+            <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
+            <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
+          </div>
+        ) : (
+          <div> - </div>
+        )
+      }
       onClose={() => {
         dispatch(setSelectedResourceId());
       }}
     >
       <S.TabsContainer>
-        <S.Tabs defaultActiveKey="1">
-          <S.Tabs.TabPane tab="Info" key="1">
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>{' '}
-          </S.Tabs.TabPane>
-          <S.Tabs.TabPane tab="Code" key="2">
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-            <p>Some contents1...</p>
-          </S.Tabs.TabPane>
-        </S.Tabs>
+        <S.Tabs
+          defaultActiveKey="1"
+          items={[
+            {
+              label: 'Info',
+              key: '1',
+              children: (
+                <>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                </>
+              ),
+            },
+            {
+              label: 'Code',
+              key: '2',
+              children: (
+                <>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                  <p>Some contents1...</p>
+                </>
+              ),
+            },
+          ]}
+        />
         <S.TabsFooter>
           <S.NavigationButton>
             <S.LeftOutlined />

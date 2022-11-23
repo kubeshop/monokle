@@ -2,6 +2,10 @@ import {Tag} from 'antd';
 
 import {DateTime} from 'luxon';
 
+import {K8sResource} from '@models/k8sresource';
+
+import {ResourceRefsIconPopover} from '@components/molecules';
+
 import * as S from './TableCells.styled';
 
 export const CellStatus = {
@@ -34,10 +38,16 @@ export const CellAge = {
 
 export const CellName = {
   title: 'Name',
-  dataIndex: 'name',
+  dataIndex: '',
   key: 'name',
-  width: '320px',
-  render: (name: string) => <div>{name}</div>,
+  width: '400px',
+  render: (resource: K8sResource) => (
+    <div style={{display: 'flex'}}>
+      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={resource} type="incoming" />
+      <div>{resource.name}</div>
+      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={resource} type="outgoing" />
+    </div>
+  ),
 };
 
 export const CellNamespace = {
@@ -172,7 +182,7 @@ export const CellEndpoints = {
   title: 'Endpoints',
   dataIndex: 'content',
   key: 'endpoints',
-  width: '180px',
+  width: '240px',
   render: (content: any) =>
     content?.subsets ? (
       content?.subsets.map(

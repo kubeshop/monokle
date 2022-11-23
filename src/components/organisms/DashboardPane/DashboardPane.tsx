@@ -16,6 +16,7 @@ export const DashboardPane = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<any>({});
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export const DashboardPane = () => {
       }, menu)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers()]);
+  }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
 
   const getResourceCount = useCallback(
     (kind: string) => {
