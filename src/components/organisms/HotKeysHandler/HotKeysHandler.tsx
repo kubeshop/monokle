@@ -2,8 +2,6 @@ import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -21,18 +19,14 @@ import {
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
-  isInPreviewModeSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
   kubeConfigPathSelector,
-  kubeConfigPathValidSelector,
   selectedResourceSelector,
 } from '@redux/selectors';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
-import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
 import {applyResource} from '@redux/thunks/applyResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
@@ -42,6 +36,15 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
+import {
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathValidSelector,
+} from '@monokle-desktop/shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();

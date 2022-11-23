@@ -1,17 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-import {CommandOptions} from './execute';
-
-type HelmEnv = {
-  KUBECONFIG?: string;
-};
-
-type HelmInstallArgs = {
-  kubeContext: string;
-  values: string;
-  name: string;
-  chart: string;
-};
+import {CommandOptions, HelmEnv, HelmInstallArgs, HelmTemplateArgs} from '@monokle-desktop/shared/models/commands';
 
 export function createHelmInstallCommand(
   {kubeContext, values, name, chart}: HelmInstallArgs,
@@ -24,12 +13,6 @@ export function createHelmInstallCommand(
     env,
   };
 }
-
-type HelmTemplateArgs = {
-  values: string;
-  name: string;
-  chart: string;
-};
 
 export function createHelmTemplateCommand({values, name, chart}: HelmTemplateArgs, env?: HelmEnv): CommandOptions {
   return {

@@ -4,15 +4,16 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
-import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {createKubeClient} from '@utils/kubeclient';
 import {getDefaultNamespaceForApply} from '@utils/resources';
+
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 

@@ -6,25 +6,20 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
-import {AlertEnum} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import Colors from '@styles/Colors';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

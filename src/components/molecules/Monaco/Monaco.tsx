@@ -5,7 +5,9 @@ import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
+// eslint-disable-next-line import/no-duplicates
 import 'monaco-editor';
+// eslint-disable-next-line import/no-duplicates
 import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
@@ -16,12 +18,6 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {Document, ParsedNode, isMap} from 'yaml';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ResourceFilterType} from '@models/appstate';
-import {ResourceRef} from '@models/k8sresource';
-import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -34,7 +30,7 @@ import {
   setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {settingsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
@@ -45,6 +41,12 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

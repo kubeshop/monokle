@@ -1,11 +1,5 @@
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
 import {
   checkMultipleResourceIds,
   checkResourceId,
@@ -13,12 +7,19 @@ import {
   uncheckMultipleResourceIds,
   uncheckResourceId,
 } from '@redux/reducers/main';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
+
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';

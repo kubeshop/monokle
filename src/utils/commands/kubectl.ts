@@ -1,16 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-import {CommandOptions} from './execute';
-
-type KubectlEnv = {
-  KUBECONFIG?: string;
-};
-
-type KubectlApplyArgs = {
-  context: string;
-  input: string;
-  namespace?: string;
-};
+import {CommandOptions, KubectlApplyArgs, KubectlEnv} from '@monokle-desktop/shared/models/commands';
 
 export function createKubectlApplyCommand(
   {context, namespace, input}: KubectlApplyArgs,

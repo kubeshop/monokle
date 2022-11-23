@@ -1,17 +1,17 @@
 import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import initialState from '@redux/initialState';
+import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
+import {getK8sResources} from '@redux/services/resource';
+
 import {
   FileMapType,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
-} from '@models/appstate';
-
-import initialState from '@redux/initialState';
-import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
-import {getK8sResources} from '@redux/services/resource';
+} from '@monokle-desktop/shared/models/appState';
+import {AppConfig} from '@monokle-desktop/shared/models/config';
 
 import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 

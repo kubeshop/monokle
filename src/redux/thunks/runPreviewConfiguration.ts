@@ -5,18 +5,19 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/commands';
+import {runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
-import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart

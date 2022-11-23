@@ -1,6 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {FormsState, initialState} from './state';
+import {FormsState} from '@monokle-desktop/shared/models/form';
+
+import {initialState} from './state';
 
 export const formSlice = createSlice({
   name: 'forms',

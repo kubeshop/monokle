@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {PanelColors} from '@styles/Colors';
+import {PanelColors} from '@monokle-desktop/shared/styles/colors';
 
 export const SplitViewContainer = styled.div`
   position: relative;

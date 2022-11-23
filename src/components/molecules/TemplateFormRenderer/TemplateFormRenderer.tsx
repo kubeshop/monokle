@@ -10,11 +10,10 @@ import fs from 'fs';
 import log from 'loglevel';
 import {Primitive} from 'type-fest';
 
-import {TemplateForm} from '@models/template';
-
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
-import Colors from '@styles/Colors';
+import {TemplateForm} from '@monokle-desktop/shared/models/template';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 

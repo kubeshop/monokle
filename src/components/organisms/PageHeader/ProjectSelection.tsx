@@ -21,13 +21,10 @@ import {
   SearchProjectTooltip,
 } from '@constants/tooltips';
 
-import {Project} from '@models/appconfig';
-
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject, updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
-import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import {Walkthrough} from '@molecules';
 
@@ -37,6 +34,9 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getRelativeDate} from '@utils';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {Project} from '@monokle-desktop/shared/models/config';
+import {activeProjectSelector, unsavedResourcesSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ProjectSelection.styled';
 

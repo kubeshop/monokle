@@ -7,9 +7,6 @@ import {isEqual} from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
-import {GitChangedFile} from '@models/git';
-
 import {setGitLoading, setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -18,11 +15,13 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 
 import {Dots} from '@components/atoms';
 
-import {deleteFile} from '@utils/fileSystem';
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import Colors from '@styles/Colors';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {GitChangedFile} from '@monokle-desktop/shared/models/git';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {deleteFile} from '@monokle-desktop/shared/utils/fileSystem';
 
 import * as S from './FileList.styled';
 

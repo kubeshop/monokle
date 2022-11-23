@@ -2,10 +2,6 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {AppState} from '@models/appstate';
-import {RootState} from '@models/rootstate';
-import {ThunkApi} from '@models/thunk';
-
 import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
@@ -14,6 +10,10 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
+
+import {AppState} from '@monokle-desktop/shared/models/appState';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {ThunkApi} from '@monokle-desktop/shared/models/thunk';
 
 type UpdateResourcePayload = {
   resourceId: string;

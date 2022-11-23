@@ -1,12 +1,11 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {ScrollIntoView} from '@molecules';
+import {ScrollIntoView} from '@atoms';
+import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
-import {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {ItemBlueprint, ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 
 import {useItemCustomization} from './useItemCustomization';
 

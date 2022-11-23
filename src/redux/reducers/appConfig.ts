@@ -7,23 +7,6 @@ import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {
-  AppConfig,
-  ClusterAccess,
-  KubeConfig,
-  Languages,
-  NewVersionCode,
-  Project,
-  ProjectConfig,
-  Settings,
-  TextSizes,
-  Themes,
-} from '@models/appconfig';
-import {ClusterColors} from '@models/cluster';
-import {UiState} from '@models/ui';
-
 import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
@@ -38,11 +21,27 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import electronStore from '@utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
+
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
+import {
+  AppConfig,
+  ClusterAccess,
+  KubeConfig,
+  Languages,
+  NewVersionCode,
+  Project,
+  ProjectConfig,
+  Settings,
+  TextSizes,
+  Themes,
+} from '@monokle-desktop/shared/models/config';
+import {UiState} from '@monokle-desktop/shared/models/ui';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

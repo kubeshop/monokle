@@ -16,11 +16,6 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {ClusterAccess} from '@models/appconfig';
-import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
-import {Policy} from '@models/policy';
-
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {
   isKustomizationFilePath,
@@ -28,8 +23,9 @@ import {
   isKustomizationResource,
   processKustomizations,
 } from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef, processRefs, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
+// import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
@@ -44,7 +40,11 @@ import {
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {processRefs} from './resourceRefs';
+import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@monokle-desktop/shared/models/appState';
+import {ClusterAccess} from '@monokle-desktop/shared/models/config';
+import {K8sResource, RefPosition, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
+import {Policy} from '@monokle-desktop/shared/models/policy';
+
 import {validatePolicies, validateResource} from './validation';
 
 /**
@@ -474,7 +474,7 @@ export function reprocessResources(
       const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
 
       resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
-      resource.version =
+      resource.apiVersion =
         resource.content.apiVersion ||
         (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
 
@@ -507,7 +507,7 @@ type ValidationOptions = {
   policyPlugins?: Policy[];
 };
 
-export function processResources(
+export async function processResources(
   schemaVersion: string,
   userHomeDir: string,
   resourceMap: ResourceMapType,
@@ -515,6 +515,9 @@ export function processResources(
   options?: ValidationOptions
 ) {
   const {current, other} = decideResourcesToValidate(resourceMap, options);
+
+  // const response = await VALIDATOR.validate({resources: other});
+  // console.log('Response:', response);
 
   if (current) {
     validateResource(current, schemaVersion, userHomeDir);
@@ -712,12 +715,14 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, content.kind),
+            fileId: relativePath,
             filePath: relativePath,
+            fileOffset: 0,
             id: (content.metadata && content.metadata.uid) || uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: content.kind,
-            version: content.apiVersion,
+            apiVersion: content.apiVersion,
             content,
             text,
             isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
@@ -762,12 +767,14 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         else if (content && isKustomizationFilePath(relativePath) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
+            fileId: relativePath,
             filePath: relativePath,
+            fileOffset: 0,
             id: uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: KUSTOMIZATION_API_VERSION,
+            apiVersion: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
             isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,

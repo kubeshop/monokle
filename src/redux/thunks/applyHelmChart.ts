@@ -2,17 +2,18 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {FileMapType} from '@models/appstate';
-import {HelmChart, HelmValuesFile} from '@models/helm';
-
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
 import {runCommandInMainThread} from '@utils/commands';
-import {APPLY_HELM_CHART, trackEvent} from '@utils/telemetry';
+
+import {APPLY_HELM_CHART} from '@monokle-desktop/shared/constants/telemetry';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Invokes helm install for the specified helm chart and values file

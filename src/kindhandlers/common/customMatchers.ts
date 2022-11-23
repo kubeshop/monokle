@@ -1,4 +1,4 @@
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 /**
  * Matcher that ensures the source and target namespace are the same
@@ -55,5 +55,5 @@ export function targetGroupMatcher(
   if (!value && properties && properties['defaultGroup']) {
     value = properties['defaultGroup'];
   }
-  return targetResource.version.startsWith(`${value}/`);
+  return targetResource.apiVersion.startsWith(`${value}/`);
 }

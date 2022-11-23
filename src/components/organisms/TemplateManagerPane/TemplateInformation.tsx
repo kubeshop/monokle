@@ -6,14 +6,14 @@ import {DeliveredProcedureOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 
-import {AnyTemplate} from '@models/template';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {handleFavoriteTemplate} from '@redux/reducers/appConfig';
 
 import {Icon, ImageIcon} from '@atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
+
+import {AnyTemplate} from '@monokle-desktop/shared/models/template';
 
 import * as S from './TemplateInformation.styled';
 

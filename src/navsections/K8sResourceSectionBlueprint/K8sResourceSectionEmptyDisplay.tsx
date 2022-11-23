@@ -2,16 +2,16 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import {ResourceFilterType} from '@models/appstate';
-import {HighlightItems} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
-import Colors from '@styles/Colors';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {HighlightItems} from '@monokle-desktop/shared/models/ui';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

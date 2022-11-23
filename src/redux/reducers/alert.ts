@@ -1,8 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {AlertState, AlertType} from '@models/alert';
-
 import initialState from '@redux/initialState';
+
+import {AlertState, AlertType} from '@monokle-desktop/shared/models/alert';
 
 export const alertSlice = createSlice({
   name: 'alert',

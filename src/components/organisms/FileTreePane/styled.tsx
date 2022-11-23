@@ -2,12 +2,13 @@ import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-import Colors, {FontColors} from '@styles/Colors';
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
+import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
 
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
+  padding: 15px 25px 15px 15px;
 
   & .ant-tree {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
@@ -31,7 +32,6 @@ export const FileTreeContainer = styled.div`
   }
 
   & .ant-tree-treenode {
-    margin-left: 8px;
     background: transparent;
   }
 
@@ -146,11 +146,8 @@ export const NumberOfResources = styled.span`
 `;
 
 export const RootFolderText = styled.div`
-  font-size: 12px;
-  line-height: 22px;
-  color: ${Colors.grey7};
-  margin-top: 10px;
-  margin-left: 14px;
+  font-size: 10px;
+  color: ${Colors.geekblue8};
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -182,6 +179,22 @@ export const Title = styled.span`
   white-space: nowrap;
   overflow: hidden;
   padding-right: 10px;
+`;
+
+export const TitleBarActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .ant-btn-icon-only.ant-btn-sm {
+    width: 20px;
+    height: 20px;
+  }
+
+  .anticon {
+    color: ${Colors.whitePure};
+    font-size: 16px;
+  }
 `;
 
 export const TitleBarContainer = styled.div`

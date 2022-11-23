@@ -7,27 +7,23 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import path from 'path';
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {ContextMenu} from '@molecules';
-
-import {Dots} from '@atoms';
+import {ContextMenu, Dots} from '@atoms';
 
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

@@ -14,12 +14,7 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelector,
-  selectedResourceSelector,
-  settingsSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
@@ -27,8 +22,11 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
-import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {CHANGES_BY_FORM_EDITOR} from '@monokle-desktop/shared/constants/telemetry';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';

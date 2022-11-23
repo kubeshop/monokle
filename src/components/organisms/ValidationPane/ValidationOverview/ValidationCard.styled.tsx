@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {Icon as BaseIcon} from '@atoms';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Card = styled(AntdCard)`
   border: 2px solid #31393c;
@@ -45,4 +45,10 @@ export const Button = styled(AntdButton)`
   background-color: ${Colors.blue7};
   margin-top: 10px;
   display: block;
+`;
+
+export const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;

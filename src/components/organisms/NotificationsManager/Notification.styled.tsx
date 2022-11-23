@@ -4,9 +4,8 @@ import {CopyOutlined as RawCopyOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {AlertEnum} from '@models/alert';
-
-import Colors from '@styles/Colors';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Span = styled.span`
   font-weight: 500;

@@ -5,12 +5,7 @@ import {v4 as uuid} from 'uuid';
 
 import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
 
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
-import {ResourceSet} from '@redux/compare';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
@@ -20,6 +15,12 @@ import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceSet} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 type Type = ResourceSet['type'];
 
@@ -135,10 +136,12 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     id,
     name,
     kind: rawResource.kind,
-    version: rawResource.apiVersion,
+    apiVersion: rawResource.apiVersion,
     content: cloneDeep(rawResource),
     text: jsonToYaml(rawResource),
+    fileId: `${UNSAVED_PREFIX}${id}`,
     filePath: `${UNSAVED_PREFIX}${id}`,
+    fileOffset: 0,
     isHighlighted: false,
     isSelected: false,
     isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,

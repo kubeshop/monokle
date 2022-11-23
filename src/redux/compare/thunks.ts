@@ -5,15 +5,14 @@ import invariant from 'tiny-invariant';
 
 import {ERROR_MSG_FALLBACK} from '@constants/constants';
 
-import {AlertType} from '@models/alert';
-import {ThunkApi} from '@models/thunk';
-
 import {setAlert} from '@redux/reducers/alert';
 import {doTransferResource} from '@redux/services/compare/transferResource';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
-import {CompareSide, MatchingResourceComparison, TransferDirection} from './state';
+import {AlertType} from '@monokle-desktop/shared/models/alert';
+import {CompareSide, MatchingResourceComparison, TransferDirection} from '@monokle-desktop/shared/models/compare';
+import {ThunkApi} from '@monokle-desktop/shared/models/thunk';
 
 type TransferResourceArgs = {
   ids: string[];

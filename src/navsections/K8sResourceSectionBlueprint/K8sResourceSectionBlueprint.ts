@@ -1,19 +1,20 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';

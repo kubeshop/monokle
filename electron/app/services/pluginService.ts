@@ -2,16 +2,14 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {AnyExtension} from '@models/extension';
+import type {AnyExtension} from '@monokle-desktop/shared/models/extension';
 import {
-  AnyPlugin,
-  PluginPackageJson,
   isTemplatePluginModule,
   validatePluginPackageJson,
   validateTemplatePluginModule,
-} from '@models/plugin';
-
-import {createFolder, doesPathExist} from '@utils/fileSystem';
+} from '@monokle-desktop/shared/models/plugin';
+import type {AnyPlugin, PluginPackageJson} from '@monokle-desktop/shared/models/plugin';
+import {createFolder, doesPathExist} from '@monokle-desktop/shared/utils/fileSystem';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

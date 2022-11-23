@@ -1,7 +1,10 @@
 import React, {useCallback} from 'react';
 
-import {ComparisonView, compareToggled} from '@redux/compare';
+import {compareToggled} from '@redux/compare';
 import {useAppDispatch} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
+
+import {ComparisonView} from '@monokle-desktop/shared/models/compare';
 
 import * as S from './QuickActionCompare.styled';
 
@@ -17,13 +20,8 @@ const QuickActionCompare: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
 
   const handleCompare = useCallback(() => {
-    dispatch(
-      compareToggled({
-        from,
-        value: true,
-        initialView: view,
-      })
-    );
+    dispatch(setLeftMenuSelection('compare'));
+    dispatch(compareToggled({from, initialView: view}));
   }, [dispatch, from, view]);
 
   return (

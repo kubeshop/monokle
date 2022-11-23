@@ -6,12 +6,12 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {isEqual} from 'lodash';
 
-import {ResourceFilterType} from '@models/appstate';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds} from '@redux/reducers/main';
 
 import {isResourcePassingFilter} from '@utils/resources';
+
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
 
 const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();

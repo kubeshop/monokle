@@ -3,13 +3,8 @@ import {useHotkeys} from 'react-hotkeys-hook';
 
 import invariant from 'tiny-invariant';
 
-import hotkeys from '@constants/hotkeys';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} from '@constants/tooltips';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-import {RootState} from '@models/rootstate';
-
-import {ResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {selectHelmConfig, selectHelmValues} from '@redux/selectors';
@@ -17,8 +12,13 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {isDefined} from '@utils/filter';
+
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {ResourceSet} from '@monokle-desktop/shared/models/compare';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
 
 import * as S from './HelmChartQuickAction.styled';
 

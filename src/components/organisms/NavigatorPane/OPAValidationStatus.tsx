@@ -4,13 +4,13 @@ import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {OPA_INTEGRATION} from '@models/integrations';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 
 import {Icon} from '@atoms';
+
+import {OPA_INTEGRATION} from '@monokle-desktop/shared/models/integrations';
 
 import * as S from './OPAValidationStatus.styled';
 

@@ -13,15 +13,16 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
 
-import {KeyValueInput} from '@atoms';
+import {InputTags, KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
-import InputTags from '../InputTags';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+
 import * as S from './ResourceFilter.styled';
 
 const ALL_OPTIONS = '<all>';
@@ -44,9 +45,7 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const areFiltersDisabled = useAppSelector(
-    state => Boolean(state.main.checkedResourceIds.length) || Boolean(state.main.clusterDiff.selectedMatches.length)
-  );
+  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);

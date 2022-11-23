@@ -2,10 +2,10 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {ValidationIntegration} from '@models/integrations';
-
 import {useAppDispatch} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
+
+import {ValidationIntegration} from '@monokle-desktop/shared/models/integrations';
 
 import * as S from './ValidationPaneHeading.styled';
 

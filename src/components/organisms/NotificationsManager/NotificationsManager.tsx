@@ -1,11 +1,11 @@
 import {useCallback, useEffect} from 'react';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {seenNotifications} from '@redux/reducers/main';
 
 import {sleep} from '@utils/sleep';
+
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 import Notification from './Notification';
 

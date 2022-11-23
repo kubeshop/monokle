@@ -8,10 +8,10 @@ import {Button, Skeleton} from 'antd';
 import path from 'path';
 import semver from 'semver';
 
-import {loadResource} from '@redux/services';
-
 import {fetchAppVersion} from '@utils/appVersion';
 import {openUrlInExternalBrowser} from '@utils/shell';
+
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
 
 import * as S from './styled';
 

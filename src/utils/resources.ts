@@ -3,21 +3,11 @@ import _ from 'lodash';
 
 import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource, ResourceRefType} from '@models/k8sresource';
-
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
-export function makeResourceNameKindNamespaceIdentifier(partialResource: {
-  name: string;
-  kind: string;
-  namespace?: string;
-}) {
-  return `${partialResource.name}#${partialResource.kind}#${
-    partialResource.namespace ? partialResource.namespace : 'default'
-  }`;
-}
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (

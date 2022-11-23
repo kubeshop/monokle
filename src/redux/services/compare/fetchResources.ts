@@ -9,28 +9,13 @@ import {
   CLUSTER_DIFF_PREFIX,
   ERROR_MSG_FALLBACK,
   PREVIEW_PREFIX,
-  ROOT_FILE_ENTRY,
   YAML_DOCUMENT_DELIMITER_NEW_LINE,
 } from '@constants/constants';
 
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
-import {
-  ClusterResourceSet,
-  CommandResourceSet,
-  CustomHelmResourceSet,
-  GitResourceSet,
-  HelmResourceSet,
-  KustomizeResourceSet,
-  LocalResourceSet,
-  ResourceSet,
-} from '@redux/compare';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {
-  CommandOptions,
   createHelmInstallCommand,
   createHelmTemplateCommand,
   hasCommandFailed,
@@ -40,6 +25,21 @@ import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {
+  ClusterResourceSet,
+  CommandResourceSet,
+  CustomHelmResourceSet,
+  GitResourceSet,
+  HelmResourceSet,
+  KustomizeResourceSet,
+  LocalResourceSet,
+  ResourceSet,
+} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';
@@ -84,7 +84,7 @@ function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sRe
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
   const {branchName, commitHash = ''} = options;
 
-  const resources: K8sResource[] = await promiseFromIpcRenderer(
+  const filesContent: Record<string, string> = await promiseFromIpcRenderer(
     'git.getCommitResources',
     'git.getCommitResources.result',
     {
@@ -94,7 +94,7 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
     }
   );
 
-  return resources;
+  return Object.entries(filesContent).flatMap(([filePath, content]) => extractK8sResources(content, filePath));
 }
 
 async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {

@@ -1,10 +1,10 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@models/navigator';
-
 import {useAppDispatch} from '@redux/hooks';
 
 import {Walkthrough} from '@molecules';
+
+import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@monokle-desktop/shared/models/navigator';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';

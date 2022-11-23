@@ -2,7 +2,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const TitleContainer = styled.div`
   display: flex;

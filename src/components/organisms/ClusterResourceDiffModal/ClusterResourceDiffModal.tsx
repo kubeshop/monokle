@@ -9,20 +9,13 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {stringify} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
-
-import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -31,6 +24,9 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ClusterResourceDiffModal.styled';
 
@@ -121,11 +117,7 @@ const ClusterResourceDiffModal = () => {
     return Object.fromEntries(
       Object.entries(resourceMap).filter(entry => {
         const value = entry[1];
-        return (
-          !value.filePath.startsWith(PREVIEW_PREFIX) &&
-          !value.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-          value.name === targetResource.name
-        );
+        return !value.filePath.startsWith(PREVIEW_PREFIX) && value.name === targetResource.name;
       })
     );
   }, [isDiffModalVisible, resourceMap, targetResource]);

@@ -2,7 +2,7 @@ import {Col} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const ContentDiv = styled.div`
   margin-right: -8px;

@@ -6,16 +6,16 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {GitChangedFile} from '@models/git';
-
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {GitChangedFile} from '@monokle-desktop/shared/models/git';
 
 import BottomActions from './BottomActions';
 import FileList from './FileList';

@@ -2,9 +2,9 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {PlusCircleFilled, SearchOutlined} from '@ant-design/icons';
 
-import {GitBranch} from '@models/git';
-
 import {useAppSelector} from '@redux/hooks';
+
+import {GitBranch} from '@monokle-desktop/shared/models/git';
 
 import * as S from './BranchTable.styled';
 import CreateBranchInput from './CreateBranchInput';

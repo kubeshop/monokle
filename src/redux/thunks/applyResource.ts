@@ -4,19 +4,8 @@ import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {ProjectConfig} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-
 import {setAlert} from '@redux/reducers/alert';
-import {
-  addResource,
-  openResourceDiffModal,
-  setApplyingResource,
-  setClusterDiffRefreshDiffResource,
-} from '@redux/reducers/main';
+import {addResource, openResourceDiffModal, setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
@@ -26,7 +15,14 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
-import {APPLY, trackEvent} from '@utils/telemetry';
+
+import {APPLY} from '@monokle-desktop/shared/constants/telemetry';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -88,7 +84,6 @@ export async function applyResource(
   namespace?: {name: string; new: boolean},
   options?: {
     isClusterPreview?: boolean;
-    isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
     quiet?: boolean;
   }
@@ -135,12 +130,6 @@ export async function applyResource(
                 dispatch(openResourceDiffModal(resourceFromCluster?.metadata?.uid));
               }
             });
-          } else if (options?.shouldPerformDiff) {
-            if (options?.isInClusterDiff) {
-              dispatch(setClusterDiffRefreshDiffResource(true));
-            } else {
-              dispatch(openResourceDiffModal(resource.id));
-            }
           }
 
           if (namespace && namespace.new) {

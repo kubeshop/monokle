@@ -7,29 +7,27 @@ import {Dropdown, Tooltip} from 'antd';
 import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
-import {K8sResource} from '@models/k8sresource';
-import {HighlightItems} from '@models/ui';
-import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
-import {
-  activeProjectSelector,
-  currentClusterAccessSelector,
-  isInPreviewModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  kubeConfigPathValidSelector,
-} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigContextColorSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
-import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
+
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {HighlightItems} from '@monokle-desktop/shared/models/ui';
+import {Size} from '@monokle-desktop/shared/models/window';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {
+  activeProjectSelector,
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathValidSelector,
+} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 

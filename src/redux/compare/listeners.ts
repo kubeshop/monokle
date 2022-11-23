@@ -9,6 +9,8 @@ import {createResourceFilters, filterComparisons} from '@redux/services/compare/
 import {errorAlert} from '@utils/alert';
 import {errorMsg} from '@utils/error';
 
+import {CompareSide} from '@monokle-desktop/shared/models/compare';
+
 import {selectCompareStatus, selectResourceSet} from './selectors';
 import {
   compareToggled,
@@ -26,7 +28,6 @@ import {
   resourceSetSelected,
   searchUpdated,
 } from './slice';
-import {CompareSide} from './state';
 import {isCompleteResourceSet} from './utils';
 
 export const resourceFetchListener =

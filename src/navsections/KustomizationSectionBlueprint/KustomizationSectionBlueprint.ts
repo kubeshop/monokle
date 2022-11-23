@@ -1,13 +1,12 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ResourceFilterType, ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-
 import {selectK8sResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {isResourcePassingFilter} from '@utils/resources';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ResourceFilterType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';

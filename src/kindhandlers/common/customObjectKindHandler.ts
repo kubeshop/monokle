@@ -6,10 +6,6 @@ import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {loadResource} from '@redux/services';
 import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
 
@@ -22,14 +18,18 @@ import {
 } from '@src/kindhandlers/common/customMatchers';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
+
 /**
  * extract the version from the apiVersion string of the specified resource
  */
 
 function extractResourceVersion(resource: K8sResource, kindVersion: string, kindGroup: string) {
-  const ix = resource.version.lastIndexOf('/');
-  const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
-  const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+  const ix = resource.apiVersion.lastIndexOf('/');
+  const version = ix > 0 ? resource.apiVersion.substring(ix + 1) : kindVersion;
+  const group = ix > 0 ? resource.apiVersion.substring(0, ix) : kindGroup;
   return {version, group};
 }
 

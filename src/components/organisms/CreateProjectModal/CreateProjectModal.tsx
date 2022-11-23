@@ -7,8 +7,6 @@ import {existsSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
-import {AnyTemplate} from '@models/template';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {closeCreateProjectModal} from '@redux/reducers/ui';
@@ -18,9 +16,11 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
-import {CREATE_EMPTY_PROJECT, trackEvent} from '@utils/telemetry';
 
-import Colors from '@styles/Colors';
+import {CREATE_EMPTY_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
+import {AnyTemplate} from '@monokle-desktop/shared/models/template';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';

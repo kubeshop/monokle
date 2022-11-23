@@ -9,15 +9,6 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import fs from 'fs';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
-import {FileMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NewResourceWizardInput} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors';
@@ -30,6 +21,14 @@ import {useNamespaces} from '@hooks/useNamespaces';
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

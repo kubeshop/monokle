@@ -5,25 +5,9 @@ import log from 'loglevel';
 import {ERROR_MSG_FALLBACK} from '@constants/constants';
 
 import {isDefined} from '@utils/filter';
-import {ensureRendererThread} from '@utils/thread';
 
-export type CommandOptions = {
-  commandId: string;
-  cmd: string;
-  args: string[];
-  env?: any;
-  input?: string;
-  cwd?: string;
-};
-
-export type CommandResult = {
-  commandId: string;
-  exitCode: null | number;
-  signal: null | string;
-  stderr?: string;
-  stdout?: string;
-  error?: string;
-};
+import {CommandOptions, CommandResult} from '@monokle-desktop/shared/models/commands';
+import {ensureRendererThread} from '@monokle-desktop/shared/utils/thread';
 
 export function runCommandInMainThread(options: CommandOptions): Promise<CommandResult> {
   ensureRendererThread();

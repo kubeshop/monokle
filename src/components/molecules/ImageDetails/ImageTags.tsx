@@ -7,9 +7,9 @@ import {debounce, isEqual} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ImageTagTooltip} from '@constants/tooltips';
 
-import {DockerHubImageTags} from '@models/image';
-
 import {openUrlInExternalBrowser} from '@utils/shell';
+
+import {DockerHubImageTags} from '@monokle-desktop/shared/models/image';
 
 import * as S from './ImageTags.styled';
 

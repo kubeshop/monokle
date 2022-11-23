@@ -3,7 +3,15 @@ import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
 
-import {AppDispatch} from '@models/appdispatch';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {highlightFileMatches} from '@redux/reducers/main';
+import {setMonacoEditor} from '@redux/reducers/ui';
+
+import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
+import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
+import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
+
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
 import {
   FileMapType,
   HelmChartMapType,
@@ -12,17 +20,9 @@ import {
   ImagesListType,
   ResourceFilterType,
   ResourceMapType,
-} from '@models/appstate';
-import {CurrentMatch} from '@models/fileentry';
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightFileMatches} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
-
-import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
-import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
-import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
+} from '@monokle-desktop/shared/models/appState';
+import {CurrentMatch} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 

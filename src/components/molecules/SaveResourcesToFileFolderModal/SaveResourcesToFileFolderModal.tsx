@@ -10,12 +10,7 @@ import path from 'path';
 import util from 'util';
 import {stringify} from 'yaml';
 
-import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
-
-import {AlertEnum} from '@models/alert';
-import {FileMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource} from '@models/k8sresource';
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -31,7 +26,12 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {isDefined} from '@utils/filter';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import * as S from './SaveResourcesToFileFolderModal.styled';
 

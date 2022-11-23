@@ -8,13 +8,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
 
-import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
-
-import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
@@ -28,10 +22,8 @@ import {
 import {
   currentConfigSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelector,
   knownResourceKindsSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
 } from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -39,15 +31,20 @@ import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {applyResource} from '@redux/thunks/applyResource';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import {ContextMenu, ModalConfirmWithNamespaceSelect} from '@molecules';
+import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
-import {Dots} from '@atoms';
+import {ContextMenu, Dots} from '@atoms';
 
 import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
-import {defineHotkey} from '@utils/defineHotkey';
-
-import Colors from '@styles/Colors';
+import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
@@ -176,7 +173,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         defaultInput: {
           name: resource.name,
           kind: resource.kind,
-          apiVersion: resource.version,
+          apiVersion: resource.apiVersion,
           namespace: resource.namespace,
           selectedResourceId: resource.id,
         },

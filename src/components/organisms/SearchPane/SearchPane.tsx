@@ -9,8 +9,6 @@ import {flatten} from 'lodash';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {CurrentMatch, FileEntry, MatchNode} from '@models/fileentry';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   highlightFileMatches,
@@ -27,16 +25,18 @@ import {
   setActiveTab,
   setExpandedSearchedFiles,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 
-import {TitleBar} from '@molecules';
+import {TitleBar} from '@atoms';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
+
+import {CurrentMatch, FileEntry, MatchNode} from '@monokle-desktop/shared/models/fileEntry';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode, TreeNode} from '../FileTreePane/types';

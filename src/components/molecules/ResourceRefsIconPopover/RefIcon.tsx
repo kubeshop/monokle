@@ -1,12 +1,11 @@
 import React from 'react';
 
-import {ResourceRef} from '@models/k8sresource';
-
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {Icon} from '@atoms';
 
-import Colors from '@styles/Colors';
+import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 interface IProps {
   resourceRef: ResourceRef;

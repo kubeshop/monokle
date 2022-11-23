@@ -1,10 +1,10 @@
 import {monaco} from 'react-monaco-editor';
 
-import {MatchNode} from '@models/fileentry';
-
 import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {createInlineDecoration} from '@molecules/Monaco/editorHelpers';
+
+import {MatchNode} from '@monokle-desktop/shared/models/fileEntry';
 
 export const fileWithMatchesIntel: CodeIntelApply = {
   name: 'fileMatches',

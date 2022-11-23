@@ -2,8 +2,6 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {RootState} from '@models/rootstate';
-
 import {deleteResource, isFileResource, isUnsavedResource, removeResourceFromFile} from '@redux/services/resource';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {clearResourceSelections} from '@redux/services/selection';
@@ -11,6 +9,8 @@ import {clearResourceSelections} from '@redux/services/selection';
 import {createKubeClient} from '@utils/kubeclient';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 export const removeResources = createAsyncThunk(
   'main/removeResources',

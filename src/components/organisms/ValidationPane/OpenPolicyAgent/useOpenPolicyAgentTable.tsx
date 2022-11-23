@@ -7,14 +7,14 @@ import {ColumnsType} from 'antd/lib/table';
 
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
-import {IconNames} from '@models/icons';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
+import {toggleOPARules} from '@redux/validation/validation.slice';
 
 import {Icon} from '@atoms';
 
-import Colors from '@styles/Colors';
+import {IconNames} from '@monokle-desktop/shared/models/icons';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
@@ -24,9 +24,12 @@ export function useOpenPolicyAgentTable(width: number) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const handleToggle = useCallback(
-    (ruleId: string) => {
-      dispatch(toggleRule({ruleId}));
+    (rule: Rule) => {
+      dispatch(toggleRule({ruleId: rule.id}));
       dispatch(reprocessAllResources());
+
+      const ruleName = `open-policy-agent/${rule.name}`;
+      dispatch(toggleOPARules({ruleName}));
     },
     [dispatch]
   );
@@ -55,20 +58,21 @@ export function useOpenPolicyAgentTable(width: number) {
         key: 'description',
         title: 'Description',
         dataIndex: 'name',
-        render: (_value, record) => {
-          const {description, learnMoreUrl} = record;
+        render: (_value, rule) => {
+          const {fullDescription, id, learnMoreUrl, shortDescription} = rule;
+
           return (
             <Tooltip
               mouseEnterDelay={TOOLTIP_DELAY}
               title={
                 <p>
-                  {description} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
+                  {fullDescription} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
                 </p>
               }
               placement="bottomLeft"
               overlayStyle={{maxWidth: '500px'}}
             >
-              {record.name} <S.RuleId>{record.id}</S.RuleId>
+              {shortDescription} <S.RuleId>{id}</S.RuleId>
             </Tooltip>
           );
         },
@@ -87,17 +91,18 @@ export function useOpenPolicyAgentTable(width: number) {
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
-          sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
+          sorter: (a, b) =>
+            SEVERITY_ORDER_MAP[b.severity] - SEVERITY_ORDER_MAP[a.severity] || b.securitySeverity - a.securitySeverity,
         }),
         render: (_value, record) => (
-          <Icon {...SEVERITY_ICON_MAP[record.severity]} style={{height: 15, width: 15, paddingTop: 15}} />
+          <Icon {...severityIconMapper(record.securitySeverity)} style={{height: 15, width: 15, paddingTop: 15}} />
         ),
       },
       {
         key: 'enabled',
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
-          return <Switch checked={rule.enabled} onChange={() => handleToggle(rule.id)} />;
+          return <Switch checked={rule.enabled} onChange={() => handleToggle(rule)} />;
         },
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
           sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
@@ -110,13 +115,19 @@ export function useOpenPolicyAgentTable(width: number) {
 }
 
 const SEVERITY_ORDER_MAP: Record<Severity, number> = {
-  low: 1,
-  medium: 2,
-  high: 3,
+  recommendation: 1,
+  warning: 2,
+  error: 3,
 };
 
-const SEVERITY_ICON_MAP: Record<Severity, {name: IconNames; color: Colors}> = {
-  high: {name: 'severity-high', color: Colors.red7},
-  medium: {name: 'severity-medium', color: Colors.red7},
-  low: {name: 'severity-low', color: Colors.green7},
+const severityIconMapper = (securitySeverity: number): {name: IconNames; color: Colors} => {
+  if (securitySeverity < 3.9) {
+    return {name: 'severity-low', color: Colors.green7};
+  }
+
+  if (securitySeverity < 6.9) {
+    return {name: 'severity-medium', color: Colors.red7};
+  }
+
+  return {name: 'severity-high', color: Colors.red7};
 };

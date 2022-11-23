@@ -1,13 +1,8 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {SavedCommand} from '@models/appconfig';
-import {RootState} from '@models/rootstate';
-
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
-
-import {ComparisonListItem} from '@components/organisms/CompareModal/types';
 
 import {isDefined} from '@utils/filter';
 import {getApiVersionGroup} from '@utils/resources';
@@ -18,10 +13,13 @@ import {
   CompareSide,
   CompareState,
   CompareStatus,
+  ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
   TransferDirection,
-} from './state';
+} from '@monokle-desktop/shared/models/compare';
+import {SavedCommand} from '@monokle-desktop/shared/models/config';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;

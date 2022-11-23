@@ -1,6 +1,3 @@
-import {AppDispatch} from '@models/appdispatch';
-import {PreviewType} from '@models/appstate';
-
 import {
   clearPreview,
   clearPreviewAndSelectionHistory,
@@ -11,6 +8,9 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {PreviewType} from '@monokle-desktop/shared/models/appState';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';

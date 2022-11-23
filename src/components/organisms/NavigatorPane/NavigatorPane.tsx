@@ -1,19 +1,16 @@
 import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
-import {useMeasure} from 'react-use';
 
 import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
-
-import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
@@ -21,15 +18,14 @@ import {MonoPaneTitle} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {FeatureFlag} from '@utils/features';
-
-import Colors from '@styles/Colors';
-
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import ClusterCompareButton from './ClusterCompareButton';
-import {CompareButton} from './CompareButton';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
@@ -45,8 +41,6 @@ const NavPane: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-
-  const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
 
@@ -71,7 +65,7 @@ const NavPane: React.FC = () => {
   };
 
   return (
-    <S.NavigatorPaneContainer ref={navigatorPaneRef}>
+    <S.NavigatorPaneContainer>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
@@ -109,10 +103,6 @@ const NavPane: React.FC = () => {
                 />
               </Tooltip>
             </Badge>
-
-            <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
-              <CompareButton width={width} />
-            </FeatureFlag>
           </S.TitleBarRightButtons>
         </S.TitleBar>
       )}

@@ -12,12 +12,12 @@ import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
-import {logsSlice} from './reducers/logs';
 import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
-import {uiCoachSlice} from './reducers/uiCoach';
+import {validationListeners} from './validation/validation.listeners';
+import {validationSlice} from './validation/validation.slice';
 
 const middlewares: Middleware[] = [];
 
@@ -41,6 +41,7 @@ combineListeners([
   imageSelectedListener,
   removedTerminalListener,
   crdsPathChangedListener,
+  ...validationListeners,
 ]);
 
 const appReducer = combineReducers({
@@ -48,14 +49,13 @@ const appReducer = combineReducers({
   compare: compareSlice.reducer,
   config: configSlice.reducer,
   extension: extensionSlice.reducer,
-  logs: logsSlice.reducer,
   main: mainSlice.reducer,
   navigator: navigatorSlice.reducer,
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
-  uiCoach: uiCoachSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
+  validation: validationSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

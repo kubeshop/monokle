@@ -8,11 +8,6 @@ import log from 'loglevel';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {ClusterAccess} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
@@ -21,9 +16,15 @@ import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
-import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+
+import {CLUSTER_VIEW} from '@monokle-desktop/shared/constants/telemetry';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ClusterAccess} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(

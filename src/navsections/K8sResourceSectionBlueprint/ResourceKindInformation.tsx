@@ -4,9 +4,9 @@ import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppSelector} from '@redux/hooks';
+
+import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
 
 import * as S from './ResourceKindInformation.styled';
 

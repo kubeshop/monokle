@@ -2,10 +2,10 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
 
 const RoleBindingHandler: ResourceKindHandler = {
   kind: 'RoleBinding',
@@ -56,7 +56,7 @@ const RoleBindingHandler: ResourceKindHandler = {
           apiGroup: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
             const apiGroup =
               value || ['User', 'Group'].includes(siblingValues['kind']) ? 'rbac.authorization.k8s.io' : '';
-            return targetResource.version.startsWith(apiGroup);
+            return targetResource.apiVersion.startsWith(apiGroup);
           },
           namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
             // namespace should not be specified for User/Group kinds

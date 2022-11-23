@@ -17,8 +17,6 @@ import {
   makeReplaceResourceText,
 } from '@constants/makeApplyText';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
@@ -27,7 +25,6 @@ import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -44,6 +41,9 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import * as S from './styled';
 

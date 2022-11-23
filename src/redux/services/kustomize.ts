@@ -3,11 +3,11 @@ import path from 'path';
 
 import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource, ResourceRefType} from '@models/k8sresource';
-
 import {getResourcesForPath} from '@redux/services/fileEntry';
+
+import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {K8sResource, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
 
 import {NodeWrapper, getScalarNodes, linkResources} from './resource';
 
@@ -37,7 +37,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith(KUSTOMIZATION_API_GROUP));
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.apiVersion || r.apiVersion.startsWith(KUSTOMIZATION_API_GROUP));
 }
 
 /**

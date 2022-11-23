@@ -2,7 +2,7 @@ import {DeleteOutlined as RawDeleteOutlined, EditOutlined as RawEditOutlined} fr
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const LabelContainer = styled.div`
   position: relative;

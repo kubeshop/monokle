@@ -12,14 +12,12 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {kubeConfigContextColorSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import store from '@redux/store';
 
@@ -28,7 +26,10 @@ import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
+import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
+
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {activeProjectSelector, isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
@@ -170,7 +171,9 @@ const PageHeader = () => {
 
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
-          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          <S.LogoContainer>
+            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          </S.LogoContainer>
 
           {activeProject && (
             <>

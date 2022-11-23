@@ -4,16 +4,16 @@ import {Badge} from 'antd';
 
 import {FilterOutlined} from '@ant-design/icons';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ResourceFilterType} from '@models/appstate';
-
 import {useAppSelector} from '@redux/hooks';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
 
-import Colors from '@styles/Colors';
+import {IconWithPopover} from '@atoms';
 
-import IconWithPopover from '../IconWithPopover';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+
 import ResourceFilter from '../ResourceFilter';
 
 const ResourceFilterIconWithPopover: React.FC = () => {

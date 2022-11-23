@@ -1,15 +1,15 @@
-import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {HelmPreviewConfiguration} from '@models/appconfig';
-import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@models/appstate';
-import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
-import {SectionBlueprint} from '@models/navigator';
+import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
 import {isDefined} from '@utils/filter';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@monokle-desktop/shared/models/appState';
+import {HelmPreviewConfiguration} from '@monokle-desktop/shared/models/config';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';

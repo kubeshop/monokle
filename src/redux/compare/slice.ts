@@ -3,11 +3,6 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
-import {K8sResource} from '@models/k8sresource';
-
-import {trackEvent} from '@utils/telemetry';
-
-import {selectIsAllComparisonSelected} from './selectors';
 import {
   CompareFilter,
   CompareOperation,
@@ -17,8 +12,12 @@ import {
   ComparisonView,
   PartialResourceSet,
   ResourceComparison,
-  initialState,
-} from './state';
+} from '@monokle-desktop/shared/models/compare';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+
+import {initialState} from './initialState';
+import {selectIsAllComparisonSelected} from './selectors';
 import {transferResource} from './thunks';
 
 export const compareSlice = createSlice({
@@ -28,19 +27,12 @@ export const compareSlice = createSlice({
     compareToggled: (
       state: Draft<CompareState>,
       action: PayloadAction<{
-        value: boolean | undefined;
-        initialView?: ComparisonView;
+        initialView: ComparisonView;
         from?: 'compare-button' | 'quick-helm-compare' | 'quick-kustomize-compare';
       }>
     ) => {
-      const {value, initialView} = action.payload;
-      const close = value === undefined ? state.isOpen : value === false;
+      const {initialView} = action.payload;
 
-      if (close) {
-        return initialState;
-      }
-
-      state.isOpen = true;
       if (initialView) {
         state.current.view = initialView;
       }

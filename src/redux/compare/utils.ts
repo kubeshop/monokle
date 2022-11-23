@@ -1,6 +1,6 @@
 import {isDefined} from '@utils/filter';
 
-import {PartialResourceSet, ResourceSet} from './state';
+import {PartialResourceSet, ResourceSet} from '@monokle-desktop/shared/models/compare';
 
 export function isCompleteResourceSet(options: PartialResourceSet | undefined): options is ResourceSet {
   switch (options?.type) {

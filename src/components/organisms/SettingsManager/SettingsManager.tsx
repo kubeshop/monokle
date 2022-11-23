@@ -6,10 +6,8 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
-
-import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -27,9 +25,7 @@ import {
   updateProjectConfig,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
-import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
-
-import {SettingsPanel} from '@organisms/SettingsManager/types';
+import {currentConfigSelector} from '@redux/selectors';
 
 import {FileExplorer} from '@atoms';
 
@@ -37,7 +33,10 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import Colors from '@styles/Colors';
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {Project, ProjectConfig, SettingsPanel} from '@monokle-desktop/shared/models/config';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import {Settings} from './Settings';
 

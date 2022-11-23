@@ -6,10 +6,9 @@ import {MenuOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {PreviewConfigValuesFileItem} from '@models/appconfig';
-
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
+import {PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
 
 import * as S from './styled';
 

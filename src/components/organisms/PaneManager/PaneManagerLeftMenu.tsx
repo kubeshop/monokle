@@ -4,7 +4,6 @@ import {FolderOpenOutlined, FolderOutlined, FormatPainterOutlined} from '@ant-de
 
 import {v4 as uuidv4} from 'uuid';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {
   FileExplorerTabTooltip,
   HelmTabTooltip,
@@ -14,19 +13,21 @@ import {
   ValidationTabTooltip,
 } from '@constants/tooltips';
 
-import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@models/ui';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
-import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
+import {kustomizationsSelector} from '@redux/selectors';
 
 import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
-import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models/ui';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

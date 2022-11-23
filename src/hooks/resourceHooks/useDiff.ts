@@ -2,14 +2,15 @@ import {useMemo} from 'react';
 
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {knownResourceKindsSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
 
 export const useDiff = (resource?: K8sResource) => {
   const dispatch = useAppDispatch();

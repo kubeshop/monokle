@@ -8,16 +8,13 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigPathSelector, selectedResourceSelector} from '@redux/selectors';
 import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
 import {SecondaryButton} from '@atoms';
+
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 type IProps = {
   isDropdownActive?: boolean;

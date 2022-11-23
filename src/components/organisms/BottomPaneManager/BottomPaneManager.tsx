@@ -8,8 +8,6 @@ import {v4 as uuidv4} from 'uuid';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
-import {TerminalType} from '@models/terminal';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
@@ -18,6 +16,8 @@ import {setTerminalShells} from '@redux/services/terminalShells';
 import {Icon} from '@atoms';
 
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
+
+import {TerminalType} from '@monokle-desktop/shared/models/terminal';
 
 import TerminalPane from '../TerminalPane';
 import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';

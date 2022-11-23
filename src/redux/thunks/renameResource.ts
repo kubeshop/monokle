@@ -1,10 +1,10 @@
 import {stringify} from 'yaml';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-
 import {isIncomingRef} from '@redux/services/resourceRefs';
 import {updateResource} from '@redux/thunks/updateResource';
+
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
 
 export const renameResource = (
   resourceId: string,

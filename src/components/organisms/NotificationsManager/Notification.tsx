@@ -6,11 +6,11 @@ import {DateTime} from 'luxon';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import {NotificationMarkdown} from '@molecules';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
+
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
 
 import * as S from './Notification.styled';
 

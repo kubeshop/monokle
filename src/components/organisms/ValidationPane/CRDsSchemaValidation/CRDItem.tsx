@@ -3,15 +3,13 @@ import {useMemo, useState} from 'react';
 import {Menu} from 'antd';
 import {ItemType} from 'antd/lib/menu/hooks/useItems';
 
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NewResourceWizardInput} from '@models/ui';
-
 import {useAppDispatch} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
-import {ContextMenu} from '@molecules';
+import {ContextMenu, Dots} from '@atoms';
 
-import {Dots} from '@atoms';
+import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
 
 import * as S from './CRDItem.styled';
 

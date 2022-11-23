@@ -1,17 +1,16 @@
 import {BrowserWindow} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import type {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import type {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import type {RootState} from '@monokle-desktop/shared/models/rootState';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 export const setWindowTitle = (state: RootState, window: BrowserWindow, projectName?: String) => {
   if (window.isDestroyed()) {
     return;
   }
+
   const isInPreviewMode = isInPreviewModeSelector(state);
   const kubeConfigContext = kubeConfigContextSelector(state);
   const previewType = state.main.previewType;

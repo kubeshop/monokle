@@ -8,19 +8,20 @@ import {Button, Skeleton, Steps, Tag} from 'antd';
 
 import {Primitive} from 'type-fest';
 
-import {Project} from '@models/appconfig';
-import {K8sResource} from '@models/k8sresource';
-import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@models/template';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
+import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@monokle-desktop/shared/constants/telemetry';
+import {Project} from '@monokle-desktop/shared/models/config';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@monokle-desktop/shared/models/template';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import * as S from './styled';
 

@@ -7,14 +7,14 @@ import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icon
 import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
-import {AlertEnum} from '@models/alert';
-
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
+
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';

@@ -5,19 +5,22 @@ import asyncLib from 'async';
 import fs from 'fs';
 import log from 'loglevel';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {KubernetesObject, isKubernetesObject} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {AnyPlugin} from '@models/plugin';
-import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
-
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
-import electronStore from '@utils/electronStore';
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
+import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {KubernetesObject, isKubernetesObject} from '@monokle-desktop/shared/models/appState';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
+import {
+  InterpolateTemplateOptions,
+  TemplateManifest,
+  TemplatePack,
+  VanillaTemplate,
+} from '@monokle-desktop/shared/models/template';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';
@@ -92,11 +95,6 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
   templatePath.startsWith(templatesPacksDir);
 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
-
-export type InterpolateTemplateOptions = {
-  templateText: string;
-  formsData: any[];
-};
 
 export const interpolateTemplate = async (templateText: string, formsData: any[]) => {
   return new Promise<string>(resolve => {

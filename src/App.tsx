@@ -1,7 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useMount} from 'react-use';
+import {useEffectOnce, useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -13,12 +13,6 @@ import semver from 'semver';
 
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {AlertEnum, ExtraContentType} from '@models/alert';
-import {NewVersionCode, Project} from '@models/appconfig';
-import {StepEnum} from '@models/walkthrough';
-import {Size} from '@models/window';
-
-import {compareToggled} from '@redux/compare';
 import {toggleForm} from '@redux/forms';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -34,26 +28,17 @@ import {
   toggleSettings,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {
-  GitCloneModal,
-  HotKeysHandler,
-  LazyDrawer,
-  MessageBox,
-  NewPaneManager,
-  PageHeader,
-  PaneManager,
-  UpdateNotice,
-} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
+
+import {PaneManager} from '@components/organisms_new';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {fetchAppVersion} from '@utils/appVersion';
-import electronStore from '@utils/electronStore';
-import {setMainProcessEnv} from '@utils/env';
-import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -61,16 +46,23 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
+import {AlertEnum, ExtraContentType} from '@monokle-desktop/shared/models/alert';
+import {NewVersionCode, Project} from '@monokle-desktop/shared/models/config';
+import {StepEnum} from '@monokle-desktop/shared/models/walkthrough';
+import {Size} from '@monokle-desktop/shared/models/window';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {setMainProcessEnv} from '@monokle-desktop/shared/utils/env';
+
 import * as S from './App.styled';
 import AppContext from './AppContext';
 
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
-const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
@@ -85,8 +77,6 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
-const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -95,7 +85,6 @@ const App = () => {
   const [appVersion, setAppVersion] = useState<string>();
 
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-  const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
 
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
@@ -115,7 +104,6 @@ const App = () => {
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
-  const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
@@ -297,6 +285,10 @@ const App = () => {
     });
   }, []);
 
+  useEffectOnce(() => {
+    dispatch(loadValidation());
+  });
+
   useEffect(() => {
     ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);
     return () => {
@@ -389,10 +381,6 @@ const App = () => {
     dispatch(closeReleaseNotesDrawer());
   }, [dispatch]);
 
-  const onCloseCompareModal = useCallback(() => {
-    dispatch(compareToggled({value: false}));
-  }, [dispatch]);
-
   const onCloseFormModal = useCallback(() => {
     dispatch(toggleForm(false));
   }, [dispatch]);
@@ -403,10 +391,7 @@ const App = () => {
         <MessageBox />
         <S.MainContainer>
           <PageHeader />
-
-          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
-            <NewPaneManager />
-          </FeatureFlag>
+          <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
@@ -450,9 +435,7 @@ const App = () => {
         <Suspense fallback={null}>
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
-          {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
-          {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}

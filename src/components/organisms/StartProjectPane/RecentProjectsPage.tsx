@@ -1,15 +1,15 @@
-import {Project} from '@models/appconfig';
-
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
+
+import {Project} from '@monokle-desktop/shared/models/config';
+import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';

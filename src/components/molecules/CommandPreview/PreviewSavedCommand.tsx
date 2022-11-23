@@ -4,12 +4,11 @@ import {Button, Dropdown, Menu} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
-import {SavedCommand} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {startPreview} from '@redux/services/preview';
 
-import Colors from '@styles/Colors';
+import {SavedCommand} from '@monokle-desktop/shared/models/config';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 import CommandLabel from './CommandLabel';
 

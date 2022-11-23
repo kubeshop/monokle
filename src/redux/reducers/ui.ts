@@ -5,9 +5,14 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import path from 'path';
 import {Entries} from 'type-fest';
 
-import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {SavedCommand} from '@models/appconfig';
+import initialState from '@redux/initialState';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {SavedCommand, SettingsPanel} from '@monokle-desktop/shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -19,16 +24,9 @@ import {
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
-} from '@models/ui';
-import {WalkthroughCollection} from '@models/walkthrough';
-
-import initialState from '@redux/initialState';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import electronStore from '@utils/electronStore';
+} from '@monokle-desktop/shared/models/ui';
+import {WalkthroughCollection} from '@monokle-desktop/shared/models/walkthrough';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -51,12 +49,6 @@ export const uiSlice = createSlice({
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
-    },
-    openClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = true;
-    },
-    closeClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = false;
     },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;
@@ -367,7 +359,6 @@ export const uiSlice = createSlice({
 export const {
   cancelWalkthrough,
   closeAboutModal,
-  closeClusterDiff,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
   closeFiltersPresetModal,
@@ -386,7 +377,6 @@ export const {
   handleWalkthroughStep,
   highlightItem,
   openAboutModal,
-  openClusterDiff,
   openCreateFileFolderModal,
   openCreateProjectModal,
   openFiltersPresetModal,

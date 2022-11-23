@@ -2,7 +2,7 @@ import log from 'loglevel';
 import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
-import {createFolder, deleteFile, doesPathExist, writeFile} from '@utils/fileSystem';
+import {createFolder, deleteFile, doesPathExist, writeFile} from '@monokle-desktop/shared/utils/fileSystem';
 
 export async function saveCRD(crdsDir: string, crdContent: string) {
   const doesPluginsDirExist = await doesPathExist(crdsDir);

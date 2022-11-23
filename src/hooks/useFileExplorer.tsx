@@ -3,7 +3,9 @@ import {useCallback, useState} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {getRootFolder} from '@redux/services/fileEntry';
 
-import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
+import {FileExplorerProps} from '@atoms/FileExplorer';
+
+import {FileExplorerOptions} from '@monokle-desktop/shared/models/fileExplorer';
 
 type FileExplorerSelectResult = {
   existingFilePath?: string;

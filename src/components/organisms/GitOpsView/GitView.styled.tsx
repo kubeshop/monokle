@@ -1,8 +1,8 @@
 // import {Button, Skeleton, Tabs as RawTabs} from 'antd';
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-import Colors from '@styles/Colors';
+import {AppBorders} from '@monokle-desktop/shared/styles/borders';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const GitPaneContainer = styled.div`
   height: 100%;

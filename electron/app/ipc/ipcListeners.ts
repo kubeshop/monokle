@@ -15,28 +15,22 @@ import {
   DOWNLOAD_TEMPLATE_RESULT,
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
-} from '@constants/ipcEvents';
-
-import {NewVersionCode} from '@models/appconfig';
+} from '@monokle-desktop/shared/constants/ipcEvents';
+import {UPDATE_APPLICATION} from '@monokle-desktop/shared/constants/telemetry';
+import type {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {NewVersionCode} from '@monokle-desktop/shared/models/config';
 import {
   AnyExtension,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
   UpdateExtensionsResult,
-} from '@models/extension';
-import {AnyPlugin} from '@models/plugin';
-import {AnyTemplate, TemplatePack} from '@models/template';
-
-import {changeCurrentProjectName, updateNewVersion} from '@redux/reducers/appConfig';
-import {InterpolateTemplateOptions} from '@redux/services/templates';
-
-import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-
-import {CommandOptions} from '@utils/commands';
-import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
-import {getSegmentClient} from '@utils/segment';
-import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
+} from '@monokle-desktop/shared/models/extension';
+import type {FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models/fileExplorer';
+import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
+import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared/models/template';
+import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -47,6 +41,7 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
+import {ProjectNameChange, StorePropagation} from '../models';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -59,7 +54,6 @@ import {
 import {askActionConfirmation} from '../utils';
 import {dispatchToAllWindows} from './ipcMainRedux';
 
-const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
@@ -260,7 +254,7 @@ ipcMain.on('check-update-available', async () => {
 ipcMain.on('quit-and-install', () => {
   trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
-  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Idle, data: null}});
 });
 
 ipcMain.on('force-reload', async (event: any) => {
@@ -274,7 +268,7 @@ ipcMain.on('confirm-action', (event: any, args) => {
 ipcMain.on('global-electron-store-update', (event, args: any) => {
   if (args.eventType === StorePropagation.ChangeProjectName) {
     const payload: ProjectNameChange = args.payload;
-    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+    dispatchToAllWindows({type: 'config/changeCurrentProjectName', payload: payload.newName});
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
   }

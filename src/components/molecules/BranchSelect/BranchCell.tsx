@@ -1,12 +1,12 @@
 import {Modal, Space} from 'antd';
 
-import {GitBranch} from '@models/git';
-
 import {useAppSelector} from '@redux/hooks';
 
 import {CopyButton} from '@components/atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {GitBranch} from '@monokle-desktop/shared/models/git';
 
 import * as S from './BranchCell.styled';
 

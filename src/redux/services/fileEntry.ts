@@ -3,21 +3,6 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ProjectConfig} from '@models/appconfig';
-import {
-  AppState,
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-
 import {
   HelmChartEventEmitter,
   createHelmChart,
@@ -43,6 +28,20 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
+
+import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {
+  AppState,
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@monokle-desktop/shared/models/appState';
+import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
 
 import {
   deleteResource,

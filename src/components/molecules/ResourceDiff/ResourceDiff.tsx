@@ -12,10 +12,8 @@ import {parse, stringify} from 'yaml';
 import {PREVIEW_PREFIX} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -27,6 +25,9 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';
@@ -43,14 +44,9 @@ const options = {
   readOnly: true,
 };
 
-const ResourceDiff = (props: {
-  localResource: K8sResource;
-  clusterResourceText: string;
-  isInClusterDiff?: boolean;
-  onApply?: () => void;
-}) => {
+const ResourceDiff = (props: {localResource: K8sResource; clusterResourceText: string; onApply?: () => void}) => {
   const dispatch = useAppDispatch();
-  const {localResource, clusterResourceText, isInClusterDiff, onApply} = props;
+  const {localResource, clusterResourceText, onApply} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -125,7 +121,6 @@ const ResourceDiff = (props: {
     applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
       isClusterPreview: previewType === 'cluster',
       shouldPerformDiff: true,
-      isInClusterDiff,
     });
     setIsApplyModalVisible(false);
   };

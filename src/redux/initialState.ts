@@ -1,18 +1,16 @@
 import os from 'os';
 
-import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {AlertState} from '@models/alert';
-import {AppConfig, NewVersionCode} from '@models/appconfig';
-import {AppState} from '@models/appstate';
-import {ExtensionState} from '@models/extension';
-import {LogsState} from '@models/logs';
-import {NavigatorState} from '@models/navigator';
-import {TerminalState} from '@models/terminal';
-import {PaneConfiguration, UiState} from '@models/ui';
-import {UiCoachState} from '@models/uiCoach';
-
-import electronStore from '@utils/electronStore';
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {AlertState} from '@monokle-desktop/shared/models/alert';
+import {AppState} from '@monokle-desktop/shared/models/appState';
+import {AppConfig, NewVersionCode} from '@monokle-desktop/shared/models/config';
+import {ExtensionState} from '@monokle-desktop/shared/models/extension';
+import {NavigatorState} from '@monokle-desktop/shared/models/navigator';
+import {TerminalState} from '@monokle-desktop/shared/models/terminal';
+import {PaneConfiguration, UiState} from '@monokle-desktop/shared/models/ui';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
 
 const initialAppState: AppState = {
   isRehydrating: false,
@@ -39,13 +37,6 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs',
       false
     ),
-  },
-  clusterDiff: {
-    clusterToLocalResourcesMatches: [],
-    hasLoaded: false,
-    hasFailed: false,
-    hideClusterOnlyResources: true,
-    selectedMatches: [],
   },
   policies: {
     plugins: [],
@@ -126,10 +117,6 @@ const initialAppConfigState: AppConfig = {
 
 const initialAlertState: AlertState = {};
 
-const initialLogsState: LogsState = {
-  logs: [''],
-};
-
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
@@ -151,7 +138,6 @@ const initialUiState: UiState = {
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
   isScaleModalOpen: false,
-  isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
@@ -244,10 +230,6 @@ const initialNavigatorState: NavigatorState = {
   registeredSectionBlueprintIds: [],
 };
 
-const initialUiCoachState: UiCoachState = {
-  hasUserPerformedClickOnClusterIcon: false,
-};
-
 const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
@@ -271,10 +253,8 @@ export default {
   alert: initialAlertState,
   config: initialAppConfigState,
   extension: initialExtensionState,
-  logs: initialLogsState,
   main: initialAppState,
   navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  uiCoach: initialUiCoachState,
 };

@@ -4,12 +4,12 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
-import {ClusterAccess, KubePermissions} from '@models/appconfig';
+import {CommandOptions, CommandResult} from '@monokle-desktop/shared/models/commands';
+import {ClusterAccess, KubePermissions} from '@monokle-desktop/shared/models/config';
+import {getMainProcessEnv} from '@monokle-desktop/shared/utils/env';
+import {isRendererThread} from '@monokle-desktop/shared/utils/thread';
 
-import {getMainProcessEnv} from '@utils/env';
-
-import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
-import {isRendererThread} from './thread';
+import {runCommandInMainThread} from './commands/execute';
 
 export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();

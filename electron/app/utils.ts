@@ -12,16 +12,12 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {AnyExtension} from '@models/extension';
-
-import {createProject} from '@redux/reducers/appConfig';
-import {loadResource} from '@redux/services';
-
-import electronStore from '@utils/electronStore';
-import {getSegmentClient} from '@utils/segment';
-import {APP_INSTALLED} from '@utils/telemetry';
+import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
+import {APP_INSTALLED} from '@monokle-desktop/shared/constants/telemetry';
+import type {AnyExtension} from '@monokle-desktop/shared/models/extension';
+import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {loadResource} from '@monokle-desktop/shared/utils/resource';
+import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
 
 const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
@@ -88,7 +84,7 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
 
   if (recentFolders && recentFolders.length > 0) {
     recentFolders.forEach((folder: string) => {
-      dispatch(createProject({rootFolder: folder}));
+      dispatch({type: 'config/createProject', payload: {rootFolder: folder}});
     });
     electronStore.delete('appConfig.recentFolders');
   }

@@ -1,17 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AlertEnum} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
-import {GitRepo} from '@models/git';
-import {RootState} from '@models/rootstate';
-
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
@@ -24,7 +12,20 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
+
+import {OPEN_EXISTING_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {
+  FileMapType,
+  HelmChartMapType,
+  HelmTemplatesMapType,
+  HelmValuesMapType,
+  ResourceMapType,
+} from '@monokle-desktop/shared/models/appState';
+import {GitRepo} from '@monokle-desktop/shared/models/git';
+import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
 
 /**
  * Thunk to set the specified root folder

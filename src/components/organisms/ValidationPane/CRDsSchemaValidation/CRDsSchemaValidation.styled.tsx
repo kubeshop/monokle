@@ -2,7 +2,7 @@ import {Button, Divider, Input} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@monokle-desktop/shared/styles/colors';
 
 export const Container = styled.div`
   margin: 16px;
