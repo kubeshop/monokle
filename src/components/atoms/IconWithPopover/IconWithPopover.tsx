@@ -4,7 +4,7 @@ import {Button, Popover} from 'antd';
 
 import {Icon} from '@atoms';
 
-import {IconNames} from '@monokle-desktop/shared/models/icons';
+import {IconNames} from '@shared/models/icons';
 
 interface IconWithPopoverProps {
   popoverContent: React.ReactNode | (() => React.ReactNode);

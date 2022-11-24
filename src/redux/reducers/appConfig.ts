@@ -26,8 +26,8 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {ClusterColors} from '@shared/models/cluster';
 import {
   AppConfig,
   ClusterAccess,
@@ -39,9 +39,9 @@ import {
   Settings,
   TextSizes,
   Themes,
-} from '@monokle-desktop/shared/models/config';
-import {UiState} from '@monokle-desktop/shared/models/ui';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+} from '@shared/models/config';
+import {UiState} from '@shared/models/ui';
+import electronStore from '@shared/utils/electronStore';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

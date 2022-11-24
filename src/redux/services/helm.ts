@@ -27,16 +27,10 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
-} from '@monokle-desktop/shared/models/appState';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {
-  HelmChart,
-  HelmTemplate,
-  HelmValueMatch,
-  HelmValuesFile,
-  RangeAndValue,
-} from '@monokle-desktop/shared/models/helm';
+} from '@shared/models/appState';
+import {ProjectConfig} from '@shared/models/config';
+import {FileEntry} from '@shared/models/fileEntry';
+import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@shared/models/helm';
 
 export const HelmChartEventEmitter = new EventEmitter();
 

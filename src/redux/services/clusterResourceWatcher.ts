@@ -9,9 +9,9 @@ import {jsonToYaml} from '@utils/yaml';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
-import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {ResourceMapType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import {extractK8sResources} from './resource';
 

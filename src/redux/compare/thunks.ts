@@ -10,9 +10,9 @@ import {doTransferResource} from '@redux/services/compare/transferResource';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
-import {AlertType} from '@monokle-desktop/shared/models/alert';
-import {CompareSide, MatchingResourceComparison, TransferDirection} from '@monokle-desktop/shared/models/compare';
-import {ThunkApi} from '@monokle-desktop/shared/models/thunk';
+import {AlertType} from '@shared/models/alert';
+import {CompareSide, MatchingResourceComparison, TransferDirection} from '@shared/models/compare';
+import {ThunkApi} from '@shared/models/thunk';
 
 type TransferResourceArgs = {
   ids: string[];

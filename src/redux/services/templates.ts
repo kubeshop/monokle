@@ -8,19 +8,14 @@ import log from 'loglevel';
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {KubernetesObject, isKubernetesObject} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
-import {
-  InterpolateTemplateOptions,
-  TemplateManifest,
-  TemplatePack,
-  VanillaTemplate,
-} from '@monokle-desktop/shared/models/template';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@shared/constants/urls';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {KubernetesObject, isKubernetesObject} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {AnyPlugin} from '@shared/models/plugin';
+import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@shared/models/template';
+import electronStore from '@shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleUnsavedResources} from './unsavedResource';

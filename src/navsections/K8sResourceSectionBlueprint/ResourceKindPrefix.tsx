@@ -9,8 +9,8 @@ import {extendResourceFilter} from '@redux/reducers/main';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
 
 const Container = styled.span`
   display: flex;

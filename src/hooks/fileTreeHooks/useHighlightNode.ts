@@ -12,7 +12,7 @@ import {TreeNode} from '@components/organisms/FileTreePane/types';
 
 import {uniqueArr} from '@utils/index';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, expandedFolders: React.Key[]) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();

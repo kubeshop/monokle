@@ -10,8 +10,8 @@ import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {TerminalType} from '@monokle-desktop/shared/models/terminal';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {TerminalType} from '@shared/models/terminal';
 
 import * as S from './TerminalPane.styled';
 

@@ -15,11 +15,11 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AlertEnum} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

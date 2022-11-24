@@ -1,4 +1,4 @@
-import {ResourceValidationError} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceValidationError} from '@shared/models/k8sResource';
 
 import * as S from './ValidationErrorLink.styled';
 

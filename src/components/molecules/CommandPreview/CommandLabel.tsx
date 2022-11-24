@@ -9,8 +9,8 @@ import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {openSaveEditCommandModal} from '@redux/reducers/ui';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {SavedCommand} from '@monokle-desktop/shared/models/config';
+import {AlertEnum} from '@shared/models/alert';
+import {SavedCommand} from '@shared/models/config';
 
 import * as S from './CommandLabel.styled';
 

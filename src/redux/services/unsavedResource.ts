@@ -9,8 +9,8 @@ import {parseYamlDocument} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `

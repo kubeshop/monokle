@@ -8,9 +8,9 @@ import {openResourceDiffModal} from '@redux/reducers/main';
 import {knownResourceKindsSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {K8sResource} from '@shared/models/k8sResource';
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 export const useDiff = (resource?: K8sResource) => {
   const dispatch = useAppDispatch();

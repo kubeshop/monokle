@@ -3,17 +3,17 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import type {AnyExtension} from '@monokle-desktop/shared/models/extension';
-import {isBundledTemplatePluginModule} from '@monokle-desktop/shared/models/plugin';
-import type {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
+import type {AnyExtension} from '@shared/models/extension';
+import {isBundledTemplatePluginModule} from '@shared/models/plugin';
+import type {AnyPlugin} from '@shared/models/plugin';
 import {
   isHelmChartTemplate,
   isVanillaTemplate,
   validateAnyTemplate,
   validateTemplatePack,
-} from '@monokle-desktop/shared/models/template';
-import type {AnyTemplate, TemplatePack} from '@monokle-desktop/shared/models/template';
-import {createFolder, doesPathExist} from '@monokle-desktop/shared/utils/fileSystem';
+} from '@shared/models/template';
+import type {AnyTemplate, TemplatePack} from '@shared/models/template';
+import {createFolder, doesPathExist} from '@shared/utils/fileSystem';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

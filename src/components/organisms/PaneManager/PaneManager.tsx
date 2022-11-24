@@ -5,7 +5,7 @@ import {setPaneConfiguration} from '@redux/reducers/ui';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import BottomPaneManager from '../BottomPaneManager';
 import {RecentProjectsPage, StartProjectPage} from '../StartProjectPane';

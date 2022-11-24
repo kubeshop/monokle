@@ -2,7 +2,7 @@ import {Checkbox as RawCheckbox, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 type NameContainerProps = {
   $hasCustomNameDisplay: boolean;

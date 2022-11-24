@@ -11,13 +11,13 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 import {runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {CommandOptions} from '@monokle-desktop/shared/models/commands';
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {RUN_PREVIEW_CONFIGURATION} from '@shared/constants/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {CommandOptions} from '@shared/models/commands';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart

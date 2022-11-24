@@ -4,10 +4,10 @@ import {createCompletionProvider, getSymbolsBeforePosition} from '@molecules/Mon
 
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
-import {HelmValuesMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {MonacoRange, MonacoSelectionFile, MonacoUiState} from '@monokle-desktop/shared/models/ui';
+import {HelmValuesMapType, ResourceMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {MonacoRange, MonacoSelectionFile, MonacoUiState} from '@shared/models/ui';
 
 export function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMapType) {
   const helmChartId = currentFile?.helmChartId;

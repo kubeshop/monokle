@@ -5,10 +5,10 @@ import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
-import type {CommandOptions, CommandResult} from '@monokle-desktop/shared/models/commands';
-import {NewVersionCode} from '@monokle-desktop/shared/models/config';
-import type {FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models/fileExplorer';
-import type {InterpolateTemplateOptions} from '@monokle-desktop/shared/models/template';
+import type {CommandOptions, CommandResult} from '@shared/models/commands';
+import {NewVersionCode} from '@shared/models/config';
+import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
+import type {InterpolateTemplateOptions} from '@shared/models/template';
 
 import autoUpdater from './autoUpdater';
 

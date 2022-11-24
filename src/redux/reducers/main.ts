@@ -32,9 +32,9 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {isResourcePassingFilter} from '@utils/resources';
 import {parseYamlDocument} from '@utils/yaml';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {DIFF} from '@monokle-desktop/shared/constants/telemetry';
-import {AlertType} from '@monokle-desktop/shared/models/alert';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {DIFF} from '@shared/constants/telemetry';
+import {AlertType} from '@shared/models/alert';
 import {
   AppState,
   FileMapType,
@@ -47,16 +47,16 @@ import {
   ResourceFilterType,
   ResourceMapType,
   SelectionHistoryEntry,
-} from '@monokle-desktop/shared/models/appState';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {CurrentMatch, FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {HelmChart} from '@monokle-desktop/shared/models/helm';
-import {ImageType} from '@monokle-desktop/shared/models/image';
-import {ValidationIntegration} from '@monokle-desktop/shared/models/integrations';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ThunkApi} from '@monokle-desktop/shared/models/thunk';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+} from '@shared/models/appState';
+import {ProjectConfig} from '@shared/models/config';
+import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
+import {HelmChart} from '@shared/models/helm';
+import {ImageType} from '@shared/models/image';
+import {ValidationIntegration} from '@shared/models/integrations';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ThunkApi} from '@shared/models/thunk';
+import electronStore from '@shared/utils/electronStore';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import initialState from '../initialState';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';

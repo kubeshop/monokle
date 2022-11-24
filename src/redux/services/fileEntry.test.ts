@@ -10,8 +10,8 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
-} from '@monokle-desktop/shared/models/appState';
-import {AppConfig} from '@monokle-desktop/shared/models/config';
+} from '@shared/models/appState';
+import {AppConfig} from '@shared/models/config';
 
 import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 

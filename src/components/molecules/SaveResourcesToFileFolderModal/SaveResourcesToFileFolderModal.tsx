@@ -26,12 +26,12 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {isDefined} from '@utils/filter';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {Colors} from '@shared/styles/colors';
 
 import * as S from './SaveResourcesToFileFolderModal.styled';
 

@@ -17,7 +17,7 @@ import {
 import {watchFunctions} from '@utils/helpers';
 import {getKubeAccess} from '@utils/kubeclient';
 
-import {KubeConfig, KubeConfigContext} from '@monokle-desktop/shared/models/config';
+import {KubeConfig, KubeConfigContext} from '@shared/models/config';
 
 let watcher: FSWatcher;
 let tempFilePath: string | undefined;

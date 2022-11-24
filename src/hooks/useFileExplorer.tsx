@@ -5,7 +5,7 @@ import {getRootFolder} from '@redux/services/fileEntry';
 
 import {FileExplorerProps} from '@atoms/FileExplorer';
 
-import {FileExplorerOptions} from '@monokle-desktop/shared/models/fileExplorer';
+import {FileExplorerOptions} from '@shared/models/fileExplorer';
 
 type FileExplorerSelectResult = {
   existingFilePath?: string;

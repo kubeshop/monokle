@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 export const ErrorMessage = styled.span`
   margin-left: 5px;

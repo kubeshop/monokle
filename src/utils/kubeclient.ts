@@ -4,10 +4,10 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
-import {CommandOptions, CommandResult} from '@monokle-desktop/shared/models/commands';
-import {ClusterAccess, KubePermissions} from '@monokle-desktop/shared/models/config';
-import {getMainProcessEnv} from '@monokle-desktop/shared/utils/env';
-import {isRendererThread} from '@monokle-desktop/shared/utils/thread';
+import {CommandOptions, CommandResult} from '@shared/models/commands';
+import {ClusterAccess, KubePermissions} from '@shared/models/config';
+import {getMainProcessEnv} from '@shared/utils/env';
+import {isRendererThread} from '@shared/utils/thread';
 
 import {runCommandInMainThread} from './commands/execute';
 

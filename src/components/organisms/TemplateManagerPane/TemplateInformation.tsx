@@ -13,7 +13,7 @@ import {Icon, ImageIcon} from '@atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
 
-import {AnyTemplate} from '@monokle-desktop/shared/models/template';
+import {AnyTemplate} from '@shared/models/template';
 
 import * as S from './TemplateInformation.styled';
 

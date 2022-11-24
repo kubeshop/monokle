@@ -15,22 +15,22 @@ import {
   DOWNLOAD_TEMPLATE_RESULT,
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
-} from '@monokle-desktop/shared/constants/ipcEvents';
-import {UPDATE_APPLICATION} from '@monokle-desktop/shared/constants/telemetry';
-import type {CommandOptions} from '@monokle-desktop/shared/models/commands';
-import {NewVersionCode} from '@monokle-desktop/shared/models/config';
+} from '@shared/constants/ipcEvents';
+import {UPDATE_APPLICATION} from '@shared/constants/telemetry';
+import type {CommandOptions} from '@shared/models/commands';
+import {NewVersionCode} from '@shared/models/config';
 import {
   AnyExtension,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
   UpdateExtensionsResult,
-} from '@monokle-desktop/shared/models/extension';
-import type {FileExplorerOptions, FileOptions} from '@monokle-desktop/shared/models/fileExplorer';
-import {AnyPlugin} from '@monokle-desktop/shared/models/plugin';
-import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@monokle-desktop/shared/models/template';
-import {getSegmentClient} from '@monokle-desktop/shared/utils/segment';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+} from '@shared/models/extension';
+import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
+import {AnyPlugin} from '@shared/models/plugin';
+import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
+import {getSegmentClient} from '@shared/utils/segment';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {

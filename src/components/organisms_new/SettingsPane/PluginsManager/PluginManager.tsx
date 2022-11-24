@@ -14,7 +14,7 @@ import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@monokle-desktop/shared/constants/urls';
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@shared/constants/urls';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';

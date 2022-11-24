@@ -8,13 +8,13 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {RootState} from '@shared/models/rootState';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';

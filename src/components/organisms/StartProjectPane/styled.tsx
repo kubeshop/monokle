@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import StartBackgrojnd from '@assets/StartBackground.svg';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionContainer = styled.div`
   display: flex;

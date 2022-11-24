@@ -11,8 +11,8 @@ import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closeSaveEditCommandModal} from '@redux/reducers/ui';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
 
 const SaveEditCommandModal: React.FC = () => {
   const dispatch = useAppDispatch();

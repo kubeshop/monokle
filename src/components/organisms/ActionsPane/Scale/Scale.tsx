@@ -13,7 +13,7 @@ import scaleDeployment from '@redux/services/scaleDeployment';
 
 import {SecondaryButton} from '@atoms';
 
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 type IProps = {
   isDropdownActive?: boolean;

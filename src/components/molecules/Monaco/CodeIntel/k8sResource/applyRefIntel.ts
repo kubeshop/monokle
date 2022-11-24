@@ -14,8 +14,8 @@ import {
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
 
-import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
+import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
 
 function applyRefIntel(
   resource: K8sResource,

@@ -37,14 +37,10 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
-import {
-  isInPreviewModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathValidSelector,
-} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {selectFromHistory} from '@shared/utils/selectionHistory';
+import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();

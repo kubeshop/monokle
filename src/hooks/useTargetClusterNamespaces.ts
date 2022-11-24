@@ -4,7 +4,7 @@ import {useAppSelector} from '@redux/hooks';
 import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
 
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';

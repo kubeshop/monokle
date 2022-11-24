@@ -36,9 +36,9 @@ import {
 } from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
 import {TitleBar} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';

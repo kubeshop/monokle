@@ -17,17 +17,17 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 
 import {sleep} from '@utils/sleep';
 
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {HighlightItems} from '@monokle-desktop/shared/models/ui';
-import {Size} from '@monokle-desktop/shared/models/window';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {K8sResource} from '@shared/models/k8sResource';
+import {HighlightItems} from '@shared/models/ui';
+import {Size} from '@shared/models/window';
+import {defineHotkey} from '@shared/utils/hotkey';
 import {
   activeProjectSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathValidSelector,
-} from '@monokle-desktop/shared/utils/selectors';
+} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 

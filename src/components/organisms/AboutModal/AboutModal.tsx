@@ -14,8 +14,8 @@ import {fetchAppVersion} from '@utils/appVersion';
 
 import MonokleAbout from '@assets/MonokleAbout.svg';
 
-import {loadResource} from '@monokle-desktop/shared/utils/resource';
 import packageJson from '@root/package.json';
+import {loadResource} from '@shared/utils/resource';
 
 import * as S from './AboutModal.styled';
 

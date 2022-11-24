@@ -8,7 +8,7 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessResources} from '@redux/services/resource';
 import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {RootState} from '@shared/models/rootState';
 
 export const updateMultipleResources = createAsyncThunk(
   'main/updateMultipleResources',

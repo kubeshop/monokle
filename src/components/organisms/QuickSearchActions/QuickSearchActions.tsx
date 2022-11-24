@@ -15,11 +15,11 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {QUICK_SEARCH} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {QUICK_SEARCH} from '@shared/constants/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceFilterType} from '@shared/models/appState';
+import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import LabelMapper from './LabelMapper';
 

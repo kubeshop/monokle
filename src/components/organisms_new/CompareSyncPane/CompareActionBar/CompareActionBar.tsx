@@ -15,7 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {Filter, FilterPopover} from '@components/molecules/FilterPopover';
 
-import {CompareOperation} from '@monokle-desktop/shared/models/compare';
+import {CompareOperation} from '@shared/models/compare';
 
 import * as S from './CompareActionBar.styled';
 

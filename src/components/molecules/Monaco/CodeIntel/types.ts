@@ -7,10 +7,10 @@ import {
   HelmValuesMapType,
   ResourceFilterType,
   ResourceMapType,
-} from '@monokle-desktop/shared/models/appState';
-import {CurrentMatch, FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
-import {MonacoUiState} from '@monokle-desktop/shared/models/ui';
+} from '@shared/models/appState';
+import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
+import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
+import {MonacoUiState} from '@shared/models/ui';
 
 export interface CodeIntelResponse {
   newDecorations: monaco.editor.IModelDeltaDecoration[];

@@ -2,8 +2,8 @@ import React from 'react';
 
 import {Icon} from '@atoms';
 
-import {IconNames} from '@monokle-desktop/shared/models/icons';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {IconNames} from '@shared/models/icons';
+import {Colors} from '@shared/styles/colors';
 
 const MenuIcon = (props: {
   icon?: React.ElementType;

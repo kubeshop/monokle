@@ -10,15 +10,15 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {AppState} from '@monokle-desktop/shared/models/appState';
-import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppState} from '@shared/models/appState';
+import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
+import {HelmValuesFile} from '@shared/models/helm';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {RootState} from '@shared/models/rootState';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 

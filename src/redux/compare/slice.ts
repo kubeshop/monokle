@@ -12,9 +12,9 @@ import {
   ComparisonView,
   PartialResourceSet,
   ResourceComparison,
-} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {initialState} from './initialState';
 import {selectIsAllComparisonSelected} from './selectors';

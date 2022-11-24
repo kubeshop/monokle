@@ -16,9 +16,9 @@ import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {defineHotkey} from '@shared/utils/hotkey';
 
 import * as S from './KustomizationQuickAction.styled';
 

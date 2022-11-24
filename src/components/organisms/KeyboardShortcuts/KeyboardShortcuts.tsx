@@ -5,8 +5,8 @@ import {closeKeyboardShortcutsModal} from '@redux/reducers/ui';
 
 import Keyboard from '@assets/Keyboard.svg';
 
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {defineHotkey} from '@shared/utils/hotkey';
 
 import BoardKeys from './BoardKeys';
 import * as S from './KeyboardShortcuts.styled';

@@ -8,8 +8,8 @@ import {openNewResourceWizard} from '@redux/reducers/ui';
 
 import {ContextMenu, Dots} from '@atoms';
 
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@shared/models/ui';
 
 import * as S from './CRDItem.styled';
 

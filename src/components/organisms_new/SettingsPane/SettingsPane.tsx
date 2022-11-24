@@ -13,8 +13,8 @@ import EditorLayout from '@assets/EditorLayout.svg';
 import LayoutDark from '@assets/LayoutDark.svg';
 import LayoutWhite from '@assets/LayoutWhite.svg';
 
-import {StepEnum} from '@monokle-desktop/shared/models/walkthrough';
 import {TitleBar} from '@monokle/components';
+import {StepEnum} from '@shared/models/walkthrough';
 
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
 import {DefaultProjectSettings} from './DefaultProjectSettings/DefaultProjectSettings';

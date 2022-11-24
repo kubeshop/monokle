@@ -1,7 +1,7 @@
 import {TypedStartListening, createListenerMiddleware} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {RootState} from '@shared/models/rootState';
 
 export const listenerMiddleware = createListenerMiddleware();
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;

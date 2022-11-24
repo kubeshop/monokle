@@ -4,8 +4,8 @@ import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/re
 
 import {Icon} from '@atoms';
 
-import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {ResourceRef} from '@shared/models/k8sResource';
+import {Colors} from '@shared/styles/colors';
 
 interface IProps {
   resourceRef: ResourceRef;

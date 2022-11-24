@@ -22,8 +22,8 @@ import {
 
 import {useAppVersion} from '@hooks/useAppVersion';
 
-import {StepEnum} from '@monokle-desktop/shared/models/walkthrough';
-import {openDiscord, openDocumentation, openGitHub} from '@monokle-desktop/shared/utils/shell';
+import {StepEnum} from '@shared/models/walkthrough';
+import {openDiscord, openDocumentation, openGitHub} from '@shared/utils/shell';
 
 import * as S from './HelpMenu.styled';
 

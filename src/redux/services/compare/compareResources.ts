@@ -3,8 +3,8 @@ import {v5 as uuid} from 'uuid';
 
 import {getApiVersionGroup} from '@utils/resources';
 
-import {CompareOperation, ResourceComparison} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {CompareOperation, ResourceComparison} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
 
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 

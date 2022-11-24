@@ -3,13 +3,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
 
-import {
-  ShellsMapType,
-  TerminalSettingsType,
-  TerminalState,
-  TerminalType,
-} from '@monokle-desktop/shared/models/terminal';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@shared/models/terminal';
+import electronStore from '@shared/utils/electronStore';
 
 import {setLeftBottomMenuSelection} from './ui';
 

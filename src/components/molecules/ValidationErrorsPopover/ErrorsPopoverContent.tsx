@@ -6,8 +6,8 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
 
-import {K8sResource, ResourceValidationError} from '@monokle-desktop/shared/models/k8sResource';
-import {MonacoRange} from '@monokle-desktop/shared/models/ui';
+import {K8sResource, ResourceValidationError} from '@shared/models/k8sResource';
+import {MonacoRange} from '@shared/models/ui';
 
 import * as S from './ErrorsPopoverContent.styled';
 

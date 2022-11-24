@@ -6,8 +6,8 @@ import {ERROR_MSG_FALLBACK} from '@constants/constants';
 
 import {isDefined} from '@utils/filter';
 
-import {CommandOptions, CommandResult} from '@monokle-desktop/shared/models/commands';
-import {ensureRendererThread} from '@monokle-desktop/shared/utils/thread';
+import {CommandOptions, CommandResult} from '@shared/models/commands';
+import {ensureRendererThread} from '@shared/utils/thread';
 
 export function runCommandInMainThread(options: CommandOptions): Promise<CommandResult> {
   ensureRendererThread();

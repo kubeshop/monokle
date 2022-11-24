@@ -13,11 +13,11 @@ import {openNewResourceWizard} from '@redux/reducers/ui';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {SectionCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {SectionCustomComponentProps} from '@shared/models/navigator';
+import {NewResourceWizardInput} from '@shared/models/ui';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

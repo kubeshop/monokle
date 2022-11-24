@@ -22,13 +22,13 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@shared/models/ui';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 

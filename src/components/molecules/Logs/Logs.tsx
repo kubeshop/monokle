@@ -11,7 +11,7 @@ import {kubeConfigPathSelector} from '@redux/selectors';
 
 import {createKubeClient} from '@utils/kubeclient';
 
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './Logs.styled';
 

@@ -20,10 +20,10 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;

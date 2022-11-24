@@ -8,8 +8,8 @@ import CreateFromGit from '@assets/FromGit.svg';
 import CreateScratch from '@assets/FromScratch.svg';
 import CreateFromTemplate from '@assets/FromTemplate.svg';
 
-import {Project} from '@monokle-desktop/shared/models/config';
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {Project} from '@shared/models/config';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';

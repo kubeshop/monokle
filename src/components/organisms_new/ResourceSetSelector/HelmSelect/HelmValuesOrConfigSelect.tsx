@@ -7,7 +7,7 @@ import invariant from 'tiny-invariant';
 import {resourceSetSelected, selectHelmResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {CompareSide, PartialResourceSet} from '@monokle-desktop/shared/models/compare';
+import {CompareSide, PartialResourceSet} from '@shared/models/compare';
 
 import * as S from '../ResourceSetSelectColor.styled';
 

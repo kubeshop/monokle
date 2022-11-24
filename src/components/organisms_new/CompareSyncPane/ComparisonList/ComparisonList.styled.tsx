@@ -4,7 +4,7 @@ import {LeftCircleFilled, RightCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 export const ApiVersionGroup = styled.span`
   font-size: 12px;

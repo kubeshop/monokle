@@ -12,7 +12,7 @@ import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import {AlertType, ExtraContentType} from '@monokle-desktop/shared/models/alert';
+import {AlertType, ExtraContentType} from '@shared/models/alert';
 
 import NotificationModalTitle from './NotificationModalTitle';
 
