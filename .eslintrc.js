@@ -10,7 +10,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier', 'import'],
   rules: {
     '@typescript-eslint/no-unused-vars': ['warn'],
     // Disabled old no-shadow rule as seems to be communicated by ESLint while working with TS.
@@ -32,15 +32,19 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/prefer-default-export': 'off', // cannot control what we import from standard libs
     'import/extensions': 'off', // don't micromanage pretty imports
-
+    'import/export': 'warn',
     'import/no-restricted-paths': [
       'error',
       {
         zones: [
-          // disallow import from electron in src
+          // disallow imports in electron from src
           {target: './electron', from: './src'},
-          // disallow import from src in electron
+          // disallow imports in src from electron
           {target: './src', from: './electron'},
+          // disallow imports in shared from src
+          {target: './shared', from: './src'},
+          // disallow imports in shared from electron
+          {target: './shared', from: './electron'},
         ],
       },
     ],
@@ -120,7 +124,7 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
-        project: ['tsconfig.json', 'electron/tsconfig.json'],
+        project: ['tsconfig.json', 'electron/tsconfig.json', 'shared/tsconfig.json'],
       },
     },
   },
