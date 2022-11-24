@@ -12,6 +12,7 @@ moduleAlias.addAliases({
   '@constants': `${__dirname}/../src/constants`,
   '@redux': `${__dirname}/../src/redux`,
   '@utils': `${__dirname}/../src/utils`,
+  '@shared': `${__dirname}/../src/shared`,
   '@src': `${__dirname}/../src/`,
   '@root': `${__dirname}/../`,
 });

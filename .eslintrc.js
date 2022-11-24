@@ -38,13 +38,13 @@ module.exports = {
       {
         zones: [
           // disallow imports in electron from src
-          {target: './electron', from: './src'},
+          {target: './electron', from: './src', except: ['./shared']},
           // disallow imports in src from electron
           {target: './src', from: './electron'},
           // disallow imports in shared from src
-          {target: './shared', from: './src'},
+          {target: './src/shared', from: './src', except: ['./shared']},
           // disallow imports in shared from electron
-          {target: './shared', from: './electron'},
+          {target: './src/shared', from: './electron'},
         ],
       },
     ],
