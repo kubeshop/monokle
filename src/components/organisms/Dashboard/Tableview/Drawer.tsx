@@ -8,6 +8,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {ResourceRefsIconPopover} from '@components/molecules';
 
 import * as S from './Drawer.styled';
+import {EditorTab} from './EditorTab';
+import {InfoTab} from './InfoTab';
 
 export const Drawer = () => {
   const dispatch = useAppDispatch();
@@ -51,65 +53,12 @@ export const Drawer = () => {
             {
               label: 'Info',
               key: '1',
-              children: (
-                <>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                </>
-              ),
+              children: <InfoTab resourceId={selectedResourceId as string} />,
             },
             {
               label: 'Code',
               key: '2',
-              children: (
-                <>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                  <p>Some contents1...</p>
-                </>
-              ),
+              children: <EditorTab />,
             },
           ]}
         />

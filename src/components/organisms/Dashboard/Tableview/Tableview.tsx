@@ -8,6 +8,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
+import {selectK8sResource} from '@redux/reducers/main';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -45,6 +46,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
                 console.log(record);
                 console.log(rowIndex);
                 dispatch(setSelectedResourceId(record.id));
+                dispatch(selectK8sResource({resourceId: record.id}));
               }, // click row
               onDoubleClick: event => {}, // double click row
               onContextMenu: event => {}, // right button click row

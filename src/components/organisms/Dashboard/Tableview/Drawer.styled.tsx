@@ -70,9 +70,11 @@ export const Tabs = styled(RawTabs)`
   }
 
   & .ant-tabs-content {
-    padding: 24px;
-    overflow-y: scroll;
     height: 100%;
+
+    & .ant-tabs-tabpane {
+      height: 100%;
+    }
   }
 `;
 
