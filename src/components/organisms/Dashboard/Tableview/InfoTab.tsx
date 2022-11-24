@@ -29,7 +29,7 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
               <S.BlueContent>{resource.namespace}</S.BlueContent>
             </S.Row>
           )}
-          {resource.content.metadata.labels && (
+          {resource.content?.metadata?.labels && (
             <S.Row>
               <S.Title>Labels</S.Title>
               <div>
@@ -41,7 +41,7 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
               </div>
             </S.Row>
           )}
-          {resource.content.metadata.annotations && (
+          {resource?.content?.metadata?.annotations && (
             <S.Row>
               <S.Title>Annotations</S.Title>
               <div>
@@ -53,13 +53,13 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
               </div>
             </S.Row>
           )}
-          {resource.content.spec.nodeName && (
+          {resource.content?.spec?.nodeName && (
             <S.Row>
               <S.Title>Node selector</S.Title>
               <S.BlueContent>{resource.content.spec.nodeName}</S.BlueContent>
             </S.Row>
           )}
-          {resource.content.status.phase && (
+          {resource.content?.status?.phase && (
             <S.Row>
               <S.Title>Status</S.Title>
               {(resource.content?.status?.phase === 'Running' && (
@@ -73,7 +73,7 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
                 )) || <Tag color="magenta">{resource.content?.status?.phase}</Tag>}
             </S.Row>
           )}
-          {resource.content.metadata.creationTimestamp && (
+          {resource.content?.metadata?.creationTimestamp && (
             <S.Row>
               <S.Title>Created At</S.Title>
               <S.GreyContent>

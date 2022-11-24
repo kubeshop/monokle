@@ -62,6 +62,7 @@ export const CellNode = {
   title: 'Node',
   dataIndex: 'content',
   key: 'node',
+  width: '240px',
   render: (content: any) => <S.NodeCell>{content?.spec?.nodeName}</S.NodeCell>,
 };
 
@@ -101,6 +102,7 @@ export const CellRestartCount = {
   title: 'Restarts',
   dataIndex: 'content',
   key: 'restarts',
+  width: '120px',
   render: (content: any) =>
     content?.status?.containerStatuses[0] ? (
       <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount}</span>
@@ -124,6 +126,7 @@ export const CellScheduledCount = {
   title: 'Scheduled',
   dataIndex: 'content',
   key: 'scheduled',
+  width: '120px',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
       {content?.status?.currentNumberScheduled} / {content?.status?.desiredNumberScheduled}
