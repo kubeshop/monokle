@@ -92,7 +92,7 @@ const initialAppConfigState: AppConfig = {
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
     allowEditInClusterMode: electronStore.get('appConfig.settings.allowEditInClusterMode', true),
   },
-  fileExplorerSortOrder: electronStore.get('appConfig.settings.fileExplorerSortOrder') || 'folders',
+  fileExplorerSortOrder: electronStore.get('appConfig.fileExplorerSortOrder') || 'folders',
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
