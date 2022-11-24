@@ -1,36 +1,22 @@
-import {Scalar} from 'yaml';
-
 import {KubernetesObject} from './appState';
-import {SarifRule} from './policy';
+import {
+  ClusterContextLocation,
+  FileLocation,
+  HelmChartLocation,
+  KustomizeKustomizationLocation,
+} from './objectLocation';
 
-type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
+type ResourceSourceLocation =
+  | FileLocation
+  | ClusterContextLocation
+  | HelmChartLocation
+  | KustomizeKustomizationLocation;
 
-type ResourceValidationError = {
-  property: string;
-  message: string;
-  errorPos?: RefPosition;
-  description?: string;
-  rule?: SarifRule;
-};
-
-type ResourceValidation = {
-  isValid: boolean;
-  errors: ResourceValidationError[];
-};
-
-/**
- * A k8s resource manifest, either extracted from a file or generated internally (for example when previewing kustomizations or helm charts)
- */
-type K8sResource = {
+type ResourceMeta = {
   /** an internally generated UUID
-   * - used for references/lookups in resourceMap */
+   * - used for references/lookups in resourceMaps */
   id: string;
-  /** the path relative to the root folder to the file containing this resource
-   * - set to preview://resourceId for internally generated resources
-   * - set to unsaved://resourceId for newly created resoruces */
-  fileId: string;
-  filePath: string;
-  fileOffset: number;
+  sourceLocation: ResourceSourceLocation;
   /**
    * name - generated from manifest metadata
    */
@@ -43,70 +29,18 @@ type K8sResource = {
   namespace?: string;
   /** if a resource is cluster scoped ( kind is namespaced ) */
   isClusterScoped: boolean;
-  /** if highlighted in UI (should probalby move to UI state object) */
-  isHighlighted: boolean;
-  /** if selected in UI (should probably move to UI state object) */
-  isSelected: boolean;
-  /** unparsed resource content (for editing) */
-  text: string;
-  /**  contains parsed yaml resource - used for filtering/finding links/refs, etc */
-  content: KubernetesObject;
-  /** array of refs (incoming, outgoing and unsatisfied) to and from other resources */
-  refs?: ResourceRef[];
-  /**  range of this resource in a multidocument file */
+  /** specifies the range in the file's content, applies only to file locations  */
   range?: {
     start: number;
     length: number;
   };
-  /** result of schema validation */
-  validation?: ResourceValidation;
-
-  /** result of policy validation */
-  issues?: ResourceValidation;
+  isUnsaved?: boolean;
 };
 
-export enum ResourceRefType {
-  Incoming = 'incoming',
-  Outgoing = 'outgoing',
-  Unsatisfied = 'unsatisfied-outgoing',
-}
-
-type RefTargetResource = {
-  type: 'resource';
-  resourceId?: string;
-  resourceKind?: string;
-  isOptional?: boolean; // set true for satisfied refs that were optional
+type ResourceContent = {
+  id: string;
+  text: string;
+  object: KubernetesObject;
 };
 
-type RefTargetFile = {
-  type: 'file';
-  filePath: string;
-};
-
-type RefTargetImage = {
-  type: 'image';
-  tag: string;
-};
-
-type RefTarget = RefTargetResource | RefTargetFile | RefTargetImage;
-
-type ResourceRef = {
-  /** the type of ref (see enum) */
-  type: ResourceRefType;
-  /** the ref value - for example the name of a configmap */
-  name: string;
-  /** the target resource or file this is referring to (empty for unsatisfied refs) */
-  target?: RefTarget;
-  /** the position in the document of the refName (undefined for incoming file refs) */
-  position?: RefPosition;
-};
-
-type RefPosition = {
-  line: number;
-  column: number;
-  length: number;
-  endLine?: number;
-  endColumn?: number;
-};
-
-export type {K8sResource, ResourceRef, RefPosition, RefNode, ResourceValidation, ResourceValidationError};
+export type {ResourceSourceLocation, ResourceMeta, ResourceContent};
