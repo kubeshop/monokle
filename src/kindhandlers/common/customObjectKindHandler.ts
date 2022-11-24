@@ -210,6 +210,7 @@ const createNamespacedCustomObjectKindHandler = (
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
+    kindPlural,
     helpLink,
     outgoingRefMappers,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
@@ -307,6 +308,7 @@ const createClusterCustomObjectKindHandler = (
     helpLink,
     outgoingRefMappers,
     isCustom: true,
+    kindPlural,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
     formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {

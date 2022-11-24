@@ -68,34 +68,26 @@ const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType
+  previewResources: ResourceMapType,
+  plural?: string
 ) => {
-  console.log('watchResource', kindHandler.isCustom, kindHandler.clusterApiVersion);
-
   disconnectResourceFromCluster(kindHandler);
   watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = await new k8s.Watch(kubeConfig).watch(
     kindHandler.isCustom
-      ? crdRequestURLGenerator(kindHandler.clusterApiVersion, kindHandler.kind)
+      ? crdRequestURLGenerator(kindHandler.clusterApiVersion, plural || kindHandler.kind)
       : resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
     (type: string, apiObj: any) => {
-      if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
-        if (type === 'ADDED') {
-          registerCrdKindHandlers(JSON.stringify(apiObj));
-          const handler = extractKindHandler(JSON.stringify(apiObj));
-          if (handler) {
-            watchResource(dispatch, handler, kubeConfig, previewResources);
-          }
-          return;
-        }
-        if (type === 'MODIFIED') {
-          registerCrdKindHandlers(JSON.stringify(apiObj), undefined, true);
-          const handler = extractKindHandler(JSON.stringify(apiObj));
-          if (handler) {
-            watchResource(dispatch, handler, kubeConfig, previewResources);
-          }
+      if (kindHandler.kind === CustomResourceDefinitionHandler.kind && type === 'ADDED') {
+        registerCrdKindHandlers(JSON.stringify(apiObj));
+        const handler = extractKindHandler(apiObj);
+        if (handler) {
+          watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
         }
       } else {
+        if (kindHandler.isCustom) {
+          console.log('kindHandler', type, apiObj);
+        }
         if (type === 'ADDED') {
           const resource: K8sResource = processResource(apiObj, kubeConfig);
           if (!previewResources[resource.id]) {
@@ -119,6 +111,7 @@ const watchResource = async (
       }
     }
   );
+  console.log('watchers', watchers);
 };
 
 export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
@@ -132,7 +125,7 @@ export const startWatchingResources = (
   previewResources: ResourceMapType
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
-    watchResource(dispatch, handler, kubeConfig, previewResources)
+    watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
   );
   watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
 };

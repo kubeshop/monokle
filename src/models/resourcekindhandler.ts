@@ -91,6 +91,8 @@ interface ResourceKindHandler {
 
   helpLink?: string;
 
+  kindPlural?: string;
+
   /**
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
