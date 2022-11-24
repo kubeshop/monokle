@@ -1,6 +1,6 @@
 import {ipcMain} from 'electron';
 
-import type {FileMapType} from '@monokle-desktop/shared/models/appState';
+import type {FileMapType} from '@shared/models/appState';
 
 import {
   areFoldersGitRepos,
@@ -15,8 +15,8 @@ import {
   getCommitResources,
   getCommitsCount,
   getCurrentBranch,
-  getGitRepoInfo,
   getGitRemoteUrl,
+  getGitRepoInfo,
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,

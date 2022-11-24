@@ -42,8 +42,8 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';
 

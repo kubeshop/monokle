@@ -11,7 +11,7 @@ import {
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@monokle-desktop/shared/models/compare';
+import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@shared/models/compare';
 
 import * as S from './ComparisonList.styled';
 

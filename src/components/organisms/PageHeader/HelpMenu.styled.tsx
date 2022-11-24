@@ -9,7 +9,7 @@ import {
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 export const ApiOutlined = styled(RawApiOutlined)`
   font-size: 14px;

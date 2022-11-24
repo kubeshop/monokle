@@ -7,13 +7,13 @@ import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ADD_NEW_RESOURCE} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ADD_NEW_RESOURCE} from '@shared/constants/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 

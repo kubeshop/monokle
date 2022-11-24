@@ -16,12 +16,12 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@monokle-desktop/shared/constants/telemetry';
-import {Project} from '@monokle-desktop/shared/models/config';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@monokle-desktop/shared/models/template';
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@shared/constants/telemetry';
+import {Project} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@shared/models/template';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './styled';
 

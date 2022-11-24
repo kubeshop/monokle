@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
-import {BackgroundColors, Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ClusterColors} from '@shared/models/cluster';
+import {BackgroundColors, Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const S = {
   PreviewOutputTag: styled.div`

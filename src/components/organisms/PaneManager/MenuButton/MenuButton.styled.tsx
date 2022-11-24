@@ -3,8 +3,8 @@ import {Button as RawButton} from 'antd';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {AnimationDurations} from '@monokle-desktop/shared/styles/animations';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {AnimationDurations} from '@shared/styles/animations';
+import {Colors} from '@shared/styles/colors';
 
 export const Button = styled(RawButton)<{$isActive: boolean; $isSelected: boolean}>`
   display: flex;

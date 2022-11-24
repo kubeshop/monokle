@@ -6,9 +6,9 @@ import {basename} from 'path';
 import {useAppSelector} from '@redux/hooks';
 import {getChildFilePath} from '@redux/services/fileEntry';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
 
 const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: string) => {
   const isRoot = fileEntry.name === ROOT_FILE_ENTRY;

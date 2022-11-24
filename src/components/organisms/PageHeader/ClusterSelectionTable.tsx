@@ -16,10 +16,10 @@ import {FilePatternList} from '@atoms';
 
 import {runCommandInMainThread} from '@utils/commands';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
-import {BackgroundColors} from '@monokle-desktop/shared/styles/colors';
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AlertEnum} from '@shared/models/alert';
+import {ClusterColors} from '@shared/models/cluster';
+import {BackgroundColors} from '@shared/styles/colors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelectionTable.styled';
 

@@ -12,7 +12,7 @@ import {closeRenameEntityModal} from '@redux/reducers/ui';
 import {RenameEntityCallback, doesPathExist, renameEntity} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AlertEnum} from '@shared/models/alert';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 

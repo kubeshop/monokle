@@ -29,7 +29,7 @@ import {
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {
   AppState,
   FileMapType,
@@ -37,11 +37,11 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceMapType,
-} from '@monokle-desktop/shared/models/appState';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+} from '@shared/models/appState';
+import {ProjectConfig} from '@shared/models/config';
+import {FileEntry} from '@shared/models/fileEntry';
+import {HelmChart, HelmValuesFile} from '@shared/models/helm';
+import {K8sResource} from '@shared/models/k8sResource';
 
 import {
   deleteResource,

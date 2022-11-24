@@ -10,7 +10,7 @@ import {selectedResourceSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './styled';
 

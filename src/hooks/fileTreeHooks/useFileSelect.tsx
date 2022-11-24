@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {stopPreview} from '@redux/services/preview';
 
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 export const useFileSelect = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);

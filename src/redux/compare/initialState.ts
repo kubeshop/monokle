@@ -1,4 +1,4 @@
-import {CompareState} from '@monokle-desktop/shared/models/compare';
+import {CompareState} from '@shared/models/compare';
 
 export const initialState: CompareState = {
   current: {

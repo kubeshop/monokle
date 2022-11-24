@@ -22,12 +22,12 @@ import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {SELECT_LEFT_TOOL_PANEL} from '@monokle-desktop/shared/constants/telemetry';
-import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@monokle-desktop/shared/models/ui';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {SELECT_LEFT_TOOL_PANEL} from '@shared/constants/telemetry';
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
+import {Colors} from '@shared/styles/colors';
+import {activeProjectSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';

@@ -12,8 +12,8 @@ import {Primitive} from 'type-fest';
 
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
-import {TemplateForm} from '@monokle-desktop/shared/models/template';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {TemplateForm} from '@shared/models/template';
+import {Colors} from '@shared/styles/colors';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 

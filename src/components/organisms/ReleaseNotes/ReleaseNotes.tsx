@@ -11,7 +11,7 @@ import semver from 'semver';
 import {fetchAppVersion} from '@utils/appVersion';
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import {loadResource} from '@monokle-desktop/shared/utils/resource';
+import {loadResource} from '@shared/utils/resource';
 
 import * as S from './styled';
 

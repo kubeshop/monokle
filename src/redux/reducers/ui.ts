@@ -11,8 +11,8 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {SavedCommand, SettingsPanel} from '@monokle-desktop/shared/models/config';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {SavedCommand, SettingsPanel} from '@shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -24,9 +24,9 @@ import {
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
-} from '@monokle-desktop/shared/models/ui';
-import {WalkthroughCollection} from '@monokle-desktop/shared/models/walkthrough';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+} from '@shared/models/ui';
+import {WalkthroughCollection} from '@shared/models/walkthrough';
+import electronStore from '@shared/utils/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',

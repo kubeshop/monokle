@@ -26,8 +26,8 @@ import {buildHelmCommand} from '@utils/helm';
 import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {CommandOptions} from '@shared/models/commands';
 import {
   ClusterResourceSet,
   CommandResourceSet,
@@ -37,9 +37,9 @@ import {
   KustomizeResourceSet,
   LocalResourceSet,
   ResourceSet,
-} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';

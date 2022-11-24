@@ -7,7 +7,7 @@ import invariant from 'tiny-invariant';
 import {resourceSetSelected, selectClusterResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {PartialResourceSet} from '@monokle-desktop/shared/models/compare';
+import {PartialResourceSet} from '@shared/models/compare';
 
 import * as S from './ResourceSetSelectColor.styled';
 

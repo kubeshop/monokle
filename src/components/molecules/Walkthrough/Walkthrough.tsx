@@ -7,12 +7,7 @@ import {CloseOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
 
-import {
-  StepEnum,
-  WalkthroughCollection,
-  WalkthroughContentProps,
-  WalkthroughStep,
-} from '@monokle-desktop/shared/models/walkthrough';
+import {StepEnum, WalkthroughCollection, WalkthroughContentProps, WalkthroughStep} from '@shared/models/walkthrough';
 
 import * as S from './Walkthrough.styled';
 import {newReleaseFeaturesContent, noviceContent} from './content';

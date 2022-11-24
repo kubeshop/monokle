@@ -2,7 +2,7 @@ import Highlighter from 'react-highlight-words';
 
 import textExtensions from 'text-extensions';
 
-import {FileEntry, MatchNode} from '@monokle-desktop/shared/models/fileEntry';
+import {FileEntry, MatchNode} from '@shared/models/fileEntry';
 
 import {FilterTreeNode} from '../FileTreePane/types';
 

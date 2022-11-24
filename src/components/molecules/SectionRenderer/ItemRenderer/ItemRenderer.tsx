@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {ScrollIntoView} from '@atoms';
 import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
-import {ItemBlueprint, ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {ItemBlueprint, ItemCustomComponentProps} from '@shared/models/navigator';
 
 import {useItemCustomization} from './useItemCustomization';
 

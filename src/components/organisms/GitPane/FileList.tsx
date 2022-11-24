@@ -18,10 +18,10 @@ import {Dots} from '@components/atoms';
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {GitChangedFile} from '@monokle-desktop/shared/models/git';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {deleteFile} from '@monokle-desktop/shared/utils/fileSystem';
+import {AlertEnum} from '@shared/models/alert';
+import {GitChangedFile} from '@shared/models/git';
+import {Colors} from '@shared/styles/colors';
+import {deleteFile} from '@shared/utils/fileSystem';
 
 import * as S from './FileList.styled';
 

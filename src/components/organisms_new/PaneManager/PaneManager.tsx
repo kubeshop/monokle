@@ -14,8 +14,8 @@ import {
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';

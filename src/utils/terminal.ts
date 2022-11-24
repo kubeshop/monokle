@@ -3,9 +3,9 @@ import {v4 as uuidv4} from 'uuid';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {TerminalType} from '@monokle-desktop/shared/models/terminal';
-import {LeftMenuBottomSelectionType} from '@monokle-desktop/shared/models/ui';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {TerminalType} from '@shared/models/terminal';
+import {LeftMenuBottomSelectionType} from '@shared/models/ui';
 
 export const addDefaultCommandTerminal = (
   terminalsMap: Record<string, TerminalType>,

@@ -1,4 +1,4 @@
-import {AppState, SelectionHistoryEntry} from '@monokle-desktop/shared/models/appState';
+import {AppState, SelectionHistoryEntry} from '@shared/models/appState';
 
 type resetSelectionHistoryOptions = {
   initialPaths?: (string | undefined)[];

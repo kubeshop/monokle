@@ -12,7 +12,7 @@ import {closeCreateFileFolderModal} from '@redux/reducers/ui';
 import {CreateFileFolderCallback, createFile, createFolder, doesPathExist} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AlertEnum} from '@shared/models/alert';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 

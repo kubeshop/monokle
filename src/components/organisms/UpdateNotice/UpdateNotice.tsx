@@ -11,7 +11,7 @@ import {updateNewVersion} from '@redux/reducers/appConfig';
 
 import NewUpdate from '@assets/NewUpdate.svg';
 
-import {NewVersionCode} from '@monokle-desktop/shared/models/config';
+import {NewVersionCode} from '@shared/models/config';
 
 import * as S from './styled';
 

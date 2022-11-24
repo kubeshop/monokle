@@ -21,10 +21,10 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';

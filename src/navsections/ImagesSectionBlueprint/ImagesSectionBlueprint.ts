@@ -1,9 +1,9 @@
 import {selectImage} from '@redux/reducers/main';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ImagesListType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {ImageType} from '@monokle-desktop/shared/models/image';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ImagesListType, ResourceMapType} from '@shared/models/appState';
+import {ImageType} from '@shared/models/image';
+import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import ImagesQuickAction from './ImagesQuickAction';

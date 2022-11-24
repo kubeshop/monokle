@@ -6,8 +6,8 @@ import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducer
 
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {FileMapType} from '@shared/models/appState';
 
 function useEditorKeybindings(
   editor: monaco.editor.IStandaloneCodeEditor | null,

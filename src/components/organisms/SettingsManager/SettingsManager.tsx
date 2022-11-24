@@ -33,10 +33,10 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {Project, ProjectConfig, SettingsPanel} from '@monokle-desktop/shared/models/config';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {Project, ProjectConfig, SettingsPanel} from '@shared/models/config';
+import {Colors} from '@shared/styles/colors';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import {Settings} from './Settings';
 

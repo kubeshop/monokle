@@ -9,10 +9,10 @@ import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors
 
 import {IconWithPopover} from '@atoms';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import ResourceFilter from '../ResourceFilter';
 

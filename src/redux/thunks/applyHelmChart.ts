@@ -8,12 +8,12 @@ import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/servic
 
 import {runCommandInMainThread} from '@utils/commands';
 
-import {APPLY_HELM_CHART} from '@monokle-desktop/shared/constants/telemetry';
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
-import {HelmChart, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {APPLY_HELM_CHART} from '@shared/constants/telemetry';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {FileMapType} from '@shared/models/appState';
+import {HelmChart, HelmValuesFile} from '@shared/models/helm';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Invokes helm install for the specified helm chart and values file

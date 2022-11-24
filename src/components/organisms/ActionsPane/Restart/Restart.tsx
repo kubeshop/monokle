@@ -14,7 +14,7 @@ import restartDeployment from '@redux/services/restartDeployment';
 
 import {SecondaryButton} from '@atoms';
 
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 type IProps = {
   isDropdownActive?: boolean;

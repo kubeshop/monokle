@@ -2,8 +2,8 @@ import {existsSync, promises as fs} from 'fs';
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
-import type {FileMapType} from '@monokle-desktop/shared/models/appState';
-import type {GitRepo} from '@monokle-desktop/shared/models/git';
+import type {FileMapType} from '@shared/models/appState';
+import type {GitRepo} from '@shared/models/git';
 
 import {formatGitChangedFiles} from '../utils/git';
 
@@ -20,7 +20,7 @@ export async function isGitInstalled(path: string) {
 
 export async function getGitRemoteUrl(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
-  const result = await git.raw('config', '--get','remote.origin.url');
+  const result = await git.raw('config', '--get', 'remote.origin.url');
   return result;
 }
 
@@ -100,7 +100,7 @@ export async function getGitRepoInfo(localPath: string) {
       hasRemoteRepo: false,
     };
 
-    if(remoteUrl){
+    if (remoteUrl) {
       gitRepo.remoteUrl = remoteUrl;
     }
 

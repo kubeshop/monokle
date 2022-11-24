@@ -21,11 +21,11 @@ import {ContextMenu, Dots, Spinner} from '@atoms';
 import {deleteEntity} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {Colors} from '@shared/styles/colors';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import {TreeItemProps} from './types';
 

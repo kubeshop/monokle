@@ -14,12 +14,12 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ResourceFilterType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {RootState} from '@shared/models/rootState';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';

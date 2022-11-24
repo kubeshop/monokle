@@ -9,9 +9,9 @@ import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
 import {isDefined} from '@utils/filter';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {RootState} from '@shared/models/rootState';
 
 import {extractK8sResources} from './resource';
 

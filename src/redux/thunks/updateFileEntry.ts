@@ -16,8 +16,8 @@ import {deleteResource, extractK8sResources, reprocessResources} from '@redux/se
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {RootState} from '@shared/models/rootState';
 
 export const updateFileEntry = createAsyncThunk(
   'main/updateFileEntry',

@@ -21,10 +21,10 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 import {showItemInFolder} from '@utils/shell';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

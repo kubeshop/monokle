@@ -4,8 +4,8 @@ import {EditOutlined as RawEditOutlined} from '@ant-design/icons/lib/icons';
 
 import styled from 'styled-components';
 
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {ClusterColors} from '@shared/models/cluster';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionsContainer = styled.div`
   display: flex;

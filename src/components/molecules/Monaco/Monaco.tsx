@@ -42,11 +42,11 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceRef} from '@shared/models/k8sResource';
+import {NewResourceWizardInput} from '@shared/models/ui';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

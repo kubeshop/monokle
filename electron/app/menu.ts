@@ -1,13 +1,13 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {NewVersionCode, Project} from '@monokle-desktop/shared/models/config';
-import type {RootState} from '@monokle-desktop/shared/models/rootState';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
-import {selectFromHistory} from '@monokle-desktop/shared/utils/selectionHistory';
-import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
-import {openDiscord, openDocumentation, openGitHub, openLogs} from '@monokle-desktop/shared/utils/shell';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {NewVersionCode, Project} from '@shared/models/config';
+import type {RootState} from '@shared/models/rootState';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {selectFromHistory} from '@shared/utils/selectionHistory';
+import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';

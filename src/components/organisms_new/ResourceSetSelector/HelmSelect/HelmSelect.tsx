@@ -1,6 +1,6 @@
 import {Space} from 'antd';
 
-import {CompareSide} from '@monokle-desktop/shared/models/compare';
+import {CompareSide} from '@shared/models/compare';
 
 import {HelmChartSelect} from './HelmChartSelect';
 import {HelmValuesOrConfigSelect} from './HelmValuesOrConfigSelect';

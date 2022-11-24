@@ -10,7 +10,7 @@ import {Icon} from '@atoms';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import {DockerHubImage, DockerHubImageTags} from '@monokle-desktop/shared/models/image';
+import {DockerHubImage, DockerHubImageTags} from '@shared/models/image';
 
 import * as S from './ImageDetails.styled';
 import ImageTags from './ImageTags';

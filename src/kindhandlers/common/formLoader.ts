@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {loadResource} from '@monokle-desktop/shared/utils/resource';
+import {loadResource} from '@shared/utils/resource';
 
 const formSchemaCache = new Map<string, any>();
 const uiformSchemaCache = new Map<string, any>();
