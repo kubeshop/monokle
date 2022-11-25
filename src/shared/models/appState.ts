@@ -199,7 +199,7 @@ type ResourceContentMap = {
   [id: string]: ResourceContent;
 };
 
-type ResourceMap = {
+type ResourceMapType = {
   [id: string]: K8sResource;
 };
 
@@ -210,7 +210,7 @@ type ResourceRefsProcessingOptions = {
 
 export type {
   AppState,
-  ResourceMap,
+  ResourceMapType,
   ResourceMetaMap,
   ResourceContentMap,
   ResourceFilterType,
