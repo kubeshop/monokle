@@ -1,8 +1,19 @@
 import {Dropdown, Button as RawButton, Skeleton as RawSkeleton} from 'antd';
 
+import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import Colors, {PanelColors} from '@styles/Colors';
+
+export const AuthRequiredContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  color: ${Colors.grey9};
+`;
 
 export const BottomActionsRef = styled.div``;
 
@@ -22,6 +33,14 @@ export const ChangeListStatus = styled.div`
 
 export const CheckboxWrapper = styled.div`
   margin: 0px 14px 15px 14px;
+`;
+
+export const CloseOutlined = styled(RawCloseOutlined)`
+  background-color: ${Colors.red4};
+  color: ${PanelColors.toolBar};
+  font-size: 20px;
+  border-radius: 50%;
+  padding: 8px;
 `;
 
 export const DropdownActions = styled.div`

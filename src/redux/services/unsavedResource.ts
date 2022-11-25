@@ -35,16 +35,30 @@ export function createUnsavedResource(
   let newResourceContent: any;
 
   if (jsonTemplate) {
-    newResourceContent = {
-      ...jsonTemplate,
-      apiVersion: input.apiVersion,
-      kind: input.kind,
-      metadata: {
-        ...(jsonTemplate.metadata || {}),
-        name: input.name,
-        namespace: input.namespace,
-      },
-    };
+    if (jsonTemplate.kind && jsonTemplate.apiVersion) {
+      newResourceContent = {
+        ...jsonTemplate,
+        apiVersion: input.apiVersion,
+        kind: input.kind,
+        metadata: {
+          ...(jsonTemplate.metadata || {}),
+          name: input.name,
+          namespace: input.namespace,
+        },
+      };
+    } else {
+      newResourceContent = {
+        apiVersion: input.apiVersion,
+        kind: input.kind,
+        metadata: {
+          ...(jsonTemplate.metadata || {}),
+          name: input.name,
+          namespace: input.namespace,
+        },
+        ...jsonTemplate,
+      };
+    }
+
     newResourceText = stringify(newResourceContent);
   } else {
     newResourceText = createDefaultResourceText(input);
