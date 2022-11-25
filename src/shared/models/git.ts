@@ -15,6 +15,12 @@ type GitBranch = {
   commits?: GitBranchCommit[];
 };
 
+type GitRemoteRepo = {
+  authRequired: boolean;
+  exists: boolean;
+  errorMessage?: string;
+};
+
 type GitRepo = {
   currentBranch: string;
   branches: string[];
@@ -23,7 +29,7 @@ type GitRepo = {
     ahead: number; // number of commits on local but not on remote ( push )
     behind: number; // number of commits on remote but not on local ( pull )
   };
-  hasRemoteRepo: boolean;
+  remoteRepo: GitRemoteRepo;
   remoteUrl?: string;
 };
 
@@ -52,4 +58,4 @@ type GitSliceState = {
   repo?: GitRepo;
 };
 
-export type {GitBranch, GitBranchCommit, GitChangedFile, GitChangedFileType, GitRepo, GitSliceState};
+export type {GitBranch, GitBranchCommit, GitChangedFile, GitChangedFileType, GitRemoteRepo, GitRepo, GitSliceState};

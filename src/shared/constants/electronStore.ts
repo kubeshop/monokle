@@ -38,6 +38,9 @@ export const electronStoreSchema = {
       loadLastProjectOnStartup: {
         type: 'boolean',
       },
+      fileExplorerSortOrder: {
+        type: 'string',
+      },
       scanExcludes: {
         type: 'array',
         items: {
@@ -294,6 +297,7 @@ export const electronStoreDefaults = {
     kubeConfigContextsColors: {},
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
+    fileExplorerSortOrder: 'folders',
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {

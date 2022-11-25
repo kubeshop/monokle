@@ -97,7 +97,7 @@ export async function getGitRepoInfo(localPath: string) {
       currentBranch: localBranches.current || remoteBranchSummary.current,
       branchMap: {},
       commits: {ahead: 0, behind: 0},
-      hasRemoteRepo: false,
+      remoteRepo: {exists: false, authRequired: false},
     };
 
     if (remoteUrl) {
@@ -140,9 +140,15 @@ export async function getGitRepoInfo(localPath: string) {
 
   try {
     await git.remote(['show', 'origin']);
-    gitRepo.hasRemoteRepo = true;
-  } catch (e) {
-    gitRepo.hasRemoteRepo = false;
+    gitRepo.remoteRepo = {exists: true, authRequired: false};
+  } catch (e: any) {
+    if (e.message.includes('Authentication failed')) {
+      gitRepo.remoteRepo = {
+        exists: true,
+        authRequired: true,
+        errorMessage: e.message.split('fatal: ').pop().replaceAll("'", ''),
+      };
+    }
   }
 
   try {
