@@ -43,9 +43,6 @@ type ResourceContent = {
   object: KubernetesObject;
 };
 
-type K8sResource = {
-  meta: ResourceMeta;
-  content: ResourceContent;
-};
+type K8sResource = ResourceMeta & ResourceContent;
 
 export type {K8sResource, ResourceSourceLocation, ResourceMeta, ResourceContent};

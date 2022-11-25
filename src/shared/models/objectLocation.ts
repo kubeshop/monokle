@@ -45,6 +45,7 @@ export type ImageLocation = {
 };
 export type KustomizeKustomizationLocation = {
   type: typeof KUSTOMIZE_KUSTOMIZATION_LOCATION_TYPE;
+  target: string;
 };
 export type KustomizePreviewResourceLocation = {
   type: typeof KUSTOMIZE_PREVIEW_RESOURCE_LOCATION_TYPE;
@@ -61,11 +62,9 @@ export type LocalResourceLocation = {
 
 export type FileLocation = HelmValuesFileLocation | LocalFileLocation;
 
-export type ResourceLocation =
-  | ClusterResourceLocation
-  | HelmPreviewResourceLocation
-  | KustomizePreviewResourceLocation
-  | LocalResourceLocation;
+export type PreviewResourceLocation = HelmPreviewResourceLocation | KustomizePreviewResourceLocation;
+
+export type ResourceLocation = ClusterResourceLocation | LocalResourceLocation | PreviewResourceLocation;
 
 export type ObjectLocation =
   | ClusterContextLocation
@@ -128,3 +127,6 @@ export const isResourceLocation = (location: ObjectLocation): location is Resour
 
 export const isFileLocation = (location: ObjectLocation): location is FileLocation =>
   isHelmValuesFileLocation(location) || isLocalFileLocation(location);
+
+export const isPreviewResourceLocation = (location: ObjectLocation): location is PreviewResourceLocation =>
+  isHelmPreviewResourceLocation(location) || isKustomizePreviewResourceLocation(location);
