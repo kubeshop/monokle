@@ -18,6 +18,7 @@ export type GitBranch = {
 export type GitRemoteRepo = {
   authRequired: boolean;
   exists: boolean;
+  errorMessage?: string;
 };
 
 export type GitRepo = {

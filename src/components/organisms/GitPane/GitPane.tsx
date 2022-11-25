@@ -120,6 +120,13 @@ const GitPane: React.FC = () => {
 
       {gitLoading ? (
         <S.Skeleton active />
+      ) : remoteRepo?.authRequired ? (
+        <S.AuthRequiredContainer>
+          <S.CloseOutlined />
+          <div>
+            <b>{remoteRepo.errorMessage}</b>. Please sign in using the terminal.
+          </div>
+        </S.AuthRequiredContainer>
       ) : changedFiles.length ? (
         <>
           {!remoteRepo?.exists ? (

@@ -147,8 +147,12 @@ export async function getGitRepoInfo(localPath: string) {
     await git.remote(['show', 'origin']);
     gitRepo.remoteRepo = {exists: true, authRequired: false};
   } catch (e: any) {
-    if (e.message.contains('Authentication failed')) {
-      gitRepo.remoteRepo = {exists: true, authRequired: true};
+    if (e.message.includes('Authentication failed')) {
+      gitRepo.remoteRepo = {
+        exists: true,
+        authRequired: true,
+        errorMessage: e.message.split('fatal: ').pop().replaceAll("'", ''),
+      };
     }
   }
 
