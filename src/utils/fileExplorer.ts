@@ -1,4 +1,4 @@
-import {cloneDeep, orderBy} from 'lodash';
+import {orderBy} from 'lodash';
 
 import {FileExplorerSortOrder} from '@models/appconfig';
 
@@ -15,7 +15,7 @@ const sortTree = (currentRoot: TreeNode, type: 'folders' | 'files') => {
 };
 
 export const sortFoldersFiles = (type: FileExplorerSortOrder, tree: TreeNode) => {
-  const treeClone = cloneDeep(tree);
+  const treeClone = {...tree};
 
   switch (type) {
     case 'files':
