@@ -5,7 +5,6 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContent, ResourceMeta} from './k8sResource';
 import {ObjectLocation} from './objectLocation';
-import {Policy} from './policy';
 
 export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
@@ -91,9 +90,6 @@ type AppState = {
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  policies: {
-    plugins: Policy[];
-  };
   notifications: AlertType[];
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
