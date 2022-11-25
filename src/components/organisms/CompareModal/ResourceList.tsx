@@ -10,12 +10,15 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceSetData} from '@redux/compare';
 
+import {getApiVersionGroup} from '@utils/resources';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './ResourceList.styled';
 
 type HeaderItem = {
   type: 'header';
+  apiVersionGroup: string;
   kind: string;
   count: number;
 };
@@ -64,7 +67,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
     const result: Array<HeaderItem | ResourceItem> = [];
 
     for (const [kind, resources] of sortedGroups) {
-      result.push({type: 'header', kind, count: resources.length});
+      result.push({type: 'header', kind, count: resources.length, apiVersionGroup: getApiVersionGroup(resources[0])});
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
@@ -79,11 +82,12 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
     <S.ResourceListDiv>
       {rows.map((row, index) => {
         if (row.type === 'header') {
-          const {kind, count: resourceCount} = row;
+          const {kind, count: resourceCount, apiVersionGroup} = row;
           return (
             <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
               <S.Header>
-                {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
+                {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+                <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
             </S.HeaderDiv>
           );
