@@ -25,17 +25,15 @@ const CompareSyncPane: React.FC = () => {
     <S.CompareSyncPaneContainer>
       <TitleBar title="Sync & compare" description={!inspection ? <CompareActionBar /> : <InspectionActionBar />} />
 
-      <S.ResourceSetSelectorsContainer $show={Boolean(!inspection)}>
-        <Row ref={containerRef}>
-          <Col span={10}>
-            <ResourceSetSelector side="left" />
-          </Col>
-          <Col span={4} />
-          <Col span={10}>
-            <ResourceSetSelector side="right" />
-          </Col>
-        </Row>
-      </S.ResourceSetSelectorsContainer>
+      <Row ref={containerRef}>
+        <Col span={10}>
+          <ResourceSetSelector side="left" />
+        </Col>
+        <Col span={4} />
+        <Col span={10}>
+          <ResourceSetSelector side="right" />
+        </Col>
+      </Row>
 
       <S.Content style={{height: `calc(100% - ${height}px - 100px - 60px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}

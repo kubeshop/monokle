@@ -4,13 +4,11 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
-import {Menu, Modal, Tooltip} from 'antd';
+import {Menu, Modal} from 'antd';
 
 import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
-
-import {LONGER_TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
@@ -99,20 +97,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       !fileMap[relativePath]?.filePath.startsWith(fileOrFolderContainedInFilter || ''),
     [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
   );
-
-  const tooltipOverlayStyle = useMemo(() => {
-    const style: Record<string, string> = {
-      fontSize: '12px',
-      wordBreak: 'break-all',
-      wordWrap: 'normal',
-    };
-
-    if (isMatchItem) {
-      style['display'] = 'none';
-    }
-
-    return style;
-  }, [isMatchItem]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -328,19 +312,14 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip
-          overlayStyle={tooltipOverlayStyle}
-          mouseEnterDelay={LONGER_TOOLTIP_DELAY}
-          title={absolutePath}
-          placement="bottom"
-        >
-          <S.TitleWrapper>
-            <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
-            {canPreview(relativePath) && (
-              <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
-            )}
-          </S.TitleWrapper>
-        </Tooltip>
+        <S.TitleWrapper>
+          <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
+
+          {canPreview(relativePath) && (
+            <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
+          )}
+        </S.TitleWrapper>
+
         {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
           <S.SpinnerWrapper>
             <Spinner />

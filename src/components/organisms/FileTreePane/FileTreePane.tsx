@@ -36,6 +36,8 @@ import {
 } from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {sortFoldersFiles} from '@utils/fileExplorer';
+
 import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
@@ -52,6 +54,7 @@ const FileTreePane: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
+  const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
@@ -61,6 +64,7 @@ const FileTreePane: React.FC = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+
   const {onFileSelect} = useFileSelect();
   const {onPreview} = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
@@ -260,7 +264,7 @@ const FileTreePane: React.FC = () => {
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onFileSelect}
-            treeData={[tree]}
+            treeData={[sortFoldersFiles(fileExplorerSortOrder, tree)]}
             ref={treeRef}
             expandedKeys={expandedFolders}
             onExpand={onExpand}
