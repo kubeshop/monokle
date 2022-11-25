@@ -85,7 +85,7 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         if (row.type === 'header') {
           const {kind, count: resourceCount, apiVersionGroup} = row;
           return (
-            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
+            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={`${kind}--${apiVersionGroup}`}>
               <S.Header>
                 {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
                 <S.ResourceCount>{resourceCount}</S.ResourceCount>
