@@ -38,11 +38,11 @@ type Props = {
 
 export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
-    const groups = groupBy(data.resources, r => r.kind);
+    const groups = groupBy(data.resources, r => `${r.kind}--${getApiVersionGroup(r)}`);
 
     const sortedGroups = Object.entries(groups).sort((a, b) => {
-      const kindA = a[0];
-      const kindB = b[0];
+      const kindA = a[0].split('--')[0];
+      const kindB = b[0].split('--')[0];
 
       const kindHandlerA = getResourceKindHandler(kindA);
       const kindHandlerB = getResourceKindHandler(kindB);
@@ -66,8 +66,9 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
     const result: Array<HeaderItem | ResourceItem> = [];
 
-    for (const [kind, resources] of sortedGroups) {
-      result.push({type: 'header', kind, count: resources.length, apiVersionGroup: getApiVersionGroup(resources[0])});
+    for (const [key, resources] of sortedGroups) {
+      const [kind, apiVersionGroup] = key.split('--');
+      result.push({type: 'header', kind, count: resources.length, apiVersionGroup});
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
