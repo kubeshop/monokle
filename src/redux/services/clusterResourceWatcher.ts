@@ -1,6 +1,8 @@
 /* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
@@ -71,37 +73,34 @@ const watchResource = async (
   previewResources: ResourceMapType,
   plural?: string
 ) => {
-  disconnectResourceFromCluster(kindHandler);
+  if (watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`]) {
+    disconnectResourceFromCluster(kindHandler);
+  }
   watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = await new k8s.Watch(kubeConfig).watch(
     kindHandler.isCustom
       ? crdRequestURLGenerator(kindHandler.clusterApiVersion, plural || kindHandler.kind)
       : resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
-    (type: string, apiObj: any) => {
-      if (kindHandler.kind === CustomResourceDefinitionHandler.kind && type === 'ADDED') {
-        registerCrdKindHandlers(JSON.stringify(apiObj));
-        const handler = extractKindHandler(apiObj);
-        if (handler) {
-          watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
-        }
-      } else {
-        if (kindHandler.isCustom) {
-          console.log('kindHandler', type, apiObj);
-        }
-        if (type === 'ADDED') {
-          const resource: K8sResource = processResource(apiObj, kubeConfig);
-          if (!previewResources[resource.id]) {
-            dispatch(updateClusterResource(resource));
+    async (type: string, apiObj: any) => {
+      const resource: K8sResource = processResource(apiObj, kubeConfig);
+
+      if (type === 'ADDED' && !previewResources[resource.id]) {
+        if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
+          registerCrdKindHandlers(JSON.stringify(apiObj));
+          const handler = extractKindHandler(apiObj);
+          if (handler) {
+            await watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
           }
-          return;
         }
-        if (type === 'MODIFIED') {
-          dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
-          return;
-        }
-        if (type === 'DELETED') {
-          dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
-        }
+        dispatch(updateClusterResource(resource));
+        return;
+      }
+      if (type === 'MODIFIED') {
+        dispatch(updateClusterResource(resource));
+        return;
+      }
+      if (type === 'DELETED') {
+        dispatch(deleteClusterResource(resource));
       }
     },
     (error: any) => {
@@ -111,7 +110,6 @@ const watchResource = async (
       }
     }
   );
-  console.log('watchers', watchers);
 };
 
 export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
@@ -131,5 +129,11 @@ export const startWatchingResources = (
 };
 
 export const disconnectFromCluster = () => {
-  Object.values(watchers).forEach(req => req.abort());
+  Object.values(watchers).forEach(req => {
+    try {
+      req.abort();
+    } catch (error: any) {
+      log.error(error.message);
+    }
+  });
 };
