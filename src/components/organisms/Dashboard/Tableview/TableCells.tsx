@@ -24,6 +24,7 @@ export const CellStatus = {
         )}
     </div>
   ),
+  sorter: (a: K8sResource, b: K8sResource) => a.content.status.phase.localeCompare(b.content.status.phase),
 };
 
 export const CellAge = {
@@ -34,6 +35,9 @@ export const CellAge = {
   render: ({metadata: {creationTimestamp}}: any) => (
     <div>{DateTime.fromISO(creationTimestamp).toRelative({style: 'short', unit: 'days'})}</div>
   ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    DateTime.fromISO(a.content.metadata?.creationTimestamp).toMillis() -
+    DateTime.fromISO(b.content.metadata?.creationTimestamp).toMillis(),
 };
 
 export const CellName = {
@@ -48,6 +52,7 @@ export const CellName = {
       <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={resource} type="outgoing" />
     </div>
   ),
+  sorter: (a: K8sResource, b: K8sResource) => a.name.localeCompare(b.name),
 };
 
 export const CellNamespace = {
@@ -56,6 +61,7 @@ export const CellNamespace = {
   key: 'namespace',
   width: '150px',
   render: (namespace: string) => <div>{namespace}</div>,
+  sorter: (a: K8sResource, b: K8sResource) => a?.namespace?.localeCompare(b?.namespace || '') || -Infinity,
 };
 
 export const CellNode = {
@@ -64,6 +70,8 @@ export const CellNode = {
   key: 'node',
   width: '240px',
   render: (content: any) => <S.NodeCell>{content?.spec?.nodeName}</S.NodeCell>,
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.spec?.nodeName?.localeCompare(b?.content?.spec?.nodeName || '') || -Infinity,
 };
 
 export const CellError = {
@@ -77,6 +85,8 @@ export const CellError = {
     ) : (
       <S.ErrorCell>{validation?.errors.length}</S.ErrorCell>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a.validation?.errors.length) - Number(b.validation?.errors.length) || -Infinity,
 };
 
 export const CellLabels = {
@@ -96,6 +106,8 @@ export const CellLabels = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Object.keys(a.content.metadata.labels).length - Object.keys(b.content.metadata.labels).length,
 };
 
 export const CellRestartCount = {
@@ -109,6 +121,9 @@ export const CellRestartCount = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a.content?.status?.containerStatuses[0].restartCount) -
+      Number(b.content?.status?.containerStatuses[0].restartCount) || -Infinity,
 };
 
 export const CellPodsCount = {
@@ -120,6 +135,8 @@ export const CellPodsCount = {
       {content?.status?.availableReplicas || 0} / {content?.status?.replicas}
     </span>
   ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a.content?.status?.availableReplicas) - Number(b.content?.status?.availableReplicas) || -Infinity,
 };
 
 export const CellScheduledCount = {
@@ -132,6 +149,8 @@ export const CellScheduledCount = {
       {content?.status?.currentNumberScheduled} / {content?.status?.desiredNumberScheduled}
     </span>
   ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a.content?.status?.currentNumberScheduled) - Number(b.content?.status?.currentNumberScheduled) || -Infinity,
 };
 
 export const CellType = {
@@ -145,6 +164,8 @@ export const CellType = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.spec?.type?.localeCompare(b?.content?.spec?.type || '') || -Infinity,
 };
 
 export const CellPorts = {
@@ -162,6 +183,8 @@ export const CellPorts = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.spec?.ports.length) - Number(b?.content?.spec?.ports.length) || -Infinity,
 };
 
 export const CellIPs = {
@@ -179,6 +202,8 @@ export const CellIPs = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.spec?.clusterIPs.length) - Number(b?.content?.spec?.clusterIPs.length) || -Infinity,
 };
 
 export const CellEndpoints = {
@@ -189,13 +214,10 @@ export const CellEndpoints = {
   render: (content: any) =>
     content?.subsets ? (
       content?.subsets.map(
-        (
-          subset: {addresses: Array<{ip: string; nodeName: string}>; ports: Array<{port: number; protocol: string}>},
-          index: number
-        ) =>
+        (subset: {addresses: Array<{ip: string; nodeName: string}>; ports: Array<{port: number; protocol: string}>}) =>
           subset.addresses && subset.ports ? (
             subset.addresses.map(address =>
-              subset.ports.map(port => (
+              subset.ports.map((port, index: number) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <div key={address.ip + port.port + index} style={{padding: '2px 4px'}}>
                   {address.ip}:{port.port}
@@ -209,4 +231,6 @@ export const CellEndpoints = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.subsets?.length) - Number(b?.content?.subsets?.length) || -Infinity,
 };

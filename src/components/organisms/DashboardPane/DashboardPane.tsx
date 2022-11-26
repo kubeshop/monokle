@@ -21,17 +21,20 @@ export const DashboardPane = () => {
 
   useEffect(() => {
     setMenu(
-      getRegisteredKindHandlers().reduce((output: any, kindHandler: ResourceKindHandler) => {
-        if (output[kindHandler.navigatorPath[1]]) {
-          output[kindHandler.navigatorPath[1]] = {
-            ...output[kindHandler.navigatorPath[1]],
-            [kindHandler.kind]: kindHandler,
-          };
-        } else {
-          output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: kindHandler};
-        }
-        return output;
-      }, menu)
+      getRegisteredKindHandlers().reduce(
+        (output: any, kindHandler: ResourceKindHandler) => {
+          if (output[kindHandler.navigatorPath[1]]) {
+            output[kindHandler.navigatorPath[1]] = {
+              ...output[kindHandler.navigatorPath[1]],
+              [kindHandler.kind]: kindHandler,
+            };
+          } else {
+            output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: kindHandler};
+          }
+          return output;
+        },
+        {Overview: {}}
+      )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);

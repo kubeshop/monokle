@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
@@ -18,40 +18,50 @@ import * as S from './Tableview.styled';
 export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; columns: ColumnsType<any>}) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
+  const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
 
   useEffect(() => {
-    console.log(dataSource);
+    setFilteredDataSource(dataSource);
   }, [dataSource]);
 
   return (
     <S.Container>
       <S.FilterContainer>
-        <S.Input size="large" placeholder="Search and filter" prefix={<SearchOutlined />} />
+        <S.Input
+          size="large"
+          placeholder="Search and filter"
+          prefix={<SearchOutlined />}
+          onChange={(event: any) =>
+            setFilteredDataSource(
+              event.target.value ? dataSource.filter(s => s.name.includes(event.target.value)) : dataSource
+            )
+          }
+        />
         <S.BulkAction size="large" disabled>
           Bulk action
         </S.BulkAction>
       </S.FilterContainer>
       <S.TableContainer>
         <S.Table
-          dataSource={dataSource}
+          dataSource={filteredDataSource}
           columns={columns}
           rowKey="id"
           scroll={{y: height - 212}}
           rowSelection={{}}
           pagination={false}
           sticky
-          onRow={(record: K8sResource | any, rowIndex) => {
+          onRow={(record: K8sResource | any, rowIndex: number | undefined) => {
             return {
-              onClick: event => {
+              onClick: (event: any) => {
                 console.log(record);
                 console.log(rowIndex);
                 dispatch(setSelectedResourceId(record.id));
                 dispatch(selectK8sResource({resourceId: record.id}));
               }, // click row
-              onDoubleClick: event => {}, // double click row
-              onContextMenu: event => {}, // right button click row
-              onMouseEnter: event => {}, // mouse enter row
-              onMouseLeave: event => {}, // mouse leave row
+              onDoubleClick: (event: any) => {}, // double click row
+              onContextMenu: (event: any) => {}, // right button click row
+              onMouseEnter: (event: any) => {}, // mouse enter row
+              onMouseLeave: (event: any) => {}, // mouse leave row
             };
           }}
         />
