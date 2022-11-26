@@ -17,6 +17,8 @@ export type KustomizeOrigin = {
   type: 'kustomize';
   kustomizationId: string;
 };
+// TODO: the ClusterOrigin should probably be removed from here after we stop supporting only one preview at a time
+export type PreviewOrigin = HelmOrigin | KustomizeOrigin | ClusterOrigin;
 export type AnyOrigin = LocalOrigin | ClusterOrigin | HelmOrigin | KustomizeOrigin;
 
 export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
@@ -37,6 +39,12 @@ export const KustomizeOriginRuntype: Rt.Runtype<KustomizeOrigin> = Rt.Record({
   kustomizationId: Rt.String,
 });
 
+const PreviewOriginRuntype: Rt.Runtype<PreviewOrigin> = Rt.Union(
+  ClusterOriginRuntype,
+  HelmOriginRuntype,
+  KustomizeOriginRuntype
+);
+
 export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
   LocalOriginRuntype,
   ClusterOriginRuntype,
@@ -48,4 +56,5 @@ export const isLocalOrigin = LocalOriginRuntype.guard;
 export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isHelmOrigin = HelmOriginRuntype.guard;
 export const isKustomizeOrigin = KustomizeOriginRuntype.guard;
+export const isPreviewOrigin = PreviewOriginRuntype.guard;
 export const isAnyOrigin = AnyOriginRuntype.guard;

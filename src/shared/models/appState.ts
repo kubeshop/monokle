@@ -39,7 +39,7 @@ type AppState = {
   selectionHistory: {
     current: AppSelection[];
     previous: AppSelection[];
-    index: number;
+    index?: number;
   };
   /**
    * Whether the app's storage is rehydrating
