@@ -3,8 +3,16 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {K8sResource, ResourceContent, ResourceMeta} from './k8sResource';
-import {ClusterOrigin, HelmOrigin, KustomizeOrigin, LocalOrigin} from './origin';
+import {
+  ClusterResourceContentMap,
+  ClusterResourceMetaMap,
+  HelmResourceContentMap,
+  HelmResourceMetaMap,
+  KustomizeResourceContentMap,
+  KustomizeResourceMetaMap,
+  LocalResourceContentMap,
+  LocalResourceMetaMap,
+} from './k8sResource';
 import {AppSelection} from './selection';
 
 export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
@@ -26,10 +34,10 @@ type AppState = {
     kustomize: Record<string, KustomizeResourceMetaMap>;
   };
   resourceContentStorage: {
-    local: ResourceContentMap;
-    cluster: Record<string, ResourceContentMap>;
-    helm: Record<string, ResourceContentMap>;
-    kustomize: Record<string, ResourceContentMap>;
+    local: LocalResourceContentMap;
+    cluster: Record<string, ClusterResourceContentMap>;
+    helm: Record<string, HelmResourceContentMap>;
+    kustomize: Record<string, KustomizeResourceContentMap>;
   };
   selection?: AppSelection;
   selectionOptions: {
@@ -89,7 +97,6 @@ type AppState = {
   previewCommandId?: string;
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
-  resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   notifications: AlertType[];
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
@@ -184,48 +191,9 @@ type ResourceFilterType = {
   fileOrFolderContainedIn?: string;
 };
 
-/**
- * Maps uuid:s to K8sResources
- */
-type ResourceMetaMap = {
-  [id: string]: ResourceMeta;
-};
-
-type LocalResourceMetaMap = {
-  [id: string]: ResourceMeta & {origin: LocalOrigin};
-};
-
-type ClusterResourceMetaMap = {
-  [id: string]: ResourceMeta & {origin: ClusterOrigin};
-};
-
-type HelmResourceMetaMap = {
-  [id: string]: ResourceMeta & {origin: HelmOrigin};
-};
-
-type KustomizeResourceMetaMap = {
-  [id: string]: ResourceMeta & {origin: KustomizeOrigin};
-};
-
-type ResourceContentMap = {
-  [id: string]: ResourceContent;
-};
-
-type ResourceMapType = {
-  [id: string]: K8sResource;
-};
-
-type ResourceRefsProcessingOptions = {
-  /** if ref processing should ignore optional unsatisfied ref  */
-  shouldIgnoreOptionalUnsatisfiedRefs: boolean;
-};
-
 export type {
   AppSelection,
   AppState,
-  ResourceMapType,
-  ResourceMetaMap,
-  ResourceContentMap,
   ResourceFilterType,
   FiltersPresetsType,
   FileMapType,
@@ -237,5 +205,4 @@ export type {
   MatchParamProps,
   PreviewLoaderType,
   PreviewType,
-  ResourceRefsProcessingOptions,
 };
