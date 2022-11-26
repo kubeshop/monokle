@@ -1,10 +1,13 @@
 import {useCallback, useEffect, useState} from 'react';
 
+import flatten, {unflatten} from 'flat';
+
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {setActiveDashboardMenu} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
@@ -18,6 +21,27 @@ export const DashboardPane = () => {
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<any>({});
+  const [filteredMenu, setFilteredMenu] = useState<any>({});
+  const [filterText, setFilterText] = useState<string>('');
+
+  useEffect(() => {
+    if (!filterText) {
+      setFilteredMenu(menu);
+      return;
+    }
+    const flattenMenu = flatten<any, any>(menu, {
+      safe: true,
+      transformKey: key => `${key.replaceAll('.', '-')}`,
+    });
+    const filteredFlattenMenuArray = Object.keys(flattenMenu).filter(key =>
+      key.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim())
+    );
+    const menuObject = filteredFlattenMenuArray.reduce(
+      (output: any, value: string) => ({...output, [value]: {Overview: {}}}),
+      {}
+    );
+    setFilteredMenu(unflatten(menuObject, {transformKey: key => key.replaceAll('-', '.')}));
+  }, [filterText, menu]);
 
   useEffect(() => {
     setMenu(
@@ -26,10 +50,10 @@ export const DashboardPane = () => {
           if (output[kindHandler.navigatorPath[1]]) {
             output[kindHandler.navigatorPath[1]] = {
               ...output[kindHandler.navigatorPath[1]],
-              [kindHandler.kind]: kindHandler,
+              [kindHandler.kind]: {},
             };
           } else {
-            output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: kindHandler};
+            output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: {}};
           }
           return output;
         },
@@ -76,12 +100,40 @@ export const DashboardPane = () => {
 
   return (
     <S.Container>
-      {Object.keys(menu).map(section => (
+      <S.HeaderContainer>
+        <S.ClusterName
+          title={new KubeConfigManager().getKubeConfig().currentContext}
+          actions={<S.DownOutlined />}
+          description={
+            <div>
+              <S.CheckCircleFilled />
+              <S.ConnectedText>Connected</S.ConnectedText>
+            </div>
+          }
+        />
+
+        <S.FilterContainer>
+          <S.Input
+            placeholder=""
+            prefix={<S.SearchOutlined />}
+            onChange={(event: any) => setFilterText(event.target.value)}
+          />
+          <S.FilterAction disabled>
+            <S.FilterOutlined />
+          </S.FilterAction>
+        </S.FilterContainer>
+      </S.HeaderContainer>
+
+      {Object.keys(filteredMenu).map(section => (
         <div key={section}>
-          <S.MainSection $active={activeMenu === section} onClick={() => dispatch(setActiveDashboardMenu(section))}>
+          <S.MainSection
+            $clickable={section === 'Overview'}
+            $active={activeMenu === section}
+            onClick={() => section === 'Overview' && dispatch(setActiveDashboardMenu(section))}
+          >
             {section}
           </S.MainSection>
-          {Object.keys(menu[section]).map((subsection: any) => (
+          {Object.keys(filteredMenu[section]).map((subsection: any) => (
             <S.SubSection
               key={subsection}
               $active={activeMenu === subsection}

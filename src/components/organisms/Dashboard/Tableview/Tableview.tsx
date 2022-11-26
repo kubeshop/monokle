@@ -2,8 +2,6 @@ import {useEffect, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
-import {SearchOutlined} from '@ant-design/icons';
-
 import {K8sResource} from '@models/k8sresource';
 
 import {setSelectedResourceId} from '@redux/dashboard';
@@ -19,10 +17,17 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
   const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
+  const [filterText, setFilterText] = useState<string>('');
 
   useEffect(() => {
-    setFilteredDataSource(dataSource);
-  }, [dataSource]);
+    if (!filterText) {
+      setFilteredDataSource(dataSource);
+      return;
+    }
+    setFilteredDataSource(
+      dataSource.filter(s => s.name.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()))
+    );
+  }, [dataSource, filterText]);
 
   return (
     <S.Container>
@@ -30,12 +35,8 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
         <S.Input
           size="large"
           placeholder="Search and filter"
-          prefix={<SearchOutlined />}
-          onChange={(event: any) =>
-            setFilteredDataSource(
-              event.target.value ? dataSource.filter(s => s.name.includes(event.target.value)) : dataSource
-            )
-          }
+          prefix={<S.SearchOutlined />}
+          onChange={(event: any) => setFilterText(event.target.value)}
         />
         <S.BulkAction size="large" disabled>
           Bulk action

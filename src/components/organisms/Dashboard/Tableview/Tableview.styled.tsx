@@ -1,5 +1,7 @@
 import {Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
 
+import {SearchOutlined as RawSearchOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -70,3 +72,4 @@ export const Table = styled(RawTable)`
 `;
 
 export const BulkAction = styled(RawButton)``;
+export const SearchOutlined = styled(RawSearchOutlined)``;
