@@ -29,16 +29,14 @@ import {ClusterAccess} from '@shared/models/config';
 import {K8sObject} from '@shared/models/k8s';
 import {
   K8sResource,
-  LocalResourceContentMap,
-  LocalResourceMetaMap,
   ResourceContent,
   ResourceContentMap,
   ResourceMapType,
   ResourceMeta,
   ResourceMetaMap,
-  isLocalK8sResource,
+  isLocalResource,
 } from '@shared/models/k8sResource';
-import {LocalOrigin, ResourceOrigin, isLocalOrigin} from '@shared/models/origin';
+import {AnyOrigin, LocalOrigin, isLocalOrigin} from '@shared/models/origin';
 import {isResourceSelection} from '@shared/models/selection';
 
 /**
@@ -177,8 +175,8 @@ export function createResourceName(content: K8sObject, kind: string, filePath?: 
  * Checks if this specified resource is from a file (and not a virtual one)
  */
 
-export function isFileResource(resource: K8sResource): resource is K8sResource & {origin: LocalOrigin} {
-  return isLocalOrigin(resource.origin) && !resource.isUnsaved;
+export function isFileResource(resource: K8sResource): resource is K8sResource<LocalOrigin> {
+  return isLocalResource(resource) && !resource.isUnsaved;
 }
 
 /**
@@ -232,13 +230,13 @@ export function removeResourceFromFile(
   removedResource: K8sResource,
   fileMap: FileMapType,
   stateArgs: {
-    resourceMetaMap: LocalResourceMetaMap;
-    resourceContentMap: LocalResourceContentMap;
+    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
+    resourceContentMap: ResourceContentMap<LocalOrigin>;
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   const resourceMap: ResourceMapType = merge(resourceMetaMap, resourceContentMap);
-  if (!isLocalK8sResource(removedResource)) {
+  if (!isLocalResource(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
   }
   const fileEntry = fileMap[removedResource.origin.filePath];
@@ -309,7 +307,7 @@ function extractNamespace(content: any) {
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources<Origin extends ResourceOrigin>(
+export function extractK8sResources<Origin extends AnyOrigin>(
   fileContent: string,
   origin: Origin
 ): K8sResource<Origin>[] {
@@ -453,7 +451,7 @@ export function isResourceSelected(resource: K8sResource | ResourceMeta | Resour
   );
 }
 
-export function splitK8sResource<Origin extends ResourceOrigin = ResourceOrigin>(
+export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
   resource: K8sResource<Origin>
 ): {meta: ResourceMeta<Origin>; content: ResourceContent<Origin>} {
   const meta: ResourceMeta<Origin> = {
