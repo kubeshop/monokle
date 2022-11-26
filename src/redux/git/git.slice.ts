@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {GitBranchCommit, GitChangedFile, GitRepo, GitSliceState} from '@models/git';
+import {GitBranchCommit, GitChangedFile, GitRemoteRepo, GitRepo, GitSliceState} from '@models/git';
 
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -54,14 +54,6 @@ export const gitSlice = createSlice({
       state.loading = action.payload;
     },
 
-    setHasRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
-      if (!state.repo) {
-        return;
-      }
-
-      state.repo.hasRemoteRepo = action.payload;
-    },
-
     setIsGitInstalled: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
       state.isGitInstalled = action.payload;
     },
@@ -72,6 +64,14 @@ export const gitSlice = createSlice({
 
     setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile | undefined>) => {
       state.selectedItem = action.payload;
+    },
+
+    updateRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRemoteRepo>) => {
+      if (!state.repo) {
+        return;
+      }
+
+      state.repo.remoteRepo = action.payload;
     },
   },
   extraReducers: builder => {
@@ -95,9 +95,9 @@ export const {
   setCommits,
   setCurrentBranch,
   setGitLoading,
-  setHasRemoteRepo,
   setIsGitInstalled,
   setSelectedItem,
   setRepo,
+  updateRemoteRepo,
 } = gitSlice.actions;
 export default gitSlice.reducer;

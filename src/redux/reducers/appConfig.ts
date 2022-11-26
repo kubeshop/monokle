@@ -12,6 +12,7 @@ import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 import {
   AppConfig,
   ClusterAccess,
+  FileExplorerSortOrder,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -475,6 +476,10 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
+    updateFileExplorerSortOrder: (state: Draft<AppConfig>, action: PayloadAction<FileExplorerSortOrder>) => {
+      state.fileExplorerSortOrder = action.payload;
+      electronStore.set('appConfig.fileExplorerSortOrder', action.payload);
+    },
     addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
       const access = state.clusterAccess.find(
         c => c.context === action.payload.context && c.namespace === action.payload.namespace
@@ -564,6 +569,7 @@ export const {
   toggleProjectPin,
   updateApplicationSettings,
   updateClusterSelectorVisibilty,
+  updateFileExplorerSortOrder,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateLanguage,

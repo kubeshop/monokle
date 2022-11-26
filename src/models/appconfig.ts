@@ -117,6 +117,8 @@ export type ProjectConfig = {
   savedCommandMap?: Record<string, SavedCommand | null>;
 };
 
+export type FileExplorerSortOrder = 'folders' | 'files' | 'mixed';
+
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
@@ -156,6 +158,7 @@ interface AppConfig {
   kubeConfigContextsColors: {
     [name: string]: ClusterColors;
   };
+  fileExplorerSortOrder: FileExplorerSortOrder;
 }
 
 export type {AppConfig};

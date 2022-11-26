@@ -10,12 +10,15 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceSetData} from '@redux/compare';
 
+import {getApiVersionGroup} from '@utils/resources';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './ResourceList.styled';
 
 type HeaderItem = {
   type: 'header';
+  apiVersionGroup: string;
   kind: string;
   count: number;
 };
@@ -35,11 +38,11 @@ type Props = {
 
 export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
-    const groups = groupBy(data.resources, r => r.kind);
+    const groups = groupBy(data.resources, r => `${r.kind}--${getApiVersionGroup(r)}`);
 
     const sortedGroups = Object.entries(groups).sort((a, b) => {
-      const kindA = a[0];
-      const kindB = b[0];
+      const kindA = a[0].split('--')[0];
+      const kindB = b[0].split('--')[0];
 
       const kindHandlerA = getResourceKindHandler(kindA);
       const kindHandlerB = getResourceKindHandler(kindB);
@@ -63,8 +66,9 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
     const result: Array<HeaderItem | ResourceItem> = [];
 
-    for (const [kind, resources] of sortedGroups) {
-      result.push({type: 'header', kind, count: resources.length});
+    for (const [key, resources] of sortedGroups) {
+      const [kind, apiVersionGroup] = key.split('--');
+      result.push({type: 'header', kind, count: resources.length, apiVersionGroup});
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
@@ -79,11 +83,12 @@ export const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
     <S.ResourceListDiv>
       {rows.map((row, index) => {
         if (row.type === 'header') {
-          const {kind, count: resourceCount} = row;
+          const {kind, count: resourceCount, apiVersionGroup} = row;
           return (
-            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
+            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={`${kind}--${apiVersionGroup}`}>
               <S.Header>
-                {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
+                {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+                <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
             </S.HeaderDiv>
           );

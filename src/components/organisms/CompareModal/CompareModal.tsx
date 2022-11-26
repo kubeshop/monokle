@@ -29,17 +29,15 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
     <Modal footer={null} title="Comparing resources" open={visible} onCancel={onClose} onOk={onClose} {...sizeProps}>
       {!inspection ? <CompareActionBar /> : <InspectionActionBar />}
 
-      <S.ResourceSetSelectorsContainer $show={Boolean(!inspection)}>
-        <Row ref={containerRef}>
-          <Col span={10}>
-            <ResourceSetSelector side="left" />
-          </Col>
-          <Col span={4} />
-          <Col span={10}>
-            <ResourceSetSelector side="right" />
-          </Col>
-        </Row>
-      </S.ResourceSetSelectorsContainer>
+      <Row ref={containerRef}>
+        <Col span={10}>
+          <ResourceSetSelector side="left" />
+        </Col>
+        <Col span={4} />
+        <Col span={10}>
+          <ResourceSetSelector side="right" />
+        </Col>
+      </Row>
 
       <S.ContentDiv style={{height: `calc(100% - ${height}px - 66px - 45px)`}}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
