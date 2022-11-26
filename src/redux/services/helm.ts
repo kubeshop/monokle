@@ -16,21 +16,15 @@ import {
   getAbsoluteFilePath,
   readFiles,
 } from '@redux/services/fileEntry';
-import {NodeWrapper} from '@redux/services/resource';
 
 import {getFileStats} from '@utils/files';
-import {parseAllYamlDocuments} from '@utils/yaml';
+import {NodeWrapper, parseAllYamlDocuments} from '@utils/yaml';
 
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@shared/models/appState';
+import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@shared/models/helm';
+import {LocalResourceContentMap, LocalResourceMetaMap} from '@shared/models/k8sResource';
 
 export const HelmChartEventEmitter = new EventEmitter();
 
@@ -200,14 +194,19 @@ export function processHelmChartFolder(
   folder: string,
   rootFolder: string,
   files: string[],
-  projectConfig: ProjectConfig,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  helmChartMap: HelmChartMapType,
-  helmValuesMap: HelmValuesMapType,
-  helmTemplatesMap: HelmTemplatesMapType,
-  depth: number
+  depth: number,
+  stateArgs: {
+    projectConfig: ProjectConfig;
+    resourceMetaMap: LocalResourceMetaMap;
+    resourceContentMap: LocalResourceContentMap;
+    fileMap: FileMapType;
+    helmChartMap: HelmChartMapType;
+    helmValuesMap: HelmValuesMapType;
+    helmTemplatesMap: HelmTemplatesMapType;
+  }
 ) {
+  const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
+    stateArgs;
   const result: string[] = [];
 
   // pre-emptively create helm chart file entry
@@ -240,11 +239,14 @@ export function processHelmChartFolder(
           fileEntry.children = readFiles(
             filePath,
             projectConfig,
-            resourceMap,
-            fileMap,
-            helmChartMap,
-            helmValuesMap,
-            helmTemplatesMap,
+            {
+              resourceMetaMap,
+              resourceContentMap,
+              fileMap,
+              helmChartMap,
+              helmValuesMap,
+              helmTemplatesMap,
+            },
             depth + 1,
             helmChart
           );
@@ -257,7 +259,7 @@ export function processHelmChartFolder(
           fileMap,
         });
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
+        extractResourcesForFileEntry(fileEntry, {fileMap, resourceMetaMap, resourceContentMap});
       } else if (isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
