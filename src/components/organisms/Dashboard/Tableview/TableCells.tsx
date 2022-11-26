@@ -1,10 +1,11 @@
-import {Tag} from 'antd';
+import {Popover, Tag} from 'antd';
 
 import {DateTime} from 'luxon';
 
 import {K8sResource} from '@models/k8sresource';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
+import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import * as S from './TableCells.styled';
 
@@ -76,14 +77,21 @@ export const CellNode = {
 
 export const CellError = {
   title: 'Errors',
-  dataIndex: 'validation',
+  dataIndex: '',
   key: 'error',
   width: '150px',
-  render: (validation: any) =>
-    !(validation && !validation?.isValid && validation?.errors && validation?.errors.length > 0) ? (
+  render: (resource: K8sResource) =>
+    !(
+      resource.validation &&
+      !resource.validation?.isValid &&
+      resource.validation?.errors &&
+      resource.validation?.errors.length > 0
+    ) ? (
       <span style={{padding: '2px 4px'}}>-</span>
     ) : (
-      <S.ErrorCell>{validation?.errors.length}</S.ErrorCell>
+      <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
+        <S.ErrorCell>{resource.validation?.errors.length}</S.ErrorCell>
+      </Popover>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
     Number(a.validation?.errors.length) - Number(b.validation?.errors.length) || -Infinity,

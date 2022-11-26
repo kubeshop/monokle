@@ -85,6 +85,7 @@ export const Overview = () => {
         .then(data => setUtilizationData(data))
         .catch(() => setUtilizationData([]));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [new KubeConfigManager().kubeConfig, hearbeat]);
 
   return (

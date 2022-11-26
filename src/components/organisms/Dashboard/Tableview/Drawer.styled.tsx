@@ -110,3 +110,20 @@ export const RightOutlined = styled(RawRightOutlined)`
   color: ${Colors.grey9};
   font-size: 18px;
 `;
+
+export const ErrorCount = styled.div`
+  color: ${Colors.whitePure};
+  background-color: ${Colors.red7};
+  font-weight: 700;
+  font-size: 10px;
+  border-radius: 100%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: -1px;
+  padding: 0 2px 0 0;
+  margin: 2px 0 2px 12px;
+  cursor: pointer;
+`;

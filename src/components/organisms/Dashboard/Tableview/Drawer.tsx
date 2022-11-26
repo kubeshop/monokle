@@ -1,11 +1,14 @@
 import {useEffect, useState} from 'react';
 
+import {Popover} from 'antd';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
+import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
@@ -37,6 +40,13 @@ export const Drawer = () => {
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="incoming" />
             <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
+            <Popover
+              mouseEnterDelay={0.5}
+              placement="rightTop"
+              content={<ErrorsPopoverContent resource={localResource} />}
+            >
+              <S.ErrorCount>{localResource.validation?.errors.length}</S.ErrorCount>
+            </Popover>
           </div>
         ) : (
           <div> - </div>

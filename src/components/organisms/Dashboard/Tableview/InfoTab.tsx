@@ -17,7 +17,7 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
   useEffect(() => {
     console.log('resource', resource);
     setResource(resourceMap[resourceId]);
-  }, [resourceMap, resourceId]);
+  }, [resourceMap, resourceId, resource]);
 
   return (
     <>
@@ -34,7 +34,11 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
               <S.Title>Labels</S.Title>
               <div>
                 {Object.keys(resource.content.metadata.labels).map(key => (
-                  <Tag color="geekblue" style={{marginBottom: '4px'}}>
+                  <Tag
+                    key={`${key}=${resource.content.metadata.labels[key]}`}
+                    color="geekblue"
+                    style={{marginBottom: '4px'}}
+                  >
                     {key}={resource.content.metadata.labels[key]}
                   </Tag>
                 ))}
@@ -46,7 +50,11 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
               <S.Title>Annotations</S.Title>
               <div>
                 {Object.keys(resource.content.metadata.annotations).map(key => (
-                  <Tag color="geekblue" style={{marginBottom: '4px'}}>
+                  <Tag
+                    key={`${key}=${resource.content.metadata.annotations[key]}`}
+                    color="geekblue"
+                    style={{marginBottom: '4px'}}
+                  >
                     {key}={resource.content.metadata.annotations[key]}
                   </Tag>
                 ))}

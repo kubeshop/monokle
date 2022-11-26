@@ -1,4 +1,4 @@
-import React, {Suspense, useCallback, useEffect} from 'react';
+import React, {Suspense, useCallback} from 'react';
 
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
@@ -49,10 +49,6 @@ const PaneManagerSplitView: React.FC = () => {
     },
     [dispatch, layout]
   );
-
-  useEffect(() => {
-    console.log(isInClusterMode, leftActiveMenu);
-  }, [isInClusterMode, leftActiveMenu]);
 
   if (!isInClusterMode && leftActiveMenu === 'dashboard') {
     return <p>Open Cluster Mode</p>;

@@ -54,15 +54,10 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           onRow={(record: K8sResource | any, rowIndex: number | undefined) => {
             return {
               onClick: (event: any) => {
-                console.log(record);
-                console.log(rowIndex);
+                console.log(record, rowIndex);
                 dispatch(setSelectedResourceId(record.id));
                 dispatch(selectK8sResource({resourceId: record.id}));
-              }, // click row
-              onDoubleClick: (event: any) => {}, // double click row
-              onContextMenu: (event: any) => {}, // right button click row
-              onMouseEnter: (event: any) => {}, // mouse enter row
-              onMouseLeave: (event: any) => {}, // mouse leave row
+              },
             };
           }}
         />
