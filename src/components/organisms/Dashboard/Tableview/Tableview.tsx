@@ -3,9 +3,10 @@ import {useEffect, useState} from 'react';
 import {ColumnsType} from 'antd/lib/table';
 
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
 import {setSelectedResourceId} from '@redux/dashboard';
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -18,6 +19,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
   const {height} = useMainPaneDimensions();
   const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
   const [filterText, setFilterText] = useState<string>('');
+  const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
 
   useEffect(() => {
     if (!filterText) {
@@ -37,6 +39,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           placeholder="Search and filter"
           prefix={<S.SearchOutlined />}
           onChange={(event: any) => setFilterText(event.target.value)}
+          allowClear
         />
         <S.BulkAction size="large" disabled>
           Bulk action
@@ -49,12 +52,12 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           rowKey="id"
           scroll={{y: height - 212}}
           rowSelection={{}}
+          rowClassName={(record: K8sResource | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky
-          onRow={(record: K8sResource | any, rowIndex: number | undefined) => {
+          onRow={(record: K8sResource | any) => {
             return {
-              onClick: (event: any) => {
-                console.log(record, rowIndex);
+              onClick: () => {
                 dispatch(setSelectedResourceId(record.id));
                 dispatch(selectK8sResource({resourceId: record.id}));
               },

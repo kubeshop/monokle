@@ -36,20 +36,23 @@ export const Drawer = () => {
       getContainer={false}
       title={
         localResource ? (
-          <div style={{display: 'flex'}}>
+          <S.TitleContainer>
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="incoming" />
             <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
-            <Popover
-              mouseEnterDelay={0.5}
-              placement="rightTop"
-              content={<ErrorsPopoverContent resource={localResource} />}
-            >
-              <S.ErrorCount>{localResource.validation?.errors.length}</S.ErrorCount>
-            </Popover>
-          </div>
+
+            {Number(localResource.validation?.errors.length) > 0 && (
+              <Popover
+                mouseEnterDelay={0.5}
+                placement="rightTop"
+                content={<ErrorsPopoverContent resource={localResource} />}
+              >
+                <S.ErrorCount>{localResource.validation?.errors.length}</S.ErrorCount>
+              </Popover>
+            )}
+          </S.TitleContainer>
         ) : (
-          <div> - </div>
+          <S.TitleContainer> - </S.TitleContainer>
         )
       }
       onClose={() => {

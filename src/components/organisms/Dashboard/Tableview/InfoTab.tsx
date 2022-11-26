@@ -2,11 +2,11 @@ import {useEffect, useState} from 'react';
 
 import {Tag} from 'antd';
 
-import {DateTime} from 'luxon';
-
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
+
+import {timeAgo} from '@utils/timeAgo';
 
 import * as S from './InfoTab.styled';
 
@@ -84,12 +84,7 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
           {resource.content?.metadata?.creationTimestamp && (
             <S.Row>
               <S.Title>Created At</S.Title>
-              <S.GreyContent>
-                {DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative({
-                  style: 'short',
-                  unit: 'days',
-                })}
-              </S.GreyContent>
+              <S.GreyContent>{timeAgo(resource.content.metadata.creationTimestamp)}</S.GreyContent>
             </S.Row>
           )}
         </S.Container>

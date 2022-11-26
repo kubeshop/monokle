@@ -64,7 +64,12 @@ export const Table = styled(RawTable)`
     .ant-table-row {
       border-top: 1px solid ${Colors.grey4};
       height: 54px;
+
       :hover {
+        background-color: ${Colors.grey6000};
+      }
+
+      &.selected {
         background-color: ${Colors.grey6000};
       }
     }

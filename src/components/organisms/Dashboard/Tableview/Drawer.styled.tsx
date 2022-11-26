@@ -127,3 +127,7 @@ export const ErrorCount = styled.div`
   margin: 2px 0 2px 12px;
   cursor: pointer;
 `;
+
+export const TitleContainer = styled.div`
+  display: flex;
+`;

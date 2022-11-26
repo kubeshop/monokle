@@ -7,6 +7,8 @@ import {K8sResource} from '@models/k8sresource';
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
+import {timeAgo} from '@utils/timeAgo';
+
 import * as S from './TableCells.styled';
 
 export const CellStatus = {
@@ -33,9 +35,7 @@ export const CellAge = {
   dataIndex: 'content',
   key: 'age',
   width: '120px',
-  render: ({metadata: {creationTimestamp}}: any) => (
-    <div>{DateTime.fromISO(creationTimestamp).toRelative({style: 'short', unit: 'days'})}</div>
-  ),
+  render: ({metadata: {creationTimestamp}}: any) => <div>{timeAgo(creationTimestamp)}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
     DateTime.fromISO(a.content.metadata?.creationTimestamp).toMillis() -
     DateTime.fromISO(b.content.metadata?.creationTimestamp).toMillis(),
@@ -124,14 +124,16 @@ export const CellRestartCount = {
   key: 'restarts',
   width: '120px',
   render: (content: any) =>
-    content?.status?.containerStatuses[0] ? (
+    content?.status?.containerStatuses ? (
       <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.content?.status?.containerStatuses[0].restartCount) -
-      Number(b.content?.status?.containerStatuses[0].restartCount) || -Infinity,
+    a.content?.status?.containerStatuses && a.content?.status?.containerStatuses
+      ? Number(a.content?.status?.containerStatuses[0].restartCount) -
+        Number(b.content?.status?.containerStatuses[0].restartCount)
+      : -Infinity,
 };
 
 export const CellPodsCount = {

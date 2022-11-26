@@ -5,7 +5,7 @@ import flatten, {unflatten} from 'flat';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {setActiveDashboardMenu} from '@redux/dashboard';
+import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -31,7 +31,7 @@ export const DashboardPane = () => {
     }
     const flattenMenu = flatten<any, any>(menu, {
       safe: true,
-      transformKey: key => `${key.replaceAll('.', '-')}`,
+      transformKey: (key: string) => `${key.replaceAll('.', '-')}`,
     });
     const filteredFlattenMenuArray = Object.keys(flattenMenu).filter(key =>
       key.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim())
@@ -40,7 +40,7 @@ export const DashboardPane = () => {
       (output: any, value: string) => ({...output, [value]: {Overview: {}}}),
       {}
     );
-    setFilteredMenu(unflatten(menuObject, {transformKey: key => key.replaceAll('-', '.')}));
+    setFilteredMenu(unflatten(menuObject, {transformKey: (key: string) => key.replaceAll('-', '.')}));
   }, [filterText, menu]);
 
   useEffect(() => {
@@ -62,6 +62,11 @@ export const DashboardPane = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
+
+  const setActiveMenu = (section: string) => {
+    dispatch(setActiveDashboardMenu(section));
+    dispatch(setSelectedResourceId());
+  };
 
   const getResourceCount = useCallback(
     (kind: string) => {
@@ -117,6 +122,7 @@ export const DashboardPane = () => {
             placeholder=""
             prefix={<S.SearchOutlined />}
             onChange={(event: any) => setFilterText(event.target.value)}
+            allowClear
           />
           <S.FilterAction disabled>
             <S.FilterOutlined />
@@ -129,7 +135,7 @@ export const DashboardPane = () => {
           <S.MainSection
             $clickable={section === 'Overview'}
             $active={activeMenu === section}
-            onClick={() => section === 'Overview' && dispatch(setActiveDashboardMenu(section))}
+            onClick={() => section === 'Overview' && setActiveMenu(section)}
           >
             {section}
           </S.MainSection>
@@ -137,7 +143,7 @@ export const DashboardPane = () => {
             <S.SubSection
               key={subsection}
               $active={activeMenu === subsection}
-              onClick={() => dispatch(setActiveDashboardMenu(subsection))}
+              onClick={() => setActiveMenu(subsection)}
             >
               <span style={{marginRight: '12px'}}>{subsection}</span>
               {getResourceCount(subsection) ? (
