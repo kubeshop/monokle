@@ -18,8 +18,9 @@ import {
 } from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';
-import {NodeWrapper, parseAllYamlDocuments} from '@utils/yaml';
+import {parseAllYamlDocuments} from '@utils/yaml';
 
+import {NodeWrapper} from '@monokle/validation';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
