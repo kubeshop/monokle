@@ -453,8 +453,10 @@ export function isResourceSelected(resource: K8sResource | ResourceMeta | Resour
   );
 }
 
-export function splitK8sResource(resource: K8sResource): {meta: ResourceMeta; content: ResourceContent} {
-  const meta: ResourceMeta = {
+export function splitK8sResource<Origin extends ResourceOrigin = ResourceOrigin>(
+  resource: K8sResource<Origin>
+): {meta: ResourceMeta<Origin>; content: ResourceContent<Origin>} {
+  const meta: ResourceMeta<Origin> = {
     id: resource.id,
     origin: resource.origin,
     name: resource.name,
@@ -465,7 +467,7 @@ export function splitK8sResource(resource: K8sResource): {meta: ResourceMeta; co
     range: resource.range,
     isUnsaved: resource.isUnsaved,
   };
-  const content: ResourceContent = {
+  const content: ResourceContent<Origin> = {
     id: resource.id,
     origin: resource.origin,
     text: resource.text,
