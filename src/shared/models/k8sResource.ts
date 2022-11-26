@@ -1,5 +1,5 @@
 import {KubernetesObject} from './appState';
-import {ResourceOrigin} from './origin';
+import {LocalOrigin, ResourceOrigin} from './origin';
 
 type ResourceMeta = {
   /** an internally generated UUID
@@ -34,4 +34,6 @@ type ResourceContent = {
 
 type K8sResource = ResourceMeta & ResourceContent;
 
-export type {K8sResource, ResourceMeta, ResourceContent};
+type LocalK8sResource = K8sResource & {origin: LocalOrigin};
+
+export type {K8sResource, LocalK8sResource, ResourceMeta, ResourceContent};
