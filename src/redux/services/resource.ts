@@ -24,10 +24,21 @@ import {getResourceKindHandler, registerKindHandler} from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {AppSelection, FileMapType, ResourceContentMap, ResourceMapType, ResourceMetaMap} from '@shared/models/appState';
+import {AppSelection, FileMapType} from '@shared/models/appState';
 import {ClusterAccess} from '@shared/models/config';
-import {K8sResource, ResourceContent, ResourceMeta} from '@shared/models/k8sResource';
-import {LocalOrigin, isLocalOrigin} from '@shared/models/origin';
+import {K8sObject} from '@shared/models/k8s';
+import {
+  K8sResource,
+  LocalResourceContentMap,
+  LocalResourceMetaMap,
+  ResourceContent,
+  ResourceContentMap,
+  ResourceMapType,
+  ResourceMeta,
+  ResourceMetaMap,
+  isLocalK8sResource,
+} from '@shared/models/k8sResource';
+import {LocalOrigin, ResourceOrigin, isLocalOrigin} from '@shared/models/origin';
 import {isResourceSelection} from '@shared/models/selection';
 
 /**
@@ -125,9 +136,13 @@ export async function getTargetClusterNamespaces(
  * Creates a UI friendly resource name
  */
 
-export function createResourceName(filePath: string, content: any, kind: string) {
+export function createResourceName(content: K8sObject, kind: string, filePath?: string) {
   // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
-  if (kind === KUSTOMIZATION_KIND && (!content?.apiVersion || content.apiVersion.startsWith(KUSTOMIZATION_API_GROUP))) {
+  if (
+    filePath &&
+    kind === KUSTOMIZATION_KIND &&
+    (!content?.apiVersion || content.apiVersion.startsWith(KUSTOMIZATION_API_GROUP))
+  ) {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
       return filePath.substr(1, ix - 1);
@@ -145,13 +160,17 @@ export function createResourceName(filePath: string, content: any, kind: string)
     return content.metadata.name;
   }
 
-  // use filename as last resort
-  const ix = filePath.lastIndexOf(path.sep);
-  if (ix > 0) {
-    return filePath.substr(ix + 1);
+  // use filename as last resort if it's provided
+  if (filePath) {
+    const ix = filePath.lastIndexOf(path.sep);
+    if (ix > 0) {
+      return filePath.substr(ix + 1);
+    }
+
+    return filePath;
   }
 
-  return filePath;
+  return 'Unnamed resource';
 }
 
 /**
@@ -213,13 +232,13 @@ export function removeResourceFromFile(
   removedResource: K8sResource,
   fileMap: FileMapType,
   stateArgs: {
-    resourceMetaMap: ResourceMetaMap;
-    resourceContentMap: ResourceContentMap;
+    resourceMetaMap: LocalResourceMetaMap;
+    resourceContentMap: LocalResourceContentMap;
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   const resourceMap: ResourceMapType = merge(resourceMetaMap, resourceContentMap);
-  if (!isLocalOrigin(removedResource.origin)) {
+  if (!isLocalK8sResource(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
   }
   const fileEntry = fileMap[removedResource.origin.filePath];
@@ -290,10 +309,13 @@ function extractNamespace(content: any) {
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources(fileContent: string, relativePath: string) {
+export function extractK8sResources<Origin extends ResourceOrigin>(
+  fileContent: string,
+  origin: Origin
+): K8sResource<Origin>[] {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
-  const result: K8sResource[] = [];
+  const result: K8sResource<Origin>[] = [];
   let splitDocs: any;
 
   if (documents) {
@@ -305,7 +327,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         }
 
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          `Ignoring document ${docIndex} in origin due to ${doc.errors.length} error(s)`,
+          origin,
           documents[docIndex],
           splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
         );
@@ -319,12 +342,13 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         if (resourceObject && resourceObject.apiVersion && resourceObject.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
-          let resource: K8sResource = {
-            name: createResourceName(relativePath, resourceObject, resourceObject.kind),
-            origin: {
-              type: 'local',
-              filePath: relativePath,
-            },
+          let resource: K8sResource<Origin> = {
+            name: createResourceName(
+              resourceObject,
+              resourceObject.kind,
+              isLocalOrigin(origin) ? origin.filePath : undefined
+            ),
+            origin,
             id: (resourceObject.metadata && resourceObject.metadata.uid) || uuidv4(),
             kind: resourceObject.kind,
             apiVersion: resourceObject.apiVersion,
@@ -369,13 +393,15 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (resourceObject && isKustomizationFilePath(relativePath) && documents.length === 1) {
-          let resource: K8sResource = {
-            name: createResourceName(relativePath, resourceObject, KUSTOMIZATION_KIND),
-            origin: {
-              type: 'local',
-              filePath: relativePath,
-            },
+        else if (
+          isLocalOrigin(origin) &&
+          resourceObject &&
+          isKustomizationFilePath(origin.filePath) &&
+          documents.length === 1
+        ) {
+          let resource: K8sResource<Origin> = {
+            name: createResourceName(resourceObject, KUSTOMIZATION_KIND, origin.filePath),
+            origin,
             id: uuidv4(),
             kind: KUSTOMIZATION_KIND,
             apiVersion: KUSTOMIZATION_API_VERSION,
@@ -419,7 +445,7 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(resource: K8sResource | ResourceMeta, selection: AppSelection) {
+export function isResourceSelected(resource: K8sResource | ResourceMeta | ResourceContent, selection: AppSelection) {
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&
@@ -441,6 +467,7 @@ export function splitK8sResource(resource: K8sResource): {meta: ResourceMeta; co
   };
   const content: ResourceContent = {
     id: resource.id,
+    origin: resource.origin,
     text: resource.text,
     object: resource.object,
   };
