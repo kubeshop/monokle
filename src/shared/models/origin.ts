@@ -17,7 +17,7 @@ export type KustomizeOrigin = {
   type: 'kustomize';
   kustomizationId: string;
 };
-export type ResourceOrigin = LocalOrigin | ClusterOrigin | HelmOrigin | KustomizeOrigin;
+export type AnyOrigin = LocalOrigin | ClusterOrigin | HelmOrigin | KustomizeOrigin;
 
 export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
   type: Rt.Literal('local'),
@@ -37,7 +37,7 @@ export const KustomizeOriginRuntype: Rt.Runtype<KustomizeOrigin> = Rt.Record({
   kustomizationId: Rt.String,
 });
 
-export const ResourceOriginRuntype: Rt.Runtype<ResourceOrigin> = Rt.Union(
+export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
   LocalOriginRuntype,
   ClusterOriginRuntype,
   HelmOriginRuntype,
@@ -48,4 +48,4 @@ export const isLocalOrigin = LocalOriginRuntype.guard;
 export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isHelmOrigin = HelmOriginRuntype.guard;
 export const isKustomizeOrigin = KustomizeOriginRuntype.guard;
-export const isResourceOrigin = ResourceOriginRuntype.guard;
+export const isAnyOrigin = AnyOriginRuntype.guard;

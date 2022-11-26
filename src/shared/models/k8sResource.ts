@@ -2,6 +2,8 @@ import * as Rt from 'runtypes';
 
 import {K8sObject, K8sObjectRuntype} from './k8s';
 import {
+  AnyOrigin,
+  AnyOriginRuntype,
   ClusterOrigin,
   ClusterOriginRuntype,
   HelmOrigin,
@@ -10,15 +12,13 @@ import {
   KustomizeOriginRuntype,
   LocalOrigin,
   LocalOriginRuntype,
-  ResourceOrigin,
-  ResourceOriginRuntype,
 } from './origin';
 
-export type ResourceMeta<OriginType extends ResourceOrigin = ResourceOrigin> = {
+export type ResourceMeta<Origin extends AnyOrigin = AnyOrigin> = {
   /** an internally generated UUID
    * - used for references/lookups in resourceMaps */
   id: string;
-  origin: OriginType;
+  origin: Origin;
   /**
    * name - generated from manifest metadata
    */
@@ -44,9 +44,9 @@ export type ClusterResourceMeta = ResourceMeta<ClusterOrigin>;
 export type HelmResourceMeta = ResourceMeta<HelmOrigin>;
 export type KustomizeResourceMeta = ResourceMeta<KustomizeOrigin>;
 
-const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<ResourceOrigin>> = Rt.Record({
+const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
   id: Rt.String,
-  origin: ResourceOriginRuntype,
+  origin: AnyOriginRuntype,
   name: Rt.String,
   kind: Rt.String,
   apiVersion: Rt.String,
@@ -71,26 +71,24 @@ export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
 export const isHelmResourceMeta = HelmResourceMetaRuntype.guard;
 export const isKustomizeResourceMeta = KustomizeResourceMetaRuntype.guard;
 
-export type ResourceContent<Origin extends ResourceOrigin = ResourceOrigin> = {
+export type ResourceContent<Origin extends AnyOrigin = AnyOrigin> = {
   id: string;
   origin: Origin;
   text: string;
   object: K8sObject;
 };
 
-export type LocalResourceContent = ResourceContent<LocalOrigin>;
-export type ClusterResourceContent = ResourceContent<ClusterOrigin>;
-export type HelmResourceContent = ResourceContent<HelmOrigin>;
-export type KustomizeResourceContent = ResourceContent<KustomizeOrigin>;
-
-const ResourceContentRuntype: Rt.Runtype<ResourceContent<ResourceOrigin>> = Rt.Record({
+const ResourceContentRuntype: Rt.Runtype<ResourceContent<AnyOrigin>> = Rt.Record({
   id: Rt.String,
-  origin: ResourceOriginRuntype,
+  origin: AnyOriginRuntype,
   text: Rt.String,
   object: K8sObjectRuntype,
 });
 
-const LocalResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: LocalOriginRuntype}));
+const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<LocalOrigin>> = Rt.Intersect(
+  ResourceContentRuntype,
+  Rt.Record({origin: LocalOriginRuntype})
+);
 const ClusterResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: ClusterOriginRuntype}));
 const HelmResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: HelmOriginRuntype}));
 const KustomizeResourceContentRuntype = Rt.Intersect(
@@ -103,47 +101,34 @@ export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
 export const isHelmResourceContent = HelmResourceContentRuntype.guard;
 export const isKustomizeResourceContent = KustomizeResourceContentRuntype.guard;
 
-export type K8sResource<Origin extends ResourceOrigin = ResourceOrigin> = ResourceMeta<Origin> &
-  ResourceContent<Origin>;
-export type LocalK8sResource = K8sResource<LocalOrigin>;
-export type ClusterK8sResource = K8sResource<ClusterOrigin>;
-export type HelmK8sResource = K8sResource<HelmOrigin>;
-export type KustomizeK8sResource = K8sResource<KustomizeOrigin>;
+export type K8sResource<Origin extends AnyOrigin = AnyOrigin> = ResourceMeta<Origin> & ResourceContent<Origin>;
 
-const K8sResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(ResourceMetaRuntype, ResourceContentRuntype);
-const LocalK8sResourceRuntype: Rt.Runtype<LocalK8sResource> = Rt.Intersect(
-  K8sResourceRuntype,
+const ResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(ResourceMetaRuntype, ResourceContentRuntype);
+const LocalResourceRuntype: Rt.Runtype<K8sResource<LocalOrigin>> = Rt.Intersect(
+  ResourceRuntype,
   Rt.Record({origin: LocalOriginRuntype})
 );
-const ClusterK8sResourceRuntype: Rt.Runtype<ClusterK8sResource> = Rt.Intersect(
-  K8sResourceRuntype,
+const ClusterResourceRuntype: Rt.Runtype<K8sResource<ClusterOrigin>> = Rt.Intersect(
+  ResourceRuntype,
   Rt.Record({origin: ClusterOriginRuntype})
 );
-const HelmK8sResourceRuntype: Rt.Runtype<HelmK8sResource> = Rt.Intersect(
-  K8sResourceRuntype,
+const HelmResourceRuntype: Rt.Runtype<K8sResource<HelmOrigin>> = Rt.Intersect(
+  ResourceRuntype,
   Rt.Record({origin: HelmOriginRuntype})
 );
-const KustomizeK8sResourceRuntype: Rt.Runtype<KustomizeK8sResource> = Rt.Intersect(
-  K8sResourceRuntype,
+const KustomizeResourceRuntype: Rt.Runtype<K8sResource<KustomizeOrigin>> = Rt.Intersect(
+  ResourceRuntype,
   Rt.Record({origin: KustomizeOriginRuntype})
 );
 
-export const isK8sResource = K8sResourceRuntype.guard;
-export const isLocalK8sResource = LocalK8sResourceRuntype.guard;
-export const isClusterK8sResource = ClusterK8sResourceRuntype.guard;
-export const isHelmK8sResource = HelmK8sResourceRuntype.guard;
-export const isKustomizeK8sResource = KustomizeK8sResourceRuntype.guard;
+export const isResource = ResourceRuntype.guard;
+export const isLocalResource = LocalResourceRuntype.guard;
+export const isClusterResource = ClusterResourceRuntype.guard;
+export const isHelmResource = HelmResourceRuntype.guard;
+export const isKustomizeResource = KustomizeResourceRuntype.guard;
 
-export type ResourceMetaMap = Record<string, ResourceMeta<ResourceOrigin>>;
-export type LocalResourceMetaMap = Record<string, LocalResourceMeta>;
-export type ClusterResourceMetaMap = Record<string, ClusterResourceMeta>;
-export type HelmResourceMetaMap = Record<string, HelmResourceMeta>;
-export type KustomizeResourceMetaMap = Record<string, KustomizeResourceMeta>;
+export type ResourceMetaMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceMeta<Origin>>;
 
-export type ResourceContentMap = Record<string, ResourceContent<ResourceOrigin>>;
-export type LocalResourceContentMap = Record<string, LocalResourceContent>;
-export type ClusterResourceContentMap = Record<string, ClusterResourceContent>;
-export type HelmResourceContentMap = Record<string, HelmResourceContent>;
-export type KustomizeResourceContentMap = Record<string, KustomizeResourceContent>;
+export type ResourceContentMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceContent<Origin>>;
 
 export type ResourceMapType = Record<string, K8sResource>;
