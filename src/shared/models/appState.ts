@@ -3,16 +3,8 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {
-  ClusterResourceContentMap,
-  ClusterResourceMetaMap,
-  HelmResourceContentMap,
-  HelmResourceMetaMap,
-  KustomizeResourceContentMap,
-  KustomizeResourceMetaMap,
-  LocalResourceContentMap,
-  LocalResourceMetaMap,
-} from './k8sResource';
+import {ResourceContentMap, ResourceMetaMap} from './k8sResource';
+import {ClusterOrigin, HelmOrigin, KustomizeOrigin, LocalOrigin} from './origin';
 import {AppSelection} from './selection';
 
 type AppState = {
@@ -22,19 +14,19 @@ type AppState = {
    */
   fileMap: FileMapType;
   resourceMetaStorage: {
-    local: LocalResourceMetaMap;
+    local: ResourceMetaMap<LocalOrigin>;
     /* key is cluster context */
-    cluster: Record<string, ClusterResourceMetaMap>;
+    cluster: Record<string, ResourceMetaMap<ClusterOrigin>>;
     /* key is helm preview id */
-    helm: Record<string, HelmResourceMetaMap>;
+    helm: Record<string, ResourceMetaMap<HelmOrigin>>;
     /* key is kustomize preview id */
-    kustomize: Record<string, KustomizeResourceMetaMap>;
+    kustomize: Record<string, ResourceMetaMap<KustomizeOrigin>>;
   };
   resourceContentStorage: {
-    local: LocalResourceContentMap;
-    cluster: Record<string, ClusterResourceContentMap>;
-    helm: Record<string, HelmResourceContentMap>;
-    kustomize: Record<string, KustomizeResourceContentMap>;
+    local: ResourceContentMap<LocalOrigin>;
+    cluster: Record<string, ResourceContentMap<ClusterOrigin>>;
+    helm: Record<string, ResourceContentMap<HelmOrigin>>;
+    kustomize: Record<string, ResourceContentMap<KustomizeOrigin>>;
   };
   selection?: AppSelection;
   selectionOptions: {
