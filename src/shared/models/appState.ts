@@ -15,9 +15,6 @@ import {
 } from './k8sResource';
 import {AppSelection} from './selection';
 
-export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
-  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
-
 type AppState = {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -155,16 +152,6 @@ type HelmValuesMapType = {
  */
 type ImagesListType = ImageType[];
 
-type KubernetesObject = {
-  apiVersion: string;
-  kind: string;
-  metadata: {
-    name: string;
-    [x: string]: any;
-  };
-  [x: string]: any;
-};
-
 type MatchParamProps = {
   matchCase: boolean;
   matchWholeWord: boolean;
@@ -201,7 +188,6 @@ export type {
   HelmValuesMapType,
   HelmTemplatesMapType,
   ImagesListType,
-  KubernetesObject,
   MatchParamProps,
   PreviewLoaderType,
   PreviewType,

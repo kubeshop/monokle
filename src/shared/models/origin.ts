@@ -1,38 +1,55 @@
 import * as Rt from 'runtypes';
 
-const LocalOriginRuntype = Rt.Record({
+export type LocalOrigin = {
+  type: 'local';
+  filePath: string;
+};
+
+export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
   type: Rt.Literal('local'),
   filePath: Rt.String,
 });
 
-const ClusterOriginRuntype = Rt.Record({
+export type ClusterOrigin = {
+  type: 'cluster';
+  context: string;
+};
+
+export const ClusterOriginRuntype: Rt.Runtype<ClusterOrigin> = Rt.Record({
   type: Rt.Literal('cluster'),
   context: Rt.String,
 });
 
-const HelmOriginRuntype = Rt.Record({
+export type HelmOrigin = {
+  type: 'helm';
+  chartId: string;
+  valuesFilePath: string;
+};
+
+export const HelmOriginRuntype: Rt.Runtype<HelmOrigin> = Rt.Record({
   type: Rt.Literal('helm'),
   chartId: Rt.String,
   valuesFilePath: Rt.String,
 });
 
-const KustomizeOriginRuntype = Rt.Record({
+export type KustomizeOrigin = {
+  type: 'kustomize';
+  kustomizationId: string;
+};
+
+export const KustomizeOriginRuntype: Rt.Runtype<KustomizeOrigin> = Rt.Record({
   type: Rt.Literal('kustomize'),
   kustomizationId: Rt.String,
 });
 
-export const ResourceOriginRuntype = Rt.Union(
+export type ResourceOrigin = LocalOrigin | ClusterOrigin | HelmOrigin | KustomizeOrigin;
+
+export const ResourceOriginRuntype: Rt.Runtype<ResourceOrigin> = Rt.Union(
   LocalOriginRuntype,
   ClusterOriginRuntype,
   HelmOriginRuntype,
   KustomizeOriginRuntype
 );
-
-export type LocalOrigin = Rt.Static<typeof LocalOriginRuntype>;
-export type ClusterOrigin = Rt.Static<typeof ClusterOriginRuntype>;
-export type HelmOrigin = Rt.Static<typeof HelmOriginRuntype>;
-export type KustomizeOrigin = Rt.Static<typeof KustomizeOriginRuntype>;
-export type ResourceOrigin = Rt.Static<typeof ResourceOriginRuntype>;
 
 export const isLocalOrigin = LocalOriginRuntype.guard;
 export const isClusterOrigin = ClusterOriginRuntype.guard;
