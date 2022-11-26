@@ -1,22 +1,11 @@
 import {KubernetesObject} from './appState';
-import {
-  ClusterContextLocation,
-  FileLocation,
-  HelmChartLocation,
-  KustomizeKustomizationLocation,
-} from './objectLocation';
-
-type ResourceSourceLocation =
-  | FileLocation
-  | ClusterContextLocation
-  | HelmChartLocation
-  | KustomizeKustomizationLocation;
+import {ResourceOrigin} from './origin';
 
 type ResourceMeta = {
   /** an internally generated UUID
    * - used for references/lookups in resourceMaps */
   id: string;
-  sourceLocation: ResourceSourceLocation;
+  origin: ResourceOrigin;
   /**
    * name - generated from manifest metadata
    */
@@ -45,4 +34,4 @@ type ResourceContent = {
 
 type K8sResource = ResourceMeta & ResourceContent;
 
-export type {K8sResource, ResourceSourceLocation, ResourceMeta, ResourceContent};
+export type {K8sResource, ResourceMeta, ResourceContent};
