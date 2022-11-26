@@ -5,6 +5,8 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContent, ResourceMeta} from './k8sResource';
 import {ObjectLocation} from './objectLocation';
+import {ClusterOrigin, HelmOrigin, KustomizeOrigin, LocalOrigin} from './origin';
+import {AppSelection} from './selection';
 
 export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
   obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
@@ -15,20 +17,30 @@ type AppState = {
    * - fileMap[**ROOT_FILE_ENTRY**] is the FileEntry for the rootFolder and it's **.filePath is absolute**
    */
   fileMap: FileMapType;
-  resourceMeta: {
-    local: ResourceMetaMap;
+  resourceMetaStorage: {
+    local: LocalResourceMetaMap;
     /* key is cluster context */
-    cluster: Record<string, ResourceMetaMap>;
+    cluster: Record<string, ClusterResourceMetaMap>;
     /* key is helm preview id */
-    helm: Record<string, ResourceMetaMap>;
+    helm: Record<string, HelmResourceMetaMap>;
     /* key is kustomize preview id */
-    kustomize: Record<string, ResourceMetaMap>;
+    kustomize: Record<string, KustomizeResourceMetaMap>;
   };
-  resourceContent: {
+  resourceContentStorage: {
     local: ResourceContentMap;
     cluster: Record<string, ResourceContentMap>;
     helm: Record<string, ResourceContentMap>;
     kustomize: Record<string, ResourceContentMap>;
+  };
+  selection: AppSelection;
+  selectionOptions: {
+    isSelecting?: boolean;
+    shouldEditorReload?: boolean;
+  };
+  selectionHistory: {
+    current: AppSelection[];
+    previous: AppSelection[];
+    index: number;
   };
   /**
    * Whether the app's storage is rehydrating
@@ -47,17 +59,6 @@ type AppState = {
   helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
-  selection: {
-    location: ObjectLocation;
-    isSelecting?: boolean;
-    /* whether or not the editor should read the selectedPath file again - used when the file is updated externally */
-    shouldEditorReload?: boolean;
-    history: {
-      currentLocations: ObjectLocation[];
-      previousLocations: ObjectLocation[];
-      index: number;
-    };
-  };
   highlight: {
     locations: ObjectLocation[];
   };
@@ -191,6 +192,22 @@ type ResourceMetaMap = {
   [id: string]: ResourceMeta;
 };
 
+type LocalResourceMetaMap = {
+  [id: string]: ResourceMeta & {origin: LocalOrigin};
+};
+
+type ClusterResourceMetaMap = {
+  [id: string]: ResourceMeta & {origin: ClusterOrigin};
+};
+
+type HelmResourceMetaMap = {
+  [id: string]: ResourceMeta & {origin: HelmOrigin};
+};
+
+type KustomizeResourceMetaMap = {
+  [id: string]: ResourceMeta & {origin: KustomizeOrigin};
+};
+
 type ResourceContentMap = {
   [id: string]: ResourceContent;
 };
@@ -205,6 +222,7 @@ type ResourceRefsProcessingOptions = {
 };
 
 export type {
+  AppSelection,
   AppState,
   ResourceMapType,
   ResourceMetaMap,
