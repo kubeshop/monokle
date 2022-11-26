@@ -32,7 +32,7 @@ export enum Themes {
   Light = 'light',
 }
 
-type AppConfig = {
+interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
   /**
@@ -71,7 +71,8 @@ type AppConfig = {
   kubeConfigContextsColors: {
     [name: string]: ClusterColors;
   };
-};
+  fileExplorerSortOrder: FileExplorerSortOrder;
+}
 
 type ClusterAccess = {
   permissions: KubePermissions[];
@@ -79,6 +80,8 @@ type ClusterAccess = {
   namespace: string;
   context: string;
 };
+
+type FileExplorerSortOrder = 'folders' | 'files' | 'mixed';
 
 type HelmPreviewConfiguration = {
   id: string;
@@ -166,6 +169,7 @@ type Settings = {
 export type {
   AppConfig,
   ClusterAccess,
+  FileExplorerSortOrder,
   HelmPreviewConfiguration,
   KubeConfig,
   KubeConfigContext,

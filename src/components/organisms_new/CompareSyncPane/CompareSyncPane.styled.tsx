@@ -21,7 +21,3 @@ export const Content = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
 `;
-
-export const ResourceSetSelectorsContainer = styled.div<{$show: boolean}>`
-  display: ${({$show}) => ($show ? 'block' : 'none')};
-`;
