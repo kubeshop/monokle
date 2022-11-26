@@ -4,7 +4,6 @@ import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContent, ResourceMeta} from './k8sResource';
-import {ObjectLocation} from './objectLocation';
 import {ClusterOrigin, HelmOrigin, KustomizeOrigin, LocalOrigin} from './origin';
 import {AppSelection} from './selection';
 
@@ -32,10 +31,13 @@ type AppState = {
     helm: Record<string, ResourceContentMap>;
     kustomize: Record<string, ResourceContentMap>;
   };
-  selection: AppSelection;
+  selection?: AppSelection;
   selectionOptions: {
     isSelecting?: boolean;
     shouldEditorReload?: boolean;
+  };
+  highlight: {
+    selections: AppSelection[];
   };
   selectionHistory: {
     current: AppSelection[];
@@ -59,9 +61,6 @@ type AppState = {
   helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
-  highlight: {
-    locations: ObjectLocation[];
-  };
   /** a list of checked resources for multi-resource actions */
   checkedResourceIds: string[];
   /** the line number for the match in file */
