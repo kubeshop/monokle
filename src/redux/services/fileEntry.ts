@@ -32,14 +32,17 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ResourceContentMap,
-  ResourceMapType,
-  ResourceMetaMap,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
-import {K8sResource, LocalK8sResource} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  LocalK8sResource,
+  LocalResourceContentMap,
+  LocalResourceMetaMap,
+  ResourceMapType,
+} from '@shared/models/k8sResource';
 import {isLocalOrigin} from '@shared/models/origin';
 import {isFileSelection, isResourceSelection} from '@shared/models/selection';
 
@@ -137,7 +140,7 @@ export function getRootFolder(fileMap: FileMapType) {
 
 export function extractResourcesForFileEntry(
   fileEntry: FileEntry,
-  stateArgs: {fileMap: FileMapType; resourceMetaMap: ResourceMetaMap; resourceContentMap: ResourceContentMap}
+  stateArgs: {fileMap: FileMapType; resourceMetaMap: LocalResourceMetaMap; resourceContentMap: LocalResourceContentMap}
 ) {
   const {fileMap, resourceMetaMap, resourceContentMap} = stateArgs;
   const result: K8sResource[] = [];
@@ -174,8 +177,8 @@ export function readFiles(
   folder: string,
   projectConfig: ProjectConfig,
   stateArgs: {
-    resourceMetaMap: ResourceMetaMap;
-    resourceContentMap: ResourceContentMap;
+    resourceMetaMap: LocalResourceMetaMap;
+    resourceContentMap: LocalResourceContentMap;
     fileMap: FileMapType;
     helmChartMap: HelmChartMapType;
     helmValuesMap: HelmValuesMapType;
@@ -350,9 +353,9 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource[] {
+export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): LocalK8sResource[] {
   const fileContent = fileMap[relativePath].text || '';
-  return extractK8sResources(fileContent, relativePath);
+  return extractK8sResources(fileContent, {type: 'local', filePath: relativePath});
 }
 
 /**
