@@ -1,23 +1,23 @@
 import * as Rt from 'runtypes';
 
 const LocalOriginRuntype = Rt.Record({
-  location: Rt.Literal('local'),
+  type: Rt.Literal('local'),
   filePath: Rt.String,
 });
 
 const ClusterOriginRuntype = Rt.Record({
-  location: Rt.Literal('cluster'),
+  type: Rt.Literal('cluster'),
   context: Rt.String,
 });
 
 const HelmOriginRuntype = Rt.Record({
-  location: Rt.Literal('helm'),
+  type: Rt.Literal('helm'),
   chartId: Rt.String,
   valuesFilePath: Rt.String,
 });
 
 const KustomizeOriginRuntype = Rt.Record({
-  location: Rt.Literal('kustomize'),
+  type: Rt.Literal('kustomize'),
   kustomizationId: Rt.String,
 });
 
