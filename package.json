@@ -268,7 +268,7 @@
           ]
         },
         {
-          "target": "flatpak",
+          "target": "rpm",
           "arch": [
             "x64",
             "arm64"
@@ -290,8 +290,8 @@
       "packageCategory": "Kubeshop",
       "priority": "standard"
     },
-    "flatpak": {
-
+    "rpm": {
+      "packageCategory": "Kubeshop"
     },
     "extends": null,
     "files": [
