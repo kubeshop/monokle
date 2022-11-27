@@ -1,3 +1,5 @@
+import {DownOutlined as RawDownOutlined, PauseCircleFilled as RawPauseCircleFilled} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -36,7 +38,16 @@ export const ActionWrapper = styled.span`
   font-size: 12px;
 
   &:hover {
-    cursor: pointer;
+    cursor: not-allowed;
     text-decoration: underline;
   }
+`;
+
+export const PauseCircleFilled = styled(RawPauseCircleFilled)`
+  color: ${Colors.blue7};
+  margin-right: 4px;
+`;
+export const DownOutlined = styled(RawDownOutlined)`
+  color: ${Colors.blue7};
+  margin-left: 4px;
 `;

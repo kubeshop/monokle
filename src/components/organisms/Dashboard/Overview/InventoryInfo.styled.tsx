@@ -47,3 +47,15 @@ export const Link = styled.div`
   color: ${Colors.blue7};
   line-height: 24px;
 `;
+
+export const PodsCount = styled.span``;
+
+export const PodsCapacity = styled.span`
+  margin-right: 4px;
+`;
+
+export const PodsUsagePercentage = styled.span``;
+
+export const ClusterAPIContainer = styled.div``;
+
+export const UsefulLinksContainer = styled.div``;

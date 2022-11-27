@@ -6,6 +6,7 @@ import DaemonSetHandler from '@src/kindhandlers/DaemonSet.handler';
 import DeploymentHandler from '@src/kindhandlers/Deployment.handler';
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
 import EndpointsHandler from '@src/kindhandlers/Endpoints.handler';
+import IngressHandler from '@src/kindhandlers/Ingress.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import ReplicaSetHandler from '@src/kindhandlers/ReplicaSet.handler';
@@ -29,6 +30,7 @@ import {
   CellScheduledCount,
   CellStatus,
   CellType,
+  LoadBalancerIPs,
 } from './Tableview/TableCells';
 import {Tableview} from './Tableview/Tableview';
 
@@ -68,8 +70,9 @@ export const resourceKindColumns = {
   [DaemonSetHandler.kind]: [CellName, CellError, CellNamespace, CellScheduledCount, CellNode, CellAge],
   [StatefulSetHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
   [ReplicaSetHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
-  [ServiceHandler.kind]: [CellName, CellError, CellNamespace, CellType, CellPorts, CellIPs, CellAge],
+  [ServiceHandler.kind]: [CellName, CellError, CellNamespace, CellType, CellPorts, CellIPs, LoadBalancerIPs, CellAge],
   [EndpointsHandler.kind]: [CellName, CellError, CellNamespace, CellEndpoints, CellAge],
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
+  [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

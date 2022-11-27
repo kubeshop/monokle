@@ -244,3 +244,23 @@ export const CellEndpoints = {
   sorter: (a: K8sResource, b: K8sResource) =>
     Number(a?.content?.subsets?.length) - Number(b?.content?.subsets?.length) || -Infinity,
 };
+
+export const LoadBalancerIPs = {
+  title: 'LoadBalancers',
+  dataIndex: 'content',
+  key: 'loadbalancers',
+  width: '150px',
+  render: (content: any) =>
+    content?.status?.loadBalancer?.ingress ? (
+      content?.status?.loadBalancer?.ingress.map((data: {ip: string}) => (
+        <div key={data.ip} style={{padding: '2px 4px'}}>
+          {data.ip}
+        </div>
+      ))
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.status?.loadBalancer?.ingress.length) -
+      Number(b?.content?.status?.loadBalancer?.ingress.length) || -Infinity,
+};

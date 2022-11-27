@@ -22,6 +22,10 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
 
   useEffect(() => {
+    console.log('filteredDataSource', filteredDataSource);
+  }, [filteredDataSource]);
+
+  useEffect(() => {
     if (!filterText) {
       setFilteredDataSource(dataSource);
       return;

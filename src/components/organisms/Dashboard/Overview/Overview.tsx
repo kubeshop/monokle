@@ -94,18 +94,18 @@ export const Overview = () => {
         <TitleBar type="secondary" title="Status" description={<Status />} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'performance'}}>
-        <TitleBar
-          type="secondary"
-          title="Performance"
-          actions={<span>CPU Graph</span>}
-          description={<p>Performance</p>}
-        />
+        <TitleBar type="secondary" title="Performance" description={<></>} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
         <TitleBar
           type="secondary"
           title="Utilization"
-          actions={<span>Default view</span>}
+          actions={
+            <S.ActionWrapper>
+              <span>Default view</span>
+              <S.DownOutlined />
+            </S.ActionWrapper>
+          }
           description={<Utilization utilizations={utilizationData} />}
         />
       </S.TitleBarContainer>
@@ -123,6 +123,10 @@ export const Overview = () => {
           title="Activity"
           actions={
             <div>
+              <S.ActionWrapper style={{marginRight: '8px'}}>
+                <S.PauseCircleFilled />
+                <span>Pause</span>
+              </S.ActionWrapper>
               <S.ActionWrapper>See all</S.ActionWrapper>
             </div>
           }
