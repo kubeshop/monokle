@@ -3,17 +3,22 @@ export type ComparisonListItem = HeaderItemProps | ComparisonItemProps;
 export type HeaderItemProps = {
   type: 'header';
   kind: string;
-  count: number;
+  apiVersionGroup: string;
+  countLeft: number;
+  countRight: number;
 };
 
 export type ComparisonItemProps = {
   type: 'comparison';
   id: string;
-  namespace: string | undefined;
+  leftNamespace?: string | undefined;
+  rightNamespace?: string | undefined;
+  namespace?: string | undefined;
   name: string;
   leftActive: boolean;
   leftTransferable: boolean;
   rightActive: boolean;
   rightTransferable: boolean;
   canDiff: boolean;
+  kind: string;
 };

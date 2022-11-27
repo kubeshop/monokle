@@ -22,12 +22,12 @@ type Props = {
 export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
   const sizeProps = useModalSize();
   const status = useAppSelector(state => selectCompareStatus(state.compare));
-  const isInspecting = useAppSelector(state => state.compare.current.inspect);
+  const inspection = useAppSelector(state => state.compare.current.inspect);
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
     <Modal footer={null} title="Comparing resources" open={visible} onCancel={onClose} onOk={onClose} {...sizeProps}>
-      {!isInspecting ? <CompareActionBar /> : <InspectionActionBar />}
+      {!inspection ? <CompareActionBar /> : <InspectionActionBar />}
 
       <Row ref={containerRef}>
         <Col span={10}>
@@ -43,15 +43,17 @@ export const CompareModal: React.FC<Props> = ({visible, onClose}) => {
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.ContentDiv>
 
-      <S.ActionsRow>
-        <Col span={10}>
-          <TransferButton side="left" />
-        </Col>
-        <Col span={4} />
-        <Col span={10}>
-          <TransferButton side="right" />
-        </Col>
-      </S.ActionsRow>
+      {!inspection || inspection?.type === 'diff' ? (
+        <S.ActionsRow>
+          <Col span={10}>
+            <TransferButton side="left" />
+          </Col>
+          <Col span={4} />
+          <Col span={10}>
+            <TransferButton side="right" />
+          </Col>
+        </S.ActionsRow>
+      ) : null}
     </Modal>
   );
 };

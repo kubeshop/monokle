@@ -15,6 +15,12 @@ export type GitBranch = {
   commits?: GitBranchCommit[];
 };
 
+export type GitRemoteRepo = {
+  authRequired: boolean;
+  exists: boolean;
+  errorMessage?: string;
+};
+
 export type GitRepo = {
   currentBranch: string;
   branches: string[];
@@ -23,7 +29,8 @@ export type GitRepo = {
     ahead: number; // number of commits on local but not on remote ( push )
     behind: number; // number of commits on remote but not on local ( pull )
   };
-  hasRemoteRepo: boolean;
+  remoteRepo: GitRemoteRepo;
+  remoteUrl?: string;
 };
 
 export type GitChangedFileType = 'added' | 'deleted' | 'modified' | 'untracked' | 'renamed' | 'conflict' | 'submodule';

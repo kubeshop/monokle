@@ -5,7 +5,7 @@ import {useForm} from 'antd/es/form/Form';
 
 import {CheckOutlined} from '@ant-design/icons';
 
-import {setHasRemoteRepo} from '@redux/git';
+import {updateRemoteRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -29,7 +29,7 @@ const RemoteInput: React.FC = () => {
         remoteURL: values.remoteURL,
       });
 
-      dispatch(setHasRemoteRepo(true));
+      dispatch(updateRemoteRepo({exists: true, authRequired: false}));
 
       form.resetFields();
     });

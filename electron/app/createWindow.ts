@@ -96,7 +96,6 @@ export const createWindow = (givenPath?: string) => {
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
   let unsavedResourceCount = 0;
-  let terminalsCount = 0;
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -123,10 +122,6 @@ export const createWindow = (givenPath?: string) => {
     });
   }
 
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
-
   autoUpdater.on('update-available', () => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
   });
@@ -148,6 +143,10 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('dom-ready', async () => {
+    if (isDev) {
+      win.webContents.openDevTools();
+    }
+
     const dispatch = createDispatchForWindow(win);
 
     subscribeToStoreStateChanges(win.webContents, storeState => {
@@ -155,7 +154,6 @@ export const createWindow = (givenPath?: string) => {
       let projectName = activeProjectSelector(storeState)?.name;
       setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
-      terminalsCount = Object.keys(storeState.terminal.terminalsMap).length;
       const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {
@@ -261,7 +259,6 @@ export const createWindow = (givenPath?: string) => {
     const confirmed = askActionConfirmation({
       unsavedResourceCount,
       action: 'close this window',
-      terminalsCount,
     });
 
     if (!confirmed) {

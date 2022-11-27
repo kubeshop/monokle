@@ -16,6 +16,7 @@ import {
   getCommitsCount,
   getCurrentBranch,
   getGitRepoInfo,
+  getGitRemoteUrl,
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,
@@ -46,6 +47,11 @@ ipcMain.on('git.isGitInstalled', async (event, path: string) => {
 ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
   const result = await cloneGitRepo(payload);
   event.sender.send('git.cloneGitRepo.result', result);
+});
+
+ipcMain.on('git.getGitRemoteUrl', async (event, path: string) => {
+  const result = await getGitRemoteUrl(path);
+  event.sender.send('git.getGitRemoteUrl.result', result);
 });
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {

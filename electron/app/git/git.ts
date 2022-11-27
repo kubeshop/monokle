@@ -23,6 +23,12 @@ export async function isGitInstalled(path: string) {
   }
 }
 
+export async function getGitRemoteUrl(path: string) {
+  const git: SimpleGit = simpleGit({baseDir: path});
+  const result = await git.raw('config', '--get', 'remote.origin.url');
+  return result;
+}
+
 export async function areFoldersGitRepos(paths: string[]) {
   let foldersStatus: {path: string; isGitRepo: boolean}[] = [];
 
@@ -89,14 +95,19 @@ export async function getGitRepoInfo(localPath: string) {
   try {
     const remoteBranchSummary = await git.branch({'-r': null});
     const localBranches = await git.branchLocal();
+    const remoteUrl = await getGitRemoteUrl(localPath);
 
     gitRepo = {
       branches: [...localBranches.all, ...remoteBranchSummary.all],
       currentBranch: localBranches.current || remoteBranchSummary.current,
       branchMap: {},
       commits: {ahead: 0, behind: 0},
-      hasRemoteRepo: false,
+      remoteRepo: {exists: false, authRequired: false},
     };
+
+    if (remoteUrl) {
+      gitRepo.remoteUrl = remoteUrl;
+    }
 
     gitRepo.branchMap = Object.fromEntries(
       Object.entries({...localBranches.branches}).map(([key, value]) => [
@@ -134,9 +145,15 @@ export async function getGitRepoInfo(localPath: string) {
 
   try {
     await git.remote(['show', 'origin']);
-    gitRepo.hasRemoteRepo = true;
-  } catch (e) {
-    gitRepo.hasRemoteRepo = false;
+    gitRepo.remoteRepo = {exists: true, authRequired: false};
+  } catch (e: any) {
+    if (e.message.includes('Authentication failed')) {
+      gitRepo.remoteRepo = {
+        exists: true,
+        authRequired: true,
+        errorMessage: e.message.split('fatal: ').pop().replaceAll("'", ''),
+      };
+    }
   }
 
   try {

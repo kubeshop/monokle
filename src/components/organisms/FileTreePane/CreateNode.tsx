@@ -1,8 +1,9 @@
 import {Tooltip} from 'antd';
 
+import path from 'path';
 import textExtensions from 'text-extensions';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -23,6 +24,7 @@ export const createNode = (
   rootFolderName: string
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry?.filePath, resourceMap);
+  const root = fileMap[ROOT_FILE_ENTRY];
   const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
   const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
   const name = isRoot ? rootFolderName : fileEntry.name;
@@ -38,17 +40,24 @@ export const createNode = (
     title: (
       <S.NodeContainer>
         <S.NodeTitleContainer>
-          <span
-            className={
-              fileEntry.isExcluded
-                ? 'excluded-file-entry-name'
-                : isSupported
-                ? 'file-entry-name'
-                : 'not-supported-file-entry-name'
-            }
+          <Tooltip
+            overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={isRoot ? fileEntry.filePath : path.join(root.filePath, fileEntry.filePath)}
+            placement="bottom"
           >
-            {name}
-          </span>
+            <span
+              className={
+                fileEntry.isExcluded
+                  ? 'excluded-file-entry-name'
+                  : isSupported
+                  ? 'file-entry-name'
+                  : 'not-supported-file-entry-name'
+              }
+            >
+              {name}
+            </span>
+          </Tooltip>
           {resources.length > 0 ? (
             <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
               <S.NumberOfResources className="file-entry-nr-of-resources">{resources.length}</S.NumberOfResources>

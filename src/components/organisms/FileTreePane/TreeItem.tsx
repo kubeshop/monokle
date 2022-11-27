@@ -1,14 +1,16 @@
+import {shell} from 'electron';
+
 import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
-import {Menu, Modal, Tooltip} from 'antd';
+import {Menu, Modal} from 'antd';
 
 import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {LONGER_TOOLTIP_DELAY, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {useAppSelector} from '@redux/hooks';
@@ -77,8 +79,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const git = useAppSelector(state => state.git);
 
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -97,20 +100,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       !fileMap[relativePath]?.filePath.startsWith(fileOrFolderContainedInFilter || ''),
     [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
   );
-
-  const tooltipOverlayStyle = useMemo(() => {
-    const style: Record<string, string> = {
-      fontSize: '12px',
-      wordBreak: 'break-all',
-      wordWrap: 'normal',
-    };
-
-    if (isMatchItem) {
-      style['display'] = 'none';
-    }
-
-    return style;
-  }, [isMatchItem]);
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
@@ -301,6 +290,18 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         ]
       : []),
     {key: 'divider-4', type: 'divider'},
+    ...(git.repo?.remoteUrl?.includes('https://github.com')
+      ? [
+          {
+            key: 'open_in_github',
+            label: 'Open on GitHub',
+            onClick: async (e: any) => {
+              e.domEvent.stopPropagation();
+              shell.openExternal(`${git.repo?.remoteUrl}/tree/${git.repo?.currentBranch}${relativePath}`);
+            },
+          },
+        ]
+      : []),
     {
       key: 'reveal_in_finder',
       label: `Reveal in ${platformFileManagerName}`,
@@ -314,19 +315,14 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   return (
     <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
       <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-        <Tooltip
-          overlayStyle={tooltipOverlayStyle}
-          mouseEnterDelay={LONGER_TOOLTIP_DELAY}
-          title={absolutePath}
-          placement="bottom"
-        >
-          <S.TitleWrapper>
-            <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
-            {canPreview(relativePath) && (
-              <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
-            )}
-          </S.TitleWrapper>
-        </Tooltip>
+        <S.TitleWrapper>
+          <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
+
+          {canPreview(relativePath) && (
+            <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
+          )}
+        </S.TitleWrapper>
+
         {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
           <S.SpinnerWrapper>
             <Spinner />
