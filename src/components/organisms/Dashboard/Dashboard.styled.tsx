@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 
+import Colors from '@styles/Colors';
+
 import {Header as RawHeader} from './Header/Header';
 
 export const Container = styled.div<{$paneHeight: number}>`
-  background-color: #0a0d0e;
+  background-color: ${Colors.black100};
   display: grid;
   width: 100%;
   height: 100%;

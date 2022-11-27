@@ -22,7 +22,7 @@ export const FilterContainer = styled.div`
 `;
 
 export const Input = styled(RawInput)`
-  background: #141414;
+  background: ${Colors.grey1};
   width: 360px;
 `;
 
@@ -55,7 +55,7 @@ export const Table = styled(RawTable)`
     }
   }
   & .ant-table-body {
-    background-color: #141414;
+    background-color: ${Colors.grey1};
     color: ${Colors.grey9};
     font-size: 14px;
     font-weight: 400;

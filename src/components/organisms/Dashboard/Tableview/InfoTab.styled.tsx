@@ -15,18 +15,18 @@ export const Row = styled.div`
 `;
 
 export const Title = styled.div`
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   font-weight: 400;
   font-size: 13px;
   margin-bottom: 2px;
 `;
 
 export const BlueContent = styled.div`
-  color: #177ddc;
+  color: ${Colors.blue7};
 `;
 
 export const GreyContent = styled.div`
-  color: #7d7d7d;
+  color: ${Colors.grey7};
 `;
 
 export const StatusRunning = styled(Tag)`
