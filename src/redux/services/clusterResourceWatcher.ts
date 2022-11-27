@@ -1,15 +1,13 @@
 /* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
-import log from 'loglevel';
-
 import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
+import {deleteClusterResource, setIsClusterConnected, updateClusterResource} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -124,7 +122,7 @@ const watchResource = async (
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
       }
-      log.debug('isClusterDisconnected', isClusterDisconnected());
+      dispatch(setIsClusterConnected(!isClusterDisconnected()));
     }
   );
 };
