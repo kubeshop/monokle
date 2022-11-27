@@ -10,6 +10,7 @@ import IngressHandler from '@src/kindhandlers/Ingress.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import ReplicaSetHandler from '@src/kindhandlers/ReplicaSet.handler';
+import SecretHandler from '@src/kindhandlers/Secret.handler';
 import ServiceHandler from '@src/kindhandlers/Service.handler';
 import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 
@@ -28,6 +29,7 @@ import {
   CellPorts,
   CellRestartCount,
   CellScheduledCount,
+  CellSecretType,
   CellStatus,
   CellType,
   LoadBalancerIPs,
@@ -74,5 +76,6 @@ export const resourceKindColumns = {
   [EndpointsHandler.kind]: [CellName, CellError, CellNamespace, CellEndpoints, CellAge],
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
   [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
+  [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

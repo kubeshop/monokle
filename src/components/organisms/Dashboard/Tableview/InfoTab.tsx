@@ -15,7 +15,6 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
   const [resource, setResource] = useState<K8sResource | null>(null);
 
   useEffect(() => {
-    console.log('resource', resource);
     setResource(resourceMap[resourceId]);
   }, [resourceMap, resourceId, resource]);
 

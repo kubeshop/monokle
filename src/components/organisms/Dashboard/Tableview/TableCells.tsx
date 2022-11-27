@@ -54,6 +54,7 @@ export const CellName = {
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.name.localeCompare(b.name),
+  defaultSortOrder: 'descend',
 };
 
 export const CellNamespace = {
@@ -263,4 +264,18 @@ export const LoadBalancerIPs = {
   sorter: (a: K8sResource, b: K8sResource) =>
     Number(a?.content?.status?.loadBalancer?.ingress.length) -
       Number(b?.content?.status?.loadBalancer?.ingress.length) || -Infinity,
+};
+
+export const CellSecretType = {
+  title: 'Type',
+  dataIndex: 'content',
+  key: 'secrettype',
+  width: '150px',
+  render: (content: any) =>
+    content?.type ? (
+      <span style={{padding: '2px 4px'}}>{content?.type}</span>
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) => a?.content?.type?.localeCompare(b?.content?.type || '') || -Infinity,
 };
