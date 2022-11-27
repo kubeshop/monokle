@@ -155,7 +155,7 @@
     "react-use": "17.3.2",
     "redux": "4.2.0",
     "redux-logger": "3.0.6",
-    "redux-thunk": "2.4.1",
+    "redux-thunk": "2.4.2",
     "replace-in-file": "6.3.5",
     "reselect": "4.1.6",
     "runtypes": "6.6.0",
