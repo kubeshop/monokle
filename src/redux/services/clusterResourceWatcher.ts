@@ -17,6 +17,8 @@ import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandl
 
 import {extractK8sResources} from './resource';
 
+let isClusterConnected: boolean = false;
+
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   ClusterRole: `/apis/rbac.authorization.k8s.io/v1/clusterroles`,
@@ -122,7 +124,10 @@ const watchResource = async (
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
       }
-      dispatch(setIsClusterConnected(!isClusterDisconnected()));
+      if (isClusterConnected === isClusterDisconnected()) {
+        isClusterConnected = !isClusterDisconnected();
+        dispatch(setIsClusterConnected(!isClusterDisconnected()));
+      }
     }
   );
 };
