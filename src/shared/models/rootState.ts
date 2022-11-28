@@ -1,9 +1,8 @@
-import {DashboardState} from '@redux/dashboard';
-
 import {AlertState} from './alert';
 import {AppState} from './appState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
+import {DashboardState} from './dashboard';
 import {ExtensionState} from './extension';
 import {FormsState} from './form';
 import {GitSliceState} from './git';

@@ -1,6 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {DashboardState, initialState} from './state';
+import {DashboardState} from '@shared/models/dashboard';
+
+import {initialState} from './state';
 
 export const dashboardSlice = createSlice({
   name: 'dashboard',

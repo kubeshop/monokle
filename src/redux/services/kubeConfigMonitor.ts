@@ -14,10 +14,10 @@ import {
   updateProjectKubeConfig,
 } from '@redux/reducers/appConfig';
 
-import {watchFunctions} from '@utils/helpers';
 import {getKubeAccess} from '@utils/kubeclient';
 
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import {watchFunctions} from '@shared/utils/watch';
 
 let watcher: FSWatcher;
 let tempFilePath: string | undefined;

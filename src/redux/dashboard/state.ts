@@ -1,3 +1,5 @@
+import {DashboardState} from '@shared/models/dashboard';
+
 export const initialState: DashboardState = {
   isOpen: false,
   ui: {
@@ -7,15 +9,4 @@ export const initialState: DashboardState = {
   tableDrawer: {
     selectedResourceId: undefined,
   },
-};
-
-export type DashboardState = {
-  isOpen: boolean;
-  ui: {
-    activeMenu: string;
-    selectedNamespace: string;
-  };
-  tableDrawer: {
-    selectedResourceId?: string;
-  };
 };

@@ -6,19 +6,12 @@ import log from 'loglevel';
 import path from 'path';
 import {AnyAction} from 'redux';
 
-import {
-  addNamespaceToContext,
-  removeNamespaceFromContext,
-  setAccessLoading,
-  updateProjectKubeConfig,
-} from '@redux/reducers/appConfig';
-
-import {watchFunctions} from '@utils/helpers';
 import {getKubeAccess} from '@utils/kubeclient';
 
 import {AlertEnum} from '@shared/models/alert';
 import type {KubeConfig, KubeConfigContext} from '@shared/models/config';
 import electronStore from '@shared/utils/electronStore';
+import {watchFunctions} from '@shared/utils/watch';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string, kubeConfigPath?: string) {
   if (kubeConfigPath) {
@@ -173,12 +166,16 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
       (type: string, apiObj: any) => {
         if (type === 'ADDED') {
           getKubeAccess(apiObj.metadata.name, key).then(value => {
-            dispatch(setAccessLoading(true));
-            dispatch(addNamespaceToContext(value));
+            dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(kubeConfigPath)});
+            dispatch({type: 'config/setAccessLoading', payload: true});
+            dispatch({type: 'config/addNamespaceToContext', payload: value});
           });
         } else if (type === 'DELETED') {
-          dispatch(setAccessLoading(true));
-          dispatch(removeNamespaceFromContext({namespace: apiObj.metadata.name, context: key}));
+          dispatch({type: 'config/setAccessLoading', payload: true});
+          dispatch({
+            type: 'config/removeNamespaceFromContext',
+            payload: {namespace: apiObj.metadata.name, context: key},
+          });
         }
       },
       () => {
@@ -195,7 +192,7 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
 
 const readAndNotifyKubeConfig = (kubeConfigPath: string, dispatch: (action: AnyAction) => void) => {
   const kubeConfig: KubeConfig = getKubeConfigContext(kubeConfigPath);
-  dispatch(updateProjectKubeConfig(kubeConfig));
+  dispatch({type: 'config/updateProjectKubeConfig', payload: kubeConfig});
 };
 
 export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
