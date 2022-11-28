@@ -14,7 +14,7 @@ import {getRegisteredKindHandlers} from '@src/kindhandlers';
 import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
-export const DashboardPane = () => {
+const DashboardPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -167,3 +167,5 @@ export const DashboardPane = () => {
     </S.Container>
   );
 };
+
+export default DashboardPane;

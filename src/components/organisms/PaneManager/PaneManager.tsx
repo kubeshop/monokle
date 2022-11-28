@@ -22,6 +22,7 @@ const PaneManager: React.FC = () => {
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const projects = useAppSelector(state => state.config.projects);
 
   const {height, width} = useMainPaneDimensions();
@@ -53,9 +54,9 @@ const PaneManager: React.FC = () => {
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : activeProject && !isStartProjectPaneVisible ? (
+      ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
         <>
-          <PaneManagerLeftMenu />
+          {!previewingCluster && <PaneManagerLeftMenu />}
 
           <ReflexContainer
             windowResizeAware

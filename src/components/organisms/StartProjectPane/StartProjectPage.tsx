@@ -2,7 +2,13 @@ import {Button} from 'antd';
 
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setLeftMenuSelection,
+  setPreviewingCluster,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
@@ -27,6 +33,7 @@ const StartProjectPage = () => {
   const START_PROJECT_OPTIONS = [
     {
       disabled: false,
+      itemId: 'new-project',
       itemLogo: SelectFolder,
       itemTitle: 'New project',
       itemDescription: 'Upload a local folder, start from a template or completely from scratch!',
@@ -62,6 +69,11 @@ const StartProjectPage = () => {
       itemLogo: QuickClusterPreview,
       itemTitle: 'Quick cluster preview',
       itemDescription: 'Preview a cluster and learn everything about it in a matter of seconds.',
+      itemAction: () => {
+        dispatch(setLeftMenuSelection('dashboard'));
+        dispatch(setPreviewingCluster(true));
+        dispatch(toggleStartProjectPane());
+      },
     },
   ];
 
