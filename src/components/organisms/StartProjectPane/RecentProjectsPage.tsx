@@ -1,3 +1,5 @@
+import {Button} from 'antd';
+
 import {Project} from '@models/appconfig';
 
 import {openGitCloneModal} from '@redux/git';
@@ -8,8 +10,7 @@ import {activeProjectSelector} from '@redux/selectors';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
-import CreateScratch from '@assets/FromScratch.svg';
-import CreateFromTemplate from '@assets/FromTemplate.svg';
+import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
 
 import Guide from './Guide';
 import RecentProject from './RecentProject';
@@ -50,7 +51,7 @@ const NewRecentProjectsPane = () => {
       <Guide />
 
       <S.Projects>
-        <S.ProjectsTitle id="recent-project-title">Select a project...</S.ProjectsTitle>
+        <S.ProjectsTitle id="recent-project-title">Select something recent…</S.ProjectsTitle>
 
         <S.ProjectsContainerWrapper>
           <S.ProjectsContainer id="recent-projects-container">
@@ -68,14 +69,26 @@ const NewRecentProjectsPane = () => {
       </S.Projects>
 
       <S.Actions>
-        <S.ActionsTitle>... or create a new one</S.ActionsTitle>
+        <S.ActionsTitle>… or start something new</S.ActionsTitle>
 
         <S.ActionItems>
-          <S.ActionItem id="select-existing-folder" onClick={handleOpenFolderExplorer}>
+          <S.ActionItem $hasMultipleActions>
             <S.ActionItemLogo src={SelectFolder} />
             <S.ActionItemContext>
-              <S.ActionItemText>Select a local folder</S.ActionItemText>
+              <S.ActionItemText>New project</S.ActionItemText>
             </S.ActionItemContext>
+
+            <S.MultipleActions>
+              <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
+                Open a local folder
+              </Button>
+              <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
+                New from template
+              </Button>
+              <Button id="create-empty-project" size="large" type="primary" onClick={() => handleCreateProject(false)}>
+                New empty project
+              </Button>
+            </S.MultipleActions>
           </S.ActionItem>
 
           <S.ActionItem
@@ -93,17 +106,10 @@ const NewRecentProjectsPane = () => {
             </S.ActionItemContext>
           </S.ActionItem>
 
-          <S.ActionItem id="start-from-template" onClick={() => handleCreateProject(true)}>
-            <S.ActionItemLogo src={CreateFromTemplate} />
+          <S.ActionItem id="quick-cluster-preview" onClick={() => handleCreateProject(true)}>
+            <S.ActionItemLogo src={QuickClusterPreview} />
             <S.ActionItemContext>
-              <S.ActionItemText>New project from template</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
-
-          <S.ActionItem id="create-empty-project" onClick={() => handleCreateProject(false)}>
-            <S.ActionItemLogo src={CreateScratch} />
-            <S.ActionItemContext>
-              <S.ActionItemText>New project from scratch</S.ActionItemText>
+              <S.ActionItemText>Quick cluster preview</S.ActionItemText>
             </S.ActionItemContext>
           </S.ActionItem>
         </S.ActionItems>

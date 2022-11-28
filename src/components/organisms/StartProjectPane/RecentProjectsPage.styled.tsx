@@ -5,7 +5,21 @@ import styled from 'styled-components';
 import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
-export const ActionItem = styled.div<{$disabled?: boolean}>`
+export const MultipleActions = styled.div`
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+`;
+
+export const ActionItem = styled.div<{$disabled?: boolean; $hasMultipleActions?: boolean}>`
+  position: relative;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -18,11 +32,15 @@ export const ActionItem = styled.div<{$disabled?: boolean}>`
   color: ${({$disabled}) => ($disabled ? Colors.grey6 : 'inherit')};
 
   &:hover {
-    transition: background ${AnimationDurations.base};
-    background: ${Colors.blue7};
+    transition: all ${AnimationDurations.base};
+    background-color: ${({$hasMultipleActions}) => ($hasMultipleActions ? Colors.grey11 : Colors.blue7)};
 
     & > div:nth-child(2) {
       color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
+    }
+
+    ${MultipleActions} {
+      display: flex;
     }
   }
 `;
@@ -54,7 +72,7 @@ export const ActionItemText = styled.div``;
 export const ActionItems = styled.div`
   min-height: 150px;
   display: grid;
-  grid-template-columns: repeat(4, 15rem);
+  grid-template-columns: repeat(3, 15rem);
   grid-column-gap: 1rem;
   justify-content: center;
   align-items: center;
