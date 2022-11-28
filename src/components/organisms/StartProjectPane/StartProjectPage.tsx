@@ -1,12 +1,20 @@
+import {Button} from 'antd';
+
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setLeftMenuSelection,
+  setPreviewingCluster,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
-import CreateScratch from '@assets/FromScratch.svg';
-import CreateFromTemplate from '@assets/FromTemplate.svg';
+import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
 
+import ActionCard from './ActionCard';
 import Guide from './Guide';
 import * as S from './StartProjectPage.styled';
 
@@ -25,37 +33,47 @@ const StartProjectPage = () => {
   const START_PROJECT_OPTIONS = [
     {
       disabled: false,
-      itemId: 'select-existing-folder',
+      itemId: 'new-project',
       itemLogo: SelectFolder,
-      itemTitle: 'Select a folder',
-      itemDescription: 'Have a local folder with ready-to-check Kubernetes resources? Bring it on!',
-      itemAction: handleOpenFolderExplorer,
+      itemTitle: 'New project',
+      itemDescription: 'Upload a local folder, start from a template or completely from scratch!',
+      multipleActions: (
+        <>
+          <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
+            Open a local folder
+          </Button>
+          <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
+            New from template
+          </Button>
+          <Button id="create-empty-project" size="large" type="primary" onClick={() => handleCreateProject(false)}>
+            New empty project
+          </Button>
+        </>
+      ),
     },
     {
       disabled: !isGitInstalled,
       itemId: 'start-from-git',
       itemLogo: CreateFromGit,
       itemTitle: 'Clone a Git repo',
-      itemDescription: 'Explore K8s resources from a public Git repo or one your own',
+      itemDescription: 'Explore K8s resources from a public Git repo or one your own.',
       itemAction: () => {
-        dispatch(openGitCloneModal());
+        if (isGitInstalled) {
+          dispatch(openGitCloneModal());
+        }
       },
     },
     {
       disabled: false,
-      itemId: 'start-from-template',
-      itemLogo: CreateFromTemplate,
-      itemTitle: 'New project from template',
-      itemDescription: 'Create basic K8s resources from ready-to-go templates',
-      itemAction: () => handleCreateProject(true),
-    },
-    {
-      disabled: false,
-      itemId: 'create-empty-project',
-      itemLogo: CreateScratch,
-      itemTitle: 'Create a project',
-      itemDescription: "Create an empty project. We'll help you along the way",
-      itemAction: () => handleCreateProject(false),
+      itemId: 'quick-cluster-preview',
+      itemLogo: QuickClusterPreview,
+      itemTitle: 'Quick cluster preview',
+      itemDescription: 'Preview a cluster and learn everything about it in a matter of seconds.',
+      itemAction: () => {
+        dispatch(setLeftMenuSelection('dashboard'));
+        dispatch(setPreviewingCluster(true));
+        dispatch(toggleStartProjectPane());
+      },
     },
   ];
 
@@ -63,29 +81,27 @@ const StartProjectPage = () => {
     <S.Container>
       <Guide />
 
-      <S.InformationMessage>Choose your way to start your first project:</S.InformationMessage>
-
       <S.StartProjectContainer>
-        {START_PROJECT_OPTIONS.map(item => {
-          const {disabled, itemId, itemLogo, itemTitle, itemDescription, itemAction} = item;
+        <S.InformationMessage>Start something new</S.InformationMessage>
 
-          return (
-            <S.StartProjectItem
-              $disabled={disabled}
-              key={itemId}
-              id={itemId}
-              onClick={() => {
-                if (!disabled) {
-                  itemAction();
-                }
-              }}
-            >
-              <S.StartProjectItemLogo src={itemLogo} />
-              <S.StartProjectItemTitle $disabled={disabled}>{itemTitle}</S.StartProjectItemTitle>
-              <S.StartProjectItemDescription $disabled={disabled}>{itemDescription}</S.StartProjectItemDescription>
-            </S.StartProjectItem>
-          );
-        })}
+        <S.StartProjectOptions>
+          {START_PROJECT_OPTIONS.map(item => {
+            const {disabled, itemId, itemLogo, itemTitle, itemDescription, itemAction, multipleActions} = item;
+
+            return (
+              <ActionCard
+                description={itemDescription}
+                disabled={disabled}
+                id={itemId}
+                logo={itemLogo}
+                multipleActions={multipleActions}
+                title={itemTitle}
+                onClick={itemAction}
+                size="big"
+              />
+            );
+          })}
+        </S.StartProjectOptions>
       </S.StartProjectContainer>
     </S.Container>
   );

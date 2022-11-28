@@ -36,7 +36,7 @@ import {
 } from './Tableview/TableCells';
 import {Tableview} from './Tableview/Tableview';
 
-export const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
@@ -64,6 +64,8 @@ export const Dashboard = () => {
     </S.Container>
   );
 };
+
+export default Dashboard;
 
 export const resourceKindColumns = {
   [NamespaceHandler.kind]: [CellStatus, CellName, CellError, CellLabels, CellAge],

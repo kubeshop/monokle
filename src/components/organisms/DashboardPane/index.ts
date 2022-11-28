@@ -1,1 +1,1 @@
-export {DashboardPane} from './DashboardPane';
+export {default} from './DashboardPane';
