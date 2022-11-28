@@ -56,6 +56,7 @@ const SettingsManager: React.FC = () => {
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const [activeTab, setActiveTab] = useState<string>(
     activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
@@ -75,6 +76,12 @@ const SettingsManager: React.FC = () => {
   const handlePaneCollapse = (value: string) => {
     setActiveTab(value);
   };
+
+  useEffect(() => {
+    if (previewingCluster) {
+      setActiveTab(SettingsPanel.DefaultProjectSettings);
+    }
+  }, [previewingCluster]);
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));

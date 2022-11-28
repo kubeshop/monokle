@@ -18,7 +18,7 @@ import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
-import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
+import {setLayoutSize, setPreviewingCluster, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import store from '@redux/store';
@@ -54,6 +54,7 @@ const PageHeader = () => {
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
@@ -81,6 +82,10 @@ const PageHeader = () => {
   const showGetStartingPage = () => {
     if (!isStartProjectPaneVisible) {
       dispatch(toggleStartProjectPane());
+    }
+
+    if (previewingCluster) {
+      dispatch(setPreviewingCluster(false));
     }
   };
 

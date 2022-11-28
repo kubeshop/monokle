@@ -175,6 +175,7 @@ export type UiState = {
       currentStep: number;
     };
   };
+  previewingCluster?: boolean;
 };
 
 export type PaneConfiguration = {

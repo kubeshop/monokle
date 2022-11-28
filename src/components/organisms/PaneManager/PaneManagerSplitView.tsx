@@ -10,15 +10,15 @@ import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {Dashboard} from '../Dashboard';
+import Dashboard from '../Dashboard';
 import {EmptyDashboard} from '../Dashboard/EmptyDashboard';
-import {DashboardPane} from '../DashboardPane';
 import GitOpsView from '../GitOpsView';
 import GitPane from '../GitPane';
 import * as S from './PaneManagerSplitView.styled';
 // eslint-disable-next-line import/no-relative-packages
 import {ReflexContainer, ReflexElement, ReflexSplitter} from './react-reflex';
 
+const DashboardPane = React.lazy(() => import('@organisms/DashboardPane'));
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));

@@ -20,7 +20,7 @@ import {
   zoomIn,
   zoomOut,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {defineHotkey} from '@utils/defineHotkey';
@@ -303,7 +303,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Toggle Left Menu',
         accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
-          dispatch(toggleLeftMenu());
+          if (!state.ui.previewingCluster) {
+            dispatch(toggleLeftMenu());
+          }
         },
       },
       {role: 'toggleDevTools'},

@@ -49,6 +49,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
   const previewCommandId = useAppSelector(state => state.main.previewCommandId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -193,7 +194,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   return (
     <S.ClusterContainer id="ClusterContainer">
-      {activeProject && (
+      {(activeProject || previewingCluster) && (
         <>
           {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
             <S.PreviewMode
@@ -252,7 +253,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         </>
       )}
       <>
-        {isKubeConfigPathValid && activeProject && (
+        {isKubeConfigPathValid && (activeProject || previewingCluster) && (
           <S.Button
             className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
             disabled={isPreviewLoading && isAccessLoading}
@@ -266,6 +267,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
           </S.Button>
         )}
+
         {!isPreviewLoading && isInPreviewMode && (
           <S.ExitButton
             onClick={onClickExit}
