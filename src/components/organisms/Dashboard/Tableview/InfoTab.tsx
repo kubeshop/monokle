@@ -1,5 +1,3 @@
-import {useEffect, useState} from 'react';
-
 import {Tag} from 'antd';
 
 import {K8sResource} from '@models/k8sresource';
@@ -11,12 +9,7 @@ import {timeAgo} from '@utils/timeAgo';
 import * as S from './InfoTab.styled';
 
 export const InfoTab = ({resourceId}: {resourceId: string}) => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [resource, setResource] = useState<K8sResource | null>(null);
-
-  useEffect(() => {
-    setResource(resourceMap[resourceId]);
-  }, [resourceMap, resourceId, resource]);
+  const resource: K8sResource = useAppSelector(state => state.main.resourceMap[resourceId]);
 
   return (
     <>

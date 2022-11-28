@@ -121,7 +121,7 @@ const watchResource = async (
       }
     },
     (error: any) => {
-      log.error('error', error);
+      log.warn('WatchClusterResource', error.message);
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;

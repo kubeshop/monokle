@@ -63,10 +63,11 @@ export const DashboardPane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
 
-  const setActiveMenu = (section: string) => {
+  const setActiveMenu = useCallback((section: string) => {
     dispatch(setActiveDashboardMenu(section));
     dispatch(setSelectedResourceId());
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getResourceCount = useCallback(
     (kind: string) => {
@@ -77,31 +78,37 @@ export const DashboardPane = () => {
     [resourceMap, selectedNamespace]
   );
 
-  const getErrorCount = (kind: string) => {
-    return Object.values(resourceMap)
-      .filter(
-        resource =>
-          resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-      )
-      .reduce(
-        (total: number, resource: K8sResource) =>
-          total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
-        0
-      );
-  };
+  const getErrorCount = useCallback(
+    (kind: string) => {
+      return Object.values(resourceMap)
+        .filter(
+          resource =>
+            resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+        )
+        .reduce(
+          (total: number, resource: K8sResource) =>
+            total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
+          0
+        );
+    },
+    [resourceMap, selectedNamespace]
+  );
 
-  const getWarningCount = (kind: string) => {
-    return Object.values(resourceMap)
-      .filter(
-        resource =>
-          resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-      )
-      .reduce(
-        (total: number, resource: K8sResource) =>
-          total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
-        0
-      );
-  };
+  const getWarningCount = useCallback(
+    (kind: string) => {
+      return Object.values(resourceMap)
+        .filter(
+          resource =>
+            resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+        )
+        .reduce(
+          (total: number, resource: K8sResource) =>
+            total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
+          0
+        );
+    },
+    [resourceMap, selectedNamespace]
+  );
 
   return (
     <S.Container>
