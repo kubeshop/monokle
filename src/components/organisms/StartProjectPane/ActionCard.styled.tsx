@@ -3,6 +3,24 @@ import styled from 'styled-components';
 import {AnimationDurations} from '@styles/Animations';
 import Colors from '@styles/Colors';
 
+export const ActionItemDescription = styled.div`
+  color: ${Colors.grey7};
+  margin-top: 15px;
+  text-align: center;
+`;
+
+export const ActionItemLogo = styled.img`
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: 20px;
+`;
+
+export const ActionItemTitle = styled.div<{$size: 'big' | 'small'}>`
+  color: ${Colors.grey9};
+  font-size: ${({$size}) => ($size === 'big' ? '16px' : '14px')};
+  font-weight: 600;
+`;
+
 export const MultipleActions = styled.div`
   display: none;
   position: absolute;
@@ -19,6 +37,7 @@ export const MultipleActions = styled.div`
 export const ActionCard = styled.div<{$disabled?: boolean; $hasMultipleActions?: boolean}>`
   position: relative;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,13 +46,22 @@ export const ActionCard = styled.div<{$disabled?: boolean; $hasMultipleActions?:
   cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   border-radius: 4px;
   color: ${({$disabled}) => ($disabled ? Colors.grey6 : 'inherit')};
-  padding: 0px 10px;
+  padding: 0px 30px;
+
+  ${ActionItemTitle} {
+    ${({$disabled}) => {
+      if ($disabled) {
+        return `color: ${Colors.grey6}`;
+      }
+    }}
+  }
 
   &:hover {
     transition: all ${AnimationDurations.base};
     background-color: ${({$hasMultipleActions}) => ($hasMultipleActions ? Colors.grey11 : Colors.blue7)};
 
-    & > div:nth-child(2) {
+    ${ActionItemDescription}, ${ActionItemLogo}, ${ActionItemTitle} {
+      display: ${({$hasMultipleActions}) => ($hasMultipleActions ? 'none' : 'block')};
       color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
     }
 
@@ -41,20 +69,4 @@ export const ActionCard = styled.div<{$disabled?: boolean; $hasMultipleActions?:
       display: flex;
     }
   }
-`;
-
-export const ActionItemDescription = styled.div`
-  color: ${Colors.grey7};
-`;
-
-export const ActionItemLogo = styled.img`
-  width: 4.5rem;
-  height: 4.5rem;
-  margin-bottom: 20px;
-`;
-
-export const ActionItemTitle = styled.div<{$size: 'big' | 'small'}>`
-  color: ${Colors.grey9};
-  font-size: ${({$size}) => ($size === 'big' ? '16px' : '14px')};
-  font-weight: 600;
 `;

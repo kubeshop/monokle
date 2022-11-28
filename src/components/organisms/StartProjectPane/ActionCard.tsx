@@ -9,7 +9,7 @@ type IProps = {
   description?: string;
   disabled?: boolean;
   id?: string;
-  multipleActions?: React.ReactNode;
+  multipleActions?: JSX.Element;
   onClick?: () => void;
 };
 
@@ -24,7 +24,7 @@ const ActionCard: React.FC<IProps> = props => {
 
       {description && <S.ActionItemDescription>{description}</S.ActionItemDescription>}
 
-      {multipleActions && <S.MultipleActions>{multipleActions}</S.MultipleActions>}
+      {multipleActions ? <S.MultipleActions>{multipleActions}</S.MultipleActions> : null}
     </S.ActionCard>
   );
 };
