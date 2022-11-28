@@ -36,13 +36,13 @@ import {Icon} from '@atoms';
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useWindowSize} from '@utils/hooks';
-import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
+import {createKubeClient, hasAccessToResource} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';

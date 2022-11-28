@@ -22,7 +22,6 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
@@ -44,6 +43,7 @@ import {
 } from '@shared/models/config';
 import {UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
+import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';

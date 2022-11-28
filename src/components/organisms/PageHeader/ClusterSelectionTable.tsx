@@ -14,11 +14,10 @@ import {kubeConfigContextsSelector} from '@redux/selectors';
 
 import {FilePatternList} from '@atoms';
 
-import {runCommandInMainThread} from '@utils/commands';
-
 import {AlertEnum} from '@shared/models/alert';
 import {ClusterColors} from '@shared/models/cluster';
 import {BackgroundColors} from '@shared/styles/colors';
+import {runCommandInMainThread} from '@shared/utils/commands';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelectionTable.styled';

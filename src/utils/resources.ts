@@ -3,11 +3,11 @@ import _ from 'lodash';
 
 import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
-import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
+import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
   if (

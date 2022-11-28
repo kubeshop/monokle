@@ -6,11 +6,10 @@ import log from 'loglevel';
 import path from 'path';
 import {AnyAction} from 'redux';
 
-import {getKubeAccess} from '@utils/kubeclient';
-
 import {AlertEnum} from '@shared/models/alert';
 import type {KubeConfig, KubeConfigContext} from '@shared/models/config';
 import electronStore from '@shared/utils/electronStore';
+import {getKubeAccess} from '@shared/utils/kubeclient';
 import {watchFunctions} from '@shared/utils/watch';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string, kubeConfigPath?: string) {

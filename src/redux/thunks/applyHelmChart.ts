@@ -6,13 +6,12 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {runCommandInMainThread} from '@utils/commands';
-
 import {APPLY_HELM_CHART} from '@shared/constants/telemetry';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
+import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**

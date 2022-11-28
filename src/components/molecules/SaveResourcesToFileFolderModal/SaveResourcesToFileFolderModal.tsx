@@ -23,7 +23,6 @@ import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {isDefined} from '@utils/filter';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -32,6 +31,7 @@ import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 import * as S from './SaveResourcesToFileFolderModal.styled';
 

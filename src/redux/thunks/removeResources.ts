@@ -6,11 +6,10 @@ import {deleteResource, isFileResource, isUnsavedResource, removeResourceFromFil
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {clearResourceSelections} from '@redux/services/selection';
 
-import {createKubeClient} from '@utils/kubeclient';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {RootState} from '@shared/models/rootState';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk(
   'main/removeResources',

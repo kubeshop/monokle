@@ -4,7 +4,6 @@ import {createSelector} from 'reselect';
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 
-import {isDefined} from '@utils/filter';
 import {getApiVersionGroup} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -20,6 +19,7 @@ import {
 } from '@shared/models/compare';
 import {SavedCommand} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
+import {isDefined} from '@shared/utils/filter';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
