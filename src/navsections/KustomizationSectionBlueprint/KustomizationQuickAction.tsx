@@ -13,11 +13,11 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
-import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {isDefined} from '@shared/utils/filter';
 import {defineHotkey} from '@shared/utils/hotkey';
 
 import * as S from './KustomizationQuickAction.styled';

@@ -28,7 +28,6 @@ import {clearRefNodesCache, isUnsatisfiedRef, processRefs, refMapperMatchesKind}
 // import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
-import {createKubeClient} from '@utils/kubeclient';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
@@ -44,6 +43,7 @@ import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@shar
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, RefPosition, ResourceRefType} from '@shared/models/k8sResource';
 import {Policy} from '@shared/models/policy';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 import {validatePolicies, validateResource} from './validation';
 

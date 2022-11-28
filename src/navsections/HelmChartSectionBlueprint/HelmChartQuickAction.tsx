@@ -12,12 +12,11 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
-import {isDefined} from '@utils/filter';
-
 import {hotkeys} from '@shared/constants/hotkeys';
 import {ResourceSet} from '@shared/models/compare';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
+import {isDefined} from '@shared/utils/filter';
 import {defineHotkey} from '@shared/utils/hotkey';
 
 import * as S from './HelmChartQuickAction.styled';

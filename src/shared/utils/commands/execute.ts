@@ -2,11 +2,9 @@ import {ipcRenderer} from 'electron';
 
 import log from 'loglevel';
 
-import {ERROR_MSG_FALLBACK} from '@constants/constants';
-
-import {isDefined} from '@utils/filter';
-
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {CommandOptions, CommandResult} from '@shared/models/commands';
+import {isDefined} from '@shared/utils/filter';
 import {ensureRendererThread} from '@shared/utils/thread';
 
 export function runCommandInMainThread(options: CommandOptions): Promise<CommandResult> {

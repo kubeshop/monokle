@@ -7,14 +7,13 @@ import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/const
 
 import {extractK8sResources, processResources} from '@redux/services/resource';
 
-import {createKubeClient} from '@utils/kubeclient';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
 import {KubernetesObject, ResourceMapType, ResourceRefsProcessingOptions} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Policy} from '@shared/models/policy';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document

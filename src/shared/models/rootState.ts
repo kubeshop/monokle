@@ -2,6 +2,7 @@ import {AlertState} from './alert';
 import {AppState} from './appState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
+import {DashboardState} from './dashboard';
 import {ExtensionState} from './extension';
 import {FormsState} from './form';
 import {GitSliceState} from './git';
@@ -26,6 +27,7 @@ type RootState = {
   terminal: TerminalState;
   ui: UiState;
   validation: ValidationSliceState;
+  dashboard: DashboardState;
 };
 
 export type {RootState};

@@ -5,7 +5,6 @@ import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -18,6 +17,7 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
@@ -207,6 +207,16 @@ export const kubeConfigPathSelector = createSelector(
       return config.kubeConfig.path;
     }
     return '';
+  }
+);
+
+export const kubeConfigPathValidSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    if (_.isBoolean(config.kubeConfig.isPathValid)) {
+      return Boolean(config.kubeConfig.isPathValid);
+    }
+    return false;
   }
 );
 

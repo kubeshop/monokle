@@ -4,21 +4,19 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {ERROR_MSG_FALLBACK} from '@constants/constants';
-
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
-
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {DO_KUSTOMIZE_PREVIEW} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandResult} from '@shared/models/commands';
 import {ProjectConfig} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
+import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**

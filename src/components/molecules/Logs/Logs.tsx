@@ -9,8 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigPathSelector} from '@redux/selectors';
 
-import {createKubeClient} from '@utils/kubeclient';
-
+import {createKubeClient} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './Logs.styled';

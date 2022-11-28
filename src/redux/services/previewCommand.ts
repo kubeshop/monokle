@@ -1,17 +1,18 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ERROR_MSG_FALLBACK, PREVIEW_PREFIX} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
-import {isDefined} from '@utils/filter';
 
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
+import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
+import {isDefined} from '@shared/utils/filter';
 
 import {extractK8sResources} from './resource';
 

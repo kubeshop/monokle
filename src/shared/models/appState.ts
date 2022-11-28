@@ -107,6 +107,7 @@ type AppState = {
     };
   };
   lastChangedLine: number;
+  isClusterConnected: boolean;
 };
 
 /**

@@ -2,14 +2,13 @@ import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
-import {isDefined} from '@utils/filter';
-
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {HelmPreviewConfiguration} from '@shared/models/config';
 import {HelmChart, HelmTemplate, HelmValuesFile} from '@shared/models/helm';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';

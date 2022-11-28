@@ -15,8 +15,6 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {createKubeClient} from '@utils/kubeclient';
-
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {CLUSTER_VIEW} from '@shared/constants/telemetry';
@@ -24,6 +22,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {createKubeClient} from '@shared/utils/kubeclient';
 import {trackEvent} from '@shared/utils/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {

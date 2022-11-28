@@ -10,8 +10,6 @@ import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {AppConfig, ProjectConfig} from '@shared/models/config';
 
-import {monitorKubeConfig} from './kubeConfigMonitor';
-
 export interface SerializableObject {
   [name: string]: any;
 }
@@ -173,8 +171,6 @@ export const updateProjectSettings = (dispatch: (action: AnyAction) => void, pro
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
-    monitorKubeConfig(dispatch, projectConfig?.kubeConfig?.path);
-
     return;
   }
   dispatch(updateProjectConfig({config: null, fromConfigFile: true}));

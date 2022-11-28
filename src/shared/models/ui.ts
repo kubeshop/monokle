@@ -22,7 +22,8 @@ type LeftMenuSelectionType =
   | 'images-pane'
   | 'validation-pane'
   | 'search'
-  | 'crds';
+  | 'crds'
+  | 'dashboard';
 
 type MonacoRange = {
   startLineNumber: number;

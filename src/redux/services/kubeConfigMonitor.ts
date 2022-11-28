@@ -14,10 +14,9 @@ import {
   updateProjectKubeConfig,
 } from '@redux/reducers/appConfig';
 
-import {watchFunctions} from '@utils/helpers';
-import {getKubeAccess} from '@utils/kubeclient';
-
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import {getKubeAccess} from '@shared/utils/kubeclient';
+import {watchFunctions} from '@shared/utils/watch';
 
 let watcher: FSWatcher;
 let tempFilePath: string | undefined;
@@ -117,7 +116,7 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
       {allowWatchBookmarks: true},
       (type: string, apiObj: any) => {
         if (type === 'ADDED') {
-          getKubeAccess(apiObj.metadata.name, key).then(value => {
+          getKubeAccess(apiObj.metadata.name, key).then((value: any) => {
             dispatch(setAccessLoading(true));
             dispatch(addNamespaceToContext(value));
           });
