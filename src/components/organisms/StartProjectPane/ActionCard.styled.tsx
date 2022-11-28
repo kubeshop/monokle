@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-import {AnimationDurations} from '@styles/Animations';
-import Colors from '@styles/Colors';
+import {AnimationDurations} from '@shared/styles/animations';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionItemDescription = styled.div`
   color: ${Colors.grey7};

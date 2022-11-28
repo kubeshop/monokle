@@ -31,6 +31,7 @@ const NewPaneManager: React.FC = () => {
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const projects = useAppSelector(state => state.config.projects);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const {height, width} = useMainPaneDimensions();
 
@@ -78,9 +79,9 @@ const NewPaneManager: React.FC = () => {
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : activeProject && !isStartProjectPaneVisible ? (
+      ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
         <>
-          <PaneManagerLeftMenu />
+          {!previewingCluster && <PaneManagerLeftMenu />}
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
