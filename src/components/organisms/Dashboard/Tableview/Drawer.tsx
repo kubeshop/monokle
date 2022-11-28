@@ -69,7 +69,7 @@ export const Drawer = () => {
               children: <InfoTab resourceId={selectedResourceId as string} />,
             },
             {
-              label: 'Code',
+              label: 'Manifest',
               key: '2',
               children: <EditorTab />,
             },
