@@ -11,6 +11,7 @@ import {ActionsPane, NavigatorPane} from '@organisms';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {Dashboard} from '../Dashboard';
+import {EmptyDashboard} from '../Dashboard/EmptyDashboard';
 import {DashboardPane} from '../DashboardPane';
 import GitOpsView from '../GitOpsView';
 import GitPane from '../GitPane';
@@ -51,7 +52,7 @@ const PaneManagerSplitView: React.FC = () => {
   );
 
   if (!isInClusterMode && leftActiveMenu === 'dashboard') {
-    return <p>Open Cluster Mode</p>;
+    return <EmptyDashboard />;
   }
 
   return (
