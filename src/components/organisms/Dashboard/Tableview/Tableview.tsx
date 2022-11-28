@@ -41,9 +41,9 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           onChange={(event: any) => setFilterText(event.target.value)}
           allowClear
         />
-        <S.BulkAction size="large" disabled>
+        {/* <S.BulkAction size="large" disabled>
           Bulk action
-        </S.BulkAction>
+        </S.BulkAction> */}
       </S.FilterContainer>
       <S.TableContainer>
         <S.Table
