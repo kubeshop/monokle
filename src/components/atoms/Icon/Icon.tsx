@@ -74,6 +74,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'split-view': SplitView,
   crds: CRDs,
   compare: Compare,
+  dashboard: Search,
 };
 
 const Icon: React.FC<IconProps> = props => {

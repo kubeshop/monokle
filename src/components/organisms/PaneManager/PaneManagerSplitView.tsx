@@ -4,11 +4,14 @@ import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constant
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {Dashboard} from '../Dashboard';
+import {DashboardPane} from '../DashboardPane';
 import GitOpsView from '../GitOpsView';
 import GitPane from '../GitPane';
 import * as S from './PaneManagerSplitView.styled';
@@ -31,6 +34,7 @@ const PaneManagerSplitView: React.FC = () => {
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
   );
   const {width} = useMainPaneDimensions();
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const handleResize = useCallback(
     (elements: any) => {
@@ -46,6 +50,10 @@ const PaneManagerSplitView: React.FC = () => {
     [dispatch, layout]
   );
 
+  if (!isInClusterMode && leftActiveMenu === 'dashboard') {
+    return <p>Open Cluster Mode</p>;
+  }
+
   return (
     <ReflexContainer orientation="vertical" onStopResize={handleResize} windowResizeAware style={{width}}>
       {leftActiveMenu && (
@@ -60,6 +68,7 @@ const PaneManagerSplitView: React.FC = () => {
               {leftActiveMenu === 'templates-pane' && <TemplateManagerPane />}
               {leftActiveMenu === 'validation-pane' && <ValidationPane />}
               {leftActiveMenu === 'search' && <SearchPane />}
+              {leftActiveMenu === 'dashboard' && <DashboardPane />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>
@@ -69,7 +78,7 @@ const PaneManagerSplitView: React.FC = () => {
             use fragments so keep this separate. */}
       {leftActiveMenu && <ReflexSplitter propagate style={{backgroundColor: '#191F21'}} />}
 
-      {leftActiveMenu !== 'git-pane' && (
+      {!(leftActiveMenu === 'git-pane' || leftActiveMenu === 'dashboard') && (
         <ReflexElement
           id="navPane"
           minSize={MIN_SPLIT_VIEW_PANE_WIDTH}
@@ -82,9 +91,11 @@ const PaneManagerSplitView: React.FC = () => {
 
       {/* react-reflex does not work as intended when you use propagate
             without multiple splitters so set is dynamically. */}
-      {leftActiveMenu !== 'git-pane' && <ReflexSplitter propagate={Boolean(leftActiveMenu)} />}
+      {!(leftActiveMenu === 'git-pane' || leftActiveMenu === 'dashboard') && (
+        <ReflexSplitter propagate={Boolean(leftActiveMenu)} />
+      )}
 
-      {leftActiveMenu !== 'git-pane' && (
+      {!(leftActiveMenu === 'git-pane' || leftActiveMenu === 'dashboard') && (
         <ReflexElement
           id="editPane"
           minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
@@ -97,6 +108,15 @@ const PaneManagerSplitView: React.FC = () => {
       {leftActiveMenu === 'git-pane' && (
         <ReflexElement id="editPane" minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}>
           <GitOpsView />
+        </ReflexElement>
+      )}
+
+      {leftActiveMenu === 'dashboard' && (
+        <ReflexElement
+          id="dashboardPane"
+          minSize={width < 1000 ? GUTTER_SPLIT_VIEW_PANE_WIDTH : MIN_SPLIT_VIEW_PANE_WIDTH}
+        >
+          <Dashboard />
         </ReflexElement>
       )}
     </ReflexContainer>
