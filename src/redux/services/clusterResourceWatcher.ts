@@ -7,20 +7,24 @@ import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
+import {deleteClusterResource, setIsClusterConnected, updateClusterResource} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
-import {getRegisteredKindHandlers} from '@src/kindhandlers';
+import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandlers';
+import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {extractK8sResources} from './resource';
 
+let isClusterConnected: boolean = false;
+
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
+  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   ClusterRole: `/apis/rbac.authorization.k8s.io/v1/clusterroles`,
   ClusterRoleBinding: `/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`,
   ConfigMap: `/api/v1/configmaps`,
   CronJob: `/apis/batch/v1/cronjobs`,
-  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   DaemonSet: `/apis/apps/v1/daemonsets`,
   Deployment: `/apis/apps/v1/deployments`,
   EndpointSlice: `/apis/discovery.k8s.io/v1/endpointslices`,
@@ -47,14 +51,25 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   VolumeAttachment: `/apis/storage.k8s.io/v1/volumeattachments`,
 };
 
-const watchers: {[resourceKind: string]: any} = {};
+export enum ClusterConnectionStatus {
+  REFUSED = -2,
+  ABORTED = -1,
+  IDLE = 0,
+  CONNECTED = 1,
+}
+
+const crdRequestURLGenerator = (clusterApiVersion: string, plural: string) => {
+  return `/apis/${clusterApiVersion}/${plural}`;
+};
+
+const watchers: {[resourceKind: string]: {watcher: any; status: ClusterConnectionStatus}} = {};
 
 const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
   try {
-    watchers[kindHandler.kind].abort();
-    watchers[kindHandler.kind] = undefined;
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher.abort();
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
   } catch (error) {
-    watchers[kindHandler.kind] = undefined;
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
   }
 };
 
@@ -62,33 +77,56 @@ const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType
+  previewResources: ResourceMapType,
+  plural?: string
 ) => {
-  disconnectResourceFromCluster(kindHandler);
-  watchers[kindHandler.kind] = await new k8s.Watch(kubeConfig).watch(
-    resourceKindRequestURLs[kindHandler.kind],
+  if (
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] &&
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status === ClusterConnectionStatus.CONNECTED
+  ) {
+    disconnectResourceFromCluster(kindHandler);
+  }
+  watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = {
+    status: ClusterConnectionStatus.IDLE,
+    watcher: undefined,
+  };
+  watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = await new k8s.Watch(kubeConfig).watch(
+    kindHandler.isCustom
+      ? crdRequestURLGenerator(kindHandler.clusterApiVersion, plural || kindHandler.kind)
+      : resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
-    (type: string, apiObj: any) => {
-      if (type === 'ADDED') {
-        const resource: K8sResource = processResource(apiObj, kubeConfig);
-        if (!previewResources[resource.id]) {
-          dispatch(updateClusterResource(resource));
+    async (type: string, apiObj: any) => {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
+      const resource: K8sResource = processResource(apiObj, kubeConfig);
+
+      if (type === 'ADDED' && !previewResources[resource.id]) {
+        if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
+          registerCrdKindHandlers(JSON.stringify(apiObj));
+          const handler = extractKindHandler(apiObj);
+          if (handler) {
+            await watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
+          }
         }
+        dispatch(updateClusterResource(resource));
         return;
       }
-
       if (type === 'MODIFIED') {
-        dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
+        dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'DELETED') {
-        dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
+        dispatch(deleteClusterResource(resource));
       }
     },
     (error: any) => {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
-        disconnectResourceFromCluster(kindHandler);
+        watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
+      }
+      if (isClusterConnected === isClusterDisconnected()) {
+        isClusterConnected = !isClusterDisconnected();
+        dispatch(setIsClusterConnected(!isClusterDisconnected()));
       }
     }
   );
@@ -105,10 +143,15 @@ export const startWatchingResources = (
   previewResources: ResourceMapType
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
-    watchResource(dispatch, handler, kubeConfig, previewResources)
+    watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
   );
+  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
 };
 
 export const disconnectFromCluster = () => {
-  Object.values(watchers).forEach(req => req.abort());
+  getRegisteredKindHandlers().map((handler: ResourceKindHandler) => disconnectResourceFromCluster(handler));
+};
+
+export const isClusterDisconnected = () => {
+  return Object.values(watchers).reduce((output: boolean, watcher) => output && watcher.status < 0, true);
 };
