@@ -1,3 +1,5 @@
+import {useCallback} from 'react';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {setSelectedNamespace} from '@redux/dashboard';
@@ -14,9 +16,9 @@ export const Header = ({title}: {title: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
-  const getNamespaces = (): K8sResource[] => {
+  const getNamespaces = useCallback((): K8sResource[] => {
     return Object.values(resourceMap).filter(resource => resource.kind === NamespaceHandler.kind);
-  };
+  }, [resourceMap]);
 
   return (
     <S.Container>

@@ -30,12 +30,12 @@ export const Overview = () => {
   const [clusterInformation, setClusterInformation] = useState<ClusterInformation | null>(null);
   const [activityData, setActivityData] = useState<ClusterEvent[]>([]);
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
-  const [hearbeat, setHearbeat] = useState(0);
+  const [heartbeat, setHeartbeat] = useState(0);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   useInterval(() => {
-    setHearbeat(hearbeat + 1);
+    setHeartbeat(heartbeat + 1);
   }, 5000);
 
   const filterResource = useCallback(
@@ -75,7 +75,7 @@ export const Overview = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [new KubeConfigManager().kubeConfig, hearbeat, selectedNamespace]);
+  }, [new KubeConfigManager().kubeConfig, heartbeat, selectedNamespace]);
 
   useEffect(() => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
@@ -86,7 +86,7 @@ export const Overview = () => {
         .catch(() => setUtilizationData([]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [new KubeConfigManager().kubeConfig, hearbeat]);
+  }, [new KubeConfigManager().kubeConfig, heartbeat]);
 
   return (
     <S.Container>

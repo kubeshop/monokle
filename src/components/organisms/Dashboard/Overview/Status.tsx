@@ -16,7 +16,7 @@ export const Status = () => {
     ).length;
   }, [resourceMap, selectedNamespace]);
 
-  const getErrorCount = () => {
+  const getErrorCount = useCallback(() => {
     return Object.values(resourceMap)
       .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
       .reduce(
@@ -24,9 +24,9 @@ export const Status = () => {
           total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
         0
       );
-  };
+  }, [resourceMap, selectedNamespace]);
 
-  const getWarningCount = () => {
+  const getWarningCount = useCallback(() => {
     return Object.values(resourceMap)
       .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
       .reduce(
@@ -34,7 +34,7 @@ export const Status = () => {
           total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
         0
       );
-  };
+  }, [resourceMap, selectedNamespace]);
 
   return (
     <S.Container>
