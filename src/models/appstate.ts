@@ -214,6 +214,7 @@ interface AppState {
     };
   };
   lastChangedLine: number;
+  isClusterConnected: boolean;
 }
 
 export interface KubernetesObject {
