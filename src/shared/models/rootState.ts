@@ -1,3 +1,5 @@
+import {DashboardState} from '@redux/dashboard';
+
 import {AlertState} from './alert';
 import {AppState} from './appState';
 import {CompareState} from './compare';
@@ -26,6 +28,7 @@ type RootState = {
   terminal: TerminalState;
   ui: UiState;
   validation: ValidationSliceState;
+  dashboard: DashboardState;
 };
 
 export type {RootState};

@@ -1,5 +1,7 @@
 export enum Colors {
   // Greys
+  grey6000 = '#1D1D1D',
+  grey5000 = '#2A385A',
   grey4000 = '#1F1F1F',
   grey3000 = '#191F21',
   grey2000 = '#081A20',
@@ -41,6 +43,7 @@ export enum Colors {
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
+  yellow12 = '#E8B339',
 
   volcano6 = '#D84A1B',
   volcano7 = '#E87040',
@@ -60,6 +63,8 @@ export enum Colors {
   blackPure = '#000000',
   blackPearl = '#111d2c',
   black9 = '#0C0D0E',
+  black10 = '#131629',
+  black100 = '#0a0d0e',
 
   lime8 = '#C9E75D',
 

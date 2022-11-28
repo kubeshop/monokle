@@ -749,6 +749,9 @@ export const mainSlice = createSlice({
     deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       delete state.resourceMap[action.payload.id];
     },
+    setIsClusterConnected: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isClusterConnected = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1199,6 +1202,7 @@ export const {
   setLastChangedLine,
   updateClusterResource,
   deleteClusterResource,
+  setIsClusterConnected,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

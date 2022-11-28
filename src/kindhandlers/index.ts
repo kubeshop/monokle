@@ -216,14 +216,14 @@ export async function readSavedCrdKindHandlers(crdsDir: string) {
   }
 }
 
-export function registerCrdKindHandlers(crdContent: string, handlerPath?: string) {
+export function registerCrdKindHandlers(crdContent: string, handlerPath?: string, shouldReplace?: boolean) {
   const documents = parseAllYamlDocuments(crdContent);
   documents.forEach(doc => {
     const crd = doc.toJS({maxAliasCount: -1});
     if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
       const kindHandler = extractKindHandler(crd, handlerPath);
       if (kindHandler) {
-        registerKindHandler(kindHandler, false);
+        registerKindHandler(kindHandler, Boolean(shouldReplace));
       }
     }
   });

@@ -65,6 +65,7 @@ const initialAppState: AppState = {
     currentMatch: null,
   },
   lastChangedLine: 0,
+  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
