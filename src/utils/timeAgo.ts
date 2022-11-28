@@ -14,7 +14,7 @@ export const timeAgo = (date: string) => {
       style: 'short',
     });
     return relativeFormatter.format(Math.trunc(diff.as(unit as any)), unit as any);
-  } catch (error) {
+  } catch (error: any) {
     log.warn(error.message);
     return '-';
   }
