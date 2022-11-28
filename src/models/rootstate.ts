@@ -1,4 +1,5 @@
 import {CompareState} from '@redux/compare';
+import {DashboardState} from '@redux/dashboard';
 import {FormsState} from '@redux/forms';
 
 import {AlertState} from './alert';
@@ -29,4 +30,5 @@ export type RootState = {
   ui: UiState;
   uiCoach: UiCoachState;
   git: GitSliceState;
+  dashboard: DashboardState;
 };

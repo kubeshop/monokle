@@ -1,4 +1,4 @@
-import {BrowserWindow, app, nativeImage} from 'electron';
+import {BrowserWindow, app, ipcMain, nativeImage} from 'electron';
 
 import {indexOf} from 'lodash';
 import {machineIdSync} from 'node-machine-id';
@@ -200,6 +200,7 @@ export const createWindow = (givenPath?: string) => {
     }, NEW_VERSION_CHECK_INTERVAL);
 
     initKubeconfig(dispatch, userHomeDir);
+
     dispatch(setAppRehydrating(false));
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);

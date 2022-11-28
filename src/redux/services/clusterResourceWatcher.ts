@@ -1,6 +1,8 @@
 /* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
 import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
@@ -119,6 +121,7 @@ const watchResource = async (
       }
     },
     (error: any) => {
+      log.warn('WatchClusterResource', error.message);
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
