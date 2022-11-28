@@ -12,6 +12,7 @@ import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
 
+import ActionCard from './ActionCard';
 import Guide from './Guide';
 import RecentProject from './RecentProject';
 import * as S from './RecentProjectsPage.styled';
@@ -72,46 +73,42 @@ const NewRecentProjectsPane = () => {
         <S.ActionsTitle>… or start something new</S.ActionsTitle>
 
         <S.ActionItems>
-          <S.ActionItem $hasMultipleActions>
-            <S.ActionItemLogo src={SelectFolder} />
-            <S.ActionItemContext>
-              <S.ActionItemText>New project</S.ActionItemText>
-            </S.ActionItemContext>
+          <ActionCard
+            logo={SelectFolder}
+            title="New project"
+            multipleActions={
+              <>
+                <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
+                  Open a local folder
+                </Button>
+                <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
+                  New from template
+                </Button>
+                <Button
+                  id="create-empty-project"
+                  size="large"
+                  type="primary"
+                  onClick={() => handleCreateProject(false)}
+                >
+                  New empty project
+                </Button>
+              </>
+            }
+          />
 
-            <S.MultipleActions>
-              <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
-                Open a local folder
-              </Button>
-              <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
-                New from template
-              </Button>
-              <Button id="create-empty-project" size="large" type="primary" onClick={() => handleCreateProject(false)}>
-                New empty project
-              </Button>
-            </S.MultipleActions>
-          </S.ActionItem>
-
-          <S.ActionItem
-            $disabled={!isGitInstalled}
+          <ActionCard
+            disabled={!isGitInstalled}
             id="start-from-git"
+            logo={CreateFromGit}
+            title="Clone a Git repo"
             onClick={() => {
               if (isGitInstalled) {
                 dispatch(openGitCloneModal());
               }
             }}
-          >
-            <S.ActionItemLogo src={CreateFromGit} />
-            <S.ActionItemContext>
-              <S.ActionItemText>Clone a Git repo</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+          />
 
-          <S.ActionItem id="quick-cluster-preview" onClick={() => handleCreateProject(true)}>
-            <S.ActionItemLogo src={QuickClusterPreview} />
-            <S.ActionItemContext>
-              <S.ActionItemText>Quick cluster preview</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+          <ActionCard id="quick-cluster-preview" logo={QuickClusterPreview} title="Quick cluster preview" />
         </S.ActionItems>
       </S.Actions>
     </S.Container>
