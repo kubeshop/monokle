@@ -5,7 +5,13 @@ import {Project} from '@models/appconfig';
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
-import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setLeftMenuSelection,
+  setPreviewingCluster,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import SelectFolder from '@assets/FromFolder.svg';
@@ -108,7 +114,19 @@ const NewRecentProjectsPane = () => {
             }}
           />
 
-          <ActionCard id="quick-cluster-preview" logo={QuickClusterPreview} title="Quick cluster preview" />
+          <ActionCard
+            id="quick-cluster-preview"
+            logo={QuickClusterPreview}
+            title="Quick cluster preview"
+            onClick={() => {
+              if (!activeProject) {
+                dispatch(setPreviewingCluster(true));
+              }
+
+              dispatch(setLeftMenuSelection('dashboard'));
+              dispatch(toggleStartProjectPane());
+            }}
+          />
         </S.ActionItems>
       </S.Actions>
     </S.Container>
