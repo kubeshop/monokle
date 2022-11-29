@@ -20,22 +20,15 @@ export const Status = () => {
     return Object.values(resourceMap)
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
       .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
-      .reduce(
-        (total: number, resource: K8sResource) =>
-          total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
-        0
-      );
-  }, [resourceMap, selectedNamespace]);
-
-  const getWarningCount = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
-      .reduce(
-        (total: number, resource: K8sResource) =>
-          total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
-        0
-      );
+      .reduce((total: number, resource: K8sResource) => {
+        if (resource.issues && resource.issues.errors) {
+          total += resource.issues.errors.length;
+        }
+        if (resource.validation && resource.validation.errors) {
+          total += resource.validation.errors.length;
+        }
+        return total;
+      }, 0);
   }, [resourceMap, selectedNamespace]);
 
   return (
@@ -45,13 +38,9 @@ export const Status = () => {
         <span>resources</span>
       </S.KindRow>
       <S.InnerContainer>
-        <S.KindRow $type="error" style={{marginRight: '8px'}}>
+        <S.KindRow $type="error">
           <S.Count>{getErrorCount()}</S.Count>
           <span>errors</span>
-        </S.KindRow>
-        <S.KindRow $type="warning" style={{marginLeft: '8px'}}>
-          <S.Count>{getWarningCount()}</S.Count>
-          <span>warnings</span>
         </S.KindRow>
       </S.InnerContainer>
     </S.Container>

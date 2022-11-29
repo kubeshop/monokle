@@ -58,14 +58,16 @@ const Dashboard: React.FC = () => {
   const {height} = useMainPaneDimensions();
 
   useEffect(() => {
-    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-    if (k8sApiClient) {
-      getNodes(k8sApiClient).then(n => {
-        // TEMPORARY NODE ADDER
-        n.forEach(node => {
-          dispatch(updateClusterResource(node));
+    if (activeMenu === 'Node') {
+      const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+      if (k8sApiClient) {
+        getNodes(k8sApiClient).then(n => {
+          // TEMPORARY NODE ADDER
+          n.forEach(node => {
+            dispatch(updateClusterResource(node));
+          });
         });
-      });
+      }
     }
   }, [activeMenu, dispatch]);
 
@@ -103,7 +105,7 @@ export default Dashboard;
 
 export const resourceKindColumns = {
   [NamespaceHandler.kind]: [CellStatus, CellName, CellError, CellLabels, CellAge],
-  [PodHandler.kind]: [CellStatus, CellName, CellNamespace, CellNode, CellRestartCount, CellAge],
+  [PodHandler.kind]: [CellStatus, CellName, CellError, CellNamespace, CellNode, CellRestartCount, CellAge],
   [DeploymentHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
   [DaemonSetHandler.kind]: [CellName, CellError, CellNamespace, CellScheduledCount, CellAge],
   [StatefulSetHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],

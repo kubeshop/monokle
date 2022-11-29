@@ -13,7 +13,7 @@ import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
-import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
+import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 const DashboardPane: React.FC = () => {
@@ -88,28 +88,15 @@ const DashboardPane: React.FC = () => {
           resource =>
             resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
         )
-        .reduce(
-          (total: number, resource: K8sResource) =>
-            total + (resource.validation && resource.validation.errors ? resource.validation.errors.length : 0),
-          0
-        );
-    },
-    [resourceMap, selectedNamespace]
-  );
-
-  const getWarningCount = useCallback(
-    (kind: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(
-          resource =>
-            resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-        )
-        .reduce(
-          (total: number, resource: K8sResource) =>
-            total + (resource.issues && resource.issues.errors ? resource.issues.errors.length : 0),
-          0
-        );
+        .reduce((total: number, resource: K8sResource) => {
+          if (resource.issues && resource.issues.errors) {
+            total += resource.issues.errors.length;
+          }
+          if (resource.validation && resource.validation.errors) {
+            total += resource.validation.errors.length;
+          }
+          return total;
+        }, 0);
     },
     [resourceMap, selectedNamespace]
   );
@@ -158,10 +145,7 @@ const DashboardPane: React.FC = () => {
               {getResourceCount(subsection) ? (
                 <Resource style={{marginRight: '12px'}}>{getResourceCount(subsection)}</Resource>
               ) : null}
-              {getErrorCount(subsection) ? (
-                <ErrorCell style={{marginRight: '12px'}}>{getErrorCount(subsection)}</ErrorCell>
-              ) : null}
-              {getWarningCount(subsection) ? <Warning>{getWarningCount(subsection)}</Warning> : null}
+              {getErrorCount(subsection) ? <ErrorCell>{getErrorCount(subsection)}</ErrorCell> : null}
             </S.SubSection>
           ))}
         </div>
