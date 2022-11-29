@@ -142,9 +142,7 @@ const DashboardPane: React.FC = () => {
               onClick={() => setActiveMenu(subsection)}
             >
               <span style={{marginRight: '4px'}}>{subsection}</span>
-              {getResourceCount(subsection) ? (
-                <Resource style={{marginRight: '12px'}}>{getResourceCount(subsection)}</Resource>
-              ) : null}
+              {getResourceCount(subsection) ? <Resource>{getResourceCount(subsection)}</Resource> : null}
               {getErrorCount(subsection) ? <ErrorCell>{getErrorCount(subsection)}</ErrorCell> : null}
             </S.SubSection>
           ))}

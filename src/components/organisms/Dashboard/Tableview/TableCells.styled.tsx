@@ -77,4 +77,6 @@ export const Resource = styled.span`
   justify-content: center;
   align-items: center;
   letter-spacing: -1px;
+  margin-left: 4px;
+  margin-right: 8px;
 `;
