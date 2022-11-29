@@ -4,6 +4,8 @@ export {default as BottomPaneManager} from './BottomPaneManager';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CreateFileFolderModal} from './CreateFileFolderModal';
 export {default as CreateProjectModal} from './CreateProjectModal';
+export {default as Dashboard} from './Dashboard';
+export {default as DashboardPane} from './DashboardPane';
 export {default as FileTreePane} from './FileTreePane';
 export {default as FiltersPresetModal} from './FiltersPresetModal';
 export {default as GitCloneModal} from './GitCloneModal';

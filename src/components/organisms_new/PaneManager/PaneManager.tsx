@@ -2,15 +2,18 @@ import React, {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
   BottomPaneManager,
+  Dashboard,
   GitOpsView,
   NavigatorPane,
   RecentProjectsPage,
   StartProjectPage,
 } from '@organisms';
+import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -25,6 +28,7 @@ const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
@@ -88,11 +92,25 @@ const NewPaneManager: React.FC = () => {
             top={
               currentActivity?.type === 'fullscreen' ? (
                 currentActivity.component
+              ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
+                <EmptyDashboard />
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={!['git', 'validation'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : undefined}
-                  right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
+                  center={
+                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
+                      <NavigatorPane />
+                    ) : undefined
+                  }
+                  right={
+                    currentActivity?.name === 'git' ? (
+                      <GitOpsView />
+                    ) : currentActivity?.name === 'dashboard' ? (
+                      <Dashboard />
+                    ) : (
+                      <ActionsPane />
+                    )
+                  }
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                   width={width}
                   onStopResize={handleColumnResize}
