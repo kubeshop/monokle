@@ -39,7 +39,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
-    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+    const kubeConfigPath = state.config.kubeConfig.path;
     return {
       resourceMap: state.main.resourceMap,
       previewResourceId: state.main.previewResourceId,
