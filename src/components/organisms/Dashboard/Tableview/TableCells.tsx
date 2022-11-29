@@ -1,5 +1,6 @@
 import {Popover, Tag} from 'antd';
 
+import {isUndefined} from 'lodash';
 import {DateTime} from 'luxon';
 
 import {K8sResource} from '@models/k8sresource';
@@ -347,6 +348,18 @@ export const CellNodeKernel = {
     UNSORTED_VALUE,
 };
 
+export const CellNodeContainerRuntime = {
+  title: 'ContainerRuntime',
+  dataIndex: 'content',
+  key: 'containerRuntime',
+  width: '180px',
+  render: (content: any) => <div>{content?.status?.nodeInfo?.containerRuntimeVersion || '-'}</div>,
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.nodeInfo?.containerRuntimeVersion.localeCompare(
+      b?.content?.status?.nodeInfo?.containerRuntimeVersion || ''
+    ) || UNSORTED_VALUE,
+};
+
 export const CellNodeRoles = {
   title: 'Roles',
   dataIndex: 'content',
@@ -354,10 +367,12 @@ export const CellNodeRoles = {
   width: '210px',
   render: (content: any) => (
     <div>
-      {content?.metadata?.labels['node-role.kubernetes.io/master'] && <span>master</span>}
-      {content?.metadata?.labels['node-role.kubernetes.io/control-plane'] && <span>, control-plane</span>}
-      {!content?.metadata?.labels['node-role.kubernetes.io/master'] &&
-        !content?.metadata?.labels['node-role.kubernetes.io/control-plane'] && <span>-</span>}
+      {!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
+      {!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+        <span>{!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
+      )}
+      {isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+        isUndefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>

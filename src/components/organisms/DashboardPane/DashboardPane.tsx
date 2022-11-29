@@ -65,11 +65,10 @@ const DashboardPane: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
 
-  const setActiveMenu = useCallback((section: string) => {
+  const setActiveMenu = (section: string) => {
     dispatch(setActiveDashboardMenu(section));
     dispatch(setSelectedResourceId());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   const getResourceCount = useCallback(
     (kind: string) => {

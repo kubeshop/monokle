@@ -14,7 +14,7 @@ export const Container = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 30% 70%;
   grid-template-areas:
-    'status performance utilization'
+    'status utilization utilization'
     'inventory-info activity activity';
 `;
 

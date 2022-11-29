@@ -93,9 +93,6 @@ export const Overview = () => {
       <S.TitleBarContainer style={{gridArea: 'status'}}>
         <TitleBar type="secondary" title="Status" description={<Status />} />
       </S.TitleBarContainer>
-      <S.TitleBarContainer style={{gridArea: 'performance'}}>
-        <TitleBar type="secondary" title="Performance" description={<></>} />
-      </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
         <TitleBar
           type="secondary"

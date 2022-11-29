@@ -4,6 +4,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {isDefined} from '@utils/filter';
 import {timeAgo} from '@utils/timeAgo';
 
 import * as S from './InfoTab.styled';
@@ -71,6 +72,34 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
                 (resource.content?.status?.phase === 'Active' && (
                   <S.StatusActive>{resource.content?.status?.phase}</S.StatusActive>
                 )) || <Tag color="magenta">{resource.content?.status?.phase}</Tag>}
+            </S.Row>
+          )}
+          {(isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) ||
+            isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane'])) && (
+            <S.Row>
+              <S.Title>Roles</S.Title>
+              <S.GreyContent>
+                {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
+                {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+                  isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+                    <span>, control-plane</span>
+                  )}
+                {!isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+                  <span>control-plane</span>
+                )}
+              </S.GreyContent>
+            </S.Row>
+          )}
+          {resource.content?.status?.nodeInfo?.kubeletVersion && (
+            <S.Row>
+              <S.Title>Kubernetes Version</S.Title>
+              <S.GreyContent>{resource.content?.status?.nodeInfo?.kubeletVersion}</S.GreyContent>
+            </S.Row>
+          )}
+          {resource.content?.status?.nodeInfo?.containerRuntimeVersion && (
+            <S.Row>
+              <S.Title>Container Runtime</S.Title>
+              <S.GreyContent>{resource.content?.status?.nodeInfo?.containerRuntimeVersion}</S.GreyContent>
             </S.Row>
           )}
           {resource.content?.metadata?.creationTimestamp && (

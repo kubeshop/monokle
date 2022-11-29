@@ -34,7 +34,6 @@ import {
   CellNamespace,
   CellNode,
   CellNodeKernel,
-  CellNodeKubelet,
   CellNodeOS,
   CellNodeRoles,
   CellPodsCount,
@@ -56,16 +55,14 @@ const Dashboard: React.FC = () => {
   const {height} = useMainPaneDimensions();
 
   useEffect(() => {
-    if (activeMenu === 'Node') {
-      const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-      if (k8sApiClient) {
-        getNodes(k8sApiClient).then(n => {
-          // TEMPORARY NODE ADDER
-          n.forEach(node => {
-            dispatch(updateClusterResource(node));
-          });
+    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+    if (k8sApiClient) {
+      getNodes(k8sApiClient).then(n => {
+        // TEMPORARY NODE ADDER
+        n.forEach(node => {
+          dispatch(updateClusterResource(node));
         });
-      }
+      });
     }
   }, [activeMenu, dispatch]);
 
@@ -111,6 +108,6 @@ export const resourceKindColumns = {
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
   [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
   [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
-  Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKubelet, CellNodeKernel, CellAge],
+  Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKernel, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };
