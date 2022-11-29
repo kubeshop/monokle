@@ -57,8 +57,6 @@ type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings';
-
 type NewResourceWizardInput = {
   name?: string;
   kind?: string;
@@ -68,6 +66,8 @@ type NewResourceWizardInput = {
   targetFolder?: string;
   targetFile?: string;
 };
+
+type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings' | 'dashboard';
 
 type PaneConfiguration = {
   leftPane: number;
@@ -172,6 +172,7 @@ type UiState = {
       currentStep: number;
     };
   };
+  previewingCluster?: boolean;
 };
 
 export type {
