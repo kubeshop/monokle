@@ -92,6 +92,7 @@ const StartProjectPage = () => {
               <ActionCard
                 description={itemDescription}
                 disabled={disabled}
+                key={itemId}
                 id={itemId}
                 logo={itemLogo}
                 multipleActions={multipleActions}
