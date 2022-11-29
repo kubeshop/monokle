@@ -22,6 +22,10 @@ export const TitleBarContainer = styled.div`
   & > div:nth-child(1) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+
+    > div:first-child {
+      padding-left: 6px;
+    }
   }
   & > div:nth-child(2) {
     border-top-left-radius: 0;

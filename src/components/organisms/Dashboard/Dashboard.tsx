@@ -15,6 +15,8 @@ import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
 import EndpointsHandler from '@src/kindhandlers/Endpoints.handler';
 import IngressHandler from '@src/kindhandlers/Ingress.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
+import PersistentVolumeHandler from '@src/kindhandlers/PersistentVolume.handler';
+import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClaim.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import ReplicaSetHandler from '@src/kindhandlers/ReplicaSet.handler';
 import SecretHandler from '@src/kindhandlers/Secret.handler';
@@ -42,6 +44,7 @@ import {
   CellScheduledCount,
   CellSecretType,
   CellStatus,
+  CellStorageCapacity,
   CellType,
   LoadBalancerIPs,
 } from './Tableview/TableCells';
@@ -108,6 +111,8 @@ export const resourceKindColumns = {
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
   [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
   [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
+  [PersistentVolumeClaimHandler.kind]: [CellName, CellError, CellNamespace, CellStatus, CellStorageCapacity, CellAge],
+  [PersistentVolumeHandler.kind]: [CellName, CellError, CellNamespace, CellStatus, CellStorageCapacity, CellAge],
   Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKernel, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

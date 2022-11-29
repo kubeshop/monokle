@@ -9,6 +9,7 @@ import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import {timeAgo} from '@utils/timeAgo';
+import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
 import * as S from './TableCells.styled';
 
@@ -22,12 +23,12 @@ export const CellStatus = {
   render: (content: any) => (
     <div>
       {(content?.status?.phase === 'Running' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
+        (content?.status?.phase === 'Bound' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
         (content?.status?.phase === 'Terminating' && (
-          <S.StatuTerminating>{content?.status?.phase}</S.StatuTerminating>
+          <S.StatusTerminating>{content?.status?.phase}</S.StatusTerminating>
         )) ||
-        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) || (
-          <Tag color="magenta">{content?.status?.phase}</Tag>
-        )}
+        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) ||
+        (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.content.status.phase.localeCompare(b.content.status.phase),
@@ -74,7 +75,7 @@ export const CellNode = {
   dataIndex: 'content',
   key: 'node',
   width: '240px',
-  render: (content: any) => <S.NodeCell>{content?.spec?.nodeName}</S.NodeCell>,
+  render: (content: any) => <div>{content?.spec?.nodeName}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
     a?.content?.spec?.nodeName?.localeCompare(b?.content?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
@@ -129,7 +130,7 @@ export const CellRestartCount = {
   width: '120px',
   render: (content: any) =>
     content?.status?.containerStatuses ? (
-      <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount}</span>
+      <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount || 0}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
@@ -146,7 +147,7 @@ export const CellPodsCount = {
   key: 'pods',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.availableReplicas || 0} / {content?.status?.replicas}
+      {content?.status?.availableReplicas || 0} / {content?.status?.replicas || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
@@ -160,7 +161,7 @@ export const CellScheduledCount = {
   width: '120px',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.currentNumberScheduled} / {content?.status?.desiredNumberScheduled}
+      {content?.status?.currentNumberScheduled || 0} / {content?.status?.desiredNumberScheduled || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
@@ -379,4 +380,19 @@ export const CellNodeRoles = {
     a?.content?.metadata?.labels['node-role.kubernetes.io/control-plane']?.localeCompare(
       b?.content?.metadata?.labels['node-role.kubernetes.io/control-plane'] || ''
     ) || UNSORTED_VALUE,
+};
+
+export const CellStorageCapacity = {
+  title: 'Capacity',
+  dataIndex: 'content',
+  key: 'storageCapacity',
+  width: '120px',
+  render: (content: any) =>
+    content?.status?.capacity?.storage ? (
+      <div>{convertBytesToGigabyte(memoryParser(content?.status?.capacity?.storage))}GB</div>
+    ) : (
+      <div>-</div>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.capacity?.storage.localeCompare(b?.content?.status?.capacity?.storage || '') || UNSORTED_VALUE,
 };

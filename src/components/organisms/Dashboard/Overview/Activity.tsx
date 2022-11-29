@@ -1,13 +1,40 @@
+import {useEffect, useState} from 'react';
+import {useInterval} from 'react-use';
+
 import {DateTime} from 'luxon';
 
-import {ClusterEvent} from '@redux/services/clusterDashboard';
+import {useAppSelector} from '@redux/hooks';
+import {ClusterEvent, getClusterEvents} from '@redux/services/clusterDashboard';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import * as S from './Activity.styled';
 
-export const Activity = ({events}: {events: ClusterEvent[]}) => {
+export const Activity = () => {
+  const [activityData, setActivityData] = useState<ClusterEvent[]>([]);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const [heartbeat, setHeartbeat] = useState(0);
+
+  useEffect(() => {
+    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+
+    if (k8sApiClient) {
+      getClusterEvents(k8sApiClient, selectedNamespace === 'ALL' ? undefined : selectedNamespace)
+        .then((events: ClusterEvent[]) => {
+          setActivityData(events);
+        })
+        .catch(() => setActivityData([]));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [new KubeConfigManager().kubeConfig, heartbeat, selectedNamespace]);
+
+  useInterval(() => {
+    setHeartbeat(heartbeat + 1);
+  }, 5000);
+
   return (
     <S.Container>
-      {events.map(event => (
+      {activityData.map(event => (
         <S.EventRow key={event.metadata.uid} $type={event.type}>
           <S.TimeInfo>
             <S.MessageTime>{DateTime.fromJSDate(event.lastTimestamp).toRelative()}</S.MessageTime>

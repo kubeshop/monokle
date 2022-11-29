@@ -12,6 +12,7 @@ import {jsonToYaml} from '@utils/yaml';
 import {KubeConfigManager} from './kubeConfigManager';
 import {extractK8sResources} from './resource';
 
+// ADD to KindHandlers
 export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: string): Promise<ClusterEvent[]> => {
   const events: k8s.CoreV1Event[] | undefined = namespace
     ? (await k8sApiClient?.listNamespacedEvent(namespace))?.body.items
@@ -46,6 +47,7 @@ export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: 
     .reverse();
 };
 
+// ADD to KindHandlers
 export const getNodes = async (k8sApiClient: k8s.CoreV1Api): Promise<K8sResource[]> => {
   try {
     const response = await k8sApiClient.listNode();
@@ -64,29 +66,15 @@ export const getNodes = async (k8sApiClient: k8s.CoreV1Api): Promise<K8sResource
   }
 };
 
-export const getClusterInformation = async (
-  k8sApiClient: k8s.CoreV1Api,
-  pods: K8sResource[],
-  storageClasses: K8sResource[],
-  persistentVolumeClaims: K8sResource[]
-): Promise<ClusterInformation> => {
-  const nodes: K8sResource[] = await getNodes(k8sApiClient);
-  return {
-    clusterApiAddress: k8sApiClient.basePath,
-    nodesCount: nodes.length,
-    podsCapacity: nodes.reduce((total, node) => total + Number(node.content.status?.capacity?.pods), 0),
-    podsCount: pods.length,
-    storageClassCount: storageClasses.length,
-    persistentVolumeClaimCount: persistentVolumeClaims.length,
-  };
-};
-
 export const getClusterUtilization = async (
   k8sApiClient: k8s.CoreV1Api,
   metricClient: k8s.Metrics
 ): Promise<NodeMetric[]> => {
   const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
   const nodes = await k8s.topNodes(k8sApiClient);
+
+  console.log('nodeMetrics', nodeMetrics);
+  console.log('nodes', nodes);
 
   return nodeMetrics.map(m => ({
     nodeName: m.metadata.name,
@@ -127,15 +115,6 @@ export interface ClusterEvent {
   lastTimestamp: Date;
   involvedObject: k8s.V1ObjectReference;
   count: number;
-}
-
-export interface ClusterInformation {
-  clusterApiAddress: string;
-  nodesCount: number;
-  podsCount: number;
-  podsCapacity: number;
-  storageClassCount: number;
-  persistentVolumeClaimCount: number;
 }
 
 export interface NodeMetric {

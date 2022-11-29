@@ -4,7 +4,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {ClusterInformation} from '@redux/services/clusterDashboard';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
@@ -14,7 +14,7 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
 import * as S from './InventoryInfo.styled';
 
-export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
+export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
@@ -30,6 +30,13 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
     },
     [resourceMap, selectedNamespace]
   );
+
+  const podsCapacity = useCallback(() => {
+    return filterResources('Node', 'v1').reduce(
+      (total, node) => total + Number(node.content.status?.capacity?.pods),
+      0
+    );
+  }, [filterResources]);
 
   const setActiveMenu = (section: string) => {
     dispatch(setActiveDashboardMenu(section));
@@ -49,9 +56,15 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
           <S.PodsCount>{filterResources(PodHandler.kind, PodHandler.clusterApiVersion).length || 0} Pods</S.PodsCount>
           <S.PercentageText> &#x2f; </S.PercentageText>
           <S.PercentageText>
-            <S.PodsCapacity>{info.podsCapacity || 0}</S.PodsCapacity>
+            <S.PodsCapacity>{podsCapacity() || 0}</S.PodsCapacity>
             <S.PodsUsagePercentage>
-              ({((info.podsCount && info.podsCapacity ? info.podsCount / info.podsCapacity : 0) * 100).toFixed(2)})
+              (
+              {(
+                (filterResources(PodHandler.kind, PodHandler.clusterApiVersion) && podsCapacity()
+                  ? filterResources(PodHandler.kind, PodHandler.clusterApiVersion).length / podsCapacity()
+                  : 0) * 100
+              ).toFixed(2)}
+              )
             </S.PodsUsagePercentage>
           </S.PercentageText>
           <S.PercentageText>&#x25;</S.PercentageText>
@@ -78,10 +91,10 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
       <S.ClusterInfoContainer>
         <S.ClusterInfoRow>
           <S.Title>Cluster API address</S.Title>
-          <S.Description>{info.clusterApiAddress || '-'}</S.Description>
+          <S.Description>{new KubeConfigManager().getV1ApiClient()?.basePath || '-'}</S.Description>
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
-          <S.Title>K8s Version</S.Title>
+          <S.Title>Kubernetes Version</S.Title>
           <S.Description>
             {filterResources('Node', 'v1')[0]?.content?.status?.nodeInfo?.kubeletVersion || '-'}
           </S.Description>

@@ -12,6 +12,7 @@ export const Container = styled.div`
     > div:first-child {
       font-weight: 700;
       font-size: 16px;
+      padding-left: 6px;
     }
   }
 `;

@@ -57,6 +57,8 @@ enum Colors {
   red4 = '#791A1F',
   red6 = '#D32029',
   red7 = '#E84749', // Dust Red
+  red10 = '#58181C',
+  red100 = '#2A1215',
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
@@ -95,6 +97,8 @@ enum Colors {
   green8 = '#8fd460',
   green9 = '#b2e58b',
   green10 = '#3E4F13', // Dark Green
+  green100 = '#274916',
+  green200 = '#162312',
 
   highlightGreen = '#33BCB7',
 

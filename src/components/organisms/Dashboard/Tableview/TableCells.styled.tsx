@@ -16,18 +16,18 @@ export const StatusRunning = styled(Tag)`
 export const StatusActive = styled(Tag)`
   font-size: 12px;
   font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.green10};
-  border: 1px solid ${Colors.green6};
+  color: ${Colors.green6};
+  background-color: ${Colors.green200};
+  border: 1px solid ${Colors.green100};
   border-radius: 2px;
 `;
 
-export const StatuTerminating = styled(Tag)`
+export const StatusTerminating = styled(Tag)`
   font-size: 12px;
   font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.redError};
-  border: 1px solid ${Colors.red7};
+  color: ${Colors.errorBg};
+  background-color: ${Colors.red100};
+  border: 1px solid ${Colors.red10};
   border-radius: 2px;
 `;
 

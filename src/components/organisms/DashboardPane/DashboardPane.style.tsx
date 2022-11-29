@@ -29,10 +29,12 @@ export const MainSection = styled.div<{$active: boolean; $clickable: boolean}>`
 
   ${props =>
     props.$clickable &&
-    `:hover {
-    background-color: ${Colors.blue9}88;
-    color: ${Colors.grey6000};
-  }`}
+    `
+    :hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: ${Colors.grey9};
+    }
+  `}
 
   ${props => `
     color: ${props.$active ? Colors.grey6000 : Colors.whitePure};
@@ -48,8 +50,8 @@ export const SubSection = styled.div<{$active: boolean}>`
   align-items: center;
 
   :hover {
-    background-color: ${Colors.blue9}88;
-    color: ${Colors.grey6000};
+    background-color: rgba(255, 255, 255, 0.08);
+    color: ${Colors.grey9};
   }
 
   ${props => `

@@ -8,6 +8,7 @@ import {isDefined} from '@utils/filter';
 import {timeAgo} from '@utils/timeAgo';
 
 import * as S from './InfoTab.styled';
+import * as TableStyle from './TableCells.styled';
 
 export const InfoTab = ({resourceId}: {resourceId: string}) => {
   const resource: K8sResource = useAppSelector(state => state.main.resourceMap[resourceId]);
@@ -64,32 +65,35 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
             <S.Row>
               <S.Title>Status</S.Title>
               {(resource.content?.status?.phase === 'Running' && (
-                <S.StatusRunning>{resource.content?.status?.phase}</S.StatusRunning>
+                <TableStyle.StatusRunning>{resource.content?.status?.phase}</TableStyle.StatusRunning>
               )) ||
                 (resource.content?.status?.phase === 'Terminating' && (
-                  <S.StatuTerminating>{resource.content?.status?.phase}</S.StatuTerminating>
+                  <TableStyle.StatusTerminating>{resource.content?.status?.phase}</TableStyle.StatusTerminating>
                 )) ||
                 (resource.content?.status?.phase === 'Active' && (
-                  <S.StatusActive>{resource.content?.status?.phase}</S.StatusActive>
+                  <TableStyle.StatusActive>{resource.content?.status?.phase}</TableStyle.StatusActive>
                 )) || <Tag color="magenta">{resource.content?.status?.phase}</Tag>}
             </S.Row>
           )}
-          {(isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) ||
-            isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane'])) && (
-            <S.Row>
-              <S.Title>Roles</S.Title>
-              <S.GreyContent>
-                {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
-                {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) &&
-                  isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-                    <span>, control-plane</span>
+          {resource.content?.metadata?.labels &&
+            (isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) ||
+              isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane'])) && (
+              <S.Row>
+                <S.Title>Roles</S.Title>
+                <S.GreyContent>
+                  {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) && (
+                    <span>master</span>
                   )}
-                {!isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-                  <span>control-plane</span>
-                )}
-              </S.GreyContent>
-            </S.Row>
-          )}
+                  {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+                    isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+                      <span>, control-plane</span>
+                    )}
+                  {!isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+                    <span>control-plane</span>
+                  )}
+                </S.GreyContent>
+              </S.Row>
+            )}
           {resource.content?.status?.nodeInfo?.kubeletVersion && (
             <S.Row>
               <S.Title>Kubernetes Version</S.Title>
