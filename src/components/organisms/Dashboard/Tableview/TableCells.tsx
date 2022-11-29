@@ -1,6 +1,5 @@
 import {Popover, Tag} from 'antd';
 
-import {isUndefined} from 'lodash';
 import {DateTime} from 'luxon';
 
 import {K8sResource} from '@models/k8sresource';
@@ -8,6 +7,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
+import {isDefined} from '@utils/filter';
 import {timeAgo} from '@utils/timeAgo';
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
@@ -364,16 +364,19 @@ export const CellNodeRoles = {
   dataIndex: 'content',
   key: 'nodeRoles',
   width: '210px',
-  render: (content: any) => (
-    <div>
-      {!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
-      {!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-        <span>{!isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
-      )}
-      {isUndefined(content?.metadata?.labels['node-role.kubernetes.io/master']) &&
-        isUndefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
-    </div>
-  ),
+  render: (content: any) =>
+    content?.metadata?.labels ? (
+      <div>
+        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
+        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+          <span>{isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
+        )}
+        {!isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+          !isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
+      </div>
+    ) : (
+      <div>-</div>
+    ),
   sorter: (a: K8sResource, b: K8sResource) =>
     a?.content?.metadata?.labels['node-role.kubernetes.io/control-plane']?.localeCompare(
       b?.content?.metadata?.labels['node-role.kubernetes.io/control-plane'] || ''
