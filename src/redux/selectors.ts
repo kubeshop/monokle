@@ -216,7 +216,7 @@ export const currentClusterAccessSelector = createSelector(
       return [];
     }
 
-    if (!config.projectConfig?.kubeConfig?.currentContext) {
+    if (!config?.kubeConfig?.currentContext) {
       return [];
     }
 
@@ -227,9 +227,6 @@ export const currentClusterAccessSelector = createSelector(
 export const kubeConfigPathSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.path) {
-      return config.projectConfig?.kubeConfig?.path;
-    }
     if (config.kubeConfig.path) {
       return config.kubeConfig.path;
     }
@@ -248,7 +245,7 @@ export const kubeConfigPathValidSelector = createSelector(
 );
 
 export const selectCurrentKubeConfig = (state: RootState) => {
-  return state.config.projectConfig?.kubeConfig ?? state.config.kubeConfig;
+  return state.config.kubeConfig;
 };
 
 export const registeredKindHandlersSelector = createSelector(

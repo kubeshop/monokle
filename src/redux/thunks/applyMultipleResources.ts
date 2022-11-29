@@ -21,8 +21,8 @@ const applyMultipleResources = async (
   namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
-  const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
-  const currentContext = config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
+  const kubeConfigPath = config.kubeConfig.path;
+  const currentContext = config.kubeConfig.currentContext;
 
   if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;
