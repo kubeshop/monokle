@@ -85,7 +85,6 @@ export const FilterContainer = styled.div`
 export const Input = styled(RawInput)`
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  margin-right: 8px;
   border: none;
 `;
 export const SearchOutlined = styled(RawSearchOutlined)`

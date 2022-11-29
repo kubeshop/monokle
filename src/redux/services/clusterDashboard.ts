@@ -2,9 +2,15 @@ import * as k8s from '@kubernetes/client-node';
 
 import _ from 'lodash';
 
+import {PREVIEW_PREFIX} from '@constants/constants';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {cpuParser, memoryParser} from '@utils/unit-converter';
+import {jsonToYaml} from '@utils/yaml';
+
+import {KubeConfigManager} from './kubeConfigManager';
+import {extractK8sResources} from './resource';
 
 export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: string): Promise<ClusterEvent[]> => {
   const events: k8s.CoreV1Event[] | undefined = namespace
@@ -40,20 +46,35 @@ export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: 
     .reverse();
 };
 
+export const getNodes = async (k8sApiClient: k8s.CoreV1Api): Promise<K8sResource[]> => {
+  try {
+    const response = await k8sApiClient.listNode();
+    let nodes: k8s.V1Node[] = response.body.items;
+
+    nodes = nodes.map(n => ({...n, apiVersion: 'v1', kind: 'Node'}));
+
+    const results = extractK8sResources(
+      nodes.map(r => jsonToYaml(r)).join('\n---\n'),
+      PREVIEW_PREFIX + new KubeConfigManager().getKubeConfig().currentContext
+    );
+
+    return results;
+  } catch (error) {
+    return [];
+  }
+};
+
 export const getClusterInformation = async (
   k8sApiClient: k8s.CoreV1Api,
   pods: K8sResource[],
   storageClasses: K8sResource[],
   persistentVolumeClaims: K8sResource[]
 ): Promise<ClusterInformation> => {
-  const responses = await Promise.all([k8sApiClient.listNode()]);
-
-  const nodes: k8s.V1Node[] = responses[0].body.items;
-
+  const nodes: K8sResource[] = await getNodes(k8sApiClient);
   return {
     clusterApiAddress: k8sApiClient.basePath,
     nodesCount: nodes.length,
-    podsCapacity: nodes.reduce((total, node) => total + Number(node.status?.capacity?.pods), 0),
+    podsCapacity: nodes.reduce((total, node) => total + Number(node.content.status?.capacity?.pods), 0),
     podsCount: pods.length,
     storageClassCount: storageClasses.length,
     persistentVolumeClaimCount: persistentVolumeClaims.length,

@@ -1,4 +1,11 @@
-import {useAppSelector} from '@redux/hooks';
+import {useCallback, useEffect} from 'react';
+
+import {K8sResource} from '@models/k8sresource';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateClusterResource} from '@redux/reducers/main';
+import {getNodes} from '@redux/services/clusterDashboard';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -17,6 +24,7 @@ import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 import * as S from './Dashboard.styled';
 import {Overview} from './Overview/Overview';
 import {
+  CellAddresses,
   CellAge,
   CellEndpoints,
   CellError,
@@ -37,17 +45,37 @@ import {
 import {Tableview} from './Tableview/Tableview';
 
 const Dashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const {height} = useMainPaneDimensions();
 
-  const filterResources = (kind: string) => {
-    return Object.values(resourceMap).filter(
-      resource =>
-        resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-    );
-  };
+  useEffect(() => {
+    if (activeMenu === 'Node') {
+      const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+      if (k8sApiClient) {
+        getNodes(k8sApiClient).then(n => {
+          // TEMPORARY NODE ADDER
+          n.forEach(node => {
+            dispatch(updateClusterResource(node));
+          });
+        });
+      }
+    }
+  }, [activeMenu, dispatch]);
+
+  const filterResources = useCallback(
+    (kind: string, apiVersion?: string) => {
+      return Object.values(resourceMap).filter(
+        (resource: K8sResource) =>
+          (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
+          resource.kind === kind &&
+          (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+      );
+    },
+    [resourceMap, selectedNamespace]
+  );
 
   return (
     <S.Container $paneHeight={height}>
@@ -56,7 +84,7 @@ const Dashboard: React.FC = () => {
         {activeMenu === 'Overview' && <Overview />}
         {activeMenu !== 'Overview' && (
           <Tableview
-            dataSource={filterResources(activeMenu)}
+            dataSource={activeMenu === 'Node' ? filterResources(activeMenu, 'v1') : filterResources(activeMenu)}
             columns={resourceKindColumns[activeMenu] || resourceKindColumns['ANY']}
           />
         )}
@@ -79,5 +107,6 @@ export const resourceKindColumns = {
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
   [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
   [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
+  Node: [CellName, CellAddresses, CellNamespace, CellSecretType, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

@@ -54,7 +54,7 @@ export const CellName = {
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.name.localeCompare(b.name),
-  defaultSortOrder: 'descend',
+  defaultSortOrder: 'ascend',
 };
 
 export const CellNamespace = {
@@ -278,4 +278,23 @@ export const CellSecretType = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) => a?.content?.type?.localeCompare(b?.content?.type || '') || -Infinity,
+};
+
+export const CellAddresses = {
+  title: 'Addresses',
+  dataIndex: 'content',
+  key: 'addresses',
+  width: '240px',
+  render: (content: any) =>
+    content?.status?.addresses ? (
+      content?.status?.addresses.map((data: {address: string; type: string}) => (
+        <div key={data.type + data.address} style={{padding: '2px 4px'}}>
+          {data.type}: {data.address}
+        </div>
+      ))
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.status?.addresses.length) - Number(b?.content?.status?.addresses.length) || -Infinity,
 };

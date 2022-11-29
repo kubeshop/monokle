@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 
+import {ClusterOutlined, FundProjectionScreenOutlined} from '@ant-design/icons';
+
 import flatten, {unflatten} from 'flat';
 
 import {K8sResource} from '@models/k8sresource';
@@ -57,7 +59,7 @@ const DashboardPane: React.FC = () => {
           }
           return output;
         },
-        {Overview: {}}
+        {Overview: {}, Node: {}}
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,7 +117,6 @@ const DashboardPane: React.FC = () => {
       <S.HeaderContainer>
         <S.ClusterName
           title={new KubeConfigManager().getKubeConfig().currentContext}
-          actions={<S.DownOutlined />}
           description={
             <div>
               <S.CheckCircleFilled />
@@ -131,19 +132,18 @@ const DashboardPane: React.FC = () => {
             onChange={(event: any) => setFilterText(event.target.value)}
             allowClear
           />
-          <S.FilterAction disabled>
-            <S.FilterOutlined />
-          </S.FilterAction>
         </S.FilterContainer>
       </S.HeaderContainer>
 
       {Object.keys(filteredMenu).map(section => (
         <div key={section}>
           <S.MainSection
-            $clickable={section === 'Overview'}
+            $clickable={section === 'Overview' || section === 'Node'}
             $active={activeMenu === section}
-            onClick={() => section === 'Overview' && setActiveMenu(section)}
+            onClick={() => (section === 'Overview' || section === 'Node') && setActiveMenu(section)}
           >
+            {section === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
+            {section === 'Node' && <ClusterOutlined style={{marginRight: '8px'}} />}
             {section}
           </S.MainSection>
           {Object.keys(filteredMenu[section]).map((subsection: any) => (
@@ -152,7 +152,7 @@ const DashboardPane: React.FC = () => {
               $active={activeMenu === subsection}
               onClick={() => setActiveMenu(subsection)}
             >
-              <span style={{marginRight: '12px'}}>{subsection}</span>
+              <span style={{marginRight: '4px'}}>{subsection}</span>
               {getResourceCount(subsection) ? (
                 <Resource style={{marginRight: '12px'}}>{getResourceCount(subsection)}</Resource>
               ) : null}

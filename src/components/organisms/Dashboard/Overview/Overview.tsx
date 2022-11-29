@@ -100,12 +100,7 @@ export const Overview = () => {
         <TitleBar
           type="secondary"
           title="Utilization"
-          actions={
-            <S.ActionWrapper>
-              <span>Default view</span>
-              <S.DownOutlined />
-            </S.ActionWrapper>
-          }
+          actions={<div />}
           description={<Utilization utilizations={utilizationData} />}
         />
       </S.TitleBarContainer>
@@ -113,7 +108,7 @@ export const Overview = () => {
         <TitleBar
           type="secondary"
           title="Inventory & Info"
-          actions={<S.ActionWrapper>See all</S.ActionWrapper>}
+          actions={<div />}
           description={<InventoryInfo info={clusterInformation || ({} as ClusterInformation)} />}
         />
       </S.TitleBarContainer>
@@ -121,15 +116,7 @@ export const Overview = () => {
         <TitleBar
           type="secondary"
           title="Activity"
-          actions={
-            <div>
-              <S.ActionWrapper style={{marginRight: '8px'}}>
-                <S.PauseCircleFilled />
-                <span>Pause</span>
-              </S.ActionWrapper>
-              <S.ActionWrapper>See all</S.ActionWrapper>
-            </div>
-          }
+          actions={<div />}
           description={<Activity events={activityData} />}
         />
       </S.TitleBarContainer>

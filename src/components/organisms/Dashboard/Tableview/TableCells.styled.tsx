@@ -69,16 +69,12 @@ export const Warning = styled.span`
 `;
 
 export const Resource = styled.span`
-  color: ${Colors.whitePure};
-  background-color: ${Colors.geekblue7};
+  color: ${Colors.grey6};
   font-weight: 700;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 100%;
-  width: 18px;
-  height: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   letter-spacing: -1px;
-  padding: 0 2px 0 0;
 `;

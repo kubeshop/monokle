@@ -1,13 +1,29 @@
+import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {useAppDispatch} from '@redux/hooks';
 import {ClusterInformation} from '@redux/services/clusterDashboard';
 
 import * as S from './InventoryInfo.styled';
 
 export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
+  const dispatch = useAppDispatch();
+
   return (
     <S.Container>
       <S.NodesInformation>
-        <S.NodesInformationRow>{info.nodesCount || 0} Nodes</S.NodesInformationRow>
-        <S.NodesInformationRow>
+        <S.NodesInformationRow
+          onClick={() => {
+            dispatch(setActiveDashboardMenu('Node'));
+            dispatch(setSelectedResourceId());
+          }}
+        >
+          {info.nodesCount || 0} Nodes
+        </S.NodesInformationRow>
+        <S.NodesInformationRow
+          onClick={() => {
+            dispatch(setActiveDashboardMenu('Pod'));
+            dispatch(setSelectedResourceId());
+          }}
+        >
           <S.PodsCount>{info.podsCount || 0} Pods</S.PodsCount>
           <S.PercentageText> &#x2f; </S.PercentageText>
           <S.PercentageText>
@@ -18,8 +34,22 @@ export const InventoryInfo = ({info}: {info: ClusterInformation}) => {
           </S.PercentageText>
           <S.PercentageText>&#x25;</S.PercentageText>
         </S.NodesInformationRow>
-        <S.NodesInformationRow>{info.storageClassCount || 0} StorageClasses</S.NodesInformationRow>
-        <S.NodesInformationRow>{info.persistentVolumeClaimCount || 0} PersistentVolumeClaims</S.NodesInformationRow>
+        <S.NodesInformationRow
+          onClick={() => {
+            dispatch(setActiveDashboardMenu('StorageClass'));
+            dispatch(setSelectedResourceId());
+          }}
+        >
+          {info.storageClassCount || 0} StorageClasses
+        </S.NodesInformationRow>
+        <S.NodesInformationRow
+          onClick={() => {
+            dispatch(setActiveDashboardMenu('PersistentVolumeClaim'));
+            dispatch(setSelectedResourceId());
+          }}
+        >
+          {info.persistentVolumeClaimCount || 0} PersistentVolumeClaims
+        </S.NodesInformationRow>
       </S.NodesInformation>
       <S.HorizontalLine />
       <S.ClusterAPIContainer>

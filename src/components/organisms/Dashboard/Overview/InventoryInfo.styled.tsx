@@ -18,6 +18,10 @@ export const NodesInformation = styled.div`
 
 export const NodesInformationRow = styled.div`
   line-height: 28px;
+  cursor: pointer;
+  :hover {
+    text-decoration: underline;
+  }
 `;
 
 export const PercentageText = styled.span`
