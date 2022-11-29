@@ -26,7 +26,7 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
   rootSectionId: HELM_CHART_SECTION_NAME,
   childSectionIds: [],
   getScope: state => {
-    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+    const kubeConfigPath = state.config.kubeConfig.path;
     return {
       isInClusterMode: kubeConfigPath
         ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))

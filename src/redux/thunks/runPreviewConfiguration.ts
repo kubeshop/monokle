@@ -35,12 +35,10 @@ export const runPreviewConfiguration = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
+  const kubeconfig = configState.kubeConfig.path;
   const k8sVersion = configState.projectConfig?.k8sVersion;
   const userDataDir = configState.userDataDir;
-  const currentContext =
-    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-    thunkAPI.getState().config.kubeConfig.currentContext;
+  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
   const policyPlugins = mainState.policies.plugins;
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
