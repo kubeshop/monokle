@@ -1,6 +1,5 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useSelector} from 'react-redux';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
@@ -21,6 +20,7 @@ import {
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
+  isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -48,7 +48,8 @@ const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -225,7 +226,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
-      if (isInPreviewMode) {
+      if (isInPreviewMode && !isInClusterMode) {
         stopPreview(dispatch);
       }
     },
