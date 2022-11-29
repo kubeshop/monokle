@@ -71,12 +71,14 @@ const Dashboard: React.FC = () => {
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
-      return Object.values(resourceMap).filter(
-        (resource: K8sResource) =>
-          (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
-          resource.kind === kind &&
-          (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-      );
+      return Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+        .filter(
+          (resource: K8sResource) =>
+            (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
+            resource.kind === kind &&
+            (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+        );
     },
     [resourceMap, selectedNamespace]
   );
@@ -103,7 +105,7 @@ export const resourceKindColumns = {
   [NamespaceHandler.kind]: [CellStatus, CellName, CellError, CellLabels, CellAge],
   [PodHandler.kind]: [CellStatus, CellName, CellNamespace, CellNode, CellRestartCount, CellAge],
   [DeploymentHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
-  [DaemonSetHandler.kind]: [CellName, CellError, CellNamespace, CellScheduledCount, CellNode, CellAge],
+  [DaemonSetHandler.kind]: [CellName, CellError, CellNamespace, CellScheduledCount, CellAge],
   [StatefulSetHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
   [ReplicaSetHandler.kind]: [CellName, CellError, CellNamespace, CellPodsCount, CellAge],
   [ServiceHandler.kind]: [CellName, CellError, CellNamespace, CellType, CellPorts, CellIPs, LoadBalancerIPs, CellAge],

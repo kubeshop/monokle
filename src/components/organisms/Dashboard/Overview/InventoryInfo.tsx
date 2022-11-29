@@ -21,12 +21,14 @@ export const InventoryInfo = () => {
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
-      return Object.values(resourceMap).filter(
-        (resource: K8sResource) =>
-          (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
-          resource.kind === kind &&
-          (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
-      );
+      return Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+        .filter(
+          (resource: K8sResource) =>
+            (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
+            resource.kind === kind &&
+            (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+        );
     },
     [resourceMap, selectedNamespace]
   );

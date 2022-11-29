@@ -63,9 +63,9 @@ export const PodsUsagePercentage = styled.span``;
 export const ClusterInfoContainer = styled.div``;
 
 export const ClusterInfoRow = styled.div`
-  margin: 8px 0;
+  margin: 12px 0;
 `;
 
 export const UsefulLinksContainer = styled.div`
-  padding: 8px 0;
+  padding: 8px 0 16px 0;
 `;

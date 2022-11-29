@@ -11,13 +11,14 @@ export const Status = () => {
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   const getResourceCount = useCallback(() => {
-    return Object.values(resourceMap).filter(r =>
-      selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true
-    ).length;
+    return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      .filter(r => (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true)).length;
   }, [resourceMap, selectedNamespace]);
 
   const getErrorCount = useCallback(() => {
     return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
       .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
       .reduce(
         (total: number, resource: K8sResource) =>
@@ -28,6 +29,7 @@ export const Status = () => {
 
   const getWarningCount = useCallback(() => {
     return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
       .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
       .reduce(
         (total: number, resource: K8sResource) =>

@@ -17,7 +17,9 @@ export const Header = ({title}: {title: string}) => {
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
 
   const getNamespaces = useCallback((): K8sResource[] => {
-    return Object.values(resourceMap).filter(resource => resource.kind === NamespaceHandler.kind);
+    return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      .filter(resource => resource.kind === NamespaceHandler.kind);
   }, [resourceMap]);
 
   return (

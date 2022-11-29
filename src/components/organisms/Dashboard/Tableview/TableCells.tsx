@@ -31,7 +31,7 @@ export const CellStatus = {
         (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
-  sorter: (a: K8sResource, b: K8sResource) => a.content.status.phase.localeCompare(b.content.status.phase),
+  sorter: (a: K8sResource, b: K8sResource) => a.content?.status?.phase?.localeCompare(b.content?.status?.phase),
 };
 
 export const CellAge = {
@@ -200,7 +200,7 @@ export const CellPorts = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.spec?.ports.length) - Number(b?.content?.spec?.ports.length) || UNSORTED_VALUE,
+    Number(a?.content?.spec?.ports?.length) - Number(b?.content?.spec?.ports?.length) || UNSORTED_VALUE,
 };
 
 export const CellIPs = {
@@ -267,8 +267,8 @@ export const LoadBalancerIPs = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.loadBalancer?.ingress.length) -
-      Number(b?.content?.status?.loadBalancer?.ingress.length) || UNSORTED_VALUE,
+    Number(a?.content?.status?.loadBalancer?.ingress?.length) -
+      Number(b?.content?.status?.loadBalancer?.ingress?.length) || UNSORTED_VALUE,
 };
 
 export const CellSecretType = {
@@ -301,7 +301,7 @@ export const CellAddresses = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.addresses.length) - Number(b?.content?.status?.addresses.length) || UNSORTED_VALUE,
+    Number(a?.content?.status?.addresses?.length) - Number(b?.content?.status?.addresses?.length) || UNSORTED_VALUE,
 };
 
 export const CellNodeOS = {
@@ -394,5 +394,5 @@ export const CellStorageCapacity = {
       <div>-</div>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.capacity?.storage.localeCompare(b?.content?.status?.capacity?.storage || '') || UNSORTED_VALUE,
+    Number(a?.content?.status?.capacity?.storage) - Number(b?.content?.status?.capacity?.storage) || UNSORTED_VALUE,
 };

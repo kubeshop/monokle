@@ -72,9 +72,10 @@ const DashboardPane: React.FC = () => {
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(resourceMap).filter(
-        r => r.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true)
-      ).length;
+      return Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+        .filter(r => r.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true))
+        .length;
     },
     [resourceMap, selectedNamespace]
   );
@@ -82,6 +83,7 @@ const DashboardPane: React.FC = () => {
   const getErrorCount = useCallback(
     (kind: string) => {
       return Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
         .filter(
           resource =>
             resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
@@ -98,6 +100,7 @@ const DashboardPane: React.FC = () => {
   const getWarningCount = useCallback(
     (kind: string) => {
       return Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
         .filter(
           resource =>
             resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)

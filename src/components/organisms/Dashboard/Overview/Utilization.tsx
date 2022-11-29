@@ -50,6 +50,7 @@ export const Utilization = () => {
 
   const getTotalCapacity = useCallback(() => {
     return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
       .filter((resource: K8sResource) => resource.content.apiVersion === 'v1' && resource.kind === 'Node')
       .reduce((total: number, node: K8sResource) => {
         if (node.content?.status?.capacity && node.content?.status?.capacity['ephemeral-storage']) {
