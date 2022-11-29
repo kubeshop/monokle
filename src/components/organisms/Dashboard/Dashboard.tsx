@@ -33,6 +33,10 @@ import {
   CellName,
   CellNamespace,
   CellNode,
+  CellNodeKernel,
+  CellNodeKubelet,
+  CellNodeOS,
+  CellNodeRoles,
   CellPodsCount,
   CellPorts,
   CellRestartCount,
@@ -107,6 +111,6 @@ export const resourceKindColumns = {
   [EndpointSliceHandler.kind]: [CellName, CellError, CellNamespace, CellAge],
   [IngressHandler.kind]: [CellName, CellError, CellNamespace, LoadBalancerIPs, CellAge],
   [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
-  Node: [CellName, CellAddresses, CellNamespace, CellSecretType, CellAge],
+  Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKubelet, CellNodeKernel, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

@@ -12,7 +12,6 @@ export const EventRow = styled.div<{$type: string}>`
   justify-content: space-between;
   border-radius: 4px;
   border: 1px solid ${Colors.grey4};
-
   margin-bottom: 10px;
   padding: 10px;
   ${props =>
@@ -21,6 +20,9 @@ export const EventRow = styled.div<{$type: string}>`
       (props.$type === 'Error' && Colors.red7) ||
       (props.$type === 'Normal' && Colors.grey5000)
     };`}
+  :hover {
+    background-color: ${Colors.grey10};
+  }
 `;
 
 export const TimeInfo = styled.div`
