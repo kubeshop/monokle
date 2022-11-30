@@ -44,6 +44,8 @@ enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
   yellow12 = '#E8B339',
+  yellow100 = '#594214',
+  yellow1000 = '#2B2111',
 
   volcano6 = '#D84A1B',
   volcano7 = '#E87040',

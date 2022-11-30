@@ -13,6 +13,15 @@ export const StatusRunning = styled(Tag)`
   border-radius: 2px;
 `;
 
+export const StatusPending = styled(Tag)`
+  font-size: 12px;
+  font-weight: 400;
+  color: ${Colors.yellow12};
+  background-color: ${Colors.yellow1000};
+  border: 1px solid ${Colors.yellow100};
+  border-radius: 2px;
+`;
+
 export const StatusActive = styled(Tag)`
   font-size: 12px;
   font-weight: 400;

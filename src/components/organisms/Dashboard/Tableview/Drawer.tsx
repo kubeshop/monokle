@@ -41,13 +41,18 @@ export const Drawer = () => {
             <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
 
-            {Number(localResource.validation?.errors.length) > 0 && (
+            {Number(Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)) >
+              0 && (
               <Popover
                 mouseEnterDelay={0.5}
                 placement="rightTop"
                 content={<ErrorsPopoverContent resource={localResource} />}
               >
-                <S.ErrorCount>{localResource.validation?.errors.length}</S.ErrorCount>
+                <S.ErrorCount>
+                  {Number(
+                    Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)
+                  )}
+                </S.ErrorCount>
               </Popover>
             )}
           </S.TitleContainer>

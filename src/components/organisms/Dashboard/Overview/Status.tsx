@@ -13,13 +13,16 @@ export const Status = () => {
   const getResourceCount = useCallback(() => {
     return Object.values(resourceMap)
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(r => (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true)).length;
+      .filter(r => (selectedNamespace !== 'ALL' && Boolean(r.namespace) ? selectedNamespace === r.namespace : true))
+      .length;
   }, [resourceMap, selectedNamespace]);
 
   const getErrorCount = useCallback(() => {
     return Object.values(resourceMap)
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(resource => (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true))
+      .filter(resource =>
+        selectedNamespace !== 'ALL' && Boolean(resource.namespace) ? selectedNamespace === resource.namespace : true
+      )
       .reduce((total: number, resource: K8sResource) => {
         if (resource.issues && resource.issues.errors) {
           total += resource.issues.errors.length;

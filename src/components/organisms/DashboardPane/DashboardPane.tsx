@@ -9,6 +9,8 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateClusterResource} from '@redux/reducers/main';
+import {getNodes} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
@@ -74,8 +76,11 @@ const DashboardPane: React.FC = () => {
     (kind: string) => {
       return Object.values(resourceMap)
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(r => r.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === r.namespace : true))
-        .length;
+        .filter(
+          r =>
+            r.kind === kind &&
+            (selectedNamespace !== 'ALL' && Boolean(r.namespace) ? selectedNamespace === r.namespace : true)
+        ).length;
     },
     [resourceMap, selectedNamespace]
   );
@@ -86,7 +91,10 @@ const DashboardPane: React.FC = () => {
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
         .filter(
           resource =>
-            resource.kind === kind && (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+            resource.kind === kind &&
+            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
+              ? selectedNamespace === resource.namespace
+              : true)
         )
         .reduce((total: number, resource: K8sResource) => {
           if (resource.issues && resource.issues.errors) {
@@ -100,6 +108,20 @@ const DashboardPane: React.FC = () => {
     },
     [resourceMap, selectedNamespace]
   );
+
+  useEffect(() => {
+    if (activeMenu === 'Node' || activeMenu === 'Overview') {
+      const k8sApiClient = new KubeConfigManager().getV1ApiClient();
+      if (k8sApiClient) {
+        getNodes(k8sApiClient).then(n => {
+          // TEMPORARY NODE ADDER
+          n.forEach(node => {
+            dispatch(updateClusterResource(node));
+          });
+        });
+      }
+    }
+  }, [activeMenu, dispatch]);
 
   return (
     <S.Container>

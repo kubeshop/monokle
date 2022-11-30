@@ -27,18 +27,23 @@ export const InventoryInfo = () => {
           (resource: K8sResource) =>
             (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
             resource.kind === kind &&
-            (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
+              ? selectedNamespace === resource.namespace
+              : true)
         );
     },
     [resourceMap, selectedNamespace]
   );
 
-  const podsCapacity = useCallback(() => {
-    return filterResources('Node', 'v1').reduce(
-      (total, node) => total + Number(node.content.status?.capacity?.pods),
-      0
+  const getNodes = useCallback(() => {
+    return Object.values(resourceMap).filter(
+      (resource: K8sResource) => resource.content.apiVersion === 'v1' && resource.kind === 'Node'
     );
-  }, [filterResources]);
+  }, [resourceMap]);
+
+  const podsCapacity = useCallback(() => {
+    return getNodes().reduce((total, node) => total + Number(node.content.status?.capacity?.pods), 0);
+  }, [getNodes]);
 
   const setActiveMenu = (section: string) => {
     dispatch(setActiveDashboardMenu(section));
@@ -49,7 +54,7 @@ export const InventoryInfo = () => {
     <S.Container>
       <S.NodesInformation>
         <S.NodesInformationRow onClick={() => setActiveMenu('Node')}>
-          {filterResources('Node', 'v1').length || 0} Nodes
+          {getNodes().length || 0} Nodes
         </S.NodesInformationRow>
         <S.NodesInformationRow onClick={() => setActiveMenu(NamespaceHandler.kind)}>
           {filterResources(NamespaceHandler.kind, NamespaceHandler.clusterApiVersion).length || 0} Namespaces
@@ -97,15 +102,11 @@ export const InventoryInfo = () => {
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>
-          <S.Description>
-            {filterResources('Node', 'v1')[0]?.content?.status?.nodeInfo?.kubeletVersion || '-'}
-          </S.Description>
+          <S.Description>{getNodes()[0]?.content?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Container Runtime</S.Title>
-          <S.Description>
-            {filterResources('Node', 'v1')[0]?.content?.status?.nodeInfo?.containerRuntimeVersion || '-'}
-          </S.Description>
+          <S.Description>{getNodes()[0]?.content?.status?.nodeInfo?.containerRuntimeVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
       </S.ClusterInfoContainer>
       <S.HorizontalLine />

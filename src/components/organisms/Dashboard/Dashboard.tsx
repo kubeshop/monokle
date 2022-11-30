@@ -1,11 +1,8 @@
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateClusterResource} from '@redux/reducers/main';
-import {getNodes} from '@redux/services/clusterDashboard';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -51,25 +48,10 @@ import {
 import {Tableview} from './Tableview/Tableview';
 
 const Dashboard: React.FC = () => {
-  const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const {height} = useMainPaneDimensions();
-
-  useEffect(() => {
-    if (activeMenu === 'Node') {
-      const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-      if (k8sApiClient) {
-        getNodes(k8sApiClient).then(n => {
-          // TEMPORARY NODE ADDER
-          n.forEach(node => {
-            dispatch(updateClusterResource(node));
-          });
-        });
-      }
-    }
-  }, [activeMenu, dispatch]);
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
@@ -79,7 +61,9 @@ const Dashboard: React.FC = () => {
           (resource: K8sResource) =>
             (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
             resource.kind === kind &&
-            (selectedNamespace !== 'ALL' ? selectedNamespace === resource.namespace : true)
+            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
+              ? selectedNamespace === resource.namespace
+              : true)
         );
     },
     [resourceMap, selectedNamespace]

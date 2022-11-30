@@ -70,6 +70,9 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
                 (resource.content?.status?.phase === 'Terminating' && (
                   <TableStyle.StatusTerminating>{resource.content?.status?.phase}</TableStyle.StatusTerminating>
                 )) ||
+                (resource.content?.status?.phase === 'Pending' && (
+                  <TableStyle.StatusPending>{resource.content?.status?.phase}</TableStyle.StatusPending>
+                )) ||
                 (resource.content?.status?.phase === 'Active' && (
                   <TableStyle.StatusActive>{resource.content?.status?.phase}</TableStyle.StatusActive>
                 )) || <Tag color="magenta">{resource.content?.status?.phase}</Tag>}
@@ -85,11 +88,12 @@ export const InfoTab = ({resourceId}: {resourceId: string}) => {
                     <span>master</span>
                   )}
                   {isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+                  isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) ? (
+                    <span>, control-plane</span>
+                  ) : (
                     isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-                      <span>, control-plane</span>
-                    )}
-                  {!isDefined(resource.content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-                    <span>control-plane</span>
+                      <span>control-plane</span>
+                    )
                   )}
                 </S.GreyContent>
               </S.Row>

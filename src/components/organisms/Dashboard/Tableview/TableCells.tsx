@@ -24,6 +24,7 @@ export const CellStatus = {
     <div>
       {(content?.status?.phase === 'Running' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
         (content?.status?.phase === 'Bound' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
+        (content?.status?.phase === 'Pending' && <S.StatusPending>{content?.status?.phase}</S.StatusPending>) ||
         (content?.status?.phase === 'Terminating' && (
           <S.StatusTerminating>{content?.status?.phase}</S.StatusTerminating>
         )) ||
