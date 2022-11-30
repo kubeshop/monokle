@@ -51,6 +51,8 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   StatefulSet: `/apis/apps/v1/statefulsets`,
   StorageClass: `/apis/storage.k8s.io/v1/storageclasses`,
   VolumeAttachment: `/apis/storage.k8s.io/v1/volumeattachments`,
+  Node: '/api/v1/nodes',
+  Event: '/apis/events.k8s.io/v1/events',
 };
 
 export enum ClusterConnectionStatus {

@@ -53,31 +53,26 @@ const Dashboard: React.FC = () => {
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const {height} = useMainPaneDimensions();
 
-  const filterResources = useCallback(
-    (kind: string, apiVersion?: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(
-          (resource: K8sResource) =>
-            (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
-            resource.kind === kind &&
-            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
-              ? selectedNamespace === resource.namespace
-              : true)
-        );
-    },
-    [resourceMap, selectedNamespace]
-  );
+  const filterResources = useCallback(() => {
+    return Object.values(resourceMap)
+      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      .filter(
+        (resource: K8sResource) =>
+          (activeMenu.key.split('-')[0] ? resource.content.apiVersion === activeMenu.key.split('-')[0] : true) &&
+          resource.kind === activeMenu.label &&
+          (selectedNamespace !== 'ALL' && Boolean(resource.namespace) ? selectedNamespace === resource.namespace : true)
+      );
+  }, [resourceMap, selectedNamespace, activeMenu]);
 
   return (
     <S.Container $paneHeight={height}>
-      <S.Header title={activeMenu} />
+      <S.Header title={activeMenu.label} />
       <S.Content>
-        {activeMenu === 'Overview' && <Overview />}
-        {activeMenu !== 'Overview' && (
+        {activeMenu.key === 'Overview' && <Overview />}
+        {activeMenu.key !== 'Overview' && (
           <Tableview
-            dataSource={activeMenu === 'Node' ? filterResources(activeMenu, 'v1') : filterResources(activeMenu)}
-            columns={resourceKindColumns[activeMenu] || resourceKindColumns['ANY']}
+            dataSource={filterResources()}
+            columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
           />
         )}
       </S.Content>

@@ -4,6 +4,8 @@ import {ClusterOutlined, FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import flatten, {unflatten} from 'flat';
 
+import navSectionNames from '@constants/navSectionNames';
+
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
@@ -15,6 +17,7 @@ import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
+import {IMenu} from './menu';
 
 const DashboardPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +25,7 @@ const DashboardPane: React.FC = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [menu, setMenu] = useState<any>({});
+  const [menu, setMenu] = useState<IMenu[]>([]);
   const [filteredMenu, setFilteredMenu] = useState<any>({});
   const [filterText, setFilterText] = useState<string>('');
 
@@ -46,27 +49,66 @@ const DashboardPane: React.FC = () => {
   }, [filterText, menu]);
 
   useEffect(() => {
-    setMenu(
-      getRegisteredKindHandlers().reduce(
-        (output: any, kindHandler: ResourceKindHandler) => {
-          if (output[kindHandler.navigatorPath[1]]) {
-            output[kindHandler.navigatorPath[1]] = {
-              ...output[kindHandler.navigatorPath[1]],
-              [kindHandler.kind]: {},
-            };
-          } else {
-            output[kindHandler.navigatorPath[1]] = {[kindHandler.kind]: {}};
-          }
-          return output;
-        },
-        {Overview: {}, Node: {}}
-      )
-    );
+    let tempMenu: IMenu[] = [
+      {
+        key: 'Overview',
+        label: 'Overview',
+        children: [],
+      },
+    ];
+
+    navSectionNames.representation[navSectionNames.K8S_RESOURCES].forEach((path: string) => {
+      tempMenu.push({
+        key: path,
+        label: path,
+        children: [],
+      });
+    });
+
+    getRegisteredKindHandlers().forEach((kindHandler: ResourceKindHandler) => {
+      const parent: IMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
+      if (parent) {
+        const child: IMenu | undefined = parent.children.find(m => m.key === kindHandler.navigatorPath[2]);
+        if (child) {
+          child.children.push({
+            key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
+            label: kindHandler.kind,
+            children: [],
+            resourceCount: getResourceCount(kindHandler.kind),
+            errorCount: getErrorCount(kindHandler.kind),
+          });
+        } else {
+          parent.children.push({
+            key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
+            label: kindHandler.kind,
+            children: [],
+            resourceCount: getResourceCount(kindHandler.kind),
+            errorCount: getErrorCount(kindHandler.kind),
+          });
+        }
+      }
+    });
+
+    tempMenu = tempMenu.map((menuItem: IMenu) => ({
+      ...menuItem,
+      resourceCount: menuItem.children.reduce(
+        (total: number, m: IMenu) => total + (m.resourceCount ? m.resourceCount : 0),
+        0
+      ),
+      errorCount: menuItem.children.reduce((total: number, m: IMenu) => total + (m.errorCount ? m.errorCount : 0), 0),
+    }));
+
+    setMenu(tempMenu);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
 
-  const setActiveMenu = (section: string) => {
-    dispatch(setActiveDashboardMenu(section));
+  useEffect(() => {
+    console.log('menu', menu);
+  }, [menu]);
+
+  const setActiveMenu = (menuItem: IMenu) => {
+    dispatch(setActiveDashboardMenu(menuItem));
     dispatch(setSelectedResourceId());
   };
 
@@ -130,30 +172,35 @@ const DashboardPane: React.FC = () => {
         </S.FilterContainer>
       </S.HeaderContainer>
 
-      {Object.keys(filteredMenu).map(section => (
-        <div key={section}>
-          <S.MainSection
-            $clickable={section === 'Overview' || section === 'Node'}
-            $active={activeMenu === section}
-            onClick={() => (section === 'Overview' || section === 'Node') && setActiveMenu(section)}
-          >
-            {section === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
-            {section === 'Node' && <ClusterOutlined style={{marginRight: '8px'}} />}
-            {section}
-          </S.MainSection>
-          {Object.keys(filteredMenu[section]).map((subsection: any) => (
-            <S.SubSection
-              key={subsection}
-              $active={activeMenu === subsection}
-              onClick={() => setActiveMenu(subsection)}
+      {menu.map((parent: IMenu) =>
+        (parent.resourceCount && parent.resourceCount > 0) || parent.key === 'Overview' ? (
+          <div key={parent.key}>
+            <S.MainSection
+              $clickable={parent.key === 'Overview' || parent.key === 'Node'}
+              $active={activeMenu.key === parent.key}
+              onClick={() => (parent.key === 'Overview' || parent.key === 'Node') && setActiveMenu(parent)}
             >
-              <span style={{marginRight: '4px'}}>{subsection}</span>
-              {getResourceCount(subsection) ? <Resource>{getResourceCount(subsection)}</Resource> : null}
-              {getErrorCount(subsection) ? <ErrorCell>{getErrorCount(subsection)}</ErrorCell> : null}
-            </S.SubSection>
-          ))}
-        </div>
-      ))}
+              {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
+              {parent.key === 'Node' && <ClusterOutlined style={{marginRight: '8px'}} />}
+              {parent.label}
+            </S.MainSection>
+
+            {parent.children.map((child: IMenu) =>
+              child.resourceCount ? (
+                <S.SubSection
+                  key={child.key}
+                  $active={activeMenu.key === child.key}
+                  onClick={() => setActiveMenu(child)}
+                >
+                  <span style={{marginRight: '4px'}}>{child.label}</span>
+                  {child.resourceCount ? <Resource>{child.resourceCount}</Resource> : null}
+                  {child.errorCount ? <ErrorCell>{child.errorCount}</ErrorCell> : null}
+                </S.SubSection>
+              ) : null
+            )}
+          </div>
+        ) : null
+      )}
     </S.Container>
   );
 };

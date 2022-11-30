@@ -28,31 +28,29 @@ export const Activity = () => {
             (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
               ? selectedNamespace === resource.namespace
               : true)
-        ),
-      'content.lastTimestamp'
-    )
-      .filter(i => Boolean(i.content.count) && Boolean(i.content.source.host))
-      .reverse();
+        )
+        .map(resource => ({
+          ...resource,
+          eventTime:
+            resource.content.eventTime || resource.content.deprecatedLastTimestamp || resource.content.lastTimestamp,
+        })),
+      'eventTime'
+    ).reverse();
   }, [resourceMap, selectedNamespace]);
 
   return (
     <S.Container>
-      {getEvents().map(({content}: K8sResource) => (
+      {getEvents().map(({content, eventTime}: K8sResource | any) => (
         <S.EventRow key={content.metadata.uid} $type={content.type}>
           <S.TimeInfo>
-            <S.MessageTime>{timeAgo(content.lastTimestamp)}</S.MessageTime>
+            <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
             <S.MessageCount>
-              <span>{content.count}</span>
+              <span>{content.deprecatedCount || content.count}</span>
               <span> times in the last </span>
               <span>
                 {
-                  DateTime.fromISO(content.lastTimestamp)
-                    .diff(DateTime.fromISO(content.metadata.creationTimestamp), [
-                      'hours',
-                      'minutes',
-                      'seconds',
-                      'milliseconds',
-                    ])
+                  DateTime.fromISO(content.deprecatedLastTimestamp || content.lastTimestamp)
+                    .diff(DateTime.fromISO(eventTime), ['hours', 'minutes', 'seconds', 'milliseconds'])
                     .toObject().hours
                 }
               </span>
@@ -60,9 +58,17 @@ export const Activity = () => {
             </S.MessageCount>
           </S.TimeInfo>
           <S.MessageInfo>
-            <S.MessageText>{content.message}</S.MessageText>
+            <S.MessageText>{content.message || content.note}</S.MessageText>
             <S.MessageHost>
-              {content.source.host || '- '}: {content.metadata.name}
+              <span>
+                {content?.deprecatedSource?.host ||
+                  content?.deprecatedSource?.component ||
+                  content?.source?.host ||
+                  content?.reportingController ||
+                  '- '}
+                :
+              </span>
+              <span> {content.metadata.name}</span>
             </S.MessageHost>
           </S.MessageInfo>
           <S.NamespaceInfo>{content.metadata.namespace || '-'}</S.NamespaceInfo>

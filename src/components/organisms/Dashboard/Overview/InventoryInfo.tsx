@@ -1,6 +1,7 @@
 import {useCallback} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -8,6 +9,7 @@ import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
+import NodeHandler from '@src/kindhandlers/NodeHandler';
 import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClaim.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
@@ -45,21 +47,27 @@ export const InventoryInfo = () => {
     return getNodes().reduce((total, node) => total + Number(node.content.status?.capacity?.pods), 0);
   }, [getNodes]);
 
-  const setActiveMenu = (section: string) => {
-    dispatch(setActiveDashboardMenu(section));
+  const setActiveMenu = (kindHandler: ResourceKindHandler) => {
+    dispatch(
+      setActiveDashboardMenu({
+        key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
+        label: kindHandler.kind,
+        children: [],
+      })
+    );
     dispatch(setSelectedResourceId());
   };
 
   return (
     <S.Container>
       <S.NodesInformation>
-        <S.NodesInformationRow onClick={() => setActiveMenu('Node')}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(NodeHandler)}>
           {getNodes().length || 0} Nodes
         </S.NodesInformationRow>
-        <S.NodesInformationRow onClick={() => setActiveMenu(NamespaceHandler.kind)}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(NamespaceHandler)}>
           {filterResources(NamespaceHandler.kind, NamespaceHandler.clusterApiVersion).length || 0} Namespaces
         </S.NodesInformationRow>
-        <S.NodesInformationRow onClick={() => setActiveMenu(PodHandler.kind)}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(PodHandler)}>
           <S.PodsCount>{filterResources(PodHandler.kind, PodHandler.clusterApiVersion).length || 0} Pods</S.PodsCount>
           <S.PercentageText> &#x2f; </S.PercentageText>
           <S.PercentageText>
@@ -76,17 +84,17 @@ export const InventoryInfo = () => {
           </S.PercentageText>
           <S.PercentageText>&#x25;</S.PercentageText>
         </S.NodesInformationRow>
-        <S.NodesInformationRow onClick={() => setActiveMenu(CustomResourceDefinitionHandler.kind)}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(CustomResourceDefinitionHandler)}>
           <span>
             {filterResources(CustomResourceDefinitionHandler.kind, CustomResourceDefinitionHandler.clusterApiVersion)
               .length || 0}
           </span>
           <span> CustomResourceDefinitions</span>
         </S.NodesInformationRow>
-        <S.NodesInformationRow onClick={() => setActiveMenu(StorageClassHandler.kind)}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(StorageClassHandler)}>
           {filterResources(StorageClassHandler.kind, StorageClassHandler.clusterApiVersion).length || 0} StorageClasses
         </S.NodesInformationRow>
-        <S.NodesInformationRow onClick={() => setActiveMenu(PersistentVolumeClaimHandler.kind)}>
+        <S.NodesInformationRow onClick={() => setActiveMenu(PersistentVolumeClaimHandler)}>
           <span>
             {filterResources(PersistentVolumeClaimHandler.kind, PersistentVolumeClaimHandler.clusterApiVersion)
               .length || 0}

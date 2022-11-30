@@ -1,7 +1,9 @@
+import {IMenu} from '@components/organisms/DashboardPane/menu';
+
 export const initialState: DashboardState = {
   isOpen: false,
   ui: {
-    activeMenu: 'Overview',
+    activeMenu: {key: 'Overview', label: 'Overview', children: []},
     selectedNamespace: 'ALL',
   },
   tableDrawer: {
@@ -12,7 +14,7 @@ export const initialState: DashboardState = {
 export type DashboardState = {
   isOpen: boolean;
   ui: {
-    activeMenu: string;
+    activeMenu: IMenu;
     selectedNamespace: string;
   };
   tableDrawer: {

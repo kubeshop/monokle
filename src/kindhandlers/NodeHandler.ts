@@ -26,7 +26,8 @@ const NodeHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listNode();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async deleteResourceInCluster(_kubeconfig: k8s.KubeConfig, _resource: K8sResource) {
     log.warn(`${NodeHandler.kind} delete is not implemented!`);
   },
   helpLink: 'https://kubernetes.io/docs/concepts/architecture/nodes/',
