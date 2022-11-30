@@ -2,15 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import _ from 'lodash';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
-
-import {K8sResource} from '@models/k8sresource';
-
 import {cpuParser, memoryParser} from '@utils/unit-converter';
-import {jsonToYaml} from '@utils/yaml';
-
-import {KubeConfigManager} from './kubeConfigManager';
-import {extractK8sResources} from './resource';
 
 // ADD to KindHandlers
 export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: string): Promise<ClusterEvent[]> => {
@@ -47,34 +39,12 @@ export const getClusterEvents = async (k8sApiClient: k8s.CoreV1Api, namespace?: 
     .reverse();
 };
 
-// ADD to KindHandlers
-export const getNodes = async (k8sApiClient: k8s.CoreV1Api): Promise<K8sResource[]> => {
-  try {
-    const response = await k8sApiClient.listNode();
-    let nodes: k8s.V1Node[] = response.body.items;
-
-    nodes = nodes.map(n => ({...n, apiVersion: 'v1', kind: 'Node'}));
-
-    const results = extractK8sResources(
-      nodes.map(r => jsonToYaml(r)).join('\n---\n'),
-      PREVIEW_PREFIX + new KubeConfigManager().getKubeConfig().currentContext
-    );
-
-    return results;
-  } catch (error) {
-    return [];
-  }
-};
-
 export const getClusterUtilization = async (
   k8sApiClient: k8s.CoreV1Api,
   metricClient: k8s.Metrics
 ): Promise<NodeMetric[]> => {
   const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
   const nodes = await k8s.topNodes(k8sApiClient);
-
-  console.log('nodeMetrics', nodeMetrics);
-  console.log('nodes', nodes);
 
   return nodeMetrics.map(m => ({
     nodeName: m.metadata.name,

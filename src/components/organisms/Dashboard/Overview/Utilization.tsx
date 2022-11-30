@@ -19,16 +19,12 @@ import * as S from './Utilization.styled';
 
 export const Utilization = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const [averageCpuUsage, setAverageCpuUsage] = useState(0);
   const [totalCpu, setTotalCpu] = useState(0);
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
   const [totalMemory, setTotalMemory] = useState(0);
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
   const [heartbeat, setHeartbeat] = useState(0);
-  useInterval(() => {
-    setHeartbeat(heartbeat + 1);
-  }, 5000);
 
   useEffect(() => {
     const k8sApiClient = new KubeConfigManager().getV1ApiClient();
@@ -40,6 +36,10 @@ export const Utilization = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [new KubeConfigManager().kubeConfig, heartbeat]);
+
+  useInterval(() => {
+    setHeartbeat(heartbeat + 1);
+  }, 5000);
 
   useEffect(() => {
     setTotalCpu(utilizationData.reduce((total, u) => u.cpuCapacity + total, 0));
