@@ -35,7 +35,7 @@ export const Utilization = () => {
         .catch(() => setUtilizationData([]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [new KubeConfigManager().kubeConfig, heartbeat]);
+  }, [heartbeat]);
 
   useInterval(() => {
     setHeartbeat(heartbeat + 1);
@@ -76,7 +76,7 @@ export const Utilization = () => {
         <S.InformationContainer>
           <S.InfoTitle>
             <span>CPU</span>
-            <Tooltip title="some text">
+            <Tooltip title="Used CPU / total CPU in cluster">
               <S.InfoIcon src={InfoCircle} width={14} />
             </Tooltip>
           </S.InfoTitle>
@@ -101,7 +101,7 @@ export const Utilization = () => {
         <S.InformationContainer>
           <S.InfoTitle>
             <span>Memory</span>
-            <Tooltip title="some text">
+            <Tooltip title="Used memory / Total Cluster Memory">
               <S.InfoIcon src={InfoCircle} width={14} />
             </Tooltip>
           </S.InfoTitle>
@@ -126,7 +126,7 @@ export const Utilization = () => {
         <S.InformationContainer>
           <S.InfoTitle>
             <span>Storage</span>
-            <Tooltip title="some text">
+            <Tooltip title="Used Storage / Node Storage">
               <S.InfoIcon src={InfoCircle} width={14} />
             </Tooltip>
           </S.InfoTitle>

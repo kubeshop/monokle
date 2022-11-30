@@ -2,8 +2,6 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {ClusterOutlined, FundProjectionScreenOutlined} from '@ant-design/icons';
 
-import flatten, {unflatten} from 'flat';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
@@ -26,7 +24,7 @@ const DashboardPane: React.FC = () => {
   const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<IMenu[]>([]);
-  const [filteredMenu, setFilteredMenu] = useState<any>({});
+  const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
 
   useEffect(() => {
@@ -34,19 +32,28 @@ const DashboardPane: React.FC = () => {
       setFilteredMenu(menu);
       return;
     }
-    const flattenMenu = flatten<any, any>(menu, {
-      safe: true,
-      transformKey: (key: string) => `${key.replaceAll('.', '-')}`,
-    });
-    const filteredFlattenMenuArray = Object.keys(flattenMenu).filter(key =>
-      key.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim())
+
+    setFilteredMenu(
+      menu
+        .map((menuItem: IMenu) => ({
+          ...menuItem,
+          children: menuItem.children?.filter((m: IMenu) => m.label.toLowerCase().includes(filterText.toLowerCase())),
+        }))
+        .filter((menuItem: IMenu) => menuItem.children && menuItem.children?.length > 0)
+        .filter((menuItem: IMenu) =>
+          menuItem.children
+            ? menuItem.children?.reduce(
+                (total: number, m: IMenu) => total + (m.resourceCount ? m.resourceCount : 0),
+                0
+              ) > 0
+            : 0
+        )
     );
-    const menuObject = filteredFlattenMenuArray.reduce(
-      (output: any, value: string) => ({...output, [value]: {Overview: {}}}),
-      {}
-    );
-    setFilteredMenu(unflatten(menuObject, {transformKey: (key: string) => key.replaceAll('-', '.')}));
   }, [filterText, menu]);
+
+  useEffect(() => {
+    console.log(filteredMenu);
+  }, [filteredMenu]);
 
   useEffect(() => {
     let tempMenu: IMenu[] = [
@@ -172,7 +179,7 @@ const DashboardPane: React.FC = () => {
         </S.FilterContainer>
       </S.HeaderContainer>
 
-      {menu.map((parent: IMenu) =>
+      {filteredMenu.map((parent: IMenu) =>
         (parent.resourceCount && parent.resourceCount > 0) || parent.key === 'Overview' ? (
           <div key={parent.key}>
             <S.MainSection
