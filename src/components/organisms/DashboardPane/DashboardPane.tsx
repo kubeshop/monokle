@@ -68,9 +68,9 @@ const DashboardPane: React.FC = () => {
     getRegisteredKindHandlers().forEach((kindHandler: ResourceKindHandler) => {
       const parent: IMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
       if (parent) {
-        const child: IMenu | undefined = parent.children.find(m => m.key === kindHandler.navigatorPath[2]);
+        const child: IMenu | undefined = parent.children?.find(m => m.key === kindHandler.navigatorPath[2]);
         if (child) {
-          child.children.push({
+          child.children?.push({
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
@@ -78,7 +78,7 @@ const DashboardPane: React.FC = () => {
             errorCount: getErrorCount(kindHandler.kind),
           });
         } else {
-          parent.children.push({
+          parent.children?.push({
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
@@ -91,21 +91,21 @@ const DashboardPane: React.FC = () => {
 
     tempMenu = tempMenu.map((menuItem: IMenu) => ({
       ...menuItem,
-      resourceCount: menuItem.children.reduce(
+      resourceCount: menuItem.children?.reduce(
         (total: number, m: IMenu) => total + (m.resourceCount ? m.resourceCount : 0),
         0
       ),
-      errorCount: menuItem.children.reduce((total: number, m: IMenu) => total + (m.errorCount ? m.errorCount : 0), 0),
+      errorCount: menuItem.children?.reduce((total: number, m: IMenu) => total + (m.errorCount ? m.errorCount : 0), 0),
     }));
 
     setMenu(tempMenu);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), activeMenu, leftMenu]);
+  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace]);
 
   useEffect(() => {
-    console.log('menu', menu);
-  }, [menu]);
+    dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
+  }, []);
 
   const setActiveMenu = (menuItem: IMenu) => {
     dispatch(setActiveDashboardMenu(menuItem));
@@ -185,7 +185,7 @@ const DashboardPane: React.FC = () => {
               {parent.label}
             </S.MainSection>
 
-            {parent.children.map((child: IMenu) =>
+            {parent.children?.map((child: IMenu) =>
               child.resourceCount ? (
                 <S.SubSection
                   key={child.key}

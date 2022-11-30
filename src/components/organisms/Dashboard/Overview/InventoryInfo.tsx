@@ -52,7 +52,6 @@ export const InventoryInfo = () => {
       setActiveDashboardMenu({
         key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
         label: kindHandler.kind,
-        children: [],
       })
     );
     dispatch(setSelectedResourceId());

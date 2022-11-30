@@ -19,6 +19,7 @@ export const Drawer = () => {
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [localResource, setLocalResource] = useState<K8sResource | undefined>();
+  const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {
@@ -66,16 +67,16 @@ export const Drawer = () => {
     >
       <S.TabsContainer>
         <S.Tabs
-          defaultActiveKey="1"
+          defaultActiveKey={activeTab}
           items={[
             {
               label: 'Info',
-              key: '1',
+              key: 'Info',
               children: <InfoTab resourceId={selectedResourceId as string} />,
             },
             {
               label: 'Manifest',
-              key: '2',
+              key: 'Manifest',
               children: <EditorTab />,
             },
           ]}

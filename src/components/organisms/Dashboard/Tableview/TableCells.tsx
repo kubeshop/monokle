@@ -92,7 +92,8 @@ export const CellError = {
     ) : (
       <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
         <S.ErrorCell>
-          {Number(resource.validation?.errors?.length) + Number(resource.issues?.errors?.length)}
+          {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
+            Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
         </S.ErrorCell>
       </Popover>
     ),

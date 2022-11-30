@@ -5,5 +5,5 @@ export interface IMenu {
   order?: number;
   resourceCount?: number;
   errorCount?: number;
-  children: IMenu[];
+  children?: IMenu[];
 }
