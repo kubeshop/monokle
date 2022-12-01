@@ -14,7 +14,7 @@ interface IProps {
   isDisabled: boolean;
   resourceMap: ResourceMapType;
   resourceRef: ResourceRef;
-  onClick?: () => void;
+  onClick?: (args?: any) => void;
 }
 
 const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
@@ -77,11 +77,11 @@ const ResourceRefLink: React.FC<IProps> = props => {
     return <span>{targetName}</span>;
   }, [isDisabled, resourceMap, resourceRef]);
 
-  const handleClick = () => {
+  const handleClick = (args: any) => {
     if (isDisabled || !onClick) {
       return;
     }
-    onClick();
+    onClick(args);
   };
 
   return (

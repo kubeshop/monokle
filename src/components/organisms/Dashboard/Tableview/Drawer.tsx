@@ -4,7 +4,7 @@ import {Popover} from 'antd';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {setSelectedResourceId} from '@redux/dashboard';
+import {setActiveTab, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
@@ -19,6 +19,7 @@ export const Drawer = () => {
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [localResource, setLocalResource] = useState<K8sResource | undefined>();
+  const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {
@@ -41,13 +42,18 @@ export const Drawer = () => {
             <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
             <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
 
-            {Number(localResource.validation?.errors.length) > 0 && (
+            {Number(Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)) >
+              0 && (
               <Popover
                 mouseEnterDelay={0.5}
                 placement="rightTop"
                 content={<ErrorsPopoverContent resource={localResource} />}
               >
-                <S.ErrorCount>{localResource.validation?.errors.length}</S.ErrorCount>
+                <S.ErrorCount>
+                  {Number(
+                    Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)
+                  )}
+                </S.ErrorCount>
               </Popover>
             )}
           </S.TitleContainer>
@@ -61,16 +67,20 @@ export const Drawer = () => {
     >
       <S.TabsContainer>
         <S.Tabs
-          defaultActiveKey="1"
+          defaultActiveKey={activeTab}
+          activeKey={activeTab}
+          onChange={(key: string) => {
+            dispatch(setActiveTab(key as any));
+          }}
           items={[
             {
               label: 'Info',
-              key: '1',
+              key: 'Info',
               children: <InfoTab resourceId={selectedResourceId as string} />,
             },
             {
               label: 'Manifest',
-              key: '2',
+              key: 'Manifest',
               children: <EditorTab />,
             },
           ]}

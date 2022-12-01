@@ -7,9 +7,13 @@ import {K8sResource} from '@models/k8sresource';
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
+import {isDefined} from '@utils/filter';
 import {timeAgo} from '@utils/timeAgo';
+import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
 import * as S from './TableCells.styled';
+
+const UNSORTED_VALUE = -9999999;
 
 export const CellStatus = {
   title: 'Status',
@@ -19,15 +23,16 @@ export const CellStatus = {
   render: (content: any) => (
     <div>
       {(content?.status?.phase === 'Running' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
+        (content?.status?.phase === 'Bound' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
+        (content?.status?.phase === 'Pending' && <S.StatusPending>{content?.status?.phase}</S.StatusPending>) ||
         (content?.status?.phase === 'Terminating' && (
-          <S.StatuTerminating>{content?.status?.phase}</S.StatuTerminating>
+          <S.StatusTerminating>{content?.status?.phase}</S.StatusTerminating>
         )) ||
-        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) || (
-          <Tag color="magenta">{content?.status?.phase}</Tag>
-        )}
+        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) ||
+        (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
-  sorter: (a: K8sResource, b: K8sResource) => a.content.status.phase.localeCompare(b.content.status.phase),
+  sorter: (a: K8sResource, b: K8sResource) => a.content?.status?.phase?.localeCompare(b.content?.status?.phase),
 };
 
 export const CellAge = {
@@ -54,7 +59,7 @@ export const CellName = {
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.name.localeCompare(b.name),
-  defaultSortOrder: 'descend',
+  defaultSortOrder: 'ascend',
 };
 
 export const CellNamespace = {
@@ -63,7 +68,7 @@ export const CellNamespace = {
   key: 'namespace',
   width: '150px',
   render: (namespace: string) => <div>{namespace}</div>,
-  sorter: (a: K8sResource, b: K8sResource) => a?.namespace?.localeCompare(b?.namespace || '') || -Infinity,
+  sorter: (a: K8sResource, b: K8sResource) => a?.namespace?.localeCompare(b?.namespace || '') || UNSORTED_VALUE,
 };
 
 export const CellNode = {
@@ -71,9 +76,9 @@ export const CellNode = {
   dataIndex: 'content',
   key: 'node',
   width: '240px',
-  render: (content: any) => <S.NodeCell>{content?.spec?.nodeName}</S.NodeCell>,
+  render: (content: any) => <div>{content?.spec?.nodeName}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.nodeName?.localeCompare(b?.content?.spec?.nodeName || '') || -Infinity,
+    a?.content?.spec?.nodeName?.localeCompare(b?.content?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
 
 export const CellError = {
@@ -82,20 +87,19 @@ export const CellError = {
   key: 'error',
   width: '150px',
   render: (resource: K8sResource) =>
-    !(
-      resource.validation &&
-      !resource.validation?.isValid &&
-      resource.validation?.errors &&
-      resource.validation?.errors.length > 0
-    ) ? (
+    !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
       <span style={{padding: '2px 4px'}}>-</span>
     ) : (
       <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-        <S.ErrorCell>{resource.validation?.errors.length}</S.ErrorCell>
+        <S.ErrorCell>
+          {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
+            Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
+        </S.ErrorCell>
       </Popover>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.validation?.errors.length) - Number(b.validation?.errors.length) || -Infinity,
+    Number(Number(a.validation?.errors?.length) + Number(a.issues?.errors?.length)) -
+      Number(Number(b.validation?.errors?.length) + Number(b.issues?.errors?.length)) || UNSORTED_VALUE,
 };
 
 export const CellLabels = {
@@ -126,7 +130,7 @@ export const CellRestartCount = {
   width: '120px',
   render: (content: any) =>
     content?.status?.containerStatuses ? (
-      <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount}</span>
+      <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount || 0}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
@@ -134,7 +138,7 @@ export const CellRestartCount = {
     a.content?.status?.containerStatuses && a.content?.status?.containerStatuses
       ? Number(a.content?.status?.containerStatuses[0].restartCount) -
         Number(b.content?.status?.containerStatuses[0].restartCount)
-      : -Infinity,
+      : UNSORTED_VALUE,
 };
 
 export const CellPodsCount = {
@@ -143,11 +147,11 @@ export const CellPodsCount = {
   key: 'pods',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.availableReplicas || 0} / {content?.status?.replicas}
+      {content?.status?.availableReplicas || 0} / {content?.status?.replicas || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.content?.status?.availableReplicas) - Number(b.content?.status?.availableReplicas) || -Infinity,
+    Number(a.content?.status?.availableReplicas) - Number(b.content?.status?.availableReplicas) || UNSORTED_VALUE,
 };
 
 export const CellScheduledCount = {
@@ -157,11 +161,12 @@ export const CellScheduledCount = {
   width: '120px',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.currentNumberScheduled} / {content?.status?.desiredNumberScheduled}
+      {content?.status?.currentNumberScheduled || 0} / {content?.status?.desiredNumberScheduled || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.content?.status?.currentNumberScheduled) - Number(b.content?.status?.currentNumberScheduled) || -Infinity,
+    Number(a.content?.status?.currentNumberScheduled) - Number(b.content?.status?.currentNumberScheduled) ||
+    UNSORTED_VALUE,
 };
 
 export const CellType = {
@@ -176,7 +181,7 @@ export const CellType = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.type?.localeCompare(b?.content?.spec?.type || '') || -Infinity,
+    a?.content?.spec?.type?.localeCompare(b?.content?.spec?.type || '') || UNSORTED_VALUE,
 };
 
 export const CellPorts = {
@@ -195,7 +200,7 @@ export const CellPorts = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.spec?.ports.length) - Number(b?.content?.spec?.ports.length) || -Infinity,
+    Number(a?.content?.spec?.ports?.length) - Number(b?.content?.spec?.ports?.length) || UNSORTED_VALUE,
 };
 
 export const CellIPs = {
@@ -214,7 +219,7 @@ export const CellIPs = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.spec?.clusterIPs.length) - Number(b?.content?.spec?.clusterIPs.length) || -Infinity,
+    Number(a?.content?.spec?.clusterIPs.length) - Number(b?.content?.spec?.clusterIPs.length) || UNSORTED_VALUE,
 };
 
 export const CellEndpoints = {
@@ -243,7 +248,7 @@ export const CellEndpoints = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.subsets?.length) - Number(b?.content?.subsets?.length) || -Infinity,
+    Number(a?.content?.subsets?.length) - Number(b?.content?.subsets?.length) || UNSORTED_VALUE,
 };
 
 export const LoadBalancerIPs = {
@@ -262,8 +267,8 @@ export const LoadBalancerIPs = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.loadBalancer?.ingress.length) -
-      Number(b?.content?.status?.loadBalancer?.ingress.length) || -Infinity,
+    Number(a?.content?.status?.loadBalancer?.ingress?.length) -
+      Number(b?.content?.status?.loadBalancer?.ingress?.length) || UNSORTED_VALUE,
 };
 
 export const CellSecretType = {
@@ -277,5 +282,120 @@ export const CellSecretType = {
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
-  sorter: (a: K8sResource, b: K8sResource) => a?.content?.type?.localeCompare(b?.content?.type || '') || -Infinity,
+  sorter: (a: K8sResource, b: K8sResource) => a?.content?.type?.localeCompare(b?.content?.type || '') || UNSORTED_VALUE,
+};
+
+export const CellAddresses = {
+  title: 'Addresses',
+  dataIndex: 'content',
+  key: 'addresses',
+  width: '240px',
+  render: (content: any) =>
+    content?.status?.addresses ? (
+      content?.status?.addresses.map((data: {address: string; type: string}) => (
+        <div key={data.type + data.address} style={{padding: '2px 4px'}}>
+          {data.type}: {data.address}
+        </div>
+      ))
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.status?.addresses?.length) - Number(b?.content?.status?.addresses?.length) || UNSORTED_VALUE,
+};
+
+export const CellNodeOS = {
+  title: 'Operating System',
+  dataIndex: 'content',
+  key: 'nodeOS',
+  width: '288px',
+  render: (content: any) => (
+    <div>
+      {content?.status?.nodeInfo?.operatingSystem &&
+        content?.status?.nodeInfo?.osImage &&
+        content?.status?.nodeInfo?.architecture && (
+          <div>
+            <span>{content?.status?.nodeInfo?.operatingSystem}, </span>
+            <span>{content?.status?.nodeInfo?.architecture}, </span>
+            <span>{content?.status?.nodeInfo?.osImage}</span>
+          </div>
+        )}
+    </div>
+  ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.nodeInfo?.operatingSystem?.localeCompare(b?.content?.status?.nodeInfo?.operatingSystem || '') ||
+    UNSORTED_VALUE,
+};
+
+export const CellNodeKubelet = {
+  title: 'Kubelet',
+  dataIndex: 'content',
+  key: 'nodeKubelet',
+  width: '180px',
+  render: (content: any) => <div>{content?.status?.nodeInfo?.kubeletVersion || '-'}</div>,
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.nodeInfo?.kubeletVersion?.localeCompare(b?.content?.status?.nodeInfo?.kubeletVersion || '') ||
+    UNSORTED_VALUE,
+};
+
+export const CellNodeKernel = {
+  title: 'Kernel',
+  dataIndex: 'content',
+  key: 'nodeKernel',
+  width: '180px',
+  render: (content: any) => <div>{content?.status?.nodeInfo?.kernelVersion || '-'}</div>,
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.nodeInfo?.kernelVersion.localeCompare(b?.content?.status?.nodeInfo?.kernelVersion || '') ||
+    UNSORTED_VALUE,
+};
+
+export const CellNodeContainerRuntime = {
+  title: 'ContainerRuntime',
+  dataIndex: 'content',
+  key: 'containerRuntime',
+  width: '180px',
+  render: (content: any) => <div>{content?.status?.nodeInfo?.containerRuntimeVersion || '-'}</div>,
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.nodeInfo?.containerRuntimeVersion.localeCompare(
+      b?.content?.status?.nodeInfo?.containerRuntimeVersion || ''
+    ) || UNSORTED_VALUE,
+};
+
+export const CellNodeRoles = {
+  title: 'Roles',
+  dataIndex: 'content',
+  key: 'nodeRoles',
+  width: '210px',
+  render: (content: any) =>
+    content?.metadata?.labels ? (
+      <div>
+        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
+        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+          <span>{isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
+        )}
+        {!isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) &&
+          !isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
+      </div>
+    ) : (
+      <div>-</div>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.metadata?.labels['node-role.kubernetes.io/control-plane']?.localeCompare(
+      b?.content?.metadata?.labels['node-role.kubernetes.io/control-plane'] || ''
+    ) || UNSORTED_VALUE,
+};
+
+export const CellStorageCapacity = {
+  title: 'Capacity',
+  dataIndex: 'content',
+  key: 'storageCapacity',
+  width: '120px',
+  render: (content: any) =>
+    content?.status?.capacity?.storage ? (
+      <div>{convertBytesToGigabyte(memoryParser(content?.status?.capacity?.storage))}GB</div>
+    ) : (
+      <div>-</div>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    Number(a?.content?.status?.capacity?.storage) - Number(b?.content?.status?.capacity?.storage) || UNSORTED_VALUE,
 };

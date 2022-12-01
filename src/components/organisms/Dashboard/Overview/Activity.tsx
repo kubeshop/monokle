@@ -1,28 +1,56 @@
+import {useCallback} from 'react';
+
+import _ from 'lodash';
 import {DateTime} from 'luxon';
 
-import {ClusterEvent} from '@redux/services/clusterDashboard';
+import {K8sResource} from '@models/k8sresource';
+
+import {useAppSelector} from '@redux/hooks';
+
+import {timeAgo} from '@utils/timeAgo';
+
+import EventHandler from '@src/kindhandlers/EventHandler';
 
 import * as S from './Activity.styled';
 
-export const Activity = ({events}: {events: ClusterEvent[]}) => {
+export const Activity = () => {
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+
+  const getEvents = useCallback(() => {
+    return _.sortBy(
+      Object.values(resourceMap)
+        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+        .filter(
+          (resource: K8sResource) =>
+            resource.content.apiVersion === EventHandler.clusterApiVersion &&
+            resource.kind === EventHandler.kind &&
+            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
+              ? selectedNamespace === resource.namespace
+              : true)
+        )
+        .map(resource => ({
+          ...resource,
+          eventTime:
+            resource.content.eventTime || resource.content.deprecatedLastTimestamp || resource.content.lastTimestamp,
+        })),
+      'eventTime'
+    ).reverse();
+  }, [resourceMap, selectedNamespace]);
+
   return (
     <S.Container>
-      {events.map(event => (
-        <S.EventRow key={event.metadata.uid} $type={event.type}>
+      {getEvents().map(({content, eventTime}: K8sResource | any) => (
+        <S.EventRow key={content.metadata.uid} $type={content.type}>
           <S.TimeInfo>
-            <S.MessageTime>{DateTime.fromJSDate(event.lastTimestamp).toRelative()}</S.MessageTime>
+            <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
             <S.MessageCount>
-              <span>{event.count}</span>
+              <span>{content.deprecatedCount || content.count}</span>
               <span> times in the last </span>
               <span>
                 {
-                  DateTime.fromJSDate(event.lastTimestamp)
-                    .diff(DateTime.fromJSDate(event.metadata.creationTimestamp), [
-                      'hours',
-                      'minutes',
-                      'seconds',
-                      'milliseconds',
-                    ])
+                  DateTime.fromISO(content.deprecatedLastTimestamp || content.lastTimestamp)
+                    .diff(DateTime.fromISO(eventTime), ['hours', 'minutes', 'seconds', 'milliseconds'])
                     .toObject().hours
                 }
               </span>
@@ -30,12 +58,20 @@ export const Activity = ({events}: {events: ClusterEvent[]}) => {
             </S.MessageCount>
           </S.TimeInfo>
           <S.MessageInfo>
-            <S.MessageText>{event.message}</S.MessageText>
+            <S.MessageText>{content.message || content.note}</S.MessageText>
             <S.MessageHost>
-              {event.source.host || '- '}: {event.metadata.name}
+              <span>
+                {content?.deprecatedSource?.host ||
+                  content?.deprecatedSource?.component ||
+                  content?.source?.host ||
+                  content?.reportingController ||
+                  '- '}
+                :
+              </span>
+              <span> {content.metadata.name}</span>
             </S.MessageHost>
           </S.MessageInfo>
-          <S.NamespaceInfo>{event.metadata.namespace || '-'}</S.NamespaceInfo>
+          <S.NamespaceInfo>{content.metadata.namespace || '-'}</S.NamespaceInfo>
         </S.EventRow>
       ))}
     </S.Container>

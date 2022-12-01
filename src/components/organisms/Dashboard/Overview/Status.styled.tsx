@@ -48,8 +48,8 @@ export const KindRow = styled.div<{$type: string}>`
       (props.$type === 'resource' && Colors.geekblue7)
     };
     font-size: ${
-      (props.$type === 'warning' && '14px') ||
-      (props.$type === 'error' && '14px') ||
-      (props.$type === 'resource' && '18px')
+      (props.$type === 'warning' && '17px') ||
+      (props.$type === 'error' && '17px') ||
+      (props.$type === 'resource' && '21px')
     };`}
 `;
