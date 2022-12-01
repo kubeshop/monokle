@@ -7,7 +7,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setSelectedNamespace, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -40,13 +40,11 @@ const DashboardPane: React.FC = () => {
           children: menuItem.children?.filter((m: IMenu) => m.label.toLowerCase().includes(filterText.toLowerCase())),
         }))
         .filter((menuItem: IMenu) => menuItem.children && menuItem.children?.length > 0)
-        .filter((menuItem: IMenu) =>
-          menuItem.children
-            ? menuItem.children?.reduce(
-                (total: number, m: IMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-                0
-              ) > 0
-            : 0
+        .filter(
+          (menuItem: IMenu) =>
+            menuItem.children &&
+            menuItem.children?.reduce((total: number, m: IMenu) => total + (m.resourceCount ? m.resourceCount : 0), 0) >
+              0
         )
     );
   }, [filterText, menu]);
@@ -112,7 +110,8 @@ const DashboardPane: React.FC = () => {
 
   useEffect(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-  }, []);
+    dispatch(setSelectedNamespace('ALL'));
+  }, [dispatch]);
 
   const setActiveMenu = (menuItem: IMenu) => {
     dispatch(setActiveDashboardMenu(menuItem));
