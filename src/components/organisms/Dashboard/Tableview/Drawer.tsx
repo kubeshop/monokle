@@ -4,7 +4,7 @@ import {Popover} from 'antd';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {setSelectedResourceId} from '@redux/dashboard';
+import {setActiveTab, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
@@ -68,6 +68,10 @@ export const Drawer = () => {
       <S.TabsContainer>
         <S.Tabs
           defaultActiveKey={activeTab}
+          activeKey={activeTab}
+          onChange={(key: string) => {
+            dispatch(setActiveTab(key as any));
+          }}
           items={[
             {
               label: 'Info',

@@ -15,6 +15,8 @@ import InfoCircle from '@assets/InfoCircle.svg';
 
 import Colors from '@styles/Colors';
 
+import NodeHandler from '@src/kindhandlers/NodeHandler';
+
 import * as S from './Utilization.styled';
 
 export const Utilization = () => {
@@ -51,7 +53,10 @@ export const Utilization = () => {
   const getTotalCapacity = useCallback(() => {
     return Object.values(resourceMap)
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter((resource: K8sResource) => resource.content.apiVersion === 'v1' && resource.kind === 'Node')
+      .filter(
+        (resource: K8sResource) =>
+          resource.content.apiVersion === NodeHandler.clusterApiVersion && resource.kind === NodeHandler.kind
+      )
       .reduce((total: number, node: K8sResource) => {
         if (node.content?.status?.capacity && node.content?.status?.capacity['ephemeral-storage']) {
           return total + memoryParser(node.content?.status?.capacity['ephemeral-storage']);
