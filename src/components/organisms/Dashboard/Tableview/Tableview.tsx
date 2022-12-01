@@ -31,10 +31,6 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
     );
   }, [dataSource, filterText]);
 
-  useEffect(() => {
-    console.log('filteredDataSource', filteredDataSource);
-  }, [filteredDataSource]);
-
   return (
     <S.Container>
       <S.FilterContainer>

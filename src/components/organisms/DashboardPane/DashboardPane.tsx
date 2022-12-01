@@ -50,10 +50,6 @@ const DashboardPane: React.FC = () => {
   }, [filterText, menu]);
 
   useEffect(() => {
-    console.log(filteredMenu);
-  }, [filteredMenu]);
-
-  useEffect(() => {
     let tempMenu: IMenu[] = [
       {
         key: 'Overview',
