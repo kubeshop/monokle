@@ -17,8 +17,9 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, setPreviewingCluster, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
+import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
 
 import {Icon} from '@components/atoms';
@@ -47,6 +48,7 @@ const PageHeader = () => {
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
@@ -80,13 +82,17 @@ const PageHeader = () => {
     dispatch(toggleNotifications());
   };
 
-  const showGetStartingPage = () => {
+  const onClickLogoHandler = () => {
     if (!isStartProjectPaneVisible) {
       dispatch(toggleStartProjectPane());
     }
 
     if (previewingCluster) {
       dispatch(setPreviewingCluster(false));
+    }
+
+    if (isInClusterMode) {
+      stopPreview(dispatch);
     }
   };
 
@@ -177,7 +183,7 @@ const PageHeader = () => {
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
           <S.LogoContainer>
-            <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+            <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
           </S.LogoContainer>
 
           {activeProject && (
