@@ -24,7 +24,7 @@ const InstallDeploy: React.FC<IProps> = props => {
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
       <PrimaryButton
         loading={Boolean(applyingResource)}
-        type={isDropdownActive ? 'link' : 'default'}
+        type="link"
         size="small"
         onClick={applySelection}
         disabled={isDisabled}

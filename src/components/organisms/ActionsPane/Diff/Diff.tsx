@@ -17,12 +17,7 @@ const Diff: React.FC<IProps> = props => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <PrimaryButton
-        size="small"
-        type={isDropdownActive ? 'link' : 'primary'}
-        onClick={diffSelectedResource}
-        disabled={isDisabled}
-      >
+      <PrimaryButton size="small" type="link" onClick={diffSelectedResource} disabled={isDisabled}>
         Diff
       </PrimaryButton>
     </Tooltip>

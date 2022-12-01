@@ -2,6 +2,8 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles/colors';
+
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;

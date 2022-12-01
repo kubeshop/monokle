@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {AppBorders} from '@shared/styles/borders';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
