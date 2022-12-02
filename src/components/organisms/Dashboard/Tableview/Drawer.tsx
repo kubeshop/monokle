@@ -16,7 +16,7 @@ import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
 import {InfoTab} from './InfoTab';
 
-export const Drawer = () => {
+export const Drawer = ({indexPosition, totalResourceLength}: {indexPosition: number; totalResourceLength: number}) => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -106,10 +106,10 @@ export const Drawer = () => {
         />
         <S.TabsFooter>
           <S.NavigationButtons>
-            <S.NavigationButton>
+            <S.NavigationButton disabled={indexPosition < 1}>
               <S.LeftOutlined />
             </S.NavigationButton>
-            <S.NavigationButton>
+            <S.NavigationButton disabled={indexPosition >= totalResourceLength - 1}>
               <S.RightOutlined />
             </S.NavigationButton>
           </S.NavigationButtons>

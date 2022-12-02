@@ -5,7 +5,7 @@ import {Tag} from 'antd';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setActiveTab, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
@@ -343,6 +343,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       return;
     }
     selectForDashboard(resource);
+    dispatch(setActiveTab('Manifest'));
   };
 
   const selectForDashboard = (r: K8sResource) => {
@@ -367,8 +368,9 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
     <S.Row>
       <S.Title>{type === 'incoming' ? 'Incoming' : 'Outgoing'} Links</S.Title>
       <S.GreyContent>
-        {processedRefsWithKeys.map(({ref, key}) => (
-          <S.RefDiv key={key}>
+        {processedRefsWithKeys.map(({ref, key}, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <S.RefDiv key={index + ref.name + ref.type + key}>
             <RefLink
               isDisabled={isRefLinkDisabled(ref)}
               resourceRef={ref}

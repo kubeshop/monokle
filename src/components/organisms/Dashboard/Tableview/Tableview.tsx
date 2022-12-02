@@ -63,7 +63,10 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
             };
           }}
         />
-        <Drawer />
+        <Drawer
+          indexPosition={filteredDataSource.findIndex(r => r.id === selectedResourceId)}
+          totalResourceLength={filteredDataSource.length}
+        />
       </S.TableContainer>
     </S.Container>
   );
