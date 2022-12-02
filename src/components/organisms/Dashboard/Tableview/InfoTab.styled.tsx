@@ -21,8 +21,15 @@ export const Title = styled.div`
 
 export const BlueContent = styled.div`
   color: ${Colors.blue7};
+  font-size: 13px;
 `;
 
 export const GreyContent = styled.div`
   color: ${Colors.grey7};
+  font-size: 13px;
+`;
+
+export const RefDiv = styled.div`
+  display: block;
+  margin: 5px 0;
 `;

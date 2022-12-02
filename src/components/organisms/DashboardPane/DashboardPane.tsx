@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 
-import {ClusterOutlined, FundProjectionScreenOutlined} from '@ant-design/icons';
+import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
@@ -102,7 +102,7 @@ const DashboardPane: React.FC = () => {
     setMenu(tempMenu);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace]);
+  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
 
   useEffect(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -183,8 +183,7 @@ const DashboardPane: React.FC = () => {
               onClick={() => (parent.key === 'Overview' || parent.key === 'Node') && setActiveMenu(parent)}
             >
               {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
-              {parent.key === 'Node' && <ClusterOutlined style={{marginRight: '8px'}} />}
-              {parent.label}
+              <span>{parent.label}</span>
             </S.MainSection>
 
             {parent.children?.map((child: IMenu) =>

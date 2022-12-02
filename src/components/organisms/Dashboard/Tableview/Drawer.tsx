@@ -6,6 +6,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {setActiveTab, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {applyResource} from '@redux/thunks/applyResource';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
@@ -20,6 +22,8 @@ export const Drawer = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [localResource, setLocalResource] = useState<K8sResource | undefined>();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
+  const projectConfig = useAppSelector(currentConfigSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {
@@ -28,6 +32,21 @@ export const Drawer = () => {
     }
     setLocalResource(undefined);
   }, [resourceMap, selectedResourceId]);
+
+  const handleApplyResource = () => {
+    if (localResource && localResource.namespace && selectedResourceId && resourceMap[selectedResourceId]) {
+      applyResource(
+        selectedResourceId,
+        resourceMap,
+        {},
+        dispatch,
+        projectConfig,
+        kubeConfigContext,
+        {name: localResource.namespace, new: false},
+        {isClusterPreview: true}
+      );
+    }
+  };
 
   return (
     <S.Drawer
@@ -86,12 +105,24 @@ export const Drawer = () => {
           ]}
         />
         <S.TabsFooter>
-          <S.NavigationButton>
-            <S.LeftOutlined />
-          </S.NavigationButton>
-          <S.NavigationButton>
-            <S.RightOutlined />
-          </S.NavigationButton>
+          <S.NavigationButtons>
+            <S.NavigationButton>
+              <S.LeftOutlined />
+            </S.NavigationButton>
+            <S.NavigationButton>
+              <S.RightOutlined />
+            </S.NavigationButton>
+          </S.NavigationButtons>
+          <S.ActionButtons>
+            {activeTab === 'Manifest' && (
+              <S.ActionButton
+                disabled={!(localResource && localResource.namespace)}
+                onClick={() => handleApplyResource()}
+              >
+                Deploy
+              </S.ActionButton>
+            )}
+          </S.ActionButtons>
         </S.TabsFooter>
       </S.TabsContainer>
     </S.Drawer>

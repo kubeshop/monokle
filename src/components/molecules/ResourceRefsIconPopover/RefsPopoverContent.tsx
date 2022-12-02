@@ -17,7 +17,7 @@ import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';
 
-const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+export const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   if (ref.target?.type === 'file') {
     return 'File';
   }

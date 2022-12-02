@@ -11,7 +11,7 @@ const EventHandler: ResourceKindHandler = {
   isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'Events'],
   clusterApiVersion: 'events.k8s.io/v1',
-  validationSchemaPrefix: 'io.k8s.api.core.v1',
+  validationSchemaPrefix: 'io.k8s.api.events.v1beta1',
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);

@@ -78,7 +78,7 @@ export const Warning = styled.span`
 `;
 
 export const Resource = styled.span`
-  color: ${Colors.grey6};
+  color: ${Colors.grey7};
   font-weight: 700;
   font-size: 12px;
   border-radius: 100%;
