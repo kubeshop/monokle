@@ -6,13 +6,7 @@ import {PrimaryButton} from '@atoms';
 
 import {useDiff} from '@hooks/resourceHooks';
 
-type IProps = {
-  isDropdownActive?: boolean;
-};
-
-const Diff: React.FC<IProps> = props => {
-  const {isDropdownActive = false} = props;
-
+const Diff: React.FC = () => {
   const {diffSelectedResource, isDisabled, tooltipTitle} = useDiff();
 
   return (

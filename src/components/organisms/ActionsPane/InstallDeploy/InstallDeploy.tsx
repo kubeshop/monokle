@@ -10,11 +10,10 @@ import {useInstallDeploy} from '@hooks/resourceHooks';
 
 type IProps = {
   applySelection: () => void;
-  isDropdownActive?: boolean;
 };
 
 const InstallDeploy: React.FC<IProps> = props => {
-  const {applySelection, isDropdownActive = false} = props;
+  const {applySelection} = props;
 
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
 
