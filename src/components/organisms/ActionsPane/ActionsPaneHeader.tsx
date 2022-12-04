@@ -211,7 +211,6 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         <S.ButtonContainer>
           {showActionsDropdown ? (
             <>
-              <Diff />
               {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                 <>
                   <Scale />
@@ -219,12 +218,12 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                 </>
               )}
               <InstallDeploy applySelection={applySelection} />
+              <Diff />
             </>
           ) : (
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>
-                  <Diff />
                   {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                     <>
                       <Scale isDropdownActive />
@@ -232,6 +231,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                     </>
                   )}
                   <InstallDeploy applySelection={applySelection} />
+                  <Diff />
                 </S.DropdownActionContainer>
               }
               placement="bottomLeft"

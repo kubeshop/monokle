@@ -72,7 +72,7 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   }
 
   & .ant-tabs-tab {
-    padding: 2px 8px;
+    padding: 0px 16px;
     margin-left: 8px;
     background: black;
     border-radius: 5px 5px 0 0;
