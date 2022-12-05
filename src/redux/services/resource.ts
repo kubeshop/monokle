@@ -279,7 +279,10 @@ export function getNamespaces(resourceMap: ResourceMapType) {
     if (e.filePath.startsWith(CLUSTER_DIFF_PREFIX)) {
       return;
     }
-    if (e.namespace && !namespaces.includes(e.namespace)) {
+
+    if (e.kind === 'Namespace' && !namespaces.includes(e.name)) {
+      namespaces.push(e.name);
+    } else if (e.namespace && !namespaces.includes(e.namespace)) {
       namespaces.push(e.namespace);
     }
   });
