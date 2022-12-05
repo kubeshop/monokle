@@ -46,12 +46,9 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {AlertEnum, ExtraContentType} from '@monokle-desktop/shared/models/alert';
-import {NewVersionCode, Project} from '@monokle-desktop/shared/models/config';
-import {StepEnum} from '@monokle-desktop/shared/models/walkthrough';
-import {Size} from '@monokle-desktop/shared/models/window';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
-import {setMainProcessEnv} from '@monokle-desktop/shared/utils/env';
+import {ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared/models';
+import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import electronStore, {setMainProcessEnv} from '@monokle-desktop/shared/utils';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

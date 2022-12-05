@@ -3,7 +3,7 @@ import {shell} from 'electron';
 import React, {useCallback} from 'react';
 
 import {Feature} from '@monokle-desktop/shared/models';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {trackEvent} from '@monokle-desktop/shared/utils';
 
 import * as S from './GettingStartedCard.styled';
 
@@ -23,7 +23,7 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
   return (
     <S.Card key={id}>
       <S.ElipseWrapper>
-        <S.Icon className={icon} component={icon} />
+        <S.Icon component={icon} />
       </S.ElipseWrapper>
       <S.Name>{name}</S.Name>
       <S.Description>{description}</S.Description>
