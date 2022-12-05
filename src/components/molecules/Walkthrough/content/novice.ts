@@ -1,4 +1,4 @@
-import {WalkthroughContentProps} from '@monokle-desktop/shared/models/walkthrough';
+import {WalkthroughContentProps} from '@shared/models/walkthrough';
 
 export const noviceContent: WalkthroughContentProps['data'][] = [
   {

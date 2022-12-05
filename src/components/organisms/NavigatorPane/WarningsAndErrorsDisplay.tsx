@@ -10,11 +10,11 @@ import {filteredResourceSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
 
-import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
-import {ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ResourceRefType} from '@shared/models/k8sResource';
+import {isDefined} from '@shared/utils/filter';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 

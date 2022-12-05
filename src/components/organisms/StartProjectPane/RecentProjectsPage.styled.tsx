@@ -1,60 +1,11 @@
-import {Button} from 'antd';
-
 import styled from 'styled-components';
 
-import {AnimationDurations} from '@monokle-desktop/shared/styles/animations';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-
-export const ActionItem = styled.div<{$disabled?: boolean}>`
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  background: ${Colors.grey11};
-  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
-  border-radius: 4px;
-  padding: 24px;
-  color: ${({$disabled}) => ($disabled ? Colors.grey6 : 'inherit')};
-
-  &:hover {
-    transition: background ${AnimationDurations.base};
-    background: ${Colors.blue7};
-
-    & > div:nth-child(2) {
-      color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.whitePure)};
-    }
-  }
-`;
-
-export const ActionItemButton = styled(Button)`
-  display: flex;
-  padding: 0;
-  margin: 0;
-  align-items: end;
-  font-size: 13px;
-`;
-
-export const ActionItemContext = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-weight: 600;
-  font-size: 14px;
-`;
-
-export const ActionItemLogo = styled.img`
-  width: 4.5rem;
-  height: 4.5rem;
-  margin-bottom: 20px;
-`;
-
-export const ActionItemText = styled.div``;
+import {Colors} from '@shared/styles/colors';
 
 export const ActionItems = styled.div`
   min-height: 150px;
   display: grid;
-  grid-template-columns: repeat(4, 15rem);
+  grid-template-columns: repeat(3, 15rem);
   grid-column-gap: 1rem;
   justify-content: center;
   align-items: center;

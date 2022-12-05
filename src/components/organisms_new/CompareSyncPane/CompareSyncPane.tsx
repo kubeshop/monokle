@@ -16,16 +16,16 @@ import InspectionActionBar from './InspectionActionBar';
 import TransferButton from './TransferButton';
 
 const CompareSyncPane: React.FC = () => {
-  const isInspecting = useAppSelector(state => state.compare.current.inspect);
+  const inspection = useAppSelector(state => state.compare.current.inspect);
   const status = useAppSelector(state => selectCompareStatus(state.compare));
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
 
   return (
     <S.CompareSyncPaneContainer>
-      <TitleBar title="Sync & compare" description={isInspecting ? <InspectionActionBar /> : <CompareActionBar />} />
+      <TitleBar title="Sync & compare" description={!inspection ? <CompareActionBar /> : <InspectionActionBar />} />
 
-      <Row ref={containerRef} style={{margin: '5px 0px'}}>
+      <Row ref={containerRef}>
         <Col span={10}>
           <ResourceSetSelector side="left" />
         </Col>
@@ -39,15 +39,17 @@ const CompareSyncPane: React.FC = () => {
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.Content>
 
-      <S.ActionsRow>
-        <Col span={10}>
-          <TransferButton side="left" />
-        </Col>
-        <Col span={4} />
-        <Col span={10}>
-          <TransferButton side="right" />
-        </Col>
-      </S.ActionsRow>
+      {!inspection || inspection?.type === 'diff' ? (
+        <S.ActionsRow>
+          <Col span={10}>
+            <TransferButton side="left" />
+          </Col>
+          <Col span={4} />
+          <Col span={10}>
+            <TransferButton side="right" />
+          </Col>
+        </S.ActionsRow>
+      ) : null}
     </S.CompareSyncPaneContainer>
   );
 };

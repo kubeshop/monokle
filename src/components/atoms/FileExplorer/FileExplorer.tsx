@@ -6,7 +6,7 @@ import log from 'loglevel';
 
 import {getChannelName} from '@utils/ipc';
 
-import {FileExplorerOptions} from '@monokle-desktop/shared/models/fileExplorer';
+import {FileExplorerOptions} from '@shared/models/fileExplorer';
 
 export type FileExplorerProps = {
   isOpen: boolean;

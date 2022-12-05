@@ -4,7 +4,7 @@ import AntdIcon from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles';
 
 export const Card = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};

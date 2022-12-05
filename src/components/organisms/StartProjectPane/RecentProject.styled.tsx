@@ -2,8 +2,8 @@ import {DeleteOutlined as RawDeleteOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {AnimationDurations} from '@monokle-desktop/shared/styles/animations';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {AnimationDurations} from '@shared/styles/animations';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionsContainer = styled.div`
   position: absolute;

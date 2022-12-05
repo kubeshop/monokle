@@ -1,8 +1,8 @@
 import {selectK8sResource} from '@redux/reducers/main';
 
-import {ResourceFilterType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ResourceFilterType, ResourceMapType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizePatchPrefix from './KustomizePatchPrefix';
@@ -26,7 +26,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
-    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+    const kubeConfigPath = state.config.kubeConfig.path;
     return {
       resourceMap: state.main.resourceMap,
       resourceFilter: state.main.resourceFilter,

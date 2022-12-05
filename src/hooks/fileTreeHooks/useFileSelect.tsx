@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {stopPreview} from '@redux/services/preview';
 
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 export const useFileSelect = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -13,7 +13,11 @@ export const useFileSelect = () => {
 
   const onFileSelect = (selectedKeysValue: React.Key[], info: any) => {
     const nodeKey = info.node.parentKey || info.node.key;
-    const {isExcluded, isSupported, isTextExtension, isLine} = info.node;
+    const {isExcluded, isFolder, isSupported, isTextExtension, isLine} = info.node;
+
+    if (isFolder) {
+      return;
+    }
 
     if (!nodeKey.startsWith(fileOrFolderContainedInFilter || '')) {
       return;

@@ -46,9 +46,12 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {ExtraContentType, NewVersionCode, Project, Size, StepEnum} from '@monokle-desktop/shared/models';
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import electronStore, {setMainProcessEnv} from '@monokle-desktop/shared/utils';
+import {AlertEnum, ExtraContentType} from '@shared/models/alert';
+import {NewVersionCode, Project} from '@shared/models/config';
+import {StepEnum} from '@shared/models/walkthrough';
+import {Size} from '@shared/models/window';
+import electronStore from '@shared/utils/electronStore';
+import {setMainProcessEnv} from '@shared/utils/env';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
@@ -71,6 +74,7 @@ const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
+const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 
@@ -96,6 +100,7 @@ const App = () => {
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
+  const isSaveEditCommandModalVisible = useAppSelector(state => state.ui.saveEditCommandModal.isOpen);
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
@@ -443,6 +448,7 @@ const App = () => {
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isReplaceImageModalVisible && <ReplaceImageModal />}
+          {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
           {showReleaseNotes && (
             <Modal

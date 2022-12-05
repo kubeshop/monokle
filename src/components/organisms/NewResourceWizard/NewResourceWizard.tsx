@@ -2,32 +2,35 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Form, Input, Modal, Select} from 'antd';
+import {Checkbox, Form, Input, Modal, Select, TreeSelect} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
+import {JSONSchemaFaker} from 'json-schema-faker';
 import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors';
+import {getResourceKindSchema} from '@redux/services/schema';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
+import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {FileMapType} from '@monokle-desktop/shared/models/appState';
-import {FileEntry} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@shared/models/ui';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -84,6 +87,11 @@ const NewResourceWizard = () => {
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [exportFileName, setExportFileName] = useState<string | undefined>('');
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const k8sVersion = useAppSelector(state => state.config.k8sVersion);
+  const [generateRandom, setGenerateRandom] = useState<boolean>(false);
+
+  const treeData = useFolderTreeSelectData();
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -354,7 +362,29 @@ const NewResourceWizard = () => {
       formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
         ? resourceMap[formValues.selectedResourceId]
         : undefined;
-    const jsonTemplate = selectedResource?.content;
+
+    let jsonTemplate = selectedResource?.content;
+    if (generateRandom) {
+      const schema = getResourceKindSchema(formValues.kind, k8sVersion, String(userDataDir));
+      if (schema) {
+        JSONSchemaFaker.option('failOnInvalidTypes', false);
+        JSONSchemaFaker.option('failOnInvalidFormat', false);
+        JSONSchemaFaker.option('useExamplesValue', true);
+        JSONSchemaFaker.option('useDefaultValue', true);
+        JSONSchemaFaker.option('maxItems', 1);
+        JSONSchemaFaker.option('alwaysFakeOptionals', true);
+
+        const value: any = JSONSchemaFaker.generate(schema);
+        if (value) {
+          delete value.status;
+          delete value.metadata;
+          delete value.kind;
+          delete value.apiVersion;
+
+          jsonTemplate = value;
+        }
+      }
+    }
 
     const newResource = createUnsavedResource(
       {
@@ -397,22 +427,17 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
-    const folders: string[] = [];
+  const filesList: string[] = useMemo(() => {
     const files: string[] = [];
 
     Object.entries(fileMap).forEach(([key, value]) => {
-      if (value.children) {
-        folders.push(key.replace(path.sep, ''));
-      } else {
-        if (!value.isSupported || value.isExcluded) {
-          return;
-        }
-        files.push(key.replace(path.sep, ''));
+      if (value.children || !value.isSupported || value.isExcluded) {
+        return;
       }
+      files.push(key.replace(path.sep, ''));
     });
 
-    return [folders, files];
+    return files;
   }, [fileMap]);
 
   const renderFileSelectOptions = useCallback(() => {
@@ -422,14 +447,6 @@ const NewResourceWizard = () => {
       </Option>
     ));
   }, [filesList]);
-
-  const renderFolderSelectOptions = useCallback(() => {
-    return foldersList.map(folderName => (
-      <Option key={folderName} value={folderName}>
-        {folderName}
-      </Option>
-    ));
-  }, [foldersList]);
 
   const onSelectChange = () => {
     setInputValue('');
@@ -446,6 +463,10 @@ const NewResourceWizard = () => {
     },
     [newResourceWizardState.isOpen]
   );
+
+  const onGenerateRandomChange = (e: any) => {
+    setGenerateRandom(e.target.checked);
+  };
 
   return (
     <Modal
@@ -566,12 +587,18 @@ const NewResourceWizard = () => {
           </Form.Item>
         )}
 
+        <Form.Item name="generateRandomContent" label="Generate Random" initialValue={false}>
+          <Checkbox onChange={onGenerateRandomChange} checked={generateRandom === true}>
+            Generate random resource content based on schema definition.
+          </Checkbox>
+        </Form.Item>
+
         <Form.Item
           name="selectedResourceId"
           label="Select existing resource as template"
           initialValue={SELECT_OPTION_NONE}
         >
-          <Select showSearch>
+          <Select showSearch disabled={generateRandom}>
             <Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
               {SELECT_OPTION_NONE}
             </Option>
@@ -590,14 +617,17 @@ const NewResourceWizard = () => {
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
-            <StyledSelect
-              showSearch
-              onChange={(value: any) => setSelectedFolder(value)}
+            <TreeSelect
+              treeDefaultExpandedKeys={['<root>']}
+              dropdownMatchSelectWidth={false}
               value={selectedFolder}
+              onChange={value => setSelectedFolder(value)}
+              showSearch
+              treeDefaultExpandAll
+              treeData={[treeData]}
               style={{flex: 2}}
-            >
-              {renderFolderSelectOptions()}
-            </StyledSelect>
+              treeNodeLabelProp="label"
+            />
           )}
           {savingDestination === 'saveToFile' && (
             <StyledSelect

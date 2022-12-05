@@ -10,7 +10,7 @@ import {
   doesPathExist,
   downloadFile,
   getAllFiles,
-} from '@monokle-desktop/shared/utils/fileSystem';
+} from '@shared/utils/fileSystem';
 
 import downloadExtensionEntry from './downloadExtensionEntry';
 import {DownloadExtensionOptions} from './types';

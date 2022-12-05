@@ -5,8 +5,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
 import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
-import {SectionInstance} from '@monokle-desktop/shared/models/navigator';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {SectionInstance} from '@shared/models/navigator';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ImagesSectionNameDisplay.styled';
 

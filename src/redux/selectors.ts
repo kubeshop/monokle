@@ -5,20 +5,20 @@ import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {isDefined} from '@utils/filter';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {AppState} from '@monokle-desktop/shared/models/appState';
-import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppState} from '@shared/models/appState';
+import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
+import {HelmValuesFile} from '@shared/models/helm';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {RootState} from '@shared/models/rootState';
+import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
@@ -189,7 +189,7 @@ export const currentClusterAccessSelector = createSelector(
       return [];
     }
 
-    if (!config.projectConfig?.kubeConfig?.currentContext) {
+    if (!config?.kubeConfig?.currentContext) {
       return [];
     }
 
@@ -200,9 +200,6 @@ export const currentClusterAccessSelector = createSelector(
 export const kubeConfigPathSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.path) {
-      return config.projectConfig?.kubeConfig?.path;
-    }
     if (config.kubeConfig.path) {
       return config.kubeConfig.path;
     }
@@ -210,8 +207,18 @@ export const kubeConfigPathSelector = createSelector(
   }
 );
 
+export const kubeConfigPathValidSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    if (_.isBoolean(config.kubeConfig.isPathValid)) {
+      return Boolean(config.kubeConfig.isPathValid);
+    }
+    return false;
+  }
+);
+
 export const selectCurrentKubeConfig = (state: RootState) => {
-  return state.config.projectConfig?.kubeConfig ?? state.config.kubeConfig;
+  return state.config.kubeConfig;
 };
 
 export const registeredKindHandlersSelector = createSelector(

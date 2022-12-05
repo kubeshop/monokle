@@ -10,20 +10,20 @@ import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/const
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {createKubeClient} from '@utils/kubeclient';
-
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {CLUSTER_VIEW} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {ClusterAccess} from '@monokle-desktop/shared/models/config';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {CLUSTER_VIEW} from '@shared/constants/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ClusterAccess} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {createKubeClient} from '@shared/utils/kubeclient';
+import {trackEvent} from '@shared/utils/telemetry';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   return Promise.allSettled(
@@ -113,6 +113,9 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       }
     }
     trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
+
+    startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);
+
     return previewResult;
   } catch (e: any) {
     log.error(e);

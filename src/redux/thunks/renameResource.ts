@@ -3,8 +3,8 @@ import {stringify} from 'yaml';
 import {isIncomingRef} from '@redux/services/resourceRefs';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceMapType} from '@shared/models/appState';
 
 export const renameResource = (
   resourceId: string,

@@ -17,10 +17,10 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RefMapper, ResourceKindHandler} from '@monokle-desktop/shared/models/resourceKindHandler';
-import {getSubfolders, readFiles} from '@monokle-desktop/shared/utils/fileSystem';
-import {getStaticResourcePath} from '@monokle-desktop/shared/utils/resource';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RefMapper, ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {getSubfolders, readFiles} from '@shared/utils/fileSystem';
+import {getStaticResourcePath} from '@shared/utils/resource';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -216,14 +216,14 @@ export async function readSavedCrdKindHandlers(crdsDir: string) {
   }
 }
 
-export function registerCrdKindHandlers(crdContent: string, handlerPath?: string) {
+export function registerCrdKindHandlers(crdContent: string, handlerPath?: string, shouldReplace?: boolean) {
   const documents = parseAllYamlDocuments(crdContent);
   documents.forEach(doc => {
     const crd = doc.toJS({maxAliasCount: -1});
     if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
       const kindHandler = extractKindHandler(crd, handlerPath);
       if (kindHandler) {
-        registerKindHandler(kindHandler, false);
+        registerKindHandler(kindHandler, Boolean(shouldReplace));
       }
     }
   });

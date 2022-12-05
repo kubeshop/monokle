@@ -8,16 +8,16 @@ import {v4 as uuid} from 'uuid';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {RUN_PREVIEW_CONFIGURATION} from '@monokle-desktop/shared/constants/telemetry';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {CommandOptions} from '@monokle-desktop/shared/models/commands';
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@monokle-desktop/shared/models/config';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {RUN_PREVIEW_CONFIGURATION} from '@shared/constants/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {CommandOptions} from '@shared/models/commands';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {RootState} from '@shared/models/rootState';
+import {runCommandInMainThread} from '@shared/utils/commands';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart
@@ -35,12 +35,10 @@ export const runPreviewConfiguration = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
+  const kubeconfig = configState.kubeConfig.path;
   const k8sVersion = configState.projectConfig?.k8sVersion;
   const userDataDir = configState.userDataDir;
-  const currentContext =
-    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-    thunkAPI.getState().config.kubeConfig.currentContext;
+  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
   const policyPlugins = mainState.policies.plugins;
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;

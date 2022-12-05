@@ -2,9 +2,8 @@ import {monaco} from 'react-monaco-editor';
 
 import {createGlyphDecoration, createMarkdownString, createMarker} from '@molecules/Monaco/editorHelpers';
 
-import {isDefined} from '@utils/filter';
-
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {K8sResource} from '@shared/models/k8sResource';
+import {isDefined} from '@shared/utils/filter';
 
 import {GlyphDecorationTypes} from '../../editorConstants';
 

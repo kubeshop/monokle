@@ -16,13 +16,13 @@ import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/
 
 import {errorAlert, successAlert} from '@utils/alert';
 
-import {APPLY} from '@monokle-desktop/shared/constants/telemetry';
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {FileMapType, ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {APPLY} from '@shared/constants/telemetry';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {ProjectConfig} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource

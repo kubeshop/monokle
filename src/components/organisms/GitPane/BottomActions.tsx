@@ -14,7 +14,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
+import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
@@ -220,7 +220,7 @@ const BottomActions: React.FC = () => {
 
       {!isBranchOnRemote ? (
         <S.PublishBranchButton
-          disabled={!gitRepo.hasRemoteRepo}
+          disabled={!gitRepo.remoteRepo.exists}
           loading={gitLoading}
           icon={<DownOutlined />}
           placement="topLeft"
@@ -233,7 +233,7 @@ const BottomActions: React.FC = () => {
         </S.PublishBranchButton>
       ) : (
         <S.SyncButton
-          disabled={!gitRepo.hasRemoteRepo || isSyncDisabled}
+          disabled={!gitRepo.remoteRepo.exists || isSyncDisabled}
           loading={gitLoading}
           icon={<DownOutlined />}
           overlay={<Menu items={syncMenuItems} />}

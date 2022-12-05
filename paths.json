@@ -24,6 +24,8 @@
       "@assets": ["src/assets/"],
       "@utils/*": ["src/utils/*"],
       "@utils": ["src/utils/"],
+      "@shared": ["src/shared/"],
+      "@shared/*": ["src/shared/*"],
       "@src/*": ["src/*"],
       "@src": ["src/"],
       "@root/*": ["./*"],

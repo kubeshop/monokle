@@ -4,7 +4,7 @@ import {createSelector} from 'reselect';
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 
-import {isDefined} from '@utils/filter';
+import {getApiVersionGroup} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -16,9 +16,10 @@ import {
   PartialResourceSet,
   ResourceComparison,
   TransferDirection,
-} from '@monokle-desktop/shared/models/compare';
-import {SavedCommand} from '@monokle-desktop/shared/models/config';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+} from '@shared/models/compare';
+import {SavedCommand} from '@shared/models/config';
+import {RootState} from '@shared/models/rootState';
+import {isDefined} from '@shared/utils/filter';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
@@ -189,12 +190,22 @@ export const selectComparisonListItems = createSelector(
     const rightTransferable = canTransfer(rightType, leftType);
 
     const groups = groupBy(comparisons, r => {
-      if (r.isMatch) return r.left.kind;
-      return r.left ? r.left.kind : r.right.kind;
+      if (r.isMatch) return `${r.left.kind}--${getApiVersionGroup(r.left)}`;
+      return r.left
+        ? `${r.left.kind}--${getApiVersionGroup(r.left)}`
+        : `${r.right.kind}--${getApiVersionGroup(r.right)}`;
     });
 
-    Object.entries(groups).forEach(([kind, comps]) => {
-      result.push({type: 'header', kind, count: comps.length});
+    Object.entries(groups).forEach(([key, comps]) => {
+      const [kind, apiVersionGroup] = key.split('--');
+
+      result.push({
+        type: 'header',
+        kind,
+        apiVersionGroup,
+        countLeft: comps.filter(c => c.left).length,
+        countRight: comps.filter(c => c.right).length,
+      });
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
@@ -203,12 +214,14 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
+            leftNamespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace : undefined,
+            rightNamespace: isNamespaced ? comparison.right.namespace ?? defaultNamespace : undefined,
             leftActive: true,
             rightActive: true,
             leftTransferable: leftTransferable && comparison.isDifferent,
             rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
+            kind,
           });
         } else {
           result.push({
@@ -216,13 +229,14 @@ export const selectComparisonListItems = createSelector(
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
             namespace: isNamespaced
-              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace
               : undefined,
             leftActive: isDefined(comparison.left),
             rightActive: isDefined(comparison.right),
             leftTransferable: leftTransferable && isDefined(comparison.left),
             rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
+            kind,
           });
         }
       });

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {Icon as BaseIcon} from '@atoms';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Card = styled(AntdCard)`
   border: 2px solid #31393c;

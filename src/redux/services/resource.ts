@@ -28,7 +28,6 @@ import {clearRefNodesCache, isUnsatisfiedRef, processRefs, refMapperMatchesKind}
 // import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
-import {createKubeClient} from '@utils/kubeclient';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
@@ -40,10 +39,11 @@ import {
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@monokle-desktop/shared/models/appState';
-import {ClusterAccess} from '@monokle-desktop/shared/models/config';
-import {K8sResource, RefPosition, ResourceRefType} from '@monokle-desktop/shared/models/k8sResource';
-import {Policy} from '@monokle-desktop/shared/models/policy';
+import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@shared/models/appState';
+import {ClusterAccess} from '@shared/models/config';
+import {K8sResource, RefPosition, ResourceRefType} from '@shared/models/k8sResource';
+import {Policy} from '@shared/models/policy';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 import {validatePolicies, validateResource} from './validation';
 
@@ -349,26 +349,6 @@ export function createResourceName(filePath: string, content: any, kind: string)
   }
 
   return filePath;
-}
-
-/**
- * Adds a file ref to the specified file to the specified resource
- */
-
-export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string, fileMap: FileMapType) {
-  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
-  resource.refs = resource.refs || [];
-  const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
-
-  resource.refs.push({
-    type: refType,
-    name: refName,
-    position: refNode?.getNodePosition(),
-    target: {
-      type: 'file',
-      filePath,
-    },
-  });
 }
 
 /**

@@ -37,14 +37,14 @@ import {ContextMenu, Dots} from '@atoms';
 
 import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {ItemCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceMapType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

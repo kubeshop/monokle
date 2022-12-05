@@ -9,18 +9,18 @@ import {kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {execute} from '@utils/commands';
-import {createKubectlApplyCommand} from '@utils/commands/kubectl';
-import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {ResourceSet} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
-import {kubeConfigContextSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceSet} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {execute} from '@shared/utils/commands';
+import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
+import {createKubeClient} from '@shared/utils/kubeclient';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 type Type = ResourceSet['type'];
 

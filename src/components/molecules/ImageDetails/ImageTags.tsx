@@ -9,7 +9,7 @@ import {ImageTagTooltip} from '@constants/tooltips';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-import {DockerHubImageTags} from '@monokle-desktop/shared/models/image';
+import {DockerHubImageTags} from '@shared/models/image';
 
 import * as S from './ImageTags.styled';
 

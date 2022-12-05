@@ -9,8 +9,8 @@ import {parseYamlDocument} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
@@ -35,16 +35,30 @@ export function createUnsavedResource(
   let newResourceContent: any;
 
   if (jsonTemplate) {
-    newResourceContent = {
-      ...jsonTemplate,
-      apiVersion: input.apiVersion,
-      kind: input.kind,
-      metadata: {
-        ...(jsonTemplate.metadata || {}),
-        name: input.name,
-        namespace: input.namespace,
-      },
-    };
+    if (jsonTemplate.kind && jsonTemplate.apiVersion) {
+      newResourceContent = {
+        ...jsonTemplate,
+        apiVersion: input.apiVersion,
+        kind: input.kind,
+        metadata: {
+          ...(jsonTemplate.metadata || {}),
+          name: input.name,
+          namespace: input.namespace,
+        },
+      };
+    } else {
+      newResourceContent = {
+        apiVersion: input.apiVersion,
+        kind: input.kind,
+        metadata: {
+          ...(jsonTemplate.metadata || {}),
+          name: input.name,
+          namespace: input.namespace,
+        },
+        ...jsonTemplate,
+      };
+    }
+
     newResourceText = stringify(newResourceContent);
   } else {
     newResourceText = createDefaultResourceText(input);

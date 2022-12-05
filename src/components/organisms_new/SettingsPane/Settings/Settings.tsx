@@ -38,9 +38,9 @@ import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {K8S_VERSIONS} from '@monokle-desktop/shared/constants/k8s';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {K8S_VERSIONS} from '@shared/constants/k8s';
+import {ProjectConfig} from '@shared/models/config';
 
 import * as S from './Settings.styled';
 

@@ -8,11 +8,19 @@ import {
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, FileTreePane, GettingStarted, GitPane, SearchPane, ValidationPane} from '@organisms';
+import {
+  BottomPaneManager,
+  DashboardPane,
+  FileTreePane,
+  GettingStarted,
+  GitPane,
+  SearchPane,
+  ValidationPane,
+} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
-import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@monokle-desktop/shared/models/ui';
 import {ActivityType, Icon} from '@monokle/components';
+import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
 import {SettingsPane} from '../SettingsPane';
@@ -68,6 +76,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
     component: <SettingsPane />,
+    useBadge: () => undefined,
+  },
+  {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="search" style={{fontSize: 16}} />,
+    component: <DashboardPane />,
     useBadge: () => undefined,
   },
   {

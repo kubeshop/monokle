@@ -2,7 +2,7 @@ import {Dropdown, Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 export const BottomActionsContainer = styled.div`
   height: 60px;

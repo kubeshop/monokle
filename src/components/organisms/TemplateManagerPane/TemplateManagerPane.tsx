@@ -16,8 +16,8 @@ import {TitleBar} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {AnyTemplate} from '@monokle-desktop/shared/models/template';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {AnyTemplate} from '@shared/models/template';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';

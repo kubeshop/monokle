@@ -2,15 +2,15 @@ import os from 'os';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {AlertState} from '@monokle-desktop/shared/models/alert';
-import {AppState} from '@monokle-desktop/shared/models/appState';
-import {AppConfig, NewVersionCode} from '@monokle-desktop/shared/models/config';
-import {ExtensionState} from '@monokle-desktop/shared/models/extension';
-import {NavigatorState} from '@monokle-desktop/shared/models/navigator';
-import {TerminalState} from '@monokle-desktop/shared/models/terminal';
-import {PaneConfiguration, UiState} from '@monokle-desktop/shared/models/ui';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {AlertState} from '@shared/models/alert';
+import {AppState} from '@shared/models/appState';
+import {AppConfig, NewVersionCode} from '@shared/models/config';
+import {ExtensionState} from '@shared/models/extension';
+import {NavigatorState} from '@shared/models/navigator';
+import {TerminalState} from '@shared/models/terminal';
+import {PaneConfiguration, UiState} from '@shared/models/ui';
+import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
   isRehydrating: false,
@@ -65,6 +65,7 @@ const initialAppState: AppState = {
     currentMatch: null,
   },
   lastChangedLine: 0,
+  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -83,6 +84,7 @@ const initialAppConfigState: AppConfig = {
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
     allowEditInClusterMode: electronStore.get('appConfig.settings.allowEditInClusterMode', true),
   },
+  fileExplorerSortOrder: electronStore.get('appConfig.fileExplorerSortOrder') || 'folders',
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
@@ -158,6 +160,9 @@ const initialUiState: UiState = {
   renameResourceModal: {
     isOpen: false,
     resourceId: '',
+  },
+  saveEditCommandModal: {
+    isOpen: false,
   },
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {

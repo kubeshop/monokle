@@ -11,7 +11,7 @@ import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
 import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
 import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
+import {AppDispatch} from '@shared/models/appDispatch';
 import {
   FileMapType,
   HelmChartMapType,
@@ -20,9 +20,9 @@ import {
   ImagesListType,
   ResourceFilterType,
   ResourceMapType,
-} from '@monokle-desktop/shared/models/appState';
-import {CurrentMatch} from '@monokle-desktop/shared/models/fileEntry';
-import {K8sResource, ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
+} from '@shared/models/appState';
+import {CurrentMatch} from '@shared/models/fileEntry';
+import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 

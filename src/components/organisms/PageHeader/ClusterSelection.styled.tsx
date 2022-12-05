@@ -11,10 +11,10 @@ import {isBoolean} from 'lodash';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {PreviewType} from '@monokle-desktop/shared/models/appState';
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {Device} from '@monokle-desktop/shared/styles/device';
+import {PreviewType} from '@shared/models/appState';
+import {ClusterColors} from '@shared/models/cluster';
+import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 interface RawButtonProps extends ButtonProps {
   $kubeConfigContextColor?: ClusterColors;

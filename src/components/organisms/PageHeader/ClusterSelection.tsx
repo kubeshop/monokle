@@ -17,17 +17,17 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 
 import {sleep} from '@utils/sleep';
 
-import {hotkeys} from '@monokle-desktop/shared/constants/hotkeys';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {HighlightItems} from '@monokle-desktop/shared/models/ui';
-import {Size} from '@monokle-desktop/shared/models/window';
-import {defineHotkey} from '@monokle-desktop/shared/utils/hotkey';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {K8sResource} from '@shared/models/k8sResource';
+import {HighlightItems} from '@shared/models/ui';
+import {Size} from '@shared/models/window';
+import {defineHotkey} from '@shared/utils/hotkey';
 import {
   activeProjectSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathValidSelector,
-} from '@monokle-desktop/shared/utils/selectors';
+} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 
@@ -47,6 +47,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const previewConfigurationId = useAppSelector(state => state.main.previewConfigurationId);
   const previewCommandId = useAppSelector(state => state.main.previewCommandId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -191,7 +192,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   return (
     <S.ClusterContainer id="ClusterContainer">
-      {activeProject && (
+      {(activeProject || previewingCluster) && (
         <>
           {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
             <S.PreviewMode
@@ -250,7 +251,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         </>
       )}
       <>
-        {isKubeConfigPathValid && activeProject && (
+        {isKubeConfigPathValid && (activeProject || previewingCluster) && (
           <S.Button
             className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
             disabled={isPreviewLoading && isAccessLoading}
@@ -264,6 +265,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
           </S.Button>
         )}
+
         {!isPreviewLoading && isInPreviewMode && (
           <S.ExitButton
             onClick={onClickExit}

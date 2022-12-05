@@ -4,7 +4,13 @@ import {LeftCircleFilled, RightCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors, FontColors} from '@monokle-desktop/shared/styles/colors';
+import {Colors, FontColors} from '@shared/styles/colors';
+
+export const ApiVersionGroup = styled.span`
+  font-size: 12px;
+  color: ${Colors.grey7};
+  margin-left: 6px;
+`;
 
 export const HeaderRow = styled(Row)`
   height: 34px;
@@ -103,4 +109,10 @@ export const ResourceNamespace = styled((props: Props) => <Tag {...props} />)`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+export const ResourceNamespacePlaceholder = styled.div`
+  height: 22px;
+  width: 72px;
+  margin-right: 8px;
 `;

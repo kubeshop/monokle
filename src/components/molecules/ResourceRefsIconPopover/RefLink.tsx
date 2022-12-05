@@ -4,8 +4,8 @@ import path from 'path';
 
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {ResourceMapType} from '@monokle-desktop/shared/models/appState';
-import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
+import {ResourceMapType} from '@shared/models/appState';
+import {ResourceRef} from '@shared/models/k8sResource';
 
 import RefIcon from './RefIcon';
 import * as S from './RefLink.styled';

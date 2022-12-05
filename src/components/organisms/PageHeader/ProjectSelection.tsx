@@ -35,8 +35,8 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {getRelativeDate} from '@utils';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {Project} from '@monokle-desktop/shared/models/config';
-import {activeProjectSelector, unsavedResourcesSelector} from '@monokle-desktop/shared/utils/selectors';
+import {Project} from '@shared/models/config';
+import {activeProjectSelector, unsavedResourcesSelector} from '@shared/utils/selectors';
 
 import * as S from './ProjectSelection.styled';
 
@@ -47,7 +47,6 @@ const ProjectSelection = () => {
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects = useAppSelector(state => state.config.projects);
-  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -94,7 +93,6 @@ const ProjectSelection = () => {
       const confirmed = ipcRenderer.sendSync('confirm-action', {
         unsavedResourceCount,
         action: 'change the active project',
-        terminalsCount: Object.keys(terminalsMap).length,
       });
 
       if (!confirmed) {

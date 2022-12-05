@@ -2,14 +2,13 @@ import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
-import {isDefined} from '@utils/filter';
-
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@monokle-desktop/shared/models/appState';
-import {HelmPreviewConfiguration} from '@monokle-desktop/shared/models/config';
-import {HelmChart, HelmTemplate, HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
+import {HelmPreviewConfiguration} from '@shared/models/config';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@shared/models/helm';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';
@@ -222,7 +221,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+      const kubeConfigPath = state.config.kubeConfig.path;
       return {
         helmValuesMap: state.main.helmValuesMap,
         isInClusterMode: kubeConfigPath
@@ -316,7 +315,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       previewConfigurationsSectionBlueprint.id,
     ],
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+      const kubeConfigPath = state.config.kubeConfig.path;
       return {
         isInClusterMode: kubeConfigPath
           ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))

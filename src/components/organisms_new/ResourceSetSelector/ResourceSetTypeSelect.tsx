@@ -8,8 +8,8 @@ import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
-import {ResourceSet} from '@monokle-desktop/shared/models/compare';
-import {kubeConfigPathValidSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ResourceSet} from '@shared/models/compare';
+import {kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceSetSelectColor.styled';
 
@@ -32,7 +32,11 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
 
   const handleSelectType = useCallback(
     (type: ResourceSet['type']) => {
-      dispatch(resourceSetSelected({side, value: {type}}));
+      if (type === 'local') {
+        dispatch(resourceSetSelected({side, value: {type, folder: '<root>'}}));
+      } else {
+        dispatch(resourceSetSelected({side, value: {type}}));
+      }
     },
     [dispatch, side]
   );

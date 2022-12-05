@@ -1,33 +1,21 @@
 import fs from 'fs';
 import {flatten, sortBy} from 'lodash';
 import log from 'loglevel';
-import path from 'path';
+import path, {sep} from 'path';
 import invariant from 'tiny-invariant';
 import {v4 as uuid} from 'uuid';
 
-import {
-  CLUSTER_DIFF_PREFIX,
-  ERROR_MSG_FALLBACK,
-  PREVIEW_PREFIX,
-  YAML_DOCUMENT_DELIMITER_NEW_LINE,
-} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
-import {
-  createHelmInstallCommand,
-  createHelmTemplateCommand,
-  hasCommandFailed,
-  runCommandInMainThread,
-} from '@utils/commands';
-import {isDefined} from '@utils/filter';
 import {buildHelmCommand} from '@utils/helm';
-import {createKubeClient} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {CommandOptions} from '@monokle-desktop/shared/models/commands';
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {CommandOptions} from '@shared/models/commands';
 import {
   ClusterResourceSet,
   CommandResourceSet,
@@ -35,10 +23,19 @@ import {
   GitResourceSet,
   HelmResourceSet,
   KustomizeResourceSet,
+  LocalResourceSet,
   ResourceSet,
-} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
-import {RootState} from '@monokle-desktop/shared/models/rootState';
+} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {
+  createHelmInstallCommand,
+  createHelmTemplateCommand,
+  hasCommandFailed,
+  runCommandInMainThread,
+} from '@shared/utils/commands';
+import {isDefined} from '@shared/utils/filter';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 import getClusterObjects from '../getClusterObjects';
 import {isKustomizationResource} from '../kustomize';
@@ -49,7 +46,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 
   switch (type) {
     case 'local':
-      return fetchLocalResources(state);
+      return fetchLocalResources(state, options);
     case 'cluster':
       return fetchResourcesFromCluster(state, options);
     case 'helm':
@@ -67,6 +64,17 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
     default:
       throw new Error('Not yet implemented');
   }
+}
+
+function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sResource[] {
+  return Object.values(state.main.resourceMap).filter(
+    resource =>
+      resource.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`) &&
+      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
+      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+      !resource.name.startsWith('Patch:') &&
+      !isKustomizationResource(resource)
+  );
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
@@ -105,16 +113,6 @@ async function fetchCommandResources(state: RootState, options: CommandResourceS
 
   const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
   return resources;
-}
-
-function fetchLocalResources(state: RootState): K8sResource[] {
-  return Object.values(state.main.resourceMap).filter(
-    resource =>
-      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
-      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-      !resource.name.startsWith('Patch:') &&
-      !isKustomizationResource(resource)
-  );
 }
 
 async function fetchResourcesFromCluster(state: RootState, options: ClusterResourceSet): Promise<K8sResource[]> {

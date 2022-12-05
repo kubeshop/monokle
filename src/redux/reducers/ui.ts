@@ -11,8 +11,8 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {SettingsPanel} from '@monokle-desktop/shared/models/config';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {SavedCommand, SettingsPanel} from '@shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -24,9 +24,9 @@ import {
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
-} from '@monokle-desktop/shared/models/ui';
-import {WalkthroughCollection} from '@monokle-desktop/shared/models/walkthrough';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+} from '@shared/models/ui';
+import {WalkthroughCollection} from '@shared/models/walkthrough';
+import electronStore from '@shared/utils/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -175,6 +175,17 @@ export const uiSlice = createSlice({
         resourcesIds: action.payload,
       };
     },
+    closeSaveEditCommandModal: (state: Draft<UiState>) => {
+      state.saveEditCommandModal = {isOpen: false};
+    },
+    openSaveEditCommandModal: (state: Draft<UiState>, action: PayloadAction<{command?: SavedCommand}>) => {
+      state.saveEditCommandModal.isOpen = true;
+
+      if (action.payload.command) {
+        state.saveEditCommandModal.command = action.payload.command;
+      }
+    },
+
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
@@ -251,6 +262,9 @@ export const uiSlice = createSlice({
     },
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
       state.kubeConfigBrowseSettings = {isOpen: true};
+    },
+    setPreviewingCluster: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.previewingCluster = action.payload;
     },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
@@ -359,6 +373,7 @@ export const {
   closeRenameEntityModal,
   closeRenameResourceModal,
   closeReplaceImageModal,
+  closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -376,6 +391,7 @@ export const {
   openRenameEntityModal,
   openRenameResourceModal,
   openReplaceImageModal,
+  openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,
@@ -387,6 +403,7 @@ export const {
   setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
+  setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
   toggleExpandActionsPaneFooter,

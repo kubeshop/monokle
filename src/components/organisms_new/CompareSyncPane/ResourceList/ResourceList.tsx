@@ -8,14 +8,17 @@ import {groupBy} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
+import {getApiVersionGroup} from '@utils/resources';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceSetData} from '@monokle-desktop/shared/models/compare';
+import {ResourceSetData} from '@shared/models/compare';
 
 import * as S from './ResourceList.styled';
 
 type HeaderItem = {
   type: 'header';
+  apiVersionGroup: string;
   kind: string;
   count: number;
 };
@@ -25,6 +28,7 @@ type ResourceItem = {
   id: string;
   namespace?: string;
   name: string;
+  kind: string;
 };
 
 type Props = {
@@ -34,11 +38,11 @@ type Props = {
 
 const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
   const rows = useMemo(() => {
-    const groups = groupBy(data.resources, r => r.kind);
+    const groups = groupBy(data.resources, r => `${r.kind}--${getApiVersionGroup(r)}`);
 
     const sortedGroups = Object.entries(groups).sort((a, b) => {
-      const kindA = a[0];
-      const kindB = b[0];
+      const kindA = a[0].split('--')[0];
+      const kindB = b[0].split('--')[0];
 
       const kindHandlerA = getResourceKindHandler(kindA);
       const kindHandlerB = getResourceKindHandler(kindB);
@@ -62,12 +66,13 @@ const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
 
     const result: Array<HeaderItem | ResourceItem> = [];
 
-    for (const [kind, resources] of sortedGroups) {
-      result.push({type: 'header', kind, count: resources.length});
+    for (const [key, resources] of sortedGroups) {
+      const [kind, apiVersionGroup] = key.split('--');
+      result.push({type: 'header', kind, count: resources.length, apiVersionGroup});
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       for (const {id, name, namespace} of resources) {
-        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace ?? 'default' : undefined});
+        result.push({type: 'resource', id, name, namespace: isNamespaced ? namespace : undefined, kind});
       }
     }
 
@@ -78,11 +83,12 @@ const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
     <S.ResourceListDiv>
       {rows.map((row, index) => {
         if (row.type === 'header') {
-          const {kind, count: resourceCount} = row;
+          const {kind, count: resourceCount, apiVersionGroup} = row;
           return (
-            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={kind}>
+            <S.HeaderDiv $index={index} $showCheckbox={showCheckbox} key={`${kind}--${apiVersionGroup}`}>
               <S.Header>
-                {kind} <S.ResourceCount>{resourceCount}</S.ResourceCount>
+                {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+                <S.ResourceCount>{resourceCount}</S.ResourceCount>
               </S.Header>
             </S.HeaderDiv>
           );
@@ -92,10 +98,12 @@ const ResourceList: React.FC<Props> = ({data, showCheckbox = false}) => {
         return (
           <S.ResourceDiv key={id}>
             {showCheckbox ? <Checkbox style={{marginRight: 16}} disabled /> : null}
-            {namespace && (
+            {namespace ? (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={namespace}>
                 <S.ResourceNamespace>{namespace}</S.ResourceNamespace>
               </Tooltip>
+            ) : (
+              row.kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
             )}
 
             <S.ResourceName>{name}</S.ResourceName>

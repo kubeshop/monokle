@@ -10,8 +10,8 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {ProjectConfig} from '@monokle-desktop/shared/models/config';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {ProjectConfig} from '@shared/models/config';
 
 import {Settings} from '../Settings/Settings';
 

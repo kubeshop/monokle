@@ -42,11 +42,11 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {ResourceFilterType} from '@monokle-desktop/shared/models/appState';
-import {ResourceRef} from '@monokle-desktop/shared/models/k8sResource';
-import {NewResourceWizardInput} from '@monokle-desktop/shared/models/ui';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceRef} from '@shared/models/k8sResource';
+import {NewResourceWizardInput} from '@shared/models/ui';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';
@@ -111,9 +111,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
   const [isEditorMounted, setEditorMounted] = useState(false);
 
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [editor, setEditor] = useState(editorRef.current);
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const selectedResource = useMemo(() => {
     return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
@@ -215,7 +214,6 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
 
-    editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
@@ -244,7 +242,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   useEffect(() => {
-    if (!firstCodeLoadedOnEditor && code) {
+    if (!firstCodeLoadedOnEditor) {
       setFirstCodeLoadedOnEditor(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -5,17 +5,17 @@ import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@monokle-desktop/shared/constants/app';
-import {DEFAULT_PLUGINS} from '@monokle-desktop/shared/constants/plugin';
-import {DISABLED_TELEMETRY} from '@monokle-desktop/shared/constants/telemetry';
-import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@monokle-desktop/shared/constants/urls';
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import type {AlertType} from '@monokle-desktop/shared/models/alert';
-import {NewVersionCode} from '@monokle-desktop/shared/models/config';
-import {StartupFlags} from '@monokle-desktop/shared/models/startupFlag';
-import utilsElectronStore from '@monokle-desktop/shared/utils/electronStore';
-import {disableSegment, enableSegment, getSegmentClient} from '@monokle-desktop/shared/utils/segment';
-import {activeProjectSelector, unsavedResourcesSelector} from '@monokle-desktop/shared/utils/selectors';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@shared/constants/app';
+import {DEFAULT_PLUGINS} from '@shared/constants/plugin';
+import {DISABLED_TELEMETRY} from '@shared/constants/telemetry';
+import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@shared/constants/urls';
+import {AlertEnum} from '@shared/models/alert';
+import type {AlertType} from '@shared/models/alert';
+import {NewVersionCode} from '@shared/models/config';
+import {StartupFlags} from '@shared/models/startupFlag';
+import utilsElectronStore from '@shared/utils/electronStore';
+import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
+import {activeProjectSelector, unsavedResourcesSelector} from '@shared/utils/selectors';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -83,7 +83,6 @@ export const createWindow = (givenPath?: string) => {
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
   let unsavedResourceCount = 0;
-  let terminalsCount = 0;
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -145,7 +144,6 @@ export const createWindow = (givenPath?: string) => {
       let projectName = activeProjectSelector(storeState)?.name;
       setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
-      terminalsCount = Object.keys(storeState.terminal.terminalsMap).length;
       const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {
@@ -254,7 +252,6 @@ export const createWindow = (givenPath?: string) => {
     const confirmed = askActionConfirmation({
       unsavedResourceCount,
       action: 'close this window',
-      terminalsCount,
     });
 
     if (!confirmed) {

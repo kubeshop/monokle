@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './styled';
 

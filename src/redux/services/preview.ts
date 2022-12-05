@@ -9,9 +9,10 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {PreviewType} from '@monokle-desktop/shared/models/appState';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {PreviewType} from '@shared/models/appState';
 
+import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
@@ -52,6 +53,7 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
+  disconnectFromCluster();
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
 };

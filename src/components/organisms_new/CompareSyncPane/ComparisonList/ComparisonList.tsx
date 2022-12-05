@@ -11,7 +11,7 @@ import {
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@monokle-desktop/shared/models/compare';
+import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@shared/models/compare';
 
 import * as S from './ComparisonList.styled';
 
@@ -31,12 +31,12 @@ const ComparisonList: React.FC = () => {
   );
 };
 
-function HeaderItem({kind, count}: HeaderItemProps) {
+function HeaderItem({kind, countLeft, countRight, apiVersionGroup}: HeaderItemProps) {
   return (
     <S.HeaderRow key={kind}>
       <Col span={10}>
         <S.Title useCheckboxOffset>
-          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+          {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup> <S.ResourceCount>{countLeft}</S.ResourceCount>
         </S.Title>
       </Col>
 
@@ -44,7 +44,8 @@ function HeaderItem({kind, count}: HeaderItemProps) {
 
       <Col span={10}>
         <S.Title>
-          {kind} <S.ResourceCount>{count}</S.ResourceCount>
+          {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
+          <S.ResourceCount>{countRight}</S.ResourceCount>
         </S.Title>
       </Col>
     </S.HeaderRow>
@@ -55,11 +56,14 @@ function ComparisonItem({
   id,
   namespace,
   name,
+  kind,
   leftActive,
   rightActive,
   leftTransferable,
   rightTransferable,
   canDiff,
+  rightNamespace,
+  leftNamespace,
 }: ComparisonItemProps) {
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
@@ -85,7 +89,11 @@ function ComparisonItem({
       <Col span={10}>
         <S.ResourceDiv>
           <Checkbox style={{marginRight: 16}} checked={selected} onChange={handleSelect} />
-          {namespace && <S.ResourceNamespace $isActive={leftActive}>{namespace}</S.ResourceNamespace>}
+          {leftNamespace || namespace ? (
+            <S.ResourceNamespace $isActive={leftActive}>{leftNamespace || namespace}</S.ResourceNamespace>
+          ) : (
+            kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
+          )}
           <S.ResourceName $isActive={leftActive} onClick={leftActive ? () => handleInspect('left') : undefined}>
             {name}
           </S.ResourceName>
@@ -114,7 +122,11 @@ function ComparisonItem({
 
       <Col span={10}>
         <S.ResourceDiv>
-          {namespace && <S.ResourceNamespace $isActive={rightActive}>{namespace}</S.ResourceNamespace>}
+          {rightNamespace || namespace ? (
+            <S.ResourceNamespace $isActive={rightActive}>{rightNamespace || namespace}</S.ResourceNamespace>
+          ) : (
+            kind !== 'Namespace' && <S.ResourceNamespacePlaceholder />
+          )}
           <S.ResourceName $isActive={rightActive} onClick={rightActive ? () => handleInspect('right') : undefined}>
             {name}
           </S.ResourceName>

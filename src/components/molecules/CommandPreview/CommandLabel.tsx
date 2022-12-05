@@ -7,9 +7,10 @@ import {cloneDeep} from 'lodash';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {openSaveEditCommandModal} from '@redux/reducers/ui';
 
-import {AlertEnum} from '@monokle-desktop/shared/models/alert';
-import {SavedCommand} from '@monokle-desktop/shared/models/config';
+import {AlertEnum} from '@shared/models/alert';
+import {SavedCommand} from '@shared/models/config';
 
 import * as S from './CommandLabel.styled';
 
@@ -40,10 +41,23 @@ const CommandLabel: React.FC<{command: SavedCommand; isPreviewed: boolean}> = pr
     });
   };
 
+  const onClickEdit: React.MouseEventHandler<HTMLSpanElement> = () => {
+    dispatch(openSaveEditCommandModal({command}));
+  };
+
   return (
     <S.LabelContainer onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {isPreviewed ? <S.PreviewedLabel>{command.label}</S.PreviewedLabel> : <span>{command.label}</span>}
-      {isHovered && <S.DeleteOutlined onClick={onClickDelete} />}
+      {isHovered && (
+        <S.ActionsContainer
+          onClick={e => {
+            e.stopPropagation();
+          }}
+        >
+          <S.EditOutlined onClick={onClickEdit} />
+          <S.DeleteOutlined onClick={onClickDelete} />
+        </S.ActionsContainer>
+      )}
     </S.LabelContainer>
   );
 };

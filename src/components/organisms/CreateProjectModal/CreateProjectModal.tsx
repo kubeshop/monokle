@@ -17,10 +17,10 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
 
-import {CREATE_EMPTY_PROJECT} from '@monokle-desktop/shared/constants/telemetry';
-import {AnyTemplate} from '@monokle-desktop/shared/models/template';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {CREATE_EMPTY_PROJECT} from '@shared/constants/telemetry';
+import {AnyTemplate} from '@shared/models/template';
+import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';

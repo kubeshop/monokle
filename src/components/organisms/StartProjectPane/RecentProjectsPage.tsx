@@ -1,16 +1,24 @@
+import {Button} from 'antd';
+
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject, sortProjects, toggleProjectPin} from '@redux/reducers/appConfig';
-import {openCreateProjectModal, openFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setLeftMenuSelection,
+  setPreviewingCluster,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
-import CreateScratch from '@assets/FromScratch.svg';
-import CreateFromTemplate from '@assets/FromTemplate.svg';
+import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
 
-import {Project} from '@monokle-desktop/shared/models/config';
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
+import {Project} from '@shared/models/config';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
+import ActionCard from './ActionCard';
 import Guide from './Guide';
 import RecentProject from './RecentProject';
 import * as S from './RecentProjectsPage.styled';
@@ -50,7 +58,7 @@ const NewRecentProjectsPane = () => {
       <Guide />
 
       <S.Projects>
-        <S.ProjectsTitle id="recent-project-title">Select a project...</S.ProjectsTitle>
+        <S.ProjectsTitle id="recent-project-title">Select something recent…</S.ProjectsTitle>
 
         <S.ProjectsContainerWrapper>
           <S.ProjectsContainer id="recent-projects-container">
@@ -68,44 +76,57 @@ const NewRecentProjectsPane = () => {
       </S.Projects>
 
       <S.Actions>
-        <S.ActionsTitle>... or create a new one</S.ActionsTitle>
+        <S.ActionsTitle>… or start something new</S.ActionsTitle>
 
         <S.ActionItems>
-          <S.ActionItem id="select-existing-folder" onClick={handleOpenFolderExplorer}>
-            <S.ActionItemLogo src={SelectFolder} />
-            <S.ActionItemContext>
-              <S.ActionItemText>Select a local folder</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+          <ActionCard
+            logo={SelectFolder}
+            title="New project"
+            multipleActions={
+              <>
+                <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
+                  Open a local folder
+                </Button>
+                <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
+                  New from template
+                </Button>
+                <Button
+                  id="create-empty-project"
+                  size="large"
+                  type="primary"
+                  onClick={() => handleCreateProject(false)}
+                >
+                  New empty project
+                </Button>
+              </>
+            }
+          />
 
-          <S.ActionItem
-            $disabled={!isGitInstalled}
+          <ActionCard
+            disabled={!isGitInstalled}
             id="start-from-git"
+            logo={CreateFromGit}
+            title="Clone a Git repo"
             onClick={() => {
               if (isGitInstalled) {
                 dispatch(openGitCloneModal());
               }
             }}
-          >
-            <S.ActionItemLogo src={CreateFromGit} />
-            <S.ActionItemContext>
-              <S.ActionItemText>Clone a Git repo</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+          />
 
-          <S.ActionItem id="start-from-template" onClick={() => handleCreateProject(true)}>
-            <S.ActionItemLogo src={CreateFromTemplate} />
-            <S.ActionItemContext>
-              <S.ActionItemText>New project from template</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+          <ActionCard
+            id="quick-cluster-preview"
+            logo={QuickClusterPreview}
+            title="Quick cluster preview"
+            onClick={() => {
+              if (!activeProject) {
+                dispatch(setPreviewingCluster(true));
+              }
 
-          <S.ActionItem id="create-empty-project" onClick={() => handleCreateProject(false)}>
-            <S.ActionItemLogo src={CreateScratch} />
-            <S.ActionItemContext>
-              <S.ActionItemText>New project from scratch</S.ActionItemText>
-            </S.ActionItemContext>
-          </S.ActionItem>
+              dispatch(setLeftMenuSelection('dashboard'));
+              dispatch(toggleStartProjectPane());
+            }}
+          />
         </S.ActionItems>
       </S.Actions>
     </S.Container>

@@ -13,8 +13,8 @@ import {toggleOPARules} from '@redux/validation/validation.slice';
 
 import {Icon} from '@atoms';
 
-import {IconNames} from '@monokle-desktop/shared/models/icons';
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {IconNames} from '@shared/models/icons';
+import {Colors} from '@shared/styles/colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';

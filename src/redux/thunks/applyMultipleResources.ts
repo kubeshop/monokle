@@ -9,10 +9,10 @@ import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {AlertEnum, AlertType} from '@monokle-desktop/shared/models/alert';
-import {AppDispatch} from '@monokle-desktop/shared/models/appDispatch';
-import {AppConfig} from '@monokle-desktop/shared/models/config';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {AppConfig} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
 
 const applyMultipleResources = async (
   config: AppConfig,
@@ -21,8 +21,8 @@ const applyMultipleResources = async (
   namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
-  const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
-  const currentContext = config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
+  const kubeConfigPath = config.kubeConfig.path;
+  const currentContext = config.kubeConfig.currentContext;
 
   if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;

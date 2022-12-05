@@ -2,8 +2,8 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {Feature} from '@monokle-desktop/shared/models';
-import {trackEvent} from '@monokle-desktop/shared/utils';
+import {Feature} from '@shared/models';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './GettingStartedCard.styled';
 

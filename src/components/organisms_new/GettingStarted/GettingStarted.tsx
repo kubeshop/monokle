@@ -1,14 +1,7 @@
 import React from 'react';
 
-import {EDIT, EXPLORE, PUBLISH, VALIDATE} from '@monokle-desktop/shared/constants/features';
-import {
-  DISCORD,
-  DOCUMENTATION,
-  FEEDBACK,
-  GUIDE,
-  TUTORIAL,
-  WHATSNEW,
-} from '@monokle-desktop/shared/constants/referenceLinks';
+import {EDIT, EXPLORE, PUBLISH, VALIDATE} from '@shared/constants/features';
+import {DISCORD, DOCUMENTATION, FEEDBACK, GUIDE, TUTORIAL, WHATSNEW} from '@shared/constants/referenceLinks';
 
 import * as S from './GettingStarted.styled';
 import GettingStartedCard from './GettingStartedCard';
@@ -17,7 +10,7 @@ import GettingStartedReference from './GettingStartedReference';
 const GettingStarted = () => {
   return (
     <S.GettingStartedContainer>
-      <S.GettingStartedTitle>Starting with Monokle</S.GettingStartedTitle>
+      <S.GettingStartedTitle>Starting with Monoklebbvb</S.GettingStartedTitle>
       <S.GettingStartedSubTitle>
         Select in which stage of the K8s manifests management you are in (or from which one you want to learn more
         about) and let us show you how Monokle can help you.

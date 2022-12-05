@@ -10,6 +10,7 @@ import path, {join} from 'path';
 import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
+import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
   keysToUpdateStateBulk,
@@ -21,16 +22,16 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import {PREDEFINED_K8S_VERSION} from '@monokle-desktop/shared/constants/k8s';
-import {ClusterColors} from '@monokle-desktop/shared/models/cluster';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {ClusterColors} from '@shared/models/cluster';
 import {
   AppConfig,
   ClusterAccess,
+  FileExplorerSortOrder,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -39,9 +40,10 @@ import {
   Settings,
   TextSizes,
   Themes,
-} from '@monokle-desktop/shared/models/config';
-import {UiState} from '@monokle-desktop/shared/models/ui';
-import electronStore from '@monokle-desktop/shared/utils/electronStore';
+} from '@shared/models/config';
+import {UiState} from '@shared/models/ui';
+import electronStore from '@shared/utils/electronStore';
+import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
@@ -215,12 +217,14 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
+      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
     },
     setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isAccessLoading = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
+      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;
@@ -308,6 +312,8 @@ export const configSlice = createSlice({
       }
 
       const kubeConfig = state.projectConfig?.kubeConfig;
+      new KubeConfigManager().initializeKubeConfig(kubeConfig.path as string, kubeConfig.currentContext);
+
       const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
       const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
       const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
@@ -365,6 +371,12 @@ export const configSlice = createSlice({
           _.set(projectConfig, key, serializedIncomingConfig[key]);
         }
       });
+
+      if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
+        state.kubeConfig.path = action.payload.config.kubeConfig.path;
+      }
+
+      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
 
       if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
         writeProjectConfigFile(state);
@@ -463,6 +475,10 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.disableEventTracking', action.payload.disableEventTracking);
       electronStore.set('appConfig.disableErrorReporting', action.payload.disableErrorReporting);
     },
+    updateFileExplorerSortOrder: (state: Draft<AppConfig>, action: PayloadAction<FileExplorerSortOrder>) => {
+      state.fileExplorerSortOrder = action.payload;
+      electronStore.set('appConfig.fileExplorerSortOrder', action.payload);
+    },
     addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
       const access = state.clusterAccess.find(
         c => c.context === action.payload.context && c.namespace === action.payload.namespace
@@ -552,6 +568,7 @@ export const {
   toggleProjectPin,
   updateApplicationSettings,
   updateClusterSelectorVisibilty,
+  updateFileExplorerSortOrder,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateLanguage,

@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {Size} from '@monokle-desktop/shared/models/window';
+import {Size} from '@shared/models/window';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
@@ -17,6 +17,7 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 
 export function useMainPaneDimensions(): {height: number; width: number} {
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.header);
   const [width, setWidth] = useState<number>(window.innerWidth - 50);
@@ -24,14 +25,14 @@ export function useMainPaneDimensions(): {height: number; width: number} {
   useEffect(() => {
     const handleResize = () => {
       setHeight(window.innerHeight - layoutSize.header);
-      setWidth(window.innerWidth - 50);
+      setWidth(window.innerWidth - (previewingCluster ? 0 : 50));
     };
 
     window.addEventListener('resize', handleResize);
     handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener('resize', handleResize);
-  }, [layoutSize]);
+  }, [layoutSize, previewingCluster]);
 
   return {height, width};
 }

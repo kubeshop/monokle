@@ -4,7 +4,7 @@ import {WarningOutlined as RawWarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Div = styled.div`
   margin-bottom: 20px;

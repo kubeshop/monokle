@@ -9,7 +9,7 @@ import newGithubIssueUrl from 'new-github-issue-url';
 
 import crashFigure from '@assets/figures/crash.svg';
 
-import {logToFile} from '@monokle-desktop/shared/utils/logs';
+import {logToFile} from '@shared/utils/logs';
 
 import * as S from './ErrorPage.styled';
 import {ErrorStack} from './ErrorStack';

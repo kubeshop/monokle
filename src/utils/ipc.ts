@@ -1,4 +1,4 @@
-import {StartupFlags} from '@monokle-desktop/shared/models/startupFlag';
+import {StartupFlags} from '@shared/models/startupFlag';
 
 import {StartupFlag} from './startupFlag';
 

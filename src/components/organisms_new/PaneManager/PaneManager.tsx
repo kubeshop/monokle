@@ -2,21 +2,24 @@ import React, {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
   BottomPaneManager,
+  Dashboard,
   GettingStarted,
   GitOpsView,
   NavigatorPane,
   RecentProjectsPage,
   StartProjectPage,
 } from '@organisms';
+import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {activeProjectSelector} from '@monokle-desktop/shared/utils/selectors';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
@@ -26,12 +29,14 @@ const NewPaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const projects = useAppSelector(state => state.config.projects);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const {height, width} = useMainPaneDimensions();
 
@@ -79,20 +84,36 @@ const NewPaneManager: React.FC = () => {
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : activeProject && !isStartProjectPaneVisible ? (
+      ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
         <>
-          <PaneManagerLeftMenu />
+          {!previewingCluster && <PaneManagerLeftMenu />}
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
             top={
               currentActivity?.type === 'fullscreen' ? (
                 currentActivity.component
+              ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
+                <EmptyDashboard />
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={!['git', 'validation'].includes(currentActivity?.name ?? '') ? <NavigatorPane />  : <GettingStarted />}
-                  right={currentActivity?.name === 'git' ? <GitOpsView /> : <ActionsPane />}
+                  center={
+                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
+                      <NavigatorPane />
+                    ) : (
+                      <GettingStarted />
+                    )
+                  }
+                  right={
+                    currentActivity?.name === 'git' ? (
+                      <GitOpsView />
+                    ) : currentActivity?.name === 'dashboard' ? (
+                      <Dashboard />
+                    ) : (
+                      <ActionsPane />
+                    )
+                  }
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
                   width={width}
                   onStopResize={handleColumnResize}

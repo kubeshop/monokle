@@ -2,9 +2,9 @@ import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
 import {HelmChartEventEmitter} from '@redux/services/helm';
 
-import {ROOT_FILE_ENTRY} from '@monokle-desktop/shared/constants/fileEntry';
-import {HelmValuesFile} from '@monokle-desktop/shared/models/helm';
-import {SectionBlueprint} from '@monokle-desktop/shared/models/navigator';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {HelmValuesFile} from '@shared/models/helm';
+import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import {makeHelmChartSectionBlueprint} from './HelmChartSectionBlueprint';
@@ -26,7 +26,7 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
   rootSectionId: HELM_CHART_SECTION_NAME,
   childSectionIds: [],
   getScope: state => {
-    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+    const kubeConfigPath = state.config.kubeConfig.path;
     return {
       isInClusterMode: kubeConfigPath
         ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))

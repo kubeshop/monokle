@@ -1,6 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-import {execute} from '@utils/commands';
+import {execute} from '@shared/utils/commands';
 
 type RestartDeploymentOptions = {
   name: string;

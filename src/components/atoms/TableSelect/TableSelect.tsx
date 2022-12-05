@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {Colors} from '@monokle-desktop/shared/styles/colors';
+import {Colors} from '@shared/styles/colors';
 
 type Props = {
   value: string;
@@ -21,6 +21,7 @@ type Props = {
 
 function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableToggle}: Props) {
   const gitLoading = useAppSelector(state => state.git.loading);
+  const remoteRepo = useAppSelector(state => state.git.repo?.remoteRepo);
 
   return (
     <Dropdown
@@ -30,6 +31,7 @@ function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableT
       placement={tablePlacement}
       arrow
       trigger={['click']}
+      disabled={remoteRepo?.authRequired}
     >
       <Button loading={gitLoading}>
         <Space>

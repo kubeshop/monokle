@@ -24,9 +24,9 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {parseYamlDocument} from '@utils/yaml';
 
-import {CHANGES_BY_FORM_EDITOR} from '@monokle-desktop/shared/constants/telemetry';
-import {isInPreviewModeSelector} from '@monokle-desktop/shared/utils/selectors';
-import {trackEvent} from '@monokle-desktop/shared/utils/telemetry';
+import {CHANGES_BY_FORM_EDITOR} from '@shared/constants/telemetry';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';

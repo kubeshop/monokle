@@ -3,10 +3,10 @@ import {useMemo} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {filteredResourceMapSelector} from '@redux/selectors';
 
-import {isDefined} from '@utils/filter';
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
-import {SectionCustomComponentProps} from '@monokle-desktop/shared/models/navigator';
+import {SectionCustomComponentProps} from '@shared/models/navigator';
+import {isDefined} from '@shared/utils/filter';
 
 import * as S from './ResourceKindSectionNameCounter.styled';
 

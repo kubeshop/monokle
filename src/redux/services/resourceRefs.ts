@@ -4,15 +4,9 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 
 import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceMapType, ResourceRefsProcessingOptions} from '@monokle-desktop/shared/models/appState';
-import {
-  K8sResource,
-  RefNode,
-  RefPosition,
-  ResourceRef,
-  ResourceRefType,
-} from '@monokle-desktop/shared/models/k8sResource';
-import {RefMapper} from '@monokle-desktop/shared/models/resourceKindHandler';
+import {ResourceMapType, ResourceRefsProcessingOptions} from '@shared/models/appState';
+import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
+import {RefMapper} from '@shared/models/resourceKindHandler';
 
 import {traverseDocument} from './manifest-utils';
 import {

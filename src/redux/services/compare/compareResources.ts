@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 import {v5 as uuid} from 'uuid';
 
-import {CompareOperation, ResourceComparison} from '@monokle-desktop/shared/models/compare';
-import {K8sResource} from '@monokle-desktop/shared/models/k8sResource';
+import {getApiVersionGroup} from '@utils/resources';
+
+import {CompareOperation, ResourceComparison} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
 
 const UUID_V5_NAMESPACE = 'c106a26a-21bb-5538-8bf2-74095d1976c1';
 
@@ -43,19 +45,19 @@ function compareResourcesAsUnion(
   const result: ResourceComparison[] = [];
 
   for (const [id, leftResource] of leftMap.entries()) {
-    const matchingRightResource = rightMap.get(id);
+    const namespaceMatchingRightResource = rightMap.get(id);
 
-    if (matchingRightResource) {
+    if (namespaceMatchingRightResource) {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
         isMatch: true,
-        isDifferent: leftResource.text !== matchingRightResource.text,
+        isDifferent: leftResource.text !== namespaceMatchingRightResource.text,
         left: leftResource,
-        right: matchingRightResource,
+        right: namespaceMatchingRightResource,
       });
     } else {
       result.push({
-        id: createStableComparisonIdentifier(leftResource, matchingRightResource),
+        id: createStableComparisonIdentifier(leftResource, namespaceMatchingRightResource),
         isMatch: false,
         left: leftResource,
         right: undefined,
@@ -64,14 +66,14 @@ function compareResourcesAsUnion(
   }
 
   for (const [id, rightResource] of rightMap.entries()) {
-    const matchingLeftResource = leftMap.get(id);
+    const namespaceMatchingLeftResource = leftMap.get(id);
 
-    if (matchingLeftResource) {
+    if (namespaceMatchingLeftResource) {
       // eslint-disable-next-line no-continue
       continue; // already had these in previous loop.
     } else {
       result.push({
-        id: createStableComparisonIdentifier(matchingLeftResource, rightResource),
+        id: createStableComparisonIdentifier(namespaceMatchingLeftResource, rightResource),
         isMatch: false,
         left: undefined,
         right: rightResource,
@@ -213,7 +215,7 @@ function createHashMap(resources: K8sResource[], defaultNamespace?: string): Map
 
 function createFullResourceIdentifier(resource: K8sResource, defaultNamespace?: string): string {
   const namespace = !resource.namespace || resource.namespace === 'default' ? defaultNamespace : resource.namespace;
-  return `${resource.name}.${resource.kind}.${namespace}.${resource.apiVersion}`;
+  return `${resource.name}.${resource.kind}.${namespace}.${getApiVersionGroup(resource)}`;
 }
 
 function createStableComparisonIdentifier(left: K8sResource | undefined, right: K8sResource | undefined): string {
