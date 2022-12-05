@@ -11,7 +11,7 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
-import {GitRepo} from '@models/git';
+import {GitChangedFile, GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
@@ -119,7 +119,7 @@ export const setRootFolder = createAsyncThunk<
 
     Promise.all([
       promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
-      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
         localPath: rootFolder,
         fileMap,
       }),
