@@ -82,7 +82,7 @@ export const TabsFooter = styled.div`
   grid-area: footer;
   padding: 0 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   border-top: 1px solid ${Colors.grey4};
 `;

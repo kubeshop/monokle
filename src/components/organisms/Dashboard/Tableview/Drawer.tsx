@@ -16,7 +16,7 @@ import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
 import {InfoTab} from './InfoTab';
 
-export const Drawer = ({indexPosition, totalResourceLength}: {indexPosition: number; totalResourceLength: number}) => {
+export const Drawer = () => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -42,7 +42,7 @@ export const Drawer = ({indexPosition, totalResourceLength}: {indexPosition: num
         dispatch,
         projectConfig,
         kubeConfigContext,
-        {name: localResource.namespace, new: false},
+        localResource.namespace ? {name: localResource.namespace, new: false} : undefined,
         {isClusterPreview: true}
       );
     }
@@ -105,20 +105,9 @@ export const Drawer = ({indexPosition, totalResourceLength}: {indexPosition: num
           ]}
         />
         <S.TabsFooter>
-          <S.NavigationButtons>
-            <S.NavigationButton disabled={indexPosition < 1}>
-              <S.LeftOutlined />
-            </S.NavigationButton>
-            <S.NavigationButton disabled={indexPosition >= totalResourceLength - 1}>
-              <S.RightOutlined />
-            </S.NavigationButton>
-          </S.NavigationButtons>
           <S.ActionButtons>
             {activeTab === 'Manifest' && (
-              <S.ActionButton
-                disabled={!(localResource && localResource.namespace)}
-                onClick={() => handleApplyResource()}
-              >
+              <S.ActionButton disabled={!localResource} onClick={() => handleApplyResource()}>
                 Deploy
               </S.ActionButton>
             )}

@@ -7,7 +7,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {setActiveDashboardMenu, setSelectedNamespace, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setSelectedNamespaces, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -21,7 +21,7 @@ const DashboardPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<IMenu[]>([]);
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
@@ -102,11 +102,11 @@ const DashboardPane: React.FC = () => {
     setMenu(tempMenu);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
+  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespaces, resourceMap]);
 
   useEffect(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-    dispatch(setSelectedNamespace('ALL'));
+    dispatch(setSelectedNamespaces([]));
   }, [dispatch]);
 
   const setActiveMenu = (menuItem: IMenu) => {
@@ -121,10 +121,12 @@ const DashboardPane: React.FC = () => {
         .filter(
           r =>
             r.kind === kind &&
-            (selectedNamespace !== 'ALL' && Boolean(r.namespace) ? selectedNamespace === r.namespace : true)
+            (selectedNamespaces.length > 0 && Boolean(r.namespace)
+              ? selectedNamespaces.find(n => n === r.namespace)
+              : true)
         ).length;
     },
-    [resourceMap, selectedNamespace]
+    [resourceMap, selectedNamespaces]
   );
 
   const getErrorCount = useCallback(
@@ -134,8 +136,8 @@ const DashboardPane: React.FC = () => {
         .filter(
           resource =>
             resource.kind === kind &&
-            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
-              ? selectedNamespace === resource.namespace
+            (selectedNamespaces.length > 0 && Boolean(resource.namespace)
+              ? selectedNamespaces.find(n => n === resource.namespace)
               : true)
         )
         .reduce((total: number, resource: K8sResource) => {
@@ -148,7 +150,7 @@ const DashboardPane: React.FC = () => {
           return total;
         }, 0);
     },
-    [resourceMap, selectedNamespace]
+    [resourceMap, selectedNamespaces]
   );
 
   return (
