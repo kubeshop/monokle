@@ -12,10 +12,9 @@ import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
-import {TitleBar} from '@atoms';
-
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {TitleBar} from '@monokle/components';
 import {AnyTemplate} from '@shared/models/template';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
@@ -105,8 +104,7 @@ const TemplatesManagerPane: React.FC = () => {
     <S.TemplateManagerPaneContainer id="TemplateManagerPane" style={{height}}>
       <TitleBar
         title="Templates"
-        closable
-        leftButtons={
+        actions={
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TemplateManagerPaneReloadTooltip} placement="bottom">
             <Button
               disabled={templates.length === 0}

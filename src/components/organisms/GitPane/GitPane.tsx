@@ -9,12 +9,11 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@atoms';
-
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import {TitleBar} from '@monokle/components';
 import {GitChangedFile} from '@shared/models/git';
 
 import BottomActions from './BottomActions';
