@@ -24,7 +24,7 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
-import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -65,7 +65,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     if (leftMenuBottomSelection === selectedOption) {
       dispatch(setLeftBottomMenuSelection(undefined));
     } else {
-      trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedOption});
+      trackEvent('explore/select_left_tool_panel', {panelID: selectedOption});
       dispatch(setLeftBottomMenuSelection(selectedOption));
     }
   };
@@ -75,7 +75,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     if (leftMenuSelection === selectedMenu) {
       dispatch(toggleLeftMenu());
     } else {
-      trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedMenu});
+      trackEvent('explore/select_left_tool_panel', {panelID: selectedMenu});
       dispatch(setLeftMenuSelection(selectedMenu));
 
       if (!leftActive) {

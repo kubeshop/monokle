@@ -10,6 +10,8 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
 
+import {trackEvent} from '@utils/telemetry';
+
 import * as S from './ErrorsPopoverContent.styled';
 
 interface IProps {
@@ -50,6 +52,7 @@ const ErrorsPopoverContent: React.FC<IProps> = props => {
   };
 
   const onLinkClick = (error: ResourceValidationError) => {
+    trackEvent('explore/navigate_resource_error');
     dispatch(setSelectedResourceId(resource.id));
     dispatch(setActiveTab('Manifest'));
     if (selectedResourceId !== resource.id) {

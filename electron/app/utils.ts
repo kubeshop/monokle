@@ -10,6 +10,7 @@ import log from 'loglevel';
 import fetch from 'node-fetch';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
+import os from 'os';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -139,6 +140,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
       userId: deviceID,
       properties: {
         appVersion,
+        deviceOS: os.platform(),
       },
     });
     electronStore.set('main.deviceID', deviceID);

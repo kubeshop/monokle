@@ -57,7 +57,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
 import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
-import {DIFF, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import initialState from '../initialState';
@@ -634,7 +634,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      trackEvent(DIFF);
+      trackEvent('cluster/diff_resource');
       state.resourceDiff.targetResourceId = action.payload;
     },
     closeResourceDiffModal: (state: Draft<AppState>) => {
@@ -700,10 +700,10 @@ export const mainSlice = createSlice({
       if (enable) {
         const allRuleIds = plugin.metadata.rules.map(r => r.id);
         plugin.config.enabledRules = allRuleIds;
-        trackEvent('OPA_ENABLED', {all: true});
+        trackEvent('configure/opa_enabled', {all: true});
       } else {
         plugin.config.enabledRules = [];
-        trackEvent('OPA_DISABLED', {all: true});
+        trackEvent('configure/opa_disabled', {all: true});
       }
 
       // persist latest configuration
@@ -722,11 +722,11 @@ export const mainSlice = createSlice({
       if (enable) {
         if (isEnabled) return;
         plugin.config.enabledRules.push(ruleId);
-        trackEvent('OPA_ENABLED', {all: false});
+        trackEvent('configure/opa_enabled', {all: false});
       } else {
         if (!isEnabled) return;
         plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
-        trackEvent('OPA_DISABLED', {all: false});
+        trackEvent('configure/opa_disabled', {all: false});
       }
 
       // persist latest configuration

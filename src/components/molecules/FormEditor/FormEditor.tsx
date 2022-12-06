@@ -27,7 +27,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
-import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
@@ -152,7 +152,7 @@ const FormEditor: React.FC<IProps> = props => {
 
     return () => {
       if ((selectedResource || selectedPath) && isResourceUpdated) {
-        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource?.kind});
+        trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

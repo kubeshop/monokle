@@ -12,7 +12,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';
@@ -134,7 +134,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   };
 
   const onLinkClick = (ref: ResourceRef) => {
-    trackEvent(FOLLOW_LINK, {type: ref.type});
+    trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
