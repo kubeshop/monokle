@@ -26,7 +26,7 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {addDefaultCommandTerminal} from '@utils/terminal';
 
 /**
@@ -103,7 +103,7 @@ export const setRootFolder = createAsyncThunk<
     type: AlertEnum.Success,
   };
 
-  trackEvent(OPEN_EXISTING_PROJECT, {
+  trackEvent('app_start/open_project', {
     numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
     numberOfResources: Object.values(resourceMap).length,
   });

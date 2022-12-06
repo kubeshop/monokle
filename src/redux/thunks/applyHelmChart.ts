@@ -12,7 +12,7 @@ import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
 import {runCommandInMainThread} from '@utils/commands';
-import {APPLY_HELM_CHART, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 /**
  * Invokes helm install for the specified helm chart and values file
@@ -27,7 +27,7 @@ function applyHelmChartToCluster(
   namespace?: string,
   shouldCreateNamespace?: boolean
 ) {
-  trackEvent(APPLY_HELM_CHART);
+  trackEvent('cluster/deploy_helm_chart');
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
   let args = [

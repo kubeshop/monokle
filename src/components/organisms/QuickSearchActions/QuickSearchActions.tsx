@@ -17,7 +17,7 @@ import {knownResourceKindsSelector} from '@redux/selectors';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
-import {QUICK_SEARCH, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -259,7 +259,7 @@ const QuickSearchActionsV3: React.FC = () => {
 
   useEffect(() => {
     if (isOpen) {
-      trackEvent(QUICK_SEARCH);
+      trackEvent('explore/quick_search');
       setSearchingValue('');
     }
   }, [isOpen]);

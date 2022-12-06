@@ -18,7 +18,7 @@ import {getRefKind} from '@components/molecules/ResourceRefsIconPopover/RefsPopo
 
 import {isDefined} from '@utils/filter';
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {timeAgo} from '@utils/timeAgo';
 
 import * as S from './InfoTab.styled';
@@ -279,7 +279,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
   };
 
   const onLinkClick = (ref: ResourceRef) => {
-    trackEvent(FOLLOW_LINK, {type: ref.type});
+    trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
