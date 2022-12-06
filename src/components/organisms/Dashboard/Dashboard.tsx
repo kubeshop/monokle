@@ -50,7 +50,7 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
@@ -60,9 +60,11 @@ const Dashboard: React.FC = () => {
         (resource: K8sResource) =>
           (activeMenu.key.split('-')[0] ? resource.content.apiVersion === activeMenu.key.split('-')[0] : true) &&
           resource.kind === activeMenu.label &&
-          (selectedNamespace !== 'ALL' && Boolean(resource.namespace) ? selectedNamespace === resource.namespace : true)
+          (selectedNamespaces.length > 0 && Boolean(resource.namespace)
+            ? selectedNamespaces.find(n => n === resource.namespace)
+            : true)
       );
-  }, [resourceMap, selectedNamespace, activeMenu]);
+  }, [resourceMap, selectedNamespaces, activeMenu]);
 
   return (
     <S.Container $paneHeight={height}>

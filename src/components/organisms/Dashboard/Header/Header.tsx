@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {setSelectedNamespace} from '@redux/dashboard';
+import {setSelectedNamespaces} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
@@ -14,7 +14,7 @@ import * as S from './Header.styled';
 export const Header = ({title}: {title: string}) => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
 
   const getNamespaces = useCallback((): K8sResource[] => {
     return Object.values(resourceMap)
@@ -29,18 +29,22 @@ export const Header = ({title}: {title: string}) => {
         title={title}
         actions={
           <S.Select
+            mode="multiple"
+            allowClear
+            maxTagCount="responsive"
             showSearch
             placeholder="Search to Select"
-            value={selectedNamespace}
+            value={selectedNamespaces}
             filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
             filterSort={(optionA: any, optionB: any) =>
               (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            onSelect={(value: any) => dispatch(setSelectedNamespace(value))}
-            options={[
-              {label: 'All namespaces', value: 'ALL'},
-              ...getNamespaces().map(resource => ({label: resource.name, value: resource.name})),
-            ]}
+            onChange={(values: any) =>
+              values && values.length > 0
+                ? dispatch(setSelectedNamespaces(values))
+                : dispatch(setSelectedNamespaces([]))
+            }
+            options={[...getNamespaces().map(resource => ({label: resource.name, value: resource.name}))]}
           />
         }
       />

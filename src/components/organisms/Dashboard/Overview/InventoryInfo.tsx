@@ -19,7 +19,7 @@ import * as S from './InventoryInfo.styled';
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.dashboard.ui.selectedNamespace);
+  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
@@ -29,12 +29,12 @@ export const InventoryInfo = () => {
           (resource: K8sResource) =>
             (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
             resource.kind === kind &&
-            (selectedNamespace !== 'ALL' && Boolean(resource.namespace)
-              ? selectedNamespace === resource.namespace
+            (selectedNamespaces.length > 0 && Boolean(resource.namespace)
+              ? selectedNamespaces.find(n => n === resource.namespace)
               : true)
         );
     },
-    [resourceMap, selectedNamespace]
+    [resourceMap, selectedNamespaces]
   );
 
   const getNodes = useCallback(() => {

@@ -80,15 +80,23 @@ export const Tabs = styled(RawTabs)`
 
 export const TabsFooter = styled.div`
   grid-area: footer;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid ${Colors.grey4};
+`;
+
+export const NavigationButtons = styled.div`
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  border-top: 1px solid ${Colors.grey4};
 
   & > button:first-child {
     margin-right: 8px;
   }
 `;
+
+export const ActionButtons = styled.div``;
 
 export const NavigationButton = styled(Button)`
   background-color: ${Colors.blue7};
@@ -98,6 +106,21 @@ export const NavigationButton = styled(Button)`
 
   &:hover,
   &:focus {
+    background-color: ${Colors.blue7}88;
+  }
+`;
+
+export const ActionButton = styled(Button)`
+  background-color: ${Colors.blue7};
+  border-radius: 2px;
+  padding: 0px 10px;
+  height: 40px;
+  font-weight: 400;
+  font-size: 14px;
+
+  &:hover,
+  &:focus {
+    color: ${Colors.grey9};
     background-color: ${Colors.blue7}88;
   }
 `;
