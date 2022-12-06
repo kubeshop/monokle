@@ -54,7 +54,7 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   overflow: visible;
 
   & .ant-tabs-nav {
-    padding: 0 16px;
+    padding: 8px 16px 0 0;
     margin-bottom: 0px;
   }
 
