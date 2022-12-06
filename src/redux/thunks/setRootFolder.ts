@@ -11,7 +11,7 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@models/appstate';
-import {GitRepo} from '@models/git';
+import {GitChangedFile, GitRepo} from '@models/git';
 import {RootState} from '@models/rootstate';
 
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
@@ -115,8 +115,18 @@ export const setRootFolder = createAsyncThunk<
   );
 
   if (isFolderGitRepo) {
-    promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder).then(repo => {
+    thunkAPI.dispatch(setGitLoading(true));
+
+    Promise.all([
+      promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
+      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolder,
+        fileMap,
+      }),
+    ]).then(([repo, changedFiles]) => {
       thunkAPI.dispatch(setRepo(repo));
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
+      thunkAPI.dispatch(setGitLoading(false));
 
       if (repo.remoteRepo.authRequired) {
         Modal.warning({
@@ -143,15 +153,6 @@ export const setRootFolder = createAsyncThunk<
           },
         });
       }
-    });
-
-    thunkAPI.dispatch(setGitLoading(true));
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: rootFolder,
-      fileMap,
-    }).then(changedFiles => {
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
     });
   }
 
