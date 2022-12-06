@@ -115,7 +115,7 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBar title="Git" closable />
+      <TitleBar title="Git" />
 
       {gitLoading ? (
         <S.Skeleton active />
