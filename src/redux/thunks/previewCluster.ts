@@ -104,14 +104,14 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
           previewResult.previewResources[r.id] = r;
         });
 
-        // only process newly added custom resources
-        processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
-          resourceIds: customResources.map(r => r.id),
-        });
-
         previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
       }
     }
+
+    processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
+      policyPlugins: thunkAPI.getState().main.policies.plugins,
+    });
+
     trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
 
     startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);

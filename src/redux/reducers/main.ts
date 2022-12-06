@@ -1,4 +1,4 @@
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
 
 import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
@@ -1463,21 +1463,6 @@ export const imageSelectedListener: AppListenerFn = listen => {
       if (leftMenu.selection !== 'images-pane') {
         dispatch(setLeftMenuSelection('images-pane'));
       }
-    },
-  });
-};
-
-export const previewsListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(
-      previewCluster.fulfilled,
-      previewKustomization.fulfilled,
-      previewHelmValuesFile.fulfilled,
-      previewSavedCommand.fulfilled
-    ),
-    effect: async (_, {dispatch, cancelActiveListeners}) => {
-      cancelActiveListeners();
-      dispatch(reprocessAllResources());
     },
   });
 };
