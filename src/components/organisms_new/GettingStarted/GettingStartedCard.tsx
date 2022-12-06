@@ -2,8 +2,8 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {Feature} from '@shared/models';
-import {trackEvent} from '@shared/utils';
+import {Feature} from '@shared/models/features';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './GettingStartedCard.styled';
 

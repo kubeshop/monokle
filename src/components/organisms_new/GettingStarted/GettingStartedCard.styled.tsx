@@ -4,7 +4,7 @@ import AntdIcon from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {Colors} from '@shared/styles';
+import {Colors} from '@shared/styles/colors';
 
 export const Card = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
