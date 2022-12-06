@@ -11,6 +11,7 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
 import {isDefined} from '@utils/filter';
+import {trackEvent} from '@utils/telemetry';
 
 import {extractK8sResources} from './resource';
 
@@ -56,6 +57,8 @@ export const previewSavedCommand = createAsyncThunk<
         "The command ran successfully but the output didn't contain any kubernetes resources."
       );
     }
+
+    trackEvent('preview/command');
 
     return {
       previewResourceId: command.id,

@@ -63,6 +63,8 @@ export type EventMap = {
   'preview/helm_preview_configuration': undefined;
   'preview/kustomize': undefined;
   'preview/cluster': {numberOfResourcesInCluster: number};
+  'preview/command': undefined;
+  'preview/restart': {type: 'helm' | 'kustomization' | 'cluster' | 'helm-preview-config' | 'command'};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;
@@ -72,6 +74,9 @@ export type EventMap = {
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};
   'compare/transfered': {from?: string; to?: string; count: number};
+  'git/branch_checkout': undefined;
+  'git/commit': undefined;
+  'git/push': undefined;
   CLUSTER_COMPARE: any; // TODO: remove this event in 2.0, keeping to make merging easier
 };
 export const APP_INSTALLED = 'APP_INSTALLED';

@@ -11,6 +11,7 @@ import {K8sResource} from '@models/k8sresource';
 import {extractK8sResources} from '@redux/services/resource';
 
 import {formatGitChangedFiles} from '@utils/git';
+import {trackEvent} from '@utils/telemetry';
 
 export async function isGitInstalled(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -178,6 +179,7 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 
   try {
     await git.checkout(branchName);
+    trackEvent('git/branch_checkout');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -246,6 +248,7 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.commit(message);
+  trackEvent('git/commit');
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
@@ -268,6 +271,7 @@ export async function pushChanges(localPath: string, branchName: string) {
 
   try {
     await git.push('origin', branchName);
+    trackEvent('git/push');
     return {};
   } catch (e: any) {
     return {error: e.message};
