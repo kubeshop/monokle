@@ -213,22 +213,16 @@ const PaneManagerLeftMenu: React.FC = () => {
         </Walkthrough>
 
         <FeatureFlag name="ImagesPane">
-          <Walkthrough placement="leftTop" collection="release" step="images">
-            <PaneTooltip
-              show={!leftActive || leftMenuSelection !== 'images-pane'}
-              title="View Images"
-              placement="right"
+          <PaneTooltip show={!leftActive || leftMenuSelection !== 'images-pane'} title="View Images" placement="right">
+            <MenuButton
+              isSelected={checkIsTabSelected('images-pane')}
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('images-pane')}
+              disabled={!activeProject}
             >
-              <MenuButton
-                isSelected={checkIsTabSelected('images-pane')}
-                isActive={isActive}
-                onClick={() => setLeftActiveMenu('images-pane')}
-                disabled={!activeProject}
-              >
-                <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
-              </MenuButton>
-            </PaneTooltip>
-          </Walkthrough>
+              <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
+            </MenuButton>
+          </PaneTooltip>
         </FeatureFlag>
         <PaneTooltip
           show={!leftActive || leftMenuSelection !== 'templates-pane'}
@@ -276,16 +270,18 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
 
-        <PaneTooltip show={!leftActive || leftMenuSelection !== 'dashboard'} title="Dashboard" placement="right">
-          <MenuButton
-            isSelected={checkIsTabSelected('dashboard')}
-            isActive={isActive}
-            onClick={() => setLeftActiveMenu('dashboard')}
-            disabled={!activeProject}
-          >
-            <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
-          </MenuButton>
-        </PaneTooltip>
+        <Walkthrough placement="leftTop" collection="release" step="compare">
+          <PaneTooltip show={!leftActive || leftMenuSelection !== 'dashboard'} title="Dashboard" placement="right">
+            <MenuButton
+              isSelected={checkIsTabSelected('dashboard')}
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('dashboard')}
+              disabled={!activeProject}
+            >
+              <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
+            </MenuButton>
+          </PaneTooltip>
+        </Walkthrough>
       </S.IconsContainer>
 
       <S.IconsContainer>
