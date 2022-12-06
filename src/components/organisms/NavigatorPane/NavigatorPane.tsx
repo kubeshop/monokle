@@ -14,13 +14,12 @@ import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
-import {MonoPaneTitle} from '@atoms';
-
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
@@ -72,11 +71,14 @@ const NavPane: React.FC = () => {
         </S.SelectionBar>
       ) : (
         <S.TitleBar>
-          <MonoPaneTitle>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
-            </div>
-          </MonoPaneTitle>
+          <TitleBar
+            title=""
+            actions={
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
+              </div>
+            }
+          />
           <S.TitleBarRightButtons>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
               <S.PlusButton
