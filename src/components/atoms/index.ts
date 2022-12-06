@@ -15,4 +15,3 @@ export {default as Spinner} from './Spinner';
 export {PrimaryButton, SecondaryButton} from './StyledComponents';
 export {default as TabHeader} from './TabHeader';
 export {default as TableSelect} from './TableSelect';
-export {default as TitleBar} from './TitleBar';
