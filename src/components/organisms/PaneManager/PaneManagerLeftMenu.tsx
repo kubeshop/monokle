@@ -270,7 +270,7 @@ const PaneManagerLeftMenu: React.FC = () => {
           </MenuButton>
         </PaneTooltip>
 
-        <Walkthrough placement="leftTop" collection="release" step="compare">
+        <Walkthrough placement="leftTop" collection="release" step="cluster">
           <PaneTooltip show={!leftActive || leftMenuSelection !== 'dashboard'} title="Dashboard" placement="right">
             <MenuButton
               isSelected={checkIsTabSelected('dashboard')}

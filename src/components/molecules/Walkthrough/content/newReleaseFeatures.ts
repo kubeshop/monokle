@@ -3,9 +3,9 @@ import {WalkthroughContentProps} from '@models/walkthrough';
 export const newReleaseFeaturesContent: WalkthroughContentProps['data'][] = [
   {
     step: 'cluster',
-    title: 'Real time cluster mode',
+    title: 'Cluster mode',
     content:
-      'See information about your running cluster, reducing the cognitive load involved in deploying and maintaining your application in Kubernetes.',
+      'Day-to-day debugging and validation tasks made easy with real-time insights into the state of deployed clusters and contained resources.',
   },
   {
     step: 'compare',
