@@ -1,6 +1,6 @@
 import {CheckOutlined, CloudUploadOutlined, CodeTwoTone, UnorderedListOutlined} from '@ant-design/icons';
 
-import {Feature} from '../models';
+import {Feature} from '@shared/models/features';
 
 export const EXPLORE: Feature = {
   id: 'explore',

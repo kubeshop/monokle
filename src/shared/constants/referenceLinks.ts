@@ -1,4 +1,4 @@
-import {ReferenceLink} from '../models';
+import {ReferenceLink} from '@shared/models/referenceLinks';
 
 export const GUIDE: ReferenceLink = {
   id: 'guide',
