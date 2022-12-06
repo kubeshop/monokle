@@ -72,39 +72,40 @@ const NavPane: React.FC = () => {
       ) : (
         <TitleBar
           title=""
-          description={
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
-            </div>
-          }
+          type="secondary"
           actions={
-            <S.TitleBarRightButtons>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-                <S.PlusButton
-                  id="create-resource-button"
-                  $disabled={!isFolderOpen || isInPreviewMode}
-                  $highlighted={highlightedItems.createResource}
-                  className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                  disabled={!isFolderOpen || isInPreviewMode}
-                  icon={<PlusOutlined />}
-                  size="small"
-                  type="link"
-                  onClick={onClickNewResource}
-                />
-              </Tooltip>
-
-              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
-                  <Button
-                    disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                    type="link"
+            <div style={{display: 'flex', justifyItems: 'space-between', width: '100%'}}>
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
+              </div>
+              <S.TitleBarRightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
+                  <S.PlusButton
+                    id="create-resource-button"
+                    $disabled={!isFolderOpen || isInPreviewMode}
+                    $highlighted={highlightedItems.createResource}
+                    className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                    disabled={!isFolderOpen || isInPreviewMode}
+                    icon={<PlusOutlined />}
                     size="small"
-                    icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                    onClick={resourceFilterButtonHandler}
+                    type="link"
+                    onClick={onClickNewResource}
                   />
                 </Tooltip>
-              </Badge>
-            </S.TitleBarRightButtons>
+
+                <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
+                    <Button
+                      disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                      type="link"
+                      size="small"
+                      icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                      onClick={resourceFilterButtonHandler}
+                    />
+                  </Tooltip>
+                </Badge>
+              </S.TitleBarRightButtons>
+            </div>
           }
         />
       )}
