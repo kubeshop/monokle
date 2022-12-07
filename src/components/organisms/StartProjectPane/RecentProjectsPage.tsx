@@ -14,6 +14,8 @@ import {
 } from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
+import {trackEvent} from '@utils/telemetry';
+
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
@@ -122,7 +124,7 @@ const NewRecentProjectsPane = () => {
               if (!activeProject) {
                 dispatch(setPreviewingCluster(true));
               }
-
+              trackEvent('dashboard/open', {from: 'recent-screen-quick-cluster-preview'});
               dispatch(setLeftMenuSelection('dashboard'));
               dispatch(toggleStartProjectPane());
             }}

@@ -11,6 +11,8 @@ import {setActiveDashboardMenu, setSelectedNamespaces, setSelectedResourceId} fr
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
+import {trackEvent} from '@utils/telemetry';
+
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
@@ -110,6 +112,7 @@ const DashboardPane: React.FC = () => {
   }, [dispatch]);
 
   const setActiveMenu = (menuItem: IMenu) => {
+    trackEvent('dashboard/selectKind', {kind: menuItem.key});
     dispatch(setActiveDashboardMenu(menuItem));
     dispatch(setSelectedResourceId());
   };

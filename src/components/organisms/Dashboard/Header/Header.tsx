@@ -5,6 +5,8 @@ import {K8sResource} from '@models/k8sresource';
 import {setSelectedNamespaces} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {trackEvent} from '@utils/telemetry';
+
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
 import {TitleBar} from '@monokle/components';
@@ -39,11 +41,12 @@ export const Header = ({title}: {title: string}) => {
             filterSort={(optionA: any, optionB: any) =>
               (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            onChange={(values: any) =>
+            onChange={(values: any) => {
+              trackEvent('dashboard/changeNamespace');
               values && values.length > 0
                 ? dispatch(setSelectedNamespaces(values))
-                : dispatch(setSelectedNamespaces([]))
-            }
+                : dispatch(setSelectedNamespaces([]));
+            }}
             options={[...getNamespaces().map(resource => ({label: resource.name, value: resource.name}))]}
           />
         }

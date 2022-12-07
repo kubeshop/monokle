@@ -2,6 +2,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {IMenu} from '@components/organisms/DashboardPane/menu';
 
+import {trackEvent} from '@utils/telemetry';
+
 import {DashboardState, initialState} from './state';
 
 export const dashboardSlice = createSlice({
@@ -19,6 +21,7 @@ export const dashboardSlice = createSlice({
     },
     setActiveTab: (state: Draft<DashboardState>, action: PayloadAction<'Info' | 'Manifest'>) => {
       state.ui.activeTab = action.payload;
+      trackEvent('dashboard/selectTab', {tab: action.payload});
     },
   },
 });

@@ -275,7 +275,10 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuButton
               isSelected={checkIsTabSelected('dashboard')}
               isActive={isActive}
-              onClick={() => setLeftActiveMenu('dashboard')}
+              onClick={() => {
+                trackEvent('dashboard/open', {from: 'left-menu'});
+                setLeftActiveMenu('dashboard');
+              }}
               disabled={!activeProject}
             >
               <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
