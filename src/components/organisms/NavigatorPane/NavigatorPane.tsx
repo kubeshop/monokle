@@ -70,14 +70,15 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <TitleBar
-          title=""
-          type="secondary"
-          actions={
-            <div style={{display: 'flex', justifyItems: 'space-between', width: '100%'}}>
+        <div style={{padding: '10px'}}>
+          <TitleBar
+            type="secondary"
+            title={
               <div style={{display: 'flex', alignItems: 'center'}}>
                 Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
               </div>
+            }
+            actions={
               <S.TitleBarRightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
                   <S.PlusButton
@@ -105,9 +106,9 @@ const NavPane: React.FC = () => {
                   </Tooltip>
                 </Badge>
               </S.TitleBarRightButtons>
-            </div>
-          }
-        />
+            }
+          />
+        </div>
       )}
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
