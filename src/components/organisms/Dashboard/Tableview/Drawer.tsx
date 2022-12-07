@@ -108,7 +108,7 @@ export const Drawer = () => {
           <S.ActionButtons>
             {activeTab === 'Manifest' && (
               <S.ActionButton disabled={!localResource} onClick={() => handleApplyResource()}>
-                Deploy
+                Update
               </S.ActionButton>
             )}
           </S.ActionButtons>

@@ -145,6 +145,7 @@ export const CellPodsCount = {
   title: 'Pods',
   dataIndex: 'content',
   key: 'pods',
+  width: '120px',
   render: (content: any) => (
     <span style={{padding: '2px 4px'}}>
       {content?.status?.availableReplicas || 0} / {content?.status?.replicas || 0}
