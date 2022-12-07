@@ -72,7 +72,8 @@ export type LeftMenuSelectionType =
   | 'validation-pane'
   | 'search'
   | 'crds'
-  | 'dashboard';
+  | 'dashboard'
+  | 'audit';
 
 export type LeftMenuBottomSelectionType = 'terminal';
 export type RightMenuSelectionType = 'logs' | 'graph';

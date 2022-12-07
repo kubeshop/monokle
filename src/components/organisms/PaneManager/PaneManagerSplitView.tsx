@@ -23,6 +23,7 @@ const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const ImagesPane = React.lazy(() => import('@components/organisms/ImagesPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
+const AuditPane = React.lazy(() => import('@organisms/AuditPane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
 const ValidationPane = React.lazy(() => import('@organisms/ValidationPane'));
 const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
@@ -70,6 +71,7 @@ const PaneManagerSplitView: React.FC = () => {
               {leftActiveMenu === 'validation-pane' && <ValidationPane />}
               {leftActiveMenu === 'search' && <SearchPane />}
               {leftActiveMenu === 'dashboard' && <DashboardPane />}
+              {leftActiveMenu === 'audit' && <AuditPane />}
             </Suspense>
           </S.LeftPane>
         </ReflexElement>
