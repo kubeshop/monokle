@@ -22,7 +22,7 @@ export type EventMap = {
   APPLY_HELM_CHART: undefined;
   RUN_PREVIEW_CONFIGURATION: undefined;
   VALIDATION_PANE_OPENED: {id: string};
-  GETTING_STARTED_PAGE_OPENED: {id: string};
+  TUTORIAL_PAGE_OPENED: {id: string};
   OPA_ENABLED: {all: boolean};
   OPA_DISABLED: {all: boolean};
   COMPARE_OPENED: {from?: string};

@@ -295,7 +295,7 @@ const HotKeysHandler = () => {
     }
   });
 
-  useHotkeys(hotkeys.OPEN_GETTING_STARTED_PAGE.key, () => {
+  useHotkeys(hotkeys.OPEN_TUTORIAL_PAGE.key, () => {
     dispatch(setLeftMenuSelection('validation-pane'));
   });
 
@@ -314,7 +314,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.OPEN_GETTING_STARTED_PAGE.key,
+    hotkeys.OPEN_TUTORIAL_PAGE.key,
     () => {
       if (!uiState.isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());

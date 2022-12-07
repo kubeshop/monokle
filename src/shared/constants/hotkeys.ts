@@ -116,8 +116,8 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+p, ctrl+shift+p, command+p, command+shift+p',
     category: 'navigation',
   },
-  OPEN_GETTING_STARTED_PAGE: {
-    name: 'Open Getting Started Page',
+  OPEN_TUTORIAL_PAGE: {
+    name: 'Open Tutorial Page',
     key: 'ctrl+shift+t, command+shift+t',
     category: 'navigation',
   },

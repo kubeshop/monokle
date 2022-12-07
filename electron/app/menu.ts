@@ -99,7 +99,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'New Project',
         submenu: [
           {
-            label: 'Getting Started Page',
+            label: 'Tutorial Page',
             click: () => {
               if (!state.ui.isStartProjectPaneVisible) {
                 dispatch({type: 'ui/toggleStartProjectPane', payload: undefined});

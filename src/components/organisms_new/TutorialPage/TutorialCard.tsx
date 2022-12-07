@@ -17,7 +17,7 @@ const TutorialCard: React.FC<Props> = ({feature}) => {
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const onCTAHandler = () => {
-    trackEvent('GETTING_STARTED_PAGE_OPENED', {id});
+    trackEvent('TUTORIAL_PAGE_OPENED', {id});
   };
 
   return (

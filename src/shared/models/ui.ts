@@ -21,7 +21,7 @@ type LeftMenuSelectionType =
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
-  | 'getting-started'
+  | 'tutorial'
   | 'search'
   | 'crds'
   | 'dashboard';
@@ -76,7 +76,7 @@ type NewLeftMenuSelectionType =
   | 'search'
   | 'settings'
   | 'dashboard'
-  | 'getting-started';
+  | 'tutorial';
 
 type PaneConfiguration = {
   leftPane: number;

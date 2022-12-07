@@ -88,7 +88,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   },
   {
     type: 'fullscreen',
-    name: 'getting-started',
+    name: 'tutorial',
     tooltip: <TutorialPageTooltip />,
     icon: () => <SettingsOutlined />,
     component: <TutorialPage />,
