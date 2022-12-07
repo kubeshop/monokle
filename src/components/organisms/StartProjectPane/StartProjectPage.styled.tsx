@@ -5,7 +5,6 @@ import Colors from '@styles/Colors';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 300px;
 `;
 
 export const InformationMessage = styled.div`
@@ -34,4 +33,6 @@ export const StartProjectContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 60px;
+  margin-top: -50px;
+  height: 100%;
 `;
