@@ -4,10 +4,10 @@ import {RightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {TutorialPage} from '@organisms';
-
 export const TutorialPageContainer = styled.div`
   height: 100%;
+  width: 100%;
+  display: flex;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
