@@ -4,13 +4,13 @@ import React, {useCallback} from 'react';
 
 import {ReferenceLink} from '@shared/models/referenceLinks';
 
-import * as S from './GettingStartedReference.styled';
+import * as S from './TutorialReference.styled';
 
 type Props = {
   referenceLink: ReferenceLink;
 };
 
-const GettingStartedReference: React.FC<Props> = ({referenceLink}) => {
+const TutorialReference: React.FC<Props> = ({referenceLink}) => {
   const {id, name, description, learnMoreUrl} = referenceLink;
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
@@ -26,4 +26,4 @@ const GettingStartedReference: React.FC<Props> = ({referenceLink}) => {
   );
 };
 
-export default GettingStartedReference;
+export default TutorialReference;

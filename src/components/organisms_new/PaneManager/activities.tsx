@@ -1,8 +1,8 @@
 import {
   FileExplorerTabTooltip,
-  GettingStartedPageTooltip,
   SettingsTooltip,
   TerminalPaneTooltip,
+  TutorialPageTooltip,
   ValidationTabTooltip,
 } from '@constants/tooltips';
 
@@ -12,9 +12,9 @@ import {
   BottomPaneManager,
   DashboardPane,
   FileTreePane,
-  GettingStarted,
   GitPane,
   SearchPane,
+  TutorialPage,
   ValidationPane,
 } from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
@@ -89,9 +89,9 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
     type: 'fullscreen',
     name: 'getting-started',
-    tooltip: <GettingStartedPageTooltip />,
+    tooltip: <TutorialPageTooltip />,
     icon: () => <SettingsOutlined />,
-    component: <GettingStarted />,
+    component: <TutorialPage />,
     useBadge: () => undefined,
   },
 ];

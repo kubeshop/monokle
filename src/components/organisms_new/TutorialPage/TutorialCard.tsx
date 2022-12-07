@@ -5,13 +5,13 @@ import React, {useCallback} from 'react';
 import {Feature} from '@shared/models/features';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import * as S from './GettingStartedCard.styled';
+import * as S from './TutorialCard.styled';
 
 type Props = {
   feature: Feature;
 };
 
-const GettingStartedCard: React.FC<Props> = ({feature}) => {
+const TutorialCard: React.FC<Props> = ({feature}) => {
   const {id, icon, name, description, learnMoreUrl, callToAction} = feature;
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
@@ -35,4 +35,4 @@ const GettingStartedCard: React.FC<Props> = ({feature}) => {
   );
 };
 
-export default GettingStartedCard;
+export default TutorialCard;

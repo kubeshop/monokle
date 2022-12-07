@@ -2,7 +2,7 @@ import {Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
-export const GettingStartedContainer = styled.div`
+export const TutorialPageContainer = styled.div`
   height: 100%;
   width: 100%;
   display: grid;
