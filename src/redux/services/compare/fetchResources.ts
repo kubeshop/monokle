@@ -124,7 +124,7 @@ async function fetchResourcesFromCluster(state: RootState, options: ClusterResou
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
     const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(kubeConfigPath, currentContext);
+    const kc = await createKubeClient(kubeConfigPath, currentContext);
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))

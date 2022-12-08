@@ -43,14 +43,14 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
   const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
-  const onClickOk = useCallback(() => {
+  const onClickOk = useCallback(async () => {
     if (selectedOption === 'create') {
       if (!createNamespaceName) {
         setErrorMessage('Namespace name must not be empty!');
         return;
       }
 
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const kc = await createKubeClient(kubeConfigPath, kubeConfigContext);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api

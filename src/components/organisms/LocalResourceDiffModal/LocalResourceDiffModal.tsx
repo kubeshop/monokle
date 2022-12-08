@@ -220,7 +220,7 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const kc = await createKubeClient(kubeConfigPath, kubeConfigContext);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {

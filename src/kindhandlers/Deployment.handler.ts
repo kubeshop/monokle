@@ -21,6 +21,7 @@ const DeploymentHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    console.log('DeploymentHandler', k8sAppV1Api.basePath);
     const response = namespace
       ? await k8sAppV1Api.listNamespacedDeployment(namespace)
       : await k8sAppV1Api.listDeploymentForAllNamespaces();

@@ -1,4 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
+import {KubeConfig} from '@kubernetes/client-node';
 
 import {spawn} from 'child_process';
 import log from 'loglevel';
@@ -11,7 +12,9 @@ import {getMainProcessEnv} from '@utils/env';
 import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
 import {isRendererThread} from './thread';
 
-export function createKubeClient(path: string, context?: string) {
+let isKubectlProxyRunning = false;
+
+export async function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();
 
   if (!path) {
@@ -19,20 +22,30 @@ export function createKubeClient(path: string, context?: string) {
   }
 
   kc.loadFromFile(path);
+  const {proxyUrl} = await spawnKubectlProxy(8080);
+  const proxyKubeConfig = new KubeConfig();
+  proxyKubeConfig.loadFromOptions({
+    currentContext: kc.getCurrentContext(),
+    clusters: kc.getClusters().map(c => ({...c, server: proxyUrl, skipTLSVerify: true})),
+    users: kc.getUsers(),
+    contexts: kc.getContexts(),
+  });
+  console.log('proxyKubeConfig', proxyKubeConfig);
+
   let currentContext = context;
 
   if (!currentContext) {
-    currentContext = kc.currentContext;
+    currentContext = proxyKubeConfig.currentContext;
     log.warn(`Missing currentContext, using default in kubeconfig: ${currentContext}`);
   } else {
-    kc.setCurrentContext(currentContext);
+    proxyKubeConfig.setCurrentContext(currentContext);
   }
 
   // find the context
-  const ctxt = kc.contexts.find(c => c.name === currentContext);
+  const ctxt = proxyKubeConfig.contexts.find(c => c.name === currentContext);
   if (ctxt) {
     // find the user
-    const user = kc.users.find(usr => usr.name === ctxt.user);
+    const user = proxyKubeConfig.users.find(usr => usr.name === ctxt.user);
 
     // does the user use the ExecAuthenticator? -> apply process env
     if (user?.exec) {
@@ -52,7 +65,7 @@ export function createKubeClient(path: string, context?: string) {
     throw new Error(`Selected context ${currentContext} not found in kubeconfig at ${path}`);
   }
 
-  return kc;
+  return proxyKubeConfig;
 }
 
 function parseCanI(stdout: string): {permissions: KubePermissions[]; hasFullAccess: boolean} {
@@ -194,3 +207,36 @@ export const runCommandPromise = (options: CommandOptions): Promise<CommandResul
       res(result);
     }
   });
+
+function spawnKubectlProxy(port: number) {
+  return new Promise<{proxyUrl: string}>((resolve, reject) => {
+    if (!isKubectlProxyRunning) {
+      const proxyProcess = spawn(`kubectl proxy --port=${port}`, {shell: true, env: process.env});
+      console.log('proxyProcess', proxyProcess);
+
+      // TODO: is there a better way to check if opening the proxy was successful?
+      const expectedMessage = `Starting to serve on 127.0.0.1:${port}`;
+      proxyProcess.stdout.on('data', data => {
+        console.log('data', data);
+        if (data.toString().trim() === expectedMessage) {
+          const proxyUrl = `http://127.0.0.1:${port}`;
+          isKubectlProxyRunning = false;
+          resolve({proxyUrl});
+        }
+      });
+
+      proxyProcess.on('error', err => {
+        isKubectlProxyRunning = false;
+
+        reject(err);
+        console.log(err);
+      });
+
+      setTimeout(() => {
+        isKubectlProxyRunning = false;
+        console.log('proxyProcess', proxyProcess);
+        reject(new Error('[spawnKubectlProxy]: Exceeded timeout'));
+      }, 10000);
+    }
+  });
+}

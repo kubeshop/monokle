@@ -48,7 +48,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const {userDataDir} = config;
 
   try {
-    const kc = createKubeClient(kubeConfigPath, context);
+    const kc = await createKubeClient(kubeConfigPath, context);
     const results =
       clusterAccess && clusterAccess.length > 0
         ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))

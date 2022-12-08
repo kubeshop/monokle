@@ -23,6 +23,7 @@ const NodeHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    console.log('NodeHandler', k8sCoreV1Api.basePath);
     const response = await k8sCoreV1Api.listNode();
     return response.body.items;
   },
