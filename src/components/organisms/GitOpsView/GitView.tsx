@@ -34,7 +34,7 @@ const GitView: React.FC = () => {
 
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
-      <TitleBar title="Editor" />
+      <TitleBar type="secondary" title="Editor" />
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>

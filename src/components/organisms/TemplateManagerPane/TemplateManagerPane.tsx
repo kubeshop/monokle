@@ -103,18 +103,20 @@ const TemplatesManagerPane: React.FC = () => {
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane" style={{height}}>
       <TitleBar
-        title="Templates"
-        actions={
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TemplateManagerPaneReloadTooltip} placement="bottom">
-            <Button
-              disabled={templates.length === 0}
-              onClick={onClickReload}
-              type="link"
-              size="small"
-              icon={<ReloadOutlined />}
-            />
-            <S.QuestionCircleOutlined onClick={openHelpUrl} />
-          </Tooltip>
+        title={
+          <div style={{display: 'flex'}}>
+            Template
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={TemplateManagerPaneReloadTooltip} placement="bottom">
+              <Button
+                disabled={templates.length === 0}
+                onClick={onClickReload}
+                type="link"
+                size="small"
+                icon={<ReloadOutlined />}
+              />
+              <S.QuestionCircleOutlined onClick={openHelpUrl} />
+            </Tooltip>
+          </div>
         }
       />
 
