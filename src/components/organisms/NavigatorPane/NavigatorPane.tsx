@@ -73,9 +73,10 @@ const NavPane: React.FC = () => {
         <div style={{padding: '10px'}}>
           <TitleBar
             type="secondary"
-            title={
+            title={<div style={{display: 'flex', alignItems: 'center'}}>Navigator</div>}
+            description={
               <div style={{display: 'flex', alignItems: 'center'}}>
-                Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
+                <WarningsAndErrorsDisplay /> <OPAValidationStatus />
               </div>
             }
             actions={
