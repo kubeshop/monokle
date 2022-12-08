@@ -1,6 +1,6 @@
 import {Image} from 'antd';
 
-import {TitleWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
@@ -9,7 +9,7 @@ import * as S from './NewValidationPane.styled';
 const NewValidationPane: React.FC = () => {
   return (
     <S.ValidationPaneContainer>
-      <TitleWrapper
+      <TitleBarWrapper
         title="Validation errors"
         description={
           <S.DescriptionContainer>
