@@ -33,6 +33,9 @@ export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   width: 100%;
   display: flex;
   flex-direction: column;
+  background: ${Colors.grey1000};
+  margin: 10px;
+  border-radius: 10px;
 `;
 
 export const ExtraRightButton = styled(Button)`
@@ -89,10 +92,4 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-ink-bar {
     background: #363636;
   }
-`;
-
-export const HeaderWrapper = styled.div`
-  background: ${Colors.grey1000};
-  margin: 10px;
-  border-radius: 10px;
 `;
