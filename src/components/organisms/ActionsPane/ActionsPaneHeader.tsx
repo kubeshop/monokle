@@ -144,17 +144,23 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   if (selectedPreviewConfigurationId) {
     return (
       <>
-        <TitleBar title="Helm Command" />
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
-          <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
-            Preview
-          </Button>
-        </Tooltip>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
-          <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
-            Edit
-          </Button>
-        </Tooltip>
+        <TitleBar
+          title="Helm Command"
+          actions={
+            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
+                <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
+                  Preview
+                </Button>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
+                <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
+                  Edit
+                </Button>
+              </Tooltip>
+            </div>
+          }
+        />
       </>
     );
   }
@@ -162,21 +168,27 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   if (selectedImage) {
     return (
       <>
-        <TitleBar title="Image Info" />
-        <S.LeftArrowButton
-          onClick={onClickLeftArrow}
-          disabled={!isLeftArrowEnabled}
-          type="link"
-          size="small"
-          icon={<LeftOutlined />}
-        />
+        <TitleBar
+          title="Image Info"
+          actions={
+            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+              <S.LeftArrowButton
+                onClick={onClickLeftArrow}
+                disabled={!isLeftArrowEnabled}
+                type="link"
+                size="small"
+                icon={<LeftOutlined />}
+              />
 
-        <S.RightArrowButton
-          onClick={onClickRightArrow}
-          disabled={!isRightArrowEnabled}
-          type="link"
-          size="small"
-          icon={<RightOutlined />}
+              <S.RightArrowButton
+                onClick={onClickRightArrow}
+                disabled={!isRightArrowEnabled}
+                type="link"
+                size="small"
+                icon={<RightOutlined />}
+              />
+            </div>
+          }
         />
       </>
     );
