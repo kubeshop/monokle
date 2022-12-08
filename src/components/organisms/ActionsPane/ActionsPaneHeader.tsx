@@ -18,7 +18,8 @@ import {isInClusterModeSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
 
-import {TitleBar} from '@monokle/components';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import {K8sResource} from '@shared/models/k8sResource';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
 
@@ -144,7 +145,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   if (selectedPreviewConfigurationId) {
     return (
       <>
-        <TitleBar
+        <TitleBarWrapper
           title="Helm Command"
           actions={
             <div style={{display: 'flex', justifyContent: 'flex-end'}}>
@@ -168,7 +169,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   if (selectedImage) {
     return (
       <>
-        <TitleBar
+        <TitleBarWrapper
           title="Image Info"
           actions={
             <div style={{display: 'flex', justifyContent: 'flex-end'}}>
@@ -195,7 +196,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }
 
   return (
-    <TitleBar
+    <TitleBarWrapper
       type="secondary"
       title="Editor"
       actions={

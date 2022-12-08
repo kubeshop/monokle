@@ -2,16 +2,16 @@ import React from 'react';
 
 import {SectionRenderer} from '@molecules';
 
-import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
-import {TitleBar} from '@monokle/components';
+import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
 import * as S from './HelmPane.styled';
 
 const HelmPane: React.FC = () => {
   return (
     <S.HelmPaneContainer id="HelmPane">
-      <TitleBar title="Helm" />
+      <TitleBarWrapper title="Helm" />
 
       <S.List id="helm-sections-container">
         <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />

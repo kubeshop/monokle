@@ -5,13 +5,13 @@ import {isEmpty} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import GitSelectItem from '@assets/GitSelectItem.svg';
-
-import {TitleBar} from '@monokle/components';
 
 import * as S from './GitView.styled';
 
@@ -34,7 +34,9 @@ const GitView: React.FC = () => {
 
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
-      <TitleBar type="secondary" title="Editor" />
+      <div style={{padding: '10px'}}>
+        <TitleBarWrapper type="secondary" title="Editor" />
+      </div>
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>

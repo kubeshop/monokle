@@ -5,6 +5,8 @@ import {cancelWalkthrough, handleWalkthroughStep} from '@redux/reducers/ui';
 
 import {TabHeader} from '@atoms';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import CurlyArrow from '@assets/CurlyArrow.svg';
@@ -13,7 +15,6 @@ import EditorLayout from '@assets/EditorLayout.svg';
 import LayoutDark from '@assets/LayoutDark.svg';
 import LayoutWhite from '@assets/LayoutWhite.svg';
 
-import {TitleBar} from '@monokle/components';
 import {StepEnum} from '@shared/models/walkthrough';
 
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
@@ -81,7 +82,7 @@ export const SettingsPane = () => {
   return (
     <S.SettingsPaneContainer>
       <div>
-        <TitleBar title="Settings" description={<TitleCardDescription />} />
+        <TitleBarWrapper title="Settings" description={<TitleCardDescription />} />
       </div>
       <div>
         <S.Tabs

@@ -4,9 +4,9 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {usePaneHeight} from '@hooks/usePaneHeight';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
-import {TitleBar} from '@monokle/components';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './OpenPolicyAgent';
@@ -31,7 +31,9 @@ const ValidationPane: React.FC = () => {
 
   return (
     <S.ValidationPaneContainer $height={height}>
-      <TitleBar title="Validate your resources" />
+      <div style={{padding: '10px'}}>
+        <TitleBarWrapper title="Validate your resources" />
+      </div>
 
       <Panel height={height - DEFAULT_PANE_TITLE_HEIGHT} />
     </S.ValidationPaneContainer>

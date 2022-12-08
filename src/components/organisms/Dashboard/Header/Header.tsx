@@ -3,9 +3,10 @@ import {useCallback} from 'react';
 import {setSelectedNamespace} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
-import {TitleBar} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './Header.styled';
@@ -21,7 +22,7 @@ export const Header = ({title}: {title: string}) => {
 
   return (
     <S.Container>
-      <TitleBar
+      <TitleBarWrapper
         type="secondary"
         title={title}
         actions={

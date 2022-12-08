@@ -12,11 +12,12 @@ import {
 } from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClaim.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
-import {TitleBar} from '@monokle/components';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import {Activity} from './Activity';
@@ -90,13 +91,13 @@ export const Overview = () => {
   return (
     <S.Container>
       <S.TitleBarContainer style={{gridArea: 'status'}}>
-        <TitleBar type="secondary" title="Status" description={<Status />} />
+        <TitleBarWrapper type="secondary" title="Status" description={<Status />} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'performance'}}>
-        <TitleBar type="secondary" title="Performance" description={<></>} />
+        <TitleBarWrapper type="secondary" title="Performance" description={<></>} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
-        <TitleBar
+        <TitleBarWrapper
           type="secondary"
           title="Utilization"
           actions={
@@ -109,7 +110,7 @@ export const Overview = () => {
         />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'inventory-info'}}>
-        <TitleBar
+        <TitleBarWrapper
           type="secondary"
           title="Inventory & Info"
           actions={<S.ActionWrapper>See all</S.ActionWrapper>}
@@ -117,7 +118,7 @@ export const Overview = () => {
         />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'activity'}}>
-        <TitleBar
+        <TitleBarWrapper
           type="secondary"
           title="Activity"
           actions={
