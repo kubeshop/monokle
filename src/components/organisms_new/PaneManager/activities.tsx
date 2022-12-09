@@ -2,15 +2,7 @@ import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, Validation
 
 import {useAppSelector} from '@redux/hooks';
 
-import {
-  BottomPaneManager,
-  DashboardPane,
-  FileTreePane,
-  GitPane,
-  SearchPane,
-  TutorialPage,
-  ValidationPane,
-} from '@organisms';
+import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
