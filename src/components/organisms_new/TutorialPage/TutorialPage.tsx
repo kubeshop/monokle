@@ -24,7 +24,6 @@ const TutorialPage = () => {
         <TutorialCard feature={VALIDATE} />
         <S.Arrow />
         <TutorialCard feature={PUBLISH} />
-        <S.Arrow />
       </S.TutorialCards>
 
       <S.TutorialPageTitle>Helpful Resources</S.TutorialPageTitle>
