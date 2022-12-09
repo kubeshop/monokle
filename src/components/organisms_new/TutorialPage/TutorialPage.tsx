@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {EDIT, EXPLORE, PUBLISH, VALIDATE} from '@shared/constants/features';
-import {DISCORD, DOCUMENTATION, FEEDBACK, GUIDE, TUTORIAL, WHATSNEW} from '@shared/constants/referenceLinks';
+import {DISCORD, DOCUMENTATION, FEEDBACK, GUIDE, TUTORIAL, WHATSNEW} from '@shared/constants/tutorialReferences';
 
 import TutorialCard from './TutorialCard';
 import * as S from './TutorialPage.styled';
@@ -10,7 +10,7 @@ import TutorialReference from './TutorialReference';
 const TutorialPage = () => {
   return (
     <S.TutorialPageContainer>
-      <S.TutorialPageTitle>Starting with Monoklebbvb</S.TutorialPageTitle>
+      <S.TutorialPageTitle>Starting with Monokle</S.TutorialPageTitle>
       <S.TutorialPageSubTitle>
         Select in which stage of the K8s manifests management you are in (or from which one you want to learn more
         about) and let us show you how Monokle can help you.
@@ -29,12 +29,12 @@ const TutorialPage = () => {
 
       <S.TutorialPageTitle>Helpful Resources</S.TutorialPageTitle>
       <S.TutorialReferences>
-        <TutorialReference referenceLink={GUIDE} />
-        <TutorialReference referenceLink={TUTORIAL} />
-        <TutorialReference referenceLink={DOCUMENTATION} />
-        <TutorialReference referenceLink={DISCORD} />
-        <TutorialReference referenceLink={WHATSNEW} />
-        <TutorialReference referenceLink={FEEDBACK} />
+        <TutorialReference tutorialReferenceLink={GUIDE} />
+        <TutorialReference tutorialReferenceLink={TUTORIAL} />
+        <TutorialReference tutorialReferenceLink={DOCUMENTATION} />
+        <TutorialReference tutorialReferenceLink={DISCORD} />
+        <TutorialReference tutorialReferenceLink={WHATSNEW} />
+        <TutorialReference tutorialReferenceLink={FEEDBACK} />
       </S.TutorialReferences>
     </S.TutorialPageContainer>
   );

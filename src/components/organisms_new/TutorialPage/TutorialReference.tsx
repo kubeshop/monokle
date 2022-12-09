@@ -2,27 +2,27 @@ import {shell} from 'electron';
 
 import React, {useCallback} from 'react';
 
-import {ReferenceLink} from '@shared/models/referenceLinks';
+import {TutorialReferenceLink} from '@shared/models/tutorialReferences';
 
 import * as S from './TutorialReference.styled';
 
 type Props = {
-  referenceLink: ReferenceLink;
+  tutorialReferenceLink: TutorialReferenceLink;
 };
 
-const TutorialReference: React.FC<Props> = ({referenceLink}) => {
-  const {id, name, description, learnMoreUrl} = referenceLink;
+const TutorialReference: React.FC<Props> = ({tutorialReferenceLink}) => {
+  const {type, name, description, learnMoreUrl} = tutorialReferenceLink;
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   return (
-    <S.ReferenceLink key={id}>
+    <S.TutorialReferenceLink key={type}>
       <span>
         <S.Link onClick={openLearnMore}>{name}</S.Link>
         <br />
         <S.Description>{description}</S.Description>
       </span>
-    </S.ReferenceLink>
+    </S.TutorialReferenceLink>
   );
 };
 

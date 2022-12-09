@@ -8,4 +8,4 @@ export * from './plugin';
 export * from './telemetry';
 export * from './urls';
 export * from './features';
-export * from './referenceLinks';
+export * from './tutorialReferences';

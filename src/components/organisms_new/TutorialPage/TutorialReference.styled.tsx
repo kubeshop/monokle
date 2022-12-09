@@ -6,7 +6,7 @@ import {Icon as BaseIcon} from '@atoms';
 
 import {Colors} from '@shared/styles/colors';
 
-export const ReferenceLink = styled(AntdCard)`
+export const TutorialReferenceLink = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
   flex-grow: 1;

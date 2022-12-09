@@ -296,7 +296,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.OPEN_TUTORIAL_PAGE.key, () => {
-    dispatch(setLeftMenuSelection('validation-pane'));
+    dispatch(setLeftMenuSelection('tutorial'));
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {

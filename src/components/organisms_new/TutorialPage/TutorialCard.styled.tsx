@@ -20,6 +20,7 @@ export const Card = styled(AntdCard)`
 export const Icon = styled(AntdIcon)`
   font-size: 14px;
   margin: 8px;
+  color: ${Colors.geekblue7};
 `;
 
 export const Name = styled.h1`

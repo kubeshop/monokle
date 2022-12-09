@@ -32,5 +32,5 @@ export * from './ui';
 export * from './validation';
 export * from './walkthrough';
 export * from './window';
-export * from './referenceLinks';
+export * from './tutorialReferences';
 export * from './features';
