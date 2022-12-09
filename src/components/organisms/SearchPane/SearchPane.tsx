@@ -27,7 +27,7 @@ import {
 } from '@redux/reducers/ui';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 
-import {TitleBar} from '@atoms';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
@@ -35,6 +35,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
 
+import {TitleBar} from '@monokle/components';
 import {CurrentMatch, FileEntry, MatchNode} from '@shared/models/fileEntry';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
@@ -415,7 +416,9 @@ const SearchPane: React.FC = () => {
 
   return (
     <S.FileTreeContainer id="AdvancedSearch">
-      <TitleBar title="Advanced Search" closable />
+      <TitleBarWrapper>
+        <TitleBar title="Advanced Search" />
+      </TitleBarWrapper>
       <S.Tabs items={tabItems} activeKey={activeTab} onChange={changeTab} />
     </S.FileTreeContainer>
   );

@@ -2,6 +2,8 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles/colors';
+
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;
@@ -27,10 +29,12 @@ export const ActionsPaneFooterContainer = styled.div`
 `;
 
 export const ActionsPaneMainContainer = styled.div<{$height: number}>`
-  height: ${({$height}) => $height}px;
-  width: 100%;
   display: flex;
+  height: ${({$height}) => $height}px;
   flex-direction: column;
+  background: ${Colors.grey1000};
+  margin: 10px;
+  border-radius: 10px;
 `;
 
 export const ExtraRightButton = styled(Button)`
@@ -52,7 +56,7 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   overflow: visible;
 
   & .ant-tabs-nav {
-    padding: 0 16px;
+    padding: 8px 16px 0 0;
     margin-bottom: 0px;
   }
 
@@ -67,5 +71,24 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-extra-content {
     display: flex;
     align-items: center;
+  }
+
+  & .ant-tabs-tab {
+    padding: 0px 16px;
+    margin-left: 8px;
+    background: black;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid #363636;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  & .ant-tabs-tab-active {
+    border-bottom: 1px solid #363636;
+    background: black;
+  }
+
+  & .ant-tabs-ink-bar {
+    background: #363636;
   }
 `;

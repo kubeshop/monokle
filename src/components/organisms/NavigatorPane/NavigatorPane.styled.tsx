@@ -62,5 +62,4 @@ export const TitleBarRightButtons = styled.div`
   float: right;
   display: flex;
   align-items: center;
-  padding-right: 16px;
 `;

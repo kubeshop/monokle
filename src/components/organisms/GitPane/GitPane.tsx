@@ -9,12 +9,13 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@atoms';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import {TitleBar} from '@monokle/components';
 import {GitChangedFile} from '@shared/models/git';
 
 import BottomActions from './BottomActions';
@@ -116,7 +117,9 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBar title="Git" closable />
+      <TitleBarWrapper>
+        <TitleBar title="Git" />
+      </TitleBarWrapper>
 
       {gitLoading ? (
         <S.Skeleton active />

@@ -12,6 +12,8 @@ import {
 } from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClaim.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
@@ -90,47 +92,57 @@ export const Overview = () => {
   return (
     <S.Container>
       <S.TitleBarContainer style={{gridArea: 'status'}}>
-        <TitleBar type="secondary" title="Status" description={<Status />} />
+        <TitleBarWrapper>
+          <TitleBar type="secondary" title="Status" description={<Status />} />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'performance'}}>
-        <TitleBar type="secondary" title="Performance" description={<></>} />
+        <TitleBarWrapper>
+          <TitleBar type="secondary" title="Performance" />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
-        <TitleBar
-          type="secondary"
-          title="Utilization"
-          actions={
-            <S.ActionWrapper>
-              <span>Default view</span>
-              <S.DownOutlined />
-            </S.ActionWrapper>
-          }
-          description={<Utilization utilizations={utilizationData} />}
-        />
+        <TitleBarWrapper>
+          <TitleBar
+            type="secondary"
+            title="Utilization"
+            actions={
+              <S.ActionWrapper>
+                <span>Default view</span>
+                <S.DownOutlined />
+              </S.ActionWrapper>
+            }
+            description={<Utilization utilizations={utilizationData} />}
+          />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'inventory-info'}}>
-        <TitleBar
-          type="secondary"
-          title="Inventory & Info"
-          actions={<S.ActionWrapper>See all</S.ActionWrapper>}
-          description={<InventoryInfo info={clusterInformation || ({} as ClusterInformation)} />}
-        />
+        <TitleBarWrapper>
+          <TitleBar
+            type="secondary"
+            title="Inventory & Info"
+            actions={<S.ActionWrapper>See all</S.ActionWrapper>}
+            description={<InventoryInfo info={clusterInformation || ({} as ClusterInformation)} />}
+          />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'activity'}}>
-        <TitleBar
-          type="secondary"
-          title="Activity"
-          actions={
-            <div>
-              <S.ActionWrapper style={{marginRight: '8px'}}>
-                <S.PauseCircleFilled />
-                <span>Pause</span>
-              </S.ActionWrapper>
-              <S.ActionWrapper>See all</S.ActionWrapper>
-            </div>
-          }
-          description={<Activity events={activityData} />}
-        />
+        <TitleBarWrapper>
+          <TitleBar
+            type="secondary"
+            title="Activity"
+            actions={
+              <div>
+                <S.ActionWrapper style={{marginRight: '8px'}}>
+                  <S.PauseCircleFilled />
+                  <span>Pause</span>
+                </S.ActionWrapper>
+                <S.ActionWrapper>See all</S.ActionWrapper>
+              </div>
+            }
+            description={<Activity events={activityData} />}
+          />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
     </S.Container>
   );

@@ -14,13 +14,14 @@ import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
-import {MonoPaneTitle} from '@atoms';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
@@ -71,40 +72,46 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <S.TitleBar>
-          <MonoPaneTitle>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
-            </div>
-          </MonoPaneTitle>
-          <S.TitleBarRightButtons>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-              <S.PlusButton
-                id="create-resource-button"
-                $disabled={!isFolderOpen || isInPreviewMode}
-                $highlighted={highlightedItems.createResource}
-                className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                disabled={!isFolderOpen || isInPreviewMode}
-                icon={<PlusOutlined />}
-                size="small"
-                type="link"
-                onClick={onClickNewResource}
-              />
-            </Tooltip>
+        <TitleBarWrapper>
+          <TitleBar
+            type="secondary"
+            title="Resources"
+            description={
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                <WarningsAndErrorsDisplay /> <OPAValidationStatus />
+              </div>
+            }
+            actions={
+              <S.TitleBarRightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
+                  <S.PlusButton
+                    id="create-resource-button"
+                    $disabled={!isFolderOpen || isInPreviewMode}
+                    $highlighted={highlightedItems.createResource}
+                    className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                    disabled={!isFolderOpen || isInPreviewMode}
+                    icon={<PlusOutlined />}
+                    size="small"
+                    type="link"
+                    onClick={onClickNewResource}
+                  />
+                </Tooltip>
 
-            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
-                <Button
-                  disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                  type="link"
-                  size="small"
-                  icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                  onClick={resourceFilterButtonHandler}
-                />
-              </Tooltip>
-            </Badge>
-          </S.TitleBarRightButtons>
-        </S.TitleBar>
+                <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
+                    <Button
+                      disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                      type="link"
+                      size="small"
+                      icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                      onClick={resourceFilterButtonHandler}
+                    />
+                  </Tooltip>
+                </Badge>
+              </S.TitleBarRightButtons>
+            }
+          />
+        </TitleBarWrapper>
       )}
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
