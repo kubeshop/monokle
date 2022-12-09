@@ -23,8 +23,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {Icon} from '@atoms';
 
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
-
 import {
   useCreate,
   useDelete,
@@ -40,6 +38,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {sortFoldersFiles} from '@utils/fileExplorer';
 
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
@@ -217,7 +216,7 @@ const FileTreePane: React.FC = () => {
 
   return (
     <S.FileTreeContainer id="FileExplorer">
-      <TitleBarWrapper
+      <TitleBar
         expandable
         isOpen
         title="Files"

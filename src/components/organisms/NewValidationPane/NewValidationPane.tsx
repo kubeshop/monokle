@@ -1,15 +1,15 @@
 import {Image} from 'antd';
 
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
-
 import ValidationFigure from '@assets/NewValidationFigure.svg';
+
+import {TitleBar} from '@monokle/components';
 
 import * as S from './NewValidationPane.styled';
 
 const NewValidationPane: React.FC = () => {
   return (
     <S.ValidationPaneContainer>
-      <TitleBarWrapper
+      <TitleBar
         title="Validation errors"
         description={
           <S.DescriptionContainer>

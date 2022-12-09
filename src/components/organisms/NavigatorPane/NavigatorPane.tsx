@@ -21,6 +21,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
@@ -71,10 +72,10 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <div style={{padding: '10px'}}>
-          <TitleBarWrapper
+        <TitleBarWrapper>
+          <TitleBar
             type="secondary"
-            title="Navigator"
+            title="Resources"
             description={
               <div style={{display: 'flex', alignItems: 'center'}}>
                 <WarningsAndErrorsDisplay /> <OPAValidationStatus />
@@ -110,7 +111,7 @@ const NavPane: React.FC = () => {
               </S.TitleBarRightButtons>
             }
           />
-        </div>
+        </TitleBarWrapper>
       )}
 
       <ReflexContainer orientation="horizontal" style={{height: height - 40}}>

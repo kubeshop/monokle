@@ -30,6 +30,7 @@ export const ActionsPaneFooterContainer = styled.div`
 
 export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   display: flex;
+  height: ${({$height}) => $height}px;
   flex-direction: column;
   background: ${Colors.grey1000};
   margin: 10px;

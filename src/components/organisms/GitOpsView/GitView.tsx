@@ -13,6 +13,8 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import GitSelectItem from '@assets/GitSelectItem.svg';
 
+import {TitleBar} from '@monokle/components';
+
 import * as S from './GitView.styled';
 
 const options: monaco.editor.IDiffEditorConstructionOptions = {
@@ -34,9 +36,9 @@ const GitView: React.FC = () => {
 
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
-      <div style={{padding: '10px'}}>
-        <TitleBarWrapper type="secondary" title="Editor" />
-      </div>
+      <TitleBarWrapper>
+        <TitleBar type="secondary" title="Editor" />
+      </TitleBarWrapper>
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>

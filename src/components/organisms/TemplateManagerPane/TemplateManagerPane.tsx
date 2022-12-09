@@ -12,10 +12,9 @@ import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
-
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {TitleBar} from '@monokle/components';
 import {AnyTemplate} from '@shared/models/template';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
@@ -103,7 +102,7 @@ const TemplatesManagerPane: React.FC = () => {
 
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane" style={{height}}>
-      <TitleBarWrapper
+      <TitleBar
         title={
           <div style={{display: 'flex'}}>
             Template

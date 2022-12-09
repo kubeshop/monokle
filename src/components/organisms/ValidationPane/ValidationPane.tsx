@@ -8,6 +8,8 @@ import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrappe
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {TitleBar} from '@monokle/components';
+
 import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './OpenPolicyAgent';
 import ValidationOverView from './ValidationOverview';
@@ -31,9 +33,9 @@ const ValidationPane: React.FC = () => {
 
   return (
     <S.ValidationPaneContainer $height={height}>
-      <div style={{padding: '10px'}}>
-        <TitleBarWrapper title="Validate your resources" />
-      </div>
+      <TitleBarWrapper>
+        <TitleBar title="Validate your resources" />
+      </TitleBarWrapper>
 
       <Panel height={height - DEFAULT_PANE_TITLE_HEIGHT} />
     </S.ValidationPaneContainer>

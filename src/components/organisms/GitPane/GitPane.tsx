@@ -15,6 +15,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import {TitleBar} from '@monokle/components';
 import {GitChangedFile} from '@shared/models/git';
 
 import BottomActions from './BottomActions';
@@ -116,9 +117,9 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <div style={{padding: '10px'}}>
-        <TitleBarWrapper title="Git" />
-      </div>
+      <TitleBarWrapper>
+        <TitleBar title="Git" />
+      </TitleBarWrapper>
 
       {gitLoading ? (
         <S.Skeleton active />

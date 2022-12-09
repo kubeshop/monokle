@@ -5,7 +5,7 @@ import {Col, Row} from 'antd';
 import {selectCompareStatus} from '@redux/compare';
 import {useAppSelector} from '@redux/hooks';
 
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+import {TitleBar} from '@monokle/components';
 
 import {ResourceSetSelector} from '../ResourceSetSelector';
 import CompareActionBar from './CompareActionBar';
@@ -23,10 +23,7 @@ const CompareSyncPane: React.FC = () => {
 
   return (
     <S.CompareSyncPaneContainer>
-      <TitleBarWrapper
-        title="Sync & compare"
-        description={!inspection ? <CompareActionBar /> : <InspectionActionBar />}
-      />
+      <TitleBar title="Sync & compare" description={!inspection ? <CompareActionBar /> : <InspectionActionBar />} />
 
       <Row ref={containerRef}>
         <Col span={10}>

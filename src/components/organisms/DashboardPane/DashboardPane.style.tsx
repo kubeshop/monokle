@@ -9,8 +9,7 @@ import {
 
 import styled from 'styled-components';
 
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
-
+import {TitleBar} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
@@ -57,7 +56,7 @@ export const SubSection = styled.div<{$active: boolean}>`
     background-color: ${props.$active ? Colors.blue9 : 'transparent'}`}
 `;
 
-export const ClusterName = styled(TitleBarWrapper)`
+export const ClusterName = styled(TitleBar)`
   & > div:first-child {
     font-size: 14px;
     color: ${Colors.whitePure};
