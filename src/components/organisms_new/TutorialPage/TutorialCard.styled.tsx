@@ -10,6 +10,8 @@ export const Card = styled(AntdCard)`
   border: 2px solid ${Colors.coldGrey};
   border-radius: 2px;
   display: flex;
+  flex-grow: 1;
+  flex-basis: 0;
   min-height: 275px;
   .ant-card-body {
     background-color: ${Colors.blueBgColor};
@@ -21,6 +23,7 @@ export const Icon = styled(AntdIcon)`
   font-size: 14px;
   margin: 8px;
   color: ${Colors.geekblue7};
+  background: ${Colors.blueWrapperColor};
 `;
 
 export const Name = styled.h1`
@@ -62,7 +65,7 @@ export const Span = styled.span`
 export const ElipseWrapper = styled.div`
   width: 32px;
   height: 32px;
-  background: #2b3759;
   border-radius: 50%;
   margin-bottom: 12px;
+  background: ${Colors.blueWrapperColor};
 `;
