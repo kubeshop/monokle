@@ -1,10 +1,4 @@
-import {
-  FileExplorerTabTooltip,
-  SettingsTooltip,
-  TerminalPaneTooltip,
-  TutorialPageTooltip,
-  ValidationTabTooltip,
-} from '@constants/tooltips';
+import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, ValidationTabTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -84,14 +78,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: 'View cluster dashboard',
     icon: () => <Icon name="search" style={{fontSize: 16}} />,
     component: <DashboardPane />,
-    useBadge: () => undefined,
-  },
-  {
-    type: 'fullscreen',
-    name: 'tutorial',
-    tooltip: <TutorialPageTooltip />,
-    icon: () => <SettingsOutlined />,
-    component: <TutorialPage />,
     useBadge: () => undefined,
   },
 ];
