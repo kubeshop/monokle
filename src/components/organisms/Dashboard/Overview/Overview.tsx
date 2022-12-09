@@ -94,7 +94,7 @@ export const Overview = () => {
         <TitleBarWrapper type="secondary" title="Status" description={<Status />} />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'performance'}}>
-        <TitleBarWrapper type="secondary" title="Performance" description={<></>} />
+        <TitleBarWrapper type="secondary" title="Performance" />
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
         <TitleBarWrapper
