@@ -114,6 +114,7 @@ function extractPatches(
   let patches = getScalarNodes(kustomization, patchPath);
   patches
     .filter(refNode => refNode.node.type === 'PLAIN')
+    .filter(refNode => !isExternalResourceRef(refNode))
     .forEach((refNode: NodeWrapper) => {
       let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
       const fileEntry = fileMap[kpath];
