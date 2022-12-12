@@ -286,17 +286,6 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
           </MenuButton>
         </PaneTooltip>
-
-        <PaneTooltip show={!leftActive || leftMenuSelection !== 'audit'} title="Audit" placement="right">
-          <MenuButton
-            isSelected={checkIsTabSelected('audit')}
-            isActive={isActive}
-            onClick={() => setLeftActiveMenu('audit')}
-            disabled={!activeProject}
-          >
-            <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
-          </MenuButton>
-        </PaneTooltip>
       </S.IconsContainer>
 
       <S.IconsContainer>
