@@ -295,6 +295,10 @@ const HotKeysHandler = () => {
     }
   });
 
+  useHotkeys(hotkeys.OPEN_TUTORIAL_PAGE.key, () => {
+    dispatch(setLeftMenuSelection('tutorial'));
+  });
+
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
     dispatch(resetResourceFilter());
   });
@@ -310,7 +314,7 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(
-    hotkeys.OPEN_GETTING_STARTED_PAGE.key,
+    hotkeys.OPEN_TUTORIAL_PAGE.key,
     () => {
       if (!uiState.isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());

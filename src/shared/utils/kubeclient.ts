@@ -4,7 +4,8 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
-import {ClusterAccess, CommandOptions, CommandResult, KubePermissions} from '@shared/models';
+import {CommandOptions, CommandResult} from '@shared/models/commands';
+import {ClusterAccess, KubePermissions} from '@shared/models/config';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {getMainProcessEnv} from '@shared/utils/env';
 

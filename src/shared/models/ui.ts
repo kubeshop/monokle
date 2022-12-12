@@ -21,6 +21,7 @@ type LeftMenuSelectionType =
   | 'templates-pane'
   | 'images-pane'
   | 'validation-pane'
+  | 'tutorial'
   | 'search'
   | 'crds'
   | 'dashboard';
@@ -67,7 +68,15 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings' | 'dashboard';
+type NewLeftMenuSelectionType =
+  | 'explorer'
+  | 'compare'
+  | 'validation'
+  | 'git'
+  | 'search'
+  | 'settings'
+  | 'dashboard'
+  | 'tutorial';
 
 type PaneConfiguration = {
   leftPane: number;

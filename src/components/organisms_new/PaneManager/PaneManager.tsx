@@ -12,6 +12,7 @@ import {
   NavigatorPane,
   RecentProjectsPage,
   StartProjectPage,
+  TutorialPage,
 } from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
@@ -100,7 +101,9 @@ const NewPaneManager: React.FC = () => {
                   center={
                     !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
                       <NavigatorPane />
-                    ) : undefined
+                    ) : (
+                      <TutorialPage />
+                    )
                   }
                   right={
                     currentActivity?.name === 'git' ? (
