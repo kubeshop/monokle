@@ -133,6 +133,15 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     }
   };
 
+  const showActionsDropdown = useMemo(
+    () =>
+      !(
+        actionsPaneWidth <
+        PANE_CONSTRAINT_VALUES.minEditPane - (isInClusterMode && selectedResource?.kind === 'Deployment' ? 0 : 105)
+      ),
+    [actionsPaneWidth, isInClusterMode, selectedResource?.kind]
+  );
+
   if (selectedPreviewConfigurationId) {
     return (
       <TitleBar title="Helm Command">
@@ -200,7 +209,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         )}
 
         <S.ButtonContainer>
-          {actionsPaneWidth > PANE_CONSTRAINT_VALUES.minEditPane && (
+          {showActionsDropdown ? (
             <>
               <Diff />
               {isInClusterMode && selectedResource?.kind === 'Deployment' && (
@@ -211,20 +220,18 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
               )}
               <InstallDeploy applySelection={applySelection} />
             </>
-          )}
-
-          {actionsPaneWidth <= PANE_CONSTRAINT_VALUES.minEditPane && (
+          ) : (
             <Dropdown
               overlay={
                 <S.DropdownActionContainer>
-                  <Diff />
+                  <Diff isDropdownActive />
                   {isInClusterMode && selectedResource?.kind === 'Deployment' && (
                     <>
-                      <Scale />
-                      <Restart />
+                      <Scale isDropdownActive />
+                      <Restart isDropdownActive />
                     </>
                   )}
-                  <InstallDeploy applySelection={applySelection} />
+                  <InstallDeploy applySelection={applySelection} isDropdownActive />
                 </S.DropdownActionContainer>
               }
               placement="bottomLeft"

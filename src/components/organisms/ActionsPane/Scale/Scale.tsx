@@ -16,9 +16,15 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import scaleDeployment from '@redux/services/scaleDeployment';
 
-import * as S from '../ActionsPaneHeader.styled';
+import {SecondaryButton} from '@atoms';
 
-const Scale = () => {
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Scale: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useAppSelector(selectedResourceSelector);
@@ -55,15 +61,16 @@ const Scale = () => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <S.SecondaryButton
+        <SecondaryButton
+          $disableHover={isDropdownActive}
           loading={Boolean(scaling)}
-          type="default"
+          type={isDropdownActive ? 'link' : 'default'}
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
         >
           Scale
-        </S.SecondaryButton>
+        </SecondaryButton>
       </Tooltip>
       <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>

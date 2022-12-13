@@ -1,6 +1,5 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useSelector} from 'react-redux';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
@@ -21,6 +20,7 @@ import {
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
+  isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -48,13 +48,15 @@ const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const currentResource = useAppSelector(selectedResourceSelector);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -204,7 +206,7 @@ const HotKeysHandler = () => {
     hotkeys.TOGGLE_TERMINAL_PANE.key,
     () => {
       if (uiState.leftMenu.bottomSelection === 'terminal') {
-        dispatch(setLeftBottomMenuSelection(null));
+        dispatch(setLeftBottomMenuSelection(undefined));
       } else {
         dispatch(setLeftBottomMenuSelection('terminal'));
       }
@@ -224,7 +226,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
-      if (isInPreviewMode) {
+      if (isInPreviewMode && !isInClusterMode) {
         stopPreview(dispatch);
       }
     },
@@ -271,19 +273,27 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
-    dispatch(setLeftMenuSelection('file-explorer'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('file-explorer'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('kustomize-pane'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('kustomize-pane'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    dispatch(setLeftMenuSelection('helm-pane'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('helm-pane'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('validation-pane'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('validation-pane'));
+    }
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
@@ -311,13 +321,17 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.FIND.key, () => {
-    dispatch(setLeftMenuSelection('search'));
-    dispatch(setActiveTab('search'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('search'));
+      dispatch(setActiveTab('search'));
+    }
   });
 
   useHotkeys(hotkeys.REPLACE.key, () => {
-    dispatch(setLeftMenuSelection('search'));
-    dispatch(setActiveTab('findReplace'));
+    if (!previewingCluster) {
+      dispatch(setLeftMenuSelection('search'));
+      dispatch(setActiveTab('findReplace'));
+    }
   });
 
   return (

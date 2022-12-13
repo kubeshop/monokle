@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, Select, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -20,6 +20,7 @@ import {
   toggleEventTracking,
   updateApplicationSettings,
   updateClusterSelectorVisibilty,
+  updateFileExplorerSortOrder,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateK8sVersion,
@@ -55,6 +56,7 @@ const SettingsManager: React.FC = () => {
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const [activeTab, setActiveTab] = useState<string>(
     activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
@@ -62,6 +64,7 @@ const SettingsManager: React.FC = () => {
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
+  const [fileExplorerForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
@@ -73,6 +76,12 @@ const SettingsManager: React.FC = () => {
   const handlePaneCollapse = (value: string) => {
     setActiveTab(value);
   };
+
+  useEffect(() => {
+    if (previewingCluster) {
+      setActiveTab(SettingsPanel.DefaultProjectSettings);
+    }
+  }, [previewingCluster]);
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));
@@ -246,6 +255,33 @@ const SettingsManager: React.FC = () => {
                 Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
               </Checkbox>
             </S.Div>
+          </S.Div>
+
+          <S.Div>
+            <S.Span>File explorer</S.Span>
+
+            <Form
+              initialValues={{fileExplorerSortOrder: appConfig.fileExplorerSortOrder}}
+              form={fileExplorerForm}
+              layout="vertical"
+              onValuesChange={values => {
+                dispatch(updateFileExplorerSortOrder(values.fileExplorerSortOrder));
+              }}
+            >
+              <Form.Item label="Sort order" name="fileExplorerSortOrder">
+                <Select style={{width: '100%'}}>
+                  <Select.Option key="folders" value="folders">
+                    Folders first
+                  </Select.Option>
+                  <Select.Option key="files" value="files">
+                    Files first
+                  </Select.Option>
+                  <Select.Option key="mixed" value="mixed">
+                    Mixed
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Form>
           </S.Div>
         </>
       ),

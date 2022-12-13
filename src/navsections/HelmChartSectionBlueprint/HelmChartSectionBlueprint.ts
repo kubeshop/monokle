@@ -222,7 +222,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+      const kubeConfigPath = state.config.kubeConfig.path;
       return {
         helmValuesMap: state.main.helmValuesMap,
         isInClusterMode: kubeConfigPath
@@ -316,7 +316,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       previewConfigurationsSectionBlueprint.id,
     ],
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+      const kubeConfigPath = state.config.kubeConfig.path;
       return {
         isInClusterMode: kubeConfigPath
           ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))

@@ -3,15 +3,18 @@ import {webFrame} from 'electron';
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
+import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {SavedCommand} from '@models/appconfig';
 import {
   HighlightItems,
   LayoutSizeType,
   LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
+  NewLeftMenuSelectionType,
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
@@ -63,11 +66,22 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftBottomMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuBottomSelectionType>) => {
+    setLeftBottomMenuSelection: (
+      state: Draft<UiState>,
+      action: PayloadAction<LeftMenuBottomSelectionType | undefined>
+    ) => {
       state.leftMenu.bottomSelection = action.payload;
-      electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+
+      if (!action.payload) {
+        electronStore.delete('ui.leftMenu.bottomSelection');
+      } else {
+        electronStore.set('ui.leftMenu.bottomSelection', action.payload);
+      }
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
+    setLeftMenuSelection: (
+      state: Draft<UiState>,
+      action: PayloadAction<LeftMenuSelectionType | NewLeftMenuSelectionType>
+    ) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -95,8 +109,13 @@ export const uiSlice = createSlice({
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
-    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
-      state.paneConfiguration = action.payload;
+    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<Partial<PaneConfiguration>>) {
+      (Object.entries(action.payload) as Entries<PaneConfiguration>).forEach(([key, value]) => {
+        if (action.payload[key]) {
+          state.paneConfiguration[key] = value;
+        }
+      });
+
       electronStore.set('ui.paneConfiguration', state.paneConfiguration);
     },
     openNewResourceWizard: (
@@ -164,6 +183,17 @@ export const uiSlice = createSlice({
         resourcesIds: action.payload,
       };
     },
+    closeSaveEditCommandModal: (state: Draft<UiState>) => {
+      state.saveEditCommandModal = {isOpen: false};
+    },
+    openSaveEditCommandModal: (state: Draft<UiState>, action: PayloadAction<{command?: SavedCommand}>) => {
+      state.saveEditCommandModal.isOpen = true;
+
+      if (action.payload.command) {
+        state.saveEditCommandModal.command = action.payload.command;
+      }
+    },
+
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
@@ -240,6 +270,9 @@ export const uiSlice = createSlice({
     },
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
       state.kubeConfigBrowseSettings = {isOpen: true};
+    },
+    setPreviewingCluster: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.previewingCluster = action.payload;
     },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
@@ -349,6 +382,7 @@ export const {
   closeRenameEntityModal,
   closeRenameResourceModal,
   closeReplaceImageModal,
+  closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   collapseNavSections,
   expandNavSections,
@@ -367,6 +401,7 @@ export const {
   openRenameEntityModal,
   openRenameResourceModal,
   openReplaceImageModal,
+  openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   resetLayout,
   setActiveSettingsPanel,
@@ -378,6 +413,7 @@ export const {
   setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
+  setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
   toggleExpandActionsPaneFooter,

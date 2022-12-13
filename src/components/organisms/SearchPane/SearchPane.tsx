@@ -33,6 +33,7 @@ import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {TitleBar} from '@molecules';
 
 import {useCreate, useDelete, useDuplicate, useFileSelect, useHighlightNode, usePreview} from '@hooks/fileTreeHooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {filterFilesByQuery, getRegexp, notEmpty} from '@utils/filterQuery';
 import {replaceInFiles} from '@utils/replaceInFiles';
@@ -58,7 +59,7 @@ const decorate = (arr: FilterTreeNode[]) => {
   } as TreeNode;
 };
 
-const SearchPane: React.FC<{height: number}> = ({height}) => {
+const SearchPane: React.FC = () => {
   const [searchTree, setSearchTree] = useState<FilterTreeNode[]>([]);
   const {currentMatch, searchQuery, replaceQuery, queryMatchParams} = useAppSelector(state => state.main.search);
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
@@ -81,6 +82,7 @@ const SearchPane: React.FC<{height: number}> = ({height}) => {
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
   const {onCreateResource} = useCreate();
+  const height = usePaneHeight();
 
   const treeRef = useRef<any>();
   const expandedFiles = useAppSelector(state => state.ui.leftMenu.expandedSearchedFiles);

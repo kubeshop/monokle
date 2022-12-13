@@ -17,9 +17,15 @@ import {
 import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
-import * as S from '../ActionsPaneHeader.styled';
+import {SecondaryButton} from '@atoms';
 
-const Restart = () => {
+type IProps = {
+  isDropdownActive?: boolean;
+};
+
+const Restart: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useAppSelector(selectedResourceSelector);
@@ -46,9 +52,15 @@ const Restart = () => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <S.SecondaryButton type="default" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
+      <SecondaryButton
+        $disableHover={isDropdownActive}
+        type={isDropdownActive ? 'link' : 'default'}
+        size="small"
+        onClick={handleClick}
+        disabled={!isBtnEnabled}
+      >
         Restart
-      </S.SecondaryButton>
+      </SecondaryButton>
     </Tooltip>
   );
 };

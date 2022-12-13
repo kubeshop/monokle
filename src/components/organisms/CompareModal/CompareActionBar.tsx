@@ -1,20 +1,16 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {AutoComplete, Checkbox, Input, Select, Space} from 'antd';
-
-import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+import {Checkbox, Input, Select, Space} from 'antd';
 
 import {
   CompareOperation,
   comparisonAllToggled,
   filterUpdated,
-  namespaceUpdated,
   operationUpdated,
   searchUpdated,
   selectCompareStatus,
   selectIsAllComparisonSelected,
-  selectKnownNamespaces,
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -52,7 +48,7 @@ export const CompareActionBar: React.FC = () => {
         <Space>
           <SearchInput disabled={disabled} />
 
-          <NamespaceInput disabled={disabled} />
+          {/* <NamespaceInput disabled={disabled} /> */}
 
           <OperationSelect />
 
@@ -88,35 +84,35 @@ function SearchInput({disabled}: {disabled: boolean}) {
   );
 }
 
-function NamespaceInput({disabled}: {disabled: boolean}) {
-  const dispatch = useAppDispatch();
-  const knownNamespaces = useAppSelector(state => selectKnownNamespaces(state.compare));
-  const options = useMemo(() => knownNamespaces.map(n => ({value: n})), [knownNamespaces]);
+// function NamespaceInput({disabled}: {disabled: boolean}) {
+//   const dispatch = useAppDispatch();
+//   const knownNamespaces = useAppSelector(state => selectKnownNamespaces(state.compare));
+//   const options = useMemo(() => knownNamespaces.map(n => ({value: n})), [knownNamespaces]);
 
-  const namespace = useAppSelector(state => state.compare.current.view.namespace);
-  const [value, setValue] = useState(namespace);
+//   const namespace = useAppSelector(state => state.compare.current.view.namespace);
+//   const [value, setValue] = useState(namespace);
 
-  useDebounce(
-    () => {
-      const newNamespace = value === '' ? undefined : value;
-      if (newNamespace === namespace) return;
-      dispatch(namespaceUpdated({namespace: newNamespace}));
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [value]
-  );
+//   useDebounce(
+//     () => {
+//       const newNamespace = value === '' ? undefined : value;
+//       if (newNamespace === namespace) return;
+//       dispatch(namespaceUpdated({namespace: newNamespace}));
+//     },
+//     DEFAULT_EDITOR_DEBOUNCE,
+//     [value]
+//   );
 
-  return (
-    <AutoComplete
-      style={{width: 175}}
-      placeholder="Set default namespace"
-      disabled={disabled}
-      value={value}
-      options={options}
-      onChange={setValue}
-    />
-  );
-}
+//   return (
+//     <AutoComplete
+//       style={{width: 175}}
+//       placeholder="Set default namespace"
+//       disabled={disabled}
+//       value={value}
+//       options={options}
+//       onChange={setValue}
+//     />
+//   );
+// }
 
 function OperationSelect() {
   const dispatch = useAppDispatch();

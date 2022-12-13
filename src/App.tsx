@@ -40,7 +40,7 @@ import {
   HotKeysHandler,
   LazyDrawer,
   MessageBox,
-  PageFooter,
+  NewPaneManager,
   PageHeader,
   PaneManager,
   UpdateNotice,
@@ -53,6 +53,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {fetchAppVersion} from '@utils/appVersion';
 import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
+import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -81,6 +82,7 @@ const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
+const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
@@ -109,6 +111,7 @@ const App = () => {
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
+  const isSaveEditCommandModalVisible = useAppSelector(state => state.ui.saveEditCommandModal.isOpen);
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
@@ -400,8 +403,10 @@ const App = () => {
         <MessageBox />
         <S.MainContainer>
           <PageHeader />
-          <PaneManager />
-          <PageFooter />
+
+          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
+            <NewPaneManager />
+          </FeatureFlag>
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
@@ -460,6 +465,7 @@ const App = () => {
           {isRenameEntityModalVisible && <RenameEntityModal />}
           {isRenameResourceModalVisible && <RenameResourceModal />}
           {isReplaceImageModalVisible && <ReplaceImageModal />}
+          {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
           {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
           {showReleaseNotes && (
             <Modal

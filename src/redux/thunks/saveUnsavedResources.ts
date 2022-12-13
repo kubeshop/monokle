@@ -11,7 +11,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
-import {ADD_NEW_RESOURCE, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 
@@ -45,7 +45,7 @@ const performSaveUnsavedResource = async (
     throw new Error('Could not find the root folder.');
   }
 
-  trackEvent(ADD_NEW_RESOURCE, {resourceKind: resource.kind});
+  trackEvent('create/resource', {resourceKind: resource.kind});
 
   if (saveMode === 'saveToFolder') {
     await writeFilePromise(absolutePath, resource.text);

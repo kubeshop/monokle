@@ -69,8 +69,8 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   return d.errors.length === 0 && isMap(d.contents);
 }
 
-const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void}) => {
-  const {diffSelectedResource, applySelection} = props;
+const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void; resourceID?: string}) => {
+  const {diffSelectedResource, applySelection, resourceID} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -109,13 +109,15 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
   const [isEditorMounted, setEditorMounted] = useState(false);
 
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [editor, setEditor] = useState(editorRef.current);
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const selectedResource = useMemo(() => {
+    if (resourceID) {
+      return resourceMap[resourceID];
+    }
     return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
-  }, [selectedResourceId, resourceMap]);
+  }, [selectedResourceId, resourceMap, resourceID]);
 
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
@@ -213,7 +215,6 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
 
-    editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
@@ -242,7 +243,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   useEffect(() => {
-    if (!firstCodeLoadedOnEditor && code) {
+    if (!firstCodeLoadedOnEditor) {
       setFirstCodeLoadedOnEditor(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

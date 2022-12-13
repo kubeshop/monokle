@@ -12,6 +12,9 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
+import {trackEvent} from '@utils/telemetry';
+
+import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
@@ -35,6 +38,7 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
 };
 
 export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
+  trackEvent('preview/restart', {type});
   dispatch(clearPreview({type: 'restartPreview'}));
   dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
@@ -52,6 +56,7 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
+  disconnectFromCluster();
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
 };

@@ -4,6 +4,7 @@ import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
 
+import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
@@ -11,12 +12,12 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';
 
-const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+export const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   if (ref.target?.type === 'file') {
     return 'File';
   }
@@ -133,7 +134,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   };
 
   const onLinkClick = (ref: ResourceRef) => {
-    trackEvent(FOLLOW_LINK, {type: ref.type});
+    trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
@@ -184,6 +185,31 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
     }
   };
 
+  const handleLinkClickForDashboard = (ref: ResourceRef) => {
+    if (ref.target?.type === 'resource') {
+      if (!ref.target.resourceId) {
+        return;
+      }
+      const targetResource = resourceMap[ref.target.resourceId];
+      if (!targetResource) {
+        return;
+      }
+      selectForDashboard(targetResource);
+      return;
+    }
+    selectForDashboard(resource);
+  };
+
+  const selectForDashboard = (r: K8sResource) => {
+    dispatch(setSelectedResourceId(r.id));
+    dispatch(
+      setActiveDashboardMenu({
+        key: `${r.content.apiVersion}-${r.content.kind}`,
+        label: r.content.kind,
+      })
+    );
+  };
+
   return (
     <S.Container>
       <S.PopoverTitle>{children}</S.PopoverTitle>
@@ -196,7 +222,12 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
             isDisabled={isRefLinkDisabled(ref)}
             resourceRef={ref}
             resourceMap={resourceMap}
-            onClick={() => onLinkClick(ref)}
+            onClick={(e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onLinkClick(ref);
+              handleLinkClickForDashboard(ref);
+            }}
           />
         </S.RefDiv>
       ))}

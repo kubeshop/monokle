@@ -3,11 +3,14 @@ import {useMemo} from 'react';
 import {K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
 
+import {setActiveTab, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
 import ValidationErrorLink from '@molecules/ValidationErrorsPopover/ValidationErrorLink';
+
+import {trackEvent} from '@utils/telemetry';
 
 import * as S from './ErrorsPopoverContent.styled';
 
@@ -49,6 +52,9 @@ const ErrorsPopoverContent: React.FC<IProps> = props => {
   };
 
   const onLinkClick = (error: ResourceValidationError) => {
+    trackEvent('explore/navigate_resource_error');
+    dispatch(setSelectedResourceId(resource.id));
+    dispatch(setActiveTab('Manifest'));
     if (selectedResourceId !== resource.id) {
       selectResource(resource.id);
     }
@@ -73,7 +79,14 @@ const ErrorsPopoverContent: React.FC<IProps> = props => {
 
       {errors.map(error => (
         <S.RefDiv key={`${error.property}:${error.message}-${error.errorPos?.line}:${error.errorPos?.column}`}>
-          <ValidationErrorLink validationError={error} onClick={() => onLinkClick(error)} />
+          <ValidationErrorLink
+            validationError={error}
+            onClick={(e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onLinkClick(error);
+            }}
+          />
           {error.description && <S.Description>{error.description}</S.Description>}
         </S.RefDiv>
       ))}

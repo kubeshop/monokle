@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import React, {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
@@ -17,14 +17,17 @@ const baseIconStyle: React.CSSProperties = {
   fontSize: '14px',
 };
 
-const ResourceRefsIconPopover = (props: {
+const ResourceRefsIconPopover = ({
+  resource,
+  type,
+  isDisabled,
+  isSelected,
+}: {
   resource: K8sResource;
   type: 'incoming' | 'outgoing';
   isDisabled: boolean;
   isSelected: boolean;
 }) => {
-  const {resource, type, isDisabled, isSelected} = props;
-
   const resourceRefs = useMemo(
     () =>
       resource.refs?.filter(r => {

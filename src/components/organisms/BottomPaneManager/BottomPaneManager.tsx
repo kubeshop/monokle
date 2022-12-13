@@ -146,7 +146,7 @@ const BottomPaneManager: React.FC = () => {
             <S.EllipsisOutlined />
           </Dropdown>
 
-          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
+          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(undefined))} />
         </S.TabsActions>
       </S.TabsContainer>
 

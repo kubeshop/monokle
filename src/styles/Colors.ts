@@ -1,5 +1,7 @@
 enum Colors {
   // Greys
+  grey6000 = '#1D1D1D',
+  grey5000 = '#2A385A',
   grey4000 = '#1F1F1F',
   grey3000 = '#191F21',
   grey2000 = '#081A20',
@@ -41,6 +43,9 @@ enum Colors {
   yellow8 = '#F3EA62',
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
+  yellow12 = '#E8B339',
+  yellow100 = '#594214',
+  yellow1000 = '#2B2111',
 
   volcano6 = '#D84A1B',
   volcano7 = '#E87040',
@@ -51,20 +56,27 @@ enum Colors {
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
+  red4 = '#791A1F',
   red6 = '#D32029',
   red7 = '#E84749', // Dust Red
+  red10 = '#58181C',
+  red100 = '#2A1215',
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
   blackPure = '#000000',
   blackPearl = '#111d2c',
   black9 = '#0C0D0E',
+  black10 = '#131629',
+  black100 = '#0a0d0e',
 
   lime8 = '#C9E75D',
 
   purple8 = '#AB7AE0',
 
   cyan = '#58D1C9',
+  cyan1 = '#112123',
+  cyan2 = '#113536',
   cyan5 = '#138585',
   cyan7 = '#33BCB7',
   cyan8 = '#58D1C9',
@@ -73,9 +85,11 @@ enum Colors {
 
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
+  blue8 = '#65B7F3',
   blue9 = '#8DCFF8',
   blue10 = '#B7E3FA',
   geekblue4 = '#203175',
+  geekblue6 = '#2B4ACB',
   geekblue7 = '#5273E0',
   blue1000 = '#7F9EF3',
 
@@ -85,13 +99,15 @@ enum Colors {
   green8 = '#8fd460',
   green9 = '#b2e58b',
   green10 = '#3E4F13', // Dark Green
+  green100 = '#274916',
+  green200 = '#162312',
 
   highlightGreen = '#33BCB7',
 
-  selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
-  selectionGradientHover = 'linear-gradient(90deg, #3C9AE8 50%, #84E2D8 100%)',
-  highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
-  highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
+  selectionColor = blue9,
+  selectionColorHover = blue8,
+  highlightColor = cyan2,
+  highlightColorHover = cyan1,
   diffBackground = '#2B2611',
   diffBackgroundHover = '#27220f',
 }

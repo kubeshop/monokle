@@ -171,7 +171,7 @@ const FileList: React.FC<IProps> = props => {
           onMouseLeave={() => setHovered(null)}
           style={{
             background: isSelected(item)
-              ? Colors.selectionGradient
+              ? Colors.selectionColor
               : selectedFiles.find(
                   searchItem => searchItem.fullGitPath === item.fullGitPath && searchItem.status === item.status
                 )

@@ -209,19 +209,22 @@ export function readFiles(
       const fileEntryPath = filePath.substring(rootFolder.length);
 
       const isDir = getFileStats(filePath)?.isDirectory();
+
       const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
       const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
 
-      if (isIncluded && (!isDir || !isExcluded)) {
+      if (!isDir && !isExcluded && isIncluded) {
         text = fs.readFileSync(path.join(filePath), 'utf8');
       }
 
-      const extension = path.extname(fileEntryPath);
+      let extension = isDir ? '' : path.extname(fileEntryPath);
+
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, text});
 
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
+
       if (isExcluded) {
         fileEntry.isExcluded = true;
       } else if (isDir) {
@@ -445,7 +448,10 @@ function reloadResourcesFromFileEntry(
       newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
-      state.resourceRefsProcessingOptions
+      state.resourceRefsProcessingOptions,
+      {
+        policyPlugins: state.policies.plugins,
+      }
     );
   }
 
@@ -615,7 +621,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
         resourcesFromFile.map(r => r.id),
         state.resourceMap,
         state.fileMap,
-        state.resourceRefsProcessingOptions
+        state.resourceRefsProcessingOptions,
+        {policyPlugins: state.policies.plugins}
       );
     }
   }

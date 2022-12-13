@@ -4,7 +4,7 @@ import * as S from './ValidationErrorLink.styled';
 
 interface IProps {
   validationError: ResourceValidationError;
-  onClick: () => void;
+  onClick: (args?: any) => void;
 }
 
 const ValidationErrorLink: React.FC<IProps> = props => {

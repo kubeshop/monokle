@@ -57,7 +57,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
 import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
-import {DIFF, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import initialState from '../initialState';
@@ -236,6 +236,7 @@ export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
         {
           resourceIds: [resource.id],
           resourceKinds,
+          policyPlugins: mainState.policies.plugins,
         }
       );
     });
@@ -274,6 +275,7 @@ export const addMultipleResources = createAsyncThunk<AppState, K8sResource[], Th
           {
             resourceIds: [resource.id],
             resourceKinds,
+            policyPlugins: mainState.policies.plugins,
           }
         );
       });
@@ -302,6 +304,7 @@ export const reprocessResource = createAsyncThunk<AppState, K8sResource, ThunkAp
         {
           resourceIds: [resource.id],
           resourceKinds,
+          policyPlugins: mainState.policies.plugins,
         }
       );
     });
@@ -631,7 +634,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      trackEvent(DIFF);
+      trackEvent('cluster/diff_resource');
       state.resourceDiff.targetResourceId = action.payload;
     },
     closeResourceDiffModal: (state: Draft<AppState>) => {
@@ -697,10 +700,10 @@ export const mainSlice = createSlice({
       if (enable) {
         const allRuleIds = plugin.metadata.rules.map(r => r.id);
         plugin.config.enabledRules = allRuleIds;
-        trackEvent('OPA_ENABLED', {all: true});
+        trackEvent('configure/opa_enabled', {all: true});
       } else {
         plugin.config.enabledRules = [];
-        trackEvent('OPA_DISABLED', {all: true});
+        trackEvent('configure/opa_disabled', {all: true});
       }
 
       // persist latest configuration
@@ -719,11 +722,11 @@ export const mainSlice = createSlice({
       if (enable) {
         if (isEnabled) return;
         plugin.config.enabledRules.push(ruleId);
-        trackEvent('OPA_ENABLED', {all: false});
+        trackEvent('configure/opa_enabled', {all: false});
       } else {
         if (!isEnabled) return;
         plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
-        trackEvent('OPA_DISABLED', {all: false});
+        trackEvent('configure/opa_disabled', {all: false});
       }
 
       // persist latest configuration
@@ -773,6 +776,15 @@ export const mainSlice = createSlice({
       }
       electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
       state.search.searchHistory = [...newSearchHistory, action.payload];
+    },
+    updateClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      state.resourceMap[action.payload.id] = action.payload;
+    },
+    deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      delete state.resourceMap[action.payload.id];
+    },
+    setIsClusterConnected: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isClusterConnected = action.payload;
     },
   },
   extraReducers: builder => {
@@ -1402,6 +1414,9 @@ export const {
   updateSearchQuery,
   updateReplaceQuery,
   setLastChangedLine,
+  updateClusterResource,
+  deleteClusterResource,
+  setIsClusterConnected,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 

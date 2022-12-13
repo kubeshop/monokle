@@ -1,5 +1,7 @@
 export {default as Collapse} from './Collapse';
+export {default as Compare} from './Compare';
 export {default as CRDs} from './CRDs';
+export {default as Explorer} from './Explorer';
 export {default as Helm} from './Helm';
 export {default as Git} from './Git';
 export {default as GitOps} from './GitOps';
@@ -24,3 +26,4 @@ export {default as Warning} from './Warning';
 export {default as YAMLSyntax} from './YAMLSyntax';
 export {default as Search} from './Search';
 export {default as SplitView} from './SplitView';
+export {default as Dashboard} from './Dashboard';

@@ -2,18 +2,29 @@ import {Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {PrimaryButton} from '@atoms';
+
 import {useDiff} from '@hooks/resourceHooks';
 
-import * as S from '../ActionsPaneHeader.styled';
+type IProps = {
+  isDropdownActive?: boolean;
+};
 
-const Diff = () => {
+const Diff: React.FC<IProps> = props => {
+  const {isDropdownActive = false} = props;
+
   const {diffSelectedResource, isDisabled, tooltipTitle} = useDiff();
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <S.PrimaryButton size="small" type="primary" onClick={diffSelectedResource} disabled={isDisabled}>
+      <PrimaryButton
+        size="small"
+        type={isDropdownActive ? 'link' : 'primary'}
+        onClick={diffSelectedResource}
+        disabled={isDisabled}
+      >
         Diff
-      </S.PrimaryButton>
+      </PrimaryButton>
     </Tooltip>
   );
 };

@@ -4,30 +4,34 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {SecondaryButton} from '@atoms';
+
 import {useInstallDeploy} from '@hooks/resourceHooks';
 
-import * as S from '../ActionsPaneHeader.styled';
-
-interface IProps {
+type IProps = {
   applySelection: () => void;
-}
+  isDropdownActive?: boolean;
+};
 
-const InstallDeploy = ({applySelection}: IProps) => {
+const InstallDeploy: React.FC<IProps> = props => {
+  const {applySelection, isDropdownActive = false} = props;
+
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
 
   const {buttonText, isDisabled, tooltipTitle} = useInstallDeploy();
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltipTitle} placement="bottomLeft">
-      <S.SecondaryButton
+      <SecondaryButton
+        $disableHover={isDropdownActive}
         loading={Boolean(applyingResource)}
-        type="default"
+        type={isDropdownActive ? 'link' : 'default'}
         size="small"
         onClick={applySelection}
         disabled={isDisabled}
       >
         {buttonText}
-      </S.SecondaryButton>
+      </SecondaryButton>
     </Tooltip>
   );
 };

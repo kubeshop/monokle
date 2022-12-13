@@ -1,7 +1,7 @@
 import fs from 'fs';
 import {flatten, sortBy} from 'lodash';
 import log from 'loglevel';
-import path from 'path';
+import path, {sep} from 'path';
 import invariant from 'tiny-invariant';
 import {v4 as uuid} from 'uuid';
 
@@ -23,6 +23,7 @@ import {
   GitResourceSet,
   HelmResourceSet,
   KustomizeResourceSet,
+  LocalResourceSet,
   ResourceSet,
 } from '@redux/compare';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
@@ -49,7 +50,7 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 
   switch (type) {
     case 'local':
-      return fetchLocalResources(state);
+      return fetchLocalResources(state, options);
     case 'cluster':
       return fetchResourcesFromCluster(state, options);
     case 'helm':
@@ -67,6 +68,17 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
     default:
       throw new Error('Not yet implemented');
   }
+}
+
+function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sResource[] {
+  return Object.values(state.main.resourceMap).filter(
+    resource =>
+      resource.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`) &&
+      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
+      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+      !resource.name.startsWith('Patch:') &&
+      !isKustomizationResource(resource)
+  );
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
@@ -105,16 +117,6 @@ async function fetchCommandResources(state: RootState, options: CommandResourceS
 
   const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
   return resources;
-}
-
-function fetchLocalResources(state: RootState): K8sResource[] {
-  return Object.values(state.main.resourceMap).filter(
-    resource =>
-      !resource.filePath.startsWith(PREVIEW_PREFIX) &&
-      !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-      !resource.name.startsWith('Patch:') &&
-      !isKustomizationResource(resource)
-  );
 }
 
 async function fetchResourcesFromCluster(state: RootState, options: ClusterResourceSet): Promise<K8sResource[]> {

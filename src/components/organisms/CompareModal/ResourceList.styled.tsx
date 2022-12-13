@@ -4,6 +4,12 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+export const ApiVersionGroup = styled.span`
+  font-size: 12px;
+  color: ${Colors.grey7};
+  margin-left: 6px;
+`;
+
 export const ResourceListDiv = styled.div`
   display: flex;
   flex-direction: column;
@@ -26,7 +32,7 @@ export const Header = styled.h1`
 `;
 
 export const ResourceCount = styled.span`
-  margin-left: 6px;
+  margin-left: 8px;
   font-size: 14px;
   color: ${FontColors.grey};
 `;
@@ -48,6 +54,12 @@ export const ResourceNamespace = styled(Tag)`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+export const ResourceNamespacePlaceholder = styled.div`
+  height: 22px;
+  width: 72px;
+  margin-right: 8px;
 `;
 
 export const ResourceName = styled.span<{$isActive?: boolean}>`

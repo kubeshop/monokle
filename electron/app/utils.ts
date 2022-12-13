@@ -10,6 +10,7 @@ import log from 'loglevel';
 import fetch from 'node-fetch';
 import {machineIdSync} from 'node-machine-id';
 import Nucleus from 'nucleus-nodejs';
+import os from 'os';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -139,6 +140,7 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
       userId: deviceID,
       properties: {
         appVersion,
+        deviceOS: os.platform(),
       },
     });
     electronStore.set('main.deviceID', deviceID);
@@ -188,13 +190,20 @@ export function askActionConfirmation({
   action: string;
   unsavedResourceCount: number;
 }): boolean {
-  if (unsavedResourceCount === 0) {
+  if (!unsavedResourceCount) {
     return true;
   }
 
+  let message: string = '';
+
   const shortAction = _.capitalize(action.split(' ')[0]);
-  const message =
-    unsavedResourceCount === 1 ? 'You have an unsaved resource' : `You have ${unsavedResourceCount} unsaved resources`;
+
+  if (unsavedResourceCount) {
+    message +=
+      unsavedResourceCount === 1
+        ? 'You have an unsaved resource.\n'
+        : `You have ${unsavedResourceCount} unsaved resources.\n`;
+  }
 
   const choice = dialog.showMessageBoxSync({
     type: 'info',

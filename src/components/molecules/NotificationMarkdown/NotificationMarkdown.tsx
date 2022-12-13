@@ -63,6 +63,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     <S.NotificationMarkdownContainer>
       <ReactMarkdown
         components={{
+          p: 'pre',
           a({href, children, ...restProps}) {
             return (
               <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>

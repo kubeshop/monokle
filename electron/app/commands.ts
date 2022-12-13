@@ -21,12 +21,15 @@ import autoUpdater from './autoUpdater';
  */
 export const selectFileDialog = (event: Electron.IpcMainInvokeEvent, options: FileExplorerOptions) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);
-  let dialogOptions: Electron.OpenDialogSyncOptions = {};
+  const dialogOptions: Electron.OpenDialogSyncOptions = {
+    properties: ['openFile'],
+  };
+
   if (options.isDirectoryExplorer) {
     dialogOptions.properties = ['openDirectory'];
   } else {
     if (options.allowMultiple) {
-      dialogOptions.properties = ['multiSelections'];
+      dialogOptions.properties?.push('multiSelections');
     }
     if (options.acceptedFileExtensions) {
       dialogOptions.filters = [{name: 'Files', extensions: options.acceptedFileExtensions}];
@@ -152,6 +155,7 @@ export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent
       },
       shell: true,
       windowsHide: true,
+      cwd: options.cwd,
     });
 
     if (options.input) {

@@ -18,7 +18,7 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
-import {CREATE_EMPTY_PROJECT, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -105,7 +105,7 @@ const CreateProjectModal: React.FC = () => {
       setFormStep(FormSteps.STEP_TWO);
     }
     if (!uiState.fromTemplate && values.rootFolder && values.name) {
-      trackEvent(CREATE_EMPTY_PROJECT);
+      trackEvent('app_start/create_project', {from: 'scratch'});
       dispatch(setCreateProject({...values}));
       closeModal();
     }

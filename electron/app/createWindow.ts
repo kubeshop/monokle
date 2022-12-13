@@ -1,4 +1,4 @@
-import {BrowserWindow, app, nativeImage} from 'electron';
+import {BrowserWindow, app, ipcMain, nativeImage} from 'electron';
 
 import {indexOf} from 'lodash';
 import {machineIdSync} from 'node-machine-id';
@@ -122,10 +122,6 @@ export const createWindow = (givenPath?: string) => {
     });
   }
 
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
-
   autoUpdater.on('update-available', () => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
   });
@@ -147,6 +143,10 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('dom-ready', async () => {
+    if (isDev) {
+      win.webContents.openDevTools();
+    }
+
     const dispatch = createDispatchForWindow(win);
 
     subscribeToStoreStateChanges(win.webContents, storeState => {
@@ -200,6 +200,7 @@ export const createWindow = (givenPath?: string) => {
     }, NEW_VERSION_CHECK_INTERVAL);
 
     initKubeconfig(dispatch, userHomeDir);
+
     dispatch(setAppRehydrating(false));
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);

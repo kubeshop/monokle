@@ -16,7 +16,7 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandResult, hasCommandFailed, runCommandInMainThread} from '@utils/commands';
-import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 /**
  * Thunk to preview kustomizations
@@ -44,7 +44,7 @@ export const previewKustomization = createAsyncThunk<
     log.info(`previewing ${resource.id} in folder ${folder}`);
     const result = await runKustomize(folder, projectConfig);
 
-    trackEvent(DO_KUSTOMIZE_PREVIEW);
+    trackEvent('preview/kustomize');
 
     if (hasCommandFailed(result)) {
       const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;

@@ -26,7 +26,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
-import {APPLY, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -106,7 +106,11 @@ export async function applyResource(
           ? await applyKustomization(resource, fileMap, context, projectConfig, namespace)
           : await applyK8sResource(resource, context, kubeconfigPath, namespace);
 
-        trackEvent(APPLY, {kind: resource.kind, isKustomization, ...options});
+        if (isKustomization) {
+          trackEvent('cluster/deploy_kustomization');
+        } else {
+          trackEvent('cluster/deploy_resource', {kind: resource.kind});
+        }
 
         if (result.exitCode !== null && result.exitCode !== 0) {
           log.warn(`apply exited with code ${result.exitCode} and signal ${result.signal}`);

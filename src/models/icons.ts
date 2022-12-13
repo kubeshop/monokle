@@ -25,4 +25,6 @@ export type IconNames =
   | 'search'
   | 'terminal'
   | 'split-view'
-  | 'crds';
+  | 'crds'
+  | 'compare'
+  | 'dashboard';

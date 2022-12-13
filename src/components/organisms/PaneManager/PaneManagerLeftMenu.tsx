@@ -24,7 +24,7 @@ import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 import {Walkthrough} from '@molecules';
 
 import {FeatureFlag} from '@utils/features';
-import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
+import {trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -63,9 +63,9 @@ const PaneManagerLeftMenu: React.FC = () => {
     }
 
     if (leftMenuBottomSelection === selectedOption) {
-      dispatch(setLeftBottomMenuSelection(null));
+      dispatch(setLeftBottomMenuSelection(undefined));
     } else {
-      trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedOption});
+      trackEvent('explore/select_left_tool_panel', {panelID: selectedOption});
       dispatch(setLeftBottomMenuSelection(selectedOption));
     }
   };
@@ -75,7 +75,7 @@ const PaneManagerLeftMenu: React.FC = () => {
     if (leftMenuSelection === selectedMenu) {
       dispatch(toggleLeftMenu());
     } else {
-      trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedMenu});
+      trackEvent('explore/select_left_tool_panel', {panelID: selectedMenu});
       dispatch(setLeftMenuSelection(selectedMenu));
 
       if (!leftActive) {
@@ -142,25 +142,23 @@ const PaneManagerLeftMenu: React.FC = () => {
         </PaneTooltip>
 
         <FeatureFlag name="GitOps">
-          <Walkthrough placement="leftTop" collection="release" step="images">
-            <PaneTooltip
-              show={!leftActive || leftMenuSelection !== 'git-pane'}
-              title="View Git operations"
-              placement="right"
+          <PaneTooltip
+            show={!leftActive || leftMenuSelection !== 'git-pane'}
+            title="View Git operations"
+            placement="right"
+          >
+            <MenuButton
+              id="git-pane"
+              isSelected={checkIsTabSelected('git-pane')}
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('git-pane')}
+              disabled={!activeProject}
             >
-              <MenuButton
-                id="git-pane"
-                isSelected={checkIsTabSelected('git-pane')}
-                isActive={isActive}
-                onClick={() => setLeftActiveMenu('git-pane')}
-                disabled={!activeProject}
-              >
-                <S.Badge color={Colors.blue6} count={changedFiles.length} size="small">
-                  <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
-                </S.Badge>
-              </MenuButton>
-            </PaneTooltip>
-          </Walkthrough>
+              <S.Badge color={Colors.blue6} count={changedFiles.length} size="small">
+                <MenuIcon iconName="git-ops" active={isActive} isSelected={checkIsTabSelected('git-pane')} />
+              </S.Badge>
+            </MenuButton>
+          </PaneTooltip>
         </FeatureFlag>
 
         <PaneTooltip
@@ -215,22 +213,16 @@ const PaneManagerLeftMenu: React.FC = () => {
         </Walkthrough>
 
         <FeatureFlag name="ImagesPane">
-          <Walkthrough placement="leftTop" collection="release" step="images">
-            <PaneTooltip
-              show={!leftActive || leftMenuSelection !== 'images-pane'}
-              title="View Images"
-              placement="right"
+          <PaneTooltip show={!leftActive || leftMenuSelection !== 'images-pane'} title="View Images" placement="right">
+            <MenuButton
+              isSelected={checkIsTabSelected('images-pane')}
+              isActive={isActive}
+              onClick={() => setLeftActiveMenu('images-pane')}
+              disabled={!activeProject}
             >
-              <MenuButton
-                isSelected={checkIsTabSelected('images-pane')}
-                isActive={isActive}
-                onClick={() => setLeftActiveMenu('images-pane')}
-                disabled={!activeProject}
-              >
-                <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
-              </MenuButton>
-            </PaneTooltip>
-          </Walkthrough>
+              <MenuIcon iconName="images" active={isActive} isSelected={checkIsTabSelected('images-pane')} />
+            </MenuButton>
+          </PaneTooltip>
         </FeatureFlag>
         <PaneTooltip
           show={!leftActive || leftMenuSelection !== 'templates-pane'}
@@ -277,6 +269,22 @@ const PaneManagerLeftMenu: React.FC = () => {
             <MenuIcon iconName="search" active={isActive} isSelected={checkIsTabSelected('search')} />
           </MenuButton>
         </PaneTooltip>
+
+        <Walkthrough placement="leftTop" collection="release" step="cluster">
+          <PaneTooltip show={!leftActive || leftMenuSelection !== 'dashboard'} title="Dashboard" placement="right">
+            <MenuButton
+              isSelected={checkIsTabSelected('dashboard')}
+              isActive={isActive}
+              onClick={() => {
+                trackEvent('dashboard/open', {from: 'left-menu'});
+                setLeftActiveMenu('dashboard');
+              }}
+              disabled={!activeProject}
+            >
+              <MenuIcon iconName="dashboard" active={isActive} isSelected={checkIsTabSelected('dashboard')} />
+            </MenuButton>
+          </PaneTooltip>
+        </Walkthrough>
       </S.IconsContainer>
 
       <S.IconsContainer>

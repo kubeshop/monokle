@@ -74,6 +74,7 @@ const initialAppState: AppState = {
     currentMatch: null,
   },
   lastChangedLine: 0,
+  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -92,6 +93,7 @@ const initialAppConfigState: AppConfig = {
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
     allowEditInClusterMode: electronStore.get('appConfig.settings.allowEditInClusterMode', true),
   },
+  fileExplorerSortOrder: electronStore.get('appConfig.fileExplorerSortOrder') || 'folders',
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
@@ -173,6 +175,9 @@ const initialUiState: UiState = {
     isOpen: false,
     resourceId: '',
   },
+  saveEditCommandModal: {
+    isOpen: false,
+  },
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
@@ -215,10 +220,7 @@ const initialUiState: UiState = {
     collapsedNavSectionNames: [],
   },
   paneConfiguration,
-  layoutSize: {
-    footer: 0,
-    header: 0,
-  },
+  layoutSize: {header: 0},
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
   highlightedItems: {

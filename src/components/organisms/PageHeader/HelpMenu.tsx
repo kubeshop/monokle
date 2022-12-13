@@ -11,7 +11,7 @@ import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/
 
 import {StepEnum} from '@models/walkthrough';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
   cancelWalkthrough,
@@ -30,6 +30,7 @@ import * as S from './HelpMenu.styled';
 
 export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
   const dispatch = useAppDispatch();
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const appVersion = useAppVersion();
 
   const parsedAppVersion = useMemo(() => {
@@ -78,19 +79,21 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
         </S.MenuItem>
       </Tooltip>
 
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-        <S.MenuItem
-          onClick={() => {
-            showPluginsDrawer();
-            handleMenuClose();
-          }}
-        >
-          <S.MenuItemIcon>
-            <S.ApiOutlined />
-          </S.MenuItemIcon>
-          <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
-        </S.MenuItem>
-      </Tooltip>
+      {!previewingCluster && (
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+          <S.MenuItem
+            onClick={() => {
+              showPluginsDrawer();
+              handleMenuClose();
+            }}
+          >
+            <S.MenuItemIcon>
+              <S.ApiOutlined />
+            </S.MenuItemIcon>
+            <S.MenuItemLabel>Plugins Manager</S.MenuItemLabel>
+          </S.MenuItem>
+        </Tooltip>
+      )}
 
       <S.MenuItem style={{borderBottom: 'none'}}>
         <S.MenuItemIcon>
@@ -130,17 +133,21 @@ export const HelpMenu = ({onMenuClose}: {onMenuClose?: Function}) => {
         >
           New in {parsedAppVersion || 'this version'}
         </S.HelpLink>
-        <S.HelpLink
-          type="link"
-          size="small"
-          onClick={() => {
-            dispatch(cancelWalkthrough('novice'));
-            dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
-            handleMenuClose();
-          }}
-        >
-          Re-play Quick Guide
-        </S.HelpLink>
+
+        {!previewingCluster && (
+          <S.HelpLink
+            type="link"
+            size="small"
+            onClick={() => {
+              dispatch(cancelWalkthrough('novice'));
+              dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
+              handleMenuClose();
+            }}
+          >
+            Re-play Quick Guide.
+          </S.HelpLink>
+        )}
+
         <S.HelpLink
           type="link"
           size="small"

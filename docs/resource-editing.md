@@ -98,7 +98,7 @@ You can rename resources and update all the references associated with that reso
 
 You can use the Clone action to create a new resource by using existing resources as a template. 
 
-![Clone Resource](img/clone .png)
+![Clone Resource](img/clone.png)
 
 ### **Delete a Resource**
 

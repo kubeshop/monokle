@@ -46,7 +46,7 @@ const ProjectSelection = () => {
   const gitRepo = useAppSelector(state => state.git.repo);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const projects: Project[] = useAppSelector(state => state.config.projects);
+  const projects = useAppSelector(state => state.config.projects);
   const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);

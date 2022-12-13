@@ -2,6 +2,8 @@ import React from 'react';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
+import {SavedCommand} from './appconfig';
+
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -51,6 +53,15 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
+export type NewLeftMenuSelectionType =
+  | 'explorer'
+  | 'compare'
+  | 'validation'
+  | 'git'
+  | 'search'
+  | 'settings'
+  | 'dashboard';
+
 export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
@@ -60,13 +71,13 @@ export type LeftMenuSelectionType =
   | 'images-pane'
   | 'validation-pane'
   | 'search'
-  | 'crds';
+  | 'crds'
+  | 'dashboard';
 
-export type LeftMenuBottomSelectionType = 'terminal' | null;
+export type LeftMenuBottomSelectionType = 'terminal';
 export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
-  footer: number;
   header: number;
 };
 
@@ -100,6 +111,10 @@ export type UiState = {
     isOpen: boolean;
     imageId: string;
   };
+  saveEditCommandModal: {
+    isOpen: boolean;
+    command?: SavedCommand;
+  };
   filtersPresetModal?: {
     isOpen: boolean;
     type: 'load' | 'save';
@@ -117,12 +132,12 @@ export type UiState = {
   layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
-    bottomSelection: LeftMenuBottomSelectionType | null;
+    bottomSelection?: LeftMenuBottomSelectionType;
     expandedFolders: React.Key[];
     expandedSearchedFiles: React.Key[];
     isActive: boolean;
     isValidationDrawerVisible: boolean;
-    selection: LeftMenuSelectionType;
+    selection: LeftMenuSelectionType | NewLeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -160,6 +175,7 @@ export type UiState = {
       currentStep: number;
     };
   };
+  previewingCluster?: boolean;
 };
 
 export type PaneConfiguration = {

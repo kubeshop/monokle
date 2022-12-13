@@ -279,7 +279,10 @@ export function getNamespaces(resourceMap: ResourceMapType) {
     if (e.filePath.startsWith(CLUSTER_DIFF_PREFIX)) {
       return;
     }
-    if (e.namespace && !namespaces.includes(e.namespace)) {
+
+    if (e.kind === 'Namespace' && !namespaces.includes(e.name)) {
+      namespaces.push(e.name);
+    } else if (e.namespace && !namespaces.includes(e.namespace)) {
       namespaces.push(e.namespace);
     }
   });
@@ -349,26 +352,6 @@ export function createResourceName(filePath: string, content: any, kind: string)
   }
 
   return filePath;
-}
-
-/**
- * Adds a file ref to the specified file to the specified resource
- */
-
-export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string, fileMap: FileMapType) {
-  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
-  resource.refs = resource.refs || [];
-  const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
-
-  resource.refs.push({
-    type: refType,
-    name: refName,
-    position: refNode?.getNodePosition(),
-    target: {
-      type: 'file',
-      filePath,
-    },
-  });
 }
 
 /**

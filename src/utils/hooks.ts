@@ -17,21 +17,22 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 
 export function useMainPaneDimensions(): {height: number; width: number} {
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
-  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.footer - layoutSize.header);
+  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.header);
   const [width, setWidth] = useState<number>(window.innerWidth - 50);
 
   useEffect(() => {
     const handleResize = () => {
-      setHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
-      setWidth(window.innerWidth - 50);
+      setHeight(window.innerHeight - layoutSize.header);
+      setWidth(window.innerWidth - (previewingCluster ? 0 : 50));
     };
 
     window.addEventListener('resize', handleResize);
     handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener('resize', handleResize);
-  }, [layoutSize]);
+  }, [layoutSize, previewingCluster]);
 
   return {height, width};
 }
