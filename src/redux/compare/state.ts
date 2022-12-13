@@ -175,6 +175,7 @@ export type GitResourceSet = {
   type: 'git';
   branchName: string;
   commitHash?: string;
+  folder: string;
 };
 
 export type CommandResourceSet = {

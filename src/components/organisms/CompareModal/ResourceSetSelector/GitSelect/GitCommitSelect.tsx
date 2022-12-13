@@ -21,7 +21,7 @@ const GitCommitSelect: React.FC<IProps> = ({side}) => {
   const {currentCommit, currentGitBranch, currentGitBranchCommits} = resourceSet;
 
   const handleSelect = (commitHash: string) => {
-    const value: PartialResourceSet = {type: 'git', branchName: currentGitBranch?.name, commitHash};
+    const value: PartialResourceSet = {type: 'git', branchName: currentGitBranch?.name, commitHash, folder: '<root>'};
     dispatch(resourceSetSelected({side, value}));
   };
 

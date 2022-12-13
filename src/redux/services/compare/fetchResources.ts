@@ -94,7 +94,9 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
     }
   );
 
-  return resources;
+  return resources.filter(resource =>
+    resource.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`)
+  );
 }
 
 async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {
