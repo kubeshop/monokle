@@ -1,6 +1,4 @@
-import {shell} from 'electron';
-
-import React, {useCallback} from 'react';
+import React from 'react';
 
 import {TutorialReferenceLink} from '@shared/models/tutorialReferences';
 
