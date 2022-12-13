@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {DISCORD, DOCUMENTATION, FEEDBACK, GUIDE, TUTORIAL, WHATSNEW} from '@shared/constants/tutorialReferences';
+import {GUIDE} from '@shared/constants/tutorialReferences';
 
 import TemplateSidebarPreview from './TemplateSidebarPreview';
 import TemplatesList from './TemplatesList';

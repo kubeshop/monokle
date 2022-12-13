@@ -11,9 +11,7 @@ type Props = {
 };
 
 const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
-  const {type, name, description, learnMoreUrl} = tutorialReferenceLink;
-
-  const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
+  const {type} = tutorialReferenceLink;
 
   return (
     <S.TutorialSidebar key={type}>
