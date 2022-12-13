@@ -95,7 +95,9 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
   );
 
   return resources.filter(resource =>
-    resource.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`)
+    `${sep}${resource.filePath.replaceAll('/', sep)}`.startsWith(
+      options.folder === '<root>' ? '' : `${options.folder}${sep}`
+    )
   );
 }
 
