@@ -144,6 +144,7 @@ jobs:
       - name: Generate Cask file
         working-directory: 'main'
         run: |
+          mkdir -p ../homebrew-monokle/Casks
           ./generate-cask.sh > ../homebrew-monokle/Casks/monokle.rb
 
       - name: Commit Cask file
