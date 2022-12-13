@@ -157,7 +157,7 @@ jobs:
       - name: Push Cask file
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.BREW_TOKEN }}
           directory: 'homebrew-monokle'
           repository: 'kubeshop/homebrew-monokle'
 
