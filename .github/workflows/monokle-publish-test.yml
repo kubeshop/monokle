@@ -55,6 +55,7 @@ jobs:
           brew install jq
 
       - name: Add MacOS certs
+        working-directory: 'main'
         run: |
           ls -la
           chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
@@ -66,6 +67,7 @@ jobs:
         run: security find-identity -v
 
       - name: Get Node Version
+        working-directory: 'main'
         run: |
           cat .nvmrc
           echo "::set-output name=nodeversion::$(cat .nvmrc)"
@@ -79,6 +81,7 @@ jobs:
           cache-dependency-path: main/package-lock.json
 
       - name: Install Dependencies
+        working-directory: 'main'
         run: |
           env
           echo "npm: $(npm --version)"
@@ -91,6 +94,7 @@ jobs:
       #     npm list --depth=1
 
       - name: Build
+        working-directory: 'main'
         run: |
           contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
@@ -104,6 +108,7 @@ jobs:
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
       - name: Package
+        working-directory: 'main'
         run: |
           contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
@@ -120,6 +125,7 @@ jobs:
 
       # Check Binary Size
       - name: Build Succeeded
+        working-directory: 'main'
         run: |
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
@@ -136,6 +142,7 @@ jobs:
           token: ${{ secrets.github_token }}
 
       - name: Generate Cask file
+        working-directory: 'main'
         run: |
           mkdir -p ./homebrew-monokle/Casks
           ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
