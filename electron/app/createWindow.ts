@@ -1,8 +1,7 @@
-import {BrowserWindow, app, ipcMain, nativeImage} from 'electron';
+import {BrowserWindow, app, nativeImage} from 'electron';
 
 import {indexOf} from 'lodash';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
 import {
@@ -29,6 +28,7 @@ import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
 import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
+import * as Sentry from '@sentry/electron';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -157,18 +157,17 @@ export const createWindow = (givenPath?: string) => {
       const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {
-        Nucleus.track(DISABLED_TELEMETRY);
-        Nucleus.disableTracking();
         segmentClient?.track({
           userId: machineId,
           event: DISABLED_TELEMETRY,
         });
         disableSegment();
       } else {
-        Nucleus.enableTracking();
-        if (!segmentClient) {
-          enableSegment();
-        }
+        enableSegment();
+      }
+
+      if (storeState.config.disableErrorReporting) {
+        Sentry.close();
       }
     });
 
