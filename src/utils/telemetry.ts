@@ -37,7 +37,7 @@ export type EventMap = {
   APP_INSTALLED: {appVersion: string; deviceOS: string};
   APP_SESSION: undefined;
   APP_UPDATED: undefined;
-  'app_start/open_project': {numberOfFiles: number; numberOfResources: number};
+  'app_start/open_project': {numberOfFiles: number; numberOfResources: number; executionTime: number};
   'app_start/create_project': {from: 'scratch' | 'git' | 'template'; templateID?: string};
   'app_start/quick_cluster_preview': undefined;
   'configure/cluster_version': undefined;
@@ -56,11 +56,11 @@ export type EventMap = {
   'edit/side_by_side_editor': {resourceKind: string};
   'create/resource': {resourceKind: string};
   'help/open_link': {linkType: string};
-  'preview/helm': undefined;
-  'preview/helm_preview_configuration': undefined;
-  'preview/kustomize': undefined;
-  'preview/cluster': {numberOfResourcesInCluster: number};
-  'preview/command': undefined;
+  'preview/helm': {resourcesCount?: number; executionTime: number};
+  'preview/helm_preview_configuration': {resourcesCount?: number; executionTime: number};
+  'preview/kustomize': {resourcesCount?: number; executionTime: number};
+  'preview/cluster': {resourcesCount: number; executionTime: number};
+  'preview/command': {resourcesCount: number; executionTime: number};
   'preview/restart': {type: 'helm' | 'kustomization' | 'cluster' | 'helm-preview-config' | 'command'};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};

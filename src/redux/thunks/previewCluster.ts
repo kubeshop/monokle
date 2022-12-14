@@ -38,6 +38,7 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
 };
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
+  const startTime = new Date().getTime();
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const k8sVersion = getK8sVersion(projectConfig);
@@ -112,7 +113,12 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       policyPlugins: thunkAPI.getState().main.policies.plugins,
     });
 
-    trackEvent('preview/cluster', {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
+    const endTime = new Date().getTime();
+
+    trackEvent('preview/cluster', {
+      resourcesCount: Object.keys(previewResult.previewResources).length,
+      executionTime: endTime - startTime,
+    });
 
     startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);
 

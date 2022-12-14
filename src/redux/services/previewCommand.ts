@@ -23,6 +23,7 @@ export const previewSavedCommand = createAsyncThunk<
     state: RootState;
   }
 >('main/previewSavedCommand', async (commandId, thunkAPI) => {
+  const startTime = new Date().getTime();
   try {
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
@@ -58,7 +59,8 @@ export const previewSavedCommand = createAsyncThunk<
       );
     }
 
-    trackEvent('preview/command');
+    const endTime = new Date().getTime();
+    trackEvent('preview/command', {resourcesCount: resources.length, executionTime: endTime - startTime});
 
     return {
       previewResourceId: command.id,
