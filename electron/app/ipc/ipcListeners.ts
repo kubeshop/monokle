@@ -3,7 +3,6 @@ import {BrowserWindow, app, ipcMain} from 'electron';
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
 import {
@@ -88,7 +87,6 @@ const killTerminal = (id: string) => {
 };
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
-  Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
   if (segmentClient) {
     segmentClient.track({

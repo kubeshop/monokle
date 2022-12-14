@@ -77,14 +77,14 @@ jobs:
 
       - name: Build
         run: |
-          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg ELECTRON_SENTRY_DSN $ELECTRON_SENTRY_DSN '.ELECTRON_SENTRY_DSN = $ELECTRON_SENTRY_DSN' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg SEGMENT_API_KEY $SEGMENT_API_KEY '.SEGMENT_API_KEY = $SEGMENT_API_KEY' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          ELECTRON_SENTRY_DSN: ${{ secrets.ELECTRON_SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
@@ -208,14 +208,14 @@ jobs:
       - name: Build
         shell: PowerShell
         run: |
-          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
+          ($contents=jq --arg ELECTRON_SENTRY_DSN $env:ELECTRON_SENTRY_DSN '.ELECTRON_SENTRY_DSN = $ELECTRON_SENTRY_DSN' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
           ($contents=jq --arg MONOKLE_INSTALLS_URL $env:MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
           ($contents=jq --arg SEGMENT_API_KEY $env:SEGMENT_API_KEY '.SEGMENT_API_KEY = $SEGMENT_API_KEY' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          ELECTRON_SENTRY_DSN: ${{ secrets.ELECTRON_SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
@@ -323,14 +323,14 @@ jobs:
 
       - name: Build
         run: |
-          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
+          contents="$(jq --arg ELECTRON_SENTRY_DSN $ELECTRON_SENTRY_DSN '.ELECTRON_SENTRY_DSN = $ELECTRON_SENTRY_DSN' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg SEGMENT_API_KEY $SEGMENT_API_KEY '.SEGMENT_API_KEY = $SEGMENT_API_KEY' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
+          ELECTRON_SENTRY_DSN: ${{ secrets.ELECTRON_SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
