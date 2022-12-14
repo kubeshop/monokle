@@ -17,7 +17,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {NewVersionCode} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
+import {initRendererSentry, setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} from '@redux/reducers/extension';
 import {setAppRehydrating} from '@redux/reducers/main';
 import {setWebContentsId} from '@redux/reducers/terminal';
@@ -28,7 +28,6 @@ import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
 import {StartupFlags} from '@utils/startupFlag';
 import {DISABLED_TELEMETRY} from '@utils/telemetry';
 
-import * as Sentry from '@sentry/electron';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -78,7 +77,6 @@ export const createWindow = (givenPath?: string) => {
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
-      preload: path.join(__dirname, 'preload.js'),
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -165,10 +163,6 @@ export const createWindow = (givenPath?: string) => {
       } else {
         enableSegment();
       }
-
-      if (storeState.config.disableErrorReporting) {
-        Sentry.close();
-      }
     });
 
     dispatch(setAppRehydrating(true));
@@ -192,6 +186,10 @@ export const createWindow = (givenPath?: string) => {
         pluginsDir,
       })
     );
+
+    if (process.env.SENTRY_DSN) {
+      dispatch(initRendererSentry({SENTRY_DSN: process.env.SENTRY_DSN}));
+    }
 
     await checkNewVersion(dispatch, true);
     setInterval(async () => {
