@@ -17,7 +17,6 @@ import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {CLUSTER_VIEW} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
@@ -38,6 +37,7 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
 };
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
+  const startTime = new Date().getTime();
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const k8sVersion = getK8sVersion(projectConfig);
@@ -104,15 +104,20 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
           previewResult.previewResources[r.id] = r;
         });
 
-        // only process newly added custom resources
-        processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
-          resourceIds: customResources.map(r => r.id),
-        });
-
         previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
       }
     }
-    trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
+
+    processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
+      policyPlugins: thunkAPI.getState().main.policies.plugins,
+    });
+
+    const endTime = new Date().getTime();
+
+    trackEvent('preview/cluster', {
+      resourcesCount: Object.keys(previewResult.previewResources).length,
+      executionTime: endTime - startTime,
+    });
 
     startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);
 

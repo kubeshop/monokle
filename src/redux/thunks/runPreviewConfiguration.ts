@@ -11,7 +11,6 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 import {buildHelmCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {RUN_PREVIEW_CONFIGURATION} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
@@ -31,7 +30,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     state: RootState;
   }
 >('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
-  trackEvent(RUN_PREVIEW_CONFIGURATION);
+  const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
@@ -121,6 +120,10 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (result.error) {
     return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
   }
+
+  const endTime = new Date().getTime();
+
+  trackEvent('preview/helm_preview_configuration', {executionTime: endTime - startTime});
 
   if (result.stdout) {
     return createPreviewResult(

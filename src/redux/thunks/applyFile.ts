@@ -8,7 +8,6 @@ import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {errorAlert} from '@utils/alert';
 
-import {APPLY_FILE} from '@shared/constants/telemetry';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
@@ -42,7 +41,7 @@ export async function applyFile(
   dispatch(setApplyingResource(true));
 
   try {
-    trackEvent(APPLY_FILE);
+    trackEvent('cluster/deploy_file');
     const fileEntry = fileMap[filePath];
     if (fileEntry && !fileEntry.children) {
       try {

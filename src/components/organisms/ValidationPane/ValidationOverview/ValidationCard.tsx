@@ -10,7 +10,6 @@ import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation} from '@redux/validation/validation.slice';
 
 import {ValidationIntegration} from '@shared/models/integrations';
-import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './ValidationCard.styled';
 
@@ -27,7 +26,6 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const onConfigureHandler = () => {
-    trackEvent('VALIDATION_PANE_OPENED', {id});
     dispatch(updateValidationIntegration(integration));
   };
 

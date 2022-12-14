@@ -4,6 +4,7 @@ import {SimpleGit, simpleGit} from 'simple-git';
 
 import type {FileMapType} from '@shared/models/appState';
 import type {GitRepo} from '@shared/models/git';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {formatGitChangedFiles} from '../utils/git';
 
@@ -173,6 +174,7 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 
   try {
     await git.checkout(branchName);
+    trackEvent('git/branch_checkout');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -241,6 +243,7 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.commit(message);
+  trackEvent('git/commit');
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
@@ -263,6 +266,7 @@ export async function pushChanges(localPath: string, branchName: string) {
 
   try {
     await git.push('origin', branchName);
+    trackEvent('git/push');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -307,7 +311,7 @@ export async function pullChanges(localPath: string) {
   }
 }
 
-export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+export async function getCommitResources(localPath: string, commitHash: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   let filesContent: Record<string, string> = {};
 
@@ -321,7 +325,7 @@ export async function getCommitResources(localPath: string, branchName: string, 
     // get the content of the file found in current branch
     try {
       // eslint-disable-next-line no-await-in-loop
-      content = await git.show(`${branchName}:${filesPaths[i]}`);
+      content = await git.show(`${commitHash}:${filesPaths[i]}`);
     } catch (e) {
       content = '';
     }

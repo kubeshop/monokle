@@ -16,7 +16,6 @@ import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
 
-import {OPEN_EXISTING_PROJECT} from '@shared/constants/telemetry';
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {
@@ -26,7 +25,7 @@ import {
   HelmValuesMapType,
   ResourceMapType,
 } from '@shared/models/appState';
-import {GitRepo} from '@shared/models/git';
+import {GitChangedFile, GitRepo} from '@shared/models/git';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -42,6 +41,7 @@ export const setRootFolder = createAsyncThunk<
     state: RootState;
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const userDataDir = thunkAPI.getState().config.userDataDir;
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -104,11 +104,6 @@ export const setRootFolder = createAsyncThunk<
     type: AlertEnum.Success,
   };
 
-  trackEvent(OPEN_EXISTING_PROJECT, {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMap).length,
-  });
-
   const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
     'git.isFolderGitRepo',
     'git.isFolderGitRepo.result',
@@ -116,8 +111,18 @@ export const setRootFolder = createAsyncThunk<
   );
 
   if (isFolderGitRepo) {
-    promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder).then(repo => {
+    thunkAPI.dispatch(setGitLoading(true));
+
+    Promise.all([
+      promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
+      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolder,
+        fileMap,
+      }),
+    ]).then(([repo, changedFiles]) => {
       thunkAPI.dispatch(setRepo(repo));
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
+      thunkAPI.dispatch(setGitLoading(false));
 
       if (repo.remoteRepo.authRequired) {
         Modal.warning({
@@ -145,16 +150,15 @@ export const setRootFolder = createAsyncThunk<
         });
       }
     });
-
-    thunkAPI.dispatch(setGitLoading(true));
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: rootFolder,
-      fileMap,
-    }).then(changedFiles => {
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
-    });
   }
+
+  const endTime = new Date().getTime();
+
+  trackEvent('app_start/open_project', {
+    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
+    numberOfResources: Object.values(resourceMap).length,
+    executionTime: endTime - startTime,
+  });
 
   return {
     projectConfig,

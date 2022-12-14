@@ -17,6 +17,7 @@ import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
 
 import {Project} from '@shared/models/config';
 import {activeProjectSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ActionCard from './ActionCard';
 import Guide from './Guide';
@@ -122,7 +123,7 @@ const NewRecentProjectsPane = () => {
               if (!activeProject) {
                 dispatch(setPreviewingCluster(true));
               }
-
+              trackEvent('dashboard/open', {from: 'recent-screen-quick-cluster-preview'});
               dispatch(setLeftMenuSelection('dashboard'));
               dispatch(toggleStartProjectPane());
             }}

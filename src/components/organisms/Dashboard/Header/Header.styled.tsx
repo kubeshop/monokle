@@ -12,6 +12,7 @@ export const Container = styled.div`
     > div:first-child {
       font-weight: 700;
       font-size: 16px;
+      padding-left: 6px;
     }
   }
 `;
@@ -19,7 +20,7 @@ export const Container = styled.div`
 export const Select = styled(RawSelect)`
   .ant-select-selector {
     width: 240px !important;
-    padding: 0 16px;
+    overflow: hidden;
     .ant-select-selection-search-input,
     .ant-select-selection-placeholder {
       color: ${Colors.whitePure};

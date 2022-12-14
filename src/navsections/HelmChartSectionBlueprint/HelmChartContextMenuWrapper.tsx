@@ -17,11 +17,11 @@ import {ContextMenu} from '@atoms';
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
-import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {showItemInFolder} from '@shared/utils/shell';
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {children, itemInstance} = props;

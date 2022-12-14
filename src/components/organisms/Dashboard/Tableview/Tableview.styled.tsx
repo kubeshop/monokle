@@ -65,12 +65,24 @@ export const Table = styled(RawTable)`
       border-top: 1px solid ${Colors.grey4};
       height: 54px;
 
+      svg {
+        path {
+          color: ${Colors.grey9} !important;
+        }
+      }
+
       :hover {
         background-color: ${Colors.grey6000};
       }
 
       &.selected {
-        background-color: ${Colors.grey6000};
+        background-color: ${Colors.blue9};
+        color: ${Colors.grey6000};
+        svg {
+          path {
+            color: ${Colors.grey6000} !important;
+          }
+        }
       }
     }
   }

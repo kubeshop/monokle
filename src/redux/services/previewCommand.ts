@@ -13,6 +13,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {extractK8sResources} from './resource';
 
@@ -24,6 +25,7 @@ export const previewSavedCommand = createAsyncThunk<
     state: RootState;
   }
 >('main/previewSavedCommand', async (commandId, thunkAPI) => {
+  const startTime = new Date().getTime();
   try {
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
@@ -58,6 +60,9 @@ export const previewSavedCommand = createAsyncThunk<
         "The command ran successfully but the output didn't contain any kubernetes resources."
       );
     }
+
+    const endTime = new Date().getTime();
+    trackEvent('preview/command', {resourcesCount: resources.length, executionTime: endTime - startTime});
 
     return {
       previewResourceId: command.id,

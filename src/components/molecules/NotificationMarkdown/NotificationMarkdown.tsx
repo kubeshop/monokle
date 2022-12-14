@@ -10,9 +10,8 @@ import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
-
 import {AlertType, ExtraContentType} from '@shared/models/alert';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import NotificationModalTitle from './NotificationModalTitle';
 
@@ -63,6 +62,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     <S.NotificationMarkdownContainer>
       <ReactMarkdown
         components={{
+          p: 'pre',
           a({href, children, ...restProps}) {
             return (
               <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>

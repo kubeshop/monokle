@@ -78,19 +78,24 @@ function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sRe
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
-  const {branchName, commitHash = ''} = options;
+  const {commitHash = ''} = options;
 
   const filesContent: Record<string, string> = await promiseFromIpcRenderer(
     'git.getCommitResources',
     'git.getCommitResources.result',
     {
       localPath: state.config.selectedProjectRootFolder,
-      branchName,
       commitHash,
     }
   );
 
-  return Object.entries(filesContent).flatMap(([filePath, content]) => extractK8sResources(content, filePath));
+  return Object.entries(filesContent)
+    .flatMap(([filePath, content]) => extractK8sResources(content, filePath))
+    .filter(resource =>
+      `${sep}${resource.filePath.replaceAll('/', sep)}`.startsWith(
+        options.folder === '<root>' ? '' : `${options.folder}${sep}`
+      )
+    );
 }
 
 async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {

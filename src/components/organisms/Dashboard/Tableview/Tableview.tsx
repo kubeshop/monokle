@@ -51,7 +51,6 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           columns={columns}
           rowKey="id"
           scroll={{y: height - 212}}
-          rowSelection={{}}
           rowClassName={(record: K8sResource | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky

@@ -24,7 +24,6 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {parseYamlDocument} from '@utils/yaml';
 
-import {CHANGES_BY_FORM_EDITOR} from '@shared/constants/telemetry';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -150,7 +149,7 @@ const FormEditor: React.FC<IProps> = props => {
 
     return () => {
       if ((selectedResource || selectedPath) && isResourceUpdated) {
-        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource?.kind});
+        trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -6,8 +6,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: space-between;
-  padding: 16px;
+  padding: 8px 16px;
   font-weight: 400;
 `;
 
@@ -18,6 +17,10 @@ export const NodesInformation = styled.div`
 
 export const NodesInformationRow = styled.div`
   line-height: 28px;
+  cursor: pointer;
+  :hover {
+    text-decoration: underline;
+  }
 `;
 
 export const PercentageText = styled.span`
@@ -28,7 +31,7 @@ export const PercentageText = styled.span`
 export const Title = styled.h3`
   font-size: 14px;
   color: ${Colors.grey9};
-  line-height: 24px;
+  line-height: 12px;
 `;
 
 export const Description = styled.div`
@@ -38,9 +41,10 @@ export const Description = styled.div`
 `;
 
 export const HorizontalLine = styled.div`
-  border: 1px solid ${Colors.grey4};
+  border: 0.5px solid ${Colors.grey4};
   width: 100%;
   height: 0;
+  margin: 18px 0;
 `;
 
 export const Link = styled.div`
@@ -56,6 +60,12 @@ export const PodsCapacity = styled.span`
 
 export const PodsUsagePercentage = styled.span``;
 
-export const ClusterAPIContainer = styled.div``;
+export const ClusterInfoContainer = styled.div``;
 
-export const UsefulLinksContainer = styled.div``;
+export const ClusterInfoRow = styled.div`
+  margin: 12px 0;
+`;
+
+export const UsefulLinksContainer = styled.div`
+  padding: 8px 0 16px 0;
+`;

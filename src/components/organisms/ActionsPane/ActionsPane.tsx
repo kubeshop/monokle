@@ -52,14 +52,13 @@ import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoP
 import {useDiff} from '@hooks/resourceHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {openExternalResourceKindDocumentation} from '@utils/shell';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
 import {K8sResource} from '@shared/models/k8sResource';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
+import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';

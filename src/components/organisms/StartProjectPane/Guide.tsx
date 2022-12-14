@@ -1,6 +1,6 @@
 import {ExclamationCircleFilled} from '@ant-design/icons';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './Guide.styled';
 

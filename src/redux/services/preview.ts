@@ -11,6 +11,7 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {PreviewType} from '@shared/models/appState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
@@ -36,6 +37,7 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
 };
 
 export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
+  trackEvent('preview/restart', {type});
   dispatch(clearPreview({type: 'restartPreview'}));
   dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
