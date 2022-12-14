@@ -1,10 +1,8 @@
-import {Button as AntdButton, Skeleton as RawSkeleton} from 'antd';
+import {Skeleton as RawSkeleton} from 'antd';
 
-import AntdIcon, {RightOutlined} from '@ant-design/icons';
+import {RightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
-
-import {Colors} from '@shared/styles/colors';
 
 export const TemplatesPageContainer = styled.div`
   height: 100%;
