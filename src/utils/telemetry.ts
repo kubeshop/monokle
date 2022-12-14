@@ -19,18 +19,6 @@ export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: Ev
     });
   }
 };
-export const trackError = (error: any) => {
-  if (isRendererThread()) {
-    ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
-  } else {
-    const segmentClient = getSegmentClient();
-    segmentClient?.track({
-      event: 'Error',
-      properties: error,
-      userId: machineId,
-    });
-  }
-};
 
 export type Event = keyof EventMap;
 export type EventMap = {
