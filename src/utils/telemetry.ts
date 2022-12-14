@@ -76,11 +76,13 @@ export type EventMap = {
   'compare/transfered': {from?: string; to?: string; count: number};
   'git/branch_checkout': undefined;
   'git/commit': undefined;
+  'git/initialize': undefined;
   'git/push': undefined;
   'dashboard/open': {from: string};
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
   'dashboard/changeNamespace': undefined;
+  'top-menu/new-project': {type: string};
   CLUSTER_COMPARE: any; // TODO: remove this event in 2.0, keeping to make merging easier
 };
 export const APP_INSTALLED = 'APP_INSTALLED';

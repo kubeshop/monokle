@@ -12,6 +12,8 @@ import {FileExplorer, Icon} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {trackEvent} from '@utils/telemetry';
+
 import FolderSmallPlusWhiteSvg from '@assets/FolderSmallPlusWhite.svg';
 import FolderSmallWhiteSvg from '@assets/FolderSmallWhite.svg';
 import PlusIconSvg from '@assets/PlusIcon.svg';
@@ -54,6 +56,8 @@ const CreateProject = () => {
 
   const onMenuOptionClick = (item: Record<string, any>) => {
     const {key} = item;
+
+    trackEvent('top-menu/new-project', {type: key});
 
     if (key === 'new_from_local_folder') {
       openFileExplorer();
