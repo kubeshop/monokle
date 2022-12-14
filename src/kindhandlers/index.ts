@@ -30,10 +30,12 @@ import CustomResourceDefinitionHandler from './CustomResourceDefinition.handler'
 import DaemonSetHandler from './DaemonSet.handler';
 import DeploymentHandler from './Deployment.handler';
 import EndpointsHandler from './Endpoints.handler';
+import EventHandler from './EventHandler';
 import IngressHandler from './Ingress.handler';
 import JobHandler from './Job.handler';
 import NamespaceHandler from './Namespace.handler';
 import NetworkPolicyHandler from './NetworkPolicy.handler';
+import NodeHandler from './NodeHandler';
 import PersistentVolumeHandler from './PersistentVolume.handler';
 import PersistentVolumeClaimHandler from './PersistentVolumeClaim.handler';
 import PodHandler from './Pod.handler';
@@ -81,6 +83,8 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ResourceQuotaHandler,
   LimitRangeHandler,
   HorizontalPodAutoscalerHandler,
+  NodeHandler,
+  EventHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

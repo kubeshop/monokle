@@ -6,7 +6,6 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {APPLY_HELM_CHART} from '@shared/constants/telemetry';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
@@ -27,7 +26,7 @@ function applyHelmChartToCluster(
   namespace?: string,
   shouldCreateNamespace?: boolean
 ) {
-  trackEvent(APPLY_HELM_CHART);
+  trackEvent('cluster/deploy_helm_chart');
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
   let args = [

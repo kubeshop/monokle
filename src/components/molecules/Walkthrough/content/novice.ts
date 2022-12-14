@@ -13,12 +13,12 @@ export const noviceContent: WalkthroughContentProps['data'][] = [
     content:
       'Check out all your K8s resources grouped by type, no matter how many they are. Search & filter them, learn about their dependencies and fix errors.',
   },
-  {
-    step: 'syntax',
-    title: 'Fix errors for a perfect syntax',
-    content:
-      'Get alerts for syntax errors. Follow suggestions for a fix on the fly. Find links to other resources right there in the code. Use forms for quick code writing.',
-  },
+  // {
+  //   step: 'syntax',
+  //   title: 'Fix errors for a perfect syntax',
+  //   content:
+  //     'Get alerts for syntax errors. Follow suggestions for a fix on the fly. Find links to other resources right there in the code. Use forms for quick code writing.',
+  // },
   {
     step: 'kustomizeHelm',
     title: 'Validate Kustomize and Helm output',

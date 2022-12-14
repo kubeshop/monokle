@@ -37,7 +37,7 @@ export const compareSlice = createSlice({
         state.current.view = initialView;
       }
 
-      trackEvent('COMPARE_OPENED', {from: action.payload.from});
+      trackEvent('compare/opened', {from: action.payload.from});
     },
     operationUpdated: (state: Draft<CompareState>, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
@@ -92,7 +92,7 @@ export const compareSlice = createSlice({
       state.current[side] = undefined;
     },
     comparisonInspecting: (state: Draft<CompareState>, action: PayloadAction<ComparisonInspection>) => {
-      trackEvent('COMPARE_INSPECTED', {type: state.current.inspect?.type});
+      trackEvent('compare/inspected', {type: state.current.inspect?.type});
       state.current.inspect = action.payload;
     },
     comparisonInspected: state => {
@@ -159,7 +159,7 @@ export const compareSlice = createSlice({
       };
     },
     resourceSetCompared: (state: Draft<CompareState>, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
-      trackEvent('COMPARE_COMPARED', {
+      trackEvent('compare/compared', {
         left: state.current.view.leftSet?.type,
         right: state.current.view.rightSet?.type,
         operation: state.current.view.operation ?? 'default',
@@ -198,7 +198,7 @@ export const compareSlice = createSlice({
       const rightSet = state.current.view.rightSet;
       const from = direction === 'left-to-right' ? leftSet?.type : rightSet?.type;
       const to = direction === 'left-to-right' ? rightSet?.type : leftSet?.type;
-      trackEvent('COMPARE_TRANSFERED', {from, to, count: delta.length});
+      trackEvent('compare/transfered', {from, to, count: delta.length});
 
       state.current.transfering.pending = false;
 

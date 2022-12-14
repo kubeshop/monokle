@@ -3,7 +3,6 @@ import {BrowserWindow, app, ipcMain} from 'electron';
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
 import {
@@ -16,7 +15,6 @@ import {
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
 } from '@shared/constants/ipcEvents';
-import {UPDATE_APPLICATION} from '@shared/constants/telemetry';
 import type {CommandOptions} from '@shared/models/commands';
 import {NewVersionCode} from '@shared/models/config';
 import {
@@ -82,7 +80,6 @@ const killTerminal = (id: string) => {
 };
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
-  Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
   if (segmentClient) {
     segmentClient.track({
@@ -252,7 +249,7 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  trackEvent(UPDATE_APPLICATION);
+  trackEvent('APP_UPDATED');
   autoUpdater.quitAndInstall();
   dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Idle, data: null}});
 });

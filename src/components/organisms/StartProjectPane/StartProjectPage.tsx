@@ -10,6 +10,8 @@ import {
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 
+import {trackEvent} from '@utils/telemetry';
+
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
@@ -70,6 +72,7 @@ const StartProjectPage = () => {
       itemTitle: 'Quick cluster preview',
       itemDescription: 'Preview a cluster and learn everything about it in a matter of seconds.',
       itemAction: () => {
+        trackEvent('dashboard/open', {from: 'start-screen-quick-cluster-preview'});
         dispatch(setLeftMenuSelection('dashboard'));
         dispatch(setPreviewingCluster(true));
         dispatch(toggleStartProjectPane());

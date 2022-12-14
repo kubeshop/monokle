@@ -2,7 +2,7 @@ type WalkthroughCollection = 'novice' | 'release';
 
 type WalkthroughStep<C extends WalkthroughCollection = WalkthroughCollection> = C extends 'novice'
   ? 'template' | 'resource' | 'syntax' | 'kustomizeHelm'
-  : 'compare' | 'images';
+  : 'compare' | 'cluster';
 
 type WalkthroughContentProps = {
   data: {

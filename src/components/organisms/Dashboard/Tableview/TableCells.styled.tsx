@@ -13,21 +13,30 @@ export const StatusRunning = styled(Tag)`
   border-radius: 2px;
 `;
 
-export const StatusActive = styled(Tag)`
+export const StatusPending = styled(Tag)`
   font-size: 12px;
   font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.green10};
-  border: 1px solid ${Colors.green6};
+  color: ${Colors.yellow12};
+  background-color: ${Colors.yellow1000};
+  border: 1px solid ${Colors.yellow100};
   border-radius: 2px;
 `;
 
-export const StatuTerminating = styled(Tag)`
+export const StatusActive = styled(Tag)`
   font-size: 12px;
   font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.redError};
-  border: 1px solid ${Colors.red7};
+  color: ${Colors.green6};
+  background-color: ${Colors.green200};
+  border: 1px solid ${Colors.green100};
+  border-radius: 2px;
+`;
+
+export const StatusTerminating = styled(Tag)`
+  font-size: 12px;
+  font-weight: 400;
+  color: ${Colors.errorBg};
+  background-color: ${Colors.red100};
+  border: 1px solid ${Colors.red10};
   border-radius: 2px;
 `;
 
@@ -69,16 +78,14 @@ export const Warning = styled.span`
 `;
 
 export const Resource = styled.span`
-  color: ${Colors.whitePure};
-  background-color: ${Colors.geekblue7};
+  color: ${Colors.grey7};
   font-weight: 700;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 100%;
-  width: 18px;
-  height: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   letter-spacing: -1px;
-  padding: 0 2px 0 0;
+  margin-left: 4px;
+  margin-right: 8px;
 `;

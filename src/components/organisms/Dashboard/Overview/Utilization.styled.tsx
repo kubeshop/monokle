@@ -22,7 +22,7 @@ export const ProgressContainer = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
-  margin: 0 -35px;
+  margin: 0 -15px;
 `;
 
 export const Progress = styled(RawProgress)`
@@ -33,6 +33,7 @@ export const Progress = styled(RawProgress)`
     border-radius: 4px;
     .ant-progress-bg {
       border-radius: 4px;
+      box-shadow: 0px 0px 4px #839ced;
     }
   }
 `;

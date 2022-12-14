@@ -11,8 +11,10 @@ export const Content = styled.div`
 `;
 
 export const NotificationMarkdownContainer = styled.div`
-  & p {
+  & pre {
     display: inline;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 `;
 

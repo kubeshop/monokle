@@ -2,14 +2,15 @@ import {WalkthroughContentProps} from '@shared/models/walkthrough';
 
 export const newReleaseFeaturesContent: WalkthroughContentProps['data'][] = [
   {
-    step: 'compare',
-    title: 'Compare anything',
-    content: 'Compare local, Helm, Kustomize and cluster resources. You can also inspect differences and deploy them.',
+    step: 'cluster',
+    title: 'Cluster mode',
+    content:
+      'Day-to-day debugging and validation tasks made easy with real-time insights into the state of deployed clusters and contained resources.',
   },
   {
-    step: 'images',
-    title: 'View Images',
+    step: 'compare',
+    title: 'Compare subfolders',
     content:
-      'An overview with all the images found in your resources. Navigate to their resources or quickly update tag versions.',
+      'Helpful when the main folder structure is complex and contains multiple subfolders with different content for the same resources.',
   },
 ];

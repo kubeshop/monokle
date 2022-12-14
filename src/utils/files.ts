@@ -185,7 +185,9 @@ export function createFolder(rootDir: string, folderName: string, callback: (arg
 }
 
 export function createFile(rootDir: string, fileName: string, callback: (args: CreateFileFolderCallback) => any) {
-  return fs.open(path.join(rootDir, fileName), 'wx', err => callback({rootDir, fileFolderName: fileName, err}));
+  return fs.writeFile(path.join(rootDir, fileName), '', {flag: 'wx'}, err =>
+    callback({rootDir, fileFolderName: fileName, err})
+  );
 }
 
 export function hasValidExtension(file: string | undefined, extensions: string[]): boolean {

@@ -16,7 +16,6 @@ import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmCha
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {START_FROM_A_TEMPLATE, USE_TEMPLATE} from '@shared/constants/telemetry';
 import {Project} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
 import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@shared/models/template';
@@ -54,7 +53,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
       if (projectToCreate) {
-        trackEvent(START_FROM_A_TEMPLATE, {templateID: template.id});
+        trackEvent('app_start/create_project', {from: 'template', templateID: template.id});
         dispatch(setCreateProject({...projectToCreate}));
         onClose('PREVIEW');
       }
@@ -63,7 +62,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       formDataList.shift();
 
       if (isVanillaTemplate(template)) {
-        trackEvent(USE_TEMPLATE, {templateID: template.id});
+        trackEvent('edit/template_use', {templateID: template.id});
         setIsLoading(true);
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
@@ -82,7 +81,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         return;
       }
       setIsLoading(true);
-      trackEvent(USE_TEMPLATE, {templateID: template.id});
+      trackEvent('edit/template_use', {templateID: template.id});
       previewReferencedHelmChart(
         template.chartName,
         template.chartVersion,

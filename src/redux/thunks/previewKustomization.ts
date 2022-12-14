@@ -11,7 +11,6 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {DO_KUSTOMIZE_PREVIEW} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandResult} from '@shared/models/commands';
 import {ProjectConfig} from '@shared/models/config';
@@ -31,6 +30,7 @@ export const previewKustomization = createAsyncThunk<
     state: RootState;
   }
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
+  const startTime = new Date().getTime();
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const k8sVersion = getK8sVersion(projectConfig);
@@ -45,12 +45,14 @@ export const previewKustomization = createAsyncThunk<
     log.info(`previewing ${resource.id} in folder ${folder}`);
     const result = await runKustomize(folder, projectConfig);
 
-    trackEvent(DO_KUSTOMIZE_PREVIEW);
-
     if (hasCommandFailed(result)) {
       const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
       return createRejectionWithAlert(thunkAPI, 'Kustomize Error', msg);
     }
+
+    const endTime = new Date().getTime();
+
+    trackEvent('preview/kustomize', {executionTime: endTime - startTime});
 
     if (result.stdout) {
       return createPreviewResult(
