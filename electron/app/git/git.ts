@@ -316,7 +316,7 @@ export async function pullChanges(localPath: string) {
   }
 }
 
-export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+export async function getCommitResources(localPath: string, commitHash: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   let resources: K8sResource[] = [];
 
@@ -330,7 +330,7 @@ export async function getCommitResources(localPath: string, branchName: string, 
     // get the content of the file found in current branch
     try {
       // eslint-disable-next-line no-await-in-loop
-      content = await git.show(`${branchName}:${filesPaths[i]}`);
+      content = await git.show(`${commitHash}:${filesPaths[i]}`);
     } catch (e) {
       content = '';
     }
