@@ -55,7 +55,6 @@ jobs:
           brew install jq
 
       - name: Add MacOS certs
-        working-directory: 'main'
         run: |
           ls -la
           chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
@@ -67,7 +66,6 @@ jobs:
         run: security find-identity -v
 
       - name: Get Node Version
-        working-directory: 'main'
         run: |
           cat .nvmrc
           echo "::set-output name=nodeversion::$(cat .nvmrc)"
@@ -81,7 +79,6 @@ jobs:
           cache-dependency-path: main/package-lock.json
 
       - name: Install Dependencies
-        working-directory: 'main'
         run: |
           env
           echo "npm: $(npm --version)"
@@ -94,7 +91,6 @@ jobs:
       #     npm list --depth=1
 
       - name: Build
-        working-directory: 'main'
         run: |
           contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           contents="$(jq --arg MONOKLE_INSTALLS_URL $MONOKLE_INSTALLS_URL '.MONOKLE_INSTALLS_URL = $MONOKLE_INSTALLS_URL' electron/env.json)" && echo "${contents}" > electron/env.json
@@ -108,7 +104,6 @@ jobs:
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
 
       - name: Package
-        working-directory: 'main'
         run: |
           contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
@@ -125,7 +120,6 @@ jobs:
 
       # Check Binary Size
       - name: Build Succeeded
-        working-directory: 'main'
         run: |
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
@@ -142,25 +136,35 @@ jobs:
           token: ${{ secrets.github_token }}
 
       - name: Generate Cask file
-        working-directory: 'main'
         run: |
-          mkdir -p ../homebrew-monokle/Casks
-          ./generate-cask.sh > ../homebrew-monokle/Casks/monokle.rb
+          mkdir -p ./homebrew-monokle/Casks
+          ./generate-cask.sh > ./homebrew-monokle/Casks/monokle.rb
 
-      - name: Commit Cask file
-        working-directory: 'homebrew-monokle'
-        run: |
-          git config --local user.email "bot-github-ci@kubeshop.io"
-          git config --local user.name "github-actions[bot]"
-          git add . 
-          git commit -m "core: add new Monokle Cask release"
-
-      - name: Push Cask file
-        uses: ad-m/github-push-action@master
+      - uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.BREW_TOKEN }}
         with:
-          github_token: ${{ secrets.BREW_TOKEN }}
-          directory: 'homebrew-monokle'
-          repository: 'kubeshop/homebrew-monokle'
+          source-directory: 'homebrew-monokle'
+          destination-github-username: 'kubeshop'
+          destination-repository-name: 'homebrew-monokle'
+          user-email: bot-github-ci@kubeshop.io
+          target-branch: main
+          target-directory: Cask
+
+      # - name: Commit Cask file
+      #   working-directory: 'homebrew-monokle'
+      #   run: |
+      #     git config --local user.email "bot-github-ci@kubeshop.io"
+      #     git config --local user.name "github-actions[bot]"
+      #     git add . 
+      #     git commit -m "core: add new Monokle Cask release"
+
+      # - name: Push Cask file
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.BREW_TOKEN }}
+      #     directory: 'homebrew-monokle'
+      #     repository: 'kubeshop/homebrew-monokle'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
