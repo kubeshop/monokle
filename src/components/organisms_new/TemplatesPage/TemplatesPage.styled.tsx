@@ -1,4 +1,4 @@
-import {Button as AntdButton, Card as AntdCard, Skeleton as RawSkeleton} from 'antd';
+import {Button as AntdButton, Skeleton as RawSkeleton} from 'antd';
 
 import AntdIcon, {RightOutlined} from '@ant-design/icons';
 

@@ -38,4 +38,5 @@ export {default as TerminalPane} from './TerminalPane';
 export {default as UpdateNotice} from './UpdateNotice';
 export {default as ValidationPane} from './ValidationPane';
 export {default as TutorialPage} from '../organisms_new/TutorialPage';
+export {default as TemplatesPage} from '../organisms_new/TemplatesPage';
 export {RecentProjectsPage, StartProjectPage} from './StartProjectPane';

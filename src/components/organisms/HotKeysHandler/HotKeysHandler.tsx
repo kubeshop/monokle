@@ -299,6 +299,10 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('tutorial'));
   });
 
+  useHotkeys(hotkeys.OPEN_TEMPLATES_PAGE.key, () => {
+    dispatch(setLeftMenuSelection('templates'));
+  });
+
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
     dispatch(resetResourceFilter());
   });

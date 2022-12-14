@@ -24,7 +24,8 @@ type LeftMenuSelectionType =
   | 'tutorial'
   | 'search'
   | 'crds'
-  | 'dashboard';
+  | 'dashboard'
+  | 'templates';
 
 type MonacoRange = {
   startLineNumber: number;

@@ -121,6 +121,11 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+shift+t, command+shift+t',
     category: 'navigation',
   },
+  OPEN_TEMPLATES_PAGE: {
+    name: 'Open Templates Page',
+    key: 'ctrl+shift+k, command+shift+k',
+    category: 'navigation',
+  },
   OPEN_NEW_WINDOW: {
     name: 'Open New Window',
     key: 'ctrl+shift+n, command+shift+n',

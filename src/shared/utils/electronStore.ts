@@ -1,4 +1,4 @@
-import {electronStoreDefaults, electronStoreSchema} from '../constants/electronStore';
+import {electronStoreDefaults, electronStoreSchema} from '@shared/constants';
 
 const ElectronStore = require('electron-store');
 
