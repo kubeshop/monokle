@@ -41,6 +41,7 @@ export const setRootFolder = createAsyncThunk<
     state: RootState;
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const userDataDir = thunkAPI.getState().config.userDataDir;
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -103,11 +104,6 @@ export const setRootFolder = createAsyncThunk<
     type: AlertEnum.Success,
   };
 
-  trackEvent('app_start/open_project', {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMap).length,
-  });
-
   const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
     'git.isFolderGitRepo',
     'git.isFolderGitRepo.result',
@@ -155,6 +151,14 @@ export const setRootFolder = createAsyncThunk<
       }
     });
   }
+
+  const endTime = new Date().getTime();
+
+  trackEvent('app_start/open_project', {
+    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
+    numberOfResources: Object.values(resourceMap).length,
+    executionTime: endTime - startTime,
+  });
 
   return {
     projectConfig,
