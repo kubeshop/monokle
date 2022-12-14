@@ -3,13 +3,13 @@ import {useCallback} from 'react';
 import _ from 'lodash';
 import {DateTime} from 'luxon';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
 
 import {timeAgo} from '@utils/timeAgo';
 
 import EventHandler from '@src/kindhandlers/EventHandler';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './Activity.styled';
 

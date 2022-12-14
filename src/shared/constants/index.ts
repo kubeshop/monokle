@@ -5,7 +5,6 @@ export * from './hotkeys';
 export * from './ipcEvents';
 export * from './k8s';
 export * from './plugin';
-export * from './telemetry';
 export * from './urls';
 export * from './features';
 export * from './tutorialReferences';

@@ -26,12 +26,12 @@ import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {trackEvent} from '@utils/telemetry';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';

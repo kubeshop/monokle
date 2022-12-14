@@ -18,12 +18,12 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
-import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8sResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {showItemInFolder} from '@shared/utils/shell';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance, children} = props;

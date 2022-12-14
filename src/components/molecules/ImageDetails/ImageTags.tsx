@@ -7,9 +7,8 @@ import {debounce, isEqual} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ImageTagTooltip} from '@constants/tooltips';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
-
 import {DockerHubImageTags} from '@shared/models/image';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './ImageTags.styled';
 

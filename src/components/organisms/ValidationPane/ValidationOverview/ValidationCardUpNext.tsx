@@ -2,7 +2,7 @@ import React from 'react';
 
 import {LET_US_KNOW_URL} from '@constants/constants';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './ValidationCardUpNext.styled';
 

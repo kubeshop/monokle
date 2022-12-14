@@ -3,8 +3,6 @@ import {useInterval} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
@@ -15,6 +13,7 @@ import InfoCircle from '@assets/InfoCircle.svg';
 
 import NodeHandler from '@src/kindhandlers/NodeHandler';
 
+import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
 import * as S from './Utilization.styled';

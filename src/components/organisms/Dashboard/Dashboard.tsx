@@ -1,7 +1,5 @@
 import {useCallback} from 'react';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -19,6 +17,8 @@ import ReplicaSetHandler from '@src/kindhandlers/ReplicaSet.handler';
 import SecretHandler from '@src/kindhandlers/Secret.handler';
 import ServiceHandler from '@src/kindhandlers/Service.handler';
 import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './Dashboard.styled';
 import {Overview} from './Overview/Overview';

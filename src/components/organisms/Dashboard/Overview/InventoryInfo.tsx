@@ -1,8 +1,5 @@
 import {useCallback} from 'react';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
 import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
@@ -13,6 +10,9 @@ import NodeHandler from '@src/kindhandlers/NodeHandler';
 import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClaim.handler';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
+
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import * as S from './InventoryInfo.styled';
 

@@ -5,11 +5,11 @@ import {DateTime} from 'luxon';
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
-import {isDefined} from '@utils/filter';
 import {timeAgo} from '@utils/timeAgo';
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
 import {K8sResource} from '@shared/models/k8sResource';
+import {isDefined} from '@shared/utils/filter';
 
 import * as S from './TableCells.styled';
 

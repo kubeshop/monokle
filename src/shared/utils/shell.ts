@@ -2,25 +2,48 @@ import {app, shell} from 'electron';
 
 import * as os from 'os';
 
-import {WINDOW_HELP_LINK} from '../constants/telemetry';
-import {trackEvent} from './telemetry';
+import {trackEvent} from '@shared/utils/telemetry';
+
+export function showItemInFolder(fullPath: string) {
+  shell.showItemInFolder(fullPath);
+}
+
+export function openGitHub() {
+  trackEvent('help/open_link', {linkType: 'github'});
+  shell.openExternal('https://github.com/kubeshop/monokle');
+}
 
 export function openDiscord() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'discord'});
+  trackEvent('help/open_link', {linkType: 'discord'});
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
+export function openUrlInExternalBrowser(url?: string) {
+  if (url) {
+    shell.openExternal(url);
+  }
+}
+
 export function openDocumentation() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'documentation'});
+  trackEvent('help/open_link', {linkType: 'documentation'});
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
 export function openLogs() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'logs'});
+  trackEvent('help/open_link', {linkType: 'logs'});
   shell.showItemInFolder(app.getPath('logs'));
 }
 
-export function openGitHub() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'github'});
-  shell.openExternal('https://github.com/kubeshop/monokle');
+export function openUniqueObjectNameTopic() {
+  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
+}
+
+export function openNamespaceTopic() {
+  shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces');
+}
+
+export function openExternalResourceKindDocumentation(resourceKindDocLink?: string) {
+  if (resourceKindDocLink) {
+    shell.openExternal(resourceKindDocLink);
+  }
 }

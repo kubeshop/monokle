@@ -12,12 +12,12 @@ import {FileExplorer, Icon} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {trackEvent} from '@utils/telemetry';
-
 import FolderSmallPlusWhiteSvg from '@assets/FolderSmallPlusWhite.svg';
 import FolderSmallWhiteSvg from '@assets/FolderSmallWhite.svg';
 import PlusIconSvg from '@assets/PlusIcon.svg';
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './CreateProject.styled';
 

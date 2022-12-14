@@ -10,11 +10,11 @@ import {
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 
-import {trackEvent} from '@utils/telemetry';
-
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
 import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ActionCard from './ActionCard';
 import Guide from './Guide';

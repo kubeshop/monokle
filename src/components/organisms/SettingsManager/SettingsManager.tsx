@@ -32,12 +32,11 @@ import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
-
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {Project, ProjectConfig, SettingsPanel} from '@shared/models/config';
 import {Colors} from '@shared/styles/colors';
 import {activeProjectSelector} from '@shared/utils/selectors';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import {Settings} from './Settings';
 
