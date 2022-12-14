@@ -11,8 +11,8 @@ import os from 'os';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
-import {APP_INSTALLED} from '@shared/constants/telemetry';
 import type {AnyExtension} from '@shared/models/extension';
+import {APP_INSTALLED} from '@shared/models/telemetry';
 import electronStore from '@shared/utils/electronStore';
 import {loadResource} from '@shared/utils/resource';
 import {getSegmentClient} from '@shared/utils/segment';
