@@ -82,14 +82,13 @@ function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sRe
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
-  const {branchName, commitHash = ''} = options;
+  const {commitHash = ''} = options;
 
   const resources: K8sResource[] = await promiseFromIpcRenderer(
     'git.getCommitResources',
     'git.getCommitResources.result',
     {
       localPath: state.config.selectedProjectRootFolder,
-      branchName,
       commitHash,
     }
   );
