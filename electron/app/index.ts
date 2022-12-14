@@ -23,8 +23,8 @@ const userDataDir = app.getPath('userData');
 const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
 const disableErrorReporting = Boolean(electronStore.get('appConfig.disableErrorReporting'));
 
-if (process.env.ELECTRON_SENTRY_DSN && !disableErrorReporting) {
-  Sentry.init({dsn: process.env.ELECTRON_SENTRY_DSN});
+if (process.env.SENTRY_DSN && !disableErrorReporting) {
+  Sentry.init({dsn: process.env.SENTRY_DSN});
 }
 
 setProjectsRootFolder(userHomeDir);
