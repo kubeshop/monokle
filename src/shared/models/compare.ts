@@ -155,6 +155,7 @@ type CommandResourceSet = {
 type GitResourceSet = {
   type: 'git';
   branchName: string;
+  folder: string;
   commitHash?: string;
 };
 
