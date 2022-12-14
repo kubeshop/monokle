@@ -4,7 +4,6 @@ import {indexOf} from 'lodash';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 
-import * as Sentry from '@sentry/electron';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@shared/constants/app';
 import {DEFAULT_PLUGINS} from '@shared/constants/plugin';
 import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@shared/constants/urls';
@@ -65,7 +64,6 @@ export const createWindow = (givenPath?: string) => {
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
-      preload: path.join(__dirname, 'preload.js'),
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -155,10 +153,6 @@ export const createWindow = (givenPath?: string) => {
       } else {
         enableSegment();
       }
-
-      if (storeState.config.disableErrorReporting) {
-        Sentry.close();
-      }
     });
 
     dispatch({type: 'main/setAppRehydrating', payload: true});
@@ -185,6 +179,10 @@ export const createWindow = (givenPath?: string) => {
         pluginsDir,
       },
     });
+
+    if (process.env.SENTRY_DSN) {
+      dispatch({type: 'config/initRendererSentry', payload: {SENTRY_DSN: process.env.SENTRY_DSN}});
+    }
 
     await checkNewVersion(dispatch, true);
     setInterval(async () => {

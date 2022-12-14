@@ -1,3 +1,25 @@
+import {ipcRenderer} from 'electron';
+
+import {machineIdSync} from 'node-machine-id';
+
+import {getSegmentClient} from '@shared/utils/segment';
+import {isRendererThread} from '@shared/utils/thread';
+
+const machineId: string = machineIdSync();
+
+export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: EventMap[TEvent]) => {
+  if (isRendererThread()) {
+    ipcRenderer.send('track-event', {eventName, payload});
+  } else {
+    const segmentClient = getSegmentClient();
+    segmentClient?.track({
+      event: eventName,
+      properties: payload,
+      userId: machineId,
+    });
+  }
+};
+
 export type Event = keyof EventMap;
 export type EventMap = {
   APP_INSTALLED: {appVersion: string; deviceOS: string};
