@@ -29,6 +29,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
+import {monitorKubeConfig} from '@redux/services/monitorKubeConfig';
 
 import {SettingsPanel} from '@organisms/SettingsManager/types';
 
@@ -85,6 +86,7 @@ const SettingsManager: React.FC = () => {
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));
+    monitorKubeConfig(dispatch, config.kubeConfig?.path);
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
@@ -98,6 +100,7 @@ const SettingsManager: React.FC = () => {
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
+      monitorKubeConfig(dispatch, config.kubeConfig?.path);
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
