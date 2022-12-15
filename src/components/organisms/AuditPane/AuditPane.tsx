@@ -38,25 +38,26 @@ const AuditPane: React.FC = () => {
 
   const renderGroupList = () => {
     // eslint-disable-next-line no-restricted-syntax
-    for (const [location, results] of Object.entries(groupedResults)) {
+    return Object.entries(groupedResults).map(([location, results]) => (
       <>
-        {' '}
         <div>{location}</div>
         {renderRules(results)}
-      </>;
-    }
+      </>
+    ));
   };
 
   const renderRules = (results: any) => {
     if (!validationResponse) return null;
-    results.map((result: any) => {
+
+    console.log(results);
+    return results.map((result: any) => {
       const rule = getRuleForResult(validationResponse, result);
       const message = result.message.text;
       return (
-        <>
-          <div>{rule.name}</div>
-          <div>{rule.helpUri}</div>
-        </>
+        <div key={JSON.stringify(result)}>
+          <div style={{color: 'yellow'}}>{rule.name}</div>
+          <div style={{color: 'red'}}>{message}</div>
+        </div>
       );
     });
   };
@@ -64,7 +65,7 @@ const AuditPane: React.FC = () => {
   return (
     <S.AuditPaneContainer id="AuditPane">
       <TitleBar title="Validation errors" />
-      <S.List id="audit-sections-container">{renderGroupList()}</S.List>
+      <S.List id="audit-sections-container">{groupedResults && renderGroupList()}</S.List>
     </S.AuditPaneContainer>
   );
 };
