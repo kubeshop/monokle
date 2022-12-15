@@ -9,6 +9,7 @@ import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {HelmValuesFile} from '@models/helm';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -36,6 +37,16 @@ const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   align-items: center;
 `;
 
+// temporary solution for renaming value file
+const DEFAULT_HELM_VALUE: HelmValuesFile = {
+  filePath: '',
+  id: '',
+  name: '',
+  isSelected: false,
+  helmChartId: '',
+  values: [],
+};
+
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
@@ -58,10 +69,14 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const helmItem = useMemo(
-    () => helmValuesMap[itemInstance.id] || helmChartMap[itemInstance.id] || helmTemplatesMap[itemInstance.id],
+    () =>
+      helmValuesMap[itemInstance.id] ||
+      helmChartMap[itemInstance.id] ||
+      helmTemplatesMap[itemInstance.id] ||
+      DEFAULT_HELM_VALUE,
     [helmChartMap, helmTemplatesMap, helmValuesMap, itemInstance.id]
   );
-  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem.filePath]);
+  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem]);
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]
