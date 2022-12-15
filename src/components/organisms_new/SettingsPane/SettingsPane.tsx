@@ -16,6 +16,7 @@ import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
 import {StepEnum} from '@shared/models/walkthrough';
 
+import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
 import {DefaultProjectSettings} from './DefaultProjectSettings/DefaultProjectSettings';
 import {GlobalSettings} from './GlobalSettings/GlobalSettings';
@@ -31,7 +32,11 @@ export const SettingsPane = () => {
       {
         key: 'validation',
         label: <TabHeader>Validation</TabHeader>,
-        children: <S.TabItemContainer>Validation</S.TabItemContainer>,
+        children: (
+          <S.TabItemContainer>
+            <ValidationSettings />
+          </S.TabItemContainer>
+        ),
         style: {height: '100%'},
       },
       {
