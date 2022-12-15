@@ -68,7 +68,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'dashboard',
     tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="search" style={{fontSize: 16}} />,
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
     component: <DashboardPane />,
     useBadge: () => undefined,
   },
