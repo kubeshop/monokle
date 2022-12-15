@@ -2,17 +2,16 @@ import {BrowserWindow, app, nativeImage} from 'electron';
 
 import {indexOf} from 'lodash';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@shared/constants/app';
 import {DEFAULT_PLUGINS} from '@shared/constants/plugin';
-import {DISABLED_TELEMETRY} from '@shared/constants/telemetry';
 import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@shared/constants/urls';
 import {AlertEnum} from '@shared/models/alert';
 import type {AlertType} from '@shared/models/alert';
 import {NewVersionCode} from '@shared/models/config';
 import {StartupFlags} from '@shared/models/startupFlag';
+import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import utilsElectronStore from '@shared/utils/electronStore';
 import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 import {activeProjectSelector, unsavedResourcesSelector} from '@shared/utils/selectors';
@@ -65,7 +64,6 @@ export const createWindow = (givenPath?: string) => {
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
-      preload: path.join(__dirname, 'preload.js'),
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -147,18 +145,13 @@ export const createWindow = (givenPath?: string) => {
       const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {
-        Nucleus.track(DISABLED_TELEMETRY);
-        Nucleus.disableTracking();
         segmentClient?.track({
           userId: machineId,
           event: DISABLED_TELEMETRY,
         });
         disableSegment();
       } else {
-        Nucleus.enableTracking();
-        if (!segmentClient) {
-          enableSegment();
-        }
+        enableSegment();
       }
     });
 
@@ -186,6 +179,10 @@ export const createWindow = (givenPath?: string) => {
         pluginsDir,
       },
     });
+
+    if (process.env.SENTRY_DSN) {
+      dispatch({type: 'config/initRendererSentry', payload: {SENTRY_DSN: process.env.SENTRY_DSN}});
+    }
 
     await checkNewVersion(dispatch, true);
     setInterval(async () => {

@@ -8,7 +8,6 @@ import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ADD_NEW_RESOURCE} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileEntry} from '@shared/models/fileEntry';
 import {K8sResource} from '@shared/models/k8sResource';
@@ -47,7 +46,7 @@ const performSaveUnsavedResource = async (
     throw new Error('Could not find the root folder.');
   }
 
-  trackEvent(ADD_NEW_RESOURCE, {resourceKind: resource.kind});
+  trackEvent('create/resource', {resourceKind: resource.kind});
 
   if (saveMode === 'saveToFolder') {
     await writeFilePromise(absolutePath, resource.text);

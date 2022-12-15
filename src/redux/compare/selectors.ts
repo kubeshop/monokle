@@ -69,8 +69,9 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
   const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
   const currentGitBranchCommits = currentGitBranch?.commits || [];
   const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
+  const currentFolder = resourceSet.folder;
 
-  return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
+  return {allGitBranches, currentCommit, currentFolder, currentGitBranch, currentGitBranchCommits};
 };
 
 export const selectCommandResourceSet = (state: RootState, side: CompareSide) => {

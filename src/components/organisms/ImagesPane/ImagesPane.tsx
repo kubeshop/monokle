@@ -1,16 +1,19 @@
 import {SectionRenderer} from '@molecules';
 
-import {TitleBar} from '@atoms';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import ImagesSectionBlueprint from '@src/navsections/ImagesSectionBlueprint';
+
+import {TitleBar} from '@monokle/components';
 
 import * as S from './ImagesPane.styled';
 
 const ImagesPane: React.FC = () => {
   return (
     <S.ImagesPaneContainer id="ImagesPane">
-      <TitleBar title="Images" closable />
-
+      <TitleBarWrapper>
+        <TitleBar title="Images" />
+      </TitleBarWrapper>
       <S.List id="images-section-container">
         <SectionRenderer sectionBlueprint={ImagesSectionBlueprint} level={0} isLastSection={false} />
       </S.List>

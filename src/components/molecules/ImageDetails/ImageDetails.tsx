@@ -8,9 +8,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {Icon} from '@atoms';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
-
 import {DockerHubImage, DockerHubImageTags} from '@shared/models/image';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './ImageDetails.styled';
 import ImageTags from './ImageTags';

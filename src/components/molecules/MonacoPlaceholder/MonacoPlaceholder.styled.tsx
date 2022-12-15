@@ -7,6 +7,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
+  background: ${Colors.blackPure};
 `;
 
 export const Title = styled.p`

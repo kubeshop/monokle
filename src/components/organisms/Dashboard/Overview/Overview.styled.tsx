@@ -14,7 +14,7 @@ export const Container = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 30% 70%;
   grid-template-areas:
-    'status performance utilization'
+    'status utilization utilization'
     'inventory-info activity activity';
 `;
 
@@ -22,6 +22,10 @@ export const TitleBarContainer = styled.div`
   & > div:nth-child(1) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+
+    > div:first-child {
+      padding-left: 6px;
+    }
   }
   & > div:nth-child(2) {
     border-top-left-radius: 0;

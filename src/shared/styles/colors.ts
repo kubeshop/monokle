@@ -44,6 +44,8 @@ export enum Colors {
   yellow10 = '#FAFAB5',
   yellow11 = '#C9E75D',
   yellow12 = '#E8B339',
+  yellow100 = '#594214',
+  yellow1000 = '#2B2111',
 
   volcano6 = '#D84A1B',
   volcano7 = '#E87040',
@@ -57,6 +59,8 @@ export enum Colors {
   red4 = '#791A1F',
   red6 = '#D32029',
   red7 = '#E84749', // Dust Red
+  red10 = '#58181C',
+  red100 = '#2A1215',
   errorBg = '#E84749',
 
   whitePure = '#ffffff',
@@ -97,6 +101,8 @@ export enum Colors {
   green8 = '#8fd460',
   green9 = '#b2e58b',
   green10 = '#3E4F13', // Dark Green
+  green100 = '#274916',
+  green200 = '#162312',
 
   highlightGreen = '#33BCB7',
 

@@ -10,10 +10,6 @@ export const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin-left: 8px;
-
-  Button {
-    margin: 0 4px;
-  }
 `;
 
 export const LeftArrowButton = styled(Button)`

@@ -18,12 +18,12 @@ import {ContextMenu, Dots} from '@atoms';
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
-import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {showItemInFolder} from '@shared/utils/shell';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

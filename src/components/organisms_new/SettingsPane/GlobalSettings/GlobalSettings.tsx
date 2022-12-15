@@ -22,7 +22,7 @@ import {FileExplorer} from '@components/atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './GlobalSettings.styled';
 

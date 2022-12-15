@@ -27,3 +27,4 @@ export {default as YAMLSyntax} from './YAMLSyntax';
 export {default as Search} from './Search';
 export {default as SplitView} from './SplitView';
 export {default as Template} from './Template';
+export {default as Dashboard} from './Dashboard';

@@ -80,18 +80,14 @@ export const SettingsPane = () => {
 
   return (
     <S.SettingsPaneContainer>
-      <div>
-        <TitleBar title="Settings" description={<TitleCardDescription />} />
-      </div>
-      <div>
-        <S.Tabs
-          $height={height - 160}
-          defaultActiveKey="source"
-          activeKey={activeTabKey}
-          items={tabItems}
-          onChange={(k: string) => setActiveTabKey(k)}
-        />
-      </div>
+      <TitleBar title="Settings" description={<TitleCardDescription />} />
+      <S.Tabs
+        $height={height - 160}
+        defaultActiveKey="source"
+        activeKey={activeTabKey}
+        items={tabItems}
+        onChange={(k: string) => setActiveTabKey(k)}
+      />
     </S.SettingsPaneContainer>
   );
 };

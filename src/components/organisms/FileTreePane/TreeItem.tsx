@@ -17,13 +17,13 @@ import {isKustomizationFile} from '@redux/services/kustomize';
 import {ContextMenu, Dots, Spinner} from '@atoms';
 
 import {deleteEntity} from '@utils/files';
-import {showItemInFolder} from '@utils/shell';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {showItemInFolder} from '@shared/utils/shell';
 
 import {TreeItemProps} from './types';
 

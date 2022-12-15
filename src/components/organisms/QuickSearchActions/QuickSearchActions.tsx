@@ -15,7 +15,6 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {QUICK_SEARCH} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
@@ -259,7 +258,7 @@ const QuickSearchActionsV3: React.FC = () => {
 
   useEffect(() => {
     if (isOpen) {
-      trackEvent(QUICK_SEARCH);
+      trackEvent('explore/quick_search');
       setSearchingValue('');
     }
   }, [isOpen]);

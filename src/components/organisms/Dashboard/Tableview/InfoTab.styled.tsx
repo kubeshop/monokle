@@ -1,5 +1,3 @@
-import {Tag} from 'antd';
-
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
@@ -23,35 +21,15 @@ export const Title = styled.div`
 
 export const BlueContent = styled.div`
   color: ${Colors.blue7};
+  font-size: 13px;
 `;
 
 export const GreyContent = styled.div`
   color: ${Colors.grey7};
+  font-size: 13px;
 `;
 
-export const StatusRunning = styled(Tag)`
-  font-size: 12px;
-  font-weight: 400;
-  color: ${Colors.blue1000};
-  background-color: ${Colors.black10};
-  border: 1px solid ${Colors.geekblue4};
-  border-radius: 2px;
-`;
-
-export const StatusActive = styled(Tag)`
-  font-size: 12px;
-  font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.green10};
-  border: 1px solid ${Colors.green6};
-  border-radius: 2px;
-`;
-
-export const StatuTerminating = styled(Tag)`
-  font-size: 12px;
-  font-weight: 400;
-  color: ${Colors.whitePure};
-  background-color: ${Colors.redError};
-  border: 1px solid ${Colors.red7};
-  border-radius: 2px;
+export const RefDiv = styled.div`
+  display: block;
+  margin: 5px 0;
 `;

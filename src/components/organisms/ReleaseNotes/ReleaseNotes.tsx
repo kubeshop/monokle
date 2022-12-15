@@ -9,9 +9,9 @@ import path from 'path';
 import semver from 'semver';
 
 import {fetchAppVersion} from '@utils/appVersion';
-import {openUrlInExternalBrowser} from '@utils/shell';
 
 import {loadResource} from '@shared/utils/resource';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './styled';
 

@@ -9,6 +9,7 @@ import {
   CRDs,
   Collapse,
   Compare,
+  Dashboard,
   Git,
   GitOps,
   GitProject,
@@ -74,7 +75,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   'split-view': SplitView,
   crds: CRDs,
   compare: Compare,
-  dashboard: Search,
+  dashboard: Dashboard,
   template: Template,
 };
 

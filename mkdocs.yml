@@ -36,7 +36,10 @@ nav:
   - Working with Helm Charts: helm.md
   - Working with Clusters:
     - Cluster Integration: cluster-integration.md
-  - Resource Compare: compare-sync.md
+    - Cluster Mode: cluster-mode.md
+  - Compare & Sync:  
+    - Resource Compare: compare-sync.md
+    - Compare Subfolders: compare-subfolders.md
   - Deploy/Diff: apply-and-diff.md
   - Development:
     - Development: development.md

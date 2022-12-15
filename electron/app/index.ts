@@ -1,39 +1,42 @@
 import {app} from 'electron';
-import unhandled from 'electron-unhandled';
 
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
 import terminal from '@root/cli/terminal';
+import * as Sentry from '@sentry/electron';
+import electronStore from '@shared/utils/electronStore';
 import '@shared/utils/segment';
 
 import './git/ipc';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
-import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from './utils';
+import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './utils';
 import {fixPath} from './utils/path';
-
-const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 
-let {disableErrorReports, disableTracking} = initNucleus(isDev, app);
-unhandled({
-  logger: error => {
-    if (!disableErrorReports) {
-      Nucleus.trackError((error && error.name) || 'Unnamed error', error);
-    }
-  },
-  showDialog: false,
-});
+const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    beforeSend: event => {
+      const disableErrorReporting = Boolean(electronStore.get('appConfig.disableErrorReporting'));
+      if (disableErrorReporting) {
+        return null;
+      }
+      return event;
+    },
+  });
+}
 
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
-setDeviceID(machineIdSync(), disableTracking, app.getVersion());
+initTelemetry(machineIdSync(), disableEventTracking, app);
 fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {

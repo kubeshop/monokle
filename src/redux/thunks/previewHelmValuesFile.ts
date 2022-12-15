@@ -8,7 +8,6 @@ import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux
 
 import {errorMsg} from '@utils/error';
 
-import {DO_HELM_PREVIEW} from '@shared/constants/telemetry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -22,8 +21,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   }
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   try {
-    trackEvent(DO_HELM_PREVIEW);
-
+    const startTime = new Date().getTime();
     const state = thunkAPI.getState().main;
     const configState = thunkAPI.getState().config;
 
@@ -40,6 +38,10 @@ export const previewHelmValuesFile = createAsyncThunk<
 
     const projectConfig = currentConfigSelector(thunkAPI.getState());
     const policyPlugins = state.policies.plugins;
+
+    const endTime = new Date().getTime();
+
+    trackEvent('preview/helm', {resourcesCount: resources.length, executionTime: endTime - startTime});
 
     return createPreviewResultFromResources(
       getK8sVersion(projectConfig),

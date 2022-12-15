@@ -17,6 +17,8 @@ import FolderSmallWhiteSvg from '@assets/FolderSmallWhite.svg';
 import PlusIconSvg from '@assets/PlusIcon.svg';
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
+import {trackEvent} from '@shared/utils/telemetry';
+
 import * as S from './CreateProject.styled';
 
 const CreateProject = () => {
@@ -54,6 +56,8 @@ const CreateProject = () => {
 
   const onMenuOptionClick = (item: Record<string, any>) => {
     const {key} = item;
+
+    trackEvent('top-menu/new-project', {type: key});
 
     if (key === 'new_from_local_folder') {
       openFileExplorer();

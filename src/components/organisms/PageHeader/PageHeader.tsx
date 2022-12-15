@@ -31,6 +31,7 @@ import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
@@ -117,6 +118,7 @@ const PageHeader = () => {
       return;
     }
 
+    trackEvent('git/initialize');
     setIsInitializingGitRepo(true);
 
     await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
