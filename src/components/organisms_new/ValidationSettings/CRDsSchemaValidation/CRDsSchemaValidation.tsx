@@ -163,7 +163,7 @@ const CRDsSchemaValidation: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <ValidationPaneHeading integration={CRD_SCHEMA_INTEGRATION} />
       <S.Container>
         {isRegistering ? (
@@ -232,7 +232,7 @@ const CRDsSchemaValidation: React.FC = () => {
           ))}
         </Collapse>
       </S.Container>
-    </div>
+    </>
   );
 };
 

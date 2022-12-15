@@ -2,8 +2,6 @@ import {shell} from 'electron';
 
 import {useCallback} from 'react';
 
-import {Switch} from 'antd';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
@@ -34,19 +32,26 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
   }, [dispatch, id]);
 
   return (
-    <S.Card key={id}>
-      <S.ToggleContainer>
-        <S.Icon name={icon} key={icon} />
-        <Switch checked={isEnabled} size="small" onChange={toggleEnabled} />
-      </S.ToggleContainer>
+    <S.ValidationCardContainer key={id}>
+      <S.Icon name={icon} key={icon} />
 
-      <S.Name>{name}</S.Name>
-      <span>
-        <S.Description>{description}</S.Description>
-        <S.Link onClick={openLearnMore}>Learn more</S.Link>
-      </span>
-      {integration.isConfigurable && <S.Button onClick={onConfigureHandler}>Configure</S.Button>}
-    </S.Card>
+      <S.InfoContainer>
+        <S.Name>{name}</S.Name>
+
+        <span>
+          <S.Description>{description}</S.Description>
+          <S.Link onClick={openLearnMore}>Learn more</S.Link>
+        </span>
+      </S.InfoContainer>
+
+      {integration.isConfigurable && (
+        <S.ConfigureButton type="primary" onClick={onConfigureHandler}>
+          Configure
+        </S.ConfigureButton>
+      )}
+
+      <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />
+    </S.ValidationCardContainer>
   );
 };
 

@@ -38,6 +38,7 @@ const ValidationOpenPolicyAgent: React.FC<IProps> = ({height}) => {
     <>
       <div ref={descriptionRef}>
         <ValidationPaneHeading integration={OPA_INTEGRATION} />
+
         <S.DescriptionContainer>
           <S.Description>
             Validate your resources with policies. Enable or disable OPA rules in this list.

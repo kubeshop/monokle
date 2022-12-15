@@ -11,7 +11,7 @@ export const Heading = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 18px 16px;
-  background-color: #31393c;
+  background-color: rgba(255, 255, 255, 0.05);
 `;
 
 export const HeadingLeft = styled.div`

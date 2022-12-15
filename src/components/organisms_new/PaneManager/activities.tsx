@@ -1,8 +1,8 @@
-import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, ValidationTabTooltip} from '@constants/tooltips';
+import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
+import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
@@ -26,14 +26,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: 'Compare resources',
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
-    useBadge: () => undefined,
-  },
-  {
-    type: 'panel',
-    name: 'validation',
-    tooltip: <ValidationTabTooltip />,
-    icon: () => <Icon name="validation" style={{fontSize: 16}} />,
-    component: <ValidationPane />,
     useBadge: () => undefined,
   },
   {
@@ -68,7 +60,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'dashboard',
     tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="search" style={{fontSize: 16}} />,
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
     component: <DashboardPane />,
     useBadge: () => undefined,
   },
