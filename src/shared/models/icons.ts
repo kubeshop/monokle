@@ -27,6 +27,7 @@ type IconNames =
   | 'split-view'
   | 'crds'
   | 'compare'
-  | 'dashboard';
+  | 'dashboard'
+  | 'template';
 
 export type {IconNames};

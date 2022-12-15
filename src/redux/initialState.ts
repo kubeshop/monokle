@@ -61,6 +61,11 @@ const initialAppState: AppState = {
       matchWholeWord: false,
       regExp: false,
     },
+    queryTemplateParams: {
+      matchCase: false,
+      matchWholeWord: false,
+      regExp: false,
+    },
     searchHistory: electronStore.get('appConfig.recentSearch') || [],
     currentMatch: null,
   },

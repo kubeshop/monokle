@@ -29,6 +29,7 @@ import {
   SeverityMedium,
   Shortcuts,
   SplitView,
+  Template,
   Terminal,
   Validation,
   Warning,
@@ -74,6 +75,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
   crds: CRDs,
   compare: Compare,
   dashboard: Search,
+  template: Template,
 };
 
 const Icon: React.FC<IconProps> = props => {

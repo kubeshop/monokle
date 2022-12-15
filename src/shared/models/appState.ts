@@ -53,6 +53,7 @@ type AppState = {
     searchQuery: string;
     replaceQuery: string;
     queryMatchParams: MatchParamProps;
+    queryTemplateParams: MatchParamProps;
     currentMatch: CurrentMatch | null;
     searchHistory: string[];
   };
