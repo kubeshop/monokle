@@ -31,6 +31,7 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
+  keysToDelete,
   keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
@@ -355,10 +356,13 @@ export const configSlice = createSlice({
       }
 
       const projectConfig = state.projectConfig;
+      const incomingConfigKeys = Object.keys(action.payload.config);
       const serializedIncomingConfig = flatten<any, any>(action.payload.config, {safe: true});
       const serializedState = flatten<any, any>(state.projectConfig, {safe: true});
 
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
+      let deletedKeys = keysToDelete(serializedState, serializedIncomingConfig, incomingConfigKeys);
+
       if (action.payload.fromConfigFile) {
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
@@ -370,11 +374,15 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
-      keys.forEach(key => {
-        if (projectConfig) {
+      if (projectConfig) {
+        keys.forEach(key => {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-        }
-      });
+        });
+
+        deletedKeys.forEach(key => {
+          _.unset(projectConfig, key);
+        });
+      }
 
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
         state.kubeConfig.path = action.payload.config.kubeConfig.path;
