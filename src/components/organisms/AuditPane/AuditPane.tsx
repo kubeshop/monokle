@@ -5,8 +5,7 @@ import groupBy from 'lodash/groupBy.js';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar} from '@monokle/components';
-import {createDefaultMonokleValidator, getRuleForResult} from '@monokle/validation';
-import {ValidationResponse} from '@monokle/validation';
+import {ValidationResponse, createDefaultMonokleValidator, getRuleForResult} from '@monokle/validation';
 import type {Resource} from '@monokle/validation/lib/common/types.js';
 
 import * as S from './AuditPane.styled';
@@ -18,7 +17,7 @@ const AuditPane: React.FC = () => {
   const validator = createDefaultMonokleValidator();
 
   const makeValidation = async () => {
-    const response = await validator.validate({resources: resources});
+    const response = await validator.validate({resources});
     setValidationResponse(response);
   };
 
@@ -37,16 +36,35 @@ const AuditPane: React.FC = () => {
     setGroupedResults(groupedResult);
   }, [validationResponse]);
 
-  console.log(validationResponse);
-  console.log(groupedResults);
+  const renderGroupList = () => {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [location, results] of Object.entries(groupedResults)) {
+      <>
+        {' '}
+        <div>{location}</div>
+        {renderRules(results)}
+      </>;
+    }
+  };
+
+  const renderRules = (results: any) => {
+    if (!validationResponse) return null;
+    results.map((result: any) => {
+      const rule = getRuleForResult(validationResponse, result);
+      const message = result.message.text;
+      return (
+        <>
+          <div>{rule.name}</div>
+          <div>{rule.helpUri}</div>
+        </>
+      );
+    });
+  };
 
   return (
     <S.AuditPaneContainer id="AuditPane">
       <TitleBar title="Validation errors" />
-      {/* <S.List id="audit-sections-container">
-        <SectionRenderer sectionBlueprint={} level={0} isLastSection={false} />
-        <SectionRenderer sectionBlueprint={} level={0} isLastSection={false} />
-      </S.List> */}
+      <S.List id="audit-sections-container">{renderGroupList()}</S.List>
     </S.AuditPaneContainer>
   );
 };
