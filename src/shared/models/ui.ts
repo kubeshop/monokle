@@ -67,7 +67,15 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-type NewLeftMenuSelectionType = 'explorer' | 'compare' | 'validation' | 'git' | 'search' | 'settings' | 'dashboard';
+type NewLeftMenuSelectionType =
+  | 'explorer'
+  | 'compare'
+  | 'validation'
+  | 'git'
+  | 'search'
+  | 'settings'
+  | 'dashboard'
+  | 'audit';
 
 type PaneConfiguration = {
   leftPane: number;

@@ -2,7 +2,15 @@ import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip, Validation
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane, ValidationPane} from '@organisms';
+import {
+  AuditPane,
+  BottomPaneManager,
+  DashboardPane,
+  FileTreePane,
+  GitPane,
+  SearchPane,
+  ValidationPane,
+} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
@@ -70,6 +78,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: 'View cluster dashboard',
     icon: () => <Icon name="search" style={{fontSize: 16}} />,
     component: <DashboardPane />,
+    useBadge: () => undefined,
+  },
+  {
+    type: 'panel',
+    name: 'audit',
+    tooltip: 'View audit panel',
+    icon: () => <Icon name="validation" style={{fontSize: 16}} />,
+    component: <AuditPane />,
     useBadge: () => undefined,
   },
 ];
