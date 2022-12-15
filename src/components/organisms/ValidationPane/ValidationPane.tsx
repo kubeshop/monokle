@@ -1,7 +1,5 @@
 import {useMemo} from 'react';
 
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
-
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
@@ -11,7 +9,6 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import {TitleBar} from '@monokle/components';
 
 import CRDsSchemaValidation from './CRDsSchemaValidation';
-import ValidationOpenPolicyAgent from './OpenPolicyAgent';
 import ValidationOverView from './ValidationOverview';
 import * as S from './ValidationPane.styled';
 
@@ -22,8 +19,6 @@ const ValidationPane: React.FC = () => {
 
   const Panel = useMemo(() => {
     switch (integration?.id) {
-      case 'open-policy-agent':
-        return ValidationOpenPolicyAgent;
       case 'crd-schema':
         return CRDsSchemaValidation;
       default:
@@ -37,7 +32,7 @@ const ValidationPane: React.FC = () => {
         <TitleBar title="Validate your resources" />
       </TitleBarWrapper>
 
-      <Panel height={height - DEFAULT_PANE_TITLE_HEIGHT} />
+      <Panel />
     </S.ValidationPaneContainer>
   );
 };

@@ -114,5 +114,5 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
 export const TabItemContainer = styled.div`
   padding: 16px;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
