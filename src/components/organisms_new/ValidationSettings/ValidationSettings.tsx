@@ -3,6 +3,7 @@ import {useMeasure} from 'react-use';
 
 import {useAppSelector} from '@redux/hooks';
 
+import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './ValidationOpenPolicyAgent';
 import ValidationOverview from './ValidationOverview';
 import * as S from './ValidationSettings.styled';
@@ -16,6 +17,8 @@ const ValidationSettings: React.FC = () => {
     switch (integration?.id) {
       case 'open-policy-agent':
         return ValidationOpenPolicyAgent;
+      case 'crd-schema':
+        return CRDsSchemaValidation;
       default:
         return ValidationOverview;
     }
