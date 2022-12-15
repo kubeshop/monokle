@@ -118,7 +118,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   const result = await runCommandInMainThread(commandOptions);
 
   if (result.error) {
-    return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
+    return createRejectionWithAlert(thunkAPI, 'Helm Error', `${result.error} - ${result.stderr}`);
   }
 
   const endTime = new Date().getTime();
@@ -142,6 +142,6 @@ export const runPreviewConfiguration = createAsyncThunk<
   return createRejectionWithAlert(
     thunkAPI,
     'Helm Error',
-    `Unable to run Helm with Preview Configuration: ${previewConfiguration.name}`
+    `Unable to run Helm with Preview Configuration: ${previewConfiguration.name} - [${result.stderr}]`
   );
 });
