@@ -42,7 +42,7 @@ export const Name = styled.div`
 export const Switch = styled(RawSwitch)`
   position: absolute;
   top: 15px;
-  right: 25px;
+  right: 20px;
 `;
 
 export const ToggleContainer = styled.div`
@@ -54,7 +54,7 @@ export const ToggleContainer = styled.div`
 export const ValidationCardContainer = styled.div`
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  padding: 20px;
+  padding: 20px 45px 20px 20px;
   position: relative;
   display: grid;
   grid-template-columns: max-content 1fr max-content;
