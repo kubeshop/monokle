@@ -25,7 +25,7 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {showItemInFolder} from '@utils/shell';
 
-// temporary solution for renaming value file
+// TODO: temporary solution for renaming value file
 const DEFAULT_HELM_VALUE: HelmValuesFile = {
   filePath: '',
   id: '',

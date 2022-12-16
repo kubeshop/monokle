@@ -37,7 +37,7 @@ const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   align-items: center;
 `;
 
-// temporary solution for renaming value file
+// TODO: temporary solution for renaming value file
 const DEFAULT_HELM_VALUE: HelmValuesFile = {
   filePath: '',
   id: '',
