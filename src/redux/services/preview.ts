@@ -28,16 +28,14 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
   }
   if (type === 'cluster') {
     getPort().then(port => {
-      const kubeProxyLister = (event: any) => {
+      startKubeProxy((event: any) => {
         if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
           dispatch(previewCluster({context: targetId, port}));
         }
         if (event.type === 'error' || event.type === 'exit') {
           stopPreview(dispatch);
         }
-        console.log('kubeProxyLister', event, port);
-      };
-      startKubeProxy(kubeProxyLister, port);
+      }, port);
     });
   }
   if (type === 'helm') {
@@ -60,16 +58,14 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
   }
   if (type === 'cluster') {
     getPort().then(port => {
-      const kubeProxyLister = (event: any) => {
+      startKubeProxy((event: any) => {
         if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
           dispatch(repreviewCluster({context: targetId, port}));
         }
         if (event.type === 'error' || event.type === 'exit') {
           stopPreview(dispatch);
         }
-        console.log('kubeProxyLister', event, port);
-      };
-      startKubeProxy(kubeProxyLister, port);
+      }, port);
     });
   }
   if (type === 'helm') {

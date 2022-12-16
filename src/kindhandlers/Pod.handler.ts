@@ -21,7 +21,6 @@ const PodHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    console.log('k8sCoreV1Api', k8sCoreV1Api.basePath);
     const response = namespace
       ? await k8sCoreV1Api.listNamespacedPod(namespace)
       : await k8sCoreV1Api.listPodForAllNamespaces();
