@@ -138,13 +138,11 @@ export const updateClusterNamespaces = createAsyncThunk(
       .filter(a => values.findIndex(v => a.namespace === v.namespace) === -1);
     accesses = accesses.filter(a => a.context !== values[0].cluster);
 
-    Promise.all(
-      newNamespaces.map(async ({namespace, cluster}) => {
-        const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-        const kubeClient = await createKubeClient(kubeConfigPath, cluster);
-        createNamespace(kubeClient, namespace);
-      })
-    );
+    newNamespaces.forEach(({namespace, cluster}) => {
+      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      const kubeClient = createKubeClient(kubeConfigPath, cluster);
+      createNamespace(kubeClient, namespace);
+    });
 
     removedNamespaces.forEach(({namespace, context}) => {
       const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());

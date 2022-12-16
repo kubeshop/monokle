@@ -50,7 +50,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
   const {userDataDir} = config;
 
   try {
-    let kc = await createKubeClient(kubeConfigPath, context);
+    let kc = createKubeClient(kubeConfigPath, context);
 
     if (port) {
       const proxyKubeConfig = new KubeConfig();

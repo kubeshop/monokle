@@ -54,10 +54,7 @@ export const removeResources = createAsyncThunk(
             mainState.previewKubeConfigContext
           ) {
             try {
-              const kubeClient = await createKubeClient(
-                mainState.previewKubeConfigPath,
-                mainState.previewKubeConfigContext
-              );
+              const kubeClient = createKubeClient(mainState.previewKubeConfigPath, mainState.previewKubeConfigContext);
 
               const kindHandler = getResourceKindHandler(resource.kind);
               if (kindHandler?.deleteResourceInCluster) {

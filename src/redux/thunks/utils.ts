@@ -116,14 +116,14 @@ export async function getResourceFromCluster(
   const resourceKindHandler = getResourceKindHandler(resource.kind);
 
   if (resource && resource.text && resourceKindHandler) {
-    const kubeClient = await createKubeClient(kubeconfigPath, context);
+    const kubeClient = createKubeClient(kubeconfigPath, context);
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
     return toPojo(resourceFromCluster.body);
   }
 }
 
 export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
-  const kubeClient = await createKubeClient(kubeconfigPath, context);
+  const kubeClient = createKubeClient(kubeconfigPath, context);
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
 }

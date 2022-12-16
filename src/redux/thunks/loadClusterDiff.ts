@@ -41,7 +41,7 @@ export const loadClusterDiff = createAsyncThunk<
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = currentKubeContext(state.config);
     const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = await createKubeClient(kubeConfigPath, currentContext);
+    const kc = createKubeClient(kubeConfigPath, currentContext);
     try {
       const res = clusterAccess.length
         ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))

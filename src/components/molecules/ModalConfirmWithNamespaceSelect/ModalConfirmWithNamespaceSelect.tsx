@@ -50,7 +50,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         return;
       }
 
-      const kc = await createKubeClient(kubeConfigPath, kubeConfigContext);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api
