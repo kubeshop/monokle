@@ -43,7 +43,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
   const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
-  const onClickOk = useCallback(async () => {
+  const onClickOk = useCallback(() => {
     if (selectedOption === 'create') {
       if (!createNamespaceName) {
         setErrorMessage('Namespace name must not be empty!');

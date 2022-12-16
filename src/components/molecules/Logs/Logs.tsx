@@ -4,6 +4,7 @@ import {useEffect, useState} from 'react';
 
 import log from 'loglevel';
 import stream from 'stream';
+import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
@@ -63,7 +64,7 @@ const Logs = () => {
 
   return (
     <S.LogContainer>
-      {logs.map((logLine: any) => (
+      {logs.map(logLine => (
         <S.LogText key={logLine.id}>{logLine.text}</S.LogText>
       ))}
       ;
@@ -72,6 +73,3 @@ const Logs = () => {
 };
 
 export default Logs;
-function uuidv4(): string {
-  throw new Error('Function not implemented.');
-}

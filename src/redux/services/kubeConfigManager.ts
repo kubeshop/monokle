@@ -20,9 +20,8 @@ export class KubeConfigManager {
     try {
       this.kubeConfigPath = kubeConfigPath;
       this.kubeConfigContext = context;
-      createKubeClient(this.kubeConfigPath as string, this.kubeConfigContext).then(kc => {
-        this.kubeConfig = kc;
-      });
+      const kc = createKubeClient(this.kubeConfigPath as string, this.kubeConfigContext);
+      this.kubeConfig = kc;
     } catch (error) {
       this.kubeConfigPath = undefined;
       this.kubeConfigContext = undefined;

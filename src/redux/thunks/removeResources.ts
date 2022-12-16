@@ -20,54 +20,52 @@ export const removeResources = createAsyncThunk(
     const nextMainState = createNextState(state.main, mainState => {
       let deletedCheckedResourcesIds: string[] = [];
 
-      Promise.all(
-        resourceIds.map(async resourceId => {
-          const resource = mainState.resourceMap[resourceId];
-          if (!resource) {
-            return;
-          }
+      resourceIds.forEach(resourceId => {
+        const resource = mainState.resourceMap[resourceId];
+        if (!resource) {
+          return;
+        }
 
-          updateReferringRefsOnDelete(resource, mainState.resourceMap);
+        updateReferringRefsOnDelete(resource, mainState.resourceMap);
 
-          if (mainState.checkedResourceIds.includes(resourceId)) {
-            deletedCheckedResourcesIds.push(resourceId);
-          }
+        if (mainState.checkedResourceIds.includes(resourceId)) {
+          deletedCheckedResourcesIds.push(resourceId);
+        }
 
-          if (mainState.selectedResourceId === resourceId) {
-            clearResourceSelections(mainState.resourceMap);
-            mainState.selectedResourceId = undefined;
-          }
+        if (mainState.selectedResourceId === resourceId) {
+          clearResourceSelections(mainState.resourceMap);
+          mainState.selectedResourceId = undefined;
+        }
 
-          if (isUnsavedResource(resource)) {
-            deleteResource(resource, mainState.resourceMap);
-            return;
-          }
+        if (isUnsavedResource(resource)) {
+          deleteResource(resource, mainState.resourceMap);
+          return;
+        }
 
-          if (isFileResource(resource)) {
-            removeResourceFromFile(resource, mainState.fileMap, mainState.resourceMap);
-            return;
-          }
+        if (isFileResource(resource)) {
+          removeResourceFromFile(resource, mainState.fileMap, mainState.resourceMap);
+          return;
+        }
 
-          if (
-            mainState.previewType === 'cluster' &&
-            mainState.previewKubeConfigPath &&
-            mainState.previewKubeConfigContext
-          ) {
-            try {
-              const kubeClient = createKubeClient(mainState.previewKubeConfigPath, mainState.previewKubeConfigContext);
+        if (
+          mainState.previewType === 'cluster' &&
+          mainState.previewKubeConfigPath &&
+          mainState.previewKubeConfigContext
+        ) {
+          try {
+            const kubeClient = createKubeClient(mainState.previewKubeConfigPath, mainState.previewKubeConfigContext);
 
-              const kindHandler = getResourceKindHandler(resource.kind);
-              if (kindHandler?.deleteResourceInCluster) {
-                kindHandler.deleteResourceInCluster(kubeClient, resource);
-                deleteResource(resource, mainState.resourceMap);
-              }
-            } catch (err) {
-              log.error(err);
-              return original(mainState);
+            const kindHandler = getResourceKindHandler(resource.kind);
+            if (kindHandler?.deleteResourceInCluster) {
+              kindHandler.deleteResourceInCluster(kubeClient, resource);
+              deleteResource(resource, mainState.resourceMap);
             }
+          } catch (err) {
+            log.error(err);
+            return original(mainState);
           }
-        })
-      );
+        }
+      });
 
       mainState.checkedResourceIds = mainState.checkedResourceIds.filter(
         id => !deletedCheckedResourcesIds.includes(id)
