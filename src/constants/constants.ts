@@ -66,12 +66,19 @@ export const PANE_CONSTRAINT_VALUES = {
   navPane: 330,
 };
 
-export const PREDEFINED_K8S_VERSION = '1.24.6';
+export const PREDEFINED_K8S_VERSION = '1.26.0';
 
 export const K8S_VERSIONS = [
+  '1.26.0',
+  '1.25.5',
+  '1.24.4',
+  '1.25.3',
   '1.25.2',
   '1.25.1',
   '1.25.0',
+  '1.24.9',
+  '1.24.8',
+  '1.24.7',
   '1.24.6',
   '1.24.5',
   '1.24.4',
