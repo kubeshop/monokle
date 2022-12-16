@@ -13,7 +13,7 @@ import {TitleBar} from '@monokle/components';
 import {GUIDE} from '@shared/constants/tutorialReferences';
 
 import TemplateSidebarPreview from './TemplateSidebarPreview';
-import TemplatesList from './TemplatesList';
+// import TemplatesList from './TemplatesList';
 import * as S from './TemplatesPage.styled';
 import TemplatesPageDescriptionBar from './TemplatesPageDescriptionBar';
 
@@ -37,8 +37,8 @@ function getItem(
 
 const items: MenuProps['items'] = [
   getItem('Default Templates', 'sub2', <S.NumberOfTemplates>7</S.NumberOfTemplates>, [
-    getItem('Option 5', '5'),
-    getItem('Option 6', '6'),
+    getItem('Option 5', '5', <S.NumberOfResources>2 resources</S.NumberOfResources>),
+    getItem('Option 6', '6', <S.NumberOfResources>1 resource</S.NumberOfResources>),
   ]),
 ];
 
@@ -62,7 +62,7 @@ const TemplatesPage = () => {
   };
 
   return (
-    <S.TemplatesPageContainer>
+    <S.TemplatesPageContainer className="horizontal reflex-element">
       <S.TemplatesPageTitle>Create Resources from a template</S.TemplatesPageTitle>
 
       <S.TemplateLeftSidebarWrapper className="vertical reflex-element">
@@ -77,24 +77,22 @@ const TemplatesPage = () => {
           </S.SearchBox>
         </S.Form>
 
-        <S.StyledMenu
-          onClick={onClick}
-          style={{width: '100%;'}}
-          defaultSelectedKeys={['1']}
-          defaultOpenKeys={['sub1']}
-          mode="inline"
-          items={items}
-        />
-
         <S.Content style={{height: `calc(100% - ${1024}px - 100px - 60px)`}}>
           <S.TemplatesListWrapper className="vertical reflex-container">
-            <TemplatesList />
+            <S.StyledMenu
+              onClick={onClick}
+              style={{width: '100%;'}}
+              defaultSelectedKeys={['1']}
+              defaultOpenKeys={['sub1']}
+              mode="inline"
+              items={items}
+            />
           </S.TemplatesListWrapper>
         </S.Content>
-
-        <S.TemplatesPageTitle>Page title</S.TemplatesPageTitle>
       </S.TemplateLeftSidebarWrapper>
+
       <S.TemplateSidebarPreviewWrapper className="vertical reflex-element">
+        <S.TemplatesPageTitle>Page title</S.TemplatesPageTitle>
         <TemplateSidebarPreview tutorialReferenceLink={GUIDE} />
       </S.TemplateSidebarPreviewWrapper>
     </S.TemplatesPageContainer>

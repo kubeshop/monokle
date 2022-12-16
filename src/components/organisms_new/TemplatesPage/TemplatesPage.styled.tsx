@@ -10,16 +10,24 @@ export const TemplatesPageContainer = styled.div`
   height: 100%;
   display: inline-block;
   margin: 40px;
-  width: 508px;
+  width: calc(100% - 80px);
   background: #131515;
 `;
 
 export const TemplateLeftSidebarWrapper = styled.div`
-  width: 100%;
+  width: 508px;
+  height: 100%;
   display: inline-block;
   background: #1d1d1d;
   padding-top: 30px;
   padding-bottom: 30px;
+`;
+
+export const TemplateSidebarPreviewWrapper = styled.div`
+  margin-top: 40px;
+  display: flex;
+  float: right;
+  gap: 10px;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -29,12 +37,6 @@ export const Skeleton = styled(RawSkeleton)`
 
 export const TemplatesListWrapper = styled.div`
   margin-top: 20px;
-  display: flex;
-  gap: 10px;
-`;
-
-export const TemplateSidebarPreviewWrapper = styled.div`
-  margin-top: 40px;
   display: flex;
   gap: 10px;
 `;
@@ -70,7 +72,31 @@ export const StyledMenu = styled(Menu)`
   background: transparent;
   color: #acacac;
   font-size: 13px;
+  &.ant-menu.ant-menu-inline {
+    border-right: 0;
+    .ant-menu-item .ant-menu-item-icon {
+      font-size: 13px;
+    }
+  }
   .ant-menu-submenu {
+    .ant-menu-selected::after,
+    .ant-menu-item-selected::after {
+      opacity: 0;
+      border: 0;
+    }
+    li {
+      background: transparent;
+      &.ant-menu-item {
+        padding: 0 52px;
+        margin: 0;
+        height: 30px;
+        line-height: 30px;
+      }
+      &.ant-menu-item-selected {
+        background: #8dcff8;
+        color: #1d1d1d;
+      }
+    }
     .ant-menu-submenu-title {
       padding: 0 52px;
       color: #acacac;
@@ -79,9 +105,12 @@ export const StyledMenu = styled(Menu)`
       left: 32px;
       color: #acacac;
     }
-    .ant-menu-sub .ant-menu-title-content {
-      margin-left: 0;
-      font-size: 13px;
+    .ant-menu-sub {
+      background: transparent;
+      .ant-menu-title-content {
+        margin-left: 0;
+        font-size: 13px;
+      }
     }
   }
 `;
@@ -89,8 +118,15 @@ export const StyledMenu = styled(Menu)`
 export const NumberOfTemplates = styled.span`
   position: absolute;
   left: 178px;
-  color: #acacac;
+`;
+
+export const NumberOfResources = styled.span`
+  position: absolute;
+  font-size: 13px;
+  right: 64px;
   //float:right;
+  width: 80px;
+  text-align: left;
 `;
 
 export const TitleBarWrapper = styled.span`
