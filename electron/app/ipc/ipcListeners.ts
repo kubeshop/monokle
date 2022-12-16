@@ -43,6 +43,7 @@ import {
   forceLoad as forceReload,
   interpolateTemplate,
   runCommand,
+  runStreamCommand,
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
@@ -245,6 +246,10 @@ ipcMain.handle('save-file', async (event: any, options: FileOptions) => {
 
 ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
+});
+
+ipcMain.on('run-command-stream', (event, args: CommandOptions) => {
+  runStreamCommand(args, event);
 });
 
 ipcMain.on('app-version', event => {

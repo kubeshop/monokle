@@ -1,7 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
-import {KubeConfig} from '@kubernetes/client-node';
 
 import {spawn} from 'child_process';
+import events from 'events';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
@@ -9,10 +9,8 @@ import {ClusterAccess, KubePermissions} from '@models/appconfig';
 
 import {getMainProcessEnv} from '@utils/env';
 
-import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
+import {CommandOptions, CommandResult, runCommandInMainThread, runCommandStreamInMainThread} from './commands/execute';
 import {isRendererThread} from './thread';
-
-let isKubectlProxyRunning = false;
 
 export async function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();
@@ -22,30 +20,21 @@ export async function createKubeClient(path: string, context?: string) {
   }
 
   kc.loadFromFile(path);
-  const {proxyUrl} = await spawnKubectlProxy(8080);
-  const proxyKubeConfig = new KubeConfig();
-  proxyKubeConfig.loadFromOptions({
-    currentContext: kc.getCurrentContext(),
-    clusters: kc.getClusters().map(c => ({...c, server: proxyUrl, skipTLSVerify: true})),
-    users: kc.getUsers(),
-    contexts: kc.getContexts(),
-  });
-  console.log('proxyKubeConfig', proxyKubeConfig);
 
   let currentContext = context;
 
   if (!currentContext) {
-    currentContext = proxyKubeConfig.currentContext;
+    currentContext = kc.currentContext;
     log.warn(`Missing currentContext, using default in kubeconfig: ${currentContext}`);
   } else {
-    proxyKubeConfig.setCurrentContext(currentContext);
+    kc.setCurrentContext(currentContext);
   }
 
   // find the context
-  const ctxt = proxyKubeConfig.contexts.find(c => c.name === currentContext);
+  const ctxt = kc.contexts.find(c => c.name === currentContext);
   if (ctxt) {
     // find the user
-    const user = proxyKubeConfig.users.find(usr => usr.name === ctxt.user);
+    const user = kc.users.find(usr => usr.name === ctxt.user);
 
     // does the user use the ExecAuthenticator? -> apply process env
     if (user?.exec) {
@@ -65,7 +54,7 @@ export async function createKubeClient(path: string, context?: string) {
     throw new Error(`Selected context ${currentContext} not found in kubeconfig at ${path}`);
   }
 
-  return proxyKubeConfig;
+  return kc;
 }
 
 function parseCanI(stdout: string): {permissions: KubePermissions[]; hasFullAccess: boolean} {
@@ -150,6 +139,38 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   };
 };
 
+export const startKubeProxy = (listener: (...args: any[]) => void, port: number) => {
+  if (isRendererThread()) {
+    runCommandStreamInMainThread(listener, {
+      commandId: uuid(),
+      cmd: 'kubectl',
+      args: ['proxy', '--port', `${port}`],
+    });
+  } else {
+    runCommandStream(listener, {
+      commandId: uuid(),
+      cmd: 'kubectl',
+      args: ['proxy', '--port', `${port}`],
+    });
+  }
+};
+
+export const killKubeProxy = (listener: (...args: any[]) => void) => {
+  if (isRendererThread()) {
+    runCommandStreamInMainThread(listener, {
+      commandId: uuid(),
+      cmd: 'pkill',
+      args: ['-9', '-f', '"kubectl proxy"'],
+    });
+  } else {
+    runCommandStream(listener, {
+      commandId: uuid(),
+      cmd: 'pkill',
+      args: ['-9', '-f', '"kubectl proxy"'],
+    });
+  }
+};
+
 export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
   if (!clusterAccess) {
     return false;
@@ -208,35 +229,42 @@ export const runCommandPromise = (options: CommandOptions): Promise<CommandResul
     }
   });
 
-function spawnKubectlProxy(port: number) {
-  return new Promise<{proxyUrl: string}>((resolve, reject) => {
-    if (!isKubectlProxyRunning) {
-      const proxyProcess = spawn(`kubectl proxy --port=${port}`, {shell: true, env: process.env});
-      console.log('proxyProcess', proxyProcess);
+export const runCommandStream = (listener: (...args: any[]) => void, options: CommandOptions): Function => {
+  const commandEventEmitter = new events.EventEmitter();
 
-      // TODO: is there a better way to check if opening the proxy was successful?
-      const expectedMessage = `Starting to serve on 127.0.0.1:${port}`;
-      proxyProcess.stdout.on('data', data => {
-        console.log('data', data);
-        if (data.toString().trim() === expectedMessage) {
-          const proxyUrl = `http://127.0.0.1:${port}`;
-          isKubectlProxyRunning = false;
-          resolve({proxyUrl});
-        }
-      });
+  commandEventEmitter.addListener(options.commandId, listener);
 
-      proxyProcess.on('error', err => {
-        isKubectlProxyRunning = false;
+  try {
+    const child = spawn(options.cmd, options.args, {
+      env: {
+        ...options.env,
+        ...process.env,
+      },
+      shell: true,
+      windowsHide: true,
+    });
 
-        reject(err);
-        console.log(err);
-      });
-
-      setTimeout(() => {
-        isKubectlProxyRunning = false;
-        console.log('proxyProcess', proxyProcess);
-        reject(new Error('[spawnKubectlProxy]: Exceeded timeout'));
-      }, 10000);
+    if (options.input) {
+      child.stdin.write(options.input);
+      child.stdin.end();
     }
-  });
-}
+
+    child.on('exit', (code, signal) => {
+      commandEventEmitter.emit(options.commandId, {
+        type: 'exit',
+        result: {exitCode: code, signal: signal && signal.toString()},
+      });
+    });
+
+    child.stdout.on('data', data => {
+      commandEventEmitter.emit(options.commandId, {type: 'stdout', result: {data: data.toString()}});
+    });
+
+    child.stderr.on('data', data => {
+      commandEventEmitter.emit(options.commandId, {type: 'stderr', result: {data: data.toString()}});
+    });
+  } catch (e: any) {
+    commandEventEmitter.emit(options.commandId, {type: 'error', result: {message: e.message}});
+  }
+  return listener;
+};

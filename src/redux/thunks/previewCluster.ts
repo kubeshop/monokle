@@ -37,7 +37,8 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
   );
 };
 
-const previewClusterHandler = async (context: string, thunkAPI: any) => {
+const previewClusterHandler = async (payload: {context: string; port?: number}, thunkAPI: any) => {
+  const {context, port} = payload;
   const startTime = new Date().getTime();
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
@@ -49,7 +50,19 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const {userDataDir} = config;
 
   try {
-    const kc = await createKubeClient(kubeConfigPath, context);
+    let kc = await createKubeClient(kubeConfigPath, context);
+
+    if (port) {
+      const proxyKubeConfig = new KubeConfig();
+      proxyKubeConfig.loadFromOptions({
+        currentContext: kc.getCurrentContext(),
+        clusters: kc.getClusters().map(c => ({...c, server: `http://127.0.0.1:${port}`, skipTLSVerify: true})),
+        users: kc.getUsers(),
+        contexts: kc.getContexts(),
+      });
+      kc = proxyKubeConfig;
+    }
+
     const results =
       clusterAccess && clusterAccess.length > 0
         ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
@@ -135,7 +148,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
 
 export const previewCluster = createAsyncThunk<
   SetPreviewDataPayload,
-  string,
+  {context: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;
@@ -144,7 +157,7 @@ export const previewCluster = createAsyncThunk<
 
 export const repreviewCluster = createAsyncThunk<
   SetPreviewDataPayload,
-  string,
+  {context: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;

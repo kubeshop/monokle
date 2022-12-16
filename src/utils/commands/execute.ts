@@ -1,5 +1,6 @@
 import {ipcRenderer} from 'electron';
 
+import events from 'events';
 import log from 'loglevel';
 
 import {ERROR_MSG_FALLBACK} from '@constants/constants';
@@ -38,6 +39,20 @@ export function runCommandInMainThread(options: CommandOptions): Promise<Command
     ipcRenderer.on('command-result', cb);
     ipcRenderer.send('run-command', options);
   });
+}
+
+export async function runCommandStreamInMainThread(listener: (...args: any[]) => void, options: CommandOptions) {
+  ensureRendererThread();
+  log.info('sending command stream to main thread', options);
+  const commandEventEmitter = new events.EventEmitter();
+  commandEventEmitter.addListener(options.commandId, listener);
+
+  const cb = (_event: unknown, arg: any) => {
+    if (arg.commandId !== options.commandId) return;
+    commandEventEmitter.emit(options.commandId, arg);
+  };
+  ipcRenderer.on('command-stream-event', cb);
+  ipcRenderer.send('run-command-stream', options);
 }
 
 export async function execute(options: CommandOptions): Promise<string> {

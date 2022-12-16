@@ -181,3 +181,54 @@ export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent
     event.sender.send('command-result', result);
   }
 };
+
+export const runStreamCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
+  ensureMainThread();
+
+  try {
+    const child = spawn(options.cmd, options.args, {
+      env: {
+        ...options.env,
+        ...process.env,
+      },
+      shell: true,
+      windowsHide: true,
+      cwd: options.cwd,
+    });
+
+    if (options.input) {
+      child.stdin.write(options.input);
+      child.stdin.end();
+    }
+
+    child.on('exit', (code, signal) => {
+      event.sender.send('command-stream-event', {
+        commandId: options.commandId,
+        type: 'exit',
+        result: {exitCode: code, signal: signal && signal.toString()},
+      });
+    });
+
+    child.stdout.on('data', data => {
+      event.sender.send('command-stream-event', {
+        commandId: options.commandId,
+        type: 'stdout',
+        result: {data: data.toString()},
+      });
+    });
+
+    child.stderr.on('data', data => {
+      event.sender.send('command-stream-event', {
+        commandId: options.commandId,
+        type: 'stderr',
+        result: {data: data.toString()},
+      });
+    });
+  } catch (e: any) {
+    event.sender.send('command-stream-event', {
+      commandId: options.commandId,
+      type: 'error',
+      result: {message: e.message},
+    });
+  }
+};
