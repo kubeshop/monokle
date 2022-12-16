@@ -7,9 +7,6 @@ import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
 import log from 'loglevel';
-import fetch from 'node-fetch';
-import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import os from 'os';
 import path, {join} from 'path';
 
@@ -23,8 +20,6 @@ import {loadResource} from '@redux/services';
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
 import {APP_INSTALLED} from '@utils/telemetry';
-
-const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -103,21 +98,12 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
-export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersion: string) => {
+export const initTelemetry = (deviceID: string, disableEventTracking: boolean, app: Electron.App) => {
   const storedDeviceID: string | undefined = electronStore.get('main.deviceID');
   const segmentClient = getSegmentClient();
 
-  const requestArgs = {
-    method: 'post',
-    body: JSON.stringify({
-      machineId: deviceID,
-    }),
-    headers: {'Content-Type': 'application/json'},
-  };
-
-  if (!disableTracking) {
+  if (!disableEventTracking) {
     log.info('New Session.');
-    fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
     segmentClient?.track({
       event: 'APP_SESSION',
       userId: deviceID,
@@ -126,12 +112,6 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
 
   if (!storedDeviceID) {
     log.info('New Installation.');
-    if (NUCLEUS_SH_APP_ID) {
-      Nucleus.track(APP_INSTALLED, {appVersion});
-    }
-    if (MONOKLE_INSTALLS_URL) {
-      fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
-    }
     segmentClient?.identify({
       userId: deviceID,
     });
@@ -139,8 +119,9 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
       event: APP_INSTALLED,
       userId: deviceID,
       properties: {
-        appVersion,
+        appVersion: app.getVersion(),
         deviceOS: os.platform(),
+        deviceLocale: app.getLocale(),
       },
     });
     electronStore.set('main.deviceID', deviceID);
@@ -233,38 +214,4 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
       return true;
     }
   });
-};
-
-export const initNucleus = (isDev: boolean, app: any) => {
-  if (NUCLEUS_SH_APP_ID) {
-    Nucleus.init(NUCLEUS_SH_APP_ID, {
-      disableInDev: isDev,
-      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-      disableErrorReports: true,
-      debug: false,
-    });
-
-    // This has to run after Nucleus.init but before tracking any events.
-    Nucleus.appStarted();
-
-    Nucleus.setUserId(machineIdSync());
-
-    Nucleus.setProps(
-      {
-        os: process.platform,
-        version: app.getVersion(),
-        language: app.getLocale(),
-      },
-      true
-    );
-    return {
-      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-      disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
-    };
-  }
-
-  return {
-    disableTracking: true,
-    disableErrorReports: true,
-  };
 };

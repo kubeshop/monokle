@@ -31,6 +31,7 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
+  keysToDelete,
   keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
@@ -45,6 +46,9 @@ import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
+
+import * as Sentry from '@sentry/react';
+import {BrowserTracing} from '@sentry/tracing';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
@@ -354,10 +358,13 @@ export const configSlice = createSlice({
       }
 
       const projectConfig = state.projectConfig;
+      const incomingConfigKeys = Object.keys(action.payload.config);
       const serializedIncomingConfig = flatten<any, any>(action.payload.config, {safe: true});
       const serializedState = flatten<any, any>(state.projectConfig, {safe: true});
 
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
+      let deletedKeys = keysToDelete(serializedState, serializedIncomingConfig, incomingConfigKeys);
+
       if (action.payload.fromConfigFile) {
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
@@ -369,11 +376,15 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
-      keys.forEach(key => {
-        if (projectConfig) {
+      if (projectConfig) {
+        keys.forEach(key => {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-        }
-      });
+        });
+
+        deletedKeys.forEach(key => {
+          _.unset(projectConfig, key);
+        });
+      }
 
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
         state.kubeConfig.path = action.payload.config.kubeConfig.path;
@@ -512,7 +523,22 @@ export const configSlice = createSlice({
       } else if (state.projectConfig && state.projectConfig.settings) {
         state.projectConfig.settings.hideEditorPlaceholder = !state.projectConfig.settings.hideEditorPlaceholder;
       }
-      electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
+    },
+    initRendererSentry: (state: Draft<AppConfig>, action: PayloadAction<{SENTRY_DSN: string}>) => {
+      Sentry.init({
+        dsn: action.payload.SENTRY_DSN,
+        integrations: [new BrowserTracing()],
+        tracesSampleRate: 0.6,
+        beforeSend: event => {
+          // we have to get this from electron store to get the most updated value
+          // because the state object in this action is a snapshot of the state at the moment of executing the reducer
+          const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');
+          if (disableErrorReporting) {
+            return null;
+          }
+          return event;
+        },
+      });
     },
   },
   extraReducers: builder => {
@@ -586,5 +612,6 @@ export const {
   updateTextSize,
   updateTheme,
   toggleEditorPlaceholderVisiblity,
+  initRendererSentry,
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -1,7 +1,6 @@
 import {ipcRenderer} from 'electron';
 
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 
 import {getSegmentClient} from './segment';
 import {isRendererThread} from './thread';
@@ -12,24 +11,10 @@ export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: Ev
   if (isRendererThread()) {
     ipcRenderer.send('track-event', {eventName, payload});
   } else {
-    Nucleus.track(eventName, payload as any);
     const segmentClient = getSegmentClient();
     segmentClient?.track({
       event: eventName,
       properties: payload,
-      userId: machineId,
-    });
-  }
-};
-export const trackError = (error: any) => {
-  if (isRendererThread()) {
-    ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
-  } else {
-    Nucleus.track('Error', error);
-    const segmentClient = getSegmentClient();
-    segmentClient?.track({
-      event: 'Error',
-      properties: error,
       userId: machineId,
     });
   }
@@ -40,7 +25,7 @@ export type EventMap = {
   APP_INSTALLED: {appVersion: string; deviceOS: string};
   APP_SESSION: undefined;
   APP_UPDATED: undefined;
-  'app_start/open_project': {numberOfFiles: number; numberOfResources: number};
+  'app_start/open_project': {numberOfFiles: number; numberOfResources: number; executionTime: number};
   'app_start/create_project': {from: 'scratch' | 'git' | 'template'; templateID?: string};
   'app_start/quick_cluster_preview': undefined;
   'configure/cluster_version': undefined;
@@ -59,11 +44,11 @@ export type EventMap = {
   'edit/side_by_side_editor': {resourceKind: string};
   'create/resource': {resourceKind: string};
   'help/open_link': {linkType: string};
-  'preview/helm': undefined;
-  'preview/helm_preview_configuration': undefined;
-  'preview/kustomize': undefined;
-  'preview/cluster': {numberOfResourcesInCluster: number};
-  'preview/command': undefined;
+  'preview/helm': {resourcesCount?: number; executionTime: number};
+  'preview/helm_preview_configuration': {resourcesCount?: number; executionTime: number};
+  'preview/kustomize': {resourcesCount?: number; executionTime: number};
+  'preview/cluster': {resourcesCount: number; executionTime: number};
+  'preview/command': {resourcesCount: number; executionTime: number};
   'preview/restart': {type: 'helm' | 'kustomization' | 'cluster' | 'helm-preview-config' | 'command'};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
@@ -76,11 +61,13 @@ export type EventMap = {
   'compare/transfered': {from?: string; to?: string; count: number};
   'git/branch_checkout': undefined;
   'git/commit': undefined;
+  'git/initialize': undefined;
   'git/push': undefined;
   'dashboard/open': {from: string};
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
   'dashboard/changeNamespace': undefined;
+  'top-menu/new-project': {type: string};
   CLUSTER_COMPARE: any; // TODO: remove this event in 2.0, keeping to make merging easier
 };
 export const APP_INSTALLED = 'APP_INSTALLED';

@@ -203,6 +203,24 @@ export const keysToUpdateStateBulk = (
   return keys;
 };
 
+export const keysToDelete = (
+  serializedState: SerializableObject,
+  serializedIncomingConfig: SerializableObject,
+  incomingConfigKeys: string[]
+) => {
+  const keys: string[] = [];
+
+  Object.keys(serializedState)
+    .filter(key => incomingConfigKeys.includes(key.split('.')[0]))
+    .forEach((key: string) => {
+      if (!_.has(serializedIncomingConfig, key)) {
+        keys.push(key);
+      }
+    });
+
+  return keys;
+};
+
 export function getK8sVersion(projectConfig: ProjectConfig) {
   return projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
 }

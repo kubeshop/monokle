@@ -33,6 +33,7 @@ import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {trackEvent} from '@utils/telemetry';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -121,6 +122,7 @@ const PageHeader = () => {
       return;
     }
 
+    trackEvent('git/initialize');
     setIsInitializingGitRepo(true);
 
     await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);

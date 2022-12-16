@@ -21,8 +21,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   }
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   try {
-    trackEvent('preview/helm');
-
+    const startTime = new Date().getTime();
     const state = thunkAPI.getState().main;
     const configState = thunkAPI.getState().config;
 
@@ -39,6 +38,10 @@ export const previewHelmValuesFile = createAsyncThunk<
 
     const projectConfig = currentConfigSelector(thunkAPI.getState());
     const policyPlugins = state.policies.plugins;
+
+    const endTime = new Date().getTime();
+
+    trackEvent('preview/helm', {resourcesCount: resources.length, executionTime: endTime - startTime});
 
     return createPreviewResultFromResources(
       getK8sVersion(projectConfig),

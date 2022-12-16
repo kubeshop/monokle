@@ -82,19 +82,22 @@ function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sRe
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource[]> {
-  const {branchName, commitHash = ''} = options;
+  const {commitHash = ''} = options;
 
   const resources: K8sResource[] = await promiseFromIpcRenderer(
     'git.getCommitResources',
     'git.getCommitResources.result',
     {
       localPath: state.config.selectedProjectRootFolder,
-      branchName,
       commitHash,
     }
   );
 
-  return resources;
+  return resources.filter(resource =>
+    `${sep}${resource.filePath.replaceAll('/', sep)}`.startsWith(
+      options.folder === '<root>' ? '' : `${options.folder}${sep}`
+    )
+  );
 }
 
 async function fetchCommandResources(state: RootState, options: CommandResourceSet): Promise<K8sResource[]> {
@@ -142,6 +145,18 @@ async function fetchResourcesFromCluster(state: RootState, options: ClusterResou
     log.debug('fetch resources from cluster failed', err);
     throw err;
   }
+}
+
+function extractResultFromHelmOutput(result: string) {
+  let data = result.trim();
+
+  // remove notes added from NOTES.txt
+  let ix = data.indexOf('\nNOTES:');
+  if (ix > 0) {
+    data = data.substring(0, ix).trim();
+  }
+
+  return data;
 }
 
 async function previewHelmResources(state: RootState, options: HelmResourceSet): Promise<K8sResource[]> {
@@ -201,7 +216,8 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + valuesFile.id);
+    let data = extractResultFromHelmOutput(result.stdout);
+    const resources = extractK8sResources(data, PREVIEW_PREFIX + valuesFile.id);
 
     return resources;
   } catch (err) {
@@ -254,7 +270,9 @@ async function previewCustomHelmResources(state: RootState, options: CustomHelmR
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + helmConfig.id);
+    let data = extractResultFromHelmOutput(result.stdout);
+
+    const resources = extractK8sResources(data, PREVIEW_PREFIX + helmConfig.id);
     return resources;
   } catch (err) {
     log.debug('preview custom Helm resources failed', err);
