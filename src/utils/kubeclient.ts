@@ -12,7 +12,7 @@ import {getMainProcessEnv} from '@utils/env';
 import {CommandOptions, CommandResult, runCommandInMainThread, runCommandStreamInMainThread} from './commands/execute';
 import {isRendererThread} from './thread';
 
-export async function createKubeClient(path: string, context?: string) {
+export function createKubeClient(path: string, context?: string) {
   const kc = new k8s.KubeConfig();
 
   if (!path) {
