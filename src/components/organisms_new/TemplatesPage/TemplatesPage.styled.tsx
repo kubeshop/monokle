@@ -11,7 +11,7 @@ export const TemplatesPageContainer = styled.div`
   display: inline-block;
   margin: 40px;
   width: calc(100% - 80px);
-  background: #131515;
+  background: black;
 `;
 
 export const TemplateLeftSidebarWrapper = styled.div`
@@ -47,7 +47,9 @@ export const TemplatesPageTitle = styled.h1`
   line-height: 22px;
   letter-spacing: 0;
   text-align: left;
-  margin: 16px 24px;
+  padding: 16px 24px;
+  margin-bottom: 0;
+  background: #131515;
 `;
 
 export const Arrow = styled(RightOutlined)`
@@ -110,6 +112,9 @@ export const StyledMenu = styled(Menu)`
       .ant-menu-title-content {
         margin-left: 0;
         font-size: 13px;
+        &:first-child {
+          padding-left: 14px;
+        }
       }
     }
   }
@@ -117,7 +122,7 @@ export const StyledMenu = styled(Menu)`
 
 export const NumberOfTemplates = styled.span`
   position: absolute;
-  left: 178px;
+  left: 170px;
 `;
 
 export const NumberOfResources = styled.span`

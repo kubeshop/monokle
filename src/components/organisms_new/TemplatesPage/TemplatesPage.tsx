@@ -81,7 +81,6 @@ const TemplatesPage = () => {
           <S.TemplatesListWrapper className="vertical reflex-container">
             <S.StyledMenu
               onClick={onClick}
-              style={{width: '100%;'}}
               defaultSelectedKeys={['1']}
               defaultOpenKeys={['sub1']}
               mode="inline"
