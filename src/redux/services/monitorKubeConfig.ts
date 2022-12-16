@@ -1,4 +1,4 @@
-/// THIS FILE WILL BE DELETED AFTER UI 2.0
+// TODO: THIS FILE WILL BE DELETED AFTER UI 2.0
 import * as k8s from '@kubernetes/client-node';
 
 import {FSWatcher, watch} from 'chokidar';
