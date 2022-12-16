@@ -1,4 +1,4 @@
-import {Button, Skeleton as RawSkeleton} from 'antd';
+import {Button, Menu, Skeleton as RawSkeleton} from 'antd';
 
 import {RightOutlined} from '@ant-design/icons';
 
@@ -9,12 +9,17 @@ import {Colors} from '@shared/styles';
 export const TemplatesPageContainer = styled.div`
   height: 100%;
   display: inline-block;
+  margin: 40px;
+  width: 508px;
+  background: #131515;
 `;
 
 export const TemplateLeftSidebarWrapper = styled.div`
-  height: 100%;
-  margin: 0 39px;
+  width: 100%;
   display: inline-block;
+  background: #1d1d1d;
+  padding-top: 30px;
+  padding-bottom: 30px;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -40,8 +45,7 @@ export const TemplatesPageTitle = styled.h1`
   line-height: 22px;
   letter-spacing: 0;
   text-align: left;
-  margin-top: 33px;
-  margin-bottom: 20px;
+  margin: 16px 24px;
 `;
 
 export const Arrow = styled(RightOutlined)`
@@ -58,7 +62,42 @@ export const Content = styled.div`
 `;
 
 export const Form = styled.div`
-  margin: 5px 0;
+  margin: 5px 28px;
+`;
+
+export const StyledMenu = styled(Menu)`
+  width: 100% !important;
+  background: transparent;
+  color: #acacac;
+  font-size: 13px;
+  .ant-menu-submenu {
+    .ant-menu-submenu-title {
+      padding: 0 52px;
+      color: #acacac;
+    }
+    .ant-menu-submenu-arrow {
+      left: 32px;
+      color: #acacac;
+    }
+    .ant-menu-sub .ant-menu-title-content {
+      margin-left: 0;
+      font-size: 13px;
+    }
+  }
+`;
+
+export const NumberOfTemplates = styled.span`
+  position: absolute;
+  left: 178px;
+  color: #acacac;
+  //float:right;
+`;
+
+export const TitleBarWrapper = styled.span`
+  > div {
+    margin: 0 28px;
+  }
+  //float:right;
 `;
 
 export const SearchBox = styled.div`

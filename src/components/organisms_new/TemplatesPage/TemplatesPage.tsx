@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 
-import {Col, Input, Row} from 'antd';
+import {Input} from 'antd';
+import type {MenuProps} from 'antd';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateSearchQuery} from '@redux/reducers/main';
 
-import {ResourceSetSelector} from '@organismsNew/ResourceSetSelector';
 import QueryTemplateParams from '@organismsNew/TemplatesPage/QueryTemplateParams';
 
 import {TitleBar} from '@monokle/components';
@@ -17,7 +17,36 @@ import TemplatesList from './TemplatesList';
 import * as S from './TemplatesPage.styled';
 import TemplatesPageDescriptionBar from './TemplatesPageDescriptionBar';
 
+type MenuItem = Required<MenuProps>['items'][number];
+
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[],
+  type?: 'group'
+): MenuItem {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    type,
+  } as MenuItem;
+}
+
+const items: MenuProps['items'] = [
+  getItem('Default Templates', 'sub2', <S.NumberOfTemplates>7</S.NumberOfTemplates>, [
+    getItem('Option 5', '5'),
+    getItem('Option 6', '6'),
+  ]),
+];
+
 const TemplatesPage = () => {
+  const onClick: MenuProps['onClick'] = e => {
+    console.log('click ', e);
+  };
+
   const dispatch = useAppDispatch();
 
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
@@ -34,10 +63,12 @@ const TemplatesPage = () => {
 
   return (
     <S.TemplatesPageContainer>
-      <S.TemplateLeftSidebarWrapper className="vertical reflex-element">
-        <S.TemplatesPageTitle>Create Resources from a template</S.TemplatesPageTitle>
+      <S.TemplatesPageTitle>Create Resources from a template</S.TemplatesPageTitle>
 
-        <TitleBar title="Templates" description={<TemplatesPageDescriptionBar />} />
+      <S.TemplateLeftSidebarWrapper className="vertical reflex-element">
+        <S.TitleBarWrapper>
+          <TitleBar title="Templates" description={<TemplatesPageDescriptionBar />} />
+        </S.TitleBarWrapper>
 
         <S.Form>
           <S.SearchBox>
@@ -46,15 +77,14 @@ const TemplatesPage = () => {
           </S.SearchBox>
         </S.Form>
 
-        <Row>
-          <Col span={10}>
-            <ResourceSetSelector side="left" />
-          </Col>
-          <Col span={4} />
-          <Col span={10}>
-            <ResourceSetSelector side="right" />
-          </Col>
-        </Row>
+        <S.StyledMenu
+          onClick={onClick}
+          style={{width: '100%;'}}
+          defaultSelectedKeys={['1']}
+          defaultOpenKeys={['sub1']}
+          mode="inline"
+          items={items}
+        />
 
         <S.Content style={{height: `calc(100% - ${1024}px - 100px - 60px)`}}>
           <S.TemplatesListWrapper className="vertical reflex-container">
