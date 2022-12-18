@@ -139,7 +139,7 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   };
 };
 
-export const startKubeProxy = (listener: (...args: any[]) => void, port: number) => {
+export const startKubeProxy = (port: number, listener: (...args: any[]) => void) => {
   if (isRendererThread()) {
     runCommandStreamInMainThread(listener, {
       commandId: uuid(),
