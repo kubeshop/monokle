@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
@@ -19,6 +20,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="explorer" />,
     component: <FileTreePane />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'fullscreen',
@@ -27,6 +29,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'panel',
@@ -39,6 +42,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'panel',
@@ -47,6 +51,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="search" style={{fontSize: 16}} />,
     component: <SearchPane />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'fullscreen',
@@ -74,5 +79,6 @@ export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
     component: <BottomPaneManager />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
 ];

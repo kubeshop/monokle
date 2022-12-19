@@ -41,12 +41,12 @@ const NewPaneManager: React.FC = () => {
   const {height, width} = useMainPaneDimensions();
 
   const gridColumns = useMemo(() => {
-    if (!activeProject || isStartProjectPaneVisible) {
+    if ((!activeProject && !previewingCluster) || isStartProjectPaneVisible) {
       return '1fr';
     }
 
     return 'max-content 1fr';
-  }, [activeProject, isStartProjectPaneVisible]);
+  }, [activeProject, isStartProjectPaneVisible, previewingCluster]);
 
   const topPaneFlex = useMemo(
     () => (bottomSelection ? 1 - layout.bottomPaneHeight / height : 1),
@@ -86,7 +86,7 @@ const NewPaneManager: React.FC = () => {
         <S.Skeleton />
       ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
         <>
-          {!previewingCluster && <PaneManagerLeftMenu />}
+          <PaneManagerLeftMenu />
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
