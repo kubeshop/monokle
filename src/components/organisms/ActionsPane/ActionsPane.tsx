@@ -380,7 +380,7 @@ const ActionsPane: React.FC = () => {
   );
 
   return (
-    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height}>
+    <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height - 21}>
       <ActionsPaneHeader
         actionsPaneWidth={actionsPaneWidth}
         applySelection={applySelection}
