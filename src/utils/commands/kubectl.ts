@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import getPort from 'get-port';
+import {getPort} from 'get-port-please';
 import {v4 as uuid} from 'uuid';
 
 import {CommandOptions} from './execute';
