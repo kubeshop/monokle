@@ -16,11 +16,13 @@ import {
 } from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
+import {FeatureFlag} from '@utils/features';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
+import StartPage from '../StartPage';
 import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';
@@ -133,10 +135,13 @@ const NewPaneManager: React.FC = () => {
             width={width}
           />
         </>
-      ) : projects.length > 0 ? (
-        <RecentProjectsPage />
       ) : (
-        <StartProjectPage />
+        <FeatureFlag
+          name="NewStartPage"
+          fallback={<>{projects.length > 0 ? <RecentProjectsPage /> : <StartProjectPage />}</>}
+        >
+          <StartPage />
+        </FeatureFlag>
       )}
     </S.PaneManagerContainer>
   );

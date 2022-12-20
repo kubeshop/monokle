@@ -93,6 +93,7 @@ export enum Colors {
   geekblue6 = '#2B4ACB',
   geekblue7 = '#5273E0',
   geekblue8 = '#7F9EF3',
+  geekblue9 = '#A8C1F8',
   blue1000 = '#7F9EF3',
 
   green5 = '#3c8618',
