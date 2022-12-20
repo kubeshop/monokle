@@ -27,6 +27,7 @@ import {
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
+  updateUsingKubectlProxy,
 } from '@redux/reducers/appConfig';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
@@ -57,6 +58,7 @@ const SettingsManager: React.FC = () => {
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
   const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [activeTab, setActiveTab] = useState<string>(
     activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
@@ -115,6 +117,10 @@ const SettingsManager: React.FC = () => {
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
+  };
+
+  const handleChangeUsingKubectlProxy = (e: any) => {
+    dispatch(updateUsingKubectlProxy(e.target.checked));
   };
 
   const handleChangeClusterSelectorVisibilty = (e: any) => {
@@ -221,6 +227,14 @@ const SettingsManager: React.FC = () => {
               </Form.Item>
             </>
           </Form>
+
+          <S.Div>
+            <S.Span>Kubectl proxy</S.Span>
+            <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
+              Use kubectl proxy
+            </Checkbox>
+          </S.Div>
+
           <S.Div>
             <S.Span>On Startup</S.Span>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
