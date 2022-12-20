@@ -29,6 +29,7 @@ export const DetailsHeader = styled.p`
   margin: 0;
   h5 {
     margin-left: 5px;
+    color: #acacac;
   }
   span {
     color: #7d7d7d;
@@ -42,17 +43,15 @@ export const ResourcesColumn = styled.div`
   margin-left: 45px;
 `;
 
-export const TutorialSidebar = styled.div`
+export const TemplateSidebar = styled.div`
   flex-grow: 1;
-  .ant-card-body {
-    background-color: ${Colors.coldGrey};
-    height: 100%;
-    min-height: 100px;
-    font-size: 14px;
+  .ant-collapse-header .ant-collapse-header-text {
+    color: #fff;
   }
   .ant-collapse {
     border: none;
     .ant-collapse-item {
+      color: #acacac;
       border-bottom: 0;
       .ant-collapse-expand-icon {
         color: #177ddc;
@@ -98,6 +97,7 @@ export const Button = styled(AntdButton)`
 export const ReadMoreStyled = styled.p`
   display: inline;
   width: 100%;
+  color: #acacac;
   .container {
     position: absolute;
     top: 10%;

@@ -24,7 +24,7 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   return (
-    <S.TutorialSidebar key={type}>
+    <S.TemplateSidebar key={type}>
       <Collapse
         defaultActiveKey={['1']}
         expandIcon={({isActive}) => <CaretRightOutlined rotate={isActive ? 90 : 270} />}
@@ -70,7 +70,7 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           </S.ResourcesColumn>
         </Panel>
       </Collapse>
-    </S.TutorialSidebar>
+    </S.TemplateSidebar>
   );
 };
 
