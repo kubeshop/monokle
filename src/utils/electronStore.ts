@@ -34,6 +34,9 @@ const schema = {
       lastSeenReleaseNotesVersion: {
         type: 'string',
       },
+      useKubectlProxy: {
+        type: 'boolean',
+      },
       isClusterSelectorVisible: {
         type: 'boolean',
       },
@@ -283,6 +286,7 @@ const defaults = {
   },
   appConfig: {
     kubeConfigContextsColors: {},
+    useKubectlProxy: true,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
