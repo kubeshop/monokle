@@ -1,3 +1,5 @@
+import {getPort} from 'get-port-please';
+
 import {AppDispatch} from '@models/appdispatch';
 import {PreviewType} from '@models/appstate';
 
@@ -12,29 +14,30 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
-import {closeKubectlProxy, listenKubectlProxyEvents, openKubectlProxy} from '@utils/commands/kubectl';
+import {closeKubectlProxy, openKubectlProxy} from '@utils/commands/kubectl';
 import {trackEvent} from '@utils/telemetry';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
-const startClusterPreview = (clusterContext: string, dispatch: AppDispatch, isRestart?: boolean) => {
-  openKubectlProxy().then(({port}) => {
-    const kubectlProxyListener = (event: any) => {
-      if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
-        if (isRestart) {
-          dispatch(repreviewCluster({context: clusterContext, port}));
-        } else {
-          dispatch(previewCluster({context: clusterContext, port}));
-        }
-      }
-      if (event.type === 'error' || event.type === 'exit') {
-        stopPreview(dispatch);
-      }
-    };
+const startClusterPreview = async (clusterContext: string, dispatch: AppDispatch, isRestart?: boolean) => {
+  const port = await getPort();
 
-    listenKubectlProxyEvents(kubectlProxyListener);
-  });
+  // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
+  const kubectlProxyListener = (event: any) => {
+    if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
+      if (isRestart) {
+        dispatch(repreviewCluster({context: clusterContext, port}));
+      } else {
+        dispatch(previewCluster({context: clusterContext, port}));
+      }
+    }
+    if (event.type === 'error' || event.type === 'exit') {
+      stopPreview(dispatch);
+    }
+  };
+
+  openKubectlProxy(port, kubectlProxyListener);
 };
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
@@ -45,19 +48,6 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
   }
   if (type === 'cluster') {
     startClusterPreview(targetId, dispatch);
-
-    openKubectlProxy().then(({port}) => {
-      const kubectlProxyListener = (event: any) => {
-        if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
-          dispatch(previewCluster({context: targetId, port}));
-        }
-        if (event.type === 'error' || event.type === 'exit') {
-          stopPreview(dispatch);
-        }
-      };
-
-      listenKubectlProxyEvents(kubectlProxyListener);
-    });
   }
   if (type === 'helm') {
     dispatch(previewHelmValuesFile(targetId));
@@ -78,7 +68,7 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
     dispatch(previewKustomization(targetId));
   }
   if (type === 'cluster') {
-    startClusterPreview(targetId, dispatch);
+    startClusterPreview(targetId, dispatch, true);
   }
   if (type === 'helm') {
     dispatch(previewHelmValuesFile(targetId));

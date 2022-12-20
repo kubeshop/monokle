@@ -4,7 +4,7 @@ import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 
 let kubectlProxyProcess: ChildProcessWithoutNullStreams | undefined;
 
-export const startKubectlProxyProcess = (event: IpcMainEvent, port: number) => {
+export const startKubectlProxyProcess = async (event: IpcMainEvent, port: number) => {
   if (kubectlProxyProcess) {
     kubectlProxyProcess.kill();
   }
@@ -44,6 +44,8 @@ export const startKubectlProxyProcess = (event: IpcMainEvent, port: number) => {
       result: {message: e?.message},
     });
   }
+
+  return port;
 };
 
 export const killKubectlProxyProcess = () => {
