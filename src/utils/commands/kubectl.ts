@@ -1,3 +1,6 @@
+import {ipcRenderer} from 'electron';
+
+import getPort from 'get-port';
 import {v4 as uuid} from 'uuid';
 
 import {CommandOptions} from './execute';
@@ -29,4 +32,20 @@ export function createKubectlApplyCommand(
     input,
     env,
   };
+}
+
+export async function openKubectlProxy() {
+  const port = await getPort();
+
+  ipcRenderer.send('kubectl-proxy-open', {port});
+
+  return {port};
+}
+
+export function closeKubectlProxy() {
+  ipcRenderer.send('kubectl-proxy-close');
+}
+
+export async function listenKubectlProxyEvents(listener: (...args: any[]) => void) {
+  ipcRenderer.on('kubectl-proxy-event', listener);
 }

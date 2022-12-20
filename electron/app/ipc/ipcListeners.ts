@@ -43,10 +43,10 @@ import {
   forceLoad as forceReload,
   interpolateTemplate,
   runCommand,
-  runStreamCommand,
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
+import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -248,8 +248,12 @@ ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
 });
 
-ipcMain.on('run-command-stream', (event, args: CommandOptions) => {
-  runStreamCommand(args, event);
+ipcMain.on('kubectl-proxy-open', (event, args: {port: number}) => {
+  startKubectlProxyProcess(event, args.port);
+});
+
+ipcMain.on('kubectl-proxy-close', () => {
+  killKubectlProxyProcess();
 });
 
 ipcMain.on('app-version', event => {

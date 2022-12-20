@@ -1,7 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
 import {spawn} from 'child_process';
-import events from 'events';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
 
@@ -9,7 +8,7 @@ import {ClusterAccess, KubePermissions} from '@models/appconfig';
 
 import {getMainProcessEnv} from '@utils/env';
 
-import {CommandOptions, CommandResult, runCommandInMainThread, runCommandStreamInMainThread} from './commands/execute';
+import {CommandOptions, CommandResult, runCommandInMainThread} from './commands/execute';
 import {isRendererThread} from './thread';
 
 export function createKubeClient(path: string, context?: string) {
@@ -139,38 +138,6 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   };
 };
 
-export const startKubeProxy = (port: number, listener: (...args: any[]) => void) => {
-  if (isRendererThread()) {
-    runCommandStreamInMainThread(listener, {
-      commandId: uuid(),
-      cmd: 'kubectl',
-      args: ['proxy', '--port', `${port}`],
-    });
-  } else {
-    runCommandStream(listener, {
-      commandId: uuid(),
-      cmd: 'kubectl',
-      args: ['proxy', '--port', `${port}`],
-    });
-  }
-};
-
-export const killKubeProxy = (listener: (...args: any[]) => void) => {
-  if (isRendererThread()) {
-    runCommandStreamInMainThread(listener, {
-      commandId: uuid(),
-      cmd: 'pkill',
-      args: ['-9', '-f', '"kubectl proxy"'],
-    });
-  } else {
-    runCommandStream(listener, {
-      commandId: uuid(),
-      cmd: 'pkill',
-      args: ['-9', '-f', '"kubectl proxy"'],
-    });
-  }
-};
-
 export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
   if (!clusterAccess) {
     return false;
@@ -228,43 +195,3 @@ export const runCommandPromise = (options: CommandOptions): Promise<CommandResul
       res(result);
     }
   });
-
-export const runCommandStream = (listener: (...args: any[]) => void, options: CommandOptions): Function => {
-  const commandEventEmitter = new events.EventEmitter();
-
-  commandEventEmitter.addListener(options.commandId, listener);
-
-  try {
-    const child = spawn(options.cmd, options.args, {
-      env: {
-        ...options.env,
-        ...process.env,
-      },
-      shell: true,
-      windowsHide: true,
-    });
-
-    if (options.input) {
-      child.stdin.write(options.input);
-      child.stdin.end();
-    }
-
-    child.on('exit', (code, signal) => {
-      commandEventEmitter.emit(options.commandId, {
-        type: 'exit',
-        result: {exitCode: code, signal: signal && signal.toString()},
-      });
-    });
-
-    child.stdout.on('data', data => {
-      commandEventEmitter.emit(options.commandId, {type: 'stdout', result: {data: data.toString()}});
-    });
-
-    child.stderr.on('data', data => {
-      commandEventEmitter.emit(options.commandId, {type: 'stderr', result: {data: data.toString()}});
-    });
-  } catch (e: any) {
-    commandEventEmitter.emit(options.commandId, {type: 'error', result: {message: e.message}});
-  }
-  return listener;
-};
