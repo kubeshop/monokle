@@ -248,8 +248,8 @@ ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
 });
 
-ipcMain.on('kubectl-proxy-open', (event, {port}) => {
-  startKubectlProxyProcess(event, port);
+ipcMain.on('kubectl-proxy-open', event => {
+  startKubectlProxyProcess(event);
 });
 
 ipcMain.on('kubectl-proxy-close', () => {

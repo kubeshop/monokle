@@ -33,9 +33,10 @@ export function createKubectlApplyCommand(
   };
 }
 
-export function openKubectlProxy(port: number, listener: (...args: any[]) => void) {
+export function openKubectlProxy(listener: (...args: any[]) => void) {
+  ipcRenderer.removeAllListeners('kubectl-proxy-event');
   ipcRenderer.on('kubectl-proxy-event', (event, args) => listener(args));
-  ipcRenderer.send('kubectl-proxy-open', {port});
+  ipcRenderer.send('kubectl-proxy-open');
 }
 
 export function closeKubectlProxy() {

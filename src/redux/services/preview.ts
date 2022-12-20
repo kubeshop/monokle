@@ -1,5 +1,3 @@
-import {getPort} from 'get-port-please';
-
 import {AppDispatch} from '@models/appdispatch';
 import {PreviewType} from '@models/appstate';
 
@@ -21,9 +19,9 @@ import {trackEvent} from '@utils/telemetry';
 import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
-const startClusterPreview = async (clusterContext: string, dispatch: AppDispatch, isRestart?: boolean) => {
-  const port = await getPort();
+const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
 
+const startClusterPreview = async (clusterContext: string, dispatch: AppDispatch, isRestart?: boolean) => {
   // TODO: if we convert the *startPreview* function to a thunk, then we could get this from the state instead
   const shouldUseKubectlProxy = electronStore.get('appConfig.useKubectlProxy');
 
@@ -38,20 +36,29 @@ const startClusterPreview = async (clusterContext: string, dispatch: AppDispatch
 
   // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
   const kubectlProxyListener = (event: any) => {
-    // TODO: is there a better way to verify that the proxy has started?
-    if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
-      if (isRestart) {
-        dispatch(repreviewCluster({context: clusterContext, port}));
-      } else {
-        dispatch(previewCluster({context: clusterContext, port}));
-      }
-    }
     if (event.type === 'error' || event.type === 'exit') {
       stopPreview(dispatch);
+      return;
+    }
+
+    if (event.type === 'stdout' && event.result && event.result.data) {
+      const proxyPortMatches = PROXY_PORT_REGEX.exec(event.result.data);
+      const proxyPortString = proxyPortMatches?.[0]?.split(':')[1];
+      const proxyPort = proxyPortString ? parseInt(proxyPortString, 10) : undefined;
+
+      if (!proxyPort) {
+        return;
+      }
+
+      if (isRestart) {
+        dispatch(repreviewCluster({context: clusterContext, port: proxyPort}));
+      } else {
+        dispatch(previewCluster({context: clusterContext, port: proxyPort}));
+      }
     }
   };
 
-  openKubectlProxy(port, kubectlProxyListener);
+  openKubectlProxy(kubectlProxyListener);
 };
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
