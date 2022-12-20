@@ -15,6 +15,7 @@ import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {closeKubectlProxy, openKubectlProxy} from '@utils/commands/kubectl';
+import electronStore from '@utils/electronStore';
 import {trackEvent} from '@utils/telemetry';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
@@ -23,8 +24,21 @@ import {previewSavedCommand} from './previewCommand';
 const startClusterPreview = async (clusterContext: string, dispatch: AppDispatch, isRestart?: boolean) => {
   const port = await getPort();
 
+  // TODO: if we convert the *startPreview* function to a thunk, then we could get this from the state instead
+  const shouldUseKubectlProxy = electronStore.get('appConfig.useKubectlProxy');
+
+  if (!shouldUseKubectlProxy) {
+    if (isRestart) {
+      dispatch(repreviewCluster({context: clusterContext}));
+    } else {
+      dispatch(previewCluster({context: clusterContext}));
+    }
+    return;
+  }
+
   // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
   const kubectlProxyListener = (event: any) => {
+    // TODO: is there a better way to verify that the proxy has started?
     if (event.result && event.result.data && event.result.data.includes(`Starting to serve on 127.0.0.1:${port}`)) {
       if (isRestart) {
         dispatch(repreviewCluster({context: clusterContext, port}));
