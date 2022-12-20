@@ -3,6 +3,7 @@ import React from 'react';
 import {Tree} from 'antd';
 
 import groupBy from 'lodash/groupBy.js';
+import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -14,6 +15,56 @@ import type {Resource} from '@monokle/validation/lib/common/types.js';
 import {Colors} from '@shared/styles/colors';
 
 import * as S from './AuditPane.styled';
+
+const StyledTreeWrapper = styled.div`
+  & .ant-tree-treenode-selected {
+    background: ${Colors.grey1} !important;
+    color: ${Colors.grey1} !important;
+  }
+  & .ant-tree-treenode-selected::before {
+    background: ${Colors.blue9} !important;
+    color: ${Colors.grey1} !important;
+  }
+  .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    color: ${Colors.blackPure} !important;
+    font-weight: bold;
+  }
+
+  .parent {
+    display: flex;
+    color: ${Colors.grey8};
+  }
+
+  & .ant-tree-node-selected > .ant-tree-title > .parent {
+    color: ${Colors.blackPure} !important;
+  }
+
+  .anticon {
+    color: ${Colors.grey8};
+  }
+
+  .redicon {
+    color: ${Colors.red7};
+  }
+
+  & .ant-tree-node-selected .anticon,
+  .ant-tree-node-selected .redicon {
+    color: ${Colors.blackPure} !important;
+  }
+
+  & .location {
+    font-weight: bold;
+    color: ${Colors.grey8};
+    display: flex;
+    margin-right: 10px;
+    font-size: 12px;
+  }
+
+  & .ant-tree-node-selected .location {
+    font-weight: normal;
+    color: ${Colors.grey1} !important;
+  }
+`;
 
 const AuditPane: React.FC = () => {
   const [validationResponse, setValidationResponse] = React.useState<ValidationResponse>();
@@ -56,11 +107,9 @@ const AuditPane: React.FC = () => {
       childNodes.push({
         title: (
           <div style={{display: 'flex', width: '100%'}}>
-            <Icon style={{fontSize: 10, margin: '4px 6px 0 -20px', color: Colors.grey8}} name="opa-status" />
-            <Icon style={{fontSize: 10, margin: '4px 10px 0 0', color: Colors.red7}} name="severity-high" />
-            <span style={{display: 'flex', color: Colors.grey8, marginRight: '10px', fontSize: '12px'}}>
-              {result.locations[0].physicalLocation.region.startLine}
-            </span>
+            <Icon style={{margin: '4px 6px 0 -20px', fontSize: 10}} name="opa-status" />
+            <Icon style={{margin: '4px 10px 0 0', fontSize: 10}} name="severity-high" className="redicon" />
+            <div className="location">{result.locations[0].physicalLocation.region.startLine}</div>
             {rule.name}
           </div>
         ),
@@ -71,7 +120,7 @@ const AuditPane: React.FC = () => {
 
     const currentData = {
       title: (
-        <div style={{display: 'flex', color: Colors.grey8}}>
+        <div className="parent">
           <span>{title}</span>
           <span style={{marginLeft: '10px', fontWeight: 'bold', fontSize: 13}}>{` ${errorCount}`}</span>
         </div>
@@ -86,7 +135,11 @@ const AuditPane: React.FC = () => {
   return (
     <S.AuditPaneContainer id="AuditPane">
       <TitleBar title="Validation errors" />
-      {treeData && <Tree treeData={treeData} />}
+      <StyledTreeWrapper>
+        {treeData && (
+          <Tree.DirectoryTree showIcon={false} style={{width: '100%'}} defaultExpandAll treeData={treeData} />
+        )}
+      </StyledTreeWrapper>
     </S.AuditPaneContainer>
   );
 };
