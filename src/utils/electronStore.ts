@@ -286,7 +286,7 @@ const defaults = {
   },
   appConfig: {
     kubeConfigContextsColors: {},
-    useKubectlProxy: true,
+    useKubectlProxy: false,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
