@@ -37,8 +37,12 @@ function getItem(
 
 const items: MenuProps['items'] = [
   getItem('Default Templates', 'sub2', <S.NumberOfTemplates>7</S.NumberOfTemplates>, [
-    getItem('Option 5', '5', <S.NumberOfResources>2 resources</S.NumberOfResources>),
-    getItem('Option 6', '6', <S.NumberOfResources>1 resource</S.NumberOfResources>),
+    getItem('Basic Service Deployment', '1', <S.NumberOfResources>2 resources</S.NumberOfResources>),
+    getItem('Advanced Pod', '2', <S.NumberOfResources>1 resource</S.NumberOfResources>),
+    getItem('Basic Kubernetes Persisted Volume', '3', <S.NumberOfResources>2 resources</S.NumberOfResources>),
+    getItem('Basic Kubernetes StatefulSet', '4', <S.NumberOfResources>3 resources</S.NumberOfResources>),
+    getItem('RoleBinding and ServiceAccount', '5', <S.NumberOfResources>1 resource</S.NumberOfResources>),
+    getItem('Basic service', '6', <S.NumberOfResources>5 resource</S.NumberOfResources>),
   ]),
 ];
 
@@ -77,7 +81,7 @@ const TemplatesPage = () => {
           </S.SearchBox>
         </S.Form>
 
-        <S.Content style={{height: `calc(100% - ${1024}px - 100px - 60px)`}}>
+        <S.Content>
           <S.TemplatesListWrapper className="vertical reflex-container">
             <S.StyledMenu
               onClick={onClick}
@@ -91,7 +95,6 @@ const TemplatesPage = () => {
       </S.TemplateLeftSidebarWrapper>
 
       <S.TemplateSidebarPreviewWrapper className="vertical reflex-element">
-        <S.TemplatesPageTitle>Page title</S.TemplatesPageTitle>
         <TemplateSidebarPreview tutorialReferenceLink={GUIDE} />
       </S.TemplateSidebarPreviewWrapper>
     </S.TemplatesPageContainer>

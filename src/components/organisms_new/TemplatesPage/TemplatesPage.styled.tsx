@@ -24,10 +24,14 @@ export const TemplateLeftSidebarWrapper = styled.div`
 `;
 
 export const TemplateSidebarPreviewWrapper = styled.div`
-  margin-top: 40px;
+  margin-top: 30px;
   display: flex;
   float: right;
   gap: 10px;
+  min-width: 60%;
+  max-width: 60%;
+  background: rgba(25, 31, 33, 0.7);
+  border-radius: 4px;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -50,6 +54,7 @@ export const TemplatesPageTitle = styled.h1`
   padding: 16px 24px;
   margin-bottom: 0;
   background: #131515;
+  border-bottom: 1px solid #434343;
 `;
 
 export const Arrow = styled(RightOutlined)`
@@ -70,7 +75,7 @@ export const Form = styled.div`
 `;
 
 export const StyledMenu = styled(Menu)`
-  width: 100% !important;
+  width: 100%;
   background: transparent;
   color: #acacac;
   font-size: 13px;
@@ -102,6 +107,9 @@ export const StyledMenu = styled(Menu)`
     .ant-menu-submenu-title {
       padding: 0 52px;
       color: #acacac;
+      .ant-menu-title-content {
+        margin-left: 24px;
+      }
     }
     .ant-menu-submenu-arrow {
       left: 32px;
@@ -138,15 +146,11 @@ export const TitleBarWrapper = styled.span`
   > div {
     margin: 0 28px;
   }
-  //float:right;
 `;
 
 export const SearchBox = styled.div`
   display: flex;
   margin: 12px 0;
-  //width: 406px;
-  //height: 32px;
-
   input {
     border-width: 0;
     background: rgba(255, 255, 255, 0.1);

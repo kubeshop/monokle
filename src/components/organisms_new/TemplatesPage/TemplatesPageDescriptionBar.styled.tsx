@@ -20,7 +20,7 @@ export const ActionBarDiv = styled.div`
 export const ActionBarRightDiv = styled.div`
   display: inline-flex;
   align-items: end;
-  width: 308px;
+  width: 305px;
 `;
 
 export const Link = styled.a`
