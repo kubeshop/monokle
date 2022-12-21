@@ -30,7 +30,7 @@ import {
 import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
@@ -390,7 +390,7 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          <PageHeader />
+          {/* <PageHeader /> */}
           <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />

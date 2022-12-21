@@ -1,8 +1,15 @@
+import {usePaneHeight} from '@hooks/usePaneHeight';
+
 import * as S from './StartPage.styled';
+import StartPageHeader from './StartPageHeader';
 
 const StartPage: React.FC = () => {
+  const height = usePaneHeight();
+
   return (
-    <div>
+    <S.StartPageContainer $height={height}>
+      <StartPageHeader />
+
       <S.Tabs
         tabPosition="left"
         items={[
@@ -11,7 +18,7 @@ const StartPage: React.FC = () => {
           {label: <div>Settings</div>, key: 'settings', children: <>Settings</>},
         ]}
       />
-    </div>
+    </S.StartPageContainer>
   );
 };
 

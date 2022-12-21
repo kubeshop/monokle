@@ -10,6 +10,7 @@ export {default as ImageIcon} from './ImageIcon';
 export {default as InputTags} from './InputTags';
 export {default as KeyValueInput} from './KeyValueInput';
 export {default as ScrollIntoView} from './ScrollIntoView';
+export {default as SearchInput} from './SearchInput';
 export {default as Spinner} from './Spinner';
 export {PrimaryButton, SecondaryButton} from './StyledComponents';
 export {default as TabHeader} from './TabHeader';
