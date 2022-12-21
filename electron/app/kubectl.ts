@@ -46,6 +46,10 @@ export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
 
 export const killKubectlProxyProcess = () => {
   if (kubectlProxyProcess?.pid) {
-    spawn('taskkill', ['/pid', kubectlProxyProcess.pid.toString(), '/f', '/t']);
+    if (process.platform === 'win32') {
+      spawn('taskkill', ['/pid', kubectlProxyProcess.pid.toString(), '/f', '/t']);
+    } else {
+      process.kill(kubectlProxyProcess.pid);
+    }
   }
 };
