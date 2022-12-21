@@ -79,10 +79,10 @@ const SettingsManager: React.FC = () => {
   };
 
   useEffect(() => {
-    if (previewingCluster) {
+    if (previewingCluster || !activeProject) {
       setActiveTab(SettingsPanel.DefaultProjectSettings);
     }
-  }, [previewingCluster]);
+  }, [activeProject, previewingCluster]);
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));
