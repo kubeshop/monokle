@@ -49,7 +49,7 @@ export const killKubectlProxyProcess = () => {
     if (process.platform === 'win32') {
       spawn('taskkill', ['/pid', kubectlProxyProcess.pid.toString(), '/f', '/t']);
     } else {
-      process.kill(kubectlProxyProcess.pid);
+      kubectlProxyProcess.kill();
     }
   }
 };
