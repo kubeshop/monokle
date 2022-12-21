@@ -5,12 +5,10 @@ import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 let kubectlProxyProcess: ChildProcessWithoutNullStreams | undefined;
 
 export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
-  if (kubectlProxyProcess) {
-    kubectlProxyProcess.kill();
-  }
+  killKubectlProxyProcess();
 
   try {
-    const child = spawn('kubectl', ['proxy', '--port=0'], {
+    kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0'], {
       env: {
         ...process.env,
       },
@@ -18,21 +16,21 @@ export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
       windowsHide: true,
     });
 
-    child.on('exit', (code, signal) => {
+    kubectlProxyProcess.on('exit', (code, signal) => {
       event.sender.send('kubectl-proxy-event', {
         type: 'exit',
         result: {exitCode: code, signal: signal?.toString()},
       });
     });
 
-    child.stdout.on('data', data => {
+    kubectlProxyProcess.stdout.on('data', data => {
       event.sender.send('kubectl-proxy-event', {
         type: 'stdout',
         result: {data: data?.toString()},
       });
     });
 
-    child.stderr.on('data', data => {
+    kubectlProxyProcess.stderr.on('data', data => {
       event.sender.send('kubectl-proxy-event', {
         type: 'stderr',
         result: {data: data?.toString()},
@@ -47,7 +45,7 @@ export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
 };
 
 export const killKubectlProxyProcess = () => {
-  if (kubectlProxyProcess) {
-    kubectlProxyProcess.kill();
+  if (kubectlProxyProcess?.pid) {
+    spawn('taskkill', ['/pid', kubectlProxyProcess.pid.toString(), '/f', '/t']);
   }
 };
