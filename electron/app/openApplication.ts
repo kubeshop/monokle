@@ -32,7 +32,7 @@ export const openApplication = async (givenPath?: string) => {
   const win = createWindow(givenPath);
 
   if (app.dock) {
-    const image = nativeImage.createFromPath(path.join(app.getAppPath(), 'build', 'large-icon-256.png'));
+    const image = nativeImage.createFromPath(path.join(app.getAppPath(), 'public', 'large-icon-256.png'));
     app.dock.setIcon(image);
     app.dock.setMenu(getDockMenu());
   }
