@@ -271,7 +271,7 @@
           ]
         }
       ],
-      "icon": "build/icon.png",
+      "icon": "build/large-icon-256.png",
       "category": "Development",
       "maintainer": "Kubeshop",
       "vendor": "Kubeshop",
