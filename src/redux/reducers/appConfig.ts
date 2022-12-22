@@ -5,6 +5,7 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -527,20 +528,24 @@ export const configSlice = createSlice({
       }
     },
     initRendererSentry: (state: Draft<AppConfig>, action: PayloadAction<{SENTRY_DSN: string}>) => {
-      Sentry.init({
-        dsn: action.payload.SENTRY_DSN,
-        integrations: [new BrowserTracing()],
-        tracesSampleRate: 0.6,
-        beforeSend: event => {
-          // we have to get this from electron store to get the most updated value
-          // because the state object in this action is a snapshot of the state at the moment of executing the reducer
-          const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');
-          if (disableErrorReporting) {
-            return null;
-          }
-          return event;
-        },
-      });
+      try {
+        Sentry.init({
+          dsn: action.payload.SENTRY_DSN,
+          integrations: [new BrowserTracing()],
+          tracesSampleRate: 0.6,
+          beforeSend: event => {
+            // we have to get this from electron store to get the most updated value
+            // because the state object in this action is a snapshot of the state at the moment of executing the reducer
+            const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');
+            if (disableErrorReporting) {
+              return null;
+            }
+            return event;
+          },
+        });
+      } catch {
+        log.warn("Couldn't initialize Sentry.");
+      }
     },
   },
   extraReducers: builder => {

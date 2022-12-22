@@ -187,8 +187,9 @@ export const createWindow = (givenPath?: string) => {
       })
     );
 
-    if (process.env.SENTRY_DSN) {
-      dispatch(initRendererSentry({SENTRY_DSN: process.env.SENTRY_DSN}));
+    const SENTRY_DSN = process.env.SENTRY_DSN;
+    if (typeof SENTRY_DSN === 'string' && SENTRY_DSN.trim().length) {
+      dispatch(initRendererSentry({SENTRY_DSN}));
     }
 
     await checkNewVersion(dispatch, true);
