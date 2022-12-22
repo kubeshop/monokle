@@ -35,7 +35,6 @@ import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorer
 import {CommandOptions} from '@utils/commands';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {getSegmentClient} from '@utils/segment';
-import {trackEvent} from '@utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -265,7 +264,6 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  trackEvent('APP_UPDATED');
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
