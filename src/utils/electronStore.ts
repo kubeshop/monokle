@@ -34,6 +34,9 @@ const schema = {
       lastSeenReleaseNotesVersion: {
         type: 'string',
       },
+      lastSessionVersion: {
+        type: 'string',
+      },
       useKubectlProxy: {
         type: 'boolean',
       },

@@ -9,6 +9,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 import os from 'os';
 import path, {join} from 'path';
+import semver from 'semver';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
@@ -19,7 +20,7 @@ import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
-import {APP_INSTALLED} from '@utils/telemetry';
+import {APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@utils/telemetry';
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -102,11 +103,36 @@ export const initTelemetry = (deviceID: string, disableEventTracking: boolean, a
   const storedDeviceID: string | undefined = electronStore.get('main.deviceID');
   const segmentClient = getSegmentClient();
 
+  let lastSessionVersion = electronStore.get('appConfig.lastSessionVersion');
+
+  if (!lastSessionVersion) {
+    lastSessionVersion = app.getVersion();
+    electronStore.set('appConfig.lastSessionVersion', lastSessionVersion);
+  }
+
+  if (semver.lt(lastSessionVersion, app.getVersion())) {
+    log.info('Application Updated.');
+    if (!disableEventTracking) {
+      segmentClient?.track({
+        event: APP_UPDATED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
+    electronStore.set('appConfig.lastSessionVersion', app.getVersion());
+  }
+
   if (!disableEventTracking) {
     log.info('New Session.');
     segmentClient?.track({
-      event: 'APP_SESSION',
+      event: APP_SESSION,
       userId: deviceID,
+      properties: {
+        appVersion: app.getVersion(),
+      },
     });
   }
 
