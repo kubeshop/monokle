@@ -203,6 +203,10 @@ export const configSlice = createSlice({
         ...action.payload.data,
       };
     },
+    updateUsingKubectlProxy: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.useKubectlProxy', action.payload);
+      state.useKubectlProxy = action.payload;
+    },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.loadLastProjectOnStartup', action.payload);
       state.loadLastProjectOnStartup = action.payload;
@@ -609,6 +613,7 @@ export const {
   updateTelemetry,
   updateTextSize,
   updateTheme,
+  updateUsingKubectlProxy,
   toggleEditorPlaceholderVisiblity,
   initRendererSentry,
 } = configSlice.actions;

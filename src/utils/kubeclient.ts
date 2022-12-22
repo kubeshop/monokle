@@ -19,6 +19,7 @@ export function createKubeClient(path: string, context?: string) {
   }
 
   kc.loadFromFile(path);
+
   let currentContext = context;
 
   if (!currentContext) {

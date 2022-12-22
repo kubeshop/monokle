@@ -19,7 +19,7 @@ export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number) 
       clearTimeout(timeout);
       throw error;
     }
-  );
+  ) as Promise<T>;
 }
 
 export function promiseFromIpcMain<Payload = any>(
