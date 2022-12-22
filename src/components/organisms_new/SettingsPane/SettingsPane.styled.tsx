@@ -5,17 +5,16 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const SettingsPaneContainer = styled.div`
-  padding: 10px;
-  background-color: ${Colors.grey10};
   height: 100%;
   width: 100%;
   overflow: hidden;
 `;
 
 export const DescriptionContainer = styled.div`
-  padding: 8px 4px;
+  padding: 8px 0px;
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 `;
 
 export const WalkThroughContainer = styled.div`
@@ -54,7 +53,7 @@ export const CurlyArrowImage = styled.img`
 export const LayoutOption = styled.div<{$selected?: boolean}>`
   border-radius: 4px;
   display: flex;
-  height: 80px;
+  height: 70px;
   cursor: pointer;
   background: ${({$selected}) => ($selected ? 'rgba(255, 255, 255, 0.2)' : 'inherit')};
   border: ${({$selected}) => ($selected ? `2px solid ${Colors.blue7}` : `1px solid ${Colors.blue11}`)};
@@ -68,9 +67,15 @@ export const LayoutContainer = styled.div`
 
 export const LayoutTitle = styled.div`
   color: ${Colors.whitePure};
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 `;
+
+export const OptionsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
 export const LayoutContent = styled.div`
   color: ${Colors.whitePure};
   font-size: 12px;
@@ -80,7 +85,7 @@ export const ThemeOption = styled.div<{$selected?: boolean}>`
   border: 1px solid #164c7e;
   border-radius: 4px;
   display: flex;
-  height: 80px;
+  height: 70px;
   cursor: pointer;
   background: ${({$selected}) => ($selected ? 'rgba(255, 255, 255, 0.2)' : 'inherit')};
   border: ${({$selected}) => ($selected ? `2px solid ${Colors.blue7}` : `1px solid ${Colors.blue11}`)};
@@ -93,8 +98,6 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   overflow: visible;
 
   & .ant-tabs-nav {
-    padding: 0 16px;
-    margin-bottom: 0px;
   }
 
   & .ant-tabs-nav::before {
@@ -112,7 +115,15 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
 `;
 
 export const TabItemContainer = styled.div`
+  background-color: ${Colors.grey10};
   padding: 16px;
   height: 100%;
   overflow-y: auto;
+  margin-top: 20px;
+`;
+
+export const TabOption = styled.div`
+  font-size: 16px;
+  padding: 4px 0px;
+  margin-top: 5px;
 `;
