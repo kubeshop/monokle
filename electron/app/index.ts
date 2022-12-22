@@ -10,7 +10,7 @@ import {fixPath} from '@utils/path';
 import '@utils/segment';
 
 import terminal from '@root/cli/terminal';
-import * as Sentry from '@sentry/electron';
+import {init as sentryInit} from '@sentry/electron/main';
 
 import './git/ipc';
 import './ipc/ipcListeners';
@@ -23,7 +23,7 @@ const userDataDir = app.getPath('userData');
 const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
 
 if (process.env.SENTRY_DSN) {
-  Sentry.init({
+  sentryInit({
     dsn: process.env.SENTRY_DSN,
     beforeSend: event => {
       const disableErrorReporting = Boolean(electronStore.get('appConfig.disableErrorReporting'));
