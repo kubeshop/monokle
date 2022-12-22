@@ -20,7 +20,7 @@ import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 import {getSegmentClient} from '@utils/segment';
-import {APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@utils/telemetry';
+import {APP_DOWNGRADED, APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@utils/telemetry';
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -110,21 +110,6 @@ export const initTelemetry = (deviceID: string, disableEventTracking: boolean, a
     electronStore.set('appConfig.lastSessionVersion', lastSessionVersion);
   }
 
-  if (semver.lt(lastSessionVersion, app.getVersion())) {
-    log.info('Application Updated.');
-    if (!disableEventTracking) {
-      segmentClient?.track({
-        event: APP_UPDATED,
-        userId: deviceID,
-        properties: {
-          oldVersion: lastSessionVersion,
-          newVersion: app.getVersion(),
-        },
-      });
-    }
-    electronStore.set('appConfig.lastSessionVersion', app.getVersion());
-  }
-
   if (!disableEventTracking) {
     log.info('New Session.');
     segmentClient?.track({
@@ -134,7 +119,33 @@ export const initTelemetry = (deviceID: string, disableEventTracking: boolean, a
         appVersion: app.getVersion(),
       },
     });
+
+    if (semver.lt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Updated.');
+      segmentClient?.track({
+        event: APP_UPDATED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
+
+    if (semver.gt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Downgraded.');
+      segmentClient?.track({
+        event: APP_DOWNGRADED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
   }
+
+  electronStore.set('appConfig.lastSessionVersion', app.getVersion());
 
   if (!storedDeviceID) {
     log.info('New Installation.');
