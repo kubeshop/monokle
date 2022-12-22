@@ -48,8 +48,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import * as Sentry from '@sentry/react';
-import {BrowserTracing} from '@sentry/tracing';
+import {init as sentryInit} from '@sentry/electron/renderer';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
@@ -529,9 +528,8 @@ export const configSlice = createSlice({
     },
     initRendererSentry: (state: Draft<AppConfig>, action: PayloadAction<{SENTRY_DSN: string}>) => {
       try {
-        Sentry.init({
+        sentryInit({
           dsn: action.payload.SENTRY_DSN,
-          integrations: [new BrowserTracing()],
           tracesSampleRate: 0.6,
           beforeSend: event => {
             // we have to get this from electron store to get the most updated value
