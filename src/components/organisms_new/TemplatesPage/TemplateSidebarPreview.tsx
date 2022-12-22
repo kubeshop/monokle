@@ -84,8 +84,10 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.ElipseStepWrapper>1</S.ElipseStepWrapper>
           <S.StepTitle>
             <span>
-              <S.Title>Start</S.Title>
-              <S.Divider />
+              <S.Title>
+                Start
+                <S.Divider />
+              </S.Title>
             </span>
             <S.StepSubTitle>Let’s begin creating...</S.StepSubTitle>
           </S.StepTitle>
@@ -94,8 +96,10 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.ElipseStepWrapper>2</S.ElipseStepWrapper>
           <S.StepTitle>
             <span>
-              <S.Title>Some more settings</S.Title>
-              <S.Divider />
+              <S.Title>
+                Some more settings
+                <S.Divider />
+              </S.Title>
             </span>
             <S.StepSubTitle>It’ll be quick!</S.StepSubTitle>
           </S.StepTitle>
@@ -104,8 +108,10 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.ElipseStepWrapper>3</S.ElipseStepWrapper>
           <S.StepTitle>
             <span>
-              <S.Title>Done!</S.Title>
-              <S.Divider />
+              <S.Title>
+                Done!
+                <S.Divider />
+              </S.Title>
             </span>
             <S.StepSubTitle>Resources are ready</S.StepSubTitle>
           </S.StepTitle>

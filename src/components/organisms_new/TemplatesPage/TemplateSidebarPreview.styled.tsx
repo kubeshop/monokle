@@ -194,6 +194,9 @@ export const ResourcesRefLink = styled.h5`
 
 export const Divider = styled.div`
   border: 1px solid #303030;
+  height: 1px;
+  width: 172px;
+  margin-left: 16px;
 `;
 
 export const FormWrapper = styled.div`
