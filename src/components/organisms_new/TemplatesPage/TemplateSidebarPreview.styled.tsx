@@ -50,6 +50,9 @@ export const TemplateSidebar = styled.div`
   }
   .ant-collapse {
     border: none;
+    display: flex;
+    flex-direction: column;
+    background: rgba(25, 31, 33, 0.7);
     .ant-collapse-item {
       color: #acacac;
       border-bottom: 0;
@@ -63,6 +66,77 @@ export const TemplateSidebar = styled.div`
       }
     }
   }
+  .columns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 40px;
+    .column {
+      flex: 33.33%;
+      &.active {
+        span {
+          background: #5273e0;
+        }
+      }
+    }
+  }
+`;
+
+export const StepTitle = styled.p`
+  font-size: 16px;
+  line-height: 24px;
+  color: #dbdbdb;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+  float: left;
+  margin-left: 8px;
+  margin-top: 4px;
+  width: 85%;
+  h1 {
+    font-size: 14px;
+    line-height: 17px;
+    font-weight: 400;
+    float: left;
+  }
+`;
+
+export const StepSubTitle = styled.p`
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: #7d7d7d;
+  order: 0;
+  flex-grow: 0;
+  width: 100%;
+  display: inline-flex;
+`;
+
+export const ElipseStepWrapper = styled.span`
+  background: #7d7d7d;
+  border-radius: 32px;
+  order: 0;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  gap: 10px;
+  width: 32px;
+  height: 32px;
+  float: left;
+`;
+
+export const Title = styled.h1`
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 19px;
+  color: #dbdbdb;
 `;
 
 export const Icon = styled(BaseIcon)`
@@ -116,4 +190,37 @@ export const ResourcesRefLink = styled.h5`
   font-size: 13px;
   line-height: 22px;
   margin: 0;
+`;
+
+export const Divider = styled.div`
+  border: 1px solid #303030;
+`;
+
+export const FormWrapper = styled.div`
+  .ant-form {
+    margin-top: 14px;
+  }
+  input {
+    min-width: 393px;
+    max-width: 393px;
+    height: 32px;
+  }
+  .SubmitWrapper {
+    margin-top: 57px;
+  }
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 8px;
+    height: 40px;
+    background: #177ddc;
+    border-radius: 2px;
+    float: left;
+  }
+  a {
+    float: left;
+    margin: 9px 33px;
+  }
 `;

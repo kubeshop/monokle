@@ -30,7 +30,6 @@ export const TemplateSidebarPreviewWrapper = styled.div`
   gap: 10px;
   min-width: 60%;
   max-width: 60%;
-  background: rgba(25, 31, 33, 0.7);
   border-radius: 4px;
 `;
 

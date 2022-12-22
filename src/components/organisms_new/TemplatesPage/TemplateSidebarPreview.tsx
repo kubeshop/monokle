@@ -1,8 +1,8 @@
 import {shell} from 'electron';
 
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 
-import {Collapse} from 'antd';
+import {Button, Collapse, Form, Input} from 'antd';
 
 import {CaretRightOutlined} from '@ant-design/icons';
 
@@ -10,6 +10,8 @@ import {TutorialReferenceLink} from '@shared/models/tutorialReferences';
 
 import {ReadMore} from './ReadMore';
 import * as S from './TemplateSidebarPreview.styled';
+
+type LayoutType = Parameters<typeof Form>[0]['layout'];
 
 const {Panel} = Collapse;
 
@@ -22,6 +24,13 @@ type Props = {
 const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
   const {type, learnMoreUrl} = tutorialReferenceLink;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
+
+  const [form] = Form.useForm();
+  const [formLayout, setFormLayout] = useState<LayoutType>('horizontal');
+
+  const onFormLayoutChange = ({layout}: {layout: LayoutType}) => {
+    setFormLayout(layout);
+  };
 
   return (
     <S.TemplateSidebar key={type}>
@@ -70,6 +79,56 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           </S.ResourcesColumn>
         </Panel>
       </Collapse>
+      <div className="columns">
+        <div className="column active">
+          <S.ElipseStepWrapper>1</S.ElipseStepWrapper>
+          <S.StepTitle>
+            <span>
+              <S.Title>Start</S.Title>
+              <S.Divider />
+            </span>
+            <S.StepSubTitle>Let’s begin creating...</S.StepSubTitle>
+          </S.StepTitle>
+        </div>
+        <div className="column">
+          <S.ElipseStepWrapper>2</S.ElipseStepWrapper>
+          <S.StepTitle>
+            <span>
+              <S.Title>Some more settings</S.Title>
+              <S.Divider />
+            </span>
+            <S.StepSubTitle>It’ll be quick!</S.StepSubTitle>
+          </S.StepTitle>
+        </div>
+        <div className="column">
+          <S.ElipseStepWrapper>3</S.ElipseStepWrapper>
+          <S.StepTitle>
+            <span>
+              <S.Title>Done!</S.Title>
+              <S.Divider />
+            </span>
+            <S.StepSubTitle>Resources are ready</S.StepSubTitle>
+          </S.StepTitle>
+        </div>
+      </div>
+      <S.FormWrapper>
+        <S.Title>Start</S.Title>
+        <Form layout="vertical" form={form} initialValues={{layout: formLayout}} onValuesChange={onFormLayoutChange}>
+          <Form.Item label="Something">
+            <Input placeholder="All or part of a name" />
+          </Form.Item>
+          <Form.Item label="Another Thing">
+            <Input placeholder="input placeholder" />
+          </Form.Item>
+          <Form.Item label="Yet Another Thing">
+            <Input placeholder="input placeholder" />
+          </Form.Item>
+          <Form.Item className="SubmitWrapper">
+            <Button type="primary">Submit</Button>
+            <S.Link onClick={openLearnMore}>Back</S.Link>
+          </Form.Item>
+        </Form>
+      </S.FormWrapper>
     </S.TemplateSidebar>
   );
 };
