@@ -63,7 +63,8 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize', 'git'];
 const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {
-  const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
+  const iconPath = isDev ? path.join('resources', 'icon.ico') : path.join(process.resourcesPath, 'icon.ico');
+  const image = nativeImage.createFromPath(iconPath);
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
