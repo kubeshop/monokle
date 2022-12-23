@@ -232,10 +232,14 @@ const SettingsManager: React.FC = () => {
           </Form>
 
           <S.Div>
-            <S.Span>Kubectl proxy</S.Span>
+            <S.Span>Cluster Connection</S.Span>
             <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
-              Use kubectl proxy
+              Enable Proxy
             </Checkbox>
+            <S.Description>
+              If this setting is enabled, Monokle will start a proxy to the Kubernetes API server before connecting to
+              the cluster.
+            </S.Description>
           </S.Div>
 
           <S.Div>
@@ -253,6 +257,16 @@ const SettingsManager: React.FC = () => {
           </S.Div>
           <S.Div>
             <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
+              </Checkbox>
+            </S.Div>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+              </Checkbox>
+            </S.Div>
             <S.TelemetryInfo>
               <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
               <S.TelemetryReadMoreLink
@@ -262,16 +276,6 @@ const SettingsManager: React.FC = () => {
                 Read more about it in our documentation.
               </S.TelemetryReadMoreLink>
             </S.TelemetryInfo>
-            <S.Div style={{marginBottom: '8px'}}>
-              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
-              </Checkbox>
-            </S.Div>
-            <S.Div>
-              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
-              </Checkbox>
-            </S.Div>
           </S.Div>
 
           <S.Div>
