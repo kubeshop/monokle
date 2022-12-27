@@ -85,7 +85,7 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.StepTitle>
             <span>
               <S.Title>
-                Start
+                <span>Start</span>
                 <S.Divider />
               </S.Title>
             </span>
@@ -97,7 +97,7 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.StepTitle>
             <span>
               <S.Title>
-                Some more settings
+                <span>Some more settings</span>
                 <S.Divider />
               </S.Title>
             </span>
@@ -109,7 +109,7 @@ const TemplateSidebarPreview: React.FC<Props> = ({tutorialReferenceLink}) => {
           <S.StepTitle>
             <span>
               <S.Title>
-                Done!
+                <span>Done!</span>
                 <S.Divider />
               </S.Title>
             </span>

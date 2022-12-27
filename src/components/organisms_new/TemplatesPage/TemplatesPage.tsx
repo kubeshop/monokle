@@ -9,11 +9,9 @@ import {updateSearchQuery} from '@redux/reducers/main';
 import QueryTemplateParams from '@organismsNew/TemplatesPage/QueryTemplateParams';
 
 import {TitleBar} from '@monokle/components';
-// import {useMeasure} from "react-use";
 import {GUIDE} from '@shared/constants/tutorialReferences';
 
 import TemplateSidebarPreview from './TemplateSidebarPreview';
-// import TemplatesList from './TemplatesList';
 import * as S from './TemplatesPage.styled';
 import TemplatesPageDescriptionBar from './TemplatesPageDescriptionBar';
 
@@ -58,45 +56,42 @@ const TemplatesPage = () => {
   const handleSearchQueryChange = (e: {target: HTMLInputElement}) => {
     setFindingMatches(true);
     dispatch(updateSearchQuery(e.target.value));
-
-    // debounceHandler.current && clearTimeout(debounceHandler.current);
-    // debounceHandler.current = setTimeout(() => {
-    //   findMatches(e.target.value);
-    // }, 1000);
   };
 
   return (
     <S.TemplatesPageContainer className="horizontal reflex-element">
       <S.TemplatesPageTitle>Create Resources from a template</S.TemplatesPageTitle>
 
-      <S.TemplateLeftSidebarWrapper className="vertical reflex-element">
-        <S.TitleBarWrapper>
-          <TitleBar title="Templates" description={<TemplatesPageDescriptionBar />} />
-        </S.TitleBarWrapper>
+      <S.TemplatesPageSidebarsContainer className="horizontal reflex-element">
+        <S.TemplateLeftSidebarWrapper className="vertical reflex-element">
+          <S.TitleBarWrapper>
+            <TitleBar title="Templates" description={<TemplatesPageDescriptionBar />} />
+          </S.TitleBarWrapper>
 
-        <S.Form>
-          <S.SearchBox>
-            <Input placeholder="Search anything..." value="" onChange={handleSearchQueryChange} />
-            <QueryTemplateParams setFindingMatches={setFindingMatches} />
-          </S.SearchBox>
-        </S.Form>
+          <S.Form>
+            <S.SearchBox>
+              <Input placeholder="Search anything..." value="" onChange={handleSearchQueryChange} />
+              <QueryTemplateParams setFindingMatches={setFindingMatches} />
+            </S.SearchBox>
+          </S.Form>
 
-        <S.Content>
-          <S.TemplatesListWrapper className="vertical reflex-container">
-            <S.StyledMenu
-              onClick={onClick}
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
-              mode="inline"
-              items={items}
-            />
-          </S.TemplatesListWrapper>
-        </S.Content>
-      </S.TemplateLeftSidebarWrapper>
+          <S.Content>
+            <S.TemplatesListWrapper className="vertical reflex-container">
+              <S.StyledMenu
+                onClick={onClick}
+                defaultSelectedKeys={['1']}
+                defaultOpenKeys={['sub1']}
+                mode="inline"
+                items={items}
+              />
+            </S.TemplatesListWrapper>
+          </S.Content>
+        </S.TemplateLeftSidebarWrapper>
 
-      <S.TemplateSidebarPreviewWrapper className="vertical reflex-element">
-        <TemplateSidebarPreview tutorialReferenceLink={GUIDE} />
-      </S.TemplateSidebarPreviewWrapper>
+        <S.TemplateSidebarPreviewWrapper className="vertical reflex-element">
+          <TemplateSidebarPreview tutorialReferenceLink={GUIDE} />
+        </S.TemplateSidebarPreviewWrapper>
+      </S.TemplatesPageSidebarsContainer>
     </S.TemplatesPageContainer>
   );
 };

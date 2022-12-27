@@ -9,28 +9,56 @@ import {Colors} from '@shared/styles';
 export const TemplatesPageContainer = styled.div`
   height: 100%;
   display: inline-block;
-  margin: 40px;
+  margin: 9px 46px 0;
   width: calc(100% - 80px);
   background: black;
 `;
 
+export const TemplatesPageSidebarsContainer = styled.div`
+  display: inline-flex;
+  flex-direction: row;
+  margin: 0;
+  width: 100%;
+  background: black;
+  @media (max-width: 1352px) {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+  }
+`;
+
 export const TemplateLeftSidebarWrapper = styled.div`
-  width: 508px;
-  height: 100%;
-  display: inline-block;
+  width: 36%;
+  display: flex;
+  flex-direction: column;
   background: #1d1d1d;
   padding-top: 30px;
   padding-bottom: 30px;
+  @media (max-width: 1352px) {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
 `;
 
 export const TemplateSidebarPreviewWrapper = styled.div`
   margin-top: 30px;
-  display: flex;
+  margin-left: 27px;
+  margin-right: 27px;
   float: right;
   gap: 10px;
-  min-width: 60%;
-  max-width: 60%;
+  width: 60%;
   border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  @media (max-width: 1352px) {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
+  @media (max-width: 1110px) {
+    width: 45%;
+  }
 `;
 
 export const Skeleton = styled(RawSkeleton)`
@@ -136,7 +164,6 @@ export const NumberOfResources = styled.span`
   position: absolute;
   font-size: 13px;
   right: 64px;
-  //float:right;
   width: 80px;
   text-align: left;
 `;

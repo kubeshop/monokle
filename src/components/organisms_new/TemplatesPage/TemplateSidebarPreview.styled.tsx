@@ -45,6 +45,8 @@ export const ResourcesColumn = styled.div`
 
 export const TemplateSidebar = styled.div`
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   .ant-collapse-header .ant-collapse-header-text {
     color: #fff;
   }
@@ -63,20 +65,37 @@ export const TemplateSidebar = styled.div`
       }
       .ant-collapse-content {
         border-top: 0;
+        .ant-collapse-content-box {
+          display: flex;
+        }
       }
     }
   }
   .columns {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
     margin-top: 40px;
+    overflow: hidden;
+    @media (max-width: 1210px) {
+      display: flex;
+      flex-direction: column;
+      .column h1 div {
+        width: 100%;
+      }
+    }
     .column {
-      flex: 33.33%;
+      display: inline-flex;
       &.active {
         span {
           background: #5273e0;
+        }
+        h1 span {
+          background: none;
+        }
+      }
+      &:last-child h1 {
+        div[class^='TemplateSidebarPreviewstyled__Divider-'] {
+          display: none;
         }
       }
     }
@@ -123,20 +142,32 @@ export const ElipseStepWrapper = styled.span`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 5px;
   gap: 10px;
   width: 32px;
   height: 32px;
   float: left;
+  padding: 16px;
 `;
 
 export const Title = styled.h1`
   font-weight: bold;
-  display: flex;
   align-items: center;
   font-size: 16px;
   line-height: 19px;
   color: #dbdbdb;
+  margin-bottom: 4px;
+  float: left;
+  display: inline-flex;
+  width: 85%;
+  span {
+    float: left;
+    width: 100%;
+    display: inline-flex;
+  }
+  div {
+    float: left;
+    display: inline-flex;
+  }
 `;
 
 export const Icon = styled(BaseIcon)`
@@ -197,9 +228,14 @@ export const Divider = styled.div`
   height: 1px;
   width: 172px;
   margin-left: 16px;
+  @media (max-width: 1352px) {
+    width: 20%;
+  }
 `;
 
 export const FormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   .ant-form {
     margin-top: 14px;
   }
