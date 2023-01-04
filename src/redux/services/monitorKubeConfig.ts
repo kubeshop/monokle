@@ -6,8 +6,6 @@ import fs from 'fs';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
-import {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
 import {
   addNamespaceToContext,
   removeNamespaceFromContext,
@@ -15,8 +13,9 @@ import {
   updateProjectKubeConfig,
 } from '@redux/reducers/appConfig';
 
-import {watchFunctions} from '@utils/helpers';
-import {getKubeAccess} from '@utils/kubeclient';
+import {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import {getKubeAccess} from '@shared/utils/kubeclient';
+import {watchFunctions} from '@shared/utils/watch';
 
 let watcher: FSWatcher;
 let clusterNamespacesWatchInterval: number | null = null;
