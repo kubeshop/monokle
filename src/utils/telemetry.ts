@@ -44,7 +44,7 @@ export type EventMap = {
   'edit/form_editor': {resourceKind?: string};
   'edit/side_by_side_editor': {resourceKind: string};
   'create/resource': {resourceKind: string};
-  'help/open_link': {linkType: string};
+  'help/open_link': {linkType: string; link?: string};
   'preview/helm': {resourcesCount?: number; executionTime: number};
   'preview/helm_preview_configuration': {resourcesCount?: number; executionTime: number};
   'preview/kustomize': {resourcesCount?: number; executionTime: number};
