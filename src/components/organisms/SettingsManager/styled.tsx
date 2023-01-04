@@ -76,11 +76,13 @@ export const TelemetryInfo = styled.p`
   padding: 0;
   margin: 0;
   margin-bottom: 8px;
+  margin-top: 0;
 `;
 
 export const TelemetryDescription = styled.span`
-  color: ${Colors.grey500};
+  color: ${Colors.grey7};
   margin-right: 4px;
+  font-size: 14px;
 `;
 
 export const TelemetryReadMoreLink = styled.span`
@@ -94,4 +96,10 @@ export const TelemetryReadMoreLink = styled.span`
 
 export const BoldSpan = styled.span`
   font-weight: 600;
+`;
+
+export const Description = styled.p`
+  margin-top: 4px;
+  font-size: 14px;
+  color: ${Colors.grey7};
 `;

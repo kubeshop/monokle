@@ -32,6 +32,12 @@ export const electronStoreSchema = {
       lastSeenReleaseNotesVersion: {
         type: 'string',
       },
+      lastSessionVersion: {
+        type: 'string',
+      },
+      useKubectlProxy: {
+        type: 'boolean',
+      },
       isClusterSelectorVisible: {
         type: 'boolean',
       },
@@ -295,6 +301,7 @@ export const electronStoreDefaults = {
   },
   appConfig: {
     kubeConfigContextsColors: {},
+    useKubectlProxy: false,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
