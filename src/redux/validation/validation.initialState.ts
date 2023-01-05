@@ -11,7 +11,7 @@ export const validationInitialState: ValidationSliceState = {
     },
     settings: {
       'kubernetes-schema': {
-        schemaVersion: '1.24.6',
+        schemaVersion: '1.26.0',
       },
     },
     rules: {
