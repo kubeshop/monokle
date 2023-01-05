@@ -3,11 +3,10 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {K8sResource} from './k8sResource';
+import {K8sResource, ResourceContentMap, ResourceMetaMap} from './k8sResource';
+import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
 import {Policy} from './policy';
-
-export const isKubernetesObject = (obj: any): obj is KubernetesObject =>
-  obj && typeof obj.apiVersion === 'string' && typeof obj.kind === 'string' && typeof obj.metadata?.name === 'string';
+import {AppSelection} from './selection';
 
 type AppState = {
   /** maps filePath to FileEntry
@@ -15,8 +14,27 @@ type AppState = {
    * - fileMap[**ROOT_FILE_ENTRY**] is the FileEntry for the rootFolder and it's **filePath is absolute**
    */
   fileMap: FileMapType;
-  /** maps resource ids to resources */
-  resourceMap: ResourceMapType;
+  resourceMetaStorage: {
+    local: ResourceMetaMap<LocalOrigin>;
+    cluster: ResourceMetaMap<ClusterOrigin>;
+    preview: ResourceMetaMap<PreviewOrigin>;
+  };
+  resourceContentStorage: {
+    local: ResourceContentMap<LocalOrigin>;
+    cluster: ResourceContentMap<ClusterOrigin>;
+    preview: ResourceContentMap<PreviewOrigin>;
+  };
+  selection?: AppSelection;
+  selectionOptions: {
+    isSelecting?: boolean;
+    shouldEditorReload?: boolean;
+  };
+  highlights: AppSelection[];
+  selectionHistory: {
+    current: AppSelection[];
+    previous: AppSelection[];
+    index?: number;
+  };
   /**
    * Whether the app's storage is rehydrating
    */
@@ -36,18 +54,7 @@ type AppState = {
   isApplyingResource: boolean;
   /** if we are currently in the process of selecting a file - used for one-time UI updates */
   isSelectingFile: boolean;
-  /** index of current selection from the history, or undefined if last selection was not virtual */
-  currentSelectionHistoryIndex?: number;
-  /** a list of previously selected resources of paths */
-  selectionHistory: SelectionHistoryEntry[];
-  /** the previous list of previously selected resources of paths */
-  previousSelectionHistory: SelectionHistoryEntry[];
-  /** the id of the currently selected resource */
-  selectedResourceId?: string;
-  /** a list of checked resources for multi-resource actions */
   checkedResourceIds: string[];
-  /** the currently selected path */
-  selectedPath?: string;
   /** the line number for the match in file */
   search: {
     searchQuery: string;
@@ -56,10 +63,6 @@ type AppState = {
     currentMatch: CurrentMatch | null;
     searchHistory: string[];
   };
-  /** the currently selected values file */
-  selectedValuesFileId?: string;
-  /** the currently selected preview configuration */
-  selectedPreviewConfigurationId?: string;
   /** the current type of preview */
   previewType?: PreviewType;
   /** information used to load the preview */
@@ -83,8 +86,6 @@ type AppState = {
     plugins: Policy[];
   };
   notifications: AlertType[];
-  /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */
-  shouldEditorReloadSelectedPath: boolean;
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
   registeredKindHandlers: string[];
@@ -94,7 +95,6 @@ type AppState = {
     previewConfigurationId?: string;
   };
   deviceID: string;
-  selectedImage?: ImageType | null;
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
   imagesList: ImagesListType;
@@ -144,30 +144,10 @@ type HelmValuesMapType = {
  */
 type ImagesListType = ImageType[];
 
-type ImageSelectionHistoryEntry = {
-  type: 'image';
-  selectedImage: ImageType;
-};
-
-type KubernetesObject = {
-  apiVersion: string;
-  kind: string;
-  metadata: {
-    name: string;
-    [x: string]: any;
-  };
-  [x: string]: any;
-};
-
 type MatchParamProps = {
   matchCase: boolean;
   matchWholeWord: boolean;
   regExp: boolean;
-};
-
-type PathSelectionHistoryEntry = {
-  type: 'path';
-  selectedPath: string;
 };
 
 type PreviewLoaderType = {
@@ -202,13 +182,6 @@ type ResourceRefsProcessingOptions = {
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
 };
 
-type ResourceSelectionHistoryEntry = {
-  type: 'resource';
-  selectedResourceId: string;
-};
-
-type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry | ImageSelectionHistoryEntry;
-
 export type {
   AppState,
   ResourceMapType,
@@ -219,10 +192,8 @@ export type {
   HelmValuesMapType,
   HelmTemplatesMapType,
   ImagesListType,
-  KubernetesObject,
   MatchParamProps,
   PreviewLoaderType,
-  SelectionHistoryEntry,
   PreviewType,
   ResourceRefsProcessingOptions,
 };
