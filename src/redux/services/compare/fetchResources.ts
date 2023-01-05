@@ -145,6 +145,18 @@ async function fetchResourcesFromCluster(state: RootState, options: ClusterResou
   }
 }
 
+function extractResultFromHelmOutput(result: string) {
+  let data = result.trim();
+
+  // remove notes added from NOTES.txt
+  let ix = data.indexOf('\nNOTES:');
+  if (ix > 0) {
+    data = data.substring(0, ix).trim();
+  }
+
+  return data;
+}
+
 async function previewHelmResources(state: RootState, options: HelmResourceSet): Promise<K8sResource[]> {
   try {
     const {chartId, valuesId} = options;
@@ -202,7 +214,8 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + valuesFile.id);
+    let data = extractResultFromHelmOutput(result.stdout);
+    const resources = extractK8sResources(data, PREVIEW_PREFIX + valuesFile.id);
 
     return resources;
   } catch (err) {
@@ -255,7 +268,9 @@ async function previewCustomHelmResources(state: RootState, options: CustomHelmR
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + helmConfig.id);
+    let data = extractResultFromHelmOutput(result.stdout);
+
+    const resources = extractK8sResources(data, PREVIEW_PREFIX + helmConfig.id);
     return resources;
   } catch (err) {
     log.debug('preview custom Helm resources failed', err);
