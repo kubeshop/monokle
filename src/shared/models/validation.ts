@@ -1,12 +1,25 @@
-import {Config, ValidationResponse} from '@monokle/validation';
+import {Config, RefPosition, ValidationResponse} from '@monokle/validation';
+
+import {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
 
-type ValidationSliceState = {
+export type ValidationSliceState = {
   config: Config;
   lastResponse?: ValidationResponse;
   loadRequestId?: string;
   status: Initialization;
 };
 
-export type {ValidationSliceState};
+export type ResourceValidationError = {
+  property: string;
+  message: string;
+  errorPos?: RefPosition;
+  description?: string;
+  rule?: SarifRule;
+};
+
+export type ResourceValidation = {
+  isValid: boolean;
+  errors: ResourceValidationError[];
+};
