@@ -3,7 +3,7 @@ import {Tooltip} from 'antd';
 import path from 'path';
 import textExtensions from 'text-extensions';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ADDITIONAL_SUPPORTED_FILES, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -32,7 +32,7 @@ export const createNode = (
   const isTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
 
   const isSupported =
-    (fileEntry.isSupported || fileEntry.children || isTextExtension) &&
+    (fileEntry.isSupported || fileEntry.children || isTextExtension || ADDITIONAL_SUPPORTED_FILES.includes(name)) &&
     (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true);
 
   const node: TreeNode = {
@@ -69,7 +69,7 @@ export const createNode = (
     children: [],
     highlight: false,
     isExcluded: fileEntry.isExcluded,
-    isSupported: fileEntry.isSupported,
+    isSupported,
     filePath: fileEntry.filePath,
     extension: fileEntry.extension,
     isTextExtension,

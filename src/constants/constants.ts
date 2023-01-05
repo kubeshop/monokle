@@ -229,3 +229,16 @@ export const VALID_URL_REGEX =
   /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
 export const VALID_IMAGE_NAME_REGEX =
   /^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?\/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:\/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?$/;
+export const ADDITIONAL_SUPPORTED_FILES = [
+  '.monokle',
+  '.gitignore',
+  'Dockerfile',
+  'LICENSE',
+  '.helmignore',
+  'database.env',
+  '.dockerignore',
+  '.env',
+  '.env.local',
+  '.env.production',
+  '.env.development',
+];
