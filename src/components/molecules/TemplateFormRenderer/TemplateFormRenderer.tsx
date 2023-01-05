@@ -11,7 +11,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import {Primitive} from 'type-fest';
 
-import {VALID_IMAGE_NAME} from '@constants/constants';
+import {VALID_IMAGE_NAME_REGEX} from '@constants/constants';
 
 import {TemplateForm} from '@models/template';
 
@@ -54,7 +54,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
         return;
       }
 
-      if (VALID_IMAGE_NAME.test(value)) {
+      if (VALID_IMAGE_NAME_REGEX.test(value)) {
         return;
       }
 
