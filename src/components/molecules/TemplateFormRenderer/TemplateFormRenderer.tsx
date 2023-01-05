@@ -5,10 +5,13 @@ import {Button, Divider, Skeleton} from 'antd';
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
 
 import fs from 'fs';
 import log from 'loglevel';
 import {Primitive} from 'type-fest';
+
+import {VALID_IMAGE_NAME} from '@constants/constants';
 
 import {TemplateForm} from '@models/template';
 
@@ -40,6 +43,26 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
   const [uiSchema, setUiSchema] = useState<any>();
+
+  const customValidate = (fData: Record<string, Primitive>, errors: any) => {
+    if (!fData) {
+      return errors;
+    }
+
+    Object.entries(fData).forEach(([key, value]) => {
+      if (!key.toLowerCase().includes('image') || !value || typeof value !== 'string') {
+        return;
+      }
+
+      if (VALID_IMAGE_NAME.test(value)) {
+        return;
+      }
+
+      errors[key].addError(' name is not valid.');
+    });
+
+    return errors;
+  };
 
   useEffect(() => {
     try {
@@ -79,6 +102,8 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
         widgets={getCustomFormWidgets()}
         onChange={e => setFormData(e.formData)}
         noHtml5Validate
+        customValidate={customValidate}
+        validator={validator}
       >
         <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
           {isLastForm ? 'Submit' : 'Next'}
