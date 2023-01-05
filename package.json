@@ -236,7 +236,8 @@
       "publisherName": [
         "Kubernetes Innovation Labs, LLC",
         "KUBERNETES INNOVATION LABS, LLC"
-      ]
+      ],
+      "requestedExecutionLevel": "highestAvailable"
     },
     "nsis": {
       "oneClick": false,
