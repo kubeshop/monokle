@@ -6,7 +6,7 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
+import {K8sResource, isLocalResource} from '@shared/models/k8sResource';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
@@ -31,14 +31,15 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   if (
     !isInPreviewMode &&
     filters.fileOrFolderContainedIn &&
-    !resource.filePath.startsWith(filters.fileOrFolderContainedIn)
+    isLocalResource(resource) &&
+    !resource.origin.filePath.startsWith(filters.fileOrFolderContainedIn)
   ) {
     return false;
   }
 
   if (filters.labels && Object.keys(filters.labels).length > 0) {
-    const resourceLabels = resource.content?.metadata?.labels;
-    const templateLabels = resource.content?.spec?.template?.metadata?.labels;
+    const resourceLabels = resource.object?.metadata?.labels;
+    const templateLabels = resource.object?.spec?.template?.metadata?.labels;
     if (!resourceLabels && !templateLabels) {
       return false;
     }
@@ -50,7 +51,7 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     }
   }
   if (filters.annotations && Object.keys(filters.annotations).length > 0) {
-    const resourceAnnotations = resource.content?.metadata?.annotations;
+    const resourceAnnotations = resource.object?.metadata?.annotations;
     if (!resourceAnnotations) {
       return false;
     }
@@ -62,18 +63,18 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   return true;
 }
 
-export function removeIgnoredPathsFromResourceContent(clusterResourceContent: any, localResourceNamespace?: string) {
-  const flattenClusterResourceContent = flatten<any, any>(clusterResourceContent, {delimiter: '#'});
-  const clusterResourceContentPaths = Object.keys(flattenClusterResourceContent);
+export function removeIgnoredPathsFromResourceObject(clusterResourceObject: any, localResourceNamespace?: string) {
+  const flattenClusterResourceObject = flatten<any, any>(clusterResourceObject, {delimiter: '#'});
+  const clusterResourceObjectPaths = Object.keys(flattenClusterResourceObject);
 
-  // deep copy of the clusterResourceContent
-  const newClusterContent = JSON.parse(JSON.stringify(clusterResourceContent));
+  // deep copy of the clusterResourceObject
+  const newClusterContent = JSON.parse(JSON.stringify(clusterResourceObject));
 
   const clusterResourcePathsToRemove: string[] = [];
   CLUSTER_RESOURCE_IGNORED_PATHS.forEach(ignoredPath => {
     if (ignoredPath.startsWith('...')) {
       clusterResourcePathsToRemove.push(
-        ...clusterResourceContentPaths.filter(contentPath => contentPath.endsWith(ignoredPath.substring(3)))
+        ...clusterResourceObjectPaths.filter(contentPath => contentPath.endsWith(ignoredPath.substring(3)))
       );
     } else {
       clusterResourcePathsToRemove.push(ignoredPath);
@@ -92,17 +93,17 @@ export function removeIgnoredPathsFromResourceContent(clusterResourceContent: an
 }
 
 export function diffLocalToClusterResources(localResource: K8sResource, clusterResource: K8sResource) {
-  const cleanClusterResourceContent = removeIgnoredPathsFromResourceContent(
-    clusterResource.content,
-    _.get(localResource.content, 'metadata.namespace')
+  const cleanClusterResourceObject = removeIgnoredPathsFromResourceObject(
+    clusterResource.object,
+    _.get(localResource.object, 'metadata.namespace')
   );
 
-  const cleanLocalResourceContent = removeNestedEmptyObjects(localResource.content);
+  const cleanLocalResourceObject = removeNestedEmptyObjects(localResource.object);
 
   return {
-    areDifferent: !_.isEqual(cleanLocalResourceContent, cleanClusterResourceContent),
-    cleanLocalResourceContent,
-    cleanClusterResourceContent,
+    areDifferent: !_.isEqual(cleanLocalResourceObject, cleanClusterResourceObject),
+    cleanLocalResourceObject,
+    cleanClusterResourceObject,
   };
 }
 
@@ -132,19 +133,20 @@ export function getDefaultNamespaceForApply(
   return {defaultNamespace: namespace};
 }
 
-export function countResourceWarnings(resources: K8sResource[]): number {
-  return resources.reduce<number>((acc, resource) => {
-    return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
-  }, 0);
-}
+// TODO: refactor countResourceWarnings and countResourceErrors using @monokle/validation
+// export function countResourceWarnings(resources: K8sResource[]): number {
+//   return resources.reduce<number>((acc, resource) => {
+//     return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
+//   }, 0);
+// }
 
-export function countResourceErrors(resources: K8sResource[]): number {
-  return resources.reduce<number>((acc, resource) => {
-    const validationErrorCount = resource.validation ? resource.validation.errors.length : 0;
-    const policyErrorCount = resource.issues ? resource.issues.errors.length : 0;
-    return acc + validationErrorCount + policyErrorCount;
-  }, 0);
-}
+// export function countResourceErrors(resources: K8sResource[]): number {
+//   return resources.reduce<number>((acc, resource) => {
+//     const validationErrorCount = resource.validation ? resource.validation.errors.length : 0;
+//     const policyErrorCount = resource.issues ? resource.issues.errors.length : 0;
+//     return acc + validationErrorCount + policyErrorCount;
+//   }, 0);
+// }
 
 export function getApiVersionGroup(resource: K8sResource) {
   return resource.apiVersion.includes('/') ? resource.apiVersion.split('/')[0] : 'kubernetes';
