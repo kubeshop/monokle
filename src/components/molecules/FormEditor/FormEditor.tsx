@@ -5,6 +5,8 @@ import {useDebounce} from 'react-use';
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
+import {TemplatesType} from '@rjsf/utils';
+import validator from '@rjsf/validator-ajv8';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -36,6 +38,11 @@ import FormObjectFieldTemplate from './FormObjectFieldTemplate';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
+
+const templates: Partial<TemplatesType> = {
+  ArrayFieldTemplate: FormArrayFieldTemplate,
+  ObjectFieldTemplate: FormObjectFieldTemplate,
+};
 
 interface IProps {
   formSchema: any;
@@ -196,12 +203,12 @@ const FormEditor: React.FC<IProps> = props => {
           schema={schema}
           uiSchema={formUiSchema}
           formData={formData}
-          ObjectFieldTemplate={FormObjectFieldTemplate}
-          ArrayFieldTemplate={FormArrayFieldTemplate}
+          templates={templates}
           onChange={onFormUpdate}
           widgets={getCustomFormWidgets()}
           fields={getCustomFormFields()}
           disabled={isReadOnlyMode}
+          validator={validator}
         >
           <div />
         </Form>

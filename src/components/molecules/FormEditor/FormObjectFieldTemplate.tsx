@@ -2,13 +2,13 @@ import {useState} from 'react';
 
 import {Button} from 'antd';
 
-import {ObjectFieldTemplateProps} from '@rjsf/core';
+import {ObjectFieldTemplateProps, RJSFSchema} from '@rjsf/utils';
 
 import {uniqueId} from 'lodash';
 
 import * as S from './FormEditor.styled';
 
-const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
+const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps<any, RJSFSchema, any>) => {
   const {title, properties, uiSchema, schema, onAddClick} = props;
   const [isExpanded, toggleExpand] = useState<boolean>(true);
   const opacity = (10 - (uiSchema?.level ?? 0)) / 10;
@@ -19,7 +19,7 @@ const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
         {isExpanded ? <S.ArrowIconExpanded /> : <S.ArrowIconClosed />}
 
         {title ? (
-          <S.TitleText isBold={uiSchema.level === 0}>{title}</S.TitleText>
+          <S.TitleText isBold={uiSchema?.level === 0}>{title}</S.TitleText>
         ) : (
           <S.ElementText>element</S.ElementText>
         )}
