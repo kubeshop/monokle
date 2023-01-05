@@ -108,6 +108,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const [isValid, setValid] = useState(true);
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
   const [isEditorMounted, setEditorMounted] = useState(false);
+  const [editorLanguage, setEditorLanguage] = useState('yaml');
 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -305,6 +306,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     } else {
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }
+
+    if (filePath.endsWith('.js')) {
+      setEditorLanguage('javascript');
+    } else {
+      setEditorLanguage('yaml');
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath, shouldEditorReloadSelectedPath]);
 
@@ -371,7 +379,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
         <MonacoEditor
           width={containerWidth}
           height={containerHeight}
-          language="yaml"
+          language={editorLanguage}
           theme={KUBESHOP_MONACO_THEME}
           value={code}
           options={options}
