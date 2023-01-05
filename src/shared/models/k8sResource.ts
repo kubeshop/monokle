@@ -1,36 +1,26 @@
-import {Scalar} from 'yaml';
+import * as Rt from 'runtypes';
 
-import {KubernetesObject} from './appState';
-import {SarifRule} from './policy';
+import {K8sObject, K8sObjectRuntype} from './k8s';
+import {
+  AnyOrigin,
+  AnyOriginRuntype,
+  ClusterOrigin,
+  ClusterOriginRuntype,
+  CommandOrigin,
+  CommandOriginRuntype,
+  HelmOrigin,
+  HelmOriginRuntype,
+  KustomizeOrigin,
+  KustomizeOriginRuntype,
+  LocalOrigin,
+  LocalOriginRuntype,
+} from './origin';
 
-type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
-
-type ResourceValidationError = {
-  property: string;
-  message: string;
-  errorPos?: RefPosition;
-  description?: string;
-  rule?: SarifRule;
-};
-
-type ResourceValidation = {
-  isValid: boolean;
-  errors: ResourceValidationError[];
-};
-
-/**
- * A k8s resource manifest, either extracted from a file or generated internally (for example when previewing kustomizations or helm charts)
- */
-type K8sResource = {
+export type ResourceMeta<Origin extends AnyOrigin = AnyOrigin> = {
   /** an internally generated UUID
-   * - used for references/lookups in resourceMap */
+   * - used for references/lookups in resourceMaps */
   id: string;
-  /** the path relative to the root folder to the file containing this resource
-   * - set to preview://resourceId for internally generated resources
-   * - set to unsaved://resourceId for newly created resoruces */
-  fileId: string;
-  filePath: string;
-  fileOffset: number;
+  origin: Origin;
   /**
    * name - generated from manifest metadata
    */
@@ -43,70 +33,108 @@ type K8sResource = {
   namespace?: string;
   /** if a resource is cluster scoped ( kind is namespaced ) */
   isClusterScoped: boolean;
-  /** if highlighted in UI (should probalby move to UI state object) */
-  isHighlighted: boolean;
-  /** if selected in UI (should probably move to UI state object) */
-  isSelected: boolean;
-  /** unparsed resource content (for editing) */
-  text: string;
-  /**  contains parsed yaml resource - used for filtering/finding links/refs, etc */
-  content: KubernetesObject;
-  /** array of refs (incoming, outgoing and unsatisfied) to and from other resources */
-  refs?: ResourceRef[];
-  /**  range of this resource in a multidocument file */
+  /** specifies the range in the file's content, applies only to file locations  */
   range?: {
     start: number;
     length: number;
   };
-  /** result of schema validation */
-  validation?: ResourceValidation;
-
-  /** result of policy validation */
-  issues?: ResourceValidation;
+  isUnsaved?: boolean;
 };
 
-export enum ResourceRefType {
-  Incoming = 'incoming',
-  Outgoing = 'outgoing',
-  Unsatisfied = 'unsatisfied-outgoing',
-}
+const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
+  id: Rt.String,
+  origin: AnyOriginRuntype,
+  name: Rt.String,
+  kind: Rt.String,
+  apiVersion: Rt.String,
+  namespace: Rt.Optional(Rt.String),
+  isClusterScoped: Rt.Boolean,
+  range: Rt.Optional(
+    Rt.Record({
+      start: Rt.Number,
+      length: Rt.Number,
+    })
+  ),
+  isUnsaved: Rt.Optional(Rt.Boolean),
+});
 
-type RefTargetResource = {
-  type: 'resource';
-  resourceId?: string;
-  resourceKind?: string;
-  isOptional?: boolean; // set true for satisfied refs that were optional
+const LocalResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: LocalOriginRuntype}));
+const ClusterResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: ClusterOriginRuntype}));
+const HelmResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: HelmOriginRuntype}));
+const KustomizeResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: KustomizeOriginRuntype}));
+const CommandResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: CommandOriginRuntype}));
+
+export const isLocalResourceMeta = LocalResourceMetaRuntype.guard;
+export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
+export const isHelmResourceMeta = HelmResourceMetaRuntype.guard;
+export const isKustomizeResourceMeta = KustomizeResourceMetaRuntype.guard;
+export const isCommandResourceMeta = CommandResourceMetaRuntype.guard;
+
+export type ResourceContent<Origin extends AnyOrigin = AnyOrigin> = {
+  id: string;
+  origin: Origin;
+  text: string;
+  object: K8sObject;
 };
 
-type RefTargetFile = {
-  type: 'file';
-  filePath: string;
-};
+const ResourceContentRuntype: Rt.Runtype<ResourceContent<AnyOrigin>> = Rt.Record({
+  id: Rt.String,
+  origin: AnyOriginRuntype,
+  text: Rt.String,
+  object: K8sObjectRuntype,
+});
 
-type RefTargetImage = {
-  type: 'image';
-  tag: string;
-};
+const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<LocalOrigin>> = Rt.Intersect(
+  ResourceContentRuntype,
+  Rt.Record({origin: LocalOriginRuntype})
+);
+const ClusterResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: ClusterOriginRuntype}));
+const HelmResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: HelmOriginRuntype}));
+const KustomizeResourceContentRuntype = Rt.Intersect(
+  ResourceContentRuntype,
+  Rt.Record({origin: KustomizeOriginRuntype})
+);
+const CommandResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: CommandOriginRuntype}));
 
-type RefTarget = RefTargetResource | RefTargetFile | RefTargetImage;
+export const isLocalResourceContent = LocalResourceContentRuntype.guard;
+export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
+export const isHelmResourceContent = HelmResourceContentRuntype.guard;
+export const isKustomizeResourceContent = KustomizeResourceContentRuntype.guard;
+export const isCommandResourceContent = CommandResourceContentRuntype.guard;
 
-type ResourceRef = {
-  /** the type of ref (see enum) */
-  type: ResourceRefType;
-  /** the ref value - for example the name of a configmap */
-  name: string;
-  /** the target resource or file this is referring to (empty for unsatisfied refs) */
-  target?: RefTarget;
-  /** the position in the document of the refName (undefined for incoming file refs) */
-  position?: RefPosition;
-};
+export type K8sResource<Origin extends AnyOrigin = AnyOrigin> = ResourceMeta<Origin> & ResourceContent<Origin>;
 
-type RefPosition = {
-  line: number;
-  column: number;
-  length: number;
-  endLine?: number;
-  endColumn?: number;
-};
+const ResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(ResourceMetaRuntype, ResourceContentRuntype);
+const LocalResourceRuntype: Rt.Runtype<K8sResource<LocalOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: LocalOriginRuntype})
+);
+const ClusterResourceRuntype: Rt.Runtype<K8sResource<ClusterOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: ClusterOriginRuntype})
+);
+const HelmResourceRuntype: Rt.Runtype<K8sResource<HelmOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: HelmOriginRuntype})
+);
+const KustomizeResourceRuntype: Rt.Runtype<K8sResource<KustomizeOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: KustomizeOriginRuntype})
+);
+const CommandResourceRuntype: Rt.Runtype<K8sResource<CommandOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: CommandOriginRuntype})
+);
 
-export type {K8sResource, ResourceRef, RefPosition, RefNode, ResourceValidation, ResourceValidationError};
+export const isResource = ResourceRuntype.guard;
+export const isLocalResource = LocalResourceRuntype.guard;
+export const isClusterResource = ClusterResourceRuntype.guard;
+export const isHelmResource = HelmResourceRuntype.guard;
+export const isKustomizeResource = KustomizeResourceRuntype.guard;
+export const isCommandResource = CommandResourceRuntype.guard;
+
+export type ResourceMetaMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceMeta<Origin>>;
+
+export type ResourceContentMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceContent<Origin>>;
+
+export type ResourceMapType = Record<string, K8sResource>;
