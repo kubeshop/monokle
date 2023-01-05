@@ -5,7 +5,6 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContentMap, ResourceMetaMap} from './k8sResource';
 import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
-import {Policy} from './policy';
 import {AppSelection} from './selection';
 
 type AppState = {
@@ -52,8 +51,6 @@ type AppState = {
   helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
-  /** if we are currently in the process of selecting a file - used for one-time UI updates */
-  isSelectingFile: boolean;
   checkedResourceIds: string[];
   /** the line number for the match in file */
   search: {
@@ -82,9 +79,6 @@ type AppState = {
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  policies: {
-    plugins: Policy[];
-  };
   notifications: AlertType[];
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;

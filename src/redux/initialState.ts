@@ -13,11 +13,26 @@ import {PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
+  resourceMetaStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+  },
+  resourceContentStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+  },
+  selection: undefined,
+  selectionOptions: {},
+  selectionHistory: {
+    current: [],
+    previous: [],
+    index: 0,
+  },
+  highlights: [],
   isRehydrating: false,
   wasRehydrated: false,
-  selectionHistory: [],
-  previousSelectionHistory: [],
-  resourceMap: {},
   resourceFilter: {
     labels: {},
     annotations: {},
@@ -30,7 +45,6 @@ const initialAppState: AppState = {
     isLoading: false,
   },
   resourceDiff: {},
-  isSelectingFile: false,
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
@@ -38,11 +52,7 @@ const initialAppState: AppState = {
       false
     ),
   },
-  policies: {
-    plugins: [],
-  },
   notifications: [],
-  shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
   registeredKindHandlers: [],
   prevConfEditor: {
