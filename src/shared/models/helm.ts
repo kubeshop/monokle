@@ -1,4 +1,4 @@
-import {RefPosition} from './k8sResource';
+import {RefPosition} from '@monokle/validation';
 
 /**
  * Corresponds to a found folder containing a Chart.yaml file
