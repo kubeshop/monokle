@@ -236,4 +236,9 @@ export const ADDITIONAL_SUPPORTED_FILES = [
   'LICENSE',
   '.helmignore',
   'database.env',
+  '.dockerignore',
+  '.env',
+  '.env.local',
+  '.env.production',
+  '.env.development',
 ];
