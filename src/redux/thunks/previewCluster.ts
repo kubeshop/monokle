@@ -13,6 +13,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
+import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
@@ -25,10 +26,14 @@ import {trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
+const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamespaces?: boolean) => {
   return Promise.allSettled(
     getRegisteredKindHandlers()
-      .filter(handler => !handler.isCustom)
+      .filter(
+        handler =>
+          !handler.isCustom &&
+          (allNamespaces ? true : namespace === '<not-namespaced>' ? !handler.isNamespaced : handler.isNamespaced)
+      )
       .map(resourceKindHandler =>
         resourceKindHandler
           .listResourcesInCluster(kc, {namespace})
@@ -45,6 +50,9 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
   const k8sVersion = getK8sVersion(projectConfig);
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+  const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
+
+  let currentNamespace: string = clusterPreviewNamespace;
 
   const config = thunkAPI.getState().config;
   const {userDataDir} = config;
@@ -63,10 +71,27 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       kc = proxyKubeConfig;
     }
 
-    const results =
-      clusterAccess && clusterAccess.length > 0
-        ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
-        : await getNonCustomClusterObjects(kc);
+    let foundNamespace: ClusterAccess | undefined;
+    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
+
+    if (clusterAccess && clusterAccess.length) {
+      foundNamespace = clusterAccess?.find(ca => ca.namespace === currentNamespace);
+
+      if (currentNamespace === '<all>') {
+        results = await Promise.all(
+          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
+        );
+      } else {
+        if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
+          currentNamespace = clusterAccess[0].namespace;
+          thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
+        }
+
+        results = await getNonCustomClusterObjects(kc, currentNamespace);
+      }
+    } else {
+      results = await getNonCustomClusterObjects(kc);
+    }
 
     const resources = flatten(results);
 
@@ -99,16 +124,23 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
-      const customResourceObjects =
-        clusterAccess && clusterAccess.length > 0
-          ? flatten(
-              await Promise.all(
-                clusterAccess.map((ca: ClusterAccess) =>
-                  loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
-                )
+      let customResourceObjects: string[];
+
+      if (clusterAccess && clusterAccess.length) {
+        if (currentNamespace === '<all>') {
+          customResourceObjects = flatten(
+            await Promise.all(
+              clusterAccess.map((ca: ClusterAccess) =>
+                loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
               )
             )
-          : await loadCustomResourceObjects(kc, customResourceDefinitions);
+          );
+        } else {
+          customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, currentNamespace);
+        }
+      } else {
+        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+      }
 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
@@ -224,7 +256,8 @@ export function findDefaultVersion(crd: any) {
 async function loadCustomResourceObjects(
   kc: KubeConfig,
   customResourceDefinitions: K8sResource[],
-  namespace?: string
+  namespace?: string,
+  allNamespaces?: string
 ): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
@@ -233,7 +266,14 @@ async function loadCustomResourceObjects(
       .filter(crd => crd.content.spec)
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
-        if (kindHandler) {
+        if (
+          kindHandler &&
+          (allNamespaces
+            ? true
+            : namespace === '<not-namespaced>'
+            ? !kindHandler.isNamespaced
+            : kindHandler.isNamespaced)
+        ) {
           return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)

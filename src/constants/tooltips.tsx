@@ -26,6 +26,7 @@ export const ClusterDiffDisabledInClusterPreviewTooltip =
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
+export const ClusterNamespaceTooltip = 'Selected cluster namespace';
 export const CollapseTreeTooltip = 'Collapse all folders';
 export const CommitTooltip = 'Commit to the main branch';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';

@@ -545,6 +545,10 @@ export const configSlice = createSlice({
         log.warn("Couldn't initialize Sentry.");
       }
     },
+    setClusterPreviewNamespace: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      state.clusterPreviewNamespace = action.payload;
+      electronStore.set('appConfig.clusterPreviewNamespace', action.payload);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -589,14 +593,17 @@ export const {
   changeProjectsRootPath,
   createProject,
   handleFavoriteTemplate,
+  initRendererSentry,
   removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
+  setClusterPreviewNamespace,
   setCurrentContext,
   setFilterObjects,
   setKubeConfig,
   setKubeConfigContextColor,
   setUserDirs,
+  toggleEditorPlaceholderVisiblity,
   toggleErrorReporting,
   toggleEventTracking,
   toggleProjectPin,
@@ -617,7 +624,5 @@ export const {
   updateTextSize,
   updateTheme,
   updateUsingKubectlProxy,
-  toggleEditorPlaceholderVisiblity,
-  initRendererSentry,
 } = configSlice.actions;
 export default configSlice.reducer;
