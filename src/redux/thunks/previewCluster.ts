@@ -13,6 +13,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
+import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
@@ -71,14 +72,15 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
         results = await Promise.all(
           clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
         );
-      }
-
-      const foundNamespace = clusterAccess.find(ca => ca.namespace === clusterPreviewNamespace);
-
-      if (foundNamespace) {
-        results = await getNonCustomClusterObjects(kc, clusterPreviewNamespace);
       } else {
-        results = await getNonCustomClusterObjects('kc', clusterAccess[0].namespace);
+        const foundNamespace = clusterAccess.find(ca => ca.namespace === clusterPreviewNamespace);
+
+        if (foundNamespace) {
+          results = await getNonCustomClusterObjects(kc, clusterPreviewNamespace);
+        } else {
+          results = await getNonCustomClusterObjects('kc', clusterAccess[0].namespace);
+          thunkAPI.dispatch(setClusterPreviewNamespace(clusterAccess[0].namespace));
+        }
       }
     } else {
       results = await getNonCustomClusterObjects(kc);

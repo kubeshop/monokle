@@ -19,6 +19,7 @@ import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/redu
 import {
   activeProjectSelector,
   currentClusterAccessSelector,
+  isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -43,6 +44,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAccessLoading = useAppSelector(state => state.config?.isAccessLoading);
@@ -262,12 +264,13 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       <>
         {isKubeConfigPathValid && (activeProject || previewingCluster) && (
           <>
-            {previewingCluster && (
+            {isInClusterMode && (
               <S.Select
                 value={clusterPreviewNamepsace}
                 showSearch
                 onChange={namespace => {
                   dispatch(setClusterPreviewNamespace(namespace as string));
+                  restartPreview(kubeConfigContext, 'cluster', dispatch);
                 }}
               >
                 <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
