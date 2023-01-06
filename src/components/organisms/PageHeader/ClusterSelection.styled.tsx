@@ -262,7 +262,7 @@ export const Select = styled(RawSelect)`
   margin-left: 10px;
   background: ${Colors.grey3b};
   border-radius: 4px;
-  width: 150px;
+  width: 175px;
   color: ${Colors.whitePure};
 
   & .ant-select-selector {

@@ -204,7 +204,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {(activeProject || previewingCluster) && (
         <>
-          {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 1350 && (
             <S.PreviewMode
               $isInPreviewMode={isInPreviewMode}
               $previewType={previewType}
@@ -218,7 +218,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 946}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 950}>
             {isKubeConfigPathValid && (
               <>
                 <S.ClusterOutlined />
@@ -274,8 +274,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 }}
               >
                 <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
-                <Select.Option key="cluster-scoped" value="cluster-scoped">
-                  Cluster scoped
+                <Select.Option key="<not-namespaced>" value="<not-namespaced>">
+                  {`<not-namespaced>`}
                 </Select.Option>
 
                 {namespaces.map(ns => (

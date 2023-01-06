@@ -32,7 +32,7 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamesp
       .filter(
         handler =>
           !handler.isCustom &&
-          (allNamespaces ? true : namespace === 'cluster-scoped' ? !handler.isNamespaced : handler.isNamespaced)
+          (allNamespaces ? true : namespace === '<not-namespaced>' ? !handler.isNamespaced : handler.isNamespaced)
       )
       .map(resourceKindHandler =>
         resourceKindHandler
@@ -82,7 +82,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
           clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
         );
       } else {
-        if (currentNamespace !== 'cluster-scoped' && !foundNamespace) {
+        if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
           currentNamespace = clusterAccess[0].namespace;
           thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
         }
@@ -268,7 +268,11 @@ async function loadCustomResourceObjects(
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (
           kindHandler &&
-          (allNamespaces ? true : namespace === 'cluster-scoped' ? !kindHandler.isNamespaced : kindHandler.isNamespaced)
+          (allNamespaces
+            ? true
+            : namespace === '<not-namespaced>'
+            ? !kindHandler.isNamespaced
+            : kindHandler.isNamespaced)
         ) {
           return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
             // @ts-ignore
