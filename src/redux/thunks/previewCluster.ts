@@ -48,6 +48,8 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
 
+  let currentNamespace: string = clusterPreviewNamespace;
+
   const config = thunkAPI.getState().config;
   const {userDataDir} = config;
 
@@ -65,22 +67,23 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       kc = proxyKubeConfig;
     }
 
+    let foundNamespace: ClusterAccess | undefined;
     let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
 
     if (clusterAccess && clusterAccess.length) {
-      if (clusterPreviewNamespace === '<all>') {
+      foundNamespace = clusterAccess?.find(ca => ca.namespace === currentNamespace);
+
+      if (currentNamespace === '<all>') {
         results = await Promise.all(
           clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
         );
       } else {
-        const foundNamespace = clusterAccess.find(ca => ca.namespace === clusterPreviewNamespace);
-
-        if (foundNamespace) {
-          results = await getNonCustomClusterObjects(kc, clusterPreviewNamespace);
-        } else {
-          results = await getNonCustomClusterObjects('kc', clusterAccess[0].namespace);
-          thunkAPI.dispatch(setClusterPreviewNamespace(clusterAccess[0].namespace));
+        if (!foundNamespace) {
+          currentNamespace = clusterAccess[0].namespace;
+          thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
         }
+
+        results = await getNonCustomClusterObjects(kc, currentNamespace);
       }
     } else {
       results = await getNonCustomClusterObjects(kc);
@@ -117,16 +120,23 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
-      const customResourceObjects =
-        clusterAccess && clusterAccess.length > 0
-          ? flatten(
-              await Promise.all(
-                clusterAccess.map((ca: ClusterAccess) =>
-                  loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
-                )
+      let customResourceObjects: string[];
+
+      if (clusterAccess && clusterAccess.length) {
+        if (currentNamespace === '<all>') {
+          customResourceObjects = flatten(
+            await Promise.all(
+              clusterAccess.map((ca: ClusterAccess) =>
+                loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
               )
             )
-          : await loadCustomResourceObjects(kc, customResourceDefinitions);
+          );
+        } else {
+          customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, currentNamespace);
+        }
+      } else {
+        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+      }
 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
