@@ -268,5 +268,9 @@ export const Select = styled(RawSelect)`
   & .ant-select-selector {
     border: none !important;
     height: 28px !important;
+
+    & .ant-select-selection-item {
+      pointer-events: none;
+    }
   }
 `;

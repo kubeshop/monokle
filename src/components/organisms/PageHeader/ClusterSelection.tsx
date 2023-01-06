@@ -8,6 +8,7 @@ import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
+import {ClusterNamespaceTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
@@ -265,25 +266,27 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         {isKubeConfigPathValid && (activeProject || previewingCluster) && (
           <>
             {isInClusterMode && (
-              <S.Select
-                value={clusterPreviewNamespace}
-                showSearch
-                onChange={namespace => {
-                  dispatch(setClusterPreviewNamespace(namespace as string));
-                  restartPreview(kubeConfigContext, 'cluster', dispatch);
-                }}
-              >
-                <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
-                <Select.Option key="<not-namespaced>" value="<not-namespaced>">
-                  {`<not-namespaced>`}
-                </Select.Option>
-
-                {namespaces.map(ns => (
-                  <Select.Option key={ns} value={ns}>
-                    {ns}
+              <Tooltip placement="left" mouseEnterDelay={TOOLTIP_DELAY} title={ClusterNamespaceTooltip}>
+                <S.Select
+                  value={clusterPreviewNamespace}
+                  showSearch
+                  onChange={namespace => {
+                    dispatch(setClusterPreviewNamespace(namespace as string));
+                    restartPreview(kubeConfigContext, 'cluster', dispatch);
+                  }}
+                >
+                  <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
+                  <Select.Option key="<not-namespaced>" value="<not-namespaced>">
+                    {`<not-namespaced>`}
                   </Select.Option>
-                ))}
-              </S.Select>
+
+                  {namespaces.map(ns => (
+                    <Select.Option key={ns} value={ns}>
+                      {ns}
+                    </Select.Option>
+                  ))}
+                </S.Select>
+              </Tooltip>
             )}
 
             <S.Button
