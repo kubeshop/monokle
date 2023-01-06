@@ -63,10 +63,24 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       kc = proxyKubeConfig;
     }
 
-    const results =
-      clusterAccess && clusterAccess.length > 0
-        ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
-        : await getNonCustomClusterObjects(kc);
+    let results: PromiseSettledResult<string>[];
+
+    if (clusterAccess && clusterAccess.length) {
+      const foundDefaultNamespace = clusterAccess.find(ca => ca.namespace === 'default');
+
+      if (foundDefaultNamespace) {
+        results = await getNonCustomClusterObjects(kc, 'default');
+      } else {
+        results = await getNonCustomClusterObjects('kc', clusterAccess[0].namespace);
+      }
+    } else {
+      results = await getNonCustomClusterObjects(kc);
+    }
+
+    // const results =
+    //   clusterAccess && clusterAccess.length > 0
+    //     ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
+    //     : await getNonCustomClusterObjects(kc);
 
     const resources = flatten(results);
 
