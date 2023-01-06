@@ -31,6 +31,8 @@ export const startClusterPreview = createAsyncThunk<
     } else {
       thunkAPI.dispatch(previewCluster({context: clusterContext}));
     }
+
+    return;
   }
 
   // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
