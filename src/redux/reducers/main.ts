@@ -1226,6 +1226,7 @@ export const mainSlice = createSlice({
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
       return action.payload;
     });
+
     builder.addCase(updateFileEntries.fulfilled, (state, action) => {
       return action.payload;
     });
