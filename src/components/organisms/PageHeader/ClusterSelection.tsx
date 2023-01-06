@@ -40,7 +40,7 @@ import * as S from './ClusterSelection.styled';
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
-  const clusterPreviewNamepsace = useAppSelector(state => state.config.clusterPreviewNamespace);
+  const clusterPreviewNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -266,7 +266,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           <>
             {isInClusterMode && (
               <S.Select
-                value={clusterPreviewNamepsace}
+                value={clusterPreviewNamespace}
                 showSearch
                 onChange={namespace => {
                   dispatch(setClusterPreviewNamespace(namespace as string));
