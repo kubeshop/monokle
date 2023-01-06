@@ -45,6 +45,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
   const k8sVersion = getK8sVersion(projectConfig);
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+  const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
 
   const config = thunkAPI.getState().config;
   const {userDataDir} = config;
@@ -63,24 +64,25 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       kc = proxyKubeConfig;
     }
 
-    let results: PromiseSettledResult<string>[];
+    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
 
     if (clusterAccess && clusterAccess.length) {
-      const foundDefaultNamespace = clusterAccess.find(ca => ca.namespace === 'default');
+      if (clusterPreviewNamespace === '<all>') {
+        results = await Promise.all(
+          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
+        );
+      }
 
-      if (foundDefaultNamespace) {
-        results = await getNonCustomClusterObjects(kc, 'default');
+      const foundNamespace = clusterAccess.find(ca => ca.namespace === clusterPreviewNamespace);
+
+      if (foundNamespace) {
+        results = await getNonCustomClusterObjects(kc, clusterPreviewNamespace);
       } else {
         results = await getNonCustomClusterObjects('kc', clusterAccess[0].namespace);
       }
     } else {
       results = await getNonCustomClusterObjects(kc);
     }
-
-    // const results =
-    //   clusterAccess && clusterAccess.length > 0
-    //     ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
-    //     : await getNonCustomClusterObjects(kc);
 
     const resources = flatten(results);
 

@@ -28,6 +28,9 @@ const schema = {
       kubeConfigContextsColors: {
         type: 'object',
       },
+      clusterPreviewNamespace: {
+        type: 'string',
+      },
       hasDeletedDefaultTemplatesPlugin: {
         type: 'boolean',
       },
@@ -289,6 +292,7 @@ const defaults = {
   },
   appConfig: {
     kubeConfigContextsColors: {},
+    clusterPreviewNamespace: 'default',
     useKubectlProxy: false,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,

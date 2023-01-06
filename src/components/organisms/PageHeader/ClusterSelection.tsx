@@ -2,7 +2,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useWindowSize} from 'react-use';
 
-import {Dropdown, Tooltip} from 'antd';
+import {Dropdown, Select, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
@@ -14,6 +14,7 @@ import {HighlightItems} from '@models/ui';
 import {Size} from '@models/window';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
@@ -28,6 +29,8 @@ import {restartPreview, startPreview, stopPreview} from '@redux/services/preview
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
+import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
+
 import {defineHotkey} from '@utils/defineHotkey';
 import {sleep} from '@utils/sleep';
 
@@ -36,6 +39,7 @@ import * as S from './ClusterSelection.styled';
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const clusterPreviewNamepsace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -55,6 +59,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const size: Size = useWindowSize();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+
+  const [namespaces] = useTargetClusterNamespaces();
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -252,20 +258,40 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           </S.ClusterStatus>
         </>
       )}
+
       <>
         {isKubeConfigPathValid && (activeProject || previewingCluster) && (
-          <S.Button
-            className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
-            disabled={isPreviewLoading && isAccessLoading}
-            onClick={loadOrReloadPreview}
-            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-            $previewType={previewType}
-            loading={isPreviewLoading}
-            size="small"
-            $kubeConfigContextColor={kubeConfigContextColor}
-          >
-            {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
-          </S.Button>
+          <>
+            {previewingCluster && (
+              <S.Select
+                value={clusterPreviewNamepsace}
+                showSearch
+                onChange={namespace => {
+                  dispatch(setClusterPreviewNamespace(namespace as string));
+                }}
+              >
+                <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
+                {namespaces.map(ns => (
+                  <Select.Option key={ns} value={ns}>
+                    {ns}
+                  </Select.Option>
+                ))}
+              </S.Select>
+            )}
+
+            <S.Button
+              className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
+              disabled={isPreviewLoading && isAccessLoading}
+              onClick={loadOrReloadPreview}
+              $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+              $previewType={previewType}
+              loading={isPreviewLoading}
+              size="small"
+              $kubeConfigContextColor={kubeConfigContextColor}
+            >
+              {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
+            </S.Button>
+          </>
         )}
 
         {!isPreviewLoading && isInPreviewMode && (

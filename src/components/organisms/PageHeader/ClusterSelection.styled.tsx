@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {ButtonProps, Button as RawButton, Divider as RawDivider} from 'antd';
+import {ButtonProps, Button as RawButton, Divider as RawDivider, Select as RawSelect} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 import {
@@ -256,4 +256,17 @@ export const PreviewMode = styled.div<{
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.05em;
+`;
+
+export const Select = styled(RawSelect)`
+  margin-left: 10px;
+  background: ${Colors.grey3b};
+  border-radius: 4px;
+  width: 150px;
+  color: ${Colors.whitePure};
+
+  & .ant-select-selector {
+    border: none !important;
+    height: 28px !important;
+  }
 `;
