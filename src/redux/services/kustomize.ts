@@ -1,8 +1,5 @@
-// TODO: remove the line below and rewrite this file later
-export const notImplemented = 'Not implemented yet.';
-
-// import micromatch from 'micromatch';
-// import path from 'path';
+import micromatch from 'micromatch';
+import path from 'path';
 
 // import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
@@ -13,6 +10,10 @@ export const notImplemented = 'Not implemented yet.';
 // import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
 
 // import {NodeWrapper, getScalarNodes, linkResources} from './resource';
+
+export function isKustomizationFilePath(filePath: string) {
+  return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*kustomization*.yaml');
+}
 
 // /**
 //  * Creates kustomization refs between a kustomization and its resources
@@ -49,10 +50,6 @@ export const notImplemented = 'Not implemented yet.';
 
 // export function isKustomizationPatch(r: K8sResource | undefined) {
 //   return r && r.name.startsWith('Patch: ');
-// }
-
-// export function isKustomizationFilePath(filePath: string) {
-//   return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*kustomization*.yaml');
 // }
 
 // /**
@@ -245,4 +242,18 @@ export const notImplemented = 'Not implemented yet.';
 //       filePath,
 //     },
 //   });
+// }
+
+/**
+ * Reprocess kustomization-specific references for all kustomizations
+ */
+
+// export function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+//   Object.values(resourceMap)
+//     .filter(r => isKustomizationResource(r))
+//     .forEach(r => {
+//       r.refs = [];
+//     });
+
+//   processKustomizations(resourceMap, fileMap);
 // }

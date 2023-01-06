@@ -1,51 +1,44 @@
 import fs from 'fs';
-import {uniq} from 'lodash';
+import {merge, uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
+import {Document, LineCounter, ParsedNode} from 'yaml';
 
 import {
-  CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
   KUSTOMIZATION_API_VERSION,
-  KUSTOMIZATION_FILE_NAME,
   KUSTOMIZATION_KIND,
-  PREVIEW_PREFIX,
-  UNSAVED_PREFIX,
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {
-  isKustomizationFilePath,
-  isKustomizationPatch,
-  isKustomizationResource,
-  processKustomizations,
-} from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef, processRefs, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
-import {
-  getDependentResourceKinds,
-  getKnownResourceKinds,
-  getResourceKindHandler,
-  registerKindHandler,
-} from '@src/kindhandlers';
+import {getResourceKindHandler, registerKindHandler} from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@shared/models/appState';
+import {FileMapType, ResourceMapType} from '@shared/models/appState';
 import {ClusterAccess} from '@shared/models/config';
-import {K8sResource, RefPosition, ResourceRefType} from '@shared/models/k8sResource';
-import {Policy} from '@shared/models/policy';
+import {K8sObject} from '@shared/models/k8s';
+import {
+  K8sResource,
+  ResourceContent,
+  ResourceContentMap,
+  ResourceMeta,
+  ResourceMetaMap,
+  isLocalResource,
+} from '@shared/models/k8sResource';
+import {AnyOrigin, LocalOrigin, isLocalOrigin} from '@shared/models/origin';
+import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
-import {validatePolicies, validateResource} from './validation';
+import {isKustomizationFilePath} from './kustomize';
 
 /**
  * Parse documents lazily...
@@ -85,201 +78,12 @@ export function getLineCounter(resource: K8sResource) {
 }
 
 /**
- * Returns the Scalar at the specified path
- */
-
-export function getScalarNode(resource: K8sResource, nodePath: string) {
-  let parent: any = getParsedDoc(resource);
-
-  const names = parseNodePath(nodePath);
-  for (let ix = 0; ix < names.length; ix += 1) {
-    const child = parent.get(names[ix], true);
-    if (child) {
-      // @ts-ignore
-      parent = child;
-    } else {
-      log.warn(`${nodePath} not found in resource`);
-      return undefined;
-    }
-  }
-
-  if (parent instanceof Scalar) {
-    return new NodeWrapper(parent, getLineCounter(resource));
-  }
-
-  log.warn(`node at ${nodePath} is not a Scalar`);
-}
-
-/**
- * Parses a nodePath into segments - simple split for now
- */
-
-export function parseNodePath(nodePath: string) {
-  return nodePath.split(':');
-}
-
-/**
- * Returns the Scalars at the specified path
- */
-
-export function getScalarNodes(resource: K8sResource, nodePath: string) {
-  let parents: any[] = [getParsedDoc(resource)];
-
-  const names = parseNodePath(nodePath);
-  for (let ix = 0; ix < names.length; ix += 1) {
-    let nextParents: any[] = [];
-    const name = names[ix];
-
-    parents.forEach(parent => {
-      const child = parent.get(name, true);
-      if (child) {
-        if (child instanceof YAMLSeq) {
-          nextParents = nextParents.concat(child.items);
-        } else {
-          // @ts-ignore
-          nextParents.push(child);
-        }
-      }
-    });
-
-    if (nextParents.length === 0) {
-      return [];
-    }
-
-    parents = nextParents;
-  }
-
-  let results: NodeWrapper[] = [];
-  parents.forEach(parent => {
-    if (parent instanceof YAMLSeq) {
-      results = results.concat(parent.items.map(node => new NodeWrapper(node, getLineCounter(resource))));
-    } else if (parent instanceof Scalar) {
-      results.push(new NodeWrapper(parent, getLineCounter(resource)));
-    }
-  });
-
-  return results;
-}
-
-/**
- * Utility class used when parsing and creating refs
- */
-
-export class NodeWrapper {
-  node: Scalar;
-  lineCounter?: LineCounter;
-
-  constructor(node: Scalar, lineCounter?: LineCounter) {
-    this.node = node;
-    this.lineCounter = lineCounter;
-  }
-
-  nodeValue(): string {
-    return this.node.value as string;
-  }
-
-  getNodePosition(): RefPosition {
-    if (this.lineCounter && this.node.range) {
-      const linePos = this.lineCounter.linePos(this.node.range[0]);
-      return {
-        line: linePos.line,
-        column: linePos.col,
-        length: this.node.range[1] - this.node.range[0],
-      };
-    }
-
-    return {line: 0, column: 0, length: 0};
-  }
-}
-
-/**
- * Utility function to get all resources of a specific kind
- */
-
-export function getK8sResources(resourceMap: ResourceMapType, kind: string) {
-  return Object.values(resourceMap).filter(item => item.kind === kind);
-}
-
-export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
-  if (a === undefined && b === undefined) {
-    return true;
-  }
-  if (!a || !b) {
-    return false;
-  }
-  return a.line === b.line && a.column === b.column && a.length === b.length;
-}
-
-/**
- * Adds a resource ref with the specified type/target to the specified resource
- */
-
-export function createResourceRef(
-  resource: K8sResource,
-  refType: ResourceRefType,
-  refNode?: NodeWrapper,
-  targetResourceId?: string,
-  targetResourceKind?: string,
-  isOptional?: boolean
-) {
-  if (refNode || targetResourceId) {
-    resource.refs = resource.refs || [];
-    const refName = (refNode ? refNode.nodeValue() : targetResourceId) || '<missing>';
-
-    // make sure we don't duplicate
-    if (
-      !resource.refs.some(
-        ref =>
-          ref.type === refType &&
-          ref.name === refName &&
-          ref.target?.type === 'resource' &&
-          ref.target.resourceId === targetResourceId &&
-          areRefPosEqual(ref.position, refNode?.getNodePosition())
-      )
-    ) {
-      resource.refs.push({
-        type: refType,
-        name: refName,
-        position: refNode?.getNodePosition(),
-        target: {
-          type: 'resource',
-          resourceId: targetResourceId,
-          resourceKind: targetResourceKind?.startsWith('$') ? undefined : targetResourceKind,
-          isOptional,
-        },
-      });
-    }
-  } else {
-    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.filePath}`);
-  }
-}
-
-/**
- * Creates bidirectional resourcerefs between two resources
- */
-
-export function linkResources(
-  source: K8sResource,
-  target: K8sResource,
-  sourceRef: NodeWrapper,
-  targetRef?: NodeWrapper,
-  isOptional?: boolean
-) {
-  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id, target.kind, isOptional);
-  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id, source.kind, isOptional);
-}
-
-/**
  * Extracts all unique namespaces from resources in specified resourceMap
  */
 
 export function getNamespaces(resourceMap: ResourceMapType) {
   const namespaces: string[] = [];
   Object.values(resourceMap).forEach(e => {
-    if (e.filePath.startsWith(CLUSTER_DIFF_PREFIX)) {
-      return;
-    }
-
     if (e.kind === 'Namespace' && !namespaces.includes(e.name)) {
       namespaces.push(e.name);
     } else if (e.namespace && !namespaces.includes(e.namespace)) {
@@ -325,9 +129,13 @@ export async function getTargetClusterNamespaces(
  * Creates a UI friendly resource name
  */
 
-export function createResourceName(filePath: string, content: any, kind: string) {
+export function createResourceName(object: K8sObject, filePath?: string) {
   // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
-  if (kind === KUSTOMIZATION_KIND && (!content?.apiVersion || content.apiVersion.startsWith(KUSTOMIZATION_API_GROUP))) {
+  if (
+    filePath &&
+    object.kind === KUSTOMIZATION_KIND &&
+    (!object?.apiVersion || object.apiVersion.startsWith(KUSTOMIZATION_API_GROUP))
+  ) {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
       return filePath.substr(1, ix - 1);
@@ -336,38 +144,26 @@ export function createResourceName(filePath: string, content: any, kind: string)
   }
 
   // use metadata name if available
-  if (content.metadata?.name) {
+  if (object.metadata?.name) {
     // name could be an object if it's a helm template value...
-    if (typeof content.metadata.name !== 'string') {
-      return JSON.stringify(content.metadata.name).trim();
+    if (typeof object.metadata.name !== 'string') {
+      return JSON.stringify(object.metadata.name).trim();
     }
 
-    return content.metadata.name;
+    return object.metadata.name;
   }
 
-  // use filename as last resort
-  const ix = filePath.lastIndexOf(path.sep);
-  if (ix > 0) {
-    return filePath.substr(ix + 1);
+  // use filename as last resort if it's provided
+  if (filePath) {
+    const ix = filePath.lastIndexOf(path.sep);
+    if (ix > 0) {
+      return filePath.substr(ix + 1);
+    }
+
+    return filePath;
   }
 
-  return filePath;
-}
-
-/**
- * Checks if this specified resource is from a file (and not a virtual one)
- */
-
-export function isFileResource(resource: K8sResource) {
-  return !resource.filePath.startsWith(PREVIEW_PREFIX) && !isUnsavedResource(resource);
-}
-
-/**
- * Checks if this specified resource has been generated by a preview
- */
-
-export function isPreviewResource(resource: K8sResource) {
-  return resource.filePath.startsWith(PREVIEW_PREFIX);
+  return 'Unnamed resource';
 }
 
 /**
@@ -375,7 +171,8 @@ export function isPreviewResource(resource: K8sResource) {
  */
 
 export function isUnsavedResource(resource: K8sResource) {
-  return resource.filePath.startsWith(UNSAVED_PREFIX);
+  // TODO: maybe this could be removed
+  return resource.isUnsaved;
 }
 
 /**
@@ -386,8 +183,8 @@ export function isUnsavedResource(resource: K8sResource) {
 export function saveResource(resource: K8sResource, newValue: string, fileMap: FileMapType) {
   let valueToWrite = `${newValue.trim()}\n`;
 
-  if (isFileResource(resource)) {
-    const fileEntry = fileMap[resource.filePath];
+  if (isLocalResource(resource)) {
+    const fileEntry = fileMap[resource.origin.filePath];
 
     let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
     if (resource.range) {
@@ -399,9 +196,9 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       }
 
       const newFileContent =
-        content.substr(0, resource.range.start) +
+        content.substring(0, resource.range.start) +
         valueToWrite +
-        content.substr(resource.range.start + resource.range.length);
+        content.substring(resource.range.start + resource.range.length);
 
       fs.writeFileSync(absoluteResourcePath, newFileContent);
     } else {
@@ -416,212 +213,24 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
   return valueToWrite;
 }
 
-/**
- * Reprocess kustomization-specific references for all kustomizations
- */
-
-export function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
-  Object.values(resourceMap)
-    .filter(r => isKustomizationResource(r))
-    .forEach(r => {
-      r.refs = [];
-    });
-
-  processKustomizations(resourceMap, fileMap);
-}
-
-/**
- * Reprocesses the specified resourceIds in regard to refs/etc (called after updating...)
- *
- * This could be more intelligent - it updates everything brute force for now...
- */
-
-export function reprocessResources(
-  schemaVersion: string,
-  userDataDir: string,
-  resourceIds: string[],
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  processingOptions: ResourceRefsProcessingOptions,
-  options?: {
-    resourceKinds?: string[];
-    policyPlugins: Policy[];
-  }
-) {
-  if (resourceIds.length === 0) {
-    return;
-  }
-
-  let resourceKinds = resourceIds
-    .map(resId => resourceMap[resId])
-    .filter(res => res !== undefined)
-    .map(res => res.kind);
-
-  if (options && options.resourceKinds) {
-    resourceKinds = [...resourceKinds, ...options.resourceKinds];
-  }
-  const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
-  let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
-  resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
-
-  resourceIds.forEach(id => {
-    const resource = resourceMap[id];
-    if (resource) {
-      const isPatch = isKustomizationPatch(resource);
-      resource.name = createResourceName(resource.filePath, resource.content, resource.kind);
-      if (isPatch) {
-        resource.name = `Patch: ${resource.name}`;
-      }
-
-      const isKustomziationFile = resource.filePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME);
-      const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
-
-      resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
-      resource.apiVersion =
-        resource.content.apiVersion ||
-        (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
-
-      resource.namespace = extractNamespace(resource.content);
-
-      // clear caches
-      parsedDocCache.delete(resource.id);
-      clearRefNodesCache(resource.id);
-    }
-  });
-
-  processResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
-    resourceIds,
-    resourceKinds: resourceKindsToReprocess,
-    policyPlugins: options?.policyPlugins,
-  });
-
-  // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
-  reprocessKustomizations(resourceMap, fileMap);
-}
-
-/**
- * Establishes refs for all resources in specified resourceMap
- */
-
-type ValidationOptions = {
-  skipValidation?: boolean;
-  resourceIds?: string[];
-  resourceKinds?: string[];
-  policyPlugins?: Policy[];
-};
-
-export async function processResources(
-  schemaVersion: string,
-  userHomeDir: string,
-  resourceMap: ResourceMapType,
-  processingOptions: ResourceRefsProcessingOptions,
-  options?: ValidationOptions
-) {
-  const {current, other} = decideResourcesToValidate(resourceMap, options);
-
-  // const response = await VALIDATOR.validate({resources: other});
-  // console.log('Response:', response);
-
-  if (current) {
-    validateResource(current, schemaVersion, userHomeDir);
-    const issues = validatePolicies(current, options?.policyPlugins ?? []);
-    current.issues = {errors: issues, isValid: issues.length === 0};
-  }
-  other.forEach(resource => validateResource(resource, schemaVersion, userHomeDir));
-
-  if (!current) {
-    // skip validating policies of other resources when users are editing.
-    other.forEach(resource => {
-      const issues = validatePolicies(resource, options?.policyPlugins ?? []);
-      resource.issues = {errors: issues, isValid: issues.length === 0};
-    });
-  }
-
-  const timestamp = Date.now();
-  processRefs(resourceMap, processingOptions, options);
-  log.info(`processing refs took ${Date.now() - timestamp}`, options);
-}
-
-function decideResourcesToValidate(
-  resourceMap: ResourceMapType,
-  options?: ValidationOptions
-): {current: K8sResource | undefined; other: K8sResource[]} {
-  const skipValidation = options?.skipValidation ?? false;
-
-  if (skipValidation) {
-    return {current: undefined, other: []};
-  }
-
-  const resourceIds = options?.resourceIds ?? [];
-  const resourceKinds = options?.resourceKinds ?? [];
-  const allResources = Object.values(resourceMap);
-
-  if (resourceIds.length === 0 && resourceKinds.length === 0) {
-    return {current: undefined, other: allResources};
-  }
-
-  const [currentId, ...relatedIds] = resourceIds;
-  const current = resourceMap[currentId];
-  const otherSet = new Set<K8sResource>();
-
-  relatedIds.forEach(id => {
-    otherSet.add(resourceMap[id]);
-  });
-  allResources.filter(r => resourceKinds.includes(r.kind)).forEach(r => otherSet.add(r));
-
-  return {current, other: Array.from(otherSet)};
-}
-
-/**
- * udpates resource ranges for all resources in the same file as the specified
- * resource
- */
-
-export function recalculateResourceRanges(resource: K8sResource, fileMap: FileMapType, resourceMap: ResourceMapType) {
-  // if length of value has changed we need to recalculate document ranges for
-  // subsequent resource so future saves will be at correct place in document
-  if (resource.range && resource.range.length !== resource.text.length) {
-    const fileEntry = fileMap[resource.filePath];
-    if (fileEntry) {
-      // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesForPath(resource.filePath, resourceMap)
-        .sort((a, b) => {
-          return a.range && b.range ? a.range.start - b.range.start : 0;
-        })
-        .map(r => r.id);
-
-      let resourceIndex = resourceIds.indexOf(resource.id);
-      if (resourceIndex !== -1) {
-        const diff = resource.text.length - resource.range.length;
-        resource.range.length = resource.text.length;
-
-        while (resourceIndex < resourceIds.length - 1) {
-          resourceIndex += 1;
-          let rid = resourceIds[resourceIndex];
-          const r = resourceMap[rid];
-          if (r && r.range) {
-            r.range.start += diff;
-          } else {
-            throw new Error(`Failed to find resource ${rid} in fileEntry resourceIds for ${fileEntry.name}`);
-          }
-        }
-      } else {
-        throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
-      }
-    } else {
-      throw new Error(`Failed to find fileEntry for resource with path ${resource.filePath}`);
-    }
-  }
-}
-
 export function removeResourceFromFile(
   removedResource: K8sResource,
   fileMap: FileMapType,
-  resourceMap: ResourceMapType
+  stateArgs: {
+    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
+    resourceContentMap: ResourceContentMap<LocalOrigin>;
+  }
 ) {
-  const fileEntry = fileMap[removedResource.filePath];
+  const {resourceMetaMap, resourceContentMap} = stateArgs;
+  const resourceMap: ResourceMapType = merge(resourceMetaMap, resourceContentMap);
+
+  if (!isLocalResource(removedResource)) {
+    throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
+  }
+
+  const fileEntry = fileMap[removedResource.origin.filePath];
   if (!fileEntry) {
-    throw new Error(`Failed to find fileEntry for resource with path ${removedResource.filePath}`);
+    throw new Error(`Failed to find fileEntry for resource with path ${removedResource.origin.filePath}`);
   }
   const absoluteFilePath = getAbsoluteResourcePath(removedResource, fileMap);
 
@@ -631,7 +240,7 @@ export function removeResourceFromFile(
   }
 
   // get list of resourceIds in file sorted by startPosition
-  const resourceIds = getResourcesForPath(removedResource.filePath, resourceMap)
+  const resourceIds = getResourcesForPath(removedResource.origin.filePath, resourceMap)
     .sort((a, b) => {
       return a.range && b.range ? a.range.start - b.range.start : 0;
     })
@@ -669,7 +278,7 @@ export function removeResourceFromFile(
       content.substr(removedResource.range.start + removedResource.range.length)
   );
   fileEntry.timestamp = getFileTimestamp(absoluteFilePath);
-  deleteResource(removedResource, resourceMap);
+  deleteResource(removedResource, {resourceMetaMap, resourceContentMap});
 }
 
 /**
@@ -687,7 +296,7 @@ function extractNamespace(content: any) {
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources(fileContent: string, relativePath: string) {
+export function extractK8sResources(fileContent: string, origin: AnyOrigin) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
   const result: K8sResource[] = [];
@@ -702,7 +311,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         }
 
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          `Ignoring document ${docIndex} in ${JSON.stringify(origin)} origin due to ${doc.errors.length} error(s)`,
           documents[docIndex],
           splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
         );
@@ -711,33 +320,29 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           log.warn('[extractK8sResources]: Doc has warnings', doc);
         }
 
-        const content = doc.toJS();
+        const resourceObject = doc.toJS();
 
-        if (content && content.apiVersion && content.kind) {
+        if (resourceObject && resourceObject.apiVersion && resourceObject.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
           let resource: K8sResource = {
-            name: createResourceName(relativePath, content, content.kind),
-            fileId: relativePath,
-            filePath: relativePath,
-            fileOffset: 0,
-            id: (content.metadata && content.metadata.uid) || uuidv4(),
-            isHighlighted: false,
-            isSelected: false,
-            kind: content.kind,
-            apiVersion: content.apiVersion,
-            content,
+            name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
+            origin,
+            id: (resourceObject.metadata && resourceObject.metadata.uid) || uuidv4(),
+            kind: resourceObject.kind,
+            apiVersion: resourceObject.apiVersion,
+            object: resourceObject,
             text,
-            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
+            isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
           };
 
           if (
             resource.kind === 'CustomResourceDefinition' &&
-            resource.content?.spec?.names?.kind &&
-            !getResourceKindHandler(resource.content.spec.names.kind)
+            resource.object?.spec?.names?.kind &&
+            !getResourceKindHandler(resource.object.spec.names.kind)
           ) {
             try {
-              const kindHandler = extractKindHandler(resource.content);
+              const kindHandler = extractKindHandler(resource.object);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
                 const crdsDir = (window as any).monokleUserCrdsDir;
@@ -745,7 +350,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
                   saveCRD(crdsDir, resource.text);
                 }
               } else {
-                log.warn('Failed to extract kindHandler', resource.content);
+                log.warn('Failed to extract kindHandler', resource.object);
               }
             } catch (e) {
               log.warn('Failed to register custom kindhandler', resource, e);
@@ -762,25 +367,26 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          resource.namespace = extractNamespace(content);
+          resource.namespace = extractNamespace(resourceObject);
 
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (content && isKustomizationFilePath(relativePath) && documents.length === 1) {
-          let resource: K8sResource = {
-            name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
-            fileId: relativePath,
-            filePath: relativePath,
-            fileOffset: 0,
+        else if (
+          isLocalOrigin(origin) &&
+          resourceObject &&
+          isKustomizationFilePath(origin.filePath) &&
+          documents.length === 1
+        ) {
+          let resource: K8sResource<AnyOrigin> = {
+            name: createResourceName(resourceObject, origin.filePath),
+            origin,
             id: uuidv4(),
-            isHighlighted: false,
-            isSelected: false,
             kind: KUSTOMIZATION_KIND,
             apiVersion: KUSTOMIZATION_API_VERSION,
-            content,
+            object: resourceObject,
             text: fileContent,
-            isClusterScoped: getResourceKindHandler(content.kind)?.isNamespaced || false,
+            isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
@@ -797,49 +403,13 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 /**
  * Deletes the specified resource from internal caches and the specified resourceMap
  */
-
-export function deleteResource(resource: K8sResource, resourceMap: ResourceMapType) {
-  parsedDocCache.delete(resource.id);
-  clearRefNodesCache(resource.id);
-  delete resourceMap[resource.id];
-}
-
-/**
- * Gets all resources linked to the specified resource
- */
-
-export function getLinkedResources(resource: K8sResource) {
-  const linkedResourceIds: string[] = [];
-  resource.refs
-    ?.filter(ref => !isUnsatisfiedRef(ref.type))
-    .forEach(ref => {
-      if (ref.target?.type === 'resource' && ref.target.resourceId) {
-        linkedResourceIds.push(ref.target.resourceId);
-      }
-    });
-
-  return linkedResourceIds;
-}
-
-/**
- * Returns all resource kinds that could potentially link to the specified resource
- */
-
-const targetResourceKindCache = new Map<string, string[]>();
-
-export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
-  if (!targetResourceKindCache.has(resource.kind)) {
-    const resourceKinds = getKnownResourceKinds().filter(kind => {
-      const handler = getResourceKindHandler(kind);
-      if (handler && handler.outgoingRefMappers) {
-        return handler.outgoingRefMappers.some(mapper => refMapperMatchesKind(mapper, resource.kind));
-      }
-      return false;
-    });
-
-    targetResourceKindCache.set(resource.kind, resourceKinds);
-  }
-  return targetResourceKindCache.get(resource.kind);
+export function deleteResource(
+  resource: K8sResource,
+  stateArgs: {resourceMetaMap: ResourceMetaMap; resourceContentMap: ResourceContentMap}
+) {
+  const {resourceMetaMap, resourceContentMap} = stateArgs;
+  delete resourceMetaMap[resource.id];
+  delete resourceContentMap[resource.id];
 }
 
 /**
@@ -851,4 +421,35 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   const helmVariableRegex = /{{.*}}/g;
   const vanillaTemplateVariableRegex = /\[\[.*]]/g;
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
+}
+
+export function isResourceSelected(resource: K8sResource | ResourceMeta | ResourceContent, selection: AppSelection) {
+  return (
+    isResourceSelection(selection) &&
+    selection.resourceId === resource.id &&
+    selection.resourceOriginType === resource.origin.type
+  );
+}
+
+export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
+  resource: K8sResource<Origin>
+): {meta: ResourceMeta<Origin>; content: ResourceContent<Origin>} {
+  const meta: ResourceMeta<Origin> = {
+    id: resource.id,
+    origin: resource.origin,
+    name: resource.name,
+    kind: resource.kind,
+    apiVersion: resource.apiVersion,
+    namespace: resource.namespace,
+    isClusterScoped: resource.isClusterScoped,
+    range: resource.range,
+    isUnsaved: resource.isUnsaved,
+  };
+  const content: ResourceContent<Origin> = {
+    id: resource.id,
+    origin: resource.origin,
+    text: resource.text,
+    object: resource.object,
+  };
+  return {meta, content};
 }
