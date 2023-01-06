@@ -1,81 +1,35 @@
-import log from 'loglevel';
-
-import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {getKustomizationRefs, isKustomizationResource} from '@redux/services/kustomize';
-import {getLinkedResources} from '@redux/services/resource';
-
-import {AppState, FileMapType, ResourceMapType} from '@shared/models/appState';
-import {FileEntry} from '@shared/models/fileEntry';
+import {AppState} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
 
-/**
- * Clears all resource highlights and selections except selection for the specified item
- */
-
-export function clearResourceSelections(resourceMap: ResourceMapType, excludeItemId?: string) {
-  Object.values(resourceMap).forEach(e => {
-    e.isHighlighted = false;
-    if (!excludeItemId || e.id !== excludeItemId) {
-      e.isSelected = false;
-    }
-  });
+export function clearSelection(state: AppState) {
+  state.selection = undefined;
+  state.selectionOptions = {};
 }
-
-/**
- * Highlight all resources in all children of the specified file
- */
-
-export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
-  fileEntry.children
-    ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
-    .filter(child => child)
-    .forEach(child => {
-      getResourcesForPath(child.filePath, resourceMap).forEach(e => {
-        e.isHighlighted = true;
-      });
-      if (child.children) {
-        highlightChildrenResources(child, resourceMap, fileMap);
-      }
-    });
-}
-
-export function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
-  const currentResource = resourceMap[resourceId];
-  if (currentResource) {
-    currentResource.isHighlighted = true;
-  } else {
-    log.warn(`[updateSelectionAndHighlights]: Couldn't find resource with id ${resourceId}`);
-  }
-}
-
 /**
  * Ensures the correct resources are selected/highlighted when selecting the
  * specified resource
  */
 export function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
-  clearResourceSelections(state.resourceMap, resource.id);
-
-  state.selectedPath = undefined;
-  state.selectedResourceId = undefined;
-  state.selectedPreviewConfigurationId = undefined;
-  state.selectedImage = undefined;
-
-  if (resource) {
-    resource.isSelected = true;
-    state.selectedResourceId = resource.id;
-
-    if (isKustomizationResource(resource)) {
-      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(resourceId => {
-        highlightResource(state.resourceMap, resourceId);
-      });
-    } else {
-      getLinkedResources(resource).forEach(resourceId => {
-        highlightResource(state.resourceMap, resourceId);
-      });
-    }
-
-    Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.isSelected = false;
-    });
-  }
+  // TODO: will have to refactor this after @monokle/validation is integrated
+  // clearResourceSelections(state.resourceMap, resource.id);
+  // state.selectedPath = undefined;
+  // state.selectedResourceId = undefined;
+  // state.selectedPreviewConfigurationId = undefined;
+  // state.selectedImage = undefined;
+  // if (resource) {
+  //   resource.isSelected = true;
+  //   state.selectedResourceId = resource.id;
+  //   if (isKustomizationResource(resource)) {
+  //     getKustomizationRefs(state.resourceMap, resource.id, true).forEach(resourceId => {
+  //       highlightResource(state.resourceMap, resourceId);
+  //     });
+  //   } else {
+  //     getLinkedResources(resource).forEach(resourceId => {
+  //       highlightResource(state.resourceMap, resourceId);
+  //     });
+  //   }
+  //   Object.values(state.helmValuesMap).forEach(valuesFile => {
+  //     valuesFile.isSelected = false;
+  //   });
+  // }
 }
