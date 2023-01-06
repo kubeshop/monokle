@@ -274,6 +274,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 }}
               >
                 <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
+                <Select.Option key="cluster-scoped" value="cluster-scoped">
+                  Cluster scoped
+                </Select.Option>
+
                 {namespaces.map(ns => (
                   <Select.Option key={ns} value={ns}>
                     {ns}

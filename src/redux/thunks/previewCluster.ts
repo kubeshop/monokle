@@ -26,10 +26,14 @@ import {trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
+const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamespaces?: boolean) => {
   return Promise.allSettled(
     getRegisteredKindHandlers()
-      .filter(handler => !handler.isCustom)
+      .filter(
+        handler =>
+          !handler.isCustom &&
+          (allNamespaces ? true : namespace === 'cluster-scoped' ? !handler.isNamespaced : handler.isNamespaced)
+      )
       .map(resourceKindHandler =>
         resourceKindHandler
           .listResourcesInCluster(kc, {namespace})
@@ -75,10 +79,10 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
 
       if (currentNamespace === '<all>') {
         results = await Promise.all(
-          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
+          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
         );
       } else {
-        if (!foundNamespace) {
+        if (currentNamespace !== 'cluster-scoped' && !foundNamespace) {
           currentNamespace = clusterAccess[0].namespace;
           thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
         }
@@ -252,7 +256,8 @@ export function findDefaultVersion(crd: any) {
 async function loadCustomResourceObjects(
   kc: KubeConfig,
   customResourceDefinitions: K8sResource[],
-  namespace?: string
+  namespace?: string,
+  allNamespaces?: string
 ): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
@@ -261,7 +266,10 @@ async function loadCustomResourceObjects(
       .filter(crd => crd.content.spec)
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
-        if (kindHandler) {
+        if (
+          kindHandler &&
+          (allNamespaces ? true : namespace === 'cluster-scoped' ? !kindHandler.isNamespaced : kindHandler.isNamespaced)
+        ) {
           return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)
