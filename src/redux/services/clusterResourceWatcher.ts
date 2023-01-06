@@ -9,7 +9,7 @@ import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, setIsClusterConnected, updateClusterResource} from '@redux/reducers/main';
+import {deleteClusterResource, setIsClusterConnected} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -113,11 +113,11 @@ const watchResource = async (
             await watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
           }
         }
-        dispatch(updateClusterResource(resource));
+        // dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'MODIFIED') {
-        dispatch(updateClusterResource(resource));
+        // dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'DELETED') {
