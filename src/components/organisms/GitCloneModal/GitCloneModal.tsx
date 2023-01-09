@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import fs from 'fs';
 import {sep} from 'path';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
@@ -47,6 +48,10 @@ const GitCloneModal: React.FC = () => {
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
+
+      if (!doesPathExist(localPath)) {
+        fs.mkdirSync(localPath, {recursive: true});
+      }
 
       promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
         localPath: `${localPath}${sep}${repoName}`,
@@ -103,11 +108,6 @@ const GitCloneModal: React.FC = () => {
 
                       if (!localPath) {
                         reject(new Error('Please provide your local path!'));
-                        return;
-                      }
-
-                      if (!doesPathExist(localPath)) {
-                        reject(new Error('Provided path does not exist!'));
                         return;
                       }
 
