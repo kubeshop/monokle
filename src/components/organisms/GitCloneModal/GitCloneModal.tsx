@@ -48,13 +48,14 @@ const GitCloneModal: React.FC = () => {
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
+      const localGitPath = `${localPath}${sep}${repoName}`;
 
       if (!doesPathExist(localPath)) {
         fs.mkdirSync(localPath, {recursive: true});
       }
 
       promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: `${localPath}${sep}${repoName}`,
+        localPath: localGitPath,
         repoPath: repoURL,
       }).then(result => {
         setLoading(false);
@@ -66,6 +67,10 @@ const GitCloneModal: React.FC = () => {
             content: <div>{result.error}</div>,
             zIndex: 100000,
           });
+
+          if (doesPathExist(localGitPath)) {
+            fs.rmdirSync(localGitPath, {recursive: true});
+          }
         } else {
           dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
         }
