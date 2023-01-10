@@ -1,4 +1,4 @@
-import {SendOutlined as RawSendOutlined} from '@ant-design/icons';
+import {SendOutlined as RawSendOutlined, SettingOutlined as RawSettingsOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -55,6 +55,12 @@ export const MenuOption = styled.div<{$active: boolean}>`
 
 export const SendOutlined = styled(RawSendOutlined)`
   transform: rotate(315deg) translate(3px, 0px);
+  font-size: 16px;
+`;
+
+export const SettingsOutlined = styled(RawSettingsOutlined)`
+  font-size: 16px;
+  padding-top: 1px;
 `;
 
 export const StartPageContainer = styled.div<{$height: number}>`
