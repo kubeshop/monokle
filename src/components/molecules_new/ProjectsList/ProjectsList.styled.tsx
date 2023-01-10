@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const RecentProjectsContainer = styled.div`
+export const ProjectsListContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;

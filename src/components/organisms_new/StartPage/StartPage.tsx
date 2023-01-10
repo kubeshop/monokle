@@ -2,11 +2,12 @@ import {useState} from 'react';
 
 import {IconButton} from '@atoms';
 
+import ProjectsList from '@components/molecules_new/ProjectsList';
+
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {Icon} from '@monokle/components';
 
-import RecentProjects from '../RecentProjects';
 import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
@@ -17,12 +18,12 @@ const options = {
   'recent-projects': {
     icon: <S.SendOutlined />,
     label: 'Recent projects',
-    content: <RecentProjects />,
+    content: <ProjectsList type="recent" />,
   },
   'all-projects': {
     icon: <Icon name="all-projects" style={{fontSize: '16px'}} />,
     label: 'All projects',
-    content: <>All projects</>,
+    content: <ProjectsList type="all" />,
   },
   settings: {
     icon: <S.SettingsOutlined />,
