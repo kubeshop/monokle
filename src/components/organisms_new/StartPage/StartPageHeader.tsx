@@ -7,7 +7,8 @@ import {BellOutlined, EllipsisOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {toggleNotifications} from '@redux/reducers/ui';
 
 import {HelpMenu} from '@organisms/PageHeader/HelpMenu';
 
@@ -18,6 +19,7 @@ import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 import * as S from './StatePageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
+  const dispatch = useAppDispatch();
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
@@ -35,7 +37,12 @@ const StartPageHeader: React.FC = () => {
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
           <Badge count={unseenNotificationsCount} size="small">
-            <IconButton $size="large">
+            <IconButton
+              $size="large"
+              onClick={() => {
+                dispatch(toggleNotifications());
+              }}
+            >
               <BellOutlined />
             </IconButton>
           </Badge>
