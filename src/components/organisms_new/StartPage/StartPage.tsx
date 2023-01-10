@@ -6,6 +6,7 @@ import {IconButton} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import RecentProjects from '../RecentProjects';
 import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
@@ -16,7 +17,7 @@ const options = {
   'recent-projects': {
     icon: <S.SendOutlined />,
     label: 'Recent projects',
-    content: <div>Recent projects</div>,
+    content: <RecentProjects />,
   },
   'all-projects': {
     icon: <S.SendOutlined />,

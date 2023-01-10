@@ -30,7 +30,7 @@ import {
 import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, UpdateNotice} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
@@ -50,6 +50,7 @@ import {AlertEnum, ExtraContentType} from '@shared/models/alert';
 import {NewVersionCode, Project} from '@shared/models/config';
 import {StepEnum} from '@shared/models/walkthrough';
 import {Size} from '@shared/models/window';
+import {activeProjectSelector} from '@shared/utils';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
 
@@ -84,8 +85,8 @@ const App = () => {
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
 
+  const activeProject = useAppSelector(activeProjectSelector);
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
@@ -106,6 +107,7 @@ const App = () => {
   );
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
@@ -390,7 +392,8 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          {/* <PageHeader /> */}
+          {activeProject && !isStartProjectPaneVisible && <PageHeader />}
+
           <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />

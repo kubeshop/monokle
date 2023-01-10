@@ -83,6 +83,7 @@ export enum Colors {
   cyan9 = '#84E2D8',
   lightSeaGreen = '#13a8a8',
 
+  blue1 = '#111D2C',
   blue6 = '#1890FF', // Daybreak Blue
   blue7 = '#177DDC', // Daybreak Blue
   blue8 = '#65B7F3',
