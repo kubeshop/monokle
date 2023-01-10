@@ -55,3 +55,15 @@ export const ProjectCardContainer = styled.div<{$isActive: boolean}>`
     }
   }
 `;
+
+export const ProjectInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+export const Type = styled.div`
+  font-weight: 700;
+  font-size: 12px;
+  color: ${Colors.geekblue8};
+`;

@@ -84,7 +84,10 @@ export const ProjectCard: React.FC<IProps> = props => {
 
       <S.Name>{project.name}</S.Name>
 
-      <S.Path>{project.rootFolder}</S.Path>
+      <S.ProjectInfo>
+        <S.Type>{project.isGitRepo ? 'Git' : 'Local'}</S.Type>
+        <S.Path>{project.rootFolder}</S.Path>
+      </S.ProjectInfo>
 
       <S.LastOpened>
         {getRelativeDate(project.lastOpened) ? `last opened ${getRelativeDate(project.lastOpened)}` : 'Not opened yet'}
