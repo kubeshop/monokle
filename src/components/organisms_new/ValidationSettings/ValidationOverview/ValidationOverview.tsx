@@ -12,9 +12,15 @@ import ValidationCard from './ValidationCard';
 import ValidationCardUpNext from './ValidationCardUpNext';
 import * as S from './ValidationOverview.styled';
 
-const ValidationOverview: React.FC = () => {
+type IProps = {
+  height: number;
+};
+
+const ValidationOverview: React.FC<IProps> = props => {
+  const {height} = props;
+
   return (
-    <S.ValidationOverviewContainer>
+    <S.ValidationOverviewContainer $height={height}>
       <ValidationCard integration={OPA_INTEGRATION} />
       <ValidationCard integration={CRD_SCHEMA_INTEGRATION} />
       <ValidationCard integration={YAML_SYNTAX_INTEGRATION} />

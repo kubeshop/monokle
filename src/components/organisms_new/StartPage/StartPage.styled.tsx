@@ -8,6 +8,7 @@ export const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  height: 100%;
 `;
 
 export const ContentTitle = styled.div`
@@ -20,6 +21,8 @@ export const MainContainer = styled.div`
   display: grid;
   grid-template-columns: 190px 1fr 190px;
   grid-column-gap: 50px;
+  overflow: hidden;
+  height: 100%;
 `;
 
 export const Menu = styled.div`

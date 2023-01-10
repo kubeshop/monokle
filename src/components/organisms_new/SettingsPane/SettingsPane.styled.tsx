@@ -92,20 +92,21 @@ export const ThemeOption = styled.div<{$selected?: boolean}>`
   padding: ${({$selected}) => ($selected ? '3px' : '4px')};
 `;
 
-export const Tabs = styled(RawTabs)<{$height: number}>`
+export const Tabs = styled(RawTabs)<{$titleBarHeight: number}>`
   width: 100%;
-  height: ${({$height}) => `${$height}px`};
+  height: ${({$titleBarHeight}) => `calc(100% - ${$titleBarHeight}px)`};
   overflow: visible;
 
-  & .ant-tabs-nav {
+  & .ant-tabs-content {
+    height: 100%;
+
+    & .ant-tabs-tabpane {
+      height: 100%;
+    }
   }
 
   & .ant-tabs-nav::before {
     border-bottom: 1px solid #363636;
-  }
-
-  & .ant-tabs-content {
-    height: ${({$height}) => $height - 46}px;
   }
 
   & .ant-tabs-extra-content {
@@ -117,9 +118,9 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
 export const TabItemContainer = styled.div`
   background-color: ${Colors.grey10};
   padding: 16px;
-  height: 100%;
-  overflow-y: auto;
+  height: calc(100% - 100px); // TODO: No hardcoded height
   margin-top: 20px;
+  overflow-y: auto;
 `;
 
 export const TabOption = styled.div`

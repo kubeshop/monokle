@@ -28,7 +28,7 @@ const ValidationSettings: React.FC = () => {
     <S.ValidationSettingsContainer ref={validationSettingsRef}>
       <S.ValidationSettingsTitle>Configure your validation policies</S.ValidationSettingsTitle>
 
-      <Panel height={height - 30} />
+      <Panel height={height - 80} />
     </S.ValidationSettingsContainer>
   );
 };

@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
-export const ValidationOverviewContainer = styled.div`
+export const ValidationOverviewContainer = styled.div<{$height: number}>`
   display: grid;
-  grid-auto-rows: 135px;
   grid-gap: 10px;
+  /* overflow-y: auto;
+  padding-right: 5px;  */
 `;
