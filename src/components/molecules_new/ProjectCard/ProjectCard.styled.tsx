@@ -29,6 +29,7 @@ export const Path = styled.div`
 
 export const ProjectCardContainer = styled.div<{$isActive: boolean}>`
   position: relative;
+  min-height: 110px;
   height: 110px;
   cursor: pointer;
   background: #191d1f;

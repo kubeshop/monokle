@@ -9,6 +9,7 @@ export const ContentContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   height: 100%;
+  overflow-y: auto;
 `;
 
 export const ContentTitle = styled.div`
