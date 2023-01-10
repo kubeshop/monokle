@@ -13,13 +13,15 @@ const RecentProjects: React.FC = () => {
 
   return (
     <S.RecentProjectsContainer>
-      {sortProjects(projects, Boolean(activeProject)).map(project => (
-        <ProjectCard
-          key={project.rootFolder}
-          isActive={project.rootFolder === activeProject?.rootFolder}
-          project={project}
-        />
-      ))}
+      {sortProjects(projects, Boolean(activeProject))
+        .slice(0, 5)
+        .map(project => (
+          <ProjectCard
+            key={project.rootFolder}
+            isActive={project.rootFolder === activeProject?.rootFolder}
+            project={project}
+          />
+        ))}
     </S.RecentProjectsContainer>
   );
 };
