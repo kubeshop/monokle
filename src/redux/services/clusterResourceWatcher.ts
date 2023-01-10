@@ -9,7 +9,11 @@ import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {deleteClusterResource, setIsClusterConnected} from '@redux/reducers/main';
+import {
+  deleteMultipleClusterResources,
+  setIsClusterConnected,
+  updateMultipleClusterResources,
+} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -20,6 +24,10 @@ import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandl
 import {extractK8sResources} from './resource';
 
 let isClusterConnected: boolean = false;
+let intervalId: string | number | NodeJS.Timeout;
+const intervalPeriod = 10000;
+let resourcesToUpdate: K8sResource[] = [];
+let resourcesToDelete: K8sResource[] = [];
 
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
@@ -113,15 +121,18 @@ const watchResource = async (
             await watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
           }
         }
+        resourcesToUpdate.push(resource);
         // dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'MODIFIED') {
+        resourcesToUpdate.push(resource);
         // dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'DELETED') {
-        dispatch(deleteClusterResource(resource));
+        resourcesToDelete.push(resource);
+        // dispatch(deleteClusterResource(resource));
       }
     },
     (error: any) => {
@@ -153,10 +164,23 @@ export const startWatchingResources = (
     watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
   );
   watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
+  intervalId = setInterval(() => {
+    if (resourcesToUpdate.length > 0) {
+      dispatch(updateMultipleClusterResources(resourcesToUpdate));
+      resourcesToUpdate = [];
+    }
+    if (resourcesToDelete.length > 0) {
+      dispatch(deleteMultipleClusterResources(resourcesToDelete));
+      resourcesToDelete = [];
+    }
+  }, intervalPeriod);
 };
 
 export const disconnectFromCluster = () => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) => disconnectResourceFromCluster(handler));
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
 };
 
 export const isClusterDisconnected = () => {

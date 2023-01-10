@@ -783,6 +783,16 @@ export const mainSlice = createSlice({
     deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       delete state.resourceMap[action.payload.id];
     },
+    updateMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
+      action.payload.forEach((r: K8sResource) => {
+        state.resourceMap[r.id] = r;
+      });
+    },
+    deleteMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
+      action.payload.forEach((r: K8sResource) => {
+        delete state.resourceMap[r.id];
+      });
+    },
     setIsClusterConnected: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isClusterConnected = action.payload;
     },
@@ -1418,6 +1428,8 @@ export const {
   updateClusterResource,
   deleteClusterResource,
   setIsClusterConnected,
+  updateMultipleClusterResources,
+  deleteMultipleClusterResources,
 } = mainSlice.actions;
 export default mainSlice.reducer;
 
