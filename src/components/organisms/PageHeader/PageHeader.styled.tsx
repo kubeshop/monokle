@@ -63,6 +63,18 @@ export const Header = styled(Layout.Header)`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  & .ant-badge-count-sm {
+    font-size: 10px;
+    min-width: 12px;
+    height: 12px;
+    line-height: 12px;
+  }
+
+  & .ant-badge-multiple-words {
+    padding: 0px 4px 0px 3px;
+    right: -3px;
+  }
 `;
 
 export const InitButton = styled(RawButton)`
