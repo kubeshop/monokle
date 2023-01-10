@@ -69,11 +69,13 @@ const crdRequestURLGenerator = (clusterApiVersion: string, plural: string) => {
 const watchers: {[resourceKind: string]: {watcher: any; status: ClusterConnectionStatus}} = {};
 
 const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
-  try {
-    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher.abort();
-    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
-  } catch (error) {
-    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
+  if (watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`]) {
+    try {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher.abort();
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
+    } catch (error) {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
+    }
   }
 };
 

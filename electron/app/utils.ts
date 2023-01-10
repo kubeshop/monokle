@@ -9,10 +9,11 @@ import _ from 'lodash';
 import log from 'loglevel';
 import os from 'os';
 import path, {join} from 'path';
+import semver from 'semver';
 
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import type {AnyExtension} from '@shared/models/extension';
-import {APP_INSTALLED} from '@shared/models/telemetry';
+import {APP_DOWNGRADED, APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@shared/models/telemetry';
 import electronStore from '@shared/utils/electronStore';
 import {loadResource} from '@shared/utils/resource';
 import {getSegmentClient} from '@shared/utils/segment';
@@ -98,13 +99,49 @@ export const initTelemetry = (deviceID: string, disableEventTracking: boolean, a
   const storedDeviceID: string | undefined = electronStore.get('main.deviceID');
   const segmentClient = getSegmentClient();
 
+  let lastSessionVersion = electronStore.get('appConfig.lastSessionVersion');
+
+  if (!lastSessionVersion) {
+    lastSessionVersion = app.getVersion();
+    electronStore.set('appConfig.lastSessionVersion', lastSessionVersion);
+  }
+
   if (!disableEventTracking) {
     log.info('New Session.');
     segmentClient?.track({
-      event: 'APP_SESSION',
+      event: APP_SESSION,
       userId: deviceID,
+      properties: {
+        appVersion: app.getVersion(),
+      },
     });
+
+    if (semver.lt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Updated.');
+      segmentClient?.track({
+        event: APP_UPDATED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
+
+    if (semver.gt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Downgraded.');
+      segmentClient?.track({
+        event: APP_DOWNGRADED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
   }
+
+  electronStore.set('appConfig.lastSessionVersion', app.getVersion());
 
   if (!storedDeviceID) {
     log.info('New Installation.');

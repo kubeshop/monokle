@@ -6,7 +6,7 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
 import terminal from '@root/cli/terminal';
-import * as Sentry from '@sentry/electron';
+import {init as sentryInit} from '@sentry/electron/main';
 import electronStore from '@shared/utils/electronStore';
 import '@shared/utils/segment';
 
@@ -22,7 +22,7 @@ const userDataDir = app.getPath('userData');
 const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
 
 if (process.env.SENTRY_DSN) {
-  Sentry.init({
+  sentryInit({
     dsn: process.env.SENTRY_DSN,
     beforeSend: event => {
       const disableErrorReporting = Boolean(electronStore.get('appConfig.disableErrorReporting'));
