@@ -92,10 +92,9 @@ export const ThemeOption = styled.div<{$selected?: boolean}>`
   padding: ${({$selected}) => ($selected ? '3px' : '4px')};
 `;
 
-export const Tabs = styled(RawTabs)<{$titleBarHeight: number}>`
+export const Tabs = styled(RawTabs)`
   width: 100%;
-  height: ${({$titleBarHeight}) => `calc(100% - ${$titleBarHeight}px)`};
-  overflow: visible;
+  height: calc(100% - 50px); // TODO: No hardcoded height
 
   & .ant-tabs-content {
     height: 100%;

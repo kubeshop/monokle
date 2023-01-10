@@ -1,5 +1,4 @@
 import {useMemo, useState} from 'react';
-import {useMeasure} from 'react-use';
 
 import DefaultLayout from '@assets/DefaultLayout.svg';
 import EditorLayout from '@assets/EditorLayout.svg';
@@ -17,8 +16,6 @@ import * as S from './SettingsPane.styled';
 
 export const SettingsPane = () => {
   const [activeTabKey, setActiveTabKey] = useState('validation');
-
-  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const tabItems = useMemo(
     () => [
@@ -73,12 +70,9 @@ export const SettingsPane = () => {
 
   return (
     <S.SettingsPaneContainer>
-      <div ref={titleBarRef}>
-        <TitleBar title="Configure your layout" description={<TitleCardDescription />} />
-      </div>
+      <TitleBar title="Configure your layout" description={<TitleCardDescription />} />
 
       <S.Tabs
-        $titleBarHeight={titleBarHeight}
         defaultActiveKey="source"
         activeKey={activeTabKey}
         items={tabItems}
