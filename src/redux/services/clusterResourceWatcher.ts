@@ -158,7 +158,8 @@ export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sRes
 export const startWatchingResources = (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType
+  previewResources: ResourceMapType,
+  namespace: string
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
     watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
@@ -166,11 +167,23 @@ export const startWatchingResources = (
   watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
   intervalId = setInterval(() => {
     if (resourcesToUpdate.length > 0) {
-      dispatch(updateMultipleClusterResources(resourcesToUpdate));
+      dispatch(
+        updateMultipleClusterResources(
+          resourcesToUpdate.filter(r => {
+            return r.namespace ? r.namespace === namespace : true;
+          })
+        )
+      );
       resourcesToUpdate = [];
     }
     if (resourcesToDelete.length > 0) {
-      dispatch(deleteMultipleClusterResources(resourcesToDelete));
+      dispatch(
+        deleteMultipleClusterResources(
+          resourcesToDelete.filter(r => {
+            return r.namespace ? r.namespace === namespace : true;
+          })
+        )
+      );
       resourcesToDelete = [];
     }
   }, intervalPeriod);

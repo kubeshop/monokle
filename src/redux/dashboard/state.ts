@@ -4,7 +4,6 @@ export const initialState: DashboardState = {
   isOpen: false,
   ui: {
     activeMenu: {key: 'Overview', label: 'Overview'},
-    selectedNamespaces: [],
     activeTab: 'Info',
   },
   tableDrawer: {
@@ -16,7 +15,6 @@ export type DashboardState = {
   isOpen: boolean;
   ui: {
     activeMenu: IMenu;
-    selectedNamespaces: string[];
     activeTab: 'Info' | 'Manifest';
   };
   tableDrawer: {

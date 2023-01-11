@@ -8,24 +8,15 @@ import * as S from './Status.styled';
 
 export const Status = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
 
   const getResourceCount = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(r =>
-        selectedNamespaces.length > 0 && Boolean(r.namespace) ? selectedNamespaces.find(n => n === r.namespace) : true
-      ).length;
-  }, [resourceMap, selectedNamespaces]);
+    return Object.values(resourceMap).filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      .length;
+  }, [resourceMap]);
 
   const getErrorCount = useCallback(() => {
     return Object.values(resourceMap)
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(resource =>
-        selectedNamespaces.length > 0 && Boolean(resource.namespace)
-          ? selectedNamespaces.find(n => n === resource.namespace)
-          : true
-      )
       .reduce((total: number, resource: K8sResource) => {
         if (resource.issues && resource.issues.errors) {
           total += resource.issues.errors.length;
@@ -35,7 +26,7 @@ export const Status = () => {
         }
         return total;
       }, 0);
-  }, [resourceMap, selectedNamespaces]);
+  }, [resourceMap]);
 
   return (
     <S.Container>

@@ -15,7 +15,6 @@ import * as S from './Activity.styled';
 
 export const Activity = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
 
   const getEvents = useCallback(() => {
     return _.sortBy(
@@ -23,11 +22,7 @@ export const Activity = () => {
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
         .filter(
           (resource: K8sResource) =>
-            resource.content.apiVersion === EventHandler.clusterApiVersion &&
-            resource.kind === EventHandler.kind &&
-            (selectedNamespaces.length > 0 && Boolean(resource.namespace)
-              ? selectedNamespaces.find(n => n === resource.namespace)
-              : true)
+            resource.content.apiVersion === EventHandler.clusterApiVersion && resource.kind === EventHandler.kind
         )
         .map(resource => ({
           ...resource,
@@ -36,7 +31,7 @@ export const Activity = () => {
         })),
       'eventTime'
     ).reverse();
-  }, [resourceMap, selectedNamespaces]);
+  }, [resourceMap]);
 
   return (
     <S.Container>
