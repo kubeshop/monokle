@@ -30,6 +30,11 @@ const options = {
     label: 'Settings',
     content: <SettingsPane />,
   },
+  'new-project': {
+    icon: <S.PlusOutlined />,
+    label: 'New project',
+    content: <div>New project</div>,
+  },
 };
 
 const StartPage: React.FC = () => {

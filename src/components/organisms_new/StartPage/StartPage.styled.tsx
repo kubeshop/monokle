@@ -1,4 +1,8 @@
-import {SendOutlined as RawSendOutlined, SettingOutlined as RawSettingsOutlined} from '@ant-design/icons';
+import {
+  PlusOutlined as RawPlusOutlined,
+  SendOutlined as RawSendOutlined,
+  SettingOutlined as RawSettingsOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -31,6 +35,10 @@ export const Menu = styled.div`
   flex-direction: column;
   gap: 20px;
   margin-top: 10px;
+
+  & div:nth-child(4) {
+    margin-top: 50px;
+  }
 `;
 
 export const MenuOption = styled.div<{$active: boolean}>`
@@ -51,6 +59,11 @@ export const MenuOption = styled.div<{$active: boolean}>`
   &:hover button {
     color: ${Colors.geekblue9};
   }
+`;
+
+export const PlusOutlined = styled(RawPlusOutlined)`
+  font-size: 16px;
+  padding-top: 1px;
 `;
 
 export const SendOutlined = styled(RawSendOutlined)`
