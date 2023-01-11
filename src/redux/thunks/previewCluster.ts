@@ -165,7 +165,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       executionTime: endTime - startTime,
     });
 
-    startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources);
+    startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources, clusterPreviewNamespace);
 
     return previewResult;
   } catch (e: any) {
