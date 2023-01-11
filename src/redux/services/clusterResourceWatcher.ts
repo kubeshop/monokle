@@ -170,7 +170,13 @@ export const startWatchingResources = (
       dispatch(
         updateMultipleClusterResources(
           resourcesToUpdate.filter(r => {
-            return r.namespace ? r.namespace === namespace : true;
+            if (namespace === '<all>') {
+              return true;
+            }
+            if (namespace === '<not-namespaced>') {
+              return !r.namespace;
+            }
+            return r.namespace === namespace;
           })
         )
       );
@@ -180,7 +186,13 @@ export const startWatchingResources = (
       dispatch(
         deleteMultipleClusterResources(
           resourcesToDelete.filter(r => {
-            return r.namespace ? r.namespace === namespace : true;
+            if (namespace === '<all>') {
+              return true;
+            }
+            if (namespace === '<not-namespaced>') {
+              return !r.namespace;
+            }
+            return r.namespace === namespace;
           })
         )
       );
