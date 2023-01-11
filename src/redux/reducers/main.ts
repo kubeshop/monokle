@@ -777,12 +777,6 @@ export const mainSlice = createSlice({
       electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
       state.search.searchHistory = [...newSearchHistory, action.payload];
     },
-    updateClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      state.resourceMap[action.payload.id] = action.payload;
-    },
-    deleteClusterResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      delete state.resourceMap[action.payload.id];
-    },
     updateMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
         state.resourceMap[r.id] = r;
@@ -1425,8 +1419,6 @@ export const {
   updateSearchQuery,
   updateReplaceQuery,
   setLastChangedLine,
-  updateClusterResource,
-  deleteClusterResource,
   setIsClusterConnected,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
