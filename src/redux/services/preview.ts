@@ -1,6 +1,7 @@
 import {AppDispatch} from '@models/appdispatch';
 import {PreviewType} from '@models/appstate';
 
+import {setClusterProxyPort} from '@redux/reducers/appConfig';
 import {
   clearPreview,
   clearPreviewAndSelectionHistory,
@@ -59,6 +60,7 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
+  dispatch(setClusterProxyPort(undefined));
   disconnectFromCluster();
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());

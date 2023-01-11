@@ -3,6 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
+import {setClusterProxyPort} from '@redux/reducers/appConfig';
 import {stopPreview} from '@redux/services/preview';
 
 import {openKubectlProxy} from '@utils/commands/kubectl';
@@ -23,6 +24,7 @@ export const startClusterPreview = createAsyncThunk<
 >('main/startClusterPreview', async (payload, thunkAPI) => {
   const {clusterContext, isRestart} = payload;
 
+  const clusterProxyPort = thunkAPI.getState().config.clusterProxyPort;
   const shouldUseKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
   if (!shouldUseKubectlProxy) {
@@ -32,6 +34,15 @@ export const startClusterPreview = createAsyncThunk<
       thunkAPI.dispatch(previewCluster({context: clusterContext}));
     }
 
+    return;
+  }
+
+  if (clusterProxyPort) {
+    if (isRestart) {
+      thunkAPI.dispatch(repreviewCluster({context: clusterContext, port: clusterProxyPort}));
+    } else {
+      thunkAPI.dispatch(previewCluster({context: clusterContext, port: clusterProxyPort}));
+    }
     return;
   }
 
@@ -50,6 +61,8 @@ export const startClusterPreview = createAsyncThunk<
       if (!proxyPort) {
         return;
       }
+
+      thunkAPI.dispatch(setClusterProxyPort(proxyPort));
 
       if (isRestart) {
         thunkAPI.dispatch(repreviewCluster({context: clusterContext, port: proxyPort}));

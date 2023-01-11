@@ -549,6 +549,9 @@ export const configSlice = createSlice({
       state.clusterPreviewNamespace = action.payload;
       electronStore.set('appConfig.clusterPreviewNamespace', action.payload);
     },
+    setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
+      state.clusterProxyPort = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -624,5 +627,6 @@ export const {
   updateTextSize,
   updateTheme,
   updateUsingKubectlProxy,
+  setClusterProxyPort,
 } = configSlice.actions;
 export default configSlice.reducer;
