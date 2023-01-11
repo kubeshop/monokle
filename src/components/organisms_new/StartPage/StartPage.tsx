@@ -1,6 +1,7 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setShowStartPageLearn} from '@redux/reducers/ui';
 
 import {IconButton} from '@atoms';
 
@@ -15,7 +16,7 @@ import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
 
-type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project';
+type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'learn';
 
 const options = {
   'recent-projects': {
@@ -42,9 +43,17 @@ const options = {
     content: <NewProject />,
     title: 'Start something new',
   },
+  learn: {
+    icon: null,
+    label: 'Learn',
+    content: <div>Content</div>,
+    title: 'Learn',
+  },
 };
 
 const StartPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const projects = useAppSelector(state => state.config.projects);
 
   const height = usePaneHeight();
@@ -52,6 +61,14 @@ const StartPage: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<OptionsKeys>(
     projects.length ? 'recent-projects' : 'new-project'
   );
+
+  useEffect(() => {
+    if (!isStartPageLearnVisible || selectedOption === 'learn') {
+      return;
+    }
+
+    setSelectedOption('learn');
+  }, [isStartPageLearnVisible, selectedOption]);
 
   return (
     <S.StartPageContainer $height={height}>
@@ -62,9 +79,13 @@ const StartPage: React.FC = () => {
           {Object.entries(options).map(([key, value]) => (
             <S.MenuOption
               key={key}
-              $active={key === selectedOption}
+              $active={!isStartPageLearnVisible && key === selectedOption}
               onClick={() => {
                 setSelectedOption(key as OptionsKeys);
+
+                if (isStartPageLearnVisible) {
+                  dispatch(setShowStartPageLearn(false));
+                }
               }}
             >
               <IconButton>{value.icon}</IconButton>

@@ -39,6 +39,10 @@ export const Menu = styled.div`
   & div:nth-child(4) {
     margin-top: 50px;
   }
+
+  & div:nth-child(5) {
+    display: none;
+  }
 `;
 
 export const MenuOption = styled.div<{$active: boolean}>`

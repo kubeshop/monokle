@@ -224,6 +224,9 @@ const initialUiState: UiState = {
       currentStep: -1,
     },
   },
+  startPageLearn: {
+    isVisible: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {

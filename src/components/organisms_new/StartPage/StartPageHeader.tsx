@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleNotifications} from '@redux/reducers/ui';
+import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
 
 import {HelpMenu} from '@organisms/PageHeader/HelpMenu';
 
@@ -20,6 +20,7 @@ import * as S from './StatePageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
+  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
@@ -33,7 +34,15 @@ const StartPageHeader: React.FC = () => {
       <SearchInput style={{width: '340px'}} />
 
       <S.ActionsContainer>
-        <S.LearnButton type="text">Learn</S.LearnButton>
+        <S.LearnButton
+          $isActive={isStartPageLearnVisible}
+          type="text"
+          onClick={() => {
+            dispatch(setShowStartPageLearn(true));
+          }}
+        >
+          Learn
+        </S.LearnButton>
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
           <Badge count={unseenNotificationsCount} size="small">

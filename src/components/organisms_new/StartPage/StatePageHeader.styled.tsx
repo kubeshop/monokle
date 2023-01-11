@@ -3,6 +3,7 @@ import {Button} from 'antd';
 import styled from 'styled-components';
 
 import {AppBorders} from '@shared/styles/borders';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionsContainer = styled.div`
   margin-left: auto;
@@ -15,9 +16,18 @@ export const ActionsContainer = styled.div`
   }
 `;
 
-export const LearnButton = styled(Button)`
+export const LearnButton = styled(Button)<{$isActive: boolean}>`
   font-size: 16px;
   padding: 0px 10px;
+  color: ${({$isActive}) => ($isActive ? Colors.geekblue9 : Colors.grey9)};
+  font-weight: ${({$isActive}) => ($isActive ? '700' : '400')};
+
+  &:active,
+  &:focus {
+    color: ${({$isActive}) => ($isActive ? Colors.geekblue9 : Colors.grey9)};
+    font-weight: ${({$isActive}) => ($isActive ? '700' : '400')};
+    background: transparent;
+  }
 `;
 
 export const Logo = styled.img`
