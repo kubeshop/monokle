@@ -140,6 +140,7 @@ interface AppConfig {
     data: any;
   };
   kubeConfig: KubeConfig;
+  clusterProxyPort?: number;
   osPlatform: NodeJS.Platform;
   projects: Project[];
   selectedProjectRootFolder: string | null;
