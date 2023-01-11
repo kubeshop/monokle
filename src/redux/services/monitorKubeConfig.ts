@@ -6,8 +6,10 @@ import fs from 'fs';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
+import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
+import {setAlert} from '@redux/reducers/alert';
 import {
   addNamespaceToContext,
   removeNamespaceFromContext,
@@ -105,10 +107,22 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
       {allowWatchBookmarks: true},
       (type: string, apiObj: any) => {
         if (type === 'ADDED') {
-          getKubeAccess(apiObj.metadata.name, key).then(value => {
-            dispatch(setAccessLoading(true));
-            dispatch(addNamespaceToContext(value));
-          });
+          getKubeAccess(apiObj.metadata.name, key)
+            .then(value => {
+              dispatch(setAccessLoading(true));
+              dispatch(addNamespaceToContext(value));
+            })
+            .catch(() => {
+              dispatch(
+                setAlert({
+                  type: AlertEnum.Warning,
+                  title: 'Cluster Watcher Error',
+                  message:
+                    "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
+                })
+              );
+              dispatch(setAccessLoading(false));
+            });
         } else if (type === 'DELETED') {
           dispatch(setAccessLoading(true));
           dispatch(removeNamespaceFromContext({namespace: apiObj.metadata.name, context: key}));

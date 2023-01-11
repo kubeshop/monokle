@@ -45,7 +45,7 @@ export enum NewVersionCode {
 }
 
 export type KubePermissions = {
-  resourceName: string;
+  resourceKind: string;
   verbs: string[];
 };
 
