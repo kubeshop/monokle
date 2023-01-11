@@ -79,22 +79,22 @@ function parseCanI(stdout: string): {permissions: KubePermissions[]; hasFullAcce
      * an output line looks like this "selfsubjectrulesreviews.authorization.k8s.io [] [] [create]"
      * and we need only the first and last items(resource name and verbs allowed)
      */
-    const [resourceName, , , rawVerbs] = columns;
+    const [resourceKind, , , rawVerbs] = columns;
 
-    if (!resourceName) {
+    if (!resourceKind) {
       return;
     }
 
     const cleanVerbs = (rawVerbs as string).replace('[', '').replace(']', '');
 
-    if (resourceName === '*.*' && cleanVerbs === '*') {
+    if (resourceKind === '*.*' && cleanVerbs === '*') {
       hasFullAccess = true;
     }
 
     const verbs = cleanVerbs ? cleanVerbs.split(' ') : [];
 
     permissions.push({
-      resourceName,
+      resourceKind,
       verbs,
     });
   });
@@ -125,11 +125,11 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   if (hasErrors) {
     const errors = result.stderr;
     log.error(`get cluster access errors ${errors}`);
-    throw new Error("Couldn't get cluster access for namespaces");
+    throw new Error(`Couldn't get cluster access for namespaces. Errors: ${JSON.stringify(errors)}`);
   }
   const stdout = result.stdout;
   if (typeof stdout !== 'string') {
-    throw new Error("Couldn't get cluster access for namespaces");
+    throw new Error("Couldn't get cluster access for namespaces.");
   }
   return {
     ...parseCanI(result.stdout as string),
@@ -138,7 +138,8 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   };
 };
 
-export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
+// TODO: verb should be typed as a union of all possible verbs
+export function hasAccessToResourceKind(resourceKind: string, verb: string, clusterAccess?: ClusterAccess) {
   if (!clusterAccess) {
     return false;
   }
@@ -148,7 +149,7 @@ export function hasAccessToResource(resourceName: string, verb: string, clusterA
   }
 
   const resourceAccess = clusterAccess.permissions.find(access => {
-    return access.resourceName === resourceName.toLowerCase() && access.verbs.includes(verb);
+    return access.resourceKind === resourceKind.toLowerCase() && access.verbs.includes(verb);
   });
 
   return Boolean(resourceAccess);
