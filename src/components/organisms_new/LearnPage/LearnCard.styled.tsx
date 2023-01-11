@@ -30,7 +30,7 @@ export const LearnCardContainer = styled.div`
   gap: 8px;
   border-radius: 4px;
   background-color: #202c4d;
-  padding: 0px 20px;
+  padding: 0px 30px;
 `;
 
 export const Title = styled.div`

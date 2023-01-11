@@ -14,6 +14,13 @@ export const Description = styled.div`
   margin-bottom: 50px;
 `;
 
+export const HelpfulResourcesContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-rows: 100px;
+  grid-gap: 15px;
+`;
+
 export const LearnCardsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -26,4 +33,10 @@ export const LearnPageContainer = styled.div`
   @media ${Device.laptopM} {
     padding-right: 150px;
   }
+`;
+
+export const SubTitle = styled.div`
+  font-size: 16px;
+  font-weight: 700;
+  margin: 40px 0px 30px 0px;
 `;

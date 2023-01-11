@@ -2,6 +2,7 @@ import {CheckOutlined, UnorderedListOutlined} from '@ant-design/icons';
 
 import {Icon} from '@monokle/components';
 
+import HelpfulResourceCard from './HelpfulResourceCard';
 import LearnCard from './LearnCard';
 import * as S from './LearnPage.styled';
 
@@ -46,6 +47,17 @@ const LearnPage: React.FC = () => {
           onClick={() => {}}
         />
       </S.LearnCardsContainer>
+
+      <S.SubTitle>Helpful resources</S.SubTitle>
+
+      <S.HelpfulResourcesContainer>
+        <HelpfulResourceCard description="A quick read" title="Start Guide" />
+        <HelpfulResourceCard description="To learn the basics" title="3-minute Video Tutorial" />
+        <HelpfulResourceCard description="in Confluence" title="Documentation" />
+        <HelpfulResourceCard description="Join the conversation" title="Discord" />
+        <HelpfulResourceCard description="in the latest version?" title="What's new" />
+        <HelpfulResourceCard description="Share your thoughts" title="Feedback" />
+      </S.HelpfulResourcesContainer>
     </S.LearnPageContainer>
   );
 };
