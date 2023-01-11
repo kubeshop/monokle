@@ -14,6 +14,7 @@ export const ContentContainer = styled.div`
   gap: 20px;
   height: 100%;
   overflow-y: auto;
+  padding-right: 10px;
 `;
 
 export const ContentTitle = styled.div`
