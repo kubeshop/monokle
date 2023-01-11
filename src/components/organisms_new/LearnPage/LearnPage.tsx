@@ -1,6 +1,9 @@
+import {shell} from 'electron';
+
 import {CheckOutlined, UnorderedListOutlined} from '@ant-design/icons';
 
 import {Icon} from '@monokle/components';
+import {openDiscord} from '@shared/utils';
 
 import HelpfulResourceCard from './HelpfulResourceCard';
 import LearnCard from './LearnCard';
@@ -51,12 +54,24 @@ const LearnPage: React.FC = () => {
       <S.SubTitle>Helpful resources</S.SubTitle>
 
       <S.HelpfulResourcesContainer>
-        <HelpfulResourceCard description="A quick read" title="Start Guide" />
-        <HelpfulResourceCard description="To learn the basics" title="3-minute Video Tutorial" />
-        <HelpfulResourceCard description="in Confluence" title="Documentation" />
-        <HelpfulResourceCard description="Join the conversation" title="Discord" />
-        <HelpfulResourceCard description="in the latest version?" title="What's new" />
-        <HelpfulResourceCard description="Share your thoughts" title="Feedback" />
+        <HelpfulResourceCard description="A quick read" title="Start Guide" onClick={() => {}} />
+        <HelpfulResourceCard description="To learn the basics" title="3-minute Video Tutorial" onClick={() => {}} />
+        <HelpfulResourceCard description="in Confluence" title="Documentation" onClick={() => {}} />
+        <HelpfulResourceCard
+          description="Join the conversation"
+          title="Discord"
+          onClick={() => {
+            openDiscord();
+          }}
+        />
+        <HelpfulResourceCard description="in the latest version?" title="What's new" onClick={() => {}} />
+        <HelpfulResourceCard
+          description="Share your thoughts"
+          title="Feedback"
+          onClick={() => {
+            shell.openExternal('https://49x902y6r6t.typeform.com/to/vkFBEYYt');
+          }}
+        />
       </S.HelpfulResourcesContainer>
     </S.LearnPageContainer>
   );
