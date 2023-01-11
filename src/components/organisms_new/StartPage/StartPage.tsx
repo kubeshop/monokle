@@ -11,6 +11,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {Icon} from '@monokle/components';
 
+import LearnPage from '../LearnPage';
 import NewProject from '../NewProject';
 import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
@@ -46,7 +47,7 @@ const options = {
   learn: {
     icon: null,
     label: 'Learn',
-    content: <div>Content</div>,
+    content: <LearnPage />,
     title: 'Learn',
   },
 };
