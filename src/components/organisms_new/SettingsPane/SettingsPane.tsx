@@ -23,14 +23,12 @@ export const SettingsPane = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
 
-  const [activeTabKey, setActiveTabKey] = useState(
-    activeProject && !isStartProjectPaneVisible ? 'validation' : 'default-project-settings'
-  );
-
   const isOnStartProjectPage = useMemo(
     () => !activeProject || isStartProjectPaneVisible,
     [activeProject, isStartProjectPaneVisible]
   );
+
+  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'global-settings' : 'validation');
 
   const tabItems = useMemo(
     () => [
