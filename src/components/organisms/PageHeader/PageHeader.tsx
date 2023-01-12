@@ -36,6 +36,8 @@ import {trackEvent} from '@shared/utils/telemetry';
 import ClusterSelection from './ClusterSelection';
 import CreateProject from './CreateProject';
 import {HelpMenu} from './HelpMenu';
+import {K8sVersionSelection} from './K8sVersionSelection';
+import {OPAChip} from './OPAChip';
 import * as S from './PageHeader.styled';
 import ProjectSelection from './ProjectSelection';
 
@@ -247,7 +249,9 @@ const PageHeader = () => {
           )}
         </div>
 
-        <div style={{display: 'flex', alignItems: 'center'}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+          <OPAChip />
+          <K8sVersionSelection />
           <ClusterSelection previewResource={previewResource} />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
