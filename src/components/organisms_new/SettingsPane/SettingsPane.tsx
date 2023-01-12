@@ -2,6 +2,8 @@ import {useMemo, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {TitleBarWrapper} from '@components/atoms';
+
 import DefaultLayout from '@assets/DefaultLayout.svg';
 import EditorLayout from '@assets/EditorLayout.svg';
 
@@ -25,6 +27,11 @@ export const SettingsPane = () => {
     activeProject && !isStartProjectPaneVisible ? 'validation' : 'default-project-settings'
   );
 
+  const isOnStartProjectPage = useMemo(
+    () => !activeProject || isStartProjectPaneVisible,
+    [activeProject, isStartProjectPaneVisible]
+  );
+
   const tabItems = useMemo(
     () => [
       ...(activeProject && !isStartProjectPaneVisible
@@ -33,7 +40,7 @@ export const SettingsPane = () => {
               key: 'validation',
               label: <S.TabOption>Validation</S.TabOption>,
               children: (
-                <S.TabItemContainer>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
                   <ValidationSettings />
                 </S.TabItemContainer>
               ),
@@ -42,7 +49,7 @@ export const SettingsPane = () => {
               key: 'current-project-settings',
               label: <S.TabOption>Current project settings</S.TabOption>,
               children: (
-                <S.TabItemContainer>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
                   <CurrentProjectSettings />
                 </S.TabItemContainer>
               ),
@@ -55,7 +62,7 @@ export const SettingsPane = () => {
               key: 'global-settings',
               label: <S.TabOption>Global settings</S.TabOption>,
               children: (
-                <S.TabItemContainer>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
                   <GlobalSettings />
                 </S.TabItemContainer>
               ),
@@ -64,7 +71,7 @@ export const SettingsPane = () => {
               key: 'plugins-manager',
               label: <S.TabOption>Plugins Manager</S.TabOption>,
               children: (
-                <S.TabItemContainer>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
                   <PluginManager />
                 </S.TabItemContainer>
               ),
@@ -73,7 +80,7 @@ export const SettingsPane = () => {
               key: 'default-project-settings',
               label: <S.TabOption>Default project settings</S.TabOption>,
               children: (
-                <S.TabItemContainer>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
                   <DefaultProjectSettings />
                 </S.TabItemContainer>
               ),
@@ -81,12 +88,17 @@ export const SettingsPane = () => {
           ]
         : []),
     ],
-    [activeProject, isStartProjectPaneVisible]
+    [activeProject, isOnStartProjectPage, isStartProjectPaneVisible]
   );
 
   return (
-    <S.SettingsPaneContainer>
-      <TitleBar title="Configure your layout" description={<TitleCardDescription />} />
+    <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
+      <TitleBarWrapper style={{padding: !isOnStartProjectPage ? '10px' : '0px'}}>
+        <TitleBar
+          title={!isOnStartProjectPage ? 'Settings' : 'Configure your layout'}
+          description={!isOnStartProjectPage ? null : <TitleCardDescription />}
+        />
+      </TitleBarWrapper>
 
       <S.Tabs
         defaultActiveKey="source"

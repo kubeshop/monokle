@@ -4,10 +4,11 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-export const SettingsPaneContainer = styled.div`
+export const SettingsPaneContainer = styled.div<{$isOnStartProjectPage: boolean}>`
   height: 100%;
   width: 100%;
   overflow: hidden;
+  background-color: ${({$isOnStartProjectPage}) => ($isOnStartProjectPage ? 'transparent' : '#191f21')};
 `;
 
 export const DescriptionContainer = styled.div`
@@ -113,8 +114,15 @@ export const Tabs = styled(RawTabs)`
     }
   }
 
+  & .ant-tabs-nav {
+    padding: 0px 16px 0px 16px;
+
+    &::before {
+      border-bottom: 1px solid #363636;
+    }
+  }
+
   & .ant-tabs-nav::before {
-    border-bottom: 1px solid #363636;
   }
 
   & .ant-tabs-extra-content {
@@ -123,11 +131,11 @@ export const Tabs = styled(RawTabs)`
   }
 `;
 
-export const TabItemContainer = styled.div`
+export const TabItemContainer = styled.div<{$isOnStartProjectPage: boolean}>`
   background-color: ${Colors.grey10};
   padding: 16px;
-  height: calc(100% - 100px); // TODO: No hardcoded height
-  margin-top: 20px;
+  height: ${({$isOnStartProjectPage}) =>
+    $isOnStartProjectPage ? 'calc(100% - 100px)' : '100%'}; // TODO: No hardcoded height: ;
   overflow-y: auto;
 `;
 
