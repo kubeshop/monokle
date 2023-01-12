@@ -85,7 +85,7 @@ export const LayoutContent = styled.div`
   font-size: 12px;
   display: none;
 
-  @media (min-width: 900px) {
+  @media (min-width: 925px) {
     display: block;
   }
 `;

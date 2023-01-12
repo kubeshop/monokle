@@ -49,33 +49,37 @@ export const SettingsPane = () => {
             },
           ]
         : []),
-      {
-        key: 'default-project-settings',
-        label: <S.TabOption>Default project settings</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <DefaultProjectSettings />
-          </S.TabItemContainer>
-        ),
-      },
-      {
-        key: 'global-settings',
-        label: <S.TabOption>Global settings</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <GlobalSettings />
-          </S.TabItemContainer>
-        ),
-      },
-      {
-        key: 'plugins-manager',
-        label: <S.TabOption>Plugins Manager</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <PluginManager />
-          </S.TabItemContainer>
-        ),
-      },
+      ...(!activeProject || isStartProjectPaneVisible
+        ? [
+            {
+              key: 'global-settings',
+              label: <S.TabOption>Global settings</S.TabOption>,
+              children: (
+                <S.TabItemContainer>
+                  <GlobalSettings />
+                </S.TabItemContainer>
+              ),
+            },
+            {
+              key: 'plugins-manager',
+              label: <S.TabOption>Plugins Manager</S.TabOption>,
+              children: (
+                <S.TabItemContainer>
+                  <PluginManager />
+                </S.TabItemContainer>
+              ),
+            },
+            {
+              key: 'default-project-settings',
+              label: <S.TabOption>Default project settings</S.TabOption>,
+              children: (
+                <S.TabItemContainer>
+                  <DefaultProjectSettings />
+                </S.TabItemContainer>
+              ),
+            },
+          ]
+        : []),
     ],
     [activeProject, isStartProjectPaneVisible]
   );
