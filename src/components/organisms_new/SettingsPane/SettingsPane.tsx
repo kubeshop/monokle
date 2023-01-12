@@ -2,9 +2,9 @@ import {useMemo, useState} from 'react';
 
 import DefaultLayout from '@assets/DefaultLayout.svg';
 import EditorLayout from '@assets/EditorLayout.svg';
-import LayoutDark from '@assets/LayoutDark.svg';
-import LayoutWhite from '@assets/LayoutWhite.svg';
 
+// import LayoutDark from '@assets/LayoutDark.svg';
+// import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
 
 import ValidationSettings from '../ValidationSettings';
@@ -84,7 +84,7 @@ export const SettingsPane = () => {
 
 export const TitleCardDescription = () => {
   const [selectedLayout, setSelectedLayout] = useState('EDITOR');
-  const [selectedTheme, setSelectedTheme] = useState('DARK');
+  // const [selectedTheme, setSelectedTheme] = useState('DARK');
 
   return (
     <S.DescriptionContainer>
@@ -116,7 +116,7 @@ export const TitleCardDescription = () => {
         </S.LayoutOption>
       </S.OptionsContainer>
 
-      <S.OptionsContainer>
+      {/* <S.OptionsContainer>
         <S.ThemeOption
           $selected={selectedTheme === 'DARK'}
           onClick={() => {
@@ -134,7 +134,7 @@ export const TitleCardDescription = () => {
         >
           <img src={LayoutWhite} />
         </S.ThemeOption>
-      </S.OptionsContainer>
+      </S.OptionsContainer> */}
     </S.DescriptionContainer>
   );
 };

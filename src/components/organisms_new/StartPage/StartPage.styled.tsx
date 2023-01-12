@@ -6,7 +6,8 @@ import {
 
 import styled from 'styled-components';
 
-import {Colors} from '@shared/styles';
+import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 export const ContentContainer = styled.div`
   display: flex;
@@ -25,10 +26,14 @@ export const ContentTitle = styled.div`
 
 export const MainContainer = styled.div`
   display: grid;
-  grid-template-columns: 190px 1fr 190px;
+  grid-template-columns: 190px 1fr;
   grid-column-gap: 50px;
   overflow: hidden;
   height: 100%;
+
+  @media ${Device.laptopM} {
+    grid-template-columns: 190px 1fr 190px;
+  }
 `;
 
 export const Menu = styled.div`

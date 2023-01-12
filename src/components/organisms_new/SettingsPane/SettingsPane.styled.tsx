@@ -12,9 +12,6 @@ export const SettingsPaneContainer = styled.div`
 
 export const DescriptionContainer = styled.div`
   padding: 8px 0px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
 `;
 
 export const WalkThroughContainer = styled.div`
@@ -63,6 +60,11 @@ export const LayoutOption = styled.div<{$selected?: boolean}>`
 export const LayoutContainer = styled.div`
   margin-right: 12px;
   padding: 4px 0 4px 4px;
+
+  @media (max-width: 900px) {
+    display: flex;
+    align-items: center;
+  }
 `;
 
 export const LayoutTitle = styled.div`
@@ -72,13 +74,19 @@ export const LayoutTitle = styled.div`
 `;
 
 export const OptionsContainer = styled.div`
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
 `;
 
 export const LayoutContent = styled.div`
   color: ${Colors.whitePure};
   font-size: 12px;
+  display: none;
+
+  @media (min-width: 900px) {
+    display: block;
+  }
 `;
 
 export const ThemeOption = styled.div<{$selected?: boolean}>`

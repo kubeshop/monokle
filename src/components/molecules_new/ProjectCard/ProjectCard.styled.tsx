@@ -35,7 +35,7 @@ export const ProjectCardContainer = styled.div<{$isActive: boolean}>`
   background: #191d1f;
   border-radius: 4px;
   padding: 16px;
-  border-left: 4px solid ${props => (props.$isActive ? Colors.blue7 : 'transparent')};
+  border-left: 4px solid ${props => (props.$isActive ? Colors.grey5000 : 'transparent')};
   transition: background ${AnimationDurations.base};
 
   & .anticon-pushpin {
