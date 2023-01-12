@@ -10,8 +10,8 @@ const HelpfulResourceCard: React.FC<IProps> = props => {
   const {description, title, onClick} = props;
 
   return (
-    <S.HelpfulResourceCardContainer>
-      <S.Title onClick={onClick}>{title}</S.Title>
+    <S.HelpfulResourceCardContainer onClick={onClick}>
+      <S.Title>{title}</S.Title>
       <S.Description>{description}</S.Description>
     </S.HelpfulResourceCardContainer>
   );
