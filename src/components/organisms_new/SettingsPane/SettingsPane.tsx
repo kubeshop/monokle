@@ -1,11 +1,14 @@
 import {useMemo, useState} from 'react';
 
+import {useAppSelector} from '@redux/hooks';
+
 import DefaultLayout from '@assets/DefaultLayout.svg';
 import EditorLayout from '@assets/EditorLayout.svg';
 
 // import LayoutDark from '@assets/LayoutDark.svg';
 // import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
+import {activeProjectSelector} from '@shared/utils';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
@@ -15,37 +18,37 @@ import {PluginManager} from './PluginsManager/PluginManager';
 import * as S from './SettingsPane.styled';
 
 export const SettingsPane = () => {
-  const [activeTabKey, setActiveTabKey] = useState('validation');
+  const activeProject = useAppSelector(activeProjectSelector);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+
+  const [activeTabKey, setActiveTabKey] = useState(
+    activeProject && !isStartProjectPaneVisible ? 'validation' : 'default-project-settings'
+  );
 
   const tabItems = useMemo(
     () => [
-      {
-        key: 'validation',
-        label: <S.TabOption>Validation</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <ValidationSettings />
-          </S.TabItemContainer>
-        ),
-      },
-      {
-        key: 'plugins-manager',
-        label: <S.TabOption>Plugins Manager</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <PluginManager />
-          </S.TabItemContainer>
-        ),
-      },
-      {
-        key: 'current-project-settings',
-        label: <S.TabOption>Current project settings</S.TabOption>,
-        children: (
-          <S.TabItemContainer>
-            <CurrentProjectSettings />
-          </S.TabItemContainer>
-        ),
-      },
+      ...(activeProject && !isStartProjectPaneVisible
+        ? [
+            {
+              key: 'validation',
+              label: <S.TabOption>Validation</S.TabOption>,
+              children: (
+                <S.TabItemContainer>
+                  <ValidationSettings />
+                </S.TabItemContainer>
+              ),
+            },
+            {
+              key: 'current-project-settings',
+              label: <S.TabOption>Current project settings</S.TabOption>,
+              children: (
+                <S.TabItemContainer>
+                  <CurrentProjectSettings />
+                </S.TabItemContainer>
+              ),
+            },
+          ]
+        : []),
       {
         key: 'default-project-settings',
         label: <S.TabOption>Default project settings</S.TabOption>,
@@ -64,8 +67,17 @@ export const SettingsPane = () => {
           </S.TabItemContainer>
         ),
       },
+      {
+        key: 'plugins-manager',
+        label: <S.TabOption>Plugins Manager</S.TabOption>,
+        children: (
+          <S.TabItemContainer>
+            <PluginManager />
+          </S.TabItemContainer>
+        ),
+      },
     ],
-    []
+    [activeProject, isStartProjectPaneVisible]
   );
 
   return (

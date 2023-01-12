@@ -50,6 +50,7 @@ export const CurlyArrowImage = styled.img`
 export const LayoutOption = styled.div<{$selected?: boolean}>`
   border-radius: 4px;
   display: flex;
+  justify-content: space-between;
   height: 70px;
   cursor: pointer;
   background: ${({$selected}) => ($selected ? 'rgba(255, 255, 255, 0.2)' : 'inherit')};
