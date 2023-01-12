@@ -23,12 +23,7 @@ export type Rule = {
   enabled: boolean;
 };
 
-interface IProps {
-  descriptionHeight: number;
-  height: number;
-}
-
-export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHeight, height}) => {
+export const ValidationOpenPolicyAgentTable: React.FC = () => {
   const configRules = useAppSelector(state => state.validation.config.rules);
 
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
@@ -79,7 +74,7 @@ export const ValidationOpenPolicyAgentTable: React.FC<IProps> = ({descriptionHei
         />
       </S.InputContainer>
 
-      <S.TableContainer $height={height - descriptionHeight - 80}>
+      <S.TableContainer>
         <S.Table
           columns={columns}
           dataSource={filteredRules}

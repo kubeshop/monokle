@@ -25,7 +25,7 @@
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@craco/craco": "6.4.3",
-    "@monokle/components": "0.0.23",
+    "@monokle/components": "0.0.26",
     "@playwright/test": "1.23.1",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.3.0",
