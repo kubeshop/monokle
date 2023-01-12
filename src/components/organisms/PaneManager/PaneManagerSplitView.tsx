@@ -1,5 +1,7 @@
 import React, {Suspense, useCallback} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -30,6 +32,7 @@ const SearchPane = React.lazy(() => import('@organisms/SearchPane'));
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
 
+  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftActiveMenu = useAppSelector(state =>
     state.ui.leftMenu.isActive ? state.ui.leftMenu.selection : undefined
@@ -52,6 +55,9 @@ const PaneManagerSplitView: React.FC = () => {
   );
 
   if (!isInClusterMode && leftActiveMenu === 'dashboard') {
+    if (isPreviewLoading) {
+      return <Skeleton active style={{margin: 20}} />;
+    }
     return <EmptyDashboard />;
   }
 
