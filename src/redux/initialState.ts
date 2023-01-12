@@ -116,6 +116,7 @@ const initialAppConfigState: AppConfig = {
   clusterAccess: [],
   isAccessLoading: false,
   kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
+  clusterPreviewNamespace: electronStore.get('appConfig.clusterPreviewNamespace') || 'default',
 };
 
 const initialAlertState: AlertState = {};

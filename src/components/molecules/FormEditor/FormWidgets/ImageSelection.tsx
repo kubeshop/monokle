@@ -68,7 +68,7 @@ export const ImageSelection: React.FC = (params: any) => {
     >
       {inputValue && images.filter(image => image === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`Create '${inputValue}'`}
+          {inputValue}
         </Option>
       )}
       {images.map(image => (

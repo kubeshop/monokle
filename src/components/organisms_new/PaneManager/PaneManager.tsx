@@ -1,5 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
@@ -32,6 +34,7 @@ const NewPaneManager: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
@@ -96,7 +99,11 @@ const NewPaneManager: React.FC = () => {
               currentActivity?.type === 'fullscreen' ? (
                 currentActivity.component
               ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
-                <EmptyDashboard />
+                isPreviewLoading ? (
+                  <Skeleton active style={{margin: 20}} />
+                ) : (
+                  <EmptyDashboard />
+                )
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}

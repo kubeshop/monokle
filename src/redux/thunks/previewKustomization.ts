@@ -25,10 +25,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 export const previewKustomization = createAsyncThunk<
   SetPreviewDataPayload,
   string,
-  {
-    dispatch: AppDispatch;
-    state: RootState;
-  }
+  {dispatch: AppDispatch; state: RootState}
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
   const startTime = new Date().getTime();
   const state = thunkAPI.getState().main;
