@@ -20,6 +20,6 @@ export const getRelativeDate = (isoDate: string | undefined) => {
   return '';
 };
 
-export const doesSchemaExist = (k8sVersion: string, userDataDir?: string) => {
+export const doesSchemaExist = (k8sVersion: string, userDataDir: string) => {
   return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
 };

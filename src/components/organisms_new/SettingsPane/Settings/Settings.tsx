@@ -7,10 +7,8 @@ import {useForm} from 'antd/lib/form/Form';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {existsSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
-import path from 'path';
 
 import {
   DEFAULT_EDITOR_DEBOUNCE,
@@ -37,6 +35,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
+import {doesSchemaExist} from '@utils/index';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@shared/constants/k8s';
@@ -250,7 +249,7 @@ export const Settings = ({
 
   const handleK8SVersionChange = (k8sVersion: string) => {
     setSelectedK8SVersion(k8sVersion);
-    if (doesSchemaExist(k8sVersion)) {
+    if (doesSchemaExist(k8sVersion, String(userDataDir))) {
       setLocalConfig({...localConfig, k8sVersion});
     }
   };
@@ -270,10 +269,8 @@ export const Settings = ({
     }
   };
 
-  const doesSchemaExist = useCallback(
-    (k8sVersion: string) => {
-      return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
-    },
+  const doesSchemaExistCb = useCallback(
+    doesSchemaExist,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isSchemaDownloading]
   );
@@ -345,7 +342,9 @@ export const Settings = ({
               <Select
                 value={selectedK8SVersion}
                 onChange={handleK8SVersionChange}
-                style={{width: doesSchemaExist(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+                style={{
+                  width: doesSchemaExist(selectedK8SVersion, String(userDataDir)) ? '100%' : 'calc(100% - 172px)',
+                }}
                 optionLabelProp="label"
                 showSearch
               >
@@ -353,7 +352,7 @@ export const Settings = ({
                   <Select.Option key={version} value={version} label={version}>
                     <S.OptionContainer>
                       <S.OptionLabel>{version}</S.OptionLabel>
-                      {doesSchemaExist(version) && (
+                      {doesSchemaExist(version, String(userDataDir)) && (
                         <S.OptionDownloadedText style={{color: 'green'}}>Downloaded</S.OptionDownloadedText>
                       )}
                     </S.OptionContainer>
@@ -362,7 +361,7 @@ export const Settings = ({
               </Select>
             </Tooltip>
 
-            {!doesSchemaExist(selectedK8SVersion) && (
+            {!doesSchemaExist(selectedK8SVersion, String(userDataDir)) && (
               <Button
                 style={{width: '160px', marginLeft: '12px'}}
                 onClick={handleDownloadVersionSchema}

@@ -13,7 +13,7 @@ import * as S from './K8sVersionSelection.style';
 export const K8sVersionSelection = () => {
   const dispatch = useAppDispatch();
   const selectedK8SVersion = useAppSelector(state => state.config?.projectConfig?.k8sVersion);
-  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const userDataDir = useAppSelector(state => String(state.config.userDataDir));
 
   const handleK8SVersionChange = async (k8sVersion: string) => {
     if (doesSchemaExist(k8sVersion, userDataDir)) {
