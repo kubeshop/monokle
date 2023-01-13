@@ -2,8 +2,8 @@ import * as Rt from 'runtypes';
 
 const HelmPreviewRuntype = Rt.Record({
   type: Rt.Literal('helm'),
-  valuesFilePath: Rt.String,
-  helmChartId: Rt.String,
+  valuesFileId: Rt.String,
+  chartId: Rt.String,
 });
 
 const HelmConfigurationPreviewRuntype = Rt.Record({

@@ -20,7 +20,6 @@ import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());
-  dispatch(startPreviewLoader({previewType: type, targetId}));
 
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetId));

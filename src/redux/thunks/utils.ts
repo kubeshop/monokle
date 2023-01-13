@@ -34,66 +34,6 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
 }
 
 /**
- * Creates a preview result from a YAML string containing resources
- */
-
-export function createPreviewResult(
-  schemaVersion: string,
-  userDataDir: string,
-  resourcesYaml: string,
-  previewResourceId: string,
-  title: string,
-  resourceRefsProcessingOptions: ResourceRefsProcessingOptions,
-  previewKubeConfigPath?: string,
-  previewKubeConfigContext?: string,
-  processOptions?: {policyPlugins?: Policy[]}
-) {
-  const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
-  return createPreviewResultFromResources(
-    schemaVersion,
-    userDataDir,
-    resources,
-    previewResourceId,
-    title,
-    resourceRefsProcessingOptions,
-    previewKubeConfigPath,
-    previewKubeConfigContext,
-    processOptions
-  );
-}
-
-export function createPreviewResultFromResources(
-  schemaVersion: string,
-  userDataDir: string,
-  resources: K8sResource[],
-  previewResourceId: string,
-  title: string,
-  resourceRefsProcessingOptions: ResourceRefsProcessingOptions,
-  previewKubeConfigPath?: string,
-  previewKubeConfigContext?: string,
-  processOptions?: {policyPlugins?: Policy[]}
-) {
-  const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-    rm[r.id] = r;
-    return rm;
-  }, {});
-
-  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions, processOptions);
-
-  return {
-    previewResourceId,
-    previewResources: resourceMap,
-    alert: {
-      title,
-      message: `Previewing ${Object.keys(resourceMap).length} resources`,
-      type: AlertEnum.Success,
-    },
-    previewKubeConfigPath,
-    previewKubeConfigContext,
-  };
-}
-
-/**
  * Creates a thunk rejection that displays an error alert
  */
 

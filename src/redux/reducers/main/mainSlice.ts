@@ -13,7 +13,7 @@ import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {previewSavedCommand} from '@redux/services/previewCommand';
-import {deleteResource, saveResource, splitK8sResource} from '@redux/services/resource';
+import {deleteResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
@@ -62,6 +62,7 @@ import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import {previewExtraReducers} from './previewReducers';
 import {clearSelectedResourceOnPreviewExit, selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
@@ -460,93 +461,7 @@ export const mainSlice = createSlice({
       state.notifications = [notification, ...state.notifications];
     });
 
-    builder
-      .addCase(previewKustomization.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
-        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
-        state.selectedResourceId = action.payload.previewResourceId;
-        state.selectedPath = undefined;
-        state.selectedValuesFileId = undefined;
-        state.selectedPreviewConfigurationId = undefined;
-        state.checkedResourceIds = [];
-        state.previousSelectionHistory = [];
-      })
-      .addCase(previewKustomization.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
-        state.selectionHistory = state.previousSelectionHistory;
-        state.previousSelectionHistory = [];
-      });
-
-    builder
-      .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.currentSelectionHistoryIndex = undefined;
-        resetSelectionHistory(state);
-        state.selectedResourceId = undefined;
-        state.selectedImage = undefined;
-        state.checkedResourceIds = [];
-        if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-          selectFilePath({filePath: state.helmValuesMap[action.payload.previewResourceId].filePath, state});
-        }
-        state.selectedValuesFileId = action.payload.previewResourceId;
-        state.previousSelectionHistory = [];
-      })
-      .addCase(previewHelmValuesFile.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
-        state.selectionHistory = state.previousSelectionHistory;
-        state.previousSelectionHistory = [];
-      });
-
-    builder
-      .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.currentSelectionHistoryIndex = undefined;
-        resetSelectionHistory(state);
-        state.selectedResourceId = undefined;
-        state.selectedImage = undefined;
-        state.selectedPath = undefined;
-        state.checkedResourceIds = [];
-        state.previousSelectionHistory = [];
-      })
-      .addCase(runPreviewConfiguration.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
-        state.selectionHistory = state.previousSelectionHistory;
-        state.previousSelectionHistory = [];
-      });
-
-    builder
-      .addCase(previewSavedCommand.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.currentSelectionHistoryIndex = undefined;
-        resetSelectionHistory(state);
-        state.selectedResourceId = undefined;
-        state.selectedImage = undefined;
-        state.selectedPath = undefined;
-        state.checkedResourceIds = [];
-        state.previousSelectionHistory = [];
-      })
-      .addCase(previewSavedCommand.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
-        state.selectionHistory = state.previousSelectionHistory;
-        state.previousSelectionHistory = [];
-      });
+    previewExtraReducers(builder);
 
     builder
       .addCase(previewCluster.fulfilled, (state, action) => {
@@ -777,74 +692,6 @@ export const mainSlice = createSlice({
     );
   },
 });
-
-// function groupResourcesByIdentifier(
-//   resources: K8sResource[],
-//   makeIdentifier: (resource: K8sResource) => string
-// ): Record<string, K8sResource[]> {
-//   const groupedResources: Record<string, K8sResource[]> = {};
-//   resources.forEach(resource => {
-//     const identifier = makeIdentifier(resource);
-//     if (groupedResources[identifier]) {
-//       groupedResources[identifier].push(resource);
-//     } else {
-//       groupedResources[identifier] = [resource];
-//     }
-//   });
-//   return groupedResources;
-// }
-
-/**
- * Sets/clears preview resources
- */
-
-function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
-  state.previewResourceId = undefined;
-  state.previewValuesFileId = undefined;
-  state.previewConfigurationId = undefined;
-  state.previewCommandId = undefined;
-
-  // TODO: rename "previewResourceId" to "previewTargetId" and maybe add a comment to the property
-
-  if (payload.previewResourceId) {
-    if (state.previewType === 'kustomization') {
-      if (state.resourceMap[payload.previewResourceId]) {
-        state.previewResourceId = payload.previewResourceId;
-      } else {
-        log.error(`Unknown preview id: ${payload.previewResourceId}`);
-      }
-    }
-    if (state.previewType === 'helm') {
-      if (state.helmValuesMap[payload.previewResourceId]) {
-        state.previewValuesFileId = payload.previewResourceId;
-      } else {
-        log.error(`Unknown preview id: ${payload.previewResourceId}`);
-      }
-    }
-    if (state.previewType === 'cluster') {
-      state.previewResourceId = payload.previewResourceId;
-      state.previewKubeConfigPath = payload.previewKubeConfigPath;
-      state.previewKubeConfigContext = payload.previewKubeConfigContext;
-    }
-    if (state.previewType === 'helm-preview-config') {
-      state.previewConfigurationId = payload.previewResourceId;
-    }
-    if (state.previewType === 'command') {
-      state.previewCommandId = payload.previewResourceId;
-    }
-  }
-
-  // remove previous preview resources
-  Object.values(state.resourceMap)
-    .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
-    .forEach(r => deleteResource(r, state.resourceMap));
-
-  if (payload.previewResourceId && payload.previewResources) {
-    Object.values(payload.previewResources).forEach(r => {
-      state.resourceMap[r.id] = r;
-    });
-  }
-}
 
 export const {
   addKindHandler,

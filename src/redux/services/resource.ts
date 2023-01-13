@@ -30,6 +30,7 @@ import {
   K8sResource,
   ResourceContent,
   ResourceContentMap,
+  ResourceMap,
   ResourceMeta,
   ResourceMetaMap,
   isLocalResource,
@@ -452,4 +453,17 @@ export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
     object: resource.object,
   };
   return {meta, content};
+}
+
+export function splitK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
+  resourceMap: ResourceMap<Origin> | K8sResource<Origin>[]
+) {
+  const metaMap: ResourceMetaMap<Origin> = {};
+  const contentMap: ResourceContentMap<Origin> = {};
+  Object.values(resourceMap).forEach(resource => {
+    const {meta, content} = splitK8sResource(resource);
+    metaMap[resource.id] = meta;
+    contentMap[resource.id] = content;
+  });
+  return {metaMap, contentMap};
 }
