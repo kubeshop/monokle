@@ -1,11 +1,12 @@
-import {Draft, PayloadAction, SliceCaseReducers, ValidateSliceCaseReducers} from '@reduxjs/toolkit';
+import {Draft, PayloadAction} from '@reduxjs/toolkit';
 
 import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState, ImageType, ResourceStorage} from '@shared/models';
 import {AppSelection} from '@shared/models/selection';
+import {createSliceReducers} from '@shared/utils/redux';
 
-export const selectionReducers: ValidateSliceCaseReducers<AppState, SliceCaseReducers<AppState>> = {
+export const selectionReducers = createSliceReducers('main', {
   /**
    * Marks the specified resource as selected and highlights all related resources
    */
@@ -85,7 +86,7 @@ export const selectionReducers: ValidateSliceCaseReducers<AppState, SliceCaseRed
 
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
-};
+});
 
 function clearSelectionAndHighlights(state: AppState) {
   state.selection = undefined;
