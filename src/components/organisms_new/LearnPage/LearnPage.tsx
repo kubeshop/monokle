@@ -3,7 +3,7 @@ import {shell} from 'electron';
 import {CheckOutlined, UnorderedListOutlined} from '@ant-design/icons';
 
 import {Icon} from '@monokle/components';
-import {openDiscord} from '@shared/utils';
+import {openDiscord} from '@shared/utils/shell';
 
 import HelpfulResourceCard from './HelpfulResourceCard';
 import LearnCard from './LearnCard';

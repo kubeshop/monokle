@@ -1,20 +1,11 @@
-import {Button} from 'antd';
-
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  openCreateProjectModal,
-  openFolderExplorer,
-  setLeftMenuSelection,
-  setPreviewingCluster,
-  toggleStartProjectPane,
-} from '@redux/reducers/ui';
+import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
 import SelectFolder from '@assets/FromFolder.svg';
 import CreateFromGit from '@assets/FromGit.svg';
-import QuickClusterPreview from '@assets/QuickClusterPreview.svg';
-
-import {trackEvent} from '@shared/utils/telemetry';
+import CreateFromScratch from '@assets/FromScratch.svg';
+import CreateFromTemplate from '@assets/FromTemplate.svg';
 
 import ActionCard from './ActionCard';
 import * as S from './NewProject.styled';
@@ -34,23 +25,27 @@ const NewProject: React.FC = () => {
   const START_PROJECT_OPTIONS = [
     {
       disabled: false,
-      itemId: 'new-project',
+      itemId: 'select-existing-folder',
       itemLogo: SelectFolder,
-      itemTitle: 'New project',
-      itemDescription: 'Upload a local folder, start from a template or completely from scratch!',
-      multipleActions: (
-        <>
-          <Button id="select-existing-folder" size="large" type="primary" onClick={handleOpenFolderExplorer}>
-            Open a local folder
-          </Button>
-          <Button id="start-from-template" size="large" type="primary" onClick={() => handleCreateProject(true)}>
-            New from template
-          </Button>
-          <Button id="create-empty-project" size="large" type="primary" onClick={() => handleCreateProject(false)}>
-            New empty project
-          </Button>
-        </>
-      ),
+      itemTitle: 'Select a folder with K8s resources',
+      itemDescription: 'Already have a local folder with ready-to-check Kubernetes resources? Bring it on!',
+      itemAction: handleOpenFolderExplorer,
+    },
+    {
+      disabled: false,
+      itemId: 'create-empty-project',
+      itemLogo: CreateFromScratch,
+      itemTitle: 'Create a project from scratch',
+      itemDescription: "Create an empty project and new resources from scratch. We'll help you along the way.",
+      itemAction: () => handleCreateProject(false),
+    },
+    {
+      disabled: false,
+      itemId: 'start-from-template',
+      itemLogo: CreateFromTemplate,
+      itemTitle: 'Start from a template',
+      itemDescription: 'Create basic jobs, pods, roles, services and other resources through ready-to-go templates.',
+      itemAction: () => handleCreateProject(true),
     },
     {
       disabled: !isGitInstalled,
@@ -64,25 +59,12 @@ const NewProject: React.FC = () => {
         }
       },
     },
-    {
-      disabled: false,
-      itemId: 'quick-cluster-preview',
-      itemLogo: QuickClusterPreview,
-      itemTitle: 'Quick cluster preview',
-      itemDescription: 'Preview a cluster and learn everything about it in a matter of seconds.',
-      itemAction: () => {
-        trackEvent('dashboard/open', {from: 'start-screen-quick-cluster-preview'});
-        dispatch(setLeftMenuSelection('dashboard'));
-        dispatch(setPreviewingCluster(true));
-        dispatch(toggleStartProjectPane());
-      },
-    },
   ];
 
   return (
     <S.NewProjectContainer>
       {START_PROJECT_OPTIONS.map(item => {
-        const {disabled, itemId, itemLogo, itemTitle, itemDescription, itemAction, multipleActions} = item;
+        const {disabled, itemId, itemLogo, itemTitle, itemDescription, itemAction} = item;
 
         return (
           <ActionCard
@@ -91,7 +73,6 @@ const NewProject: React.FC = () => {
             key={itemId}
             id={itemId}
             logo={itemLogo}
-            multipleActions={multipleActions}
             title={itemTitle}
             onClick={itemAction}
             size="big"

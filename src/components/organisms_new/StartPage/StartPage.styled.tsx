@@ -46,7 +46,7 @@ export const Menu = styled.div`
     margin-top: 50px;
   }
 
-  & div:nth-child(5) {
+  & div:nth-child(6) {
     display: none;
   }
 `;

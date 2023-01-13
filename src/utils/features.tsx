@@ -10,7 +10,6 @@ const FEATURES = createFeatureFlags(featureJson, {
   CompareEverything: false,
   Terminal: true,
   GitOps: true,
-  NewStartPage: true,
 });
 
 function createFeatureFlags<TFeature extends string>(

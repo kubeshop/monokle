@@ -104,7 +104,7 @@ export const ThemeOption = styled.div<{$selected?: boolean}>`
 
 export const Tabs = styled(RawTabs)`
   width: 100%;
-  height: calc(100% - 50px); // TODO: No hardcoded height
+  height: 100%;
 
   & .ant-tabs-content {
     height: 100%;
@@ -135,7 +135,7 @@ export const TabItemContainer = styled.div<{$isOnStartProjectPage: boolean}>`
   background-color: ${Colors.grey10};
   padding: 16px;
   height: ${({$isOnStartProjectPage}) =>
-    $isOnStartProjectPage ? 'calc(100% - 100px)' : '100%'}; // TODO: No hardcoded height: ;
+    !$isOnStartProjectPage ? 'calc(100% - 50px)' : '100%'}; // TODO: No hardcoded height: ;
   overflow-y: auto;
 `;
 

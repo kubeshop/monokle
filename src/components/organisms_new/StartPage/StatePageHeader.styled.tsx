@@ -32,10 +32,11 @@ export const LearnButton = styled(Button)<{$isActive: boolean}>`
 
 export const Logo = styled.img`
   height: 31px;
+  cursor: pointer;
 `;
 
 export const LogoContainer = styled.div`
-  border-right: ${AppBorders.sectionDivider};
+  /* border-right: ${AppBorders.sectionDivider}; */
   width: 50px;
 `;
 

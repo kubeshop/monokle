@@ -10,7 +10,7 @@ import EditorLayout from '@assets/EditorLayout.svg';
 // import LayoutDark from '@assets/LayoutDark.svg';
 // import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
-import {activeProjectSelector} from '@shared/utils';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
@@ -28,21 +28,12 @@ export const SettingsPane = () => {
     [activeProject, isStartProjectPaneVisible]
   );
 
-  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'global-settings' : 'validation');
+  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'validation' : 'current-project-settings');
 
   const tabItems = useMemo(
     () => [
       ...(activeProject && !isStartProjectPaneVisible
         ? [
-            {
-              key: 'validation',
-              label: <S.TabOption>Validation</S.TabOption>,
-              children: (
-                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
-                  <ValidationSettings />
-                </S.TabItemContainer>
-              ),
-            },
             {
               key: 'current-project-settings',
               label: <S.TabOption>Current project settings</S.TabOption>,
@@ -54,6 +45,15 @@ export const SettingsPane = () => {
             },
           ]
         : []),
+      {
+        key: 'validation',
+        label: <S.TabOption>Validation</S.TabOption>,
+        children: (
+          <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
+            <ValidationSettings />
+          </S.TabItemContainer>
+        ),
+      },
       ...(!activeProject || isStartProjectPaneVisible
         ? [
             {
@@ -91,12 +91,11 @@ export const SettingsPane = () => {
 
   return (
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
-      <TitleBarWrapper style={{padding: !isOnStartProjectPage ? '10px' : '0px'}}>
-        <TitleBar
-          title={!isOnStartProjectPage ? 'Settings' : 'Configure your layout'}
-          description={!isOnStartProjectPage ? null : <TitleCardDescription />}
-        />
-      </TitleBarWrapper>
+      {!isOnStartProjectPage && (
+        <TitleBarWrapper>
+          <TitleBar title="Settings" />
+        </TitleBarWrapper>
+      )}
 
       <S.Tabs
         defaultActiveKey="source"
