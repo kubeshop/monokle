@@ -1,7 +1,12 @@
 import {useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setShowStartPageLearn} from '@redux/reducers/ui';
+import {
+  setLeftMenuSelection,
+  setPreviewingCluster,
+  setShowStartPageLearn,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
 import {IconButton} from '@atoms';
 
@@ -10,6 +15,7 @@ import ProjectsList from '@components/molecules_new/ProjectsList';
 import {useWindowSize} from '@utils/hooks';
 
 import {Icon} from '@monokle/components';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import LearnPage from '../LearnPage';
 import NewProject from '../NewProject';
@@ -17,7 +23,7 @@ import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
 
-type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'learn';
+type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'cluster-preview' | 'learn';
 
 const options = {
   'recent-projects': {
@@ -44,6 +50,12 @@ const options = {
     content: <NewProject />,
     title: 'Start something new',
   },
+  'cluster-preview': {
+    icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
+    label: 'Cluster preview',
+    content: null,
+    title: '',
+  },
   learn: {
     icon: null,
     label: 'Learn',
@@ -62,6 +74,13 @@ const StartPage: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<OptionsKeys>(
     projects.length ? 'recent-projects' : 'new-project'
   );
+
+  const onClickClusterPreview = () => {
+    trackEvent('dashboard/open', {from: 'start-screen-quick-cluster-preview'});
+    dispatch(setLeftMenuSelection('dashboard'));
+    dispatch(setPreviewingCluster(true));
+    dispatch(toggleStartProjectPane());
+  };
 
   useEffect(() => {
     if (!isStartPageLearnVisible || selectedOption === 'learn') {
@@ -82,6 +101,11 @@ const StartPage: React.FC = () => {
               key={key}
               $active={!isStartPageLearnVisible && key === selectedOption}
               onClick={() => {
+                if (key === 'cluster-preview') {
+                  onClickClusterPreview();
+                  return;
+                }
+
                 setSelectedOption(key as OptionsKeys);
 
                 if (isStartPageLearnVisible) {
