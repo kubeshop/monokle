@@ -91,12 +91,11 @@ export const SettingsPane = () => {
 
   return (
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
-      <TitleBarWrapper style={{padding: !isOnStartProjectPage ? '10px' : '0px'}}>
-        <TitleBar
-          title={!isOnStartProjectPage ? 'Settings' : 'Configure your layout'}
-          description={!isOnStartProjectPage ? null : <TitleCardDescription />}
-        />
-      </TitleBarWrapper>
+      {!isOnStartProjectPage && (
+        <TitleBarWrapper>
+          <TitleBar title="Settings" />
+        </TitleBarWrapper>
+      )}
 
       <S.Tabs
         defaultActiveKey="source"
