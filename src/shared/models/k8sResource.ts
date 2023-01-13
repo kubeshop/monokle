@@ -16,11 +16,21 @@ import {
   LocalOriginRuntype,
 } from './origin';
 
-export type ResourceMeta<Origin extends AnyOrigin = AnyOrigin> = {
+export type ResourceIdentifier<Origin extends AnyOrigin = AnyOrigin> = {
   /** an internally generated UUID
    * - used for references/lookups in resourceMaps */
   id: string;
   origin: Origin;
+};
+
+const ResourceIdentifierRuntype: Rt.Runtype<ResourceIdentifier<AnyOrigin>> = Rt.Record({
+  id: Rt.String,
+  origin: AnyOriginRuntype,
+});
+
+export const isResourceIdentifier = ResourceIdentifierRuntype.guard;
+
+export interface ResourceMeta<Origin extends AnyOrigin = AnyOrigin> extends ResourceIdentifier<Origin> {
   /**
    * name - generated from manifest metadata
    */
@@ -39,7 +49,7 @@ export type ResourceMeta<Origin extends AnyOrigin = AnyOrigin> = {
     length: number;
   };
   isUnsaved?: boolean;
-};
+}
 
 const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
   id: Rt.String,
@@ -70,12 +80,10 @@ export const isHelmResourceMeta = HelmResourceMetaRuntype.guard;
 export const isKustomizeResourceMeta = KustomizeResourceMetaRuntype.guard;
 export const isCommandResourceMeta = CommandResourceMetaRuntype.guard;
 
-export type ResourceContent<Origin extends AnyOrigin = AnyOrigin> = {
-  id: string;
-  origin: Origin;
+export interface ResourceContent<Origin extends AnyOrigin = AnyOrigin> extends ResourceIdentifier<Origin> {
   text: string;
   object: K8sObject;
-};
+}
 
 const ResourceContentRuntype: Rt.Runtype<ResourceContent<AnyOrigin>> = Rt.Record({
   id: Rt.String,
