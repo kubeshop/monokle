@@ -44,10 +44,7 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
   }
 `;
 
-export const TableContainer = styled.div<{$height: number}>`
-  ${({$height}) => `
-    height: ${$height}px;
-`}
+export const TableContainer = styled.div`
   overflow-y: auto;
   margin-top: 10px;
 `;

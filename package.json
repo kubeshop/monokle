@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.13.2",
+  "version": "1.13.3",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -25,7 +25,7 @@
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@craco/craco": "6.4.3",
-    "@monokle/components": "0.0.23",
+    "@monokle/components": "0.0.26",
     "@playwright/test": "1.23.1",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.3.0",
@@ -100,12 +100,14 @@
     "@ant-design/icons": "4.8.0",
     "@dnd-kit/core": "5.0.3",
     "@dnd-kit/sortable": "6.0.1",
-    "@kubernetes/client-node": "0.17.1",
     "@monokle/validation": "^0.5.0",
+    "@kubernetes/client-node": "0.18.0",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.9.1",
-    "@rjsf/antd": "4.2.0",
-    "@rjsf/core": "4.2.3",
+    "@rjsf/validator-ajv8": "5.0.0-beta.15",
+    "@rjsf/antd": "5.0.0-beta.15",
+    "@rjsf/core": "5.0.0-beta.15",
+    "@rjsf/utils": "5.0.0-beta.15",
     "@sentry/electron": "4.1.2",
     "@trodi/electron-splashscreen": "1.0.2",
     "@types/analytics-node": "3.1.9",
@@ -131,7 +133,7 @@
     "jsonpath-plus": "6.0.1",
     "lodash": "4.17.21",
     "loglevel": "1.8.1",
-    "luxon": "2.5.0",
+    "luxon": "2.5.2",
     "micromatch": "4.0.5",
     "module-alias": "2.2.2",
     "monaco-editor": "0.34.1",
@@ -237,7 +239,8 @@
       "publisherName": [
         "Kubernetes Innovation Labs, LLC",
         "KUBERNETES INNOVATION LABS, LLC"
-      ]
+      ],
+      "requestedExecutionLevel": "highestAvailable"
     },
     "nsis": {
       "oneClick": false,

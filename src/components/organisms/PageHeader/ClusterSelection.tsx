@@ -2,18 +2,27 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useWindowSize} from 'react-use';
 
-import {Dropdown, Tooltip} from 'antd';
+import {Dropdown, Select, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterNamespaceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
-import {currentClusterAccessSelector, kubeConfigContextColorSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {
+  currentClusterAccessSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigPathSelector,
+} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
+
+import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {sleep} from '@utils/sleep';
 
@@ -34,9 +43,11 @@ import * as S from './ClusterSelection.styled';
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const clusterPreviewNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAccessLoading = useAppSelector(state => state.config?.isAccessLoading);
@@ -53,6 +64,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const size: Size = useWindowSize();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+
+  const [namespaces] = useTargetClusterNamespaces();
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -194,7 +207,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.ClusterContainer id="ClusterContainer">
       {(activeProject || previewingCluster) && (
         <>
-          {!isPreviewLoading && isInPreviewMode && size.width > 946 && (
+          {!isPreviewLoading && isInPreviewMode && size.width > 1350 && (
             <S.PreviewMode
               $isInPreviewMode={isInPreviewMode}
               $previewType={previewType}
@@ -208,7 +221,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             </S.PreviewMode>
           )}
 
-          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 946}>
+          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 950}>
             {isKubeConfigPathValid && (
               <>
                 <S.ClusterOutlined />
@@ -250,20 +263,47 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           </S.ClusterStatus>
         </>
       )}
+
       <>
         {isKubeConfigPathValid && (activeProject || previewingCluster) && (
-          <S.Button
-            className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
-            disabled={isPreviewLoading && isAccessLoading}
-            onClick={loadOrReloadPreview}
-            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-            $previewType={previewType}
-            loading={isPreviewLoading}
-            size="small"
-            $kubeConfigContextColor={kubeConfigContextColor}
-          >
-            {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
-          </S.Button>
+          <>
+            {isInClusterMode && (
+              <Tooltip placement="left" mouseEnterDelay={TOOLTIP_DELAY} title={ClusterNamespaceTooltip}>
+                <S.Select
+                  value={clusterPreviewNamespace}
+                  showSearch
+                  onChange={namespace => {
+                    dispatch(setClusterPreviewNamespace(namespace as string));
+                    restartPreview(kubeConfigContext, 'cluster', dispatch);
+                  }}
+                >
+                  <Select.Option key="<all>" value="<all>">{`<all>`}</Select.Option>
+                  <Select.Option key="<not-namespaced>" value="<not-namespaced>">
+                    {`<not-namespaced>`}
+                  </Select.Option>
+
+                  {namespaces.map(ns => (
+                    <Select.Option key={ns} value={ns}>
+                      {ns}
+                    </Select.Option>
+                  ))}
+                </S.Select>
+              </Tooltip>
+            )}
+
+            <S.Button
+              className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
+              disabled={isPreviewLoading && isAccessLoading}
+              onClick={loadOrReloadPreview}
+              $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+              $previewType={previewType}
+              loading={isPreviewLoading}
+              size="small"
+              $kubeConfigContextColor={kubeConfigContextColor}
+            >
+              {isPreviewLoading ? '' : isInPreviewMode ? 'Reload' : 'Load'}
+            </S.Button>
+          </>
         )}
 
         {!isPreviewLoading && isInPreviewMode && (

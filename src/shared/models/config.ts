@@ -53,6 +53,7 @@ interface AppConfig {
     data: any;
   };
   kubeConfig: KubeConfig;
+  clusterProxyPort?: number;
   osPlatform: NodeJS.Platform;
   projects: Project[];
   selectedProjectRootFolder: string | null;
@@ -73,6 +74,7 @@ interface AppConfig {
     [name: string]: ClusterColors;
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
+  clusterPreviewNamespace: string;
 }
 
 type ClusterAccess = {
@@ -109,7 +111,7 @@ type KubeConfigContext = {
 };
 
 type KubePermissions = {
-  resourceName: string;
+  resourceKind: string;
   verbs: string[];
 };
 

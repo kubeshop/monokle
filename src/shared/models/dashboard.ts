@@ -12,7 +12,6 @@ export type DashboardState = {
   isOpen: boolean;
   ui: {
     activeMenu: DashboardMenu;
-    selectedNamespaces: string[];
     activeTab: 'Info' | 'Manifest';
   };
   tableDrawer: {

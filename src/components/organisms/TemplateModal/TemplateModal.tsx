@@ -155,7 +155,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
           <span>{template.name}</span>
         </S.ModalTitle>
       }
-      visible
+      open
       footer={
         activeFormIndex === 0 ? (
           <Button htmlType="submit" type="primary" loading={isLoading} onClick={() => setActiveFormIndex(1)}>

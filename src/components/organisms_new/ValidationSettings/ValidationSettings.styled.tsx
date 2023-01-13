@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const ValidationSettingsContainer = styled.div`
-  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 25px;

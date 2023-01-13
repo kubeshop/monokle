@@ -1,4 +1,4 @@
-export * from './electronStore';
+export {default as electronStore} from './electronStore';
 export * from './env';
 export * from './fileSystem';
 export * from './hotkey';

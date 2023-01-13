@@ -1,6 +1,6 @@
 import {Button} from 'antd';
 
-import {ArrayFieldTemplateProps} from '@rjsf/core';
+import {ArrayFieldTemplateProps} from '@rjsf/utils';
 
 export const FormArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
   const {items, canAdd, onAddClick} = props;

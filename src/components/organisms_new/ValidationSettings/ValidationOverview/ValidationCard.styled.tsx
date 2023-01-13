@@ -59,4 +59,5 @@ export const ValidationCardContainer = styled.div`
   display: grid;
   grid-template-columns: max-content 1fr max-content;
   grid-column-gap: 25px;
+  height: 145px;
 `;

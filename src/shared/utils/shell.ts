@@ -43,6 +43,7 @@ export function openNamespaceTopic() {
 }
 
 export function openExternalResourceKindDocumentation(resourceKindDocLink?: string) {
+  trackEvent('help/open_link', {linkType: 'external_documentation', link: resourceKindDocLink});
   if (resourceKindDocLink) {
     shell.openExternal(resourceKindDocLink);
   }

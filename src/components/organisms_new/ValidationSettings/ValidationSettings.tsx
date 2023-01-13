@@ -1,5 +1,4 @@
 import {useMemo} from 'react';
-import {useMeasure} from 'react-use';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -10,8 +9,6 @@ import * as S from './ValidationSettings.styled';
 
 const ValidationSettings: React.FC = () => {
   const integration = useAppSelector(state => state.main.validationIntegration);
-
-  const [validationSettingsRef, {height}] = useMeasure<HTMLDivElement>();
 
   const Panel = useMemo(() => {
     switch (integration?.id) {
@@ -25,10 +22,10 @@ const ValidationSettings: React.FC = () => {
   }, [integration]);
 
   return (
-    <S.ValidationSettingsContainer ref={validationSettingsRef}>
+    <S.ValidationSettingsContainer>
       <S.ValidationSettingsTitle>Configure your validation policies</S.ValidationSettingsTitle>
 
-      <Panel height={height - 30} />
+      <Panel />
     </S.ValidationSettingsContainer>
   );
 };

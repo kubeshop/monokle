@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.3](https://github.com/kubeshop/monokle/compare/v1.13.3-nightly-2023-01-12.0...v1.13.3) (2023-01-12)
+
+
+### Bug Fixes
+
+* add loading skeleton for dashboard reloading ([43327a9](https://github.com/kubeshop/monokle/commit/43327a972f4db4bd1ed723de903d686afdabd9bd))
+
 ### [1.13.2](https://github.com/kubeshop/monokle/compare/v1.13.2-nightly-2022-12-23.0...v1.13.2) (2022-12-23)
 
 ### [1.13.1](https://github.com/kubeshop/monokle/compare/v1.13.1-nightly-2022-12-14.0...v1.13.1) (2022-12-14)
