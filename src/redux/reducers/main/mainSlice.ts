@@ -1,19 +1,14 @@
-import {Draft, PayloadAction, createAsyncThunk, createNextState, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
-
 import {transferResource} from '@redux/compare';
 import {AppListenerFn} from '@redux/listeners/base';
-import {currentConfigSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {previewSavedCommand} from '@redux/services/previewCommand';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -44,37 +39,43 @@ import {
   MatchParamProps,
   PreviewType,
   ResourceFilterType,
-  ResourceMapType,
-  SelectionHistoryEntry,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
 import {HelmChart} from '@shared/models/helm';
 import {ImageType} from '@shared/models/image';
 import {ValidationIntegration} from '@shared/models/integrations';
-import {K8sResource} from '@shared/models/k8sResource';
-import {ThunkApi} from '@shared/models/thunk';
+import {
+  K8sResource,
+  ResourceContentMap,
+  ResourceMetaMap,
+  ResourceStorage,
+  isLocalResource,
+} from '@shared/models/k8sResource';
+import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
+import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import initialState from '../initialState';
-import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
 import {
-  deleteResource,
-  getResourceKindsWithTargetingRefs,
-  isFileResource,
-  processResources,
-  recalculateResourceRanges,
-  saveResource,
-} from '../services/resource';
-import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
+  createFileEntry,
+  getFileEntryForAbsolutePath,
+  highlightResourcesFromFile,
+  removePath,
+  selectFilePath,
+} from '../services/fileEntry';
+import {deleteResource, saveResource} from '../services/resource';
+import {updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
+import {selectionReducers} from './selectionReducers';
 import {setLeftMenuSelection, toggleLeftMenu} from './ui';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
   fileMap: FileMapType;
-  resourceMap: ResourceMapType;
+  resourceMetaMap: ResourceMetaMap<LocalOrigin>;
+  resourceContentMap: ResourceContentMap<LocalOrigin>;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   helmTemplatesMap: HelmTemplatesMapType;
@@ -99,8 +100,9 @@ export type UpdateFilesEntryPayload = {
 };
 
 export type SetPreviewDataPayload = {
-  previewResourceId?: string;
-  previewResources?: ResourceMapType;
+  // TODO: probably need to add info about what type of preview this is and what was it's source (helm chart id, kustomization id, etc)
+  previewResourceMetaMap?: ResourceMetaMap<PreviewOrigin>;
+  previewResourceContentMap?: ResourceContentMap<PreviewOrigin>;
   alert?: AlertType;
   previewKubeConfigPath?: string;
   previewKubeConfigContext?: string;
@@ -116,260 +118,66 @@ export type StartPreviewLoaderPayload = {
   previewType: PreviewType;
 };
 
-function getImages(resourceMap: ResourceMapType) {
-  let images: ImagesListType = [];
+// function getImages(resourceMap: ResourceMapType) {
+//   let images: ImagesListType = [];
 
-  Object.values(resourceMap).forEach(k8sResource => {
-    if (k8sResource.refs?.length) {
-      k8sResource.refs.forEach(ref => {
-        if (ref.type === 'outgoing' && ref.target?.type === 'image') {
-          const refName = ref.name;
-          const refTag = ref.target?.tag || 'latest';
+//   Object.values(resourceMap).forEach(k8sResource => {
+//     if (k8sResource.refs?.length) {
+//       k8sResource.refs.forEach(ref => {
+//         if (ref.type === 'outgoing' && ref.target?.type === 'image') {
+//           const refName = ref.name;
+//           const refTag = ref.target?.tag || 'latest';
 
-          const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
+//           const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
 
-          if (!foundImage) {
-            images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
-          } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
-            foundImage.resourcesIds.push(k8sResource.id);
-          }
-        }
-      });
-    }
-  });
+//           if (!foundImage) {
+//             images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
+//           } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
+//             foundImage.resourcesIds.push(k8sResource.id);
+//           }
+//         }
+//       });
+//     }
+//   });
 
-  return images;
-}
+//   return images;
+// }
 
-function updateSelectionHistory(type: 'resource' | 'path' | 'image', isVirtualSelection: boolean, state: AppState) {
-  if (isVirtualSelection) {
-    return;
-  }
-
-  if (type === 'resource' && state.selectedResourceId) {
-    state.selectionHistory.push({
-      type,
-      selectedResourceId: state.selectedResourceId,
-    });
-  }
-
-  if (type === 'path' && state.selectedPath) {
-    state.selectionHistory.push({
-      type,
-      selectedPath: state.selectedPath,
-    });
-  }
-
-  if (type === 'image' && state.selectedImage) {
-    state.selectionHistory.push({
-      type,
-      selectedImage: state.selectedImage,
-    });
-  }
-
-  state.currentSelectionHistoryIndex = undefined;
-}
-
-export const performResourceContentUpdate = (
-  resource: K8sResource,
-  newText: string,
-  fileMap: FileMapType,
-  resourceMap: ResourceMapType
-) => {
-  if (isFileResource(resource)) {
+export const performResourceContentUpdate = (resource: K8sResource, newText: string, fileMap: FileMapType) => {
+  if (isLocalResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
     resource.text = updatedFileText;
-    fileMap[resource.filePath].text = updatedFileText;
-    resource.content = parseYamlDocument(updatedFileText).toJS();
-    recalculateResourceRanges(resource, fileMap, resourceMap);
+    fileMap[resource.origin.filePath].text = updatedFileText;
+    resource.object = parseYamlDocument(updatedFileText).toJS();
   } else {
     resource.text = newText;
-    resource.content = parseYamlDocument(newText).toJS();
+    resource.object = parseYamlDocument(newText).toJS();
   }
 };
 
-export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk<AppState, boolean, ThunkApi>(
-  'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
-  async (shouldIgnore, thunkAPI) => {
-    const state = thunkAPI.getState();
+// TODO: @monokle/validation - use the shouldIgnoreOptionalUnsatisfiedRefs setting and reprocess all refs
+// export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk<AppState, boolean, ThunkApi>(
+//   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
+//   async (shouldIgnore, thunkAPI) => {}
+// );
 
-    const nextMainState = createNextState(state.main, mainState => {
-      electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
-      mainState.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
+/**
+ * TODO: This function is not needed anymore because it was only doing processing on the resource that we were adding.
+ * @deprecated
+ */
+export const addResource = createAsyncThunk('main/addResource', async () => {});
 
-      const projectConfig = currentConfigSelector(state);
-      const schemaVersion = getK8sVersion(projectConfig);
-      const userDataDir = String(state.config.userDataDir);
-      const resourceMap = getActiveResourceMap(mainState);
-
-      reprocessOptionalRefs(schemaVersion, userDataDir, resourceMap, mainState.resourceRefsProcessingOptions);
-    });
-
-    return nextMainState;
-  }
-);
-
-export const addResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
-  'main/addResource',
-  async (resource, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-
-    const nextMainState = createNextState(state.main, mainState => {
-      mainState.resourceMap[resource.id] = resource;
-      clearResourceSelections(mainState.resourceMap);
-      resource.isSelected = true;
-      resource.isHighlighted = true;
-      mainState.selectedResourceId = resource.id;
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processResources(
-        schemaVersion,
-        userDataDir,
-        getActiveResourceMap(mainState),
-        mainState.resourceRefsProcessingOptions,
-        {
-          resourceIds: [resource.id],
-          resourceKinds,
-          policyPlugins: mainState.policies.plugins,
-        }
-      );
-    });
-
-    return nextMainState;
-  }
-);
-
-export const addMultipleResources = createAsyncThunk<AppState, K8sResource[], ThunkApi>(
-  'main/addMultipleResources',
-  async (resources, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-
-    const nextMainState = createNextState(state.main, mainState => {
-      clearResourceSelections(mainState.resourceMap);
-
-      resources.forEach((resource, index) => {
-        // select first resource
-        if (!index) {
-          resource.isSelected = true;
-          resource.isHighlighted = true;
-          mainState.selectedResourceId = resource.id;
-        }
-
-        mainState.resourceMap[resource.id] = resource;
-        const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-        processResources(
-          schemaVersion,
-          userDataDir,
-          getActiveResourceMap(mainState),
-          mainState.resourceRefsProcessingOptions,
-          {
-            resourceIds: [resource.id],
-            resourceKinds,
-            policyPlugins: mainState.policies.plugins,
-          }
-        );
-      });
-    });
-
-    return nextMainState;
-  }
-);
-
-export const reprocessResource = createAsyncThunk<AppState, K8sResource, ThunkApi>(
-  'main/reprocessResource',
-  async (resource, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-
-    const nextMainState = createNextState(state.main, mainState => {
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processResources(
-        schemaVersion,
-        userDataDir,
-        getActiveResourceMap(mainState),
-        mainState.resourceRefsProcessingOptions,
-        {
-          resourceIds: [resource.id],
-          resourceKinds,
-          policyPlugins: mainState.policies.plugins,
-        }
-      );
-    });
-
-    return nextMainState;
-  }
-);
-
-export const reprocessAllResources = createAsyncThunk<AppState, void, ThunkApi>(
-  'main/reprocessAllResources',
-  async (_, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const userDataDir = String(state.config.userDataDir);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const policyPlugins = state.main.policies.plugins;
-
-    const nextMainState = createNextState(state.main, mainState => {
-      processResources(schemaVersion, userDataDir, mainState.resourceMap, mainState.resourceRefsProcessingOptions, {
-        policyPlugins,
-      });
-    });
-
-    return nextMainState;
-  }
-);
+/**
+ * TODO: This function is not needed anymore because it was only doing processing on the resources that we were adding.
+ * @deprecated
+ */
+export const addMultipleResources = createAsyncThunk('main/addMultipleResources', async (resources, thunkAPI) => {});
 
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
-  if (state.selectedResourceId) {
-    const selectedResource = state.resourceMap[state.selectedResourceId];
-    if (selectedResource && selectedResource.filePath.startsWith(PREVIEW_PREFIX)) {
-      state.selectedResourceId = undefined;
-    }
+  if (state.selection?.type === 'resource' && state.selection.resourceOriginType === 'preview') {
+    state.selection = undefined;
   }
 };
-
-/**
- * Returns a resourceMap containing only active resources depending if we are in preview mode
- */
-
-export function getActiveResourceMap(state: AppState) {
-  if (state.previewResourceId || state.previewValuesFileId) {
-    let activeResourceMap: ResourceMapType = {};
-    Object.values(state.resourceMap)
-      .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
-      .forEach(r => {
-        activeResourceMap[r.id] = r;
-      });
-
-    return activeResourceMap;
-  }
-  return state.resourceMap;
-}
-
-/**
- * Returns a resourceMap containing only local resources
- */
-
-export function getLocalResourceMap(state: AppState) {
-  let localResourceMap: ResourceMapType = {};
-  Object.values(state.resourceMap)
-    .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-    .forEach(r => {
-      localResourceMap[r.id] = r;
-    });
-
-  return localResourceMap;
-}
 
 /**
  * The main reducer slice
@@ -379,6 +187,7 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
+    ...selectionReducers,
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -403,46 +212,7 @@ export const mainSlice = createSlice({
         }
       });
     },
-    /**
-     * Marks the specified resource as selected and highlights all related resources
-     */
-    selectK8sResource: (
-      state: Draft<AppState>,
-      action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
-    ) => {
-      const resource = state.resourceMap[action.payload.resourceId];
-      state.lastChangedLine = 0;
-      if (resource) {
-        updateSelectionAndHighlights(state, resource);
-        updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);
-      }
-    },
-    /**
-     * Marks the specified values as selected
-     */
-    selectHelmValuesFile: (
-      state: Draft<AppState>,
-      action: PayloadAction<{valuesFileId: string; isVirtualSelection?: boolean}>
-    ) => {
-      const valuesFileId = action.payload.valuesFileId;
-      Object.values(state.helmValuesMap).forEach(values => {
-        values.isSelected = values.id === valuesFileId;
-      });
 
-      state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
-      selectFilePath({filePath: state.helmValuesMap[valuesFileId].filePath, state});
-      updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
-    },
-    /**
-     * Marks the specified file as selected and highlights all related resources
-     */
-    selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
-      const filePath = action.payload.filePath;
-      if (filePath.length > 0) {
-        selectFilePath({filePath, state});
-        updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
-      }
-    },
     updateSearchQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.search.searchQuery = action.payload;
     },
@@ -459,16 +229,6 @@ export const mainSlice = createSlice({
     highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
       state.search.currentMatch = action.payload;
     },
-    selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.selectedPreviewConfigurationId = action.payload;
-      state.selectedPath = undefined;
-      state.selectedResourceId = undefined;
-      state.selectedValuesFileId = undefined;
-      state.selectedImage = undefined;
-    },
-    setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.isSelectingFile = action.payload;
-    },
     setFiltersToBeChanged: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType | undefined>) => {
       state.filtersToBeChanged = action.payload;
     },
@@ -484,14 +244,15 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
-      state.previousSelectionHistory = state.selectionHistory;
-      clearSelectedResourceOnPreviewExit(state);
+      state.selectionHistory.previous = state.selectionHistory.current;
+      state.selectionHistory.current = [];
+      state.selectionHistory.index = undefined;
+      if (isResourceSelection(state.selection) && state.selection.resourceOriginType === 'preview') {
+        state.selection = undefined;
+      }
       setPreviewData({}, state);
       state.previewType = undefined;
-      state.currentSelectionHistoryIndex = undefined;
-      state.selectionHistory = [];
       state.checkedResourceIds = [];
-      state.selectedImage = undefined;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -573,13 +334,14 @@ export const mainSlice = createSlice({
     },
     setSelectionHistory: (
       state: Draft<AppState>,
-      action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: SelectionHistoryEntry[]}>
+      action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: AppSelection[]}>
     ) => {
-      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
-      state.selectionHistory = action.payload.newSelectionHistory;
+      state.selectionHistory.index = action.payload.nextSelectionHistoryIndex;
+      state.selectionHistory.current = action.payload.newSelectionHistory;
     },
     editorHasReloadedSelectedPath: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.shouldEditorReloadSelectedPath = action.payload;
+      // TODO: why is shouldEditorReload needed?
+      state.selectionOptions.shouldEditorReload = action.payload;
     },
     checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (!state.checkedResourceIds.includes(action.payload)) {
@@ -647,70 +409,7 @@ export const mainSlice = createSlice({
         previewConfigurationId: undefined,
       };
     },
-    clearSelected: (state: Draft<AppState>) => {
-      state.selectedPath = undefined;
-      state.selectedResourceId = undefined;
-      state.selectedPreviewConfigurationId = undefined;
-      state.selectedValuesFileId = undefined;
-      state.selectedImage = undefined;
-    },
-    clearSelectedPath: (state: Draft<AppState>) => {
-      state.selectedPath = undefined;
-    },
-    toggleAllRules: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      const enable = action.payload;
-      const plugin = state.policies.plugins[0];
-      if (!plugin) return; // not yet loaded;
 
-      if (enable) {
-        const allRuleIds = plugin.metadata.rules.map(r => r.id);
-        plugin.config.enabledRules = allRuleIds;
-        trackEvent('configure/opa_enabled', {all: true});
-      } else {
-        plugin.config.enabledRules = [];
-        trackEvent('configure/opa_disabled', {all: true});
-      }
-
-      // persist latest configuration
-      const allConfig = state.policies.plugins.map(p => p.config);
-      electronStore.set('pluginConfig.policies', allConfig);
-    },
-    toggleRule: (state: Draft<AppState>, action: PayloadAction<{ruleId: string; enable?: boolean}>) => {
-      const plugin = state.policies.plugins[0];
-      if (!plugin) return; // not yet loaded;
-
-      const ruleId = action.payload.ruleId;
-      const shouldToggle = action.payload.enable === undefined;
-      const isEnabled = plugin.config.enabledRules.includes(ruleId);
-      const enable = shouldToggle ? !isEnabled : action.payload.enable;
-
-      if (enable) {
-        if (isEnabled) return;
-        plugin.config.enabledRules.push(ruleId);
-        trackEvent('configure/opa_enabled', {all: false});
-      } else {
-        if (!isEnabled) return;
-        plugin.config.enabledRules = plugin.config.enabledRules.filter(id => id !== ruleId);
-        trackEvent('configure/opa_disabled', {all: false});
-      }
-
-      // persist latest configuration
-      const allConfig = state.policies.plugins.map(p => p.config);
-      electronStore.set('pluginConfig.policies', allConfig);
-    },
-    selectImage: (state: Draft<AppState>, action: PayloadAction<{image: ImageType; isVirtualSelection?: boolean}>) => {
-      state.selectedImage = action.payload.image;
-
-      clearResourceSelections(state.resourceMap);
-      action.payload.image.resourcesIds.forEach(resourceId => highlightResource(state.resourceMap, resourceId));
-
-      updateSelectionHistory('image', Boolean(action.payload.isVirtualSelection), state);
-
-      state.selectedResourceId = undefined;
-      state.selectedPreviewConfigurationId = undefined;
-      state.selectedPath = undefined;
-      state.selectedValuesFileId = undefined;
-    },
     setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.imagesSearchedValue = action.payload;
     },

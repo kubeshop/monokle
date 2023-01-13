@@ -1,13 +1,27 @@
 import * as Rt from 'runtypes';
 
+import {ResourceStorage} from './k8sResource';
+
 const FileSelectionRuntype = Rt.Record({
   type: Rt.Literal('file'),
   filePath: Rt.String,
 });
 
-const ResourceSelectionRuntype = Rt.Record({
+const HelmValuesFileSelectionRuntype = Rt.Record({
+  type: Rt.Literal('helm.values.file'),
+  filePath: Rt.String,
+  valuesFileId: Rt.String,
+});
+
+export type ResourceSelection = {
+  type: 'resource';
+  resourceStorage: ResourceStorage;
+  resourceId: string;
+};
+
+const ResourceSelectionRuntype: Rt.Runtype<ResourceSelection> = Rt.Record({
   type: Rt.Literal('resource'),
-  resourceOriginType: Rt.Union(Rt.Literal('local'), Rt.Literal('cluster'), Rt.Literal('preview')),
+  resourceStorage: Rt.Union(Rt.Literal('local'), Rt.Literal('cluster'), Rt.Literal('preview')),
   resourceId: Rt.String,
 });
 
@@ -28,6 +42,7 @@ const PreviewConfigurationSelectionRuntype = Rt.Record({
 
 const AppSelectionRuntype = Rt.Union(
   FileSelectionRuntype,
+  HelmValuesFileSelectionRuntype,
   ResourceSelectionRuntype,
   ImageSelectionRuntype,
   CommandSelectionRuntype,
@@ -35,13 +50,14 @@ const AppSelectionRuntype = Rt.Union(
 );
 
 export type FileSelection = Rt.Static<typeof FileSelectionRuntype>;
-export type ResourceSelection = Rt.Static<typeof ResourceSelectionRuntype>;
+export type HelmValuesFileSelection = Rt.Static<typeof HelmValuesFileSelectionRuntype>;
 export type ImageSelection = Rt.Static<typeof ImageSelectionRuntype>;
 export type CommandSelection = Rt.Static<typeof CommandSelectionRuntype>;
 export type PreviewConfigurationSelection = Rt.Static<typeof PreviewConfigurationSelectionRuntype>;
 export type AppSelection = Rt.Static<typeof AppSelectionRuntype>;
 
 export const isFileSelection = FileSelectionRuntype.guard;
+export const isHelmValuesFileSelection = HelmValuesFileSelectionRuntype.guard;
 export const isResourceSelection = ResourceSelectionRuntype.guard;
 export const isImageSelection = ImageSelectionRuntype.guard;
 export const isCommandSelection = CommandSelectionRuntype.guard;

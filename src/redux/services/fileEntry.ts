@@ -22,6 +22,7 @@ import {getK8sVersion} from '@redux/services/projectConfig';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
+  createChildrenResourcesHighlights,
   highlightChildrenResources,
   updateSelectionAndHighlights,
 } from '@redux/services/selection';
@@ -41,7 +42,9 @@ import {
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
+import {AppSelection} from '@shared/models/selection';
 
 import {
   deleteResource,
@@ -262,11 +265,11 @@ export function readFiles(
 }
 
 /**
- * Returns all resources associated with the specified path
+ * Returns all local resource metas associated with the specified path
  */
 
-export function getResourcesForPath(filePath: string, resourceMap: ResourceMapType) {
-  return Object.values(resourceMap).filter(r => r.filePath === filePath);
+export function getLocalResourceMetasForPath(filePath: string, resourceMap: ResourceMetaMap<LocalOrigin>) {
+  return Object.values(resourceMap).filter(r => r.origin.filePath === filePath);
 }
 
 /**
@@ -812,30 +815,36 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
 }
 
 /**
- * Selects the specified filePath - used by several reducers
+ * Highlights all resources in the specified file
  */
 
-export function selectFilePath({filePath, state}: {filePath: string; state: AppState}) {
+export function highlightResourcesFromFile({filePath, state}: {filePath: string; state: AppState}) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
-  clearResourceSelections(state.resourceMap);
+
+  state.selection = undefined;
+  state.selectionOptions = {};
+
+  const highlights: AppSelection[] = [];
 
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
-    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-      r.isHighlighted = true;
+    getLocalResourceMetasForPath(parent.filePath, state.resourceMetaStorage.local).forEach(r => {
+      highlights.push({
+        type: 'resource',
+        resourceId: r.id,
+        resourceStorage: 'local',
+      });
     });
 
     if (parent.children) {
-      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
+      const childrenHighlights = createChildrenResourcesHighlights(
+        parent,
+        state.resourceMetaStorage.local,
+        state.fileMap
+      );
+      highlights.push(...childrenHighlights);
     }
-
-    Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.isSelected = valuesFile.filePath === filePath;
-    });
   }
 
-  state.selectedResourceId = undefined;
-  state.selectedPreviewConfigurationId = undefined;
-  state.selectedImage = undefined;
-  state.selectedPath = filePath;
+  state.highlights = highlights;
 }
