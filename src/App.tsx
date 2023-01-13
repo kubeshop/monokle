@@ -50,9 +50,9 @@ import {AlertEnum, ExtraContentType} from '@shared/models/alert';
 import {NewVersionCode, Project} from '@shared/models/config';
 import {StepEnum} from '@shared/models/walkthrough';
 import {Size} from '@shared/models/window';
-import {activeProjectSelector} from '@shared/utils';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

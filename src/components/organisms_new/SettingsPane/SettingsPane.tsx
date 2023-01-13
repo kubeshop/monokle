@@ -10,7 +10,7 @@ import EditorLayout from '@assets/EditorLayout.svg';
 // import LayoutDark from '@assets/LayoutDark.svg';
 // import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
-import {activeProjectSelector} from '@shared/utils';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
