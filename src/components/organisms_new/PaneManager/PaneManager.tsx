@@ -14,7 +14,6 @@ import {
   NavigatorPane,
   RecentProjectsPage,
   StartProjectPage,
-  TutorialPage,
 } from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
@@ -108,11 +107,7 @@ const NewPaneManager: React.FC = () => {
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
-                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
-                      <NavigatorPane />
-                    ) : (
-                      <TutorialPage />
-                    )
+                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null
                   }
                   right={
                     currentActivity?.name === 'git' ? (
