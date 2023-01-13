@@ -250,8 +250,12 @@ const PageHeader = () => {
         </div>
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
-          <OPAChip />
-          <K8sVersionSelection />
+          {projectRootFolder && (
+            <>
+              <OPAChip />
+              <K8sVersionSelection />
+            </>
+          )}
           <ClusterSelection previewResource={previewResource} />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>

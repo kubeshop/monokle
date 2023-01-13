@@ -31,7 +31,7 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {downloadSchema} from '@redux/services/k8sVersionService';
+import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {FilePatternList} from '@atoms';
@@ -67,7 +67,8 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   // const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
-  const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
+  const isScanIncludesUpdated = useAppSelector(state => state.config.isScanIncludesUpdated);
+  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
   const [isKubeConfigBrowseSettingsOpen, setIsKubeConfigBrowseSettingsOpen] = useState(false);
 
@@ -257,10 +258,8 @@ export const Settings = ({
   const handleDownloadVersionSchema = async () => {
     try {
       setIsSchemaDownloading(true);
-      await downloadSchema(
-        `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${selectedK8SVersion}/_definitions.json`,
-        path.join(String(userDataDir), path.sep, 'schemas', `${selectedK8SVersion}.json`)
-      );
+      await dispatch(downloadK8sSchema(selectedK8SVersion)).unwrap();
+
       setIsSchemaDownloading(false);
       setLocalConfig({
         ...localConfig,

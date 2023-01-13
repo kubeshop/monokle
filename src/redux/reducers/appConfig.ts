@@ -396,6 +396,12 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
+    updateProjectK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (state.selectedProjectRootFolder && state.projectConfig) {
+        state.projectConfig.k8sVersion = action.payload;
+        writeProjectConfigFile(state);
+      }
+    },
     setUserDirs: (
       state: Draft<AppConfig>,
       action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string; crdsDir: string}>
@@ -608,6 +614,7 @@ export const {
   updateK8sVersion,
   updateNewVersion,
   updateProjectConfig,
+  updateProjectK8sVersion,
   updateProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,
