@@ -23,6 +23,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
+  },
+  {
     type: 'fullscreen',
     name: 'compare',
     tooltip: 'Compare resources',
@@ -59,14 +67,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
     component: <SettingsPane />,
-    useBadge: () => undefined,
-  },
-  {
-    type: 'panel',
-    name: 'dashboard',
-    tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
-    component: <DashboardPane />,
     useBadge: () => undefined,
   },
 ];

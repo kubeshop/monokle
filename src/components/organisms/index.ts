@@ -36,4 +36,3 @@ export {default as TemplateManagerPane} from './TemplateManagerPane';
 export {default as TemplateModal} from './TemplateModal';
 export {default as TerminalPane} from './TerminalPane';
 export {default as UpdateNotice} from './UpdateNotice';
-export {RecentProjectsPage, StartProjectPage} from './StartProjectPane';

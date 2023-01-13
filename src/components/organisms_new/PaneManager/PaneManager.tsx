@@ -6,18 +6,9 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {
-  ActionsPane,
-  BottomPaneManager,
-  Dashboard,
-  GitOpsView,
-  NavigatorPane,
-  RecentProjectsPage,
-  StartProjectPage,
-} from '@organisms';
+import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
-import {FeatureFlag} from '@utils/features';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
@@ -39,7 +30,6 @@ const NewPaneManager: React.FC = () => {
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const projects = useAppSelector(state => state.config.projects);
   const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const {height, width} = useMainPaneDimensions();
@@ -138,12 +128,7 @@ const NewPaneManager: React.FC = () => {
           />
         </>
       ) : (
-        <FeatureFlag
-          name="NewStartPage"
-          fallback={<>{projects.length > 0 ? <RecentProjectsPage /> : <StartProjectPage />}</>}
-        >
-          <StartPage />
-        </FeatureFlag>
+        <StartPage />
       )}
     </S.PaneManagerContainer>
   );

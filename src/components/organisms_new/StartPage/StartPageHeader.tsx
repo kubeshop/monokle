@@ -12,7 +12,7 @@ import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
 
 import {HelpMenu} from '@organisms/PageHeader/HelpMenu';
 
-import {IconButton, SearchInput} from '@atoms';
+import {IconButton} from '@atoms';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
@@ -31,7 +31,7 @@ const StartPageHeader: React.FC = () => {
         <S.Logo id="monokle-logo-header" src={MonokleKubeshopLogo} alt="Monokle" />
       </S.LogoContainer>
 
-      <SearchInput style={{width: '340px'}} />
+      {/* <SearchInput style={{width: '340px'}} /> */}
 
       <S.ActionsContainer>
         <S.LearnButton
