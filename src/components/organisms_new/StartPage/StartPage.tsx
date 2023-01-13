@@ -7,7 +7,7 @@ import {IconButton} from '@atoms';
 
 import ProjectsList from '@components/molecules_new/ProjectsList';
 
-import {usePaneHeight} from '@hooks/usePaneHeight';
+import {useWindowSize} from '@utils/hooks';
 
 import {Icon} from '@monokle/components';
 
@@ -57,7 +57,7 @@ const StartPage: React.FC = () => {
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const projects = useAppSelector(state => state.config.projects);
 
-  const height = usePaneHeight();
+  const {height} = useWindowSize();
 
   const [selectedOption, setSelectedOption] = useState<OptionsKeys>(
     projects.length ? 'recent-projects' : 'new-project'
