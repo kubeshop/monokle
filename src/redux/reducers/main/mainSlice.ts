@@ -6,9 +6,15 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 import {transferResource} from '@redux/compare';
+import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
+import {setAlert} from '@redux/reducers/alert';
+import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
+import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {previewSavedCommand} from '@redux/services/previewCommand';
+import {deleteResource, saveResource} from '@redux/services/resource';
+import {updateSelectionAndHighlights} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -43,33 +49,14 @@ import {
 import {ProjectConfig} from '@shared/models/config';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
 import {HelmChart} from '@shared/models/helm';
-import {ImageType} from '@shared/models/image';
 import {ValidationIntegration} from '@shared/models/integrations';
-import {
-  K8sResource,
-  ResourceContentMap,
-  ResourceMetaMap,
-  ResourceStorage,
-  isLocalResource,
-} from '@shared/models/k8sResource';
+import {K8sResource, ResourceContentMap, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
 import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import initialState from '../initialState';
-import {
-  createFileEntry,
-  getFileEntryForAbsolutePath,
-  highlightResourcesFromFile,
-  removePath,
-  selectFilePath,
-} from '../services/fileEntry';
-import {deleteResource, saveResource} from '../services/resource';
-import {updateSelectionAndHighlights} from '../services/selection';
-import {setAlert} from './alert';
-import {selectionReducers} from './selectionReducers';
-import {setLeftMenuSelection, toggleLeftMenu} from './ui';
+import {clearSelectedResourceOnPreviewExit, selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -173,12 +160,6 @@ export const addResource = createAsyncThunk('main/addResource', async () => {});
  */
 export const addMultipleResources = createAsyncThunk('main/addMultipleResources', async (resources, thunkAPI) => {});
 
-const clearSelectedResourceOnPreviewExit = (state: AppState) => {
-  if (state.selection?.type === 'resource' && state.selection.resourceOriginType === 'preview') {
-    state.selection = undefined;
-  }
-};
-
 /**
  * The main reducer slice
  */
@@ -247,7 +228,7 @@ export const mainSlice = createSlice({
       state.selectionHistory.previous = state.selectionHistory.current;
       state.selectionHistory.current = [];
       state.selectionHistory.index = undefined;
-      if (isResourceSelection(state.selection) && state.selection.resourceOriginType === 'preview') {
+      if (isResourceSelection(state.selection) && state.selection.resourceStorage === 'preview') {
         state.selection = undefined;
       }
       setPreviewData({}, state);

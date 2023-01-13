@@ -118,3 +118,9 @@ export function highlightResourcesUsingImage(image: ImageType, state: AppState) 
 
   state.highlights = highlights;
 }
+
+export const clearSelectedResourceOnPreviewExit = (state: AppState) => {
+  if (state.selection?.type === 'resource' && state.selection.resourceStorage === 'preview') {
+    state.selection = undefined;
+  }
+};
