@@ -13,7 +13,7 @@ import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {previewSavedCommand} from '@redux/services/previewCommand';
-import {deleteResource, saveResource} from '@redux/services/resource';
+import {deleteResource, saveResource, splitK8sResource} from '@redux/services/resource';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
@@ -50,7 +50,13 @@ import {ProjectConfig} from '@shared/models/config';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
 import {HelmChart} from '@shared/models/helm';
 import {ValidationIntegration} from '@shared/models/integrations';
-import {K8sResource, ResourceContentMap, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  ResourceContentMap,
+  ResourceMetaMap,
+  isClusterResource,
+  isLocalResource,
+} from '@shared/models/k8sResource';
 import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
@@ -424,12 +430,18 @@ export const mainSlice = createSlice({
     },
     updateMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
-        state.resourceMap[r.id] = r;
+        if (!isClusterResource(r)) {
+          return;
+        }
+        const {meta, content} = splitK8sResource(r);
+        state.resourceMetaStorage.cluster[r.id] = meta;
+        state.resourceContentStorage.cluster[r.id] = content;
       });
     },
     deleteMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
-        delete state.resourceMap[r.id];
+        delete state.resourceMetaStorage.cluster[r.id];
+        delete state.resourceContentStorage.cluster[r.id];
       });
     },
     setIsClusterConnected: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
@@ -453,6 +465,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetId = undefined;
+        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
         state.selectedResourceId = action.payload.previewResourceId;
         state.selectedPath = undefined;

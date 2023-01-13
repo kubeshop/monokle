@@ -5,6 +5,7 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContentMap, ResourceMetaMap} from './k8sResource';
 import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
+import {PreviewState} from './preview';
 import {AppSelection} from './selection';
 
 type AppState = {
@@ -34,6 +35,7 @@ type AppState = {
     previous: AppSelection[];
     index?: number;
   };
+  preview: PreviewState;
   /**
    * Whether the app's storage is rehydrating
    */
@@ -60,22 +62,6 @@ type AppState = {
     currentMatch: CurrentMatch | null;
     searchHistory: string[];
   };
-  /** the current type of preview */
-  previewType?: PreviewType;
-  /** information used to load the preview */
-  previewLoader: PreviewLoaderType;
-  /** the resource currently being previewed */
-  previewResourceId?: string;
-  /** the kubeconfig path for current cluster preview */
-  previewKubeConfigPath?: string;
-  /** the kubeconfig context for current cluster preview */
-  previewKubeConfigContext?: string;
-  /** the values file currently being previewed */
-  previewValuesFileId?: string;
-  /** the preview configuration currently being previewed */
-  previewConfigurationId?: string;
-  /** the id of the currently being previewed command */
-  previewCommandId?: string;
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;

@@ -6,14 +6,9 @@ import {
   AnyOriginRuntype,
   ClusterOrigin,
   ClusterOriginRuntype,
-  CommandOrigin,
-  CommandOriginRuntype,
-  HelmOrigin,
-  HelmOriginRuntype,
-  KustomizeOrigin,
-  KustomizeOriginRuntype,
   LocalOrigin,
   LocalOriginRuntype,
+  PreviewOriginRuntype,
 } from './origin';
 
 export type ResourceIdentifier<Origin extends AnyOrigin = AnyOrigin> = {
@@ -70,15 +65,11 @@ const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
 
 const LocalResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: LocalOriginRuntype}));
 const ClusterResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: ClusterOriginRuntype}));
-const HelmResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: HelmOriginRuntype}));
-const KustomizeResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: KustomizeOriginRuntype}));
-const CommandResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: CommandOriginRuntype}));
+const PreviewResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: PreviewOriginRuntype}));
 
 export const isLocalResourceMeta = LocalResourceMetaRuntype.guard;
 export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
-export const isHelmResourceMeta = HelmResourceMetaRuntype.guard;
-export const isKustomizeResourceMeta = KustomizeResourceMetaRuntype.guard;
-export const isCommandResourceMeta = CommandResourceMetaRuntype.guard;
+export const isPreviewResourceMeta = PreviewResourceMetaRuntype.guard;
 
 export interface ResourceContent<Origin extends AnyOrigin = AnyOrigin> extends ResourceIdentifier<Origin> {
   text: string;
@@ -97,18 +88,11 @@ const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<LocalOrigin>> = Rt
   Rt.Record({origin: LocalOriginRuntype})
 );
 const ClusterResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: ClusterOriginRuntype}));
-const HelmResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: HelmOriginRuntype}));
-const KustomizeResourceContentRuntype = Rt.Intersect(
-  ResourceContentRuntype,
-  Rt.Record({origin: KustomizeOriginRuntype})
-);
-const CommandResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: CommandOriginRuntype}));
+const PreviewResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: PreviewOriginRuntype}));
 
 export const isLocalResourceContent = LocalResourceContentRuntype.guard;
 export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
-export const isHelmResourceContent = HelmResourceContentRuntype.guard;
-export const isKustomizeResourceContent = KustomizeResourceContentRuntype.guard;
-export const isCommandResourceContent = CommandResourceContentRuntype.guard;
+export const isPreviewResourceContent = PreviewResourceContentRuntype.guard;
 
 export type K8sResource<Origin extends AnyOrigin = AnyOrigin> = ResourceMeta<Origin> & ResourceContent<Origin>;
 
@@ -121,25 +105,15 @@ const ClusterResourceRuntype: Rt.Runtype<K8sResource<ClusterOrigin>> = Rt.Inters
   ResourceRuntype,
   Rt.Record({origin: ClusterOriginRuntype})
 );
-const HelmResourceRuntype: Rt.Runtype<K8sResource<HelmOrigin>> = Rt.Intersect(
+const PreviewResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(
   ResourceRuntype,
-  Rt.Record({origin: HelmOriginRuntype})
-);
-const KustomizeResourceRuntype: Rt.Runtype<K8sResource<KustomizeOrigin>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({origin: KustomizeOriginRuntype})
-);
-const CommandResourceRuntype: Rt.Runtype<K8sResource<CommandOrigin>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({origin: CommandOriginRuntype})
+  Rt.Record({origin: PreviewOriginRuntype})
 );
 
 export const isResource = ResourceRuntype.guard;
 export const isLocalResource = LocalResourceRuntype.guard;
 export const isClusterResource = ClusterResourceRuntype.guard;
-export const isHelmResource = HelmResourceRuntype.guard;
-export const isKustomizeResource = KustomizeResourceRuntype.guard;
-export const isCommandResource = CommandResourceRuntype.guard;
+export const isPreviewResource = PreviewResourceRuntype.guard;
 
 export type ResourceMetaMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceMeta<Origin>>;
 
