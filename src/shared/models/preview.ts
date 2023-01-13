@@ -39,8 +39,3 @@ export const isHelmConfigurationPreview = HelmConfigurationPreviewRuntype.guard;
 export const isKustomizePreview = KustomizePreviewRuntype.guard;
 export const isCommandPreview = CommandPreviewRuntype.guard;
 export const isAnyPreview = AnyPreviewRuntype.guard;
-
-export type PreviewState = {
-  current?: AnyPreview;
-  isLoading?: boolean;
-};

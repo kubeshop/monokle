@@ -5,7 +5,7 @@ import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceContentMap, ResourceMetaMap} from './k8sResource';
 import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
-import {PreviewState} from './preview';
+import {AnyPreview} from './preview';
 import {AppSelection} from './selection';
 
 type AppState = {
@@ -35,7 +35,14 @@ type AppState = {
     previous: AppSelection[];
     index?: number;
   };
-  preview: PreviewState;
+  preview: AnyPreview;
+  previewOptions: {
+    isLoading?: boolean;
+  };
+  clusterConnection: {
+    context: string;
+    isLoading?: boolean;
+  };
   /**
    * Whether the app's storage is rehydrating
    */
