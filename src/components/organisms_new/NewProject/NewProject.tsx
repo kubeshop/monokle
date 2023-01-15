@@ -35,7 +35,7 @@ const NewProject: React.FC = () => {
       disabled: false,
       itemId: 'create-empty-project',
       itemLogo: CreateFromScratch,
-      itemTitle: 'Create a project from scratch',
+      itemTitle: 'Create from scratch',
       itemDescription: "Create an empty project and new resources from scratch. We'll help you along the way.",
       itemAction: () => handleCreateProject(false),
     },
