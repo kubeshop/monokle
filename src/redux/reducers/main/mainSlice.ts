@@ -12,18 +12,14 @@ import {setAlert} from '@redux/reducers/alert';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {previewSavedCommand} from '@redux/services/previewCommand';
-import {deleteResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {saveResource, splitK8sResource} from '@redux/services/resource';
 import {updateSelectionAndHighlights} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadPolicies} from '@redux/thunks/loadPolicies';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {removeResources} from '@redux/thunks/removeResources';
-import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
@@ -58,12 +54,12 @@ import {
   isLocalResource,
 } from '@shared/models/k8sResource';
 import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
-import {AppSelection, isResourceSelection} from '@shared/models/selection';
+import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {previewExtraReducers} from './previewReducers';
-import {clearSelectedResourceOnPreviewExit, selectionReducers} from './selectionReducers';
+import {previewExtraReducers, previewReducers} from './previewReducers';
+import {selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -176,6 +172,7 @@ export const mainSlice = createSlice({
   initialState: initialState.main,
   reducers: {
     ...selectionReducers,
+    ...previewReducers,
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -222,34 +219,6 @@ export const mainSlice = createSlice({
     },
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
-    },
-    clearPreview: (state: Draft<AppState>, action: PayloadAction<{type: 'restartPreview'}>) => {
-      if (action.payload.type !== 'restartPreview') {
-        clearSelectedResourceOnPreviewExit(state);
-      }
-      setPreviewData({}, state);
-      state.previewType = undefined;
-      state.checkedResourceIds = [];
-    },
-    clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
-      state.selectionHistory.previous = state.selectionHistory.current;
-      state.selectionHistory.current = [];
-      state.selectionHistory.index = undefined;
-      if (isResourceSelection(state.selection) && state.selection.resourceStorage === 'preview') {
-        state.selection = undefined;
-      }
-      setPreviewData({}, state);
-      state.previewType = undefined;
-      state.checkedResourceIds = [];
-    },
-    startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
-      state.previewLoader.isLoading = true;
-      state.previewLoader.targetId = action.payload.targetId;
-      state.previewType = action.payload.previewType;
-    },
-    stopPreviewLoader: (state: Draft<AppState>) => {
-      state.previewLoader.isLoading = false;
-      state.previewLoader.targetId = undefined;
     },
     resetResourceFilter: (state: Draft<AppState>) => {
       state.resourceFilter = {labels: {}, annotations: {}};

@@ -35,7 +35,7 @@ type AppState = {
     previous: AppSelection[];
     index?: number;
   };
-  preview: AnyPreview;
+  preview?: AnyPreview;
   previewOptions: {
     isLoading?: boolean;
   };

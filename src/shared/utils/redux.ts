@@ -1,6 +1,6 @@
 import {ActionReducerMapBuilder, SliceCaseReducers, ValidateSliceCaseReducers} from '@reduxjs/toolkit';
 
-import {RootState} from '@shared/models';
+import {RootState} from '@shared/models/rootState';
 
 export function createSliceReducers<SliceName extends keyof RootState>(
   sliceName: SliceName,

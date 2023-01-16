@@ -1,5 +1,8 @@
+import {Draft, PayloadAction} from '@reduxjs/toolkit';
+
 import {previewSavedCommand} from '@redux/services/previewCommand';
 import {splitK8sResourceMap} from '@redux/services/resource';
+import {clearSelection} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
@@ -16,7 +19,43 @@ import {
   PreviewConfigurationSelection,
   ResourceSelection,
 } from '@shared/models/selection';
-import {createSliceExtraReducers} from '@shared/utils/redux';
+import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
+
+export const clearPreviewReducer = (state: Draft<AppState>) => {
+  state.checkedResourceIds = [];
+  state.resourceMetaStorage.preview = {};
+  state.resourceContentStorage.preview = {};
+  state.preview = undefined;
+  state.previewOptions = {};
+};
+
+export const previewReducers = createSliceReducers('main', {
+  clearPreview: (state: Draft<AppState>, action: PayloadAction<{type: 'restartPreview'}>) => {
+    if (action.payload.type !== 'restartPreview') {
+      clearSelectedResourceOnPreviewExit(state);
+    }
+    clearPreviewReducer(state);
+    state.checkedResourceIds = [];
+    state.resourceMetaStorage.preview = {};
+    state.resourceContentStorage.preview = {};
+    state.preview = undefined;
+    state.previewOptions = {};
+  },
+  clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+    clearPreviewReducer(state);
+    resetSelectionHistory(state);
+    clearSelectedResourceOnPreviewExit(state);
+  },
+  setPreviewLoading: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+    state.previewOptions.isLoading = action.payload;
+  },
+});
+
+const clearSelectedResourceOnPreviewExit = (state: AppState) => {
+  if (state.selection?.type === 'resource' && state.selection.resourceStorage === 'preview') {
+    clearSelection(state);
+  }
+};
 
 const onPreviewPending = (state: AppState) => {
   state.previewOptions.isLoading = true;
