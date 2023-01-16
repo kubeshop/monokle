@@ -16,21 +16,19 @@ import {
   getAbsoluteFilePath,
   readFiles,
 } from '@redux/services/fileEntry';
-import {NodeWrapper} from '@redux/services/resource';
 
 import {getFileStats} from '@utils/files';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@shared/models/appState';
+import {NodeWrapper} from '@monokle/validation';
+import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@shared/models/helm';
+import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
+
+import {splitK8sResource} from './resource';
 
 export const HelmChartEventEmitter = new EventEmitter();
 
@@ -200,14 +198,19 @@ export function processHelmChartFolder(
   folder: string,
   rootFolder: string,
   files: string[],
-  projectConfig: ProjectConfig,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  helmChartMap: HelmChartMapType,
-  helmValuesMap: HelmValuesMapType,
-  helmTemplatesMap: HelmTemplatesMapType,
+  stateArgs: {
+    projectConfig: ProjectConfig;
+    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
+    resourceContentMap: ResourceContentMap<LocalOrigin>;
+    fileMap: FileMapType;
+    helmChartMap: HelmChartMapType;
+    helmValuesMap: HelmValuesMapType;
+    helmTemplatesMap: HelmTemplatesMapType;
+  },
   depth: number
 ) {
+  const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
+    stateArgs;
   const result: string[] = [];
 
   // pre-emptively create helm chart file entry
@@ -239,12 +242,15 @@ export function processHelmChartFolder(
         } else {
           fileEntry.children = readFiles(
             filePath,
-            projectConfig,
-            resourceMap,
-            fileMap,
-            helmChartMap,
-            helmValuesMap,
-            helmTemplatesMap,
+            {
+              projectConfig,
+              resourceMetaMap,
+              resourceContentMap,
+              fileMap,
+              helmChartMap,
+              helmValuesMap,
+              helmTemplatesMap,
+            },
             depth + 1,
             helmChart
           );
@@ -257,7 +263,12 @@ export function processHelmChartFolder(
           fileMap,
         });
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
+        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, fileMap);
+        resourcesFromFile.forEach(resource => {
+          const {meta, content} = splitK8sResource(resource);
+          resourceMetaMap[meta.id] = meta;
+          resourceContentMap[meta.id] = content;
+        });
       } else if (isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }

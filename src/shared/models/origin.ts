@@ -7,16 +7,16 @@ import {AnyPreview, AnyPreviewRuntype} from './preview';
  */
 
 export type LocalOrigin = {
-  type: 'local';
+  storage: 'local';
   filePath: string;
 };
 export type ClusterOrigin = {
-  type: 'cluster';
+  storage: 'cluster';
   context: string;
 };
-export type PreviewOrigin = {
-  type: 'preview';
-  preview: AnyPreview;
+export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
+  storage: 'preview';
+  preview: Preview;
 };
 
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin;
@@ -26,15 +26,15 @@ export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin;
  */
 
 export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
-  type: Rt.Literal('local'),
+  storage: Rt.Literal('local'),
   filePath: Rt.String,
 });
 export const ClusterOriginRuntype: Rt.Runtype<ClusterOrigin> = Rt.Record({
-  type: Rt.Literal('cluster'),
+  storage: Rt.Literal('cluster'),
   context: Rt.String,
 });
 export const PreviewOriginRuntype: Rt.Runtype<PreviewOrigin> = Rt.Record({
-  type: Rt.Literal('preview'),
+  storage: Rt.Literal('preview'),
   preview: AnyPreviewRuntype,
 });
 

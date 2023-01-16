@@ -12,7 +12,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {getAbsoluteResourcePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
@@ -30,6 +30,7 @@ import {
   K8sResource,
   ResourceContent,
   ResourceContentMap,
+  ResourceIdentifier,
   ResourceMap,
   ResourceMeta,
   ResourceMetaMap,
@@ -241,7 +242,7 @@ export function removeResourceFromFile(
   }
 
   // get list of resourceIds in file sorted by startPosition
-  const resourceIds = getResourcesForPath(removedResource.origin.filePath, resourceMap)
+  const resourceIds = getLocalResourceMetasForPath(removedResource.origin.filePath, resourceMetaMap)
     .sort((a, b) => {
       return a.range && b.range ? a.range.start - b.range.start : 0;
     })
@@ -297,10 +298,13 @@ function extractNamespace(content: any) {
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources(fileContent: string, origin: AnyOrigin) {
+export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
+  fileContent: string,
+  origin: Origin
+): K8sResource<Origin>[] {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
-  const result: K8sResource[] = [];
+  const result: K8sResource<Origin>[] = [];
   let splitDocs: any;
 
   if (documents) {
@@ -326,7 +330,7 @@ export function extractK8sResources(fileContent: string, origin: AnyOrigin) {
         if (resourceObject && resourceObject.apiVersion && resourceObject.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
-          let resource: K8sResource = {
+          let resource: K8sResource<Origin> = {
             name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
             origin,
             id: (resourceObject.metadata && resourceObject.metadata.uid) || uuidv4(),
@@ -379,7 +383,7 @@ export function extractK8sResources(fileContent: string, origin: AnyOrigin) {
           isKustomizationFilePath(origin.filePath) &&
           documents.length === 1
         ) {
-          let resource: K8sResource<AnyOrigin> = {
+          let resource: K8sResource<Origin> = {
             name: createResourceName(resourceObject, origin.filePath),
             origin,
             id: uuidv4(),
@@ -405,7 +409,7 @@ export function extractK8sResources(fileContent: string, origin: AnyOrigin) {
  * Deletes the specified resource from internal caches and the specified resourceMap
  */
 export function deleteResource(
-  resource: K8sResource,
+  resource: ResourceIdentifier,
   stateArgs: {resourceMetaMap: ResourceMetaMap; resourceContentMap: ResourceContentMap}
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
@@ -428,7 +432,7 @@ export function isResourceSelected(resource: K8sResource | ResourceMeta | Resour
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&
-    selection.resourceOriginType === resource.origin.type
+    selection.resourceStorage === resource.origin.storage
   );
 }
 
