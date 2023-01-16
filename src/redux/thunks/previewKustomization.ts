@@ -11,10 +11,10 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {K8sResource} from '@shared/models';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandResult} from '@shared/models/commands';
 import {ProjectConfig} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
 import {PreviewOrigin} from '@shared/models/origin';
 import {KustomizePreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';

@@ -3,8 +3,6 @@ import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
-
 import {
   deleteMultipleClusterResources,
   setIsClusterConnected,
@@ -111,7 +109,7 @@ const watchResource = async (
     {allowWatchBookmarks: false},
     async (type: string, apiObj: any) => {
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
-      const resource: K8sResource = processResource(apiObj, kubeConfig);
+      const resource: K8sResource = extractClusterResourceFromObject(apiObj, kubeConfig);
 
       if (type === 'ADDED' && !previewResources[resource.id]) {
         if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
@@ -150,21 +148,24 @@ const watchResource = async (
   );
 };
 
-export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), PREVIEW_PREFIX + kubeConfig.currentContext);
+export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
+  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), {
+    storage: 'cluster',
+    context: kubeConfig.currentContext,
+  });
   return resource;
 };
 
 export const startWatchingResources = (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType,
+  clusterResourceMap: ResourceMapType,
   namespace: string
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
-    watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
+    watchResource(dispatch, handler, kubeConfig, clusterResourceMap, handler.kindPlural)
   );
-  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
+  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, clusterResourceMap);
   intervalId = setInterval(() => {
     if (resourcesToUpdate.length > 0) {
       dispatch(

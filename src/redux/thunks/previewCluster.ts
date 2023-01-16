@@ -6,21 +6,22 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {flatten} from 'lodash';
 import log from 'loglevel';
 
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
-import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {getK8sVersion} from '@redux/services/projectConfig';
-import {extractK8sResources, processResources} from '@redux/services/resource';
-import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+import {extractK8sResources} from '@redux/services/resource';
+import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
+import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
+import {ClusterOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -41,7 +42,7 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamesp
   );
 };
 
-const previewClusterHandler = async (payload: {context: string; port?: number}, thunkAPI: any) => {
+const loadClusterResourcesHandler = async (payload: {context: string; port?: number}, thunkAPI: any) => {
   const {context, port} = payload;
   const startTime = new Date().getTime();
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -92,9 +93,9 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       results = await getNonCustomClusterObjects(kc);
     }
 
-    const resources = flatten(results);
+    const flatResults = flatten(results);
 
-    const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
+    const fulfilledResults = flatResults.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
       return createRejectionWithAlert(
         thunkAPI,
@@ -107,19 +108,18 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
     // @ts-ignore
     const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 
-    const previewResult = createPreviewResult(
-      k8sVersion,
-      userDataDir,
-      allYaml,
-      context,
-      'Get Cluster Resources',
-      resourceRefsProcessingOptions,
-      kubeConfigPath,
-      kc.currentContext
-    );
+    const clusterResourceMap = Object.values(
+      extractK8sResources(allYaml, {
+        storage: 'cluster',
+        context,
+      })
+    ).reduce((acc: ResourceMap<ClusterOrigin>, resource) => {
+      acc[resource.id] = resource;
+      return acc;
+    }, {});
 
     // if the cluster contains CRDs we need to check if there are any corresponding resources also
-    const customResourceDefinitions = Object.values(previewResult.previewResources).filter(
+    const customResourceDefinitions = Object.values(clusterResourceMap).filter(
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
@@ -144,29 +144,34 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
         const customResourcesYaml = customResourceObjects.join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const customResources = extractK8sResources(customResourcesYaml, PREVIEW_PREFIX + context);
+        const customResources = extractK8sResources(customResourcesYaml, {storage: 'cluster', context});
         customResources.forEach(r => {
-          previewResult.previewResources[r.id] = r;
+          clusterResourceMap[r.id] = r;
         });
-
-        previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
       }
     }
 
-    processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
-      policyPlugins: thunkAPI.getState().main.policies.plugins,
-    });
+    // TODO: process the resources via the validation listener after the preview is complete
 
     const endTime = new Date().getTime();
 
     trackEvent('preview/cluster', {
-      resourcesCount: Object.keys(previewResult.previewResources).length,
+      resourcesCount: Object.keys(clusterResourceMap).length,
       executionTime: endTime - startTime,
     });
 
-    startWatchingResources(thunkAPI.dispatch, kc, previewResult.previewResources, clusterPreviewNamespace);
+    startWatchingResources(thunkAPI.dispatch, kc, clusterResourceMap, clusterPreviewNamespace);
 
-    return previewResult;
+    const alert: AlertType = {
+      type: AlertEnum.Success,
+      title: 'Cluster Resources Loaded',
+      message: `Loaded ${Object.keys(clusterResourceMap).length} resources from ${context}}`,
+    };
+
+    return {
+      resources: Object.values(clusterResourceMap),
+      alert,
+    };
   } catch (e: any) {
     log.error(e);
     return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
@@ -177,23 +182,27 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
  * Thunk to preview cluster objects
  */
 
-export const previewCluster = createAsyncThunk<
-  SetPreviewDataPayload,
+export const loadClusterResources = createAsyncThunk<
+  {
+    resources: K8sResource<ClusterOrigin>[];
+  },
   {context: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/previewCluster', previewClusterHandler);
+>('main/loadClusterResources', loadClusterResourcesHandler);
 
-export const repreviewCluster = createAsyncThunk<
-  SetPreviewDataPayload,
+export const reloadClusterResources = createAsyncThunk<
+  {
+    resources: K8sResource<ClusterOrigin>[];
+  },
   {context: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/repreviewCluster', previewClusterHandler);
+>('main/reloadClusterResources', loadClusterResourcesHandler);
 
 /**
  * Find the default version in line with the algorithm described at
@@ -262,9 +271,9 @@ async function loadCustomResourceObjects(
 
   try {
     const customObjects = customResourceDefinitions
-      .filter(crd => crd.content.spec)
+      .filter(crd => crd.object.spec)
       .map(crd => {
-        const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
+        const kindHandler = getResourceKindHandler(crd.object.spec.names?.kind);
         if (
           kindHandler &&
           (allNamespaces
@@ -280,16 +289,16 @@ async function loadCustomResourceObjects(
         }
 
         // retrieve objects using latest version name
-        const version = findDefaultVersion(crd.content) || 'v1';
+        const version = findDefaultVersion(crd.object) || 'v1';
         return namespace
           ? k8sApi
-              .listNamespacedCustomObject(crd.content.spec.group, version, namespace, crd.content.spec.names.plural)
+              .listNamespacedCustomObject(crd.object.spec.group, version, namespace, crd.object.spec.names.plural)
               .then(response =>
                 // @ts-ignore
                 getK8sObjectsAsYaml(response.body.items)
               )
           : k8sApi
-              .listClusterCustomObject(crd.content.spec.group, version, crd.content.spec.names.plural)
+              .listClusterCustomObject(crd.object.spec.group, version, crd.object.spec.names.plural)
               .then(response =>
                 // @ts-ignore
                 getK8sObjectsAsYaml(response.body.items)
