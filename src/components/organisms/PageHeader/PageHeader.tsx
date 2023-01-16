@@ -10,7 +10,7 @@ import {ReloadOutlined} from '@ant-design/icons';
 import newGithubIssueUrl from 'new-github-issue-url';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
+import {NotificationsTooltip} from '@constants/tooltips';
 
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -22,9 +22,6 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
 
-import {Icon} from '@components/atoms';
-import BranchSelect from '@components/molecules/BranchSelect';
-
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
@@ -34,7 +31,6 @@ import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/sele
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
-import CreateProject from './CreateProject';
 import {HelpMenu} from './HelpMenu';
 import * as S from './PageHeader.styled';
 import ProjectSelection from './ProjectSelection';
@@ -192,29 +188,6 @@ const PageHeader = () => {
             <>
               <S.Divider type="vertical" />
               <ProjectSelection />
-              {hasGitRepo ? (
-                <S.BranchSelectContainer>
-                  <BranchSelect />
-                </S.BranchSelectContainer>
-              ) : (
-                <Tooltip
-                  mouseEnterDelay={TOOLTIP_DELAY}
-                  placement="bottomRight"
-                  title={isGitInstalled ? InitializeGitTooltip : InstallGitTooltip}
-                >
-                  <S.InitButton
-                    disabled={!isGitInstalled}
-                    icon={<Icon name="git" />}
-                    loading={isInitializingGitRepo || gitLoading}
-                    type="primary"
-                    size="small"
-                    onClick={initGitRepo}
-                  >
-                    Initialize Git
-                  </S.InitButton>
-                </Tooltip>
-              )}
-              <CreateProject />
             </>
           )}
           {isStartProjectPaneVisible && activeProject && (

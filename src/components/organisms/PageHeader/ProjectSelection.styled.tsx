@@ -8,6 +8,7 @@ import {
   FolderOutlined as RawFolderOutlined,
   FormatPainterOutlined as RawFormatPainterOutlined,
   GithubFilled as RawGithubFilled,
+  MenuOutlined as RawMenuOutlined,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -105,7 +106,6 @@ export const ProjectContainer = styled.div`
   display: flex;
   align-items: center;
   width: 240px;
-  background: ${Colors.grey3b};
   padding: 2px 4px;
   border-radius: 4px;
 `;
@@ -160,11 +160,12 @@ export const ProjectName = styled.span`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  color: ${Colors.whitePure};
-  font-weight: 600;
-  font-size: 12px;
+  color: ${Colors.grey9};
+  font-family: 'Inter';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
   text-align: left;
-  transition: all 0.2s ease-in;
 
   &:disabled {
     color: inherit !important;
@@ -202,5 +203,16 @@ export const TableColumnName = styled.div`
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+`;
+
+export const MenuOutlinedIcon = styled(RawMenuOutlined)`
+  color: ${Colors.grey9};
+  margin-right: 16px;
+  transition: all 0.2s ease-in;
+
+  svg {
+    width: 20px;
+    height: 20px;
   }
 `;
