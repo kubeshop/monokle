@@ -12,13 +12,11 @@ import {setAlert} from '@redux/reducers/alert';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {saveResource, splitK8sResource} from '@redux/services/resource';
-import {updateSelectionAndHighlights} from '@redux/services/selection';
+import {saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {loadPolicies} from '@redux/thunks/loadPolicies';
+import {loadClusterResources, reloadClusterResources} from '@redux/thunks/loadCluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
-import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {removeResources} from '@redux/thunks/removeResources';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -59,7 +57,7 @@ import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {previewExtraReducers, previewReducers} from './previewReducers';
-import {selectionReducers} from './selectionReducers';
+import {clearSelectionReducer, selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -433,48 +431,46 @@ export const mainSlice = createSlice({
     previewExtraReducers(builder);
 
     builder
-      .addCase(previewCluster.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
-        state.selectedResourceId = undefined;
-        state.selectedPath = undefined;
-        state.selectedValuesFileId = undefined;
-        state.selectedPreviewConfigurationId = undefined;
-        state.checkedResourceIds = [];
-        state.selectedImage = undefined;
-        Object.values(state.resourceMap).forEach(resource => {
-          resource.isSelected = false;
-          resource.isHighlighted = false;
-        });
-        state.previousSelectionHistory = [];
+      .addCase(loadClusterResources.pending, state => {
+        // TODO: should we set the context of the cluster connection here?
+        state.clusterConnection.isLoading = true;
       })
-      .addCase(previewCluster.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
-        state.selectionHistory = state.previousSelectionHistory;
-        state.previousSelectionHistory = [];
+      .addCase(loadClusterResources.fulfilled, (state, action) => {
+        state.clusterConnection.isLoading = false;
+        resetSelectionHistory(state);
+        clearSelectionReducer(state);
+        state.checkedResourceIds = [];
+
+        const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
+
+        state.resourceMetaStorage.cluster = metaMap;
+        state.resourceContentStorage.cluster = contentMap;
+        state.clusterConnection.context = action.payload.context;
+      })
+      .addCase(loadClusterResources.rejected, state => {
+        state.clusterConnection.isLoading = false;
+        state.clusterConnection.context = undefined;
       });
 
     builder
-      .addCase(repreviewCluster.fulfilled, (state, action) => {
-        setPreviewData(action.payload, state);
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        let resource = null;
-        if (action && action.payload && action.payload.previewResources && state && state.selectedResourceId) {
-          resource = action.payload.previewResources[state.selectedResourceId];
-        }
-        if (resource) {
-          updateSelectionAndHighlights(state, resource);
+      .addCase(reloadClusterResources.pending, state => {
+        state.clusterConnection.isLoading = true;
+      })
+      .addCase(reloadClusterResources.fulfilled, state => {
+        state.clusterConnection.isLoading = false;
+        state.checkedResourceIds = [];
+
+        if (
+          state.selection?.type === 'resource' &&
+          state.selection.resourceStorage === 'cluster' &&
+          !state.resourceMetaStorage.cluster[state.selection.resourceId]
+        ) {
+          clearSelectionReducer(state);
         }
       })
-      .addCase(repreviewCluster.rejected, state => {
-        state.previewLoader.isLoading = false;
-        state.previewLoader.targetId = undefined;
-        state.previewType = undefined;
+      .addCase(reloadClusterResources.rejected, state => {
+        state.clusterConnection.isLoading = false;
+        state.clusterConnection.context = undefined;
       });
 
     builder.addCase(setRootFolder.pending, state => {
@@ -605,23 +601,11 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
     builder.addCase(addResource.fulfilled, (state, action) => {
       return action.payload;
     });
 
     builder.addCase(addMultipleResources.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
-    builder.addCase(reprocessResource.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
-    builder.addCase(reprocessAllResources.fulfilled, (state, action) => {
       return action.payload;
     });
 
@@ -639,11 +623,6 @@ export const mainSlice = createSlice({
           state.resourceMap[comparison.right.id] = comparison.right;
         }
       });
-    });
-    builder.addCase(loadPolicies.fulfilled, (state, action) => {
-      state.policies = {
-        plugins: action.payload,
-      };
     });
 
     builder.addMatcher(

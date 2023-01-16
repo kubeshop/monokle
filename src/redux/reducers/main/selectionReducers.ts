@@ -2,7 +2,9 @@ import {Draft, PayloadAction} from '@reduxjs/toolkit';
 
 import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
-import {AppState, ImageType, ResourceStorage} from '@shared/models';
+import {AppState} from '@shared/models/appState';
+import {ImageType} from '@shared/models/image';
+import {ResourceStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
@@ -79,12 +81,9 @@ export const selectionReducers = createSliceReducers('main', {
       values.isSelected = values.id === valuesFileId;
     });
 
-    const filePath = state.helmValuesMap[valuesFileId].filePath;
-
     state.selection = {
       type: 'helm.values.file',
       valuesFileId,
-      filePath,
     };
 
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);

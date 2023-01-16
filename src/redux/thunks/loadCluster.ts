@@ -9,9 +9,8 @@ import log from 'loglevel';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
-import {currentClusterAccessSelector, currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
-import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
@@ -45,17 +44,11 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamesp
 const loadClusterResourcesHandler = async (payload: {context: string; port?: number}, thunkAPI: any) => {
   const {context, port} = payload;
   const startTime = new Date().getTime();
-  const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
-  const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const k8sVersion = getK8sVersion(projectConfig);
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
 
   let currentNamespace: string = clusterPreviewNamespace;
-
-  const config = thunkAPI.getState().config;
-  const {userDataDir} = config;
 
   try {
     let kc = createKubeClient(kubeConfigPath, context);
@@ -171,6 +164,7 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
     return {
       resources: Object.values(clusterResourceMap),
       alert,
+      context,
     };
   } catch (e: any) {
     log.error(e);
@@ -185,6 +179,7 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
 export const loadClusterResources = createAsyncThunk<
   {
     resources: K8sResource<ClusterOrigin>[];
+    context: string;
   },
   {context: string; port?: number},
   {
@@ -196,6 +191,7 @@ export const loadClusterResources = createAsyncThunk<
 export const reloadClusterResources = createAsyncThunk<
   {
     resources: K8sResource<ClusterOrigin>[];
+    context: string;
   },
   {context: string; port?: number},
   {
