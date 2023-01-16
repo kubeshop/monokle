@@ -70,7 +70,7 @@ export const previewKustomization = createAsyncThunk<
   const preview = {type: 'kustomize', kustomizationId: kustomization.id} as const;
 
   const resources = extractK8sResources(result.stdout, {
-    type: 'preview',
+    storage: 'preview',
     preview,
   });
 

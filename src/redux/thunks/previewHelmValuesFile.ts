@@ -1,9 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
 import {fetchResources} from '@redux/services/compare/fetchResources';
-import {getK8sVersion} from '@redux/services/projectConfig';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
