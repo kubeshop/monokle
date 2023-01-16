@@ -6,7 +6,7 @@ const HelmPreviewRuntype = Rt.Record({
   chartId: Rt.String,
 });
 
-const HelmConfigurationPreviewRuntype = Rt.Record({
+const HelmConfigPreviewRuntype = Rt.Record({
   type: Rt.Literal('helm-config'),
   configId: Rt.String,
 });
@@ -23,19 +23,19 @@ const CommandPreviewRuntype = Rt.Record({
 
 export const AnyPreviewRuntype = Rt.Union(
   HelmPreviewRuntype,
-  HelmConfigurationPreviewRuntype,
+  HelmConfigPreviewRuntype,
   KustomizePreviewRuntype,
   CommandPreviewRuntype
 );
 
 export type HelmPreview = Rt.Static<typeof HelmPreviewRuntype>;
-export type HelmConfigurationPreview = Rt.Static<typeof HelmConfigurationPreviewRuntype>;
+export type HelmConfigPreview = Rt.Static<typeof HelmConfigPreviewRuntype>;
 export type KustomizePreview = Rt.Static<typeof KustomizePreviewRuntype>;
 export type CommandPreview = Rt.Static<typeof CommandPreviewRuntype>;
 export type AnyPreview = Rt.Static<typeof AnyPreviewRuntype>;
 
 export const isHelmPreview = HelmPreviewRuntype.guard;
-export const isHelmConfigurationPreview = HelmConfigurationPreviewRuntype.guard;
+export const isHelmConfigPreview = HelmConfigPreviewRuntype.guard;
 export const isKustomizePreview = KustomizePreviewRuntype.guard;
 export const isCommandPreview = CommandPreviewRuntype.guard;
 export const isAnyPreview = AnyPreviewRuntype.guard;
