@@ -2,10 +2,10 @@ import {ActionReducerMapBuilder, SliceCaseReducers, ValidateSliceCaseReducers} f
 
 import {RootState} from '@shared/models/rootState';
 
-export function createSliceReducers<SliceName extends keyof RootState>(
-  sliceName: SliceName,
-  reducers: ValidateSliceCaseReducers<RootState[SliceName], SliceCaseReducers<RootState[SliceName]>>
-) {
+export function createSliceReducers<
+  SliceName extends keyof RootState,
+  Reducers extends ValidateSliceCaseReducers<RootState[SliceName], SliceCaseReducers<RootState[SliceName]>>
+>(sliceName: SliceName, reducers: Reducers) {
   return reducers;
 }
 
