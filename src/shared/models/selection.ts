@@ -9,7 +9,6 @@ const FileSelectionRuntype = Rt.Record({
 
 const HelmValuesFileSelectionRuntype = Rt.Record({
   type: Rt.Literal('helm.values.file'),
-  filePath: Rt.String,
   valuesFileId: Rt.String,
 });
 

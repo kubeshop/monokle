@@ -1,18 +1,22 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {fetchResources} from '@redux/services/compare/fetchResources';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
 
 import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
+import {PreviewOrigin} from '@shared/models/origin';
 import {HelmPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
 export const previewHelmValuesFile = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<PreviewOrigin<HelmPreview>>[];
+    preview: HelmPreview;
+  },
   string,
   {
     dispatch: AppDispatch;

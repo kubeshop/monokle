@@ -5,7 +5,6 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
@@ -15,6 +14,9 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {PreviewOrigin} from '@shared/models/origin';
+import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -24,7 +26,10 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 export const runPreviewConfiguration = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<PreviewOrigin<HelmConfigPreview>>[];
+    preview: HelmConfigPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
@@ -124,7 +129,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   trackEvent('preview/helm_preview_configuration', {executionTime: endTime - startTime});
 
   if (result.stdout) {
-    const preview = {type: 'helm-config', configId: previewConfiguration.id} as const;
+    const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
 
     const resources = extractK8sResources(result.stdout, {
       storage: 'preview',

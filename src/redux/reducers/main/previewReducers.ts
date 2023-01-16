@@ -6,6 +6,16 @@ import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {AppState} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
+import {PreviewOrigin} from '@shared/models/origin';
+import {AnyPreview} from '@shared/models/preview';
+import {
+  AppSelection,
+  CommandSelection,
+  HelmValuesFileSelection,
+  PreviewConfigurationSelection,
+  ResourceSelection,
+} from '@shared/models/selection';
 import {createSliceExtraReducers} from '@shared/utils/redux';
 
 const onPreviewPending = (state: AppState) => {
@@ -18,79 +28,71 @@ export const onPreviewRejected = (state: AppState) => {
   state.selectionHistory.previous = [];
 };
 
+const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
+  state: AppState,
+  payload: {resources: K8sResource<PreviewOrigin<Preview>>[]; preview: Preview},
+  initialSelection?: AppSelection
+) => {
+  state.previewOptions.isLoading = false;
+  state.checkedResourceIds = [];
+
+  const {metaMap, contentMap} = splitK8sResourceMap(payload.resources);
+
+  state.resourceMetaStorage.preview = metaMap;
+  state.resourceContentStorage.preview = contentMap;
+
+  if (initialSelection) {
+    state.selection = initialSelection;
+    resetSelectionHistory(state, [initialSelection]);
+  } else {
+    resetSelectionHistory(state);
+  }
+};
+
 export const previewExtraReducers = createSliceExtraReducers('main', builder => {
   builder
     .addCase(previewKustomization.pending, onPreviewPending)
     .addCase(previewKustomization.fulfilled, (state, action) => {
-      state.previewOptions.isLoading = false;
-
-      const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
-
-      state.resourceMetaStorage.preview = metaMap;
-      state.resourceContentStorage.preview = contentMap;
-
-      state.checkedResourceIds = [];
-
-      state.preview = action.payload.preview;
-
-      const initialSelection = {
+      const initialSelection: ResourceSelection = {
         type: 'resource',
         resourceId: action.payload.preview.kustomizationId,
         resourceStorage: 'local',
       } as const;
-      state.selection = initialSelection;
-      resetSelectionHistory(state, [initialSelection]);
+
+      onPreviewSuccess(state, action.payload, initialSelection);
     })
     .addCase(previewKustomization.rejected, onPreviewRejected);
 
   builder
     .addCase(previewHelmValuesFile.pending, onPreviewPending)
     .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
-      setPreviewData(action.payload, state);
-      state.previewLoader.isLoading = false;
-      state.previewLoader.targetId = undefined;
-      state.currentSelectionHistoryIndex = undefined;
-      resetSelectionHistory(state);
-      state.selectedResourceId = undefined;
-      state.selectedImage = undefined;
-      state.checkedResourceIds = [];
-      if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-        selectFilePath({filePath: state.helmValuesMap[action.payload.previewResourceId].filePath, state});
-      }
-      state.selectedValuesFileId = action.payload.previewResourceId;
-      state.previousSelectionHistory = [];
+      const initialSelection: HelmValuesFileSelection = {
+        type: 'helm.values.file',
+        valuesFileId: action.payload.preview.valuesFileId,
+      };
+      onPreviewSuccess(state, action.payload, initialSelection);
     })
     .addCase(previewHelmValuesFile.rejected, onPreviewRejected);
 
   builder
     .addCase(runPreviewConfiguration.pending, onPreviewPending)
     .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
-      setPreviewData(action.payload, state);
-      state.previewLoader.isLoading = false;
-      state.previewLoader.targetId = undefined;
-      state.currentSelectionHistoryIndex = undefined;
-      resetSelectionHistory(state);
-      state.selectedResourceId = undefined;
-      state.selectedImage = undefined;
-      state.selectedPath = undefined;
-      state.checkedResourceIds = [];
-      state.previousSelectionHistory = [];
+      const initialSelection: PreviewConfigurationSelection = {
+        type: 'preview.configuration',
+        previewConfigurationId: action.payload.preview.configId,
+      };
+      onPreviewSuccess(state, action.payload, initialSelection);
     })
     .addCase(runPreviewConfiguration.rejected, onPreviewRejected);
 
   builder
     .addCase(previewSavedCommand.pending, onPreviewPending)
     .addCase(previewSavedCommand.fulfilled, (state, action) => {
-      setPreviewData(action.payload, state);
-      state.previewLoader.isLoading = false;
-      state.previewLoader.targetId = undefined;
-      state.currentSelectionHistoryIndex = undefined;
-      resetSelectionHistory(state);
-      state.selectedResourceId = undefined;
-      state.selectedImage = undefined;
-      state.selectedPath = undefined;
-      state.checkedResourceIds = [];
-      state.previousSelectionHistory = [];
+      const initialSelection: CommandSelection = {
+        type: 'command',
+        commandId: action.payload.preview.commandId,
+      };
+      onPreviewSuccess(state, action.payload, initialSelection);
     })
     .addCase(previewSavedCommand.rejected, onPreviewRejected);
 });
