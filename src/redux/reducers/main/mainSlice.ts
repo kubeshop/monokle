@@ -56,7 +56,7 @@ import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {previewExtraReducers, previewReducers} from './previewReducers';
+import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
 import {clearSelectionReducer, selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
@@ -481,38 +481,25 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
-      state.resourceMap = action.payload.resourceMap;
+      state.resourceMetaStorage.local = action.payload.resourceMetaMap;
+      state.resourceContentStorage.local = action.payload.resourceContentMap;
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
       state.helmTemplatesMap = action.payload.helmTemplatesMap;
-      state.previewLoader.isLoading = false;
-      state.previewLoader.targetId = undefined;
-      state.selectedResourceId = undefined;
-      state.selectedImage = undefined;
-      state.selectedValuesFileId = undefined;
-      state.selectedPath = undefined;
-      state.previewResourceId = undefined;
-      state.previewConfigurationId = undefined;
-      state.previewCommandId = undefined;
-      state.previewType = undefined;
-      state.previewValuesFileId = undefined;
-      state.selectedPreviewConfigurationId = undefined;
-      state.previewLoader = {
-        isLoading: false,
-        targetId: undefined,
-      };
+
+      clearSelectionReducer(state);
+      clearPreviewReducer(state);
+      resetSelectionHistory(state);
       state.checkedResourceIds = [];
+      state.isApplyingResource = false;
       state.resourceDiff = {
         targetResourceId: undefined,
       };
-      state.isSelectingFile = false;
-      state.isApplyingResource = false;
       state.resourceFilter = {
         labels: {},
         annotations: {},
       };
-      resetSelectionHistory(state);
     });
 
     builder.addCase(saveUnsavedResources.fulfilled, (state, action) => {
@@ -697,50 +684,3 @@ export const {
   deleteMultipleClusterResources,
 } = mainSlice.actions;
 export default mainSlice.reducer;
-
-/* * * * * * * * * * * * * *
- * Listeners
- * * * * * * * * * * * * * */
-export const resourceMapChangedListener: AppListenerFn = listen => {
-  listen({
-    predicate: (action, currentState, previousState) => {
-      return (
-        !isEqual(currentState.main.resourceMap, previousState.main.resourceMap) ||
-        !isEqual(currentState.main.resourceFilter, previousState.main.resourceFilter)
-      );
-    },
-
-    effect: async (_action, {dispatch, getState}) => {
-      const resourceFilter = getState().main.resourceFilter;
-      const resourceMap = getActiveResourceMap(getState().main);
-
-      const currentResourcesMap = Object.fromEntries(
-        Object.entries(resourceMap).filter(([, value]) => isResourcePassingFilter(value, resourceFilter))
-      );
-
-      const imagesList = getState().main.imagesList;
-      const images = getImages(currentResourcesMap);
-
-      if (!isEqual(images, imagesList)) {
-        dispatch(setImagesList(images));
-      }
-    },
-  });
-};
-
-export const imageSelectedListener: AppListenerFn = listen => {
-  listen({
-    type: selectImage.type,
-    effect: async (_action, {dispatch, getState}) => {
-      const leftMenu = getState().ui.leftMenu;
-
-      if (!leftMenu.isActive) {
-        dispatch(toggleLeftMenu());
-      }
-
-      if (leftMenu.selection !== 'images-pane') {
-        dispatch(setLeftMenuSelection('images-pane'));
-      }
-    },
-  });
-};

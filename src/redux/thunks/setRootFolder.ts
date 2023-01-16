@@ -7,9 +7,6 @@ import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
-import {processKustomizations} from '@redux/services/kustomize';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
@@ -18,14 +15,10 @@ import {addDefaultCommandTerminal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@shared/models/appState';
+import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {GitChangedFile, GitRepo} from '@shared/models/git';
+import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -47,7 +40,8 @@ export const setRootFolder = createAsyncThunk<
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const terminalState = thunkAPI.getState().terminal;
 
-  const resourceMap: ResourceMapType = {};
+  const resourceMetaMap: ResourceMetaMap<LocalOrigin> = {};
+  const resourceContentMap: ResourceContentMap<LocalOrigin> = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
@@ -57,7 +51,8 @@ export const setRootFolder = createAsyncThunk<
     return {
       projectConfig,
       fileMap,
-      resourceMap,
+      resourceMetaMap,
+      resourceContentMap,
       helmChartMap,
       helmValuesMap,
       helmTemplatesMap,
@@ -80,7 +75,15 @@ export const setRootFolder = createAsyncThunk<
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
       resolve(
-        readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap)
+        readFiles(rootFolder, {
+          projectConfig,
+          resourceMetaMap,
+          resourceContentMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap,
+          helmTemplatesMap,
+        })
       );
     });
   });
@@ -88,17 +91,11 @@ export const setRootFolder = createAsyncThunk<
 
   rootEntry.children = files;
 
-  const policyPlugins = thunkAPI.getState().main.policies.plugins;
-  processKustomizations(resourceMap, fileMap);
-  processResources(getK8sVersion(projectConfig), String(userDataDir), resourceMap, resourceRefsProcessingOptions, {
-    policyPlugins,
-  });
-
   monitorRootFolder(rootFolder, thunkAPI);
 
   const generatedAlert = {
     title: 'Folder Import',
-    message: `${Object.values(resourceMap).length} resources found in ${
+    message: `${Object.values(resourceMetaMap).length} resources found in ${
       Object.values(fileMap).filter(f => !f.children).length
     } files`,
     type: AlertEnum.Success,
@@ -156,14 +153,17 @@ export const setRootFolder = createAsyncThunk<
 
   trackEvent('app_start/open_project', {
     numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMap).length,
+    numberOfResources: Object.values(resourceMetaMap).length,
     executionTime: endTime - startTime,
   });
+
+  // TODO: process resources in validation listener after folder was loaded
 
   return {
     projectConfig,
     fileMap,
-    resourceMap,
+    resourceMetaMap,
+    resourceContentMap,
     helmChartMap,
     helmValuesMap,
     helmTemplatesMap,
