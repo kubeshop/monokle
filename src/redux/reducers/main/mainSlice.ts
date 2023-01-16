@@ -1,15 +1,12 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import isEqual from 'lodash/isEqual';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 import {transferResource} from '@redux/compare';
 import initialState from '@redux/initialState';
-import {AppListenerFn} from '@redux/listeners/base';
 import {setAlert} from '@redux/reducers/alert';
-import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
@@ -24,7 +21,6 @@ import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry'
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {isResourcePassingFilter} from '@utils/resources';
 import {parseYamlDocument} from '@utils/yaml';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -35,10 +31,8 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ImagesListType,
   MatchParamProps,
   PreviewType,
-  ResourceFilterType,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
@@ -56,6 +50,7 @@ import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import {filterReducers} from './filterReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
 import {clearSelectionReducer, selectionReducers} from './selectionReducers';
 
@@ -106,31 +101,6 @@ export type StartPreviewLoaderPayload = {
   previewType: PreviewType;
 };
 
-// function getImages(resourceMap: ResourceMapType) {
-//   let images: ImagesListType = [];
-
-//   Object.values(resourceMap).forEach(k8sResource => {
-//     if (k8sResource.refs?.length) {
-//       k8sResource.refs.forEach(ref => {
-//         if (ref.type === 'outgoing' && ref.target?.type === 'image') {
-//           const refName = ref.name;
-//           const refTag = ref.target?.tag || 'latest';
-
-//           const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
-
-//           if (!foundImage) {
-//             images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
-//           } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
-//             foundImage.resourcesIds.push(k8sResource.id);
-//           }
-//         }
-//       });
-//     }
-//   });
-
-//   return images;
-// }
-
 export const performResourceContentUpdate = (resource: K8sResource, newText: string, fileMap: FileMapType) => {
   if (isLocalResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
@@ -171,6 +141,7 @@ export const mainSlice = createSlice({
   reducers: {
     ...selectionReducers,
     ...previewReducers,
+    ...filterReducers,
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -211,81 +182,6 @@ export const mainSlice = createSlice({
     },
     highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
       state.search.currentMatch = action.payload;
-    },
-    setFiltersToBeChanged: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType | undefined>) => {
-      state.filtersToBeChanged = action.payload;
-    },
-    setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.isApplyingResource = action.payload;
-    },
-    resetResourceFilter: (state: Draft<AppState>) => {
-      state.resourceFilter = {labels: {}, annotations: {}};
-    },
-    updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
-      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
-        state.filtersToBeChanged = action.payload;
-        return;
-      }
-
-      if (state.filtersToBeChanged) {
-        state.filtersToBeChanged = undefined;
-      }
-
-      state.resourceFilter = action.payload;
-    },
-    extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
-      const filter = action.payload;
-
-      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
-        state.filtersToBeChanged = filter;
-        return;
-      }
-
-      if (state.filtersToBeChanged) {
-        state.filtersToBeChanged = undefined;
-      }
-
-      // construct new filter
-      let newFilter: ResourceFilterType = {
-        names: filter.names
-          ? isEqual(filter.names, state.resourceFilter.names)
-            ? undefined
-            : filter.names
-          : state.resourceFilter.names,
-        namespace: filter.namespace
-          ? filter.namespace === state.resourceFilter.namespace
-            ? undefined
-            : filter.namespace
-          : state.resourceFilter.namespace,
-        kinds: filter.kinds
-          ? isEqual(filter.kinds, state.resourceFilter.kinds)
-            ? undefined
-            : filter.kinds
-          : state.resourceFilter.kinds,
-        fileOrFolderContainedIn: filter.fileOrFolderContainedIn
-          ? filter.fileOrFolderContainedIn === state.resourceFilter.fileOrFolderContainedIn
-            ? undefined
-            : filter.fileOrFolderContainedIn
-          : state.resourceFilter.fileOrFolderContainedIn,
-        labels: state.resourceFilter.labels,
-        annotations: state.resourceFilter.annotations,
-      };
-
-      Object.keys(filter.labels).forEach(key => {
-        if (newFilter.labels[key] === filter.labels[key]) {
-          delete newFilter.labels[key];
-        } else {
-          newFilter.labels[key] = filter.labels[key];
-        }
-      });
-      Object.keys(filter.annotations).forEach(key => {
-        if (newFilter.annotations[key] === filter.annotations[key]) {
-          delete newFilter.annotations[key];
-        } else {
-          newFilter.annotations[key] = filter.annotations[key];
-        }
-      });
-      state.resourceFilter = newFilter;
     },
     setSelectionHistory: (
       state: Draft<AppState>,
@@ -365,26 +261,10 @@ export const mainSlice = createSlice({
       };
     },
 
-    setImagesSearchedValue: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.imagesSearchedValue = action.payload;
-    },
     setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
       state.lastChangedLine = action.payload;
     },
-    setImagesList: (state: Draft<AppState>, action: PayloadAction<ImagesListType>) => {
-      state.imagesList = action.payload;
-    },
-    deleteFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      delete state.filtersPresets[action.payload];
-      electronStore.set('main.filtersPresets', state.filtersPresets);
-    },
-    loadFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.resourceFilter = state.filtersPresets[action.payload];
-    },
-    saveFilterPreset: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.filtersPresets[action.payload] = state.resourceFilter;
-      electronStore.set('main.filtersPresets', state.filtersPresets);
-    },
+
     updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
       state.validationIntegration = action.payload;
     },
