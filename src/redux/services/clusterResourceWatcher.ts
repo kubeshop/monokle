@@ -15,8 +15,7 @@ import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandl
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {ResourceMap} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import {extractK8sResources} from './resource';

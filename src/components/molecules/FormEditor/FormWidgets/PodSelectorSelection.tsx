@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 
 import {Select} from 'antd';
 
-import {uniq} from 'lodash';
+import {merge, uniq} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
-import {getK8sResources} from '@redux/services/resource';
+import {getResourcesOfKind} from '@redux/services/resource';
 
 import * as S from './styled';
 
@@ -16,7 +16,9 @@ const EMPTY_VALUE = 'NONE';
 
 export const PodSelectorSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMap = useAppSelector(state =>
+    merge(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local)
+  );
   const [podSelectors, setPodSelectors] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
@@ -55,11 +57,9 @@ export const PodSelectorSelection = (params: any) => {
   useEffect(() => {
     const labels: string[] = [];
 
-    getK8sResources(resourceMap, 'Pod').forEach(r => {
-      if (r.content?.metadata?.labels) {
-        Object.keys(r.content.metadata?.labels).forEach(key =>
-          labels.push(`${key}: ${r.content.metadata?.labels[key]}`)
-        );
+    getResourcesOfKind(resourceMap, 'Pod').forEach(r => {
+      if (r.object?.metadata?.labels) {
+        Object.keys(r.object.metadata?.labels).forEach(key => labels.push(`${key}: ${r.object.metadata?.labels[key]}`));
       }
     });
 
@@ -68,9 +68,9 @@ export const PodSelectorSelection = (params: any) => {
         ['DaemonSet', 'Deployment', 'Job', 'ReplicaSet', 'ReplicationController', 'StatefulSet'].includes(r.kind)
       )
       .forEach(r => {
-        if (r.content?.spec?.template?.metadata?.labels) {
-          Object.keys(r.content.spec?.template?.metadata?.labels).forEach(key =>
-            labels.push(`${key}: ${r.content.spec?.template?.metadata?.labels[key]}`)
+        if (r.object?.spec?.template?.metadata?.labels) {
+          Object.keys(r.object.spec?.template?.metadata?.labels).forEach(key =>
+            labels.push(`${key}: ${r.object.spec?.template?.metadata?.labels[key]}`)
           );
         }
       });
