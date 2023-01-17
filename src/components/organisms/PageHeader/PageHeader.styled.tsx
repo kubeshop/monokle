@@ -98,6 +98,7 @@ export const Logo = styled.img`
 export const LogoContainer = styled.div`
   height: 100%;
   min-width: 50px;
+  width: 50px;
   display: flex;
   justify-content: center;
 `;
@@ -139,11 +140,11 @@ export const ActiveProjectButton = styled(RawButton).attrs({
 
 export const ProjectName = styled.span`
   width: 100%;
+  max-width: 272px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   color: ${Colors.grey9};
-  font-family: 'Inter';
   font-weight: 700;
   font-size: 16px;
   line-height: 20px;
