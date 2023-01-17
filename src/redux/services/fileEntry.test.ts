@@ -1,19 +1,17 @@
+import {merge} from 'lodash';
+
 import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
-import {getK8sResources} from '@redux/services/resource';
+import {getResourcesOfKind} from '@redux/services/resource';
 
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMap,
-} from '@shared/models/appState';
+import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {AppConfig} from '@shared/models/config';
+import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
 
-import {createFileEntry, createRootFileEntry, getResourcesForPath, readFiles} from './fileEntry';
+import {createFileEntry, createRootFileEntry, getLocalResourceMetasForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
   const fileMap: FileMapType = {};
@@ -32,13 +30,25 @@ test('create-file-entry', () => {
 
 export function readManifests(rootFolder: string) {
   const appConfig: AppConfig = initialState.config;
-  const resourceMap: ResourceMap = {};
+  const resourceMetaMap: ResourceMetaMap<LocalOrigin> = {};
+  const resourceContentMap: ResourceContentMap<LocalOrigin> = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
   const helmTemplatesMap: HelmTemplatesMapType = {};
 
-  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap);
+  const files = readFiles(rootFolder, {
+    projectConfig: appConfig,
+    resourceMetaMap,
+    resourceContentMap,
+    fileMap,
+    helmChartMap,
+    helmValuesMap,
+    helmTemplatesMap,
+  });
+
+  const resourceMap = merge(resourceMetaMap, resourceContentMap);
+
   return {resourceMap, fileMap, files, helmChartMap, helmValuesMap};
 }
 
@@ -47,8 +57,10 @@ test('read-files', () => {
 
   expect(files.length).toBe(7);
   expect(Object.values(fileMap).length).toBe(27);
-  expect(getK8sResources(resourceMap, KUSTOMIZATION_KIND).length).toBe(5);
-  expect(getResourcesForPath(createSafePath('/base/argo-rollouts-aggregate-roles.yaml'), resourceMap).length).toBe(3);
+  expect(getResourcesOfKind(resourceMap, KUSTOMIZATION_KIND).length).toBe(5);
+  expect(
+    getLocalResourceMetasForPath(createSafePath('/base/argo-rollouts-aggregate-roles.yaml'), resourceMap).length
+  ).toBe(3);
 });
 
 test('read-folder-with-one-file', () => {

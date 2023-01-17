@@ -80,6 +80,14 @@ export function getLineCounter(resource: K8sResource) {
 }
 
 /**
+ * Utility function to get all resources of a specific kind
+ */
+
+export function getResourcesOfKind(resourceMap: ResourceMap, kind: string) {
+  return Object.values(resourceMap).filter(item => item.kind === kind);
+}
+
+/**
  * Extracts all unique namespaces from resources in specified resourceMap
  */
 
