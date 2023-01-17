@@ -6,8 +6,6 @@ import {uniq} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {K8sResource} from '@shared/models/k8sResource';
-
 import * as S from './styled';
 
 const Option = Select.Option;
@@ -21,7 +19,7 @@ ResourceSelection.defaultProps = {
 
 export function ResourceSelection(props: any) {
   const {value, onChange, disabled, options, readonly} = props;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMetaMap = useAppSelector(state => state.main.resourceMetaStorage.local);
   const [resourceNames, setResourceNames] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
@@ -57,19 +55,19 @@ export function ResourceSelection(props: any) {
   }, [selectValue]);
 
   useEffect(() => {
-    if (resourceMap) {
+    if (resourceMetaMap) {
       const resourceKinds: string[] | undefined = options?.resourceKinds ? options.resourceKinds.split('|') : undefined;
       setResourceNames(
         uniq(
-          Object.values(resourceMap)
+          Object.values(resourceMetaMap)
             .filter(resource => !resourceKinds || resourceKinds.includes(resource.kind))
-            .map((resource: K8sResource) => resource.name)
+            .map(resource => resource.name)
         ).sort()
       );
     } else {
       setResourceNames([]);
     }
-  }, [resourceMap, options.resourceKinds]);
+  }, [resourceMetaMap, options.resourceKinds]);
 
   return (
     <S.SelectStyled
