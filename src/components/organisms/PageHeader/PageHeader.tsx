@@ -10,18 +10,28 @@ import {ReloadOutlined} from '@ant-design/icons';
 import newGithubIssueUrl from 'new-github-issue-url';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NotificationsTooltip} from '@constants/tooltips';
+import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
+import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, setPreviewingCluster, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
+import store from '@redux/store';
+
+import {Icon} from '@components/atoms';
+import BranchSelect from '@components/molecules/BranchSelect';
+
+import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
 import {HelpMenu} from './HelpMenu';
@@ -32,8 +42,11 @@ const PageHeader = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const autosavingError = useAppSelector(state => state.main.autosaving.error);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
+  const gitLoading = useAppSelector(state => state.git.loading);
+  const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -44,11 +57,13 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+  const [isInitializingGitRepo, setIsInitializingGitRepo] = useState(false);
   const [showAutosaving, setShowAutosaving] = useState(false);
 
   const runningPreviewConfiguration = useAppSelector(state => {
@@ -80,10 +95,6 @@ const PageHeader = () => {
     }
   };
 
-  const onClickProjectHandler = () => {
-    dispatch(toggleStartProjectPane());
-  };
-
   const createGitHubIssue = useCallback(() => {
     if (!autosavingError) {
       return null;
@@ -99,6 +110,30 @@ const PageHeader = () => {
 
     shell.openExternal(url);
   }, [autosavingError]);
+
+  const initGitRepo = async () => {
+    if (!projectRootFolder) {
+      return;
+    }
+
+    trackEvent('git/initialize');
+    setIsInitializingGitRepo(true);
+
+    await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
+
+    monitorGitFolder(projectRootFolder, store);
+
+    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
+      dispatch(setRepo(result));
+      dispatch(setCurrentBranch(result.currentBranch));
+      setIsInitializingGitRepo(false);
+      dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
+    });
+  };
+
+  const onClickProjectHandler = () => {
+    dispatch(toggleStartProjectPane());
+  };
 
   useEffect(() => {
     if (previewResourceId) {
@@ -156,18 +191,34 @@ const PageHeader = () => {
           </S.LogoContainer>
 
           {activeProject && (
-            <S.ActiveProjectButton onClick={onClickProjectHandler}>
-              <S.MenuOutlinedIcon />
-
-              <S.ProjectName>{activeProject.name}</S.ProjectName>
-            </S.ActiveProjectButton>
-          )}
-          {isStartProjectPaneVisible && activeProject && (
             <>
-              <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
-              <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-                Back to Project
-              </S.BackToProjectButton>
+              <S.Divider type="vertical" />
+              <S.ActiveProjectButton onClick={onClickProjectHandler}>
+                <S.MenuOutlinedIcon />
+                <S.ProjectName>{activeProject.name}</S.ProjectName>
+              </S.ActiveProjectButton>
+              {hasGitRepo ? (
+                <S.BranchSelectContainer>
+                  <BranchSelect />
+                </S.BranchSelectContainer>
+              ) : (
+                <Tooltip
+                  mouseEnterDelay={TOOLTIP_DELAY}
+                  placement="bottomRight"
+                  title={isGitInstalled ? InitializeGitTooltip : InstallGitTooltip}
+                >
+                  <S.InitButton
+                    disabled={!isGitInstalled}
+                    icon={<Icon name="git" />}
+                    loading={isInitializingGitRepo || gitLoading}
+                    type="primary"
+                    size="small"
+                    onClick={initGitRepo}
+                  >
+                    Initialize Git
+                  </S.InitButton>
+                </Tooltip>
+              )}
             </>
           )}
 
