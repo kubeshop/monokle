@@ -1,5 +1,7 @@
 import * as Rt from 'runtypes';
 
+import {ResourceRef} from '@monokle/validation';
+
 import {K8sObject, K8sObjectRuntype} from './k8s';
 import {
   AnyOrigin,
@@ -8,6 +10,7 @@ import {
   ClusterOriginRuntype,
   LocalOrigin,
   LocalOriginRuntype,
+  PreviewOrigin,
   PreviewOriginRuntype,
 } from './origin';
 
@@ -44,6 +47,7 @@ export interface ResourceMeta<Origin extends AnyOrigin = AnyOrigin> extends Reso
     length: number;
   };
   isUnsaved?: boolean;
+  refs?: ResourceRef[];
 }
 
 const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
@@ -105,7 +109,7 @@ const ClusterResourceRuntype: Rt.Runtype<K8sResource<ClusterOrigin>> = Rt.Inters
   ResourceRuntype,
   Rt.Record({origin: ClusterOriginRuntype})
 );
-const PreviewResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(
+const PreviewResourceRuntype: Rt.Runtype<K8sResource<PreviewOrigin>> = Rt.Intersect(
   ResourceRuntype,
   Rt.Record({origin: PreviewOriginRuntype})
 );

@@ -1,12 +1,12 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ImagesListType, ResourceMapType, SelectionHistoryEntry} from '../models';
+import {FileMapType, ImagesListType, ResourceMap, SelectionHistoryEntry} from '../models';
 
 export const selectFromHistory = (
   direction: 'left' | 'right',
   currentSelectionHistoryIndex: number | undefined,
   selectionHistory: SelectionHistoryEntry[],
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   fileMap: FileMapType,
   imagesList: ImagesListType,
   dispatch: (action: AnyAction) => void

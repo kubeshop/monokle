@@ -19,7 +19,7 @@ import {
   HelmValuesMapType,
   ImagesListType,
   ResourceFilterType,
-  ResourceMapType,
+  ResourceMap,
 } from '@shared/models/appState';
 import {CurrentMatch} from '@shared/models/fileEntry';
 import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
@@ -31,7 +31,7 @@ interface CodeIntelProps {
   isDirty: boolean;
   selectedResource: K8sResource | undefined;
   code: string | undefined;
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   fileMap: FileMapType;
   imagesList: ImagesListType;
   isEditorMounted: boolean;

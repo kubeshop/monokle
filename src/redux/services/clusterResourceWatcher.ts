@@ -15,7 +15,7 @@ import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandl
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
@@ -89,7 +89,7 @@ const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType,
+  previewResources: ResourceMap,
   plural?: string
 ) => {
   if (
@@ -159,7 +159,7 @@ export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.Ku
 export const startWatchingResources = (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
-  clusterResourceMap: ResourceMapType,
+  clusterResourceMap: ResourceMap,
   namespace: string
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>

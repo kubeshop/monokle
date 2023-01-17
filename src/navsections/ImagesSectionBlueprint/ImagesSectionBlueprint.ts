@@ -1,8 +1,9 @@
 import {selectImage} from '@redux/reducers/main';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ImagesListType, ResourceMapType} from '@shared/models/appState';
+import {ImagesListType} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
+import {ResourceMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -12,7 +13,7 @@ import ImagesSectionNameDisplay from './ImagesSectionNameDisplay';
 import ImagesSectionNameSuffix from './ImagesSectionNameSuffix';
 
 export type ImagesScopeType = {
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
   imagesList: ImagesListType;

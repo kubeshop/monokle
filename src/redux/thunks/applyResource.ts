@@ -18,7 +18,7 @@ import {errorAlert, successAlert} from '@utils/alert';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {FileMapType, ResourceMap} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -75,7 +75,7 @@ function applyKustomization(
 
 export async function applyResource(
   resourceId: string,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   fileMap: FileMapType,
   dispatch: AppDispatch,
   projectConfig: ProjectConfig,

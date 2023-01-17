@@ -5,7 +5,7 @@ import path from 'path';
 
 // import {getResourcesForPath} from '@redux/services/fileEntry';
 
-// import {FileMapType, ResourceMapType} from '@shared/models/appState';
+// import {FileMapType, ResourceMap} from '@shared/models/appState';
 // import {FileEntry} from '@shared/models/fileEntry';
 // import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
 
@@ -22,7 +22,7 @@ export function isKustomizationFilePath(filePath: string) {
 // function linkParentKustomization(
 //   fileEntry: FileEntry,
 //   kustomization: K8sResource,
-//   resourceMap: ResourceMapType,
+//   resourceMap: ResourceMap,
 //   refNode: NodeWrapper
 // ) {
 //   let result: K8sResource[] = [];
@@ -56,7 +56,7 @@ export function isKustomizationFilePath(filePath: string) {
 //  * Checks if the specified fileEntry is a kustomization file
 //  */
 
-// export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
+// export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMap) {
 //   if (fileEntry?.filePath && isKustomizationFilePath(fileEntry.filePath)) {
 //     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 //     return resources.length === 1 && isKustomizationResource(resources[0]);
@@ -72,7 +72,7 @@ export function isKustomizationFilePath(filePath: string) {
 // function processKustomizationResourceRef(
 //   kustomization: K8sResource,
 //   refNode: NodeWrapper,
-//   resourceMap: ResourceMapType,
+//   resourceMap: ResourceMap,
 //   fileMap: FileMapType
 // ) {
 //   let resourcePath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
@@ -108,7 +108,7 @@ export function isKustomizationFilePath(filePath: string) {
 // function extractPatches(
 //   kustomization: K8sResource,
 //   fileMap: FileMapType,
-//   resourceMap: ResourceMapType,
+//   resourceMap: ResourceMap,
 //   patchPath: string
 // ) {
 //   let patches = getScalarNodes(kustomization, patchPath);
@@ -159,7 +159,7 @@ export function isKustomizationFilePath(filePath: string) {
 //  * Processes all kustomizations in resourceMap and establishes corresponding resourcerefs
 //  */
 
-// export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+// export function processKustomizations(resourceMap: ResourceMap, fileMap: FileMapType) {
 //   Object.values(resourceMap)
 //     .filter(r => isKustomizationResource(r))
 //     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge || k.content.patchesJson6902)
@@ -189,7 +189,7 @@ export function isKustomizationFilePath(filePath: string) {
 //  */
 
 // export function getKustomizationRefs(
-//   resourceMap: ResourceMapType,
+//   resourceMap: ResourceMap,
 //   kustomizationId: string,
 //   selectParent: boolean = false
 // ) {
@@ -248,7 +248,7 @@ export function isKustomizationFilePath(filePath: string) {
  * Reprocess kustomization-specific references for all kustomizations
  */
 
-// export function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+// export function reprocessKustomizations(resourceMap: ResourceMap, fileMap: FileMapType) {
 //   Object.values(resourceMap)
 //     .filter(r => isKustomizationResource(r))
 //     .forEach(r => {

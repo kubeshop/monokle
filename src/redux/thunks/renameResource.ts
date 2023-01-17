@@ -4,13 +4,13 @@ import {isIncomingRef} from '@redux/services/resourceRefs';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/appState';
 
 export const renameResource = (
   resourceId: string,
   newResourceName: string,
   shouldUpdateRefs: boolean,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   dispatch: AppDispatch,
   selectedResourceId?: string
 ) => {

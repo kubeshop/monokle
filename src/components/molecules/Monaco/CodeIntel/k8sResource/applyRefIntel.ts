@@ -1,8 +1,7 @@
 import {monaco} from 'react-monaco-editor';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {areRefPosEqual, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {isUnsavedResource} from '@redux/services/resource';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {
@@ -14,16 +13,17 @@ import {
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
 
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
-import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
+import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual, isUnsatisfiedRef} from '@monokle/validation';
+import {FileMapType} from '@shared/models/appState';
+import {K8sResource, ResourceMap, isLocalResource, isPreviewResource} from '@shared/models/k8sResource';
 
 function applyRefIntel(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
-  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
   selectImage: (imageId: string) => void,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   fileMap: FileMapType
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
@@ -85,7 +85,11 @@ function applyRefIntel(
             `Create ${matchRef.target.resourceKind}`,
             'Create Resource',
             () => {
-              createResource(matchRef, resource.namespace, getResourceFolder(resource));
+              createResource(
+                matchRef,
+                resource.namespace,
+                isLocalResource(resource) ? getResourceFolder(resource) : undefined
+              );
             }
           );
           commandMarkdownLinkList.push(commandMarkdownLink);
@@ -182,7 +186,11 @@ function applyRefIntel(
             : 'Open resource',
           () => {
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
-              createResource(matchRef, resource.namespace, getResourceFolder(resource));
+              createResource(
+                matchRef,
+                resource.namespace,
+                isLocalResource(resource) ? getResourceFolder(resource) : undefined
+              );
             } else if (matchRef.target?.type === 'resource' && matchRef.target.resourceId) {
               selectResource(matchRef.target.resourceId);
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {

@@ -1,13 +1,13 @@
 import {loadTestResource} from '@redux/services/__test__/utils';
 
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/appState';
 
 import {extractK8sResources, getNamespaces, getScalarNode, getScalarNodes} from './resource';
 
 test('get-namespaces', () => {
   expect(getNamespaces({}).length).toBe(0);
 
-  const resourceMapWithoutNamespaces: ResourceMapType = {};
+  const resourceMapWithoutNamespaces: ResourceMap = {};
   resourceMapWithoutNamespaces['1'] = {
     id: '1',
     fileId: 'folder/filename',

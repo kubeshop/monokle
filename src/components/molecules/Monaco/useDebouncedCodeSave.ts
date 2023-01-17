@@ -9,7 +9,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/k8sResource';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,
@@ -17,7 +17,7 @@ function useDebouncedCodeSave(
   code: string,
   isDirty: boolean,
   isValid: boolean,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   selectedResourceId: string | undefined,
   selectedPath: string | undefined,
   setOrgCode: (newOrgCode: string) => void

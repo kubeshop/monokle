@@ -1,11 +1,10 @@
 import {selectK8sResource} from '@redux/reducers/main';
-import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ResourceFilterType, ResourceMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceFilterType} from '@shared/models/appState';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
@@ -18,7 +17,7 @@ import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay
 import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationScopeType = {
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   previewResourceId: string | undefined;
   resourceFilters: ResourceFilterType;
   isInClusterMode: boolean;

@@ -6,7 +6,7 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceFilterType,
-  ResourceMapType,
+  ResourceMap,
 } from '@shared/models/appState';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
 import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
@@ -41,7 +41,7 @@ export interface CodeIntelParams {
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
   selectImageHandler: (imageId: string) => void;
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   model: monaco.editor.IModel | null;
   matchOptions?: CurrentMatch | null;
   lastChangedLine: number;

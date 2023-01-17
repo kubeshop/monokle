@@ -23,7 +23,7 @@ import {getResourceKindHandler, registerKindHandler} from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {FileMapType} from '@shared/models/appState';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sObject} from '@shared/models/k8s';
 import {
@@ -83,7 +83,7 @@ export function getLineCounter(resource: K8sResource) {
  * Extracts all unique namespaces from resources in specified resourceMap
  */
 
-export function getNamespaces(resourceMap: ResourceMapType) {
+export function getNamespaces(resourceMap: ResourceMap) {
   const namespaces: string[] = [];
   Object.values(resourceMap).forEach(e => {
     if (e.kind === 'Namespace' && !namespaces.includes(e.name)) {
@@ -224,7 +224,7 @@ export function removeResourceFromFile(
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
-  const resourceMap: ResourceMapType = merge(resourceMetaMap, resourceContentMap);
+  const resourceMap: ResourceMap = merge(resourceMetaMap, resourceContentMap);
 
   if (!isLocalResource(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);

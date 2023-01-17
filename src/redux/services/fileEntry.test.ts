@@ -9,7 +9,7 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ResourceMapType,
+  ResourceMap,
 } from '@shared/models/appState';
 import {AppConfig} from '@shared/models/config';
 
@@ -32,7 +32,7 @@ test('create-file-entry', () => {
 
 export function readManifests(rootFolder: string) {
   const appConfig: AppConfig = initialState.config;
-  const resourceMap: ResourceMapType = {};
+  const resourceMap: ResourceMap = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};

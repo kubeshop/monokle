@@ -1,7 +1,7 @@
 import {UpdateMultipleResourcesPayload, selectImage} from '@redux/reducers/main';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
 
 import {updateMultipleResources} from './updateMultipleResources';
@@ -9,7 +9,7 @@ import {updateMultipleResources} from './updateMultipleResources';
 export const replaceImageTag = (
   image: ImageType,
   newImageTag: string,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   dispatch: AppDispatch
 ) => {
   const {resourcesIds} = image;

@@ -4,20 +4,18 @@ import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard/sl
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
 
-import {ResourceMapType} from '@shared/models/appState';
-import {K8sResource, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
+import {ResourceRef} from '@monokle/validation';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {MonacoRange} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';
 
-export const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+export const getRefKind = (ref: ResourceRef, resourceMap: ResourceMap) => {
   if (ref.target?.type === 'file') {
     return 'File';
   }

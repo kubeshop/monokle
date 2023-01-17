@@ -25,9 +25,7 @@ import {
   knownResourceKindsSelector,
   kubeConfigContextColorSelector,
 } from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {isFileResource, isUnsavedResource} from '@redux/services/resource';
+import {isUnsavedResource} from '@redux/services/resource';
 import {applyResource} from '@redux/thunks/applyResource';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -39,8 +37,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
@@ -53,7 +50,7 @@ const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   align-items: center;
 `;
 
-function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
+function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMap, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
 
   if (isFileResource(resource)) {

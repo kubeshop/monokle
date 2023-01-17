@@ -10,7 +10,7 @@ import {extractK8sResources, processResources} from '@redux/services/resource';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
-import {KubernetesObject, ResourceMapType, ResourceRefsProcessingOptions} from '@shared/models/appState';
+import {KubernetesObject, ResourceMap, ResourceRefsProcessingOptions} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Policy} from '@shared/models/policy';
 import {createKubeClient} from '@shared/utils/kubeclient';

@@ -1,7 +1,7 @@
 import {selectK8sResource} from '@redux/reducers/main';
 
-import {ResourceFilterType, ResourceMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceFilterType} from '@shared/models/appState';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -9,7 +9,7 @@ import KustomizePatchPrefix from './KustomizePatchPrefix';
 import KustomizePatchSuffix from './KustomizePatchSuffix';
 
 export type KustomizePatchScopeType = {
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   resourceFilter: ResourceFilterType;
   selectedPath?: string;
   selectedResourceId?: string;

@@ -2,22 +2,20 @@ import React, {useMemo} from 'react';
 
 import path from 'path';
 
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
-
-import {ResourceMapType} from '@shared/models/appState';
-import {ResourceRef} from '@shared/models/k8sResource';
+import {ResourceRef, isUnsatisfiedRef} from '@monokle/validation';
+import {ResourceMap} from '@shared/models/k8sResource';
 
 import RefIcon from './RefIcon';
 import * as S from './RefLink.styled';
 
 interface IProps {
   isDisabled: boolean;
-  resourceMap: ResourceMapType;
+  resourceMap: ResourceMap;
   resourceRef: ResourceRef;
   onClick?: (args?: any) => void;
 }
 
-const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMap) => {
   if (ref.target?.type === 'resource') {
     if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
       return resourceMap[ref.target.resourceId].name;

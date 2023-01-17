@@ -3,7 +3,7 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {K8sResource, ResourceContentMap, ResourceMetaMap} from './k8sResource';
+import {ResourceContentMap, ResourceMetaMap} from './k8sResource';
 import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
 import {AnyPreview} from './preview';
 import {AppSelection} from './selection';
@@ -157,13 +157,6 @@ type ResourceFilterType = {
   fileOrFolderContainedIn?: string;
 };
 
-/**
- * Maps uuid:s to K8sResources
- */
-type ResourceMapType = {
-  [id: string]: K8sResource;
-};
-
 type ResourceRefsProcessingOptions = {
   /** if ref processing should ignore optional unsatisfied ref  */
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
@@ -171,7 +164,6 @@ type ResourceRefsProcessingOptions = {
 
 export type {
   AppState,
-  ResourceMapType,
   ResourceFilterType,
   FiltersPresetsType,
   FileMapType,

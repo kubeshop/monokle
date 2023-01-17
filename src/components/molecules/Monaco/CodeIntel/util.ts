@@ -4,9 +4,9 @@ import {createCompletionProvider, getSymbolsBeforePosition} from '@molecules/Mon
 
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
-import {HelmValuesMapType, ResourceMapType} from '@shared/models/appState';
+import {HelmValuesMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {MonacoRange, MonacoSelectionFile, MonacoUiState} from '@shared/models/ui';
 
 export function getHelmValueFile(currentFile?: FileEntry, helmValuesMap?: HelmValuesMapType) {
@@ -93,7 +93,7 @@ const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) 
 };
 
 function createSuggestionsForResourceKind(
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   resourceKind: string,
   range: monaco.IRange,
   triggerCharacter: string | undefined
@@ -112,7 +112,7 @@ function createSuggestionsForResourceKind(
   return suggestions;
 }
 
-export function applyAutocomplete(resourceMap: ResourceMapType) {
+export function applyAutocomplete(resourceMap: ResourceMap) {
   const newCompletionDisposable = createCompletionProvider({
     triggerCharacters: [':', '-', ' '],
     provideCompletionItems: async (model, position, context) => {

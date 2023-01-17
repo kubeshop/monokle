@@ -8,8 +8,9 @@ import {ADDITIONAL_SUPPORTED_FILES, TOOLTIP_DELAY} from '@constants/constants';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
+import {ResourceMap} from '@shared/models/k8sResource';
 
 import {TreeNode} from './types';
 
@@ -18,7 +19,7 @@ import * as S from './styled';
 export const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   hideExcludedFilesInFileExplorer: boolean,
   hideUnsupportedFilesInFileExplorer: boolean,
   fileOrFolderContainedInFilter: string | undefined,
