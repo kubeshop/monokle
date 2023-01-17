@@ -77,18 +77,23 @@ export const selectionReducers = createSliceReducers('main', {
     action: PayloadAction<{valuesFileId: string; isVirtualSelection?: boolean}>
   ) => {
     const valuesFileId = action.payload.valuesFileId;
-    Object.values(state.helmValuesMap).forEach(values => {
-      values.isSelected = values.id === valuesFileId;
-    });
-
     state.selection = {
       type: 'helm.values.file',
       valuesFileId,
     };
-
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
-
+  selectPreviewConfiguration: (
+    state: Draft<AppState>,
+    action: PayloadAction<{previewConfigurationId: string; isVirtualSelection?: boolean}>
+  ) => {
+    const previewConfigurationId = action.payload.previewConfigurationId;
+    state.selection = {
+      type: 'preview.configuration',
+      previewConfigurationId,
+    };
+    updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
+  },
   clearSelection: (state: Draft<AppState>) => {
     clearSelectionReducer(state);
   },
@@ -97,9 +102,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'image',
       imageId: action.payload.image.id,
     };
-
     highlightResourcesUsingImage(action.payload.image, state);
-
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
 });

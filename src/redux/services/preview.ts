@@ -42,7 +42,6 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
   trackEvent('preview/restart', {type});
   disconnectFromCluster();
   dispatch(clearPreview({type: 'restartPreview'}));
-  dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetId));
   }
@@ -60,7 +59,6 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 export const stopPreview = (dispatch: AppDispatch) => {
   dispatch(setClusterProxyPort(undefined));
   disconnectFromCluster();
-  dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
   closeKubectlProxy();
 };

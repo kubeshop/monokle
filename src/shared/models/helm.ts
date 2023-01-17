@@ -30,7 +30,6 @@ type HelmValuesFile = {
   id: string;
   filePath: string;
   name: string;
-  isSelected: boolean;
   /** the id of the containing helm chart */
   helmChartId: string;
   values: HelmValueMatch[];

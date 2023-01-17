@@ -1,10 +1,10 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {merge} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {transferResource} from '@redux/compare';
 import initialState from '@redux/initialState';
 import {setAlert} from '@redux/reducers/alert';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
@@ -51,6 +51,7 @@ import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {filterReducers} from './filterReducers';
+import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
 import {clearSelectionReducer, selectionReducers} from './selectionReducers';
 
@@ -142,6 +143,7 @@ export const mainSlice = createSlice({
     ...selectionReducers,
     ...previewReducers,
     ...filterReducers,
+    ...imageReducers,
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -386,7 +388,9 @@ export const mainSlice = createSlice({
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
 
       action.payload.resourcePayloads.forEach(resourcePayload => {
-        const resource = state.resourceMap[resourcePayload.resourceId];
+        const resourceMeta = state.resourceMetaStorage.local[resourcePayload.resourceId];
+        const resourceContent = state.resourceContentStorage.local[resourcePayload.resourceId];
+        const resource = merge(resourceMeta, resourceContent);
         const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
 
@@ -430,11 +434,18 @@ export const mainSlice = createSlice({
         }
 
         if (resource) {
-          resource.filePath = relativeFilePath;
+          resource.origin = {
+            storage: 'local',
+            filePath: relativeFilePath,
+          };
           resource.range = resourcePayload.resourceRange;
 
-          if (state.selectedPath === relativeFilePath) {
-            resource.isHighlighted = true;
+          if (state.selection?.type === 'file' && state.selection.filePath === relativeFilePath) {
+            state.highlights.push({
+              type: 'resource',
+              resourceId: resource.id,
+              resourceStorage: resource.origin.storage,
+            });
           }
         }
       });
@@ -476,21 +487,22 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(transferResource.fulfilled, (state, action) => {
-      const {side, delta} = action.payload;
+    // TODO: how do we make this work with the new resource storage?
+    // builder.addCase(transferResource.fulfilled, (state, action) => {
+    //   const {side, delta} = action.payload;
 
-      // Warning: The compare feature has its own slice and does bookkeeping
-      // of its own resources. This reducer works because transfer only works
-      // for cluster and local which are also in main slice. Should we add
-      // transfer for other resource set types this will give unexpected behavior.
-      delta.forEach(comparison => {
-        if (side === 'left') {
-          state.resourceMap[comparison.left.id] = comparison.left;
-        } else {
-          state.resourceMap[comparison.right.id] = comparison.right;
-        }
-      });
-    });
+    //   // Warning: The compare feature has its own slice and does bookkeeping
+    //   // of its own resources. This reducer works because transfer only works
+    //   // for cluster and local which are also in main slice. Should we add
+    //   // transfer for other resource set types this will give unexpected behavior.
+    //   delta.forEach(comparison => {
+    //     if (side === 'left') {
+    //       state.resourceMap[comparison.left.id] = comparison.left;
+    //     } else {
+    //       state.resourceMap[comparison.right.id] = comparison.right;
+    //     }
+    //   });
+    // });
 
     builder.addMatcher(
       () => true,
@@ -516,8 +528,7 @@ export const {
   clearNotifications,
   clearPreview,
   clearPreviewAndSelectionHistory,
-  clearSelected,
-  clearSelectedPath,
+  clearSelection,
   closePreviewConfigurationEditor,
   closeResourceDiffModal,
   deleteFilterPreset,
@@ -542,13 +553,8 @@ export const {
   setFiltersToBeChanged,
   setImagesList,
   setImagesSearchedValue,
-  setSelectingFile,
   setSelectionHistory,
-  startPreviewLoader,
-  stopPreviewLoader,
-  toggleAllRules,
   toggleMatchParams,
-  toggleRule,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
   uncheckResourceId,

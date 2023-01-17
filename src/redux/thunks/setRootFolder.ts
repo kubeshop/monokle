@@ -36,8 +36,6 @@ export const setRootFolder = createAsyncThunk<
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const userDataDir = thunkAPI.getState().config.userDataDir;
-  const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const terminalState = thunkAPI.getState().terminal;
 
   const resourceMetaMap: ResourceMetaMap<LocalOrigin> = {};
