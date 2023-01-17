@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
@@ -268,12 +268,6 @@ export const Settings = ({
       log.error(error.message);
     }
   };
-
-  const doesSchemaExistCb = useCallback(
-    doesSchemaExist,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSchemaDownloading]
-  );
 
   return (
     <S.SettingsContainer>
