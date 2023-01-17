@@ -312,11 +312,16 @@ const ProjectSelection = () => {
           open={isDropdownMenuVisible}
           onOpenChange={onDropdownVisibleChange}
         >
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomLeft" title={ProjectManagementTooltip}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
             <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading} type="link" size="small">
-              <S.MenuOutlinedIcon />
+              <S.ProjectLabel>Project</S.ProjectLabel>
 
-              <S.ProjectName>{activeProject.name}</S.ProjectName>
+              <S.ProjectContent>
+                {gitRepo ? <S.GitProjectIcon name="git-project" /> : <S.FolderOutlined />}
+
+                <S.ProjectName>{activeProject.name}</S.ProjectName>
+                <S.DownOutlined />
+              </S.ProjectContent>
             </S.Button>
           </Tooltip>
         </Dropdown>
