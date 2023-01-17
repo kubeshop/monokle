@@ -9,7 +9,7 @@ import {ResourceFilterType} from '@shared/models/appState';
 import {K8sResource, isLocalResource} from '@shared/models/k8sResource';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
-export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
+export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
     filters.names &&
     filters.names.length &&
@@ -29,7 +29,6 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     }
   }
   if (
-    !isInPreviewMode &&
     filters.fileOrFolderContainedIn &&
     isLocalResource(resource) &&
     !resource.origin.filePath.startsWith(filters.fileOrFolderContainedIn)
