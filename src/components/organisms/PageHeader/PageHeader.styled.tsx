@@ -1,6 +1,10 @@
 import {Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
 
-import {BellOutlined as RawBellOutlined, EllipsisOutlined as RawEllipsisOutlined} from '@ant-design/icons';
+import {
+  BellOutlined as RawBellOutlined,
+  EllipsisOutlined as RawEllipsisOutlined,
+  MenuOutlined as RawMenuOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -93,7 +97,7 @@ export const Logo = styled.img`
 
 export const LogoContainer = styled.div`
   height: 100%;
-  width: 50px;
+  min-width: 50px;
   display: flex;
   justify-content: center;
 `;
@@ -113,4 +117,51 @@ export const Divider = styled(RawDivider)`
   margin: 0;
   margin-right: 1rem;
   top: 0;
+`;
+
+export const ActiveProjectButton = styled(RawButton).attrs({
+  type: 'text',
+  ghost: true,
+})`
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  padding: 0px;
+  width: 100%;
+  background-color: transparent !important;
+  :hover {
+    background-color: transparent;
+    & span {
+      color: ${Colors.geekblue9} !important;
+    }
+  }
+`;
+
+export const ProjectName = styled.span`
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: ${Colors.grey9};
+  font-family: 'Inter';
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: left;
+  transition: all 0.5s ease-in;
+
+  &:disabled {
+    color: inherit !important;
+  }
+`;
+
+export const MenuOutlinedIcon = styled(RawMenuOutlined)`
+  color: ${Colors.grey9};
+  margin-right: 8px;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    transition: all 0.5s ease-in;
+  }
 `;
