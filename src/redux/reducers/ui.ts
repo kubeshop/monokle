@@ -348,7 +348,7 @@ export const uiSlice = createSlice({
 
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
+          !Object.values(action.payload.resourceMetaMap).some(r => isKustomizationResource(r))
         ) {
           state.leftMenu.selection = 'file-explorer';
         }

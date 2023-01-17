@@ -1,6 +1,14 @@
 import micromatch from 'micromatch';
 import path from 'path';
 
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
+
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
+
+import {getLocalResourceMetasForPath} from './fileEntry';
+
 // import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 // import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -36,34 +44,34 @@ export function isKustomizationFilePath(filePath: string) {
 //   return result;
 // }
 
-// /**
-//  * Checks if the specified resource is a kustomization resource
-//  */
+/**
+ * Checks if the specified resource is a kustomization resource
+ */
 
-// export function isKustomizationResource(r: K8sResource | undefined) {
-//   return r && r.kind === KUSTOMIZATION_KIND && (!r.apiVersion || r.apiVersion.startsWith(KUSTOMIZATION_API_GROUP));
-// }
+export function isKustomizationResource(r: ResourceMeta | undefined) {
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.apiVersion || r.apiVersion.startsWith(KUSTOMIZATION_API_GROUP));
+}
 
-// /**
-//  * Checks if the specified resource is a kustomization patch
-//  */
+/**
+ * Checks if the specified resource is a kustomization patch
+ */
 
-// export function isKustomizationPatch(r: K8sResource | undefined) {
-//   return r && r.name.startsWith('Patch: ');
-// }
+export function isKustomizationPatch(r: K8sResource | undefined) {
+  return r && r.name.startsWith('Patch: ');
+}
 
-// /**
-//  * Checks if the specified fileEntry is a kustomization file
-//  */
+/**
+ * Checks if the specified fileEntry is a kustomization file
+ */
 
-// export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMap) {
-//   if (fileEntry?.filePath && isKustomizationFilePath(fileEntry.filePath)) {
-//     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
-//     return resources.length === 1 && isKustomizationResource(resources[0]);
-//   }
+export function isKustomizationFile(fileEntry: FileEntry, resourceMetaMap: ResourceMetaMap<LocalOrigin>) {
+  if (fileEntry?.filePath && isKustomizationFilePath(fileEntry.filePath)) {
+    const resources = getLocalResourceMetasForPath(fileEntry.filePath, resourceMetaMap);
+    return resources.length === 1 && isKustomizationResource(resources[0]);
+  }
 
-//   return false;
-// }
+  return false;
+}
 
 // /**
 //  * Processes a resource ref in a kustomization and creates corresponding resourcerefs
