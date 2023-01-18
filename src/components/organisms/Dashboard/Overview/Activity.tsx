@@ -5,7 +5,8 @@ import {DateTime} from 'luxon';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {useAppSelector} from '@redux/hooks';
+import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {timeAgo} from '@utils/timeAgo';
 
@@ -14,6 +15,7 @@ import EventHandler from '@src/kindhandlers/EventHandler';
 import * as S from './Activity.styled';
 
 export const Activity = () => {
+  const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const getEvents = useCallback(() => {
@@ -35,8 +37,20 @@ export const Activity = () => {
 
   return (
     <S.Container>
-      {getEvents().map(({content, eventTime}: K8sResource | any) => (
-        <S.EventRow key={content.metadata.uid} $type={content.type}>
+      {getEvents().map(({content, eventTime, id}: K8sResource | any) => (
+        <S.EventRow
+          key={content.metadata.uid}
+          $type={content.type}
+          onClick={() => {
+            dispatch(
+              setActiveDashboardMenu({
+                key: `${EventHandler.clusterApiVersion}-${EventHandler.kind}`,
+                label: EventHandler.kind,
+              })
+            );
+            dispatch(setSelectedResourceId(id));
+          }}
+        >
           <S.TimeInfo>
             <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
             <S.MessageCount>

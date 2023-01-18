@@ -12,9 +12,13 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
+import PodHandler from '@src/kindhandlers/Pod.handler';
+
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
 import {InfoTab} from './InfoTab';
+import {LogTab} from './LogTab';
+import {TerminalTab} from './TerminalTab';
 
 export const Drawer = () => {
   const dispatch = useAppDispatch();
@@ -102,6 +106,20 @@ export const Drawer = () => {
               key: 'Manifest',
               children: <EditorTab />,
             },
+            ...(localResource?.kind === PodHandler.kind
+              ? [
+                  {
+                    label: 'Logs',
+                    key: 'Logs',
+                    children: <LogTab />,
+                  },
+                  {
+                    label: 'Shell',
+                    key: 'Shell',
+                    children: <TerminalTab />,
+                  },
+                ]
+              : []),
           ]}
         />
         <S.TabsFooter>

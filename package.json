@@ -139,7 +139,7 @@
     "new-github-issue-url": "1.0.0",
     "node-fetch": "2.6.7",
     "node-machine-id": "1.1.12",
-    "node-pty": "0.11.0-beta11",
+    "node-pty": "0.11.0-beta27",
     "numeral": "2.0.6",
     "polished": "4.2.2",
     "pretty-bytes": "6.0.0",

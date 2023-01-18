@@ -23,6 +23,7 @@ export const EventRow = styled.div<{$type: string}>`
   :hover {
     background-color: ${Colors.grey10};
   }
+  cursor: pointer;
 `;
 
 export const TimeInfo = styled.div`
