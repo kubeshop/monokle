@@ -19,7 +19,7 @@ export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
   preview: Preview;
 };
 export type UnsavedOrigin = {
-  type: 'unsaved';
+  storage: 'unsaved';
 };
 
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | UnsavedOrigin;
@@ -40,11 +40,15 @@ export const PreviewOriginRuntype: Rt.Runtype<PreviewOrigin> = Rt.Record({
   storage: Rt.Literal('preview'),
   preview: AnyPreviewRuntype,
 });
+export const UnsavedOriginRuntype: Rt.Runtype<UnsavedOrigin> = Rt.Record({
+  storage: Rt.Literal('unsaved'),
+});
 
 export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
   LocalOriginRuntype,
   ClusterOriginRuntype,
-  PreviewOriginRuntype
+  PreviewOriginRuntype,
+  UnsavedOriginRuntype
 );
 
 /*
@@ -54,4 +58,5 @@ export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
 export const isLocalOrigin = LocalOriginRuntype.guard;
 export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isPreviewOrigin = PreviewOriginRuntype.guard;
+export const isUnsavedOrigin = UnsavedOriginRuntype.guard;
 export const isAnyOrigin = AnyOriginRuntype.guard;
