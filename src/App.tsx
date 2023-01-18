@@ -19,7 +19,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
+import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
@@ -371,9 +371,10 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    dispatch(reprocessAllResources());
-  }, [k8sVersion, dispatch]);
+  // TODO: this should happen in the validation listener after we add @monokle/validation
+  // useEffect(() => {
+  //   dispatch(reprocessAllResources());
+  // }, [k8sVersion, dispatch]);
 
   const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());

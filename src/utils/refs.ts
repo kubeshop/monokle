@@ -1,4 +1,4 @@
-import {ResourceRef} from '@shared/models/k8sResource';
+import {ResourceRef} from '@monokle/validation';
 
 export const getRefRange = (ref: ResourceRef) => {
   if (!ref.position) {

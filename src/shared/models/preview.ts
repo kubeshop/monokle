@@ -34,6 +34,8 @@ export type KustomizePreview = Rt.Static<typeof KustomizePreviewRuntype>;
 export type CommandPreview = Rt.Static<typeof CommandPreviewRuntype>;
 export type AnyPreview = Rt.Static<typeof AnyPreviewRuntype>;
 
+export type PreviewType = AnyPreview['type'];
+
 export const isHelmPreview = HelmPreviewRuntype.guard;
 export const isHelmConfigPreview = HelmConfigPreviewRuntype.guard;
 export const isKustomizePreview = KustomizePreviewRuntype.guard;

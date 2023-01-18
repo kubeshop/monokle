@@ -134,8 +134,6 @@ type PreviewLoaderType = {
   targetId?: string;
 };
 
-type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config' | 'command';
-
 type ResourceDiffType = {
   targetResourceId?: string;
 };
@@ -165,6 +163,5 @@ export type {
   ImagesListType,
   MatchParamProps,
   PreviewLoaderType,
-  PreviewType,
   ResourceRefsProcessingOptions,
 };
