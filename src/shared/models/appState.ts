@@ -32,6 +32,8 @@ type AppState = {
   };
   clusterConnection?: {
     context: string;
+  };
+  clusterConnectionOptions: {
     isLoading?: boolean;
   };
   /**

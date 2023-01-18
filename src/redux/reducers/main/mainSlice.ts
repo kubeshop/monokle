@@ -1,4 +1,4 @@
-import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {merge} from 'lodash';
 import log from 'loglevel';
@@ -121,20 +121,17 @@ export const performResourceContentUpdate = (resource: K8sResource, newText: str
 // );
 
 /**
- * TODO: This function is not needed anymore because it was only doing processing on the resource that we were adding.
- * @deprecated
- */
-export const addResource = createAsyncThunk('main/addResource', async () => {});
-
-/**
- * TODO: This function is not needed anymore because it was only doing processing on the resources that we were adding.
- * @deprecated
- */
-export const addMultipleResources = createAsyncThunk('main/addMultipleResources', async (resources, thunkAPI) => {});
-
-/**
  * The main reducer slice
  */
+
+const addResourceReducer = (state: AppState, resource: K8sResource) => {
+  const {meta, content} = splitK8sResource(resource);
+  // TODO: how can we fix the types here?
+  // @ts-ignore
+  state.resourceMetaStorage[meta.origin.storage] = meta;
+  // @ts-ignore
+  state.resourceContentStorage[content.origin.storage] = content;
+};
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -144,6 +141,14 @@ export const mainSlice = createSlice({
     ...previewReducers,
     ...filterReducers,
     ...imageReducers,
+    addResource(state: Draft<AppState>, action: PayloadAction<K8sResource>) {
+      addResourceReducer(state, action.payload);
+    },
+    addMultipleResources(state: Draft<AppState>, action: PayloadAction<K8sResource[]>) {
+      action.payload.forEach(resource => {
+        addResourceReducer(state, resource);
+      });
+    },
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -294,9 +299,6 @@ export const mainSlice = createSlice({
         delete state.resourceContentStorage.cluster[r.id];
       });
     },
-    setIsClusterConnected: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.isClusterConnected = action.payload;
-    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -315,10 +317,10 @@ export const mainSlice = createSlice({
     builder
       .addCase(loadClusterResources.pending, state => {
         // TODO: should we set the context of the cluster connection here?
-        state.clusterConnection.isLoading = true;
+        state.clusterConnectionOptions.isLoading = true;
       })
       .addCase(loadClusterResources.fulfilled, (state, action) => {
-        state.clusterConnection.isLoading = false;
+        state.clusterConnectionOptions.isLoading = false;
         resetSelectionHistory(state);
         clearSelectionReducer(state);
         state.checkedResourceIds = [];
@@ -327,19 +329,19 @@ export const mainSlice = createSlice({
 
         state.resourceMetaStorage.cluster = metaMap;
         state.resourceContentStorage.cluster = contentMap;
-        state.clusterConnection.context = action.payload.context;
+        state.clusterConnection = {context: action.payload.context};
       })
       .addCase(loadClusterResources.rejected, state => {
-        state.clusterConnection.isLoading = false;
-        state.clusterConnection.context = undefined;
+        state.clusterConnectionOptions.isLoading = false;
+        state.clusterConnection = undefined;
       });
 
     builder
       .addCase(reloadClusterResources.pending, state => {
-        state.clusterConnection.isLoading = true;
+        state.clusterConnectionOptions.isLoading = true;
       })
       .addCase(reloadClusterResources.fulfilled, state => {
-        state.clusterConnection.isLoading = false;
+        state.clusterConnectionOptions.isLoading = false;
         state.checkedResourceIds = [];
 
         if (
@@ -351,8 +353,8 @@ export const mainSlice = createSlice({
         }
       })
       .addCase(reloadClusterResources.rejected, state => {
-        state.clusterConnection.isLoading = false;
-        state.clusterConnection.context = undefined;
+        state.clusterConnectionOptions.isLoading = false;
+        state.clusterConnection = undefined;
       });
 
     builder.addCase(setRootFolder.pending, state => {
@@ -479,14 +481,6 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
-    builder.addCase(addResource.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
-    builder.addCase(addMultipleResources.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
     // TODO: how do we make this work with the new resource storage?
     // builder.addCase(transferResource.fulfilled, (state, action) => {
     //   const {side, delta} = action.payload;
@@ -521,6 +515,8 @@ export const mainSlice = createSlice({
 });
 
 export const {
+  addResource,
+  addMultipleResources,
   addKindHandler,
   addMultipleKindHandlers,
   checkMultipleResourceIds,
@@ -565,7 +561,6 @@ export const {
   updateSearchQuery,
   updateReplaceQuery,
   setLastChangedLine,
-  setIsClusterConnected,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
 } = mainSlice.actions;
