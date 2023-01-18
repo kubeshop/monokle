@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {AnimationDurations} from '@shared/styles';
 import {Colors} from '@shared/styles/colors';
 
 type Props = {
@@ -62,11 +63,11 @@ const Button = styled(RawButton)`
   }
 
   svg {
-    transition: all 0.3s ease-in;
+    transition: all ${AnimationDurations.base} ease-in;
   }
 
   span {
-    transition: all 0.3s ease-in;
+    transition: all ${AnimationDurations.base} ease-in;
     color: ${Colors.grey7};
   }
 `;

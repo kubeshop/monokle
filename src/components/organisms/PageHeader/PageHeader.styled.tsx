@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import {PreviewType} from '@shared/models/appState';
 import {ClusterColors} from '@shared/models/cluster';
+import {AnimationDurations} from '@shared/styles';
 import {Colors, FontColors, PanelColors} from '@shared/styles/colors';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
@@ -149,7 +150,7 @@ export const ProjectName = styled.span`
   font-size: 16px;
   line-height: 20px;
   text-align: left;
-  transition: all 0.5s ease-in;
+  transition: all ${AnimationDurations.slow} ease-in;
 
   &:disabled {
     color: inherit !important;
@@ -163,6 +164,6 @@ export const MenuOutlinedIcon = styled(RawMenuOutlined)`
   svg {
     width: 20px;
     height: 20px;
-    transition: all 0.5s ease-in;
+    transition: all ${AnimationDurations.slow} ease-in;
   }
 `;
