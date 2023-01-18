@@ -30,8 +30,8 @@ type AppState = {
   previewOptions: {
     isLoading?: boolean;
   };
-  clusterConnection: {
-    context?: string;
+  clusterConnection?: {
+    context: string;
     isLoading?: boolean;
   };
   /**
@@ -85,7 +85,6 @@ type AppState = {
     };
   };
   lastChangedLine: number;
-  isClusterConnected: boolean;
 };
 
 /**
