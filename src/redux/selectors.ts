@@ -91,7 +91,7 @@ export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
   state => {
     const kubeConfig = selectCurrentKubeConfig(state);
-    const clusterConnectionContext = state.main.clusterConnection.context;
+    const clusterConnectionContext = state.main.clusterConnection?.context;
     return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
   }
 );
