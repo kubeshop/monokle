@@ -4,7 +4,7 @@ import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceStorage} from '@shared/models/k8sResource';
+import {ResourceStorageKey} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
@@ -24,7 +24,7 @@ export const selectFileReducer = (state: AppState, payload: {filePath: string; i
 
 export const selectK8sResourceReducer = (
   state: AppState,
-  payload: {resourceId: string; resourceStorage: ResourceStorage; isVirtualSelection?: boolean}
+  payload: {resourceId: string; resourceStorage: ResourceStorageKey; isVirtualSelection?: boolean}
 ) => {
   const storage = payload.resourceStorage;
   const resource = state.resourceMetaStorage[storage][payload.resourceId];
@@ -57,7 +57,7 @@ export const selectionReducers = createSliceReducers('main', {
     state: Draft<AppState>,
     action: PayloadAction<{
       resourceId: string;
-      resourceStorage: ResourceStorage;
+      resourceStorage: ResourceStorageKey;
       isVirtualSelection?: boolean;
     }>
   ) => {
@@ -94,16 +94,17 @@ export const selectionReducers = createSliceReducers('main', {
     };
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
-  clearSelection: (state: Draft<AppState>) => {
-    clearSelectionReducer(state);
-  },
-  selectImage: (state: Draft<AppState>, action: PayloadAction<{image: ImageType; isVirtualSelection?: boolean}>) => {
+  selectImage: (state: Draft<AppState>, action: PayloadAction<{imageId: string; isVirtualSelection?: boolean}>) => {
     state.selection = {
       type: 'image',
-      imageId: action.payload.image.id,
+      imageId: action.payload.imageId,
     };
-    highlightResourcesUsingImage(action.payload.image, state);
+    // TODO: fix highlighting of resources from image
+    // highlightResourcesUsingImage(action.payload.image, state);
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
+  },
+  clearSelection: (state: Draft<AppState>) => {
+    clearSelectionReducer(state);
   },
 });
 

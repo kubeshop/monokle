@@ -170,7 +170,9 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
-  const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
+  const isMonacoActionEnabled =
+    Boolean(state.main.selection?.type === 'resource' || state.main.selection?.type === 'file') &&
+    state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
 
@@ -213,7 +215,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
+        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
         click: () => {
           dispatch({type: 'ui/setMonacoEditor', payload: {apply: true}});
         },
@@ -221,12 +223,13 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Diff',
         accelerator: hotkeys.DIFF_RESOURCE.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
+        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
         click: () => {
-          if (!state.main.selectedResourceId) {
+          if (state.main.selection?.type !== 'resource') {
             return;
           }
-          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selectedResourceId});
+          // TODO: the openResourceDiffModal will have to get the origin as well
+          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selection.resourceId});
         },
       },
     ],
@@ -235,13 +238,14 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 
 const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isPreviousResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    (state.main.currentSelectionHistoryIndex === undefined ||
-      (state.main.currentSelectionHistoryIndex && state.main.currentSelectionHistoryIndex > 0));
+    state.main.selectionHistory.current.length > 1 &&
+    (state.main.selectionHistory.index === undefined ||
+      (state.main.selectionHistory.index && state.main.selectionHistory.index > 0));
+
   const isNextResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    state.main.currentSelectionHistoryIndex !== undefined &&
-    state.main.currentSelectionHistoryIndex < state.main.selectionHistory.length - 1;
+    state.main.selectionHistory.current.length > 1 &&
+    state.main.selectionHistory.index !== undefined &&
+    state.main.selectionHistory.index < state.main.selectionHistory.current.length - 1;
 
   return {
     label: 'View',
@@ -256,9 +260,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: () => {
           selectFromHistory(
             'left',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
+            state.main.selectionHistory.index,
+            state.main.selectionHistory.current,
+            state.main.resourceMetaStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch
@@ -272,9 +276,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: () => {
           selectFromHistory(
             'right',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
+            state.main.selectionHistory.index,
+            state.main.selectionHistory.current,
+            state.main.resourceMetaStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch

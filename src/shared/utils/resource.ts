@@ -3,6 +3,14 @@ import 'electron';
 import {existsSync, readFileSync} from 'fs';
 import path from 'path';
 
+import {
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMap,
+  ResourceMetaStorage,
+  ResourceStorageKey,
+} from '@shared/models/k8sResource';
+
 import {getMainProcessEnv} from './env';
 
 /**
@@ -31,4 +39,13 @@ export function loadResource(resourcePath: string) {
 export function loadBinaryResource(resourcePath: string): ArrayBuffer | undefined {
   const staticResourcePath = getStaticResourcePath(resourcePath);
   return existsSync(staticResourcePath) ? readFileSync(staticResourcePath) : undefined;
+}
+
+export function findResourceMetaInStorage(
+  resourceIdentifier: ResourceIdentifier | {id: string; storage: ResourceStorageKey},
+  storage: ResourceMetaStorage
+) {
+  const storageKey = 'storage' in resourceIdentifier ? resourceIdentifier.storage : resourceIdentifier.origin.storage;
+  const resourceMetaMap: ResourceMetaMap = storage[storageKey];
+  return resourceMetaMap[resourceIdentifier.id] as ResourceMeta | undefined;
 }

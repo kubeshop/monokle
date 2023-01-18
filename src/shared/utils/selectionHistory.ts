@@ -1,30 +1,38 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ImagesListType, ResourceMap, SelectionHistoryEntry} from '../models';
+import {FileMapType, ImagesListType} from '@shared/models/appState';
+import {ResourceMetaStorage} from '@shared/models/k8sResource';
+import {AppSelection} from '@shared/models/selection';
+
+import {findResourceMetaInStorage} from './resource';
 
 export const selectFromHistory = (
   direction: 'left' | 'right',
   currentSelectionHistoryIndex: number | undefined,
-  selectionHistory: SelectionHistoryEntry[],
-  resourceMap: ResourceMap,
+  selectionHistory: AppSelection[],
+  resourceMetaStorage: ResourceMetaStorage,
   fileMap: FileMapType,
   imagesList: ImagesListType,
   dispatch: (action: AnyAction) => void
 ) => {
   let removedSelectionHistoryEntriesCount = 0;
-  const newSelectionHistory = selectionHistory.filter(historyEntry => {
-    if (historyEntry.type === 'resource') {
-      if (resourceMap[historyEntry.selectedResourceId] !== undefined) {
+  const newSelectionHistory = selectionHistory.filter(selection => {
+    if (selection.type === 'resource') {
+      const resource = findResourceMetaInStorage(
+        {id: selection.resourceId, storage: selection.resourceStorage},
+        resourceMetaStorage
+      );
+      if (resource) {
         return true;
       }
     }
-    if (historyEntry.type === 'path') {
-      if (fileMap[historyEntry.selectedPath] !== undefined) {
+    if (selection.type === 'file') {
+      if (fileMap[selection.filePath] !== undefined) {
         return true;
       }
     }
-    if (historyEntry.type === 'image') {
-      if (imagesList.find(image => image.id === historyEntry.selectedImage.id)) {
+    if (selection.type === 'image') {
+      if (imagesList.find(image => image.id === selection.imageId)) {
         return true;
       }
     }
@@ -85,23 +93,27 @@ export const selectFromHistory = (
     return;
   }
 
-  const selectionHistoryEntry = newSelectionHistory[nextSelectionHistoryIndex];
-  if (selectionHistoryEntry.type === 'resource') {
+  const nextSelection = newSelectionHistory[nextSelectionHistoryIndex];
+  if (nextSelection.type === 'resource') {
     dispatch({
       type: 'main/selectK8sResource',
-      payload: {resourceId: selectionHistoryEntry.selectedResourceId, isVirtualSelection: true},
+      payload: {
+        resourceId: nextSelection.resourceId,
+        resourceStorage: nextSelection.resourceStorage,
+        isVirtualSelection: true,
+      },
     });
   }
-  if (selectionHistoryEntry.type === 'path') {
+  if (nextSelection.type === 'file') {
     dispatch({
       type: 'main/selectFile',
-      payload: {filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true},
+      payload: {filePath: nextSelection.filePath, isVirtualSelection: true},
     });
   }
-  if (selectionHistoryEntry.type === 'image') {
+  if (nextSelection.type === 'image') {
     dispatch({
       type: 'main/selectImage',
-      payload: {image: selectionHistoryEntry.selectedImage, isVirtualSelection: true},
+      payload: {imageId: nextSelection.imageId, isVirtualSelection: true},
     });
   }
 
