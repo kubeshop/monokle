@@ -7,10 +7,10 @@ import {ColumnsType} from 'antd/lib/table';
 
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
-import {toggleOPARules} from '@redux/validation/validation.slice';
+import {useAppDispatch} from '@redux/hooks';
 
+// import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
+// import {toggleOPARules} from '@redux/validation/validation.slice';
 import {Icon} from '@atoms';
 
 import {IconNames} from '@shared/models/icons';
@@ -21,36 +21,37 @@ import * as S from './ValidationOpenPolicyAgentTable.styled';
 
 export function useOpenPolicyAgentTable(width: number) {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
+  // TODO: re-implement this when we integrate @monokle/validation
   const handleToggle = useCallback(
     (rule: Rule) => {
-      dispatch(toggleRule({ruleId: rule.id}));
-      dispatch(reprocessAllResources());
-
-      const ruleName = `open-policy-agent/${rule.name}`;
-      dispatch(toggleOPARules({ruleName}));
+      // dispatch(toggleRule({ruleId: rule.id}));
+      // dispatch(reprocessAllResources());
+      // const ruleName = `open-policy-agent/${rule.name}`;
+      // dispatch(toggleOPARules({ruleName}));
     },
     [dispatch]
   );
 
-  const errorsCounter = useMemo(() => {
-    return Object.values(resourceMap).reduce<{[key: string]: number}>((validationsCounter, resource) => {
-      if (!resource.issues?.errors.length) {
-        return validationsCounter;
-      }
+  const errorsCounter = useMemo<Record<string, number>>(() => {
+    // return Object.values(resourceMap).reduce<{[key: string]: number}>((validationsCounter, resource) => {
+    //   if (!resource.issues?.errors.length) {
+    //     return validationsCounter;
+    //   }
 
-      resource.issues.errors.forEach(error => {
-        if (validationsCounter[error.message]) {
-          validationsCounter[error.message] += 1;
-        } else {
-          validationsCounter[error.message] = 1;
-        }
-      });
+    //   resource.issues.errors.forEach(error => {
+    //     if (validationsCounter[error.message]) {
+    //       validationsCounter[error.message] += 1;
+    //     } else {
+    //       validationsCounter[error.message] = 1;
+    //     }
+    //   });
 
-      return validationsCounter;
-    }, {});
-  }, [resourceMap]);
+    //   return validationsCounter;
+    // }, {});
+    return {};
+  }, []);
 
   const columns: ColumnsType<Rule> = useMemo(() => {
     return [

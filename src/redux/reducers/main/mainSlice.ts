@@ -32,7 +32,6 @@ import {
   HelmTemplatesMapType,
   HelmValuesMapType,
   MatchParamProps,
-  PreviewType,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
@@ -46,6 +45,7 @@ import {
   isLocalResource,
 } from '@shared/models/k8sResource';
 import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
+import {PreviewType} from '@shared/models/preview';
 import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';

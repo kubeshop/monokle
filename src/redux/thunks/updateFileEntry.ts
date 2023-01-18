@@ -8,11 +8,9 @@ import {parse} from 'yaml';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
+import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
+import {deleteResource, extractK8sResources} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
@@ -23,9 +21,6 @@ export const updateFileEntry = createAsyncThunk(
   'main/updateFileEntry',
   async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
 
     let error: any;
 
@@ -64,38 +59,48 @@ export const updateFileEntry = createAsyncThunk(
               }
             }
           } else {
-            getResourcesForPath(fileEntry.filePath, mainState.resourceMap).forEach(r => {
-              deleteResource(r, mainState.resourceMap);
+            getLocalResourceMetasForPath(fileEntry.filePath, mainState.resourceMetaStorage.local).forEach(r => {
+              deleteResource(r, {
+                resourceMetaMap: mainState.resourceMetaStorage.local,
+                resourceContentMap: mainState.resourceContentStorage.local,
+              });
             });
 
-            const extractedResources = extractK8sResources(payload.text, filePath.substring(rootFolder.length));
+            const extractedResources = extractK8sResources(payload.text, {
+              storage: 'local',
+              filePath: filePath.substring(rootFolder.length),
+            });
 
-            let resourceIds: string[] = [];
-
+            // TODO: re-implement when we have @monokle/validation
+            // let resourceIds: string[] = [];
             // only recalculate refs for resources that already have refs
-            Object.values(mainState.resourceMap)
-              .filter(r => r.refs)
-              .forEach(r => resourceIds.push(r.id));
+            // Object.values(mainState.resourceMap)
+            //   .filter(r => r.refs)
+            //   .forEach(r => resourceIds.push(r.id));
+            // reprocessResources(
+            //   schemaVersion,
+            //   userDataDir,
+            //   resourceIds,
+            //   mainState.resourceMap,
+            //   mainState.fileMap,
+            //   mainState.resourceRefsProcessingOptions,
+            //   {
+            //     resourceKinds: extractedResources.map(r => r.kind),
+            //     policyPlugins: [],
+            //   });
 
+            // TODO: is this correct?
             Object.values(extractedResources).forEach(r => {
-              mainState.resourceMap[r.id] = r;
-              r.isHighlighted = true;
-              resourceIds.push(r.id);
+              mainState.resourceMetaStorage.local[r.id] = r;
+              mainState.highlights.push({
+                type: 'resource',
+                resourceId: r.id,
+                resourceStorage: r.origin.storage,
+              });
+              // resourceIds.push(r.id); // this is from the commented out code above
             });
 
-            reprocessResources(
-              schemaVersion,
-              userDataDir,
-              resourceIds,
-              mainState.resourceMap,
-              mainState.fileMap,
-              mainState.resourceRefsProcessingOptions,
-              {
-                resourceKinds: extractedResources.map(r => r.kind),
-                policyPlugins: [],
-              }
-            );
-
+            // TODO: move the reprocessing of helm files to a redux listener, triggered after we save the file
             if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
               reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
             }
