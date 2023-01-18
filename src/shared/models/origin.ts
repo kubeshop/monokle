@@ -18,8 +18,11 @@ export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
   storage: 'preview';
   preview: Preview;
 };
+export type UnsavedOrigin = {
+  type: 'unsaved';
+};
 
-export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin;
+export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | UnsavedOrigin;
 
 /*
  * Runtypes

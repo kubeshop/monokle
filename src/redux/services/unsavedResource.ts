@@ -1,8 +1,6 @@
 import {v4 as uuidv4} from 'uuid';
 import {stringify} from 'yaml';
 
-import {UNSAVED_PREFIX} from '@constants/constants';
-
 import {addMultipleResources, addResource} from '@redux/reducers/main';
 
 import {parseYamlDocument} from '@utils/yaml';
@@ -10,6 +8,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sObject} from '@shared/models/k8s';
 import {K8sResource} from '@shared/models/k8sResource';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
@@ -28,15 +27,15 @@ metadata:
 export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch,
-  jsonTemplate?: any
+  jsonTemplate?: Partial<K8sObject>
 ) {
   const newResourceId = uuidv4();
   let newResourceText: string;
-  let newResourceContent: any;
+  let newResourceObject: K8sObject;
 
   if (jsonTemplate) {
     if (jsonTemplate.kind && jsonTemplate.apiVersion) {
-      newResourceContent = {
+      newResourceObject = {
         ...jsonTemplate,
         apiVersion: input.apiVersion,
         kind: input.kind,
@@ -47,7 +46,7 @@ export function createUnsavedResource(
         },
       };
     } else {
-      newResourceContent = {
+      newResourceObject = {
         apiVersion: input.apiVersion,
         kind: input.kind,
         metadata: {
@@ -59,25 +58,21 @@ export function createUnsavedResource(
       };
     }
 
-    newResourceText = stringify(newResourceContent);
+    newResourceText = stringify(newResourceObject);
   } else {
     newResourceText = createDefaultResourceText(input);
-    newResourceContent = parseYamlDocument(newResourceText).toJS();
+    newResourceObject = parseYamlDocument(newResourceText).toJS();
   }
 
   const newResource: K8sResource = {
     name: input.name,
-    fileId: `${UNSAVED_PREFIX}${newResourceId}`,
-    filePath: `${UNSAVED_PREFIX}${newResourceId}`,
-    fileOffset: 0,
+    origin: {type: 'unsaved'},
     id: newResourceId,
-    isHighlighted: false,
-    isSelected: false,
     kind: input.kind,
     apiVersion: input.apiVersion,
     namespace: input.namespace,
     text: newResourceText,
-    content: newResourceContent,
+    object: newResourceObject,
     isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
   };
   dispatch(addResource(newResource));
@@ -86,18 +81,17 @@ export function createUnsavedResource(
 }
 
 export function createMultipleUnsavedResources(
-  inputs: {name: string; kind: string; apiVersion: string; namespace?: string; obj?: any}[],
+  inputs: {name: string; kind: string; apiVersion: string; namespace?: string; obj?: K8sObject}[],
   dispatch: AppDispatch
 ) {
-  const resourceMap: any = {};
+  const resources: K8sResource[] = [];
 
   inputs.forEach(input => {
-    const resourceId = uuidv4();
-    resourceMap[resourceId] = {};
-    resourceMap[resourceId].input = input;
+    let resourceText: string;
+    let resourceObject: K8sObject;
 
     if (input.obj) {
-      resourceMap[resourceId].content = {
+      resourceObject = {
         ...input.obj,
         apiVersion: input.apiVersion,
         kind: input.kind,
@@ -107,30 +101,28 @@ export function createMultipleUnsavedResources(
           namespace: input.namespace,
         },
       };
-      resourceMap[resourceId].text = stringify(resourceMap[resourceId].content);
+      resourceText = stringify(resourceObject);
     } else {
-      resourceMap[resourceId].text = createDefaultResourceText(input);
-      resourceMap[resourceId].content = parseYamlDocument(resourceMap[resourceId].text).toJS();
+      resourceText = createDefaultResourceText(input);
+      resourceObject = parseYamlDocument(resourceText).toJS();
     }
+
+    const newResource: K8sResource = {
+      id: uuidv4(),
+      origin: {type: 'unsaved'},
+      name: input.name,
+      kind: input.kind,
+      namespace: input.namespace,
+      apiVersion: input.apiVersion,
+      isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
+      text: resourceText,
+      object: resourceObject,
+    };
+
+    resources.push(newResource);
   });
 
-  const newResources: K8sResource[] = Object.keys(resourceMap).map(resourceId => ({
-    name: resourceMap[resourceId].input.name,
-    fileId: `${UNSAVED_PREFIX}${resourceId}`,
-    filePath: `${UNSAVED_PREFIX}${resourceId}`,
-    fileOffset: 0,
-    id: resourceId,
-    isHighlighted: false,
-    isSelected: false,
-    kind: resourceMap[resourceId].input.kind,
-    apiVersion: resourceMap[resourceId].input.apiVersion,
-    namespace: resourceMap[resourceId].input.namespace,
-    text: resourceMap[resourceId].text,
-    content: resourceMap[resourceId].content,
-    isClusterScoped: getResourceKindHandler(resourceMap[resourceId].input.kind)?.isNamespaced || false,
-  }));
+  dispatch(addMultipleResources(resources));
 
-  dispatch(addMultipleResources(newResources));
-
-  return newResources;
+  return resources;
 }

@@ -46,7 +46,6 @@ export interface ResourceMeta<Origin extends AnyOrigin = AnyOrigin> extends Reso
     start: number;
     length: number;
   };
-  isUnsaved?: boolean;
   refs?: ResourceRef[];
 }
 
