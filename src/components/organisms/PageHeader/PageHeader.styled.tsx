@@ -116,7 +116,6 @@ export const Divider = styled(RawDivider)`
 
 export const ActiveProjectButton = styled(RawButton).attrs({
   type: 'text',
-  ghost: true,
 })`
   display: flex;
   align-items: center;
