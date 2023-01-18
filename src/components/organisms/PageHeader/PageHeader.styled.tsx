@@ -29,13 +29,6 @@ export const AutosavingErrorContainer = styled.div`
   color: ${Colors.red6};
 `;
 
-export const BackToProjectButton = styled(RawButton)`
-  margin-right: 0px !important;
-  padding: 0px;
-  font-size: 12px;
-  color: ${Colors.blue6};
-`;
-
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 1rem;
@@ -127,7 +120,6 @@ export const ActiveProjectButton = styled(RawButton).attrs({
 })`
   display: flex;
   align-items: center;
-  margin-left: 16px;
   padding: 0px;
   width: 100%;
   background-color: transparent !important;
@@ -160,10 +152,9 @@ export const ProjectName = styled.span`
 export const MenuOutlinedIcon = styled(RawMenuOutlined)`
   color: ${Colors.grey9};
   margin-right: 8px;
+  font-size: 20px;
 
   svg {
-    width: 20px;
-    height: 20px;
     transition: all ${AnimationDurations.slow} ease-in;
   }
 `;
