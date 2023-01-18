@@ -3,7 +3,7 @@ import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSe
 
 import {parseAllYamlDocuments} from '@utils/yaml';
 
-import {KubernetesObject} from '@shared/models/appState';
+import {K8sObject} from '@shared/models/k8s';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
   const templateNode = findValueNode(templateDoc, path);
@@ -182,7 +182,7 @@ export function traverseDocument(
 export function extractObjectsFromYaml(yamlText: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(yamlText, lineCounter);
-  const result: KubernetesObject[] = [];
+  const result: K8sObject[] = [];
   if (documents) {
     let docIndex = 0;
     documents.forEach(doc => {

@@ -122,7 +122,6 @@ export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileM
     id: uuidv4(),
     filePath: fileEntry.filePath,
     name: path.basename(fileEntry.filePath),
-    isSelected: false,
     helmChartId: helmChart.id,
     values,
   };

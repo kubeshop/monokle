@@ -11,7 +11,7 @@ import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/
 import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@shared/constants/urls';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {KubernetesObject, isKubernetesObject} from '@shared/models/appState';
+import {K8sObject, isK8sObject} from '@shared/models/k8s';
 import {K8sResource} from '@shared/models/k8sResource';
 import {AnyPlugin} from '@shared/models/plugin';
 import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@shared/models/template';
@@ -124,7 +124,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     }
   );
 
-  let objects: KubernetesObject[] = [];
+  let objects: K8sObject[] = [];
 
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
@@ -133,7 +133,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     });
 
   const inputs = objects
-    .filter(obj => isKubernetesObject(obj))
+    .filter(obj => isK8sObject(obj))
     .map(obj => ({
       name: obj.metadata.name,
       namespace: obj.metadata.namespace,

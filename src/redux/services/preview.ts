@@ -1,10 +1,5 @@
 import {setClusterProxyPort} from '@redux/reducers/appConfig';
-import {
-  clearPreview,
-  clearPreviewAndSelectionHistory,
-  startPreviewLoader,
-  stopPreviewLoader,
-} from '@redux/reducers/main';
+import {clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
