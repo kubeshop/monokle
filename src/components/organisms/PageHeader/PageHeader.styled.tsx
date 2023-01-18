@@ -152,7 +152,7 @@ export const MenuOutlinedIcon = styled(RawMenuOutlined)`
   color: ${Colors.grey9};
   margin-right: 8px;
   font-size: 20px;
-
+  line-height: 0;
   svg {
     transition: all ${AnimationDurations.slow} ease-in;
   }
