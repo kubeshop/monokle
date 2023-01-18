@@ -125,4 +125,16 @@ export type ResourceContentMap<Origin extends AnyOrigin = AnyOrigin> = Record<st
 
 export type ResourceMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, K8sResource<Origin>>;
 
-export type ResourceStorage = 'local' | 'cluster' | 'preview';
+export type ResourceStorageKey = 'local' | 'cluster' | 'preview';
+
+export type ResourceMetaStorage = {
+  local: ResourceMetaMap<LocalOrigin>;
+  cluster: ResourceMetaMap<ClusterOrigin>;
+  preview: ResourceMetaMap<PreviewOrigin>;
+};
+
+export type ResourceContentStorage = {
+  local: ResourceContentMap<LocalOrigin>;
+  cluster: ResourceContentMap<ClusterOrigin>;
+  preview: ResourceContentMap<PreviewOrigin>;
+};

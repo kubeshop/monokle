@@ -3,8 +3,7 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {ResourceContentMap, ResourceMetaMap} from './k8sResource';
-import {ClusterOrigin, LocalOrigin, PreviewOrigin} from './origin';
+import {ResourceContentStorage, ResourceMetaStorage} from './k8sResource';
 import {AnyPreview} from './preview';
 import {AppSelection} from './selection';
 
@@ -14,16 +13,8 @@ type AppState = {
    * - fileMap[**ROOT_FILE_ENTRY**] is the FileEntry for the rootFolder and it's **filePath is absolute**
    */
   fileMap: FileMapType;
-  resourceMetaStorage: {
-    local: ResourceMetaMap<LocalOrigin>;
-    cluster: ResourceMetaMap<ClusterOrigin>;
-    preview: ResourceMetaMap<PreviewOrigin>;
-  };
-  resourceContentStorage: {
-    local: ResourceContentMap<LocalOrigin>;
-    cluster: ResourceContentMap<ClusterOrigin>;
-    preview: ResourceContentMap<PreviewOrigin>;
-  };
+  resourceMetaStorage: ResourceMetaStorage;
+  resourceContentStorage: ResourceContentStorage;
   selection?: AppSelection;
   selectionOptions: {
     isSelecting?: boolean;
