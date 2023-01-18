@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
@@ -7,10 +7,8 @@ import {useForm} from 'antd/lib/form/Form';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {existsSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
-import path from 'path';
 
 import {
   DEFAULT_EDITOR_DEBOUNCE,
@@ -31,12 +29,13 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {downloadSchema} from '@redux/services/k8sVersionService';
+import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {FilePatternList} from '@atoms';
 
 import {useFocus} from '@utils/hooks';
+import {doesSchemaExist} from '@utils/index';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@shared/constants/k8s';
@@ -67,7 +66,8 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   // const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
-  const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
+  const isScanIncludesUpdated = useAppSelector(state => state.config.isScanIncludesUpdated);
+  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
   const [isKubeConfigBrowseSettingsOpen, setIsKubeConfigBrowseSettingsOpen] = useState(false);
 
@@ -249,7 +249,7 @@ export const Settings = ({
 
   const handleK8SVersionChange = (k8sVersion: string) => {
     setSelectedK8SVersion(k8sVersion);
-    if (doesSchemaExist(k8sVersion)) {
+    if (doesSchemaExist(k8sVersion, String(userDataDir))) {
       setLocalConfig({...localConfig, k8sVersion});
     }
   };
@@ -257,10 +257,8 @@ export const Settings = ({
   const handleDownloadVersionSchema = async () => {
     try {
       setIsSchemaDownloading(true);
-      await downloadSchema(
-        `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${selectedK8SVersion}/_definitions.json`,
-        path.join(String(userDataDir), path.sep, 'schemas', `${selectedK8SVersion}.json`)
-      );
+      await dispatch(downloadK8sSchema(selectedK8SVersion)).unwrap();
+
       setIsSchemaDownloading(false);
       setLocalConfig({
         ...localConfig,
@@ -270,14 +268,6 @@ export const Settings = ({
       log.error(error.message);
     }
   };
-
-  const doesSchemaExist = useCallback(
-    (k8sVersion: string) => {
-      return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSchemaDownloading]
-  );
 
   return (
     <S.SettingsContainer>
@@ -346,7 +336,9 @@ export const Settings = ({
               <Select
                 value={selectedK8SVersion}
                 onChange={handleK8SVersionChange}
-                style={{width: doesSchemaExist(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+                style={{
+                  width: doesSchemaExist(selectedK8SVersion, String(userDataDir)) ? '100%' : 'calc(100% - 172px)',
+                }}
                 optionLabelProp="label"
                 showSearch
               >
@@ -354,7 +346,7 @@ export const Settings = ({
                   <Select.Option key={version} value={version} label={version}>
                     <S.OptionContainer>
                       <S.OptionLabel>{version}</S.OptionLabel>
-                      {doesSchemaExist(version) && (
+                      {doesSchemaExist(version, String(userDataDir)) && (
                         <S.OptionDownloadedText style={{color: 'green'}}>Downloaded</S.OptionDownloadedText>
                       )}
                     </S.OptionContainer>
@@ -363,7 +355,7 @@ export const Settings = ({
               </Select>
             </Tooltip>
 
-            {!doesSchemaExist(selectedK8SVersion) && (
+            {!doesSchemaExist(selectedK8SVersion, String(userDataDir)) && (
               <Button
                 style={{width: '160px', marginLeft: '12px'}}
                 onClick={handleDownloadVersionSchema}
