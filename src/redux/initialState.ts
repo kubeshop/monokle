@@ -31,6 +31,7 @@ const initialAppState: AppState = {
     index: 0,
   },
   highlights: [],
+  previewOptions: {},
   isRehydrating: false,
   wasRehydrated: false,
   resourceFilter: {
@@ -41,9 +42,6 @@ const initialAppState: AppState = {
   helmChartMap: {},
   helmValuesMap: {},
   helmTemplatesMap: {},
-  previewLoader: {
-    isLoading: false,
-  },
   resourceDiff: {},
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
@@ -75,7 +73,6 @@ const initialAppState: AppState = {
     currentMatch: null,
   },
   lastChangedLine: 0,
-  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
