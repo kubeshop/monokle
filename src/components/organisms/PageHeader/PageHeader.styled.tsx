@@ -1,11 +1,16 @@
 import {Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
 
-import {BellOutlined as RawBellOutlined, EllipsisOutlined as RawEllipsisOutlined} from '@ant-design/icons';
+import {
+  BellOutlined as RawBellOutlined,
+  EllipsisOutlined as RawEllipsisOutlined,
+  MenuOutlined as RawMenuOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {PreviewType} from '@shared/models/appState';
 import {ClusterColors} from '@shared/models/cluster';
+import {AnimationDurations} from '@shared/styles';
 import {Colors, FontColors, PanelColors} from '@shared/styles/colors';
 
 import {getPreviewTheme} from './ClusterSelection.styled';
@@ -22,13 +27,6 @@ export const AutosavingErrorContainer = styled.div`
   display: flex;
   align-items: center;
   color: ${Colors.red6};
-`;
-
-export const BackToProjectButton = styled(RawButton)`
-  margin-right: 0px !important;
-  padding: 0px;
-  font-size: 12px;
-  color: ${Colors.blue6};
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
@@ -93,6 +91,7 @@ export const Logo = styled.img`
 
 export const LogoContainer = styled.div`
   height: 100%;
+  min-width: 50px;
   width: 50px;
   display: flex;
   justify-content: center;
@@ -113,4 +112,48 @@ export const Divider = styled(RawDivider)`
   margin: 0;
   margin-right: 1rem;
   top: 0;
+`;
+
+export const ActiveProjectButton = styled(RawButton).attrs({
+  type: 'text',
+})`
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  background-color: transparent !important;
+  :hover {
+    background-color: transparent;
+    & span {
+      color: ${Colors.geekblue9} !important;
+    }
+  }
+`;
+
+export const ProjectName = styled.span`
+  width: 100%;
+  max-width: 272px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: ${Colors.grey9};
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: left;
+  transition: all ${AnimationDurations.slow} ease-in;
+
+  &:disabled {
+    color: inherit !important;
+  }
+`;
+
+export const MenuOutlinedIcon = styled(RawMenuOutlined)`
+  color: ${Colors.grey9};
+  margin-right: 8px;
+  font-size: 20px;
+  line-height: 0;
+  svg {
+    transition: all ${AnimationDurations.slow} ease-in;
+  }
 `;

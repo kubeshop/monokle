@@ -34,10 +34,8 @@ import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/sele
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
-import CreateProject from './CreateProject';
 import {HelpMenu} from './HelpMenu';
 import * as S from './PageHeader.styled';
-import ProjectSelection from './ProjectSelection';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
@@ -133,6 +131,10 @@ const PageHeader = () => {
     });
   };
 
+  const onClickProjectHandler = () => {
+    dispatch(toggleStartProjectPane());
+  };
+
   useEffect(() => {
     if (previewResourceId) {
       setPreviewResource(resourceMap[previewResourceId]);
@@ -191,7 +193,10 @@ const PageHeader = () => {
           {activeProject && (
             <>
               <S.Divider type="vertical" />
-              <ProjectSelection />
+              <S.ActiveProjectButton onClick={onClickProjectHandler}>
+                <S.MenuOutlinedIcon />
+                <S.ProjectName>{activeProject.name}</S.ProjectName>
+              </S.ActiveProjectButton>
               {hasGitRepo ? (
                 <S.BranchSelectContainer>
                   <BranchSelect />
@@ -214,15 +219,6 @@ const PageHeader = () => {
                   </S.InitButton>
                 </Tooltip>
               )}
-              <CreateProject />
-            </>
-          )}
-          {isStartProjectPaneVisible && activeProject && (
-            <>
-              <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
-              <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-                Back to Project
-              </S.BackToProjectButton>
             </>
           )}
 
