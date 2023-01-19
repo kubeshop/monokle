@@ -9,7 +9,7 @@ import {Colors} from '@shared/styles/colors';
 export const DetailsColumn = styled.div`
   font-size: 13px;
   line-height: 22px;
-  color: #acacac;
+  color: ${Colors.grey8};
   float: left;
   width: 310px;
   text-align: left;
@@ -29,10 +29,10 @@ export const DetailsHeader = styled.p`
   margin: 0;
   h5 {
     margin-left: 5px;
-    color: #acacac;
+    color: ${Colors.grey8};
   }
   span {
-    color: #7d7d7d;
+    color: ${Colors.grey7};
   }
 `;
 export const ResourcesColumn = styled.div`
@@ -48,18 +48,18 @@ export const TemplateSidebar = styled.div`
   display: flex;
   flex-direction: column;
   .ant-collapse-header .ant-collapse-header-text {
-    color: #fff;
+    color: ${Colors.whitePure};
   }
   .ant-collapse {
     border: none;
     display: flex;
     flex-direction: column;
-    background: rgba(25, 31, 33, 0.7);
+    background: ${Colors.backgroundDarkGreyColor};
     .ant-collapse-item {
-      color: #acacac;
+      color: ${Colors.grey8};
       border-bottom: 0;
       .ant-collapse-expand-icon {
-        color: #177ddc;
+        color: ${Colors.blue7};
         position: absolute;
         right: 0;
       }
@@ -89,8 +89,8 @@ export const TemplateSidebar = styled.div`
       width: 100%;
       &.active {
         > span:first-child {
-          background: #5273e0;
-          color: #141414;
+          background: ${Colors.geekblue7};
+          color: ${Colors.grey1000};
         }
         h1 span {
           background: none;
@@ -108,7 +108,7 @@ export const TemplateSidebar = styled.div`
 export const StepTitle = styled.p`
   font-size: 16px;
   line-height: 24px;
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   flex: none;
   order: 1;
   flex-grow: 1;
@@ -130,7 +130,7 @@ export const StepSubTitle = styled.p`
   font-weight: 400;
   font-size: 14px;
   line-height: 22px;
-  color: #7d7d7d;
+  color: ${Colors.grey7};
   order: 0;
   flex-grow: 1;
   width: 100%;
@@ -150,8 +150,8 @@ export const ElipseStepWrapper = styled.span`
   height: 32px;
   float: left;
   padding: 16px;
-  background: #2d3757;
-  color: #7d7d7d;
+  background: ${Colors.elipseBackgroundColor};
+  color: ${Colors.grey7};
 `;
 
 export const Title = styled.h1`
@@ -159,7 +159,7 @@ export const Title = styled.h1`
   align-items: center;
   font-size: 16px;
   line-height: 19px;
-  color: #dbdbdb;
+  color: ${Colors.grey9};
   margin-bottom: 4px;
   float: left;
   display: inline-flex;
@@ -208,7 +208,7 @@ export const Button = styled(AntdButton)`
 export const ReadMoreStyled = styled.p`
   display: inline;
   width: 100%;
-  color: #acacac;
+  color: ${Colors.grey8};
   .container {
     position: absolute;
     top: 10%;
@@ -222,7 +222,7 @@ export const ReadMoreStyled = styled.p`
 
 export const ResourcesRefLink = styled.h5`
   a {
-    color: #b2f1e8;
+    color: ${Colors.referenceLinkColorinTemplates};
   }
   font-size: 13px;
   line-height: 22px;
@@ -230,7 +230,7 @@ export const ResourcesRefLink = styled.h5`
 `;
 
 export const Divider = styled.div`
-  border: 1px solid #303030;
+  border: 1px solid ${Colors.grey4};
   height: 1px;
   width: 100%;
   margin-left: 16px;
@@ -261,7 +261,7 @@ export const FormWrapper = styled.div`
     padding: 8px 16px;
     gap: 8px;
     height: 40px;
-    background: #177ddc;
+    background: ${Colors.blue7};
     border-radius: 2px;
     float: left;
   }

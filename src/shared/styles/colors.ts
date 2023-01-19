@@ -116,6 +116,13 @@ export enum Colors {
   diffBackgroundHover = '#27220f',
   blueBgColor = '#202C4D',
   blueWrapperColor = '#2b3759',
+
+  // TemplateColors
+  backgroundColor = 'rgba(255, 255, 255, 0.1)',
+  backgroundDarkGreyColor = 'rgba(25, 31, 33, 0.7)',
+  elipseBackgroundColor = '#2D3757',
+  referenceLinkColorinTemplates = '#b2f1e8',
+  titleBarBackground = '#131515',
 }
 
 export enum PanelColors {
