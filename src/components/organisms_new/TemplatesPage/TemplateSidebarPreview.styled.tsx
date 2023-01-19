@@ -85,9 +85,12 @@ export const TemplateSidebar = styled.div`
     }
     .column {
       display: inline-flex;
+      flex-grow: 1;
+      width: 100%;
       &.active {
-        span {
+        > span:first-child {
           background: #5273e0;
+          color: #141414;
         }
         h1 span {
           background: none;
@@ -108,14 +111,15 @@ export const StepTitle = styled.p`
   color: #dbdbdb;
   flex: none;
   order: 1;
-  flex-grow: 0;
+  flex-grow: 1;
   float: left;
   margin-left: 8px;
   margin-top: 4px;
   width: 85%;
   h1 {
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 16px;
+    line-height: 24px;
+    width: 100%;
     font-weight: 400;
     float: left;
   }
@@ -128,13 +132,12 @@ export const StepSubTitle = styled.p`
   line-height: 22px;
   color: #7d7d7d;
   order: 0;
-  flex-grow: 0;
+  flex-grow: 1;
   width: 100%;
   display: inline-flex;
 `;
 
 export const ElipseStepWrapper = styled.span`
-  background: #7d7d7d;
   border-radius: 32px;
   order: 0;
   flex-grow: 0;
@@ -147,6 +150,8 @@ export const ElipseStepWrapper = styled.span`
   height: 32px;
   float: left;
   padding: 16px;
+  background: #2d3757;
+  color: #7d7d7d;
 `;
 
 export const Title = styled.h1`
@@ -161,8 +166,9 @@ export const Title = styled.h1`
   width: 85%;
   span {
     float: left;
-    width: 100%;
-    display: inline-flex;
+    width: auto;
+    white-space: nowrap;
+    display: inline-block;
   }
   div {
     float: left;
@@ -226,8 +232,9 @@ export const ResourcesRefLink = styled.h5`
 export const Divider = styled.div`
   border: 1px solid #303030;
   height: 1px;
-  width: 172px;
+  width: 100%;
   margin-left: 16px;
+  margin-right: 8px;
   @media (max-width: 1352px) {
     width: 20%;
   }
