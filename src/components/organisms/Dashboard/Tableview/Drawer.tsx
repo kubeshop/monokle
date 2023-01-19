@@ -116,7 +116,7 @@ export const Drawer = () => {
                   {
                     label: 'Shell',
                     key: 'Shell',
-                    children: <TerminalTab />,
+                    children: <TerminalTab resourceId={selectedResourceId as string} />,
                   },
                 ]
               : []),

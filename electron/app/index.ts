@@ -19,6 +19,8 @@ import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './util
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+app.commandLine.appendSwitch('ignore-certificate-errors');
+app.commandLine.appendSwitch('ignore-ssl-errors');
 
 const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
 

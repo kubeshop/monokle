@@ -35,7 +35,6 @@ export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
       dataSource.filter(s => s.kind.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()))
     );
   }, [dataSource, filterText]);
-  console.log('dataSource', dataSource);
 
   const setActiveMenu = (menuItem: IMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});

@@ -1,54 +1,72 @@
+import {ipcRenderer} from 'electron';
+
 import {useEffect, useRef} from 'react';
 
-import * as pty from 'node-pty';
-import {IDisposable, Terminal} from 'xterm';
+import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
+
+import {K8sResource} from '@models/k8sresource';
+
+import {useAppSelector} from '@redux/hooks';
 
 import * as S from './TerminalTab.styled';
 
-export const TerminalTab = () => {
+export const TerminalTab = ({resourceId}: {resourceId: string}) => {
+  const previewKubeConfigPath = useAppSelector(state => state.main.previewKubeConfigPath);
   const terminalContainerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal>();
-  const terminalDataRef = useRef<IDisposable>();
-  const incomingDataRef = useRef((_: any, data: string | Uint8Array) => {
-    terminalRef.current?.write(data);
-  });
-  const addonRef = useRef<FitAddon>();
+  const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
-  const terminalResizeRef = useRef<IDisposable>();
+  const addonRef = useRef<FitAddon>();
+  const resource: K8sResource = useAppSelector(state => state.main.resourceMap[resourceId]);
+  useEffect(() => {
+    if (webContentsId && resource && previewKubeConfigPath) {
+      ipcRenderer.send('pod.terminal.init', {
+        previewKubeConfigPath,
+        podNamespace: resource.namespace,
+        podName: resource.name,
+        containerName: resource.content.spec.containers[0].name,
+        webContentsId,
+      });
+    }
+
+    return () => {
+      ipcRenderer.send('pod.terminal.close');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewKubeConfigPath, resource, webContentsId]);
 
   useEffect(() => {
     if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {
       return;
     }
 
-    try {
-      const ptyProcess = pty.spawn('sh', [], {
-        name: 'xterm-256color',
-        rows: 24,
-        cols: 80,
-        cwd: '/',
-        env: process.env as Record<string, string>,
-        useConpty: false,
-      });
-
-      ptyProcess.onData((incomingData: any) => {
-        console.log('incomingData', incomingData);
-        incomingDataRef.current = incomingData;
-      });
-
-      ptyProcess.onExit(() => {});
-    } catch (error) {
-      console.log(error);
-    }
-
     terminalRef.current = new Terminal({cursorBlink: true, fontSize: 12});
     addonRef.current = new FitAddon();
     terminalRef.current.loadAddon(addonRef.current);
 
-    terminalRef.current.open(terminalContainerRef.current);
+    let command: Array<string> = [];
+    terminalRef.current.onKey(e => {
+      if (terminalRef.current) {
+        terminalRef.current.write(e.key);
+        command.push(e.key);
+        if (e.domEvent.key === 'Enter') {
+          ipcRenderer.send('pod.terminal.command', command.join(''));
+          command = [];
+        }
 
-    terminalDataRef.current = terminalRef.current.onData(data => {});
+        if (e.domEvent.key === 'Backspace') {
+          terminalRef.current.write('\b \b');
+          command.pop();
+        }
+      }
+    });
+    terminalRef.current.open(terminalContainerRef.current);
+    ipcRenderer.on('pod.terminal.output', (_event, output) => {
+      if (terminalRef && terminalRef.current) {
+        terminalRef.current.write(output);
+      }
+    });
   }, []);
   return (
     <S.TerminalPaneContainer>
