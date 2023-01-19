@@ -19,9 +19,20 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {HelmValuesFile} from '@shared/models/helm';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
+
+// TODO: temporary solution for renaming value file
+const DEFAULT_HELM_VALUE: HelmValuesFile = {
+  filePath: '',
+  id: '',
+  name: '',
+  isSelected: false,
+  helmChartId: '',
+  values: [],
+};
 
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {children, itemInstance} = props;
@@ -44,10 +55,14 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const helmItem = useMemo(
-    () => helmValuesMap[itemInstance.id] || helmChartMap[itemInstance.id] || helmTemplatesMap[itemInstance.id],
+    () =>
+      helmValuesMap[itemInstance.id] ||
+      helmChartMap[itemInstance.id] ||
+      helmTemplatesMap[itemInstance.id] ||
+      DEFAULT_HELM_VALUE,
     [helmChartMap, helmTemplatesMap, helmValuesMap, itemInstance.id]
   );
-  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem.filePath]);
+  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem]);
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]

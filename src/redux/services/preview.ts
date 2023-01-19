@@ -1,16 +1,18 @@
+import {setClusterProxyPort} from '@redux/reducers/appConfig';
 import {
   clearPreview,
   clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
 } from '@redux/reducers/main';
-import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+import {startClusterPreview} from '@redux/thunks/startClusterPreview';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {PreviewType} from '@shared/models/appState';
+import {closeKubectlProxy} from '@shared/utils/commands/kubectl';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
@@ -19,11 +21,12 @@ import {previewSavedCommand} from './previewCommand';
 export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());
   dispatch(startPreviewLoader({previewType: type, targetId}));
+
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetId));
   }
   if (type === 'cluster') {
-    dispatch(previewCluster(targetId));
+    dispatch(startClusterPreview({clusterContext: targetId}));
   }
   if (type === 'helm') {
     dispatch(previewHelmValuesFile(targetId));
@@ -38,13 +41,14 @@ export const startPreview = (targetId: string, type: PreviewType, dispatch: AppD
 
 export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
   trackEvent('preview/restart', {type});
+  disconnectFromCluster();
   dispatch(clearPreview({type: 'restartPreview'}));
   dispatch(startPreviewLoader({previewType: type, targetId}));
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetId));
   }
   if (type === 'cluster') {
-    dispatch(repreviewCluster(targetId));
+    dispatch(startClusterPreview({clusterContext: targetId, isRestart: true}));
   }
   if (type === 'helm') {
     dispatch(previewHelmValuesFile(targetId));
@@ -55,7 +59,9 @@ export const restartPreview = (targetId: string, type: PreviewType, dispatch: Ap
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
+  dispatch(setClusterProxyPort(undefined));
   disconnectFromCluster();
   dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
+  closeKubectlProxy();
 };

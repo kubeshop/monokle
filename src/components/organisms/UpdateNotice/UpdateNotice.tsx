@@ -31,9 +31,9 @@ const UpdateNotice = () => {
       return <div>Auto-update is not enabled in development mode!</div>;
     }
     if (code === -10) {
-      return <div>Could not get code signature for running application!</div>;
+      return <div>Could not get code signature for the running application!</div>;
     }
-    return <div>Update process encountered with an error!</div>;
+    return <div>The updating process was unsuccessful due to an error!</div>;
   }, []);
 
   const handleClose = () => {
@@ -53,7 +53,7 @@ const UpdateNotice = () => {
       return (
         <>
           <img src={NewUpdate} alt="new update" />
-          <S.NewVersionText>A new version is available!</S.NewVersionText> Restart to fully enjoy it.
+          <S.NewVersionText>There is a new version available!</S.NewVersionText> Restart to fully enjoy it.
           <S.InstallButton type="primary" onClick={handleInstall}>
             Restart
           </S.InstallButton>
@@ -62,7 +62,7 @@ const UpdateNotice = () => {
     }
 
     if (newVersion.code === NewVersionCode.NotAvailable) {
-      return <span>New version is not available!</span>;
+      return <span>You are already running the latest version of Monokle!</span>;
     }
 
     if (newVersion.code === NewVersionCode.Errored) {

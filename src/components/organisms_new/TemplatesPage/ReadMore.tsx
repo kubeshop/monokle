@@ -5,7 +5,6 @@ import * as S from './TemplateSidebarPreview.styled';
 
 export const ReadMore = ({children}: any) => {
   const text = children;
-  console.log(text, 'txt');
   const [isReadMore, setIsReadMore] = useState(true);
   const toggleReadMore = () => {
     setIsReadMore(!isReadMore);

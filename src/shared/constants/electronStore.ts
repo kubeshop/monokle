@@ -26,11 +26,20 @@ export const electronStoreSchema = {
       kubeConfigContextsColors: {
         type: 'object',
       },
+      clusterPreviewNamespace: {
+        type: 'string',
+      },
       hasDeletedDefaultTemplatesPlugin: {
         type: 'boolean',
       },
       lastSeenReleaseNotesVersion: {
         type: 'string',
+      },
+      lastSessionVersion: {
+        type: 'string',
+      },
+      useKubectlProxy: {
+        type: 'boolean',
       },
       isClusterSelectorVisible: {
         type: 'boolean',
@@ -295,6 +304,8 @@ export const electronStoreDefaults = {
   },
   appConfig: {
     kubeConfigContextsColors: {},
+    clusterPreviewNamespace: 'default',
+    useKubectlProxy: false,
     isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',

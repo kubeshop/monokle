@@ -42,7 +42,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
-import {createKubeClient, hasAccessToResource} from '@shared/utils/kubeclient';
+import {createKubeClient, hasAccessToResourceKind} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';
@@ -233,7 +233,7 @@ const DiffModal = () => {
         }
 
         const namespacesWithAccess = clusterAccess
-          .filter(ca => hasAccessToResource(targetResource.kind, 'get', ca))
+          .filter(ca => hasAccessToResourceKind(targetResource.kind, 'get', ca))
           .map(ca => ca.namespace);
         const resources = await Promise.all(
           namespacesWithAccess.map(ns => resourceKindHandler.listResourcesInCluster(kc, {namespace: ns}))

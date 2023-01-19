@@ -28,7 +28,6 @@ import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer
 import {AnyPlugin} from '@shared/models/plugin';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
 import {getSegmentClient} from '@shared/utils/segment';
-import {trackEvent} from '@shared/utils/telemetry';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -39,6 +38,7 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
+import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {ProjectNameChange, StorePropagation} from '../models';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
@@ -240,6 +240,14 @@ ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
 });
 
+ipcMain.on('kubectl-proxy-open', event => {
+  startKubectlProxyProcess(event);
+});
+
+ipcMain.on('kubectl-proxy-close', () => {
+  killKubectlProxyProcess();
+});
+
 ipcMain.on('app-version', event => {
   event.sender.send('app-version', {version: app.getVersion()});
 });
@@ -249,7 +257,6 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  trackEvent('APP_UPDATED');
   autoUpdater.quitAndInstall();
   dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Idle, data: null}});
 });

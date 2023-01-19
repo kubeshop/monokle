@@ -4,7 +4,7 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {setActiveDashboardMenu, setSelectedNamespaces, setSelectedResourceId} from '@redux/dashboard/slice';
+import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -22,7 +22,7 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
+  const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<DashboardMenu[]>([]);
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
@@ -110,11 +110,10 @@ const DashboardPane = () => {
     setMenu(tempMenu);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespaces, resourceMap]);
+  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
 
   useEffect(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-    dispatch(setSelectedNamespaces([]));
   }, [dispatch]);
 
   const setActiveMenu = (menuItem: DashboardMenu) => {
@@ -127,28 +126,16 @@ const DashboardPane = () => {
     (kind: string) => {
       return Object.values(resourceMap)
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(
-          r =>
-            r.kind === kind &&
-            (selectedNamespaces.length > 0 && Boolean(r.namespace)
-              ? selectedNamespaces.find(n => n === r.namespace)
-              : true)
-        ).length;
+        .filter(r => r.kind === kind).length;
     },
-    [resourceMap, selectedNamespaces]
+    [resourceMap]
   );
 
   const getErrorCount = useCallback(
     (kind: string) => {
       return Object.values(resourceMap)
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(
-          resource =>
-            resource.kind === kind &&
-            (selectedNamespaces.length > 0 && Boolean(resource.namespace)
-              ? selectedNamespaces.find(n => n === resource.namespace)
-              : true)
-        )
+        .filter(resource => resource.kind === kind)
         .reduce((total: number, resource: K8sResource) => {
           if (resource.issues && resource.issues.errors) {
             total += resource.issues.errors.length;
@@ -159,7 +146,7 @@ const DashboardPane = () => {
           return total;
         }, 0);
     },
-    [resourceMap, selectedNamespaces]
+    [resourceMap]
   );
 
   return (

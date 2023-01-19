@@ -1,19 +1,12 @@
 import React, {useCallback, useMemo} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {
-  ActionsPane,
-  BottomPaneManager,
-  Dashboard,
-  GitOpsView,
-  NavigatorPane,
-  RecentProjectsPage,
-  StartProjectPage,
-  TutorialPage,
-} from '@organisms';
+import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -21,6 +14,7 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
+import StartPage from '../StartPage';
 import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';
@@ -30,23 +24,23 @@ const NewPaneManager: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const projects = useAppSelector(state => state.config.projects);
   const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
   const {height, width} = useMainPaneDimensions();
 
   const gridColumns = useMemo(() => {
-    if (!activeProject || isStartProjectPaneVisible) {
+    if ((!activeProject && !previewingCluster) || isStartProjectPaneVisible) {
       return '1fr';
     }
 
     return 'max-content 1fr';
-  }, [activeProject, isStartProjectPaneVisible]);
+  }, [activeProject, isStartProjectPaneVisible, previewingCluster]);
 
   const topPaneFlex = useMemo(
     () => (bottomSelection ? 1 - layout.bottomPaneHeight / height : 1),
@@ -86,7 +80,7 @@ const NewPaneManager: React.FC = () => {
         <S.Skeleton />
       ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
         <>
-          {!previewingCluster && <PaneManagerLeftMenu />}
+          <PaneManagerLeftMenu />
 
           <ResizableRowsPanel
             layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
@@ -94,16 +88,16 @@ const NewPaneManager: React.FC = () => {
               currentActivity?.type === 'fullscreen' ? (
                 currentActivity.component
               ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
-                <EmptyDashboard />
+                isPreviewLoading ? (
+                  <Skeleton active style={{margin: 20}} />
+                ) : (
+                  <EmptyDashboard />
+                )
               ) : (
                 <ResizableColumnsPanel
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
-                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
-                      <NavigatorPane />
-                    ) : (
-                      <TutorialPage />
-                    )
+                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null
                   }
                   right={
                     currentActivity?.name === 'git' ? (
@@ -133,10 +127,8 @@ const NewPaneManager: React.FC = () => {
             width={width}
           />
         </>
-      ) : projects.length > 0 ? (
-        <RecentProjectsPage />
       ) : (
-        <StartProjectPage />
+        <StartPage />
       )}
     </S.PaneManagerContainer>
   );

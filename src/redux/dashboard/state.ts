@@ -4,7 +4,6 @@ export const initialState: DashboardState = {
   isOpen: false,
   ui: {
     activeMenu: {key: 'Overview', label: 'Overview'},
-    selectedNamespaces: [],
     activeTab: 'Info',
   },
   tableDrawer: {

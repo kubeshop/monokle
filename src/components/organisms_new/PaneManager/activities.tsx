@@ -1,22 +1,9 @@
-import {
-  FileExplorerTabTooltip,
-  SettingsTooltip,
-  TemplatesPageTooltip,
-  TerminalPaneTooltip,
-  ValidationTabTooltip,
-} from '@constants/tooltips';
+/* eslint-disable react-hooks/rules-of-hooks */
+import {FileExplorerTabTooltip, SettingsTooltip, TemplatesPageTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {
-  BottomPaneManager,
-  DashboardPane,
-  FileTreePane,
-  GitPane,
-  SearchPane,
-  TemplatesPage,
-  ValidationPane,
-} from '@organisms';
+import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane, TemplatesPage} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
@@ -33,6 +20,15 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="explorer" />,
     component: <FileTreePane />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+  },
+  {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
   },
   {
     type: 'fullscreen',
@@ -41,14 +37,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-  },
-  {
-    type: 'panel',
-    name: 'validation',
-    tooltip: <ValidationTabTooltip />,
-    icon: () => <Icon name="validation" style={{fontSize: 16}} />,
-    component: <ValidationPane />,
-    useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'panel',
@@ -61,6 +50,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'panel',
@@ -69,6 +59,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="search" style={{fontSize: 16}} />,
     component: <SearchPane />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
     type: 'fullscreen',
@@ -104,5 +95,6 @@ export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
     component: <BottomPaneManager />,
     useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
 ];

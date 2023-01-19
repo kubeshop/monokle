@@ -25,8 +25,10 @@ import {
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
+  updateUsingKubectlProxy,
 } from '@redux/reducers/appConfig';
 import {currentConfigSelector} from '@redux/selectors';
+import {monitorKubeConfig} from '@redux/services/monitorKubeConfig';
 
 import {FileExplorer} from '@atoms';
 
@@ -55,6 +57,7 @@ const SettingsManager: React.FC = () => {
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
   const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [activeTab, setActiveTab] = useState<string>(
     activeSettingsPanel ? String(activeSettingsPanel) : SettingsPanel.ActiveProjectSettings
@@ -76,13 +79,14 @@ const SettingsManager: React.FC = () => {
   };
 
   useEffect(() => {
-    if (previewingCluster) {
+    if (previewingCluster || !activeProject) {
       setActiveTab(SettingsPanel.DefaultProjectSettings);
     }
-  }, [previewingCluster]);
+  }, [activeProject, previewingCluster]);
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));
+    monitorKubeConfig(dispatch, config.kubeConfig?.path);
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
@@ -96,6 +100,7 @@ const SettingsManager: React.FC = () => {
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
+      monitorKubeConfig(dispatch, config.kubeConfig?.path);
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
@@ -113,6 +118,10 @@ const SettingsManager: React.FC = () => {
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
+  };
+
+  const handleChangeUsingKubectlProxy = (e: any) => {
+    dispatch(updateUsingKubectlProxy(e.target.checked));
   };
 
   const handleChangeClusterSelectorVisibilty = (e: any) => {
@@ -219,6 +228,18 @@ const SettingsManager: React.FC = () => {
               </Form.Item>
             </>
           </Form>
+
+          <S.Div>
+            <S.Span>Cluster Connection</S.Span>
+            <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
+              Enable Proxy
+            </Checkbox>
+            <S.Description>
+              If this setting is enabled, Monokle will start a proxy to the Kubernetes API server before connecting to
+              the cluster.
+            </S.Description>
+          </S.Div>
+
           <S.Div>
             <S.Span>On Startup</S.Span>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
@@ -234,6 +255,16 @@ const SettingsManager: React.FC = () => {
           </S.Div>
           <S.Div>
             <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
+              </Checkbox>
+            </S.Div>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
+              </Checkbox>
+            </S.Div>
             <S.TelemetryInfo>
               <S.TelemetryDescription>Data gathering is anonymous.</S.TelemetryDescription>
               <S.TelemetryReadMoreLink
@@ -243,16 +274,6 @@ const SettingsManager: React.FC = () => {
                 Read more about it in our documentation.
               </S.TelemetryReadMoreLink>
             </S.TelemetryInfo>
-            <S.Div style={{marginBottom: '8px'}}>
-              <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                Disable gathering of <S.BoldSpan>usage metrics</S.BoldSpan>
-              </Checkbox>
-            </S.Div>
-            <S.Div>
-              <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
-                Disable gathering of <S.BoldSpan>error reports</S.BoldSpan>
-              </Checkbox>
-            </S.Div>
           </S.Div>
 
           <S.Div>

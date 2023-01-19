@@ -183,6 +183,9 @@ type UiState = {
     };
   };
   previewingCluster?: boolean;
+  startPageLearn: {
+    isVisible: boolean;
+  };
 };
 
 export type {
