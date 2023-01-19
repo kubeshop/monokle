@@ -12,6 +12,8 @@ import {
   LocalOriginRuntype,
   PreviewOrigin,
   PreviewOriginRuntype,
+  UnsavedOrigin,
+  UnsavedOriginRuntype,
 } from './origin';
 
 export type ResourceIdentifier<Origin extends AnyOrigin = AnyOrigin> = {
@@ -78,10 +80,12 @@ const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
 const LocalResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: LocalOriginRuntype}));
 const ClusterResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: ClusterOriginRuntype}));
 const PreviewResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: PreviewOriginRuntype}));
+const UnsavedResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: UnsavedOriginRuntype}));
 
 export const isLocalResourceMeta = LocalResourceMetaRuntype.guard;
 export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
 export const isPreviewResourceMeta = PreviewResourceMetaRuntype.guard;
+export const isUnsavedResourceMeta = UnsavedResourceMetaRuntype.guard;
 
 export interface ResourceContent<Origin extends AnyOrigin = AnyOrigin> extends ResourceIdentifier<Origin> {
   text: string;
@@ -101,10 +105,12 @@ const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<LocalOrigin>> = Rt
 );
 const ClusterResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: ClusterOriginRuntype}));
 const PreviewResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: PreviewOriginRuntype}));
+const UnsavedResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: UnsavedOriginRuntype}));
 
 export const isLocalResourceContent = LocalResourceContentRuntype.guard;
 export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
 export const isPreviewResourceContent = PreviewResourceContentRuntype.guard;
+export const isUnsavedResourceContent = UnsavedResourceContentRuntype.guard;
 
 export type K8sResource<Origin extends AnyOrigin = AnyOrigin> = ResourceMeta<Origin> & ResourceContent<Origin>;
 
@@ -121,11 +127,16 @@ const PreviewResourceRuntype: Rt.Runtype<K8sResource<PreviewOrigin>> = Rt.Inters
   ResourceRuntype,
   Rt.Record({origin: PreviewOriginRuntype})
 );
+const UnsavedResourceRuntype: Rt.Runtype<K8sResource<UnsavedOrigin>> = Rt.Intersect(
+  ResourceRuntype,
+  Rt.Record({origin: UnsavedOriginRuntype})
+);
 
 export const isResource = ResourceRuntype.guard;
 export const isLocalResource = LocalResourceRuntype.guard;
 export const isClusterResource = ClusterResourceRuntype.guard;
 export const isPreviewResource = PreviewResourceRuntype.guard;
+export const isUnsavedResource = UnsavedResourceRuntype.guard;
 
 export type ResourceMetaMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceMeta<Origin>>;
 
@@ -137,12 +148,14 @@ export type ResourceMetaStorage = {
   local: ResourceMetaMap<LocalOrigin>;
   cluster: ResourceMetaMap<ClusterOrigin>;
   preview: ResourceMetaMap<PreviewOrigin>;
+  unsaved: ResourceMetaMap<UnsavedOrigin>;
 };
 
 export type ResourceContentStorage = {
   local: ResourceContentMap<LocalOrigin>;
   cluster: ResourceContentMap<ClusterOrigin>;
   preview: ResourceContentMap<PreviewOrigin>;
+  unsaved: ResourceContentMap<UnsavedOrigin>;
 };
 
 export type ResourceStorageKey = keyof ResourceMetaStorage | keyof ResourceContentStorage;
