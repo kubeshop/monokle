@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.3](https://github.com/kubeshop/monokle/compare/v1.13.3-nightly-2023-01-12.0...v1.13.3) (2023-01-12)
+
+
+### Bug Fixes
+
+* add loading skeleton for dashboard reloading ([43327a9](https://github.com/kubeshop/monokle/commit/43327a972f4db4bd1ed723de903d686afdabd9bd))
+
+### [1.13.2](https://github.com/kubeshop/monokle/compare/v1.13.2-nightly-2022-12-23.0...v1.13.2) (2022-12-23)
+
+### [1.13.1](https://github.com/kubeshop/monokle/compare/v1.13.1-nightly-2022-12-14.0...v1.13.1) (2022-12-14)
+
+
+### Features
+
+* add new tracking events ([5f7aaff](https://github.com/kubeshop/monokle/commit/5f7aaffcdef31003ca5d1266780210b591cb2a4b))
+* add Sentry to electron and remove Nucleus ([5002c21](https://github.com/kubeshop/monokle/commit/5002c21cd0ee2eafbb8ab1501e74e6abab3f3e06))
+* add Sentry to renderer ([a29e0f1](https://github.com/kubeshop/monokle/commit/a29e0f1ce43198dd12c1c7e6d022aac86d17f7aa))
+* track time for loading project & previews ([9d2fe7e](https://github.com/kubeshop/monokle/commit/9d2fe7e84a001b79ba301b4224d23ea856b98bdb))
+
+
+### Bug Fixes
+
+* create file ([f290e5d](https://github.com/kubeshop/monokle/commit/f290e5d57f89f880e7f7ed93fd3afda8e1d1e304))
+* git compare resource content ([f23cad4](https://github.com/kubeshop/monokle/commit/f23cad463a873227d45570df736ae8c01b4755f4))
+* upgrade @ant-design/icons from 4.7.0 to 4.8.0 ([c8eba2d](https://github.com/kubeshop/monokle/commit/c8eba2da3257bd5ca9a0ca12370c3b7620d86ccd))
+* upgrade react-monaco-editor from 0.50.1 to 0.51.0 ([726a136](https://github.com/kubeshop/monokle/commit/726a136eb0e7860f3b9aaaf5b1aa1fac498ea54b))
+
 ## [1.13.0](https://github.com/kubeshop/monokle/compare/v1.12.1-nightly-2022-12-07.0...v1.13.0) (2022-12-07)
 
 ## [1.12.0](https://github.com/kubeshop/monokle/compare/v1.11.2-nightly-2022-10-21.0...v1.12.0) (2022-10-21)

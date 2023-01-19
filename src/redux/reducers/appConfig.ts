@@ -5,6 +5,7 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 import path, {join} from 'path';
 
 import {AppListenerFn} from '@redux/listeners/base';
@@ -13,6 +14,7 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
+  keysToDelete,
   keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
@@ -26,8 +28,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
-import * as Sentry from '@sentry/react';
-import {BrowserTracing} from '@sentry/tracing';
+import {init as sentryInit} from '@sentry/electron/renderer';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {ClusterColors} from '@shared/models/cluster';
 import {
@@ -200,6 +201,10 @@ export const configSlice = createSlice({
         ...action.payload.data,
       };
     },
+    updateUsingKubectlProxy: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.useKubectlProxy', action.payload);
+      state.useKubectlProxy = action.payload;
+    },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.loadLastProjectOnStartup', action.payload);
       state.loadLastProjectOnStartup = action.payload;
@@ -353,10 +358,13 @@ export const configSlice = createSlice({
       }
 
       const projectConfig = state.projectConfig;
+      const incomingConfigKeys = Object.keys(action.payload.config);
       const serializedIncomingConfig = flatten<any, any>(action.payload.config, {safe: true});
       const serializedState = flatten<any, any>(state.projectConfig, {safe: true});
 
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
+      let deletedKeys = keysToDelete(serializedState, serializedIncomingConfig, incomingConfigKeys);
+
       if (action.payload.fromConfigFile) {
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
@@ -368,11 +376,15 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
-      keys.forEach(key => {
-        if (projectConfig) {
+      if (projectConfig) {
+        keys.forEach(key => {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-        }
-      });
+        });
+
+        deletedKeys.forEach(key => {
+          _.unset(projectConfig, key);
+        });
+      }
 
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
         state.kubeConfig.path = action.payload.config.kubeConfig.path;
@@ -381,6 +393,12 @@ export const configSlice = createSlice({
       new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
 
       if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
+        writeProjectConfigFile(state);
+      }
+    },
+    updateProjectK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (state.selectedProjectRootFolder && state.projectConfig) {
+        state.projectConfig.k8sVersion = action.payload;
         writeProjectConfigFile(state);
       }
     },
@@ -513,20 +531,30 @@ export const configSlice = createSlice({
       }
     },
     initRendererSentry: (state: Draft<AppConfig>, action: PayloadAction<{SENTRY_DSN: string}>) => {
-      Sentry.init({
-        dsn: action.payload.SENTRY_DSN,
-        integrations: [new BrowserTracing()],
-        tracesSampleRate: 0.6,
-        beforeSend: event => {
-          // we have to get this from electron store to get the most updated value
-          // because the state object in this action is a snapshot of the state at the moment of executing the reducer
-          const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');
-          if (disableErrorReporting) {
-            return null;
-          }
-          return event;
-        },
-      });
+      try {
+        sentryInit({
+          dsn: action.payload.SENTRY_DSN,
+          tracesSampleRate: 0.6,
+          beforeSend: event => {
+            // we have to get this from electron store to get the most updated value
+            // because the state object in this action is a snapshot of the state at the moment of executing the reducer
+            const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');
+            if (disableErrorReporting) {
+              return null;
+            }
+            return event;
+          },
+        });
+      } catch {
+        log.warn("Couldn't initialize Sentry.");
+      }
+    },
+    setClusterPreviewNamespace: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      state.clusterPreviewNamespace = action.payload;
+      electronStore.set('appConfig.clusterPreviewNamespace', action.payload);
+    },
+    setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
+      state.clusterProxyPort = action.payload;
     },
   },
   extraReducers: builder => {
@@ -572,14 +600,17 @@ export const {
   changeProjectsRootPath,
   createProject,
   handleFavoriteTemplate,
+  initRendererSentry,
   removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
+  setClusterPreviewNamespace,
   setCurrentContext,
   setFilterObjects,
   setKubeConfig,
   setKubeConfigContextColor,
   setUserDirs,
+  toggleEditorPlaceholderVisiblity,
   toggleErrorReporting,
   toggleEventTracking,
   toggleProjectPin,
@@ -593,13 +624,14 @@ export const {
   updateK8sVersion,
   updateNewVersion,
   updateProjectConfig,
+  updateProjectK8sVersion,
   updateProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
   updateTextSize,
   updateTheme,
-  toggleEditorPlaceholderVisiblity,
-  initRendererSentry,
+  updateUsingKubectlProxy,
+  setClusterProxyPort,
 } = configSlice.actions;
 export default configSlice.reducer;

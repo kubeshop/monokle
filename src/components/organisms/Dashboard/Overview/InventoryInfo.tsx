@@ -19,7 +19,6 @@ import * as S from './InventoryInfo.styled';
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespaces = useAppSelector(state => state.dashboard.ui.selectedNamespaces);
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
@@ -27,14 +26,10 @@ export const InventoryInfo = () => {
         .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
         .filter(
           (resource: K8sResource) =>
-            (apiVersion ? resource.content.apiVersion === apiVersion : true) &&
-            resource.kind === kind &&
-            (selectedNamespaces.length > 0 && Boolean(resource.namespace)
-              ? selectedNamespaces.find(n => n === resource.namespace)
-              : true)
+            (apiVersion ? resource.content.apiVersion === apiVersion : true) && resource.kind === kind
         );
     },
-    [resourceMap, selectedNamespaces]
+    [resourceMap]
   );
 
   const getNodes = useCallback(() => {

@@ -2,8 +2,6 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
-import {Colors} from '@shared/styles/colors';
-
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;
@@ -32,7 +30,6 @@ export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   display: flex;
   height: ${({$height}) => $height}px;
   flex-direction: column;
-  background: ${Colors.grey1000};
   margin: 10px;
   border-radius: 10px;
 `;
@@ -58,10 +55,13 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-nav {
     padding: 8px 16px 0 0;
     margin-bottom: 0px;
+    background: rgba(25, 31, 33, 0.7);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 
   & .ant-tabs-nav::before {
-    border-bottom: 1px solid #363636;
+    border-bottom: none;
   }
 
   & .ant-tabs-content {
@@ -78,17 +78,17 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     margin-left: 8px;
     background: black;
     border-radius: 5px 5px 0 0;
-    border-bottom: 1px solid #363636;
+    border-bottom: none;
     font-weight: bold;
     font-size: 12px;
   }
 
   & .ant-tabs-tab-active {
-    border-bottom: 1px solid #363636;
+    border-bottom: none;
     background: black;
   }
 
   & .ant-tabs-ink-bar {
-    background: #363636;
+    background: transparent;
   }
 `;

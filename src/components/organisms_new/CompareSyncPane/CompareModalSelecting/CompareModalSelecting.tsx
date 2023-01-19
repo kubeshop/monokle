@@ -36,7 +36,7 @@ const CompareModalSelecting: React.FC = () => {
         <S.ListRow>
           <Col span={10}>
             {left.loading ? (
-              <Skeleton />
+              <Skeleton active />
             ) : left.error ? (
               <ErrorFigure onRetry={() => handleRetry('left')} />
             ) : (
@@ -53,7 +53,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : right.error ? (
             <ErrorFigure onRetry={() => handleRetry('right')} />
           ) : (
-            <Skeleton />
+            <Skeleton active />
           )}
         </S.FloatingFigure>
       </>
@@ -68,7 +68,7 @@ const CompareModalSelecting: React.FC = () => {
 
           <Col span={10}>
             {right.loading ? (
-              <div>loading...</div>
+              <Skeleton active />
             ) : right.error ? (
               <ErrorFigure onRetry={() => handleRetry('right')} />
             ) : (
@@ -85,7 +85,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : left.error ? (
             <ErrorFigure onRetry={() => handleRetry('left')} />
           ) : (
-            <p>loading..</p>
+            <Skeleton active />
           )}
         </S.FloatingFigure>
       </>

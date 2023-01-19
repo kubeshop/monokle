@@ -164,11 +164,25 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
       {allowWatchBookmarks: true},
       (type: string, apiObj: any) => {
         if (type === 'ADDED') {
-          getKubeAccess(apiObj.metadata.name, key).then(value => {
-            dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(kubeConfigPath)});
-            dispatch({type: 'config/setAccessLoading', payload: true});
-            dispatch({type: 'config/addNamespaceToContext', payload: value});
-          });
+          getKubeAccess(apiObj.metadata.name, key)
+            .then(clusterAccess => {
+              // TODO: is setKubeConfig needed? on main branch it was removed..
+              dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(kubeConfigPath)});
+              dispatch({type: 'config/setAccessLoading', payload: true});
+              dispatch({type: 'config/addNamespaceToContext', payload: clusterAccess});
+            })
+            .catch(() => {
+              dispatch({
+                type: 'alert/setAlert',
+                payload: {
+                  type: AlertEnum.Warning,
+                  title: 'Cluster Watcher Error',
+                  message:
+                    "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
+                },
+              });
+              dispatch({type: 'config/setAccessLoading', payload: false});
+            });
         } else if (type === 'DELETED') {
           dispatch({type: 'config/setAccessLoading', payload: true});
           dispatch({

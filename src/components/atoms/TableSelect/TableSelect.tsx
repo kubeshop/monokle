@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {AnimationDurations} from '@shared/styles';
 import {Colors} from '@shared/styles/colors';
 
 type Props = {
@@ -33,7 +34,7 @@ function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableT
       trigger={['click']}
       disabled={remoteRepo?.authRequired}
     >
-      <Button loading={gitLoading}>
+      <Button loading={gitLoading} type="text">
         <Space>
           {icon}
           <span>{value}</span>
@@ -50,10 +51,23 @@ const Button = styled(RawButton)`
   border: none;
   border-radius: 4px;
   height: 28px;
-  background: ${Colors.grey3b};
+  background-color: transparent;
+
   :hover,
   :focus {
-    background: ${Colors.grey3b};
-    color: ${Colors.lightSeaGreen};
+    background-color: transparent;
+
+    span {
+      color: ${Colors.geekblue9};
+    }
+  }
+
+  svg {
+    transition: all ${AnimationDurations.base} ease-in;
+  }
+
+  span {
+    transition: all ${AnimationDurations.base} ease-in;
+    color: ${Colors.grey7};
   }
 `;

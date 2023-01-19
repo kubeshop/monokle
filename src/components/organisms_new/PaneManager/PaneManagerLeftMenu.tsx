@@ -14,8 +14,12 @@ const NewPaneManagerLeftMenu: React.FC = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
 
-  const isActive = useMemo(() => Boolean(activeProject) && leftActive, [activeProject, leftActive]);
+  const isActive = useMemo(
+    () => Boolean(activeProject || previewingCluster) && leftActive,
+    [activeProject, leftActive, previewingCluster]
+  );
 
   return (
     <ActivityBar

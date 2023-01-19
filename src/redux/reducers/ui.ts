@@ -321,6 +321,9 @@ export const uiSlice = createSlice({
       const collection = action.payload;
       state.walkThrough[collection].currentStep = -1;
     },
+    setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.startPageLearn.isVisible = action.payload;
+    },
     handleWalkthroughStep: (
       state: Draft<UiState>,
       action: PayloadAction<{step: number; collection: WalkthroughCollection}>
@@ -406,6 +409,7 @@ export const {
   setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
+  setShowStartPageLearn,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,

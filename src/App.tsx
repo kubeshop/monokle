@@ -52,6 +52,7 @@ import {StepEnum} from '@shared/models/walkthrough';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
@@ -84,8 +85,8 @@ const App = () => {
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
 
+  const activeProject = useAppSelector(activeProjectSelector);
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
@@ -97,6 +98,7 @@ const App = () => {
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
+  const isPreviewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
@@ -106,6 +108,7 @@ const App = () => {
   );
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
@@ -390,7 +393,8 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          <PageHeader />
+          {(isPreviewingCluster || (activeProject && !isStartProjectPaneVisible)) && <PageHeader />}
+
           <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
