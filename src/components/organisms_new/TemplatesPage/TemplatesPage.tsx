@@ -46,7 +46,7 @@ const items: MenuProps['items'] = [
 
 const TemplatesPage = () => {
   const onClick: MenuProps['onClick'] = e => {
-    console.log('click ', e);
+    // console.log('click ', e);
   };
 
   const dispatch = useAppDispatch();
