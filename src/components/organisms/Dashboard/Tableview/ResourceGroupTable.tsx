@@ -109,6 +109,6 @@ export const resourceGroupColumns: ColumnsType<any> = [
     width: '150px',
     render: (menu: any) => <span>{menu.resourceCount}</span>,
     // eslint-disable-next-line no-unsafe-optional-chaining
-    sorter: (a: any, b: any) => a?.resourceCount - b?.resourceCount,
+    sorter: (a: any, b: any) => a && b ? a.resourceCount - b.resourceCount : 0,
   },
 ];
