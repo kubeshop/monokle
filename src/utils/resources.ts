@@ -6,39 +6,39 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource, isLocalResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta, isLocalResource} from '@shared/models/k8sResource';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
-export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
+export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
   if (
     filters.names &&
     filters.names.length &&
-    !filters.names.some(name => resource.name.toLowerCase().includes(name.toLowerCase()))
+    !filters.names.some(name => resourceMeta.name.toLowerCase().includes(name.toLowerCase()))
   ) {
     return false;
   }
 
-  if (filters.kinds?.length && !filters.kinds?.includes(resource.kind)) {
+  if (filters.kinds?.length && !filters.kinds?.includes(resourceMeta.kind)) {
     return false;
   }
 
   if (filters.namespace) {
-    const resourceNamespace = resource.namespace || 'default';
+    const resourceNamespace = resourceMeta.namespace || 'default';
     if (resourceNamespace !== filters.namespace) {
       return false;
     }
   }
   if (
     filters.fileOrFolderContainedIn &&
-    isLocalResource(resource) &&
-    !resource.origin.filePath.startsWith(filters.fileOrFolderContainedIn)
+    isLocalResource(resourceMeta) &&
+    !resourceMeta.origin.filePath.startsWith(filters.fileOrFolderContainedIn)
   ) {
     return false;
   }
 
   if (filters.labels && Object.keys(filters.labels).length > 0) {
-    const resourceLabels = resource.object?.metadata?.labels;
-    const templateLabels = resource.object?.spec?.template?.metadata?.labels;
+    const resourceLabels = resourceMeta.labels;
+    const templateLabels = resourceMeta.templateLabels;
     if (!resourceLabels && !templateLabels) {
       return false;
     }
@@ -50,7 +50,7 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     }
   }
   if (filters.annotations && Object.keys(filters.annotations).length > 0) {
-    const resourceAnnotations = resource.object?.metadata?.annotations;
+    const resourceAnnotations = resourceMeta.annotations;
     if (!resourceAnnotations) {
       return false;
     }

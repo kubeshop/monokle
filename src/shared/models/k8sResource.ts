@@ -39,6 +39,12 @@ export interface ResourceMeta<Origin extends AnyOrigin = AnyOrigin> extends Reso
   apiVersion: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;
+  /** spec.metadata.labels */
+  labels: Record<string, string>;
+  /** spec.metadata.labels.annotations  */
+  annotations: Record<string, string>;
+  /** spec.template.metadata.labels */
+  templateLabels?: Record<string, string>;
   /** if a resource is cluster scoped ( kind is namespaced ) */
   isClusterScoped: boolean;
   /** specifies the range in the file's content, applies only to file locations  */
@@ -56,6 +62,9 @@ const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
   kind: Rt.String,
   apiVersion: Rt.String,
   namespace: Rt.Optional(Rt.String),
+  labels: Rt.Dictionary(Rt.String),
+  annotations: Rt.Dictionary(Rt.String),
+  templateLabels: Rt.Optional(Rt.Dictionary(Rt.String)),
   isClusterScoped: Rt.Boolean,
   range: Rt.Optional(
     Rt.Record({
