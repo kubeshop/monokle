@@ -22,7 +22,7 @@ export const selectFileReducer = (state: AppState, payload: {filePath: string; i
   }
 };
 
-export const selectK8sResourceReducer = (
+export const selectResourceReducer = (
   state: AppState,
   payload: {resourceId: string; resourceStorage: ResourceStorageKey; isVirtualSelection?: boolean}
 ) => {
@@ -40,6 +40,8 @@ export const selectK8sResourceReducer = (
     resourceStorage: storage,
   };
 
+  // TODO: highlight resources from resource.refs
+
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
 };
 
@@ -53,7 +55,7 @@ export const selectionReducers = createSliceReducers('main', {
   /**
    * Marks the specified resource as selected and highlights all related resources
    */
-  selectK8sResource: (
+  selectResource: (
     state: Draft<AppState>,
     action: PayloadAction<{
       resourceId: string;
@@ -61,7 +63,7 @@ export const selectionReducers = createSliceReducers('main', {
       isVirtualSelection?: boolean;
     }>
   ) => {
-    selectK8sResourceReducer(state, action.payload);
+    selectResourceReducer(state, action.payload);
   },
   /**
    * Marks the specified file as selected and highlights all related resources

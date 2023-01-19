@@ -2,14 +2,11 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {performResourceContentUpdate} from '@redux/reducers/main';
+import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
+import {activeResourceMapSelector} from '@redux/selectors';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {reprocessResources} from '@redux/services/resource';
-import {findResourcesToReprocess} from '@redux/services/resourceRefs';
-import {updateSelectionAndHighlights} from '@redux/services/selection';
 
 import {AppState} from '@shared/models/appState';
 import {RootState} from '@shared/models/rootState';
@@ -19,7 +16,6 @@ type UpdateResourcePayload = {
   resourceId: string;
   text: string;
   preventSelectionAndHighlightsUpdate?: boolean;
-  isInClusterMode?: boolean;
   isUpdateFromForm?: boolean;
 };
 
@@ -27,23 +23,31 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
   'main/updateResource',
   async (payload, thunkAPI) => {
     const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-    const policyPlugins = state.main.policies.plugins;
 
-    const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
+    const {resourceId, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
 
     let error: any;
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
-        const currentResourceMap = isInClusterMode ? getLocalResourceMap(mainState) : getActiveResourceMap(mainState);
-        const resourceMap = mainState.resourceMap;
-        const resource = isInClusterMode ? resourceMap[resourceId] : currentResourceMap[resourceId];
+        const activeResourceMap = activeResourceMapSelector(mainState);
+        const resource = activeResourceMap[resourceId];
 
         const fileMap = mainState.fileMap;
-        if (resource) {
+
+        if (!resource) {
+          log.warn('Failed to find updated resource during preview', resourceId);
+          return;
+        }
+
+        // check if this was a kustomization resource updated during a kustomize preview
+        if (
+          (isKustomizationResource(resource) || isKustomizationPatch(resource)) &&
+          mainState.preview?.type === 'kustomize' &&
+          mainState.preview.kustomizationId === resource.id
+        ) {
+          performResourceContentUpdate(resource, text, fileMap);
+        } else {
           const prevContent = resource.text;
           const newContent = text;
           if (isUpdateFromForm) {
@@ -51,34 +55,10 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
             mainState.lastChangedLine = lineChanged;
           }
 
-          performResourceContentUpdate(resource, text, fileMap, resourceMap);
-          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(
-            schemaVersion,
-            userDataDir,
-            resourceIds,
-            currentResourceMap,
-            fileMap,
-            mainState.resourceRefsProcessingOptions,
-            {policyPlugins}
-          );
+          performResourceContentUpdate(resource, text, fileMap);
+
           if (!preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(mainState, resource);
-          }
-        } else {
-          const r = resourceMap[resourceId];
-          // check if this was a kustomization resource updated during a kustomize preview
-          if (
-            r &&
-            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
-            mainState.previewResourceId &&
-            isKustomizationResource(resourceMap[mainState.previewResourceId])
-          ) {
-            performResourceContentUpdate(r, text, fileMap, resourceMap);
-            processKustomizations(resourceMap, fileMap);
-          } else {
-            log.warn('Failed to find updated resource during preview', resourceId);
+            selectResourceReducer(mainState, {resourceId: resource.id, resourceStorage: resource.origin.storage});
           }
         }
 
