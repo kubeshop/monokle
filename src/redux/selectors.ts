@@ -67,6 +67,17 @@ export const selectedResourceSelector = createSelector(
 //   resources.filter((r: K8sResource) => isKustomizationResource(r))
 // );
 
+// TODO: should we merge the Unsaved storage into these or do we handle those differently directly in the Navigator?
+export const activeResourceMapSelector = (state: AppState) => {
+  if (state.clusterConnection) {
+    return merge(state.resourceMetaStorage.cluster, state.resourceContentStorage.cluster);
+  }
+  if (state.preview) {
+    return merge(state.resourceMetaStorage.preview, state.resourceContentStorage.preview);
+  }
+  return merge(state.resourceMetaStorage.local, state.resourceContentStorage.local);
+};
+
 export const helmChartsSelector = createSelector(
   (state: RootState) => state.main.helmChartMap,
   helmCharts => helmCharts
