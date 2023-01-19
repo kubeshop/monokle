@@ -3,16 +3,13 @@ import * as k8s from '@kubernetes/client-node';
 import invariant from 'tiny-invariant';
 import {stringify} from 'yaml';
 
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
-
-import {extractK8sResources, processResources} from '@redux/services/resource';
+import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
-import {KubernetesObject, ResourceMap, ResourceRefsProcessingOptions} from '@shared/models/appState';
+import {K8sObject} from '@shared/models/k8s';
 import {K8sResource} from '@shared/models/k8sResource';
-import {Policy} from '@shared/models/policy';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 /**
@@ -51,7 +48,7 @@ export async function getResourceFromCluster(
   resource: K8sResource,
   kubeconfigPath: string,
   context?: string
-): Promise<KubernetesObject | undefined> {
+): Promise<K8sObject | undefined> {
   const resourceKindHandler = getResourceKindHandler(resource.kind);
 
   if (resource && resource.text && resourceKindHandler) {
@@ -69,7 +66,7 @@ export async function removeNamespaceFromCluster(namespace: string, kubeconfigPa
 
 type KubeClient = k8s.KubeConfig;
 
-export async function getNamespace(client: KubeClient, name: string): Promise<KubernetesObject | undefined> {
+export async function getNamespace(client: KubeClient, name: string): Promise<K8sObject | undefined> {
   try {
     const api = client.makeApiClient(k8s.CoreV1Api);
     const resource = await api.readNamespace(name, 'true');
@@ -79,7 +76,7 @@ export async function getNamespace(client: KubeClient, name: string): Promise<Ku
   }
 }
 
-export async function createNamespace(client: KubeClient, name: string): Promise<KubernetesObject> {
+export async function createNamespace(client: KubeClient, name: string): Promise<K8sObject> {
   const api = client.makeApiClient(k8s.CoreV1Api);
   const resource = await api.createNamespace({metadata: {name}}, 'true');
   return toPojoStrict(resource.body);
@@ -91,12 +88,12 @@ export async function createNamespace(client: KubeClient, name: string): Promise
  * The Kubernetes client works with JavaScript classes.
  * These are incompatible with Redux because they are inserializable.
  */
-function toPojo(resource: k8s.KubernetesObject | undefined): KubernetesObject | undefined {
+function toPojo(resource: k8s.KubernetesObject | undefined): K8sObject | undefined {
   if (!resource) return undefined;
   return JSON.parse(JSON.stringify(resource));
 }
 
-function toPojoStrict(resource: k8s.KubernetesObject | undefined): KubernetesObject {
+function toPojoStrict(resource: k8s.KubernetesObject | undefined): K8sObject {
   invariant(resource, 'unexpected undefined resource');
   return JSON.parse(JSON.stringify(resource));
 }
