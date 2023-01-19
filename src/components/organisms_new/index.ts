@@ -5,5 +5,5 @@ export {default as NewProject} from './NewProject';
 export {default as PaneManager} from './PaneManager';
 export {default as StartPage} from './StartPage';
 export {default as ValidationSettings} from './ValidationSettings';
-export {default as TutorialPage} from './TutorialPage';
+// export {default as TutorialPage} from './TutorialPage';
 export {default as TemplatesPage} from './TemplatesPage';
