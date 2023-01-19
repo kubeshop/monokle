@@ -26,15 +26,12 @@ export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
 
-  useEffect(() => {
+    const filteredDataSource = useMemo(() => {
     if (!filterText) {
-      setFilteredDataSource(dataSource);
-      return;
+      return dataSource;
     }
-    setFilteredDataSource(
-      dataSource.filter(s => s.kind.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()))
-    );
-  }, [dataSource, filterText]);
+    return dataSource.filter(s => s.kind.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()));
+  });
 
   const setActiveMenu = (menuItem: IMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
