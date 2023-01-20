@@ -12,6 +12,7 @@ import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
+import enhanceErrorMessage from '@utils/notification';
 import {openUrlInExternalBrowser} from '@utils/shell';
 
 import NotificationModalTitle from './NotificationModalTitle';
@@ -46,7 +47,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     Modal[type]({
       content: (
         <S.NotificationModalContent>
-          <ReactMarkdown>{message}</ReactMarkdown>
+          <ReactMarkdown>{enhanceErrorMessage(message)}</ReactMarkdown>
         </S.NotificationModalContent>
       ),
       title: (
