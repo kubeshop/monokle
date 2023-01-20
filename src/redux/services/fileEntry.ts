@@ -589,7 +589,7 @@ function addHelmChartFile(
  * Helm Charts/Values and regular resource files
  */
 
-function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
@@ -656,7 +656,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   const parentPath = absolutePath.slice(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -672,7 +672,7 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
     }
     const fileEntry = isDirectory
       ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig, userDataDir);
+      : addFile(absolutePath, state, projectConfig);
 
     if (fileEntry) {
       parentEntry.children = parentEntry.children || [];
