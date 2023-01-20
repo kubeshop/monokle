@@ -20,7 +20,9 @@ const PreviwConfigurationDetails: React.FC = () => {
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
   const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
-  const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
+  const selectedPreviewConfigurationId = useAppSelector(state =>
+    state.main.selection?.type === 'preview.configuration' ? state.main.selection.previewConfigurationId : undefined
+  );
 
   const previewConfiguration = useMemo(
     () =>

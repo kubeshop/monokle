@@ -7,7 +7,12 @@ import {DownOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {
+  kustomizationsSelector,
+  previewedHelmChartSelector,
+  previewedKustomizationSelector,
+  previewedValuesFileSelector,
+} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
 import {HelmChartMenuItem} from '@shared/models/helm';
@@ -25,19 +30,14 @@ const PreviewDropdown: React.FC<IProps> = props => {
   const {btnStyle} = props;
 
   const dispatch = useAppDispatch();
-  const previewHelmChart = useAppSelector(state =>
-    previewValuesFile ? state.main.helmChartMap[previewValuesFile.helmChartId] : undefined
-  );
-  const previewResource = useAppSelector(state =>
-    state.main.previewResourceId ? state.main.resourceMap[state.main.previewResourceId] : undefined
-  );
-  const previewValuesFile = useAppSelector(state =>
-    state.main.previewValuesFileId ? state.main.helmValuesMap[state.main.previewValuesFileId] : undefined
-  );
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewedHelmChart = useAppSelector(previewedHelmChartSelector);
+  const previewedValuesFile = useAppSelector(previewedValuesFileSelector);
+  const previewedKustomization = useAppSelector(previewedKustomizationSelector);
+  const selection = useAppSelector(state => state.main.selection);
 
-  const helmCharts: HelmChartMenuItem[] = useAppSelector(state => {
+  const valuesFileMap = useAppSelector(state => state.main.helmValuesMap);
+
+  const helmChartMenuItems: HelmChartMenuItem[] = useAppSelector(state => {
     const helmValuesMap = state.main.helmValuesMap;
     return Object.values(state.main.helmChartMap).map(helmChart => {
       const valuesFiles = helmChart.valueFileIds.map(valuesFileId => helmValuesMap[valuesFileId]);
@@ -54,54 +54,59 @@ const PreviewDropdown: React.FC<IProps> = props => {
     });
   }, shallowEqual);
 
-  const kustomizations: KustomizationMenuItem[] = useAppSelector(state => {
-    return Object.values(state.main.resourceMap)
-      .filter(i => isKustomizationResource(i))
+  const kustomizationMenuItems: KustomizationMenuItem[] = useAppSelector(state => {
+    return kustomizationsSelector(state)
       .map(res => ({id: res.id, name: res.name}))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, shallowEqual);
 
   const selectAndPreviewKustomization = useCallback(
-    (resourceId: string) => {
-      if (resourceId !== selectedResourceId) {
-        dispatch(selectK8sResource({resourceId}));
+    (kustomizationId: string) => {
+      if (
+        !selection ||
+        selection?.type !== 'resource' ||
+        selection.resourceStorage !== 'local' ||
+        selection.resourceId !== kustomizationId
+      ) {
+        dispatch(selectK8sResource({resourceId: kustomizationId}));
       }
-      if (resourceId !== previewResource?.id) {
-        startPreview(resourceId, 'kustomization', dispatch);
+      if (kustomizationId !== previewedKustomization?.id) {
+        startPreview({type: 'kustomize', kustomizationId}, dispatch);
       }
     },
-    [selectedResourceId, previewResource, dispatch]
+    [selection, previewedKustomization, dispatch]
   );
 
   const selectAndPreviewHelmValuesFile = useCallback(
     (valuesFileId: string) => {
-      if (valuesFileId !== selectedValuesFileId) {
+      const valuesFileToPreview = valuesFileMap[valuesFileId];
+      if (selection?.type !== 'helm.values.file' || selection.valuesFileId !== valuesFileId) {
         dispatch(selectHelmValuesFile({valuesFileId}));
       }
-      if (valuesFileId !== previewValuesFile?.id) {
-        startPreview(valuesFileId, 'helm', dispatch);
+      if (valuesFileId !== previewedValuesFile?.id) {
+        startPreview({type: 'helm', valuesFileId, chartId: valuesFileToPreview.helmChartId}, dispatch);
       }
     },
-    [selectedValuesFileId, previewValuesFile, dispatch]
+    [selection, valuesFileMap, previewedValuesFile, dispatch]
   );
 
   const previewKey = useMemo(() => {
-    if (previewResource) {
-      return `kustomization__${previewResource.id}`;
+    if (previewedKustomization) {
+      return `kustomization__${previewedKustomization.id}`;
     }
-    if (previewValuesFile) {
-      return `valuesFile__${previewValuesFile.id}`;
+    if (previewedValuesFile) {
+      return `valuesFile__${previewedValuesFile.id}`;
     }
-  }, [previewResource, previewValuesFile]);
+  }, [previewedKustomization, previewedValuesFile]);
 
   const previewText = useMemo(() => {
-    if (previewResource) {
-      return `Kustomization: ${previewResource.name}`;
+    if (previewedKustomization) {
+      return `Kustomization: ${previewedKustomization.name}`;
     }
-    if (previewValuesFile && previewHelmChart) {
-      return `Helm Chart: ${previewHelmChart.name} - ${previewValuesFile.name}`;
+    if (previewedValuesFile && previewedHelmChart) {
+      return `Helm Chart: ${previewedHelmChart.name} - ${previewedValuesFile.name}`;
     }
-  }, [previewResource, previewValuesFile, previewHelmChart]);
+  }, [previewedKustomization, previewedValuesFile, previewedHelmChart]);
 
   const onMenuItemClick = ({key}: {key: string}) => {
     const [type, id] = key.split('__');
@@ -116,11 +121,11 @@ const PreviewDropdown: React.FC<IProps> = props => {
 
   return (
     <Dropdown
-      disabled={helmCharts.length === 0 && kustomizations.length === 0}
+      disabled={helmChartMenuItems.length === 0 && kustomizationMenuItems.length === 0}
       overlay={
         <PreviewMenu
-          helmCharts={helmCharts}
-          kustomizations={kustomizations}
+          helmCharts={helmChartMenuItems}
+          kustomizations={kustomizationMenuItems}
           onClick={onMenuItemClick}
           previewKey={previewKey}
         />

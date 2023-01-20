@@ -14,6 +14,7 @@ import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
+import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
 export const rootFolderSelector = createSelector(
@@ -86,6 +87,51 @@ export const selectedResourceSelector = createSelector(
       return undefined;
     }
     return resourceSelector(state, selection.resourceId, selection.resourceStorage);
+  }
+);
+
+export const previewedKustomizationSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const preview = state.main.preview;
+    if (!preview || preview.type !== 'kustomize') {
+      return undefined;
+    }
+    return resourceSelector(state, preview.kustomizationId, 'local');
+  }
+);
+
+export const previewedValuesFileSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const preview = state.main.preview;
+    if (!preview || preview.type !== 'helm') {
+      return undefined;
+    }
+    return state.main.helmValuesMap[preview.valuesFileId];
+  }
+);
+
+export const previewedHelmChartSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const preview = state.main.preview;
+    if (!preview || preview.type !== 'helm') {
+      return undefined;
+    }
+    return state.main.helmChartMap[preview.chartId];
+  }
+);
+
+export const kustomizationsSelector = createSelector(
+  [
+    (state: RootState) => state.main.resourceMetaStorage.local,
+    (state: RootState) => state.main.resourceContentStorage.local,
+  ],
+  (resourceMetaMap, resourceContentMap) => {
+    return Object.values(resourceMetaMap)
+      .filter(resource => isKustomizationResource(resource))
+      .map(resource => merge(resource, resourceContentMap[resource.id]));
   }
 );
 
