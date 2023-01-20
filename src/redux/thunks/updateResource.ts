@@ -30,7 +30,7 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
-        const activeResourceMap = activeResourceMapSelector(mainState);
+        const activeResourceMap = activeResourceMapSelector(state);
         const resource = activeResourceMap[resourceId];
 
         const fileMap = mainState.fileMap;

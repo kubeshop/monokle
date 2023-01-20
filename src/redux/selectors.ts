@@ -228,6 +228,15 @@ export const isInClusterModeSelector = createSelector(
   }
 );
 
+// TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
+// the previous selector returned `true` even if you were in ClusterMode but that's no longer desired
+export const isInPreviewModeSelectorNew = createSelector(
+  (state: RootState) => state,
+  state => {
+    return Boolean(state.main.preview);
+  }
+);
+
 export const currentConfigSelector = createSelector(
   (state: RootState) => state.config,
   config => {

@@ -6,7 +6,7 @@ import {Dropdown} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
+import {selectHelmValuesFile, selectResource} from '@redux/reducers/main';
 import {
   kustomizationsSelector,
   previewedHelmChartSelector,
@@ -68,7 +68,7 @@ const PreviewDropdown: React.FC<IProps> = props => {
         selection.resourceStorage !== 'local' ||
         selection.resourceId !== kustomizationId
       ) {
-        dispatch(selectK8sResource({resourceId: kustomizationId}));
+        dispatch(selectResource({resourceId: kustomizationId, resourceStorage: 'local'}));
       }
       if (kustomizationId !== previewedKustomization?.id) {
         startPreview({type: 'kustomize', kustomizationId}, dispatch);

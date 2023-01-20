@@ -2,62 +2,75 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {deleteResource, isFileResource, isUnsavedResource, removeResourceFromFile} from '@redux/services/resource';
-import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
-import {clearResourceSelections} from '@redux/services/selection';
+import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
+import {deleteResource, removeResourceFromFile} from '@redux/services/resource';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {
+  ResourceIdentifier,
+  isClusterResourceMeta,
+  isLocalResourceMeta,
+  isTransientResourceMeta,
+} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk(
   'main/removeResources',
-  async (resourceIds: string[], thunkAPI: {getState: Function; dispatch: Function}) => {
+  async (resourceIds: ResourceIdentifier[], thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
 
     const nextMainState = createNextState(state.main, mainState => {
       let deletedCheckedResourcesIds: string[] = [];
 
       resourceIds.forEach(resourceId => {
-        const resource = mainState.resourceMap[resourceId];
-        if (!resource) {
+        const resourceMeta = mainState.resourceMetaStorage[resourceId.origin.storage][resourceId.id];
+        if (!resourceMeta) {
           return;
         }
 
-        updateReferringRefsOnDelete(resource, mainState.resourceMap);
+        // TODO: after @monokle/validation is added, we will need to reprocess resources
+        // updateReferringRefsOnDelete(resource, mainState.resourceMap);
 
-        if (mainState.checkedResourceIds.includes(resourceId)) {
-          deletedCheckedResourcesIds.push(resourceId);
+        if (mainState.checkedResourceIds.includes(resourceId.id)) {
+          deletedCheckedResourcesIds.push(resourceId.id);
         }
 
-        if (mainState.selectedResourceId === resourceId) {
-          clearResourceSelections(mainState.resourceMap);
-          mainState.selectedResourceId = undefined;
+        if (mainState.selection?.type === 'resource' && mainState.selection.resourceId === resourceId.id) {
+          clearSelectionReducer(mainState);
         }
 
-        if (isUnsavedResource(resource)) {
-          deleteResource(resource, mainState.resourceMap);
+        if (isTransientResourceMeta(resourceMeta)) {
+          deleteResource(resourceMeta, {
+            resourceMetaMap: mainState.resourceMetaStorage.transient,
+            resourceContentMap: mainState.resourceContentStorage.transient,
+          });
           return;
         }
 
-        if (isFileResource(resource)) {
-          removeResourceFromFile(resource, mainState.fileMap, mainState.resourceMap);
+        if (isLocalResourceMeta(resourceMeta)) {
+          removeResourceFromFile(resourceMeta, mainState.fileMap, {
+            resourceMetaMap: mainState.resourceMetaStorage.local,
+            resourceContentMap: mainState.resourceContentStorage.local,
+          });
           return;
         }
 
-        if (
-          mainState.previewType === 'cluster' &&
-          mainState.previewKubeConfigPath &&
-          mainState.previewKubeConfigContext
-        ) {
+        if (mainState.clusterConnection && isClusterResourceMeta(resourceMeta)) {
           try {
-            const kubeClient = createKubeClient(mainState.previewKubeConfigPath, mainState.previewKubeConfigContext);
+            const kubeClient = createKubeClient(
+              mainState.clusterConnection.kubeConfigPath,
+              mainState.clusterConnection.context
+            );
 
-            const kindHandler = getResourceKindHandler(resource.kind);
+            const kindHandler = getResourceKindHandler(resourceMeta.kind);
             if (kindHandler?.deleteResourceInCluster) {
-              kindHandler.deleteResourceInCluster(kubeClient, resource);
-              deleteResource(resource, mainState.resourceMap);
+              kindHandler.deleteResourceInCluster(kubeClient, resourceMeta);
+              deleteResource(resourceMeta, {
+                resourceMetaMap: mainState.resourceMetaStorage.cluster,
+                resourceContentMap: mainState.resourceContentStorage.cluster,
+              });
             }
           } catch (err) {
             log.error(err);

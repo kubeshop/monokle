@@ -32,6 +32,7 @@ type AppState = {
   };
   clusterConnection?: {
     context: string;
+    kubeConfigPath: string;
   };
   clusterConnectionOptions: {
     isLoading?: boolean;

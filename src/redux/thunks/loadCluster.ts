@@ -165,6 +165,7 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
       resources: Object.values(clusterResourceMap),
       alert,
       context,
+      kubeConfigPath,
     };
   } catch (e: any) {
     log.error(e);
@@ -180,6 +181,7 @@ export const loadClusterResources = createAsyncThunk<
   {
     resources: K8sResource<ClusterOrigin>[];
     context: string;
+    kubeConfigPath: string;
   },
   {context: string; port?: number},
   {
@@ -192,6 +194,7 @@ export const reloadClusterResources = createAsyncThunk<
   {
     resources: K8sResource<ClusterOrigin>[];
     context: string;
+    kubeConfigPath: string;
   },
   {context: string; port?: number},
   {

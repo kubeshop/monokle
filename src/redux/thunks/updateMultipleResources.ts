@@ -17,7 +17,7 @@ export const updateMultipleResources = createAsyncThunk(
       try {
         // let resourceIdsToReprocess: string[] = [];
         // const activeResources = getActiveResourceMap(mainState);
-        const activeResourceMap = activeResourceMapSelector(mainState);
+        const activeResourceMap = activeResourceMapSelector(state);
 
         // TODO: reimplement getActiveResourceMap...
 

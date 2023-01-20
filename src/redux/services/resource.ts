@@ -215,7 +215,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
 }
 
 export function removeResourceFromFile(
-  removedResource: K8sResource,
+  removedResource: ResourceMeta<LocalOrigin>,
   fileMap: FileMapType,
   stateArgs: {
     resourceMetaMap: ResourceMetaMap<LocalOrigin>;
@@ -407,9 +407,9 @@ export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
 /**
  * Deletes the specified resource from internal caches and the specified resourceMap
  */
-export function deleteResource(
-  resource: ResourceIdentifier,
-  stateArgs: {resourceMetaMap: ResourceMetaMap; resourceContentMap: ResourceContentMap}
+export function deleteResource<Origin extends AnyOrigin>(
+  resource: ResourceIdentifier<Origin>,
+  stateArgs: {resourceMetaMap: ResourceMetaMap<Origin>; resourceContentMap: ResourceContentMap<Origin>}
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   delete resourceMetaMap[resource.id];

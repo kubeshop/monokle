@@ -16,14 +16,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isUnsavedResource} from '@redux/services/resource';
-import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
+import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertEnum} from '@shared/models/alert';
@@ -179,7 +178,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
     }
 
     let writeAppendErrors = 0;
-    let unsavedResources: {resource: K8sResource; absolutePath: string}[] = [];
+    let transientResources: {resource: K8sResource; absolutePath: string}[] = [];
 
     for (let i = 0; i < resourcesIds.length; i += 1) {
       const resource = resourceMap[resourcesIds[i]];
@@ -202,10 +201,10 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
       }
 
-      if (isUnsavedResource(resource)) {
-        unsavedResources.push({resource, absolutePath});
+      if (resource.origin.storage === 'transient') {
+        transientResources.push({resource, absolutePath});
       } else {
-        const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
+        const cleanResourceContent = removeIgnoredPathsFromResourceObject(resource.content);
         let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
 
         if (savingDestination === 'appendToFile') {
@@ -233,8 +232,8 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       }
     }
 
-    if (unsavedResources.length) {
-      dispatch(saveUnsavedResources({resourcePayloads: unsavedResources, saveMode: savingDestination}));
+    if (transientResources.length) {
+      dispatch(saveTransientResources({resourcePayloads: transientResources, saveMode: savingDestination}));
     }
 
     dispatch(closeSaveResourcesToFileFolderModal());

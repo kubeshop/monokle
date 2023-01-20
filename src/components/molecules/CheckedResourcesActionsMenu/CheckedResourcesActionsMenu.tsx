@@ -10,7 +10,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {
+  activeResourceMetaMapSelector,
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+  kubeConfigContextColorSelector,
+} from '@redux/selectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -19,7 +24,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';
@@ -28,7 +33,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const resourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
@@ -58,7 +63,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     setIsApplyModalVisible(false);
   };
 
-  const areOnlyUnsavedResourcesChecked = useMemo(
+  const areOnlyTransientResourcesChecked = useMemo(
     () =>
       checkedResourceIds.map(resourceId => resourceMetaMap[resourceId]).every(r => r.origin.storage === 'transient'),
     [checkedResourceIds, resourceMetaMap]
@@ -92,13 +97,13 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           ]
         : []),
       ...(!isInClusterMode ? [{key: 'deploy', label: 'Deploy', onClick: onClickDeployChecked}] : []),
-      ...(isInPreviewMode || areOnlyUnsavedResourcesChecked
+      ...(isInPreviewMode || areOnlyTransientResourcesChecked
         ? [{key: 'save_to_file_folder', label: 'Save to file/folder', onClick: onClickSaveToFileFolder}]
         : []),
       {key: 'deselect', label: <CloseOutlined />, style: {marginLeft: 'auto'}, onClick: onClickUncheckAll},
     ],
     [
-      areOnlyUnsavedResourcesChecked,
+      areOnlyTransientResourcesChecked,
       checkedResourceIds.length,
       isInClusterMode,
       isInPreviewMode,

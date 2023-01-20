@@ -25,8 +25,8 @@ type ResourcePayload = {
   fileTimestamp: number | undefined;
 };
 
-type SaveMultipleUnsavedResourcesPayload = {resourcePayloads: ResourcePayload[]};
-type SaveMultipleUnsavedResourcesArgs = {
+type SaveMultipleTransientResourcesPayload = {resourcePayloads: ResourcePayload[]};
+type SaveMultipleTransientResourcesArgs = {
   resourcePayloads: {resource: K8sResource; absolutePath: string}[];
   saveMode: 'saveToFolder' | 'appendToFile';
 };
@@ -35,7 +35,7 @@ const readFilePromise = util.promisify(fs.readFile);
 const appendFilePromise = util.promisify(fs.appendFile);
 const writeFilePromise = util.promisify(fs.writeFile);
 
-const performSaveUnsavedResource = async (
+const performSaveTransientResource = async (
   resource: K8sResource,
   rootFolder: FileEntry | undefined,
   absolutePath: string,
@@ -79,14 +79,14 @@ const performSaveUnsavedResource = async (
   return {resourceRange, fileTimestamp};
 };
 
-export const saveUnsavedResources = createAsyncThunk<
-  SaveMultipleUnsavedResourcesPayload,
-  SaveMultipleUnsavedResourcesArgs,
+export const saveTransientResources = createAsyncThunk<
+  SaveMultipleTransientResourcesPayload,
+  SaveMultipleTransientResourcesArgs,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/saveUnsavedResources', async (args, thunkAPI) => {
+>('main/saveTransientResources', async (args, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
 
@@ -97,7 +97,7 @@ export const saveUnsavedResources = createAsyncThunk<
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      const {resourceRange, fileTimestamp} = await performSaveUnsavedResource(
+      const {resourceRange, fileTimestamp} = await performSaveTransientResource(
         resource,
         rootFolder,
         absolutePath,

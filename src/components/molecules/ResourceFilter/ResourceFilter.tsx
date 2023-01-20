@@ -13,15 +13,19 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {allResourceAnnotationsSelector, allResourceKindsSelector, allResourceLabelsSelector} from '@redux/selectors';
+import {
+  allResourceAnnotationsSelector,
+  allResourceKindsSelector,
+  allResourceLabelsSelector,
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+} from '@redux/selectors';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
-
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 
@@ -48,7 +52,8 @@ const ResourceFilter = () => {
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
@@ -298,7 +303,7 @@ const ResourceFilter = () => {
         <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
         <S.SelectStyled
           defaultValue={ROOT_OPTIONS}
-          disabled={isInPreviewMode || areFiltersDisabled}
+          disabled={isInPreviewMode || isInClusterMode || areFiltersDisabled}
           showSearch
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}

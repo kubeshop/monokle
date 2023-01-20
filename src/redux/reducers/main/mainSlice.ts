@@ -15,7 +15,7 @@ import {loadClusterResources, reloadClusterResources} from '@redux/thunks/loadCl
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {removeResources} from '@redux/thunks/removeResources';
-import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
+import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
@@ -329,7 +329,7 @@ export const mainSlice = createSlice({
 
         state.resourceMetaStorage.cluster = metaMap;
         state.resourceContentStorage.cluster = contentMap;
-        state.clusterConnection = {context: action.payload.context};
+        state.clusterConnection = {context: action.payload.context, kubeConfigPath: action.payload.kubeConfigPath};
       })
       .addCase(loadClusterResources.rejected, state => {
         state.clusterConnectionOptions.isLoading = false;
@@ -386,7 +386,7 @@ export const mainSlice = createSlice({
       };
     });
 
-    builder.addCase(saveUnsavedResources.fulfilled, (state, action) => {
+    builder.addCase(saveTransientResources.fulfilled, (state, action) => {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
 
       action.payload.resourcePayloads.forEach(resourcePayload => {
@@ -430,7 +430,7 @@ export const mainSlice = createSlice({
                 parentPathFileEntry.children = [childFileName];
               }
             } else {
-              log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+              log.warn(`[saveTransientResource]: Couldn't find parent path for ${relativeFilePath}`);
             }
           }
         }
