@@ -1,6 +1,8 @@
 import _, {merge} from 'lodash';
 import {createSelector} from 'reselect';
 
+import {mapKeyValuesFromNestedObjects} from '@utils/objects';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -87,6 +89,44 @@ export const selectedResourceSelector = createSelector(
       return undefined;
     }
     return resourceSelector(state, selection.resourceId, selection.resourceStorage);
+  }
+);
+
+export const allResourcesMetaSelector = createSelector(
+  (state: RootState) => state.main,
+  mainState => {
+    // TODO: maybe we should have a constant for the ResourceStorageKey type so we could map the values?
+    return [
+      ...Object.values(mainState.resourceMetaStorage.local),
+      ...Object.values(mainState.resourceMetaStorage.preview),
+      ...Object.values(mainState.resourceMetaStorage.cluster),
+      ...Object.values(mainState.resourceMetaStorage.transient),
+    ];
+  }
+);
+
+export const allResourceKindsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const knownResourceKinds = knownResourceKindsSelector(state);
+    const allResources = allResourcesMetaSelector(state);
+    return allResources.filter(r => !knownResourceKinds.includes(r.kind)).map(r => r.kind);
+  }
+);
+
+export const allResourceLabelsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const allResources = allResourcesMetaSelector(state);
+    return mapKeyValuesFromNestedObjects(allResources, resource => resource.labels || {});
+  }
+);
+
+export const allResourceAnnotationsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const allResources = allResourcesMetaSelector(state);
+    return mapKeyValuesFromNestedObjects(allResources, resource => resource.annotations || {});
   }
 );
 

@@ -13,7 +13,7 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {allResourceAnnotationsSelector, allResourceKindsSelector, allResourceLabelsSelector} from '@redux/selectors';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
@@ -52,29 +52,16 @@ const ResourceFilter = () => {
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const allResourceKinds = useMemo(() => {
-    return [
-      ...new Set([
-        ...knownResourceKinds,
-        ...Object.values(resourceMap)
-          .filter(r => !knownResourceKinds.includes(r.kind))
-          .map(r => r.kind),
-      ]),
-    ].sort();
-  }, [knownResourceKinds, resourceMap]);
+  const allResourceKinds = useAppSelector(allResourceKindsSelector);
+  const allResourceLabels = useAppSelector(allResourceLabelsSelector);
+  const allResourceAnnotations = useAppSelector(allResourceAnnotationsSelector);
 
-  const allLabelsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
-  }, [resourceMap]);
-  const allLabelsSchema = useMemo(() => mapValues(allLabelsData, () => 'string'), [allLabelsData]);
-
-  const allAnnotationsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
-  }, [resourceMap]);
-  const allAnnotationsSchema = useMemo(() => mapValues(allAnnotationsData, () => 'string'), [allAnnotationsData]);
+  const allLabelsSchema = useMemo(() => mapValues(allResourceLabels, () => 'string'), [allResourceLabels]);
+  const allAnnotationsSchema = useMemo(
+    () => mapValues(allResourceAnnotations, () => 'string'),
+    [allResourceAnnotations]
+  );
 
   const fileOrFolderContainedInOptions = useMemo(() => {
     return Object.keys(fileMap).map(option => (
@@ -289,7 +276,7 @@ const ResourceFilter = () => {
         <KeyValueInput
           label="Labels:"
           schema={allLabelsSchema}
-          availableValuesByKey={allLabelsData}
+          availableValuesByKey={allResourceLabels}
           value={labels}
           onChange={updateLabels}
           disabled={areFiltersDisabled}
@@ -301,7 +288,7 @@ const ResourceFilter = () => {
           disabled={areFiltersDisabled}
           label="Annotations:"
           schema={allAnnotationsSchema}
-          availableValuesByKey={allAnnotationsData}
+          availableValuesByKey={allResourceAnnotations}
           value={annotations}
           onChange={updateAnnotations}
         />
@@ -321,28 +308,6 @@ const ResourceFilter = () => {
       </S.Field>
     </S.Container>
   );
-};
-
-const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
-  const keyValues: Record<string, string[]> = {};
-  Object.values(objectList).forEach(currentObject => {
-    const nestedObject = getNestedObject(currentObject);
-    if (nestedObject) {
-      Object.entries(nestedObject).forEach(([key, value]) => {
-        if (typeof value !== 'string') {
-          return;
-        }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
-          }
-        } else {
-          keyValues[key] = [value];
-        }
-      });
-    }
-  });
-  return keyValues;
 };
 
 export default ResourceFilter;
