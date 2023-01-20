@@ -7,7 +7,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
-import {ResourceMetaMap} from '@shared/models/k8sResource';
+import {ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
 import {AnyOrigin} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
@@ -32,21 +32,6 @@ export const rootFolderSelector = createSelector(
 //   );
 //   return unknownResources;
 // };
-
-export const selectedResourceSelector = createSelector(
-  (state: RootState) => state.main.resourceMetaStorage.local,
-  (state: RootState) => state.main.resourceContentStorage.local,
-  (state: RootState) => state.main.selection,
-  (resourceMetaMap, resourceContentMap, selection) => {
-    const resourceId = selection?.type === 'resource' ? selection.resourceId : undefined;
-    if (!resourceId) {
-      return undefined;
-    }
-    const resourceMeta = resourceMetaMap[resourceId];
-    const resourceContent = resourceContentMap[resourceId];
-    return merge(resourceMeta, resourceContent);
-  }
-);
 
 // export const filteredResourceSelector = createSelector(
 //   (state: RootState) => state.main.resourceMap,
@@ -79,6 +64,30 @@ export const activeResourceMapSelector = (state: AppState) => {
   }
   return merge(state.resourceMetaStorage.local, state.resourceContentStorage.local);
 };
+
+export const resourceSelector = createSelector(
+  [
+    (state: RootState) => state.main,
+    (state: RootState, resourceId: string) => resourceId,
+    (state: RootState, resourceId: string, resourceStorage: ResourceStorageKey) => resourceStorage,
+  ],
+  (mainState, resourceId, resourceStorage) => {
+    const resourceMeta = mainState.resourceMetaStorage[resourceStorage][resourceId];
+    const resourceContent = mainState.resourceContentStorage[resourceStorage][resourceId];
+    return merge(resourceMeta, resourceContent);
+  }
+);
+
+export const selectedResourceSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!selection || selection.type !== 'resource') {
+      return undefined;
+    }
+    return resourceSelector(state, selection.resourceId, selection.resourceStorage);
+  }
+);
 
 export const activeResourceMetaMapSelector = createSelector(
   (state: RootState) => state.main,
