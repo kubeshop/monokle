@@ -8,15 +8,6 @@ export const activeProjectSelector = createSelector(
   config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
 );
 
-export const isInPreviewModeSelector = createSelector(
-  (state: RootState) => state,
-  state =>
-    Boolean(state.main.previewResourceId) ||
-    Boolean(state.main.previewValuesFileId) ||
-    Boolean(state.main.previewConfigurationId) ||
-    Boolean(state.main.previewCommandId)
-);
-
 export const kubeConfigContextSelector = createSelector(
   (state: RootState) => state.config,
   config => {
@@ -39,9 +30,4 @@ export const kubeConfigPathValidSelector = createSelector(
     }
     return false;
   }
-);
-
-export const unsavedResourcesSelector = createSelector(
-  (state: RootState) => state.main.resourceMap,
-  resourceMap => Object.values(resourceMap).filter(resource => resource.filePath.startsWith('unsaved://'))
 );
