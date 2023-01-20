@@ -48,6 +48,20 @@ const Notification: React.FC<NotificationProps> = props => {
     setCopyToClipboardState(true);
   };
 
+  const modify = (title1: string) => {
+    const wordsArray = title1.split(' ');
+    const unauthIndex = wordsArray.indexOf('UNAUTHORIZED');
+
+    if (unauthIndex === -1) {
+      return title1;
+    }
+
+    return `We're sorry, it looks like you're not authorized to connect to this cluster. Please take a look at our troubleshooting guide for cluster connections in our documentation https://kubeshop.github.io/monokle/cluster-issues for steps on how to resolve this issue.\n\n
+      
+    Error:\n
+    ${title1}`;
+  };
+
   return (
     <S.NotificationContainer $isNew={!hasSeen} $type={type} key={notification.id}>
       <S.DateSpan>
@@ -60,7 +74,7 @@ const Notification: React.FC<NotificationProps> = props => {
           <S.CopyOutlined onClick={onCopyToClipboard} />
         </Tooltip>
         <S.MessageBodyContainer>
-          <S.TitleSpan>{title}</S.TitleSpan>
+          <S.TitleSpan>{modify(title)}</S.TitleSpan>
           <S.MessageSpan>
             <NotificationMarkdown notification={notification} type={notificationType} />
           </S.MessageSpan>
