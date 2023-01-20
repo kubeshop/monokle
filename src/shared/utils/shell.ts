@@ -8,6 +8,11 @@ export function showItemInFolder(fullPath: string) {
   shell.showItemInFolder(fullPath);
 }
 
+export function openTutorialVideo() {
+  trackEvent('help/open_link', {linkType: 'video-tutorial'});
+  shell.openExternal('https://www.youtube.com/watch?v=wkFWg_S8eUA');
+}
+
 export function openGitHub() {
   trackEvent('help/open_link', {linkType: 'github'});
   shell.openExternal('https://github.com/kubeshop/monokle');
