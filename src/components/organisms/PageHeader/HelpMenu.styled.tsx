@@ -3,6 +3,7 @@ import {Button as RawButton} from 'antd';
 import {
   ApiOutlined as RawApiOutlined,
   CommentOutlined as RawCommentOutlined,
+  FormatPainterOutlined as RawFormatPainterOutlined,
   QuestionCircleOutlined as RawQuestionCircleOutlined,
   SettingOutlined as RawSettingOutlined,
 } from '@ant-design/icons';
@@ -78,6 +79,11 @@ export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
+  font-size: 14px;
+  cursor: pointer;
+`;
+
+export const FormatPainter = styled(RawFormatPainterOutlined)`
   font-size: 14px;
   cursor: pointer;
 `;

@@ -4,7 +4,7 @@ import {FileExplorerTabTooltip, SettingsTooltip, TemplatesPageTooltip, TerminalP
 import {useAppSelector} from '@redux/hooks';
 
 import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane, TemplatesPage} from '@organisms';
-import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
+import {FormatPainter, SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
@@ -81,7 +81,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     type: 'fullscreen',
     name: 'tutorial',
     tooltip: <TemplatesPageTooltip />,
-    icon: () => <SettingsOutlined />,
+    icon: () => <FormatPainter />,
     component: <TemplatesPage />,
     useBadge: () => undefined,
   },
