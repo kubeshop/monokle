@@ -176,15 +176,23 @@ export const kustomizationsSelector = createSelector(
 );
 
 export const activeResourceMetaMapSelector = createSelector(
-  (state: RootState) => state.main,
-  (mainState): ResourceMetaMap<AnyOrigin> => {
-    if (mainState.clusterConnection) {
-      return mainState.resourceMetaStorage.cluster;
+  (state: RootState) => state,
+  (state): ResourceMetaMap<AnyOrigin> => {
+    if (state.main.clusterConnection) {
+      return state.main.resourceMetaStorage.cluster;
     }
-    if (mainState.preview) {
-      return mainState.resourceMetaStorage.preview;
+    if (state.main.preview) {
+      return state.main.resourceMetaStorage.preview;
     }
-    return mainState.resourceMetaStorage.local;
+    return state.main.resourceMetaStorage.local;
+  }
+);
+
+export const activeResourceCountSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const activeResourceMetaMap = activeResourceMetaMapSelector(state);
+    return Object.keys(activeResourceMetaMap).length;
   }
 );
 

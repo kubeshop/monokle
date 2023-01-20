@@ -5,7 +5,7 @@ import {Badge} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
+import {activeResourceCountSelector, isInClusterModeSelector} from '@redux/selectors';
 
 import {IconWithPopover} from '@atoms';
 
@@ -17,7 +17,7 @@ import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import ResourceFilter from '../ResourceFilter';
 
 const ResourceFilterIconWithPopover: React.FC = () => {
-  const activeResources = useAppSelector(activeResourcesSelector);
+  const activeResourceCount = useAppSelector(activeResourceCountSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -39,7 +39,7 @@ const ResourceFilterIconWithPopover: React.FC = () => {
         popoverContent={<ResourceFilter />}
         popoverTrigger="click"
         iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-        isDisabled={(!doesRootFileEntryExist && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+        isDisabled={(!doesRootFileEntryExist && !isInClusterMode && !isInPreviewMode) || activeResourceCount === 0}
       />
     </Badge>
   );
