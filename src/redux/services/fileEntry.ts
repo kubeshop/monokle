@@ -3,11 +3,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {
-  clearSelectionReducer,
-  selectFileReducer,
-  selectK8sResourceReducer,
-} from '@redux/reducers/main/selectionReducers';
+import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
   HelmChartEventEmitter,
   createHelmChart,
@@ -464,7 +460,7 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
         resourceId: newResourcesFromFile[0].id,
         resourceStorage: 'local',
       };
-      selectK8sResourceReducer(state, newResourceSelection);
+      selectResourceReducer(state, newResourceSelection);
     } else {
       clearSelectionReducer(state);
     }

@@ -9,7 +9,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
-import {ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
+import {ResourceMap, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
 import {AnyOrigin} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
@@ -58,15 +58,39 @@ export const rootFolderSelector = createSelector(
 // );
 
 // TODO: should we merge the Unsaved storage into these or do we handle those differently directly in the Navigator?
-export const activeResourceMapSelector = (state: AppState) => {
-  if (state.clusterConnection) {
-    return merge(state.resourceMetaStorage.cluster, state.resourceContentStorage.cluster);
+export const activeResourceMapSelector = createSelector(
+  (state: RootState) => state,
+  (state): ResourceMap<AnyOrigin> => {
+    if (state.main.clusterConnection) {
+      return merge(state.main.resourceMetaStorage.cluster, state.main.resourceContentStorage.cluster);
+    }
+    if (state.main.preview) {
+      return merge(state.main.resourceMetaStorage.preview, state.main.resourceContentStorage.preview);
+    }
+    return merge(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local);
   }
-  if (state.preview) {
-    return merge(state.resourceMetaStorage.preview, state.resourceContentStorage.preview);
+);
+
+export const activeResourceMetaMapSelector = createSelector(
+  (state: RootState) => state,
+  (state): ResourceMetaMap<AnyOrigin> => {
+    if (state.main.clusterConnection) {
+      return state.main.resourceMetaStorage.cluster;
+    }
+    if (state.main.preview) {
+      return state.main.resourceMetaStorage.preview;
+    }
+    return state.main.resourceMetaStorage.local;
   }
-  return merge(state.resourceMetaStorage.local, state.resourceContentStorage.local);
-};
+);
+
+export const activeResourceCountSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const activeResourceMetaMap = activeResourceMetaMapSelector(state);
+    return Object.keys(activeResourceMetaMap).length;
+  }
+);
 
 export const resourceSelector = createSelector(
   [
@@ -172,27 +196,6 @@ export const kustomizationsSelector = createSelector(
     return Object.values(resourceMetaMap)
       .filter(resource => isKustomizationResource(resource))
       .map(resource => merge(resource, resourceContentMap[resource.id]));
-  }
-);
-
-export const activeResourceMetaMapSelector = createSelector(
-  (state: RootState) => state,
-  (state): ResourceMetaMap<AnyOrigin> => {
-    if (state.main.clusterConnection) {
-      return state.main.resourceMetaStorage.cluster;
-    }
-    if (state.main.preview) {
-      return state.main.resourceMetaStorage.preview;
-    }
-    return state.main.resourceMetaStorage.local;
-  }
-);
-
-export const activeResourceCountSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const activeResourceMetaMap = activeResourceMetaMapSelector(state);
-    return Object.keys(activeResourceMetaMap).length;
   }
 );
 
