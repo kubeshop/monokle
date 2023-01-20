@@ -77,6 +77,7 @@ type AppState = {
   deviceID: string;
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
+  // TODO: imagesList should probably be transformed to a map "imageMap"
   imagesList: ImagesListType;
   validationIntegration: ValidationIntegration | undefined;
   autosaving: {
