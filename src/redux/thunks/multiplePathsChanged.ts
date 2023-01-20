@@ -15,16 +15,15 @@ export const multiplePathsChanged = createAsyncThunk(
   async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
-    const userDataDir = String(state.config.userDataDir);
     const projectRootFolder = state.config.selectedProjectRootFolder;
 
     const nextMainState = createNextState(state.main, mainState => {
       filePaths.forEach(filePath => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
         if (fileEntry) {
-          reloadFile(filePath, fileEntry, mainState, projectConfig, userDataDir);
+          reloadFile(filePath, fileEntry, mainState, projectConfig);
         } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
-          addPath(filePath, mainState, projectConfig, userDataDir);
+          addPath(filePath, mainState, projectConfig);
         }
       });
     });
