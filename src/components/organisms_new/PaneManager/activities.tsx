@@ -10,7 +10,7 @@ import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
-import {SettingsPane} from '../SettingsPane';
+import SettingsPane from '../SettingsPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {

@@ -1,1 +1,1 @@
-export {SettingsPane} from './SettingsPane';
+export {default} from './SettingsPane';

@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -10,16 +10,12 @@ import {
 
 import {IconButton} from '@atoms';
 
-import ProjectsList from '@components/molecules_new/ProjectsList';
+import {useStartPageOptions} from '@hooks/useStartPageOptions';
 
 import {useWindowSize} from '@utils/hooks';
 
-import {Icon, LearnPage} from '@monokle/components';
-import {openDiscord, openDocumentation, openTutorialVideo} from '@shared/utils/shell';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import NewProject from '../NewProject';
-import {SettingsPane} from '../SettingsPane';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
 
@@ -36,62 +32,7 @@ const StartPage: React.FC = () => {
     projects.length ? 'recent-projects' : 'new-project'
   );
 
-  const options = useMemo(
-    () => ({
-      'recent-projects': {
-        icon: <S.SendOutlined />,
-        label: 'Recent projects',
-        content: <ProjectsList type="recent" />,
-        title: 'Recent projects',
-      },
-      'all-projects': {
-        icon: <Icon name="all-projects" style={{fontSize: '16px'}} />,
-        label: 'All projects',
-        content: <ProjectsList type="all" />,
-        title: 'All projects',
-      },
-      settings: {
-        icon: <S.SettingsOutlined />,
-        label: 'Settings',
-        content: <SettingsPane />,
-        title: 'Settings',
-      },
-      'new-project': {
-        icon: <S.PlusOutlined />,
-        label: 'New project',
-        content: <NewProject />,
-        title: 'Start something new',
-      },
-      'cluster-preview': {
-        icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
-        label: 'Cluster preview',
-        content: null,
-        title: '',
-      },
-      learn: {
-        icon: null,
-        label: 'Learn',
-        content: (
-          <LearnPage
-            onHelpfulResourceCardClick={topic => {
-              if (topic === 'documentation') {
-                openDocumentation();
-              } else if (topic === 'discord') {
-                openDiscord();
-              } else if (topic === 'video-tutorial') {
-                openTutorialVideo();
-              }
-            }}
-            onLearnCardClick={topic => {
-              console.log(topic);
-            }}
-          />
-        ),
-        title: 'Learn',
-      },
-    }),
-    []
-  );
+  const options = useStartPageOptions();
 
   const onClickClusterPreview = () => {
     trackEvent('dashboard/open', {from: 'start-screen-quick-cluster-preview'});
