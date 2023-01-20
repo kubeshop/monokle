@@ -177,15 +177,6 @@ export function createResourceName(object: K8sObject, filePath?: string) {
 }
 
 /**
- * Checks if this specified resource is unsaved
- */
-
-export function isUnsavedResource(resource: K8sResource) {
-  // TODO: maybe this could be removed
-  return resource.isUnsaved;
-}
-
-/**
  * Saves the specified value to the file of the specified resource - handles both
  * single and multi-resource files
  */
@@ -453,10 +444,12 @@ export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
     name: resource.name,
     kind: resource.kind,
     apiVersion: resource.apiVersion,
+    labels: resource.labels,
+    annotations: resource.annotations,
+    templateLabels: resource.templateLabels,
     namespace: resource.namespace,
     isClusterScoped: resource.isClusterScoped,
     range: resource.range,
-    isUnsaved: resource.isUnsaved,
   };
   const content: ResourceContent<Origin> = {
     id: resource.id,

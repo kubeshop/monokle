@@ -3,11 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
 
-import {
-  deleteMultipleClusterResources,
-  setIsClusterConnected,
-  updateMultipleClusterResources,
-} from '@redux/reducers/main';
+import {deleteMultipleClusterResources, updateMultipleClusterResources} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -141,7 +137,8 @@ const watchResource = async (
       }
       if (isClusterConnected === isClusterDisconnected()) {
         isClusterConnected = !isClusterDisconnected();
-        dispatch(setIsClusterConnected(!isClusterDisconnected()));
+        // TODO: after finishing the refactoring, what should we do with the following line?
+        // dispatch(setIsClusterConnected(!isClusterDisconnected()));
       }
     }
   );
@@ -208,6 +205,9 @@ export const disconnectFromCluster = () => {
   }
 };
 
-export const isClusterDisconnected = () => {
+/**
+ * Indicates if all elements in the "watchers" object have a "status" property less than 0
+ */
+export const isClusterDisconnected = (): boolean => {
   return Object.values(watchers).reduce((output: boolean, watcher) => output && watcher.status < 0, true);
 };

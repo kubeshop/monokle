@@ -18,7 +18,7 @@ import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTempl
 import electronStore from '@shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
-import {createMultipleUnsavedResources} from './unsavedResource';
+import {createMultipleTransientResources} from './transientResource';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
@@ -103,7 +103,7 @@ export const interpolateTemplate = async (templateText: string, formsData: any[]
   });
 };
 
-export const createUnsavedResourcesFromVanillaTemplate = async (
+export const createTransientResourcesFromVanillaTemplate = async (
   template: VanillaTemplate,
   formsData: any[],
   dispatch: AppDispatch
@@ -117,7 +117,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
         return interpolatedTemplateText;
       } catch (e) {
         if (e instanceof Error) {
-          log.warn(`[createUnsavedResourcesFromVanillaTemplate]: ${e.message}`);
+          log.warn(`[createTransientResourcesFromVanillaTemplate]: ${e.message}`);
           return undefined;
         }
       }
@@ -142,7 +142,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       obj,
     }));
 
-  const createdResources: K8sResource[] = createMultipleUnsavedResources(inputs, dispatch);
+  const createdResources: K8sResource[] = createMultipleTransientResources(inputs, dispatch);
 
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };

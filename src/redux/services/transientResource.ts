@@ -22,9 +22,9 @@ metadata:
 }
 
 /**
- * Creates an unsaved Resource which will have its filePath set as unsaved://resourceId
+ * Creates an transient Resource which will have its filePath set as transient://resourceId
  */
-export function createUnsavedResource(
+export function createTransientResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch,
   jsonTemplate?: Partial<K8sObject>
@@ -66,7 +66,7 @@ export function createUnsavedResource(
 
   const newResource: K8sResource = {
     name: input.name,
-    origin: {type: 'unsaved'},
+    origin: {storage: 'transient'},
     id: newResourceId,
     kind: input.kind,
     apiVersion: input.apiVersion,
@@ -80,7 +80,7 @@ export function createUnsavedResource(
   return newResource;
 }
 
-export function createMultipleUnsavedResources(
+export function createMultipleTransientResources(
   inputs: {name: string; kind: string; apiVersion: string; namespace?: string; obj?: K8sObject}[],
   dispatch: AppDispatch
 ) {
@@ -109,7 +109,7 @@ export function createMultipleUnsavedResources(
 
     const newResource: K8sResource = {
       id: uuidv4(),
-      origin: {type: 'unsaved'},
+      origin: {storage: 'transient'},
       name: input.name,
       kind: input.kind,
       namespace: input.namespace,
