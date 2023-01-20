@@ -32,7 +32,7 @@ export const TemplateLeftSidebarWrapper = styled.div`
   width: 36%;
   display: flex;
   flex-direction: column;
-  background: #1d1d1d;
+  background: ${Colors.grey6000};
   padding-top: 30px;
   padding-bottom: 30px;
   @media (max-width: 1352px) {
@@ -81,8 +81,8 @@ export const TemplatesPageTitle = styled.h1`
   text-align: left;
   padding: 16px 24px;
   margin-bottom: 0;
-  background: #131515;
-  border-bottom: 1px solid #434343;
+  background: ${Colors.titleBarBackground};
+  border-bottom: 1px solid ${Colors.grey5b}; ;
 `;
 
 export const Arrow = styled(RightOutlined)`
@@ -105,7 +105,7 @@ export const Form = styled.div`
 export const StyledMenu = styled(Menu)`
   width: 100%;
   background: transparent;
-  color: #acacac;
+  color: ${Colors.grey8};
   font-size: 13px;
   &.ant-menu.ant-menu-inline {
     border-right: 0;
@@ -127,21 +127,22 @@ export const StyledMenu = styled(Menu)`
         height: 30px;
         line-height: 30px;
       }
+
       &.ant-menu-item-selected {
-        background: #8dcff8;
-        color: #1d1d1d;
+        background: ${Colors.blue9}
+        color: ${Colors.grey6000};
       }
     }
     .ant-menu-submenu-title {
       padding: 0 52px;
-      color: #acacac;
+      color: ${Colors.grey8};
       .ant-menu-title-content {
         margin-left: 24px;
       }
     }
     .ant-menu-submenu-arrow {
       left: 32px;
-      color: #acacac;
+      color: ${Colors.grey8};
     }
     .ant-menu-sub {
       background: transparent;
@@ -180,7 +181,7 @@ export const SearchBox = styled.div`
   margin: 12px 0;
   input {
     border-width: 0;
-    background: rgba(255, 255, 255, 0.1);
+    background: ${Colors.backgroundColor};
     border-radius: 4px;
   }
 `;
@@ -192,7 +193,7 @@ export const StyledButton = styled(Button)<{$isItemSelected: boolean}>`
   margin-left: 8px;
   ${({$isItemSelected}) => `background-color: ${$isItemSelected ? Colors.blue6 : Colors.grey6};`}
   border-width: 0;
-  background: rgba(255, 255, 255, 0.1);
+  background: ${Colors.backgroundColor};
   border-radius: 4px;
 
   &:hover {

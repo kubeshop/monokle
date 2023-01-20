@@ -18,11 +18,11 @@ const TemplatesPageDescriptionBar: React.FC = () => {
   //     ? comparison?.right?.name
   //     : comparison?.left?.name ?? comparison?.right?.name;
 
-  const handleBack = useCallback(() => {
-    // dispatch(comparisonInspected());
-  }, []);
+  // const handleBack = useCallback(() => {
+  // dispatch(comparisonInspected());
+  // }, []);
 
-  const openLearnMore = useCallback(() => shell.openExternal(''), ['']);
+  const openLearnMore = useCallback(() => shell.openExternal(''), []);
 
   return (
     <S.ActionBarDiv>
