@@ -58,9 +58,7 @@ export function useStartPageOptions() {
                 openTutorialVideo();
               }
             }}
-            onLearnCardClick={topic => {
-              console.log(topic);
-            }}
+            onLearnCardClick={() => {}}
           />
         ),
         title: 'Learn',
