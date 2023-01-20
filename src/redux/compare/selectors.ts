@@ -1,4 +1,4 @@
-import {groupBy} from 'lodash';
+import {groupBy, merge} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
@@ -125,7 +125,12 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   if (resourceSet?.type !== 'kustomize') return undefined;
   const {kustomizationId} = resourceSet;
 
-  const currentKustomization = kustomizationId ? state.main.resourceMap[kustomizationId] : undefined;
+  const currentKustomization = kustomizationId
+    ? merge(
+        state.main.resourceMetaStorage.local[kustomizationId],
+        state.main.resourceContentStorage.local[kustomizationId]
+      )
+    : undefined;
   const allKustomizations = kustomizationsSelector(state);
 
   return {allKustomizations, currentKustomization};

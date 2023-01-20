@@ -55,7 +55,7 @@ type ResourceKindHandler = {
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource | ResourceMeta): Promise<any>;
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any>;
 
   /**
    * Get all resources of this type using the provided kubeconfig
@@ -71,7 +71,7 @@ type ResourceKindHandler = {
    * Delete the specified resource from the cluster
    */
 
-  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, resource: K8sResource | ResourceMeta) => Promise<void>;
+  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, resource: ResourceMeta) => Promise<void>;
 
   /**
    * The desired navigator section and subsection for this resource type,

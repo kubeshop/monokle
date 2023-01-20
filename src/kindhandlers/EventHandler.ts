@@ -2,7 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const EventHandler: ResourceKindHandler = {
@@ -13,7 +13,7 @@ const EventHandler: ResourceKindHandler = {
   clusterApiVersion: 'events.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.events.v1beta1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedEvent(resource.name, resource.namespace || 'default', 'true');
   },
@@ -24,11 +24,10 @@ const EventHandler: ResourceKindHandler = {
       : await k8sCoreV1Api.listEventForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespacedEvent(resource.name, resource.namespace || 'default');
   },
-  outgoingRefMappers: [],
   helpLink: 'https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/',
 };
 

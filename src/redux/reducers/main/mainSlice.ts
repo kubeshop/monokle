@@ -540,7 +540,7 @@ export const {
   selectFile,
   selectHelmValuesFile,
   selectImage,
-  selectK8sResource,
+  selectResource,
   selectPreviewConfiguration,
   setAppRehydrating,
   setApplyingResource,
