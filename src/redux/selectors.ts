@@ -7,6 +7,8 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
+import {ResourceMetaMap} from '@shared/models/k8sResource';
+import {AnyOrigin} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles/colors';
@@ -77,6 +79,19 @@ export const activeResourceMapSelector = (state: AppState) => {
   }
   return merge(state.resourceMetaStorage.local, state.resourceContentStorage.local);
 };
+
+export const activeResourceMetaMapSelector = createSelector(
+  (state: RootState) => state.main,
+  (mainState): ResourceMetaMap<AnyOrigin> => {
+    if (mainState.clusterConnection) {
+      return mainState.resourceMetaStorage.cluster;
+    }
+    if (mainState.preview) {
+      return mainState.resourceMetaStorage.preview;
+    }
+    return mainState.resourceMetaStorage.local;
+  }
+);
 
 export const helmChartsSelector = createSelector(
   (state: RootState) => state.main.helmChartMap,

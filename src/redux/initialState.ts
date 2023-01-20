@@ -17,11 +17,13 @@ const initialAppState: AppState = {
     local: {},
     cluster: {},
     preview: {},
+    transient: {},
   },
   resourceContentStorage: {
     local: {},
     cluster: {},
     preview: {},
+    transient: {},
   },
   selection: undefined,
   selectionOptions: {},
@@ -32,6 +34,7 @@ const initialAppState: AppState = {
   },
   highlights: [],
   previewOptions: {},
+  clusterConnectionOptions: {},
   isRehydrating: false,
   wasRehydrated: false,
   resourceFilter: {

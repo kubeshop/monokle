@@ -107,7 +107,7 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
 }
 
 export function getDefaultNamespaceForApply(
-  resources: K8sResource[],
+  resourceMetaList: ResourceMeta[],
   defaultNamespace = 'default'
 ): {
   defaultNamespace: string;
@@ -115,11 +115,11 @@ export function getDefaultNamespaceForApply(
 } {
   let namespace = defaultNamespace;
 
-  for (let i = 0; i < resources.length; i += 1) {
-    const resourceNamespace = resources[i].namespace;
+  for (let i = 0; i < resourceMetaList.length; i += 1) {
+    const resourceNamespace = resourceMetaList[i].namespace;
 
     if (resourceNamespace) {
-      if (resources[i].namespace !== namespace) {
+      if (resourceMetaList[i].namespace !== namespace) {
         if (namespace !== 'default') {
           return {defaultNamespace: 'default', defaultOption: 'none'};
         }

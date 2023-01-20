@@ -10,15 +10,15 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
-import {isUnsavedResource} from '@redux/services/resource';
+import {activeResourceMetaMapSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
@@ -29,19 +29,17 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const onClickDelete = useCallback(() => {
-    const resourcesToDelete = checkedResourceIds
-      .map(resource => resourceMap[resource])
-      .filter((r): r is K8sResource => r !== undefined);
+    const resourcesToDelete = checkedResourceIds.map(resource => resourceMetaMap[resource]).filter(isDefined);
 
     deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
-  }, [checkedResourceIds, dispatch, resourceMap]);
+  }, [checkedResourceIds, dispatch, resourceMetaMap]);
 
   const onClickUncheckAll = useCallback(() => {
     dispatch(uncheckAllResourceIds());
@@ -62,16 +60,13 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const areOnlyUnsavedResourcesChecked = useMemo(
     () =>
-      checkedResourceIds
-        .map(resourceId => resourceMap[resourceId])
-        .filter((resource): resource is K8sResource => resource !== undefined)
-        .every(isUnsavedResource),
-    [checkedResourceIds, resourceMap]
+      checkedResourceIds.map(resourceId => resourceMetaMap[resourceId]).every(r => r.origin.storage === 'transient'),
+    [checkedResourceIds, resourceMetaMap]
   );
 
   const checkedResources = useMemo(
-    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
-    [checkedResourceIds, resourceMap]
+    () => checkedResourceIds.map(resource => resourceMetaMap[resource]).filter(isDefined),
+    [checkedResourceIds, resourceMetaMap]
   );
 
   const confirmModalTitle = useMemo(
@@ -119,7 +114,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
-          resources={checkedResources}
+          resourceMetaList={checkedResources}
           isVisible={isApplyModalVisible}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyCheckedResources(namespace)}
@@ -130,7 +125,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   );
 };
 
-const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
+const deleteCheckedResourcesWithConfirm = (checkedResources: ResourceMeta[], dispatch: AppDispatch) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
   Modal.confirm({
