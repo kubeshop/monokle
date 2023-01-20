@@ -12,8 +12,8 @@ import {
   LocalOriginRuntype,
   PreviewOrigin,
   PreviewOriginRuntype,
-  UnsavedOrigin,
-  UnsavedOriginRuntype,
+  TransientOrigin,
+  TransientOriginRuntype,
 } from './origin';
 
 export type ResourceIdentifier<Origin extends AnyOrigin = AnyOrigin> = {
@@ -42,9 +42,9 @@ export interface ResourceMeta<Origin extends AnyOrigin = AnyOrigin> extends Reso
   /** k8s namespace is specified (for filtering) */
   namespace?: string;
   /** spec.metadata.labels */
-  labels: Record<string, string>;
+  labels?: Record<string, string>;
   /** spec.metadata.labels.annotations  */
-  annotations: Record<string, string>;
+  annotations?: Record<string, string>;
   /** spec.template.metadata.labels */
   templateLabels?: Record<string, string>;
   /** if a resource is cluster scoped ( kind is namespaced ) */
@@ -64,8 +64,8 @@ const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
   kind: Rt.String,
   apiVersion: Rt.String,
   namespace: Rt.Optional(Rt.String),
-  labels: Rt.Dictionary(Rt.String),
-  annotations: Rt.Dictionary(Rt.String),
+  labels: Rt.Optional(Rt.Dictionary(Rt.String)),
+  annotations: Rt.Optional(Rt.Dictionary(Rt.String)),
   templateLabels: Rt.Optional(Rt.Dictionary(Rt.String)),
   isClusterScoped: Rt.Boolean,
   range: Rt.Optional(
@@ -74,18 +74,18 @@ const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<AnyOrigin>> = Rt.Record({
       length: Rt.Number,
     })
   ),
-  isUnsaved: Rt.Optional(Rt.Boolean),
+  isTransient: Rt.Optional(Rt.Boolean),
 });
 
 const LocalResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: LocalOriginRuntype}));
 const ClusterResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: ClusterOriginRuntype}));
 const PreviewResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: PreviewOriginRuntype}));
-const UnsavedResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: UnsavedOriginRuntype}));
+const TransientResourceMetaRuntype = Rt.Intersect(ResourceMetaRuntype, Rt.Record({origin: TransientOriginRuntype}));
 
 export const isLocalResourceMeta = LocalResourceMetaRuntype.guard;
 export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
 export const isPreviewResourceMeta = PreviewResourceMetaRuntype.guard;
-export const isUnsavedResourceMeta = UnsavedResourceMetaRuntype.guard;
+export const isTransientResourceMeta = TransientResourceMetaRuntype.guard;
 
 export interface ResourceContent<Origin extends AnyOrigin = AnyOrigin> extends ResourceIdentifier<Origin> {
   text: string;
@@ -105,12 +105,15 @@ const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<LocalOrigin>> = Rt
 );
 const ClusterResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: ClusterOriginRuntype}));
 const PreviewResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: PreviewOriginRuntype}));
-const UnsavedResourceContentRuntype = Rt.Intersect(ResourceContentRuntype, Rt.Record({origin: UnsavedOriginRuntype}));
+const TransientResourceContentRuntype = Rt.Intersect(
+  ResourceContentRuntype,
+  Rt.Record({origin: TransientOriginRuntype})
+);
 
 export const isLocalResourceContent = LocalResourceContentRuntype.guard;
 export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
 export const isPreviewResourceContent = PreviewResourceContentRuntype.guard;
-export const isUnsavedResourceContent = UnsavedResourceContentRuntype.guard;
+export const isTransientResourceContent = TransientResourceContentRuntype.guard;
 
 export type K8sResource<Origin extends AnyOrigin = AnyOrigin> = ResourceMeta<Origin> & ResourceContent<Origin>;
 
@@ -127,16 +130,16 @@ const PreviewResourceRuntype: Rt.Runtype<K8sResource<PreviewOrigin>> = Rt.Inters
   ResourceRuntype,
   Rt.Record({origin: PreviewOriginRuntype})
 );
-const UnsavedResourceRuntype: Rt.Runtype<K8sResource<UnsavedOrigin>> = Rt.Intersect(
+const TransientResourceRuntype: Rt.Runtype<K8sResource<TransientOrigin>> = Rt.Intersect(
   ResourceRuntype,
-  Rt.Record({origin: UnsavedOriginRuntype})
+  Rt.Record({origin: TransientOriginRuntype})
 );
 
 export const isResource = ResourceRuntype.guard;
 export const isLocalResource = LocalResourceRuntype.guard;
 export const isClusterResource = ClusterResourceRuntype.guard;
 export const isPreviewResource = PreviewResourceRuntype.guard;
-export const isUnsavedResource = UnsavedResourceRuntype.guard;
+export const isTransientResource = TransientResourceRuntype.guard;
 
 export type ResourceMetaMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, ResourceMeta<Origin>>;
 
@@ -148,14 +151,14 @@ export type ResourceMetaStorage = {
   local: ResourceMetaMap<LocalOrigin>;
   cluster: ResourceMetaMap<ClusterOrigin>;
   preview: ResourceMetaMap<PreviewOrigin>;
-  unsaved: ResourceMetaMap<UnsavedOrigin>;
+  transient: ResourceMetaMap<TransientOrigin>;
 };
 
 export type ResourceContentStorage = {
   local: ResourceContentMap<LocalOrigin>;
   cluster: ResourceContentMap<ClusterOrigin>;
   preview: ResourceContentMap<PreviewOrigin>;
-  unsaved: ResourceContentMap<UnsavedOrigin>;
+  transient: ResourceContentMap<TransientOrigin>;
 };
 
 export type ResourceStorageKey = keyof ResourceMetaStorage | keyof ResourceContentStorage;

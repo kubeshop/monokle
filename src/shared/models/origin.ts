@@ -18,11 +18,11 @@ export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
   storage: 'preview';
   preview: Preview;
 };
-export type UnsavedOrigin = {
-  storage: 'unsaved';
+export type TransientOrigin = {
+  storage: 'transient';
 };
 
-export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | UnsavedOrigin;
+export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientOrigin;
 
 /*
  * Runtypes
@@ -40,15 +40,15 @@ export const PreviewOriginRuntype: Rt.Runtype<PreviewOrigin> = Rt.Record({
   storage: Rt.Literal('preview'),
   preview: AnyPreviewRuntype,
 });
-export const UnsavedOriginRuntype: Rt.Runtype<UnsavedOrigin> = Rt.Record({
-  storage: Rt.Literal('unsaved'),
+export const TransientOriginRuntype: Rt.Runtype<TransientOrigin> = Rt.Record({
+  storage: Rt.Literal('transient'),
 });
 
 export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
   LocalOriginRuntype,
   ClusterOriginRuntype,
   PreviewOriginRuntype,
-  UnsavedOriginRuntype
+  TransientOriginRuntype
 );
 
 /*
@@ -58,5 +58,5 @@ export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
 export const isLocalOrigin = LocalOriginRuntype.guard;
 export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isPreviewOrigin = PreviewOriginRuntype.guard;
-export const isUnsavedOrigin = UnsavedOriginRuntype.guard;
+export const isTransientOrigin = TransientOriginRuntype.guard;
 export const isAnyOrigin = AnyOriginRuntype.guard;
