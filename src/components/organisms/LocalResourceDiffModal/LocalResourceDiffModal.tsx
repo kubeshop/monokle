@@ -31,8 +31,6 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {Icon} from '@atoms';
-
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useWindowSize} from '@utils/hooks';
@@ -41,6 +39,7 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {createKubeClient, hasAccessToResourceKind} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';

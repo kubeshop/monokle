@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 
-import {FileExplorer, Icon} from '@atoms';
+import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -17,6 +17,7 @@ import FolderSmallWhiteSvg from '@assets/FolderSmallWhite.svg';
 import PlusIconSvg from '@assets/PlusIcon.svg';
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
+import {Icon} from '@monokle/components';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './CreateProject.styled';
