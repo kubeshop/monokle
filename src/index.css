@@ -411,3 +411,15 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
   display: block;
 }
+
+.help-menu-dropdown .ant-dropdown-menu {
+  padding: 0;
+}
+
+.help-menu-dropdown .ant-dropdown-menu-item {
+  padding: 0;
+}
+
+.help-menu-dropdown .ant-dropdown-menu-item:hover {
+  background-color: transparent;
+}
