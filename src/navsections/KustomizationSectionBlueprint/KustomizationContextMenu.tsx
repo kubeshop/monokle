@@ -8,9 +8,11 @@ import path from 'path';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
+import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {isInPreviewModeSelectorNew, resourceMapSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {isResourceSelected} from '@redux/services/resource';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ContextMenu, Dots} from '@atoms';
@@ -23,7 +25,6 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
@@ -40,20 +41,21 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const filters = useAppSelector(state => state.main.resourceFilter);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
+  const isKustomizationSelected = useAppSelector(state => isResourceSelected(resource, state.main.selection));
 
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const isResourceSelected = useMemo(() => itemInstance.id === selectedResourceId, [itemInstance, selectedResourceId]);
-
-  const resource = useMemo(() => resourceMap[itemInstance.id], [itemInstance.id, resourceMap]);
-  const absolutePath = useMemo(() => getAbsoluteFilePath(resource.filePath, fileMap), [fileMap, resource.filePath]);
+  const resource = useMemo(() => localResourceMap[itemInstance.id], [itemInstance.id, localResourceMap]);
+  const absolutePath = useMemo(
+    () => getAbsoluteFilePath(resource.origin.filePath, fileMap),
+    [fileMap, resource.origin.filePath]
+  );
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]
@@ -62,11 +64,11 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
-  const isRoot = useMemo(() => resource.filePath === ROOT_FILE_ENTRY, [resource.filePath]);
+  const isRoot = useMemo(() => resource.origin.filePath === ROOT_FILE_ENTRY, [resource.origin.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const target = useMemo(
-    () => (isRoot ? ROOT_FILE_ENTRY : resource.filePath.replace(path.sep, '')),
-    [isRoot, resource.filePath]
+    () => (isRoot ? ROOT_FILE_ENTRY : resource.origin.filePath.replace(path.sep, '')),
+    [isRoot, resource.origin.filePath]
   );
   const isPassingFilter = useMemo(
     () => (resource ? isResourcePassingFilter(resource, filters) : false),
@@ -82,8 +84,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     }
 
     dispatch(setLeftMenuSelection('file-explorer'));
-    dispatch(setSelectingFile(true));
-    dispatch(selectFile({filePath: resource.filePath}));
+    dispatch(selectFile({filePath: resource.origin.filePath}));
   };
 
   const menuItems = [
@@ -106,15 +107,15 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     {
       key: 'filter_on_this_file',
       label:
-        fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter
+        fileOrFolderContainedInFilter && resource.origin.filePath === fileOrFolderContainedInFilter
           ? 'Remove from filter'
           : 'Filter on this file',
       disabled: true,
       onClick: () => {
-        if (isRoot || (fileOrFolderContainedInFilter && resource.filePath === fileOrFolderContainedInFilter)) {
+        if (isRoot || (fileOrFolderContainedInFilter && resource.origin.filePath === fileOrFolderContainedInFilter)) {
           onFilterByFileOrFolder(undefined);
         } else {
-          onFilterByFileOrFolder(resource.filePath);
+          onFilterByFileOrFolder(resource.origin.filePath);
         }
       },
     },
@@ -123,7 +124,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       label: 'Add to Files: Exclude',
       disabled: isInPreviewMode,
       onClick: () => {
-        onExcludeFromProcessing(resource.filePath);
+        onExcludeFromProcessing(resource.origin.filePath);
       },
     },
     {key: 'divider-3', type: 'divider'},
@@ -138,7 +139,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       key: 'copy_relative_path',
       label: 'Copy Relative Path',
       onClick: () => {
-        navigator.clipboard.writeText(resource.filePath);
+        navigator.clipboard.writeText(resource.origin.filePath);
       },
     },
     {key: 'divider-4', type: 'divider'},
@@ -189,7 +190,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   return (
     <ContextMenu overlay={<Menu items={menuItems} />}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
-        <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
+        <Dots color={isKustomizationSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>
     </ContextMenu>
   );

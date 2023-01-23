@@ -428,7 +428,7 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(resource: ResourceIdentifier, selection?: AppSelection) {
+export function isResourceSelected(resource: ResourceIdentifier, selection: AppSelection | undefined) {
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&
@@ -436,11 +436,11 @@ export function isResourceSelected(resource: ResourceIdentifier, selection?: App
   );
 }
 
-export function isResourceHighlighted(resource: ResourceIdentifier, highlights?: AppSelection[]) {
+export function isResourceHighlighted(resource: ResourceIdentifier, highlights: AppSelection[] | undefined) {
   return highlights?.some(highlight => isResourceSelected(resource, highlight)) || false;
 }
 
-export function isKustomizationPreviewed(kustomization: ResourceIdentifier, preview?: AnyPreview) {
+export function isKustomizationPreviewed(kustomization: ResourceIdentifier, preview: AnyPreview | undefined) {
   return isKustomizePreview(preview) && preview.kustomizationId === kustomization.id;
 }
 

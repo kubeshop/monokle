@@ -10,6 +10,7 @@ import {
   ClusterOriginRuntype,
   LocalOrigin,
   LocalOriginRuntype,
+  OriginFromStorage,
   PreviewOrigin,
   PreviewOriginRuntype,
   TransientOrigin,
@@ -148,17 +149,11 @@ export type ResourceContentMap<Origin extends AnyOrigin = AnyOrigin> = Record<st
 export type ResourceMap<Origin extends AnyOrigin = AnyOrigin> = Record<string, K8sResource<Origin>>;
 
 export type ResourceMetaStorage = {
-  local: ResourceMetaMap<LocalOrigin>;
-  cluster: ResourceMetaMap<ClusterOrigin>;
-  preview: ResourceMetaMap<PreviewOrigin>;
-  transient: ResourceMetaMap<TransientOrigin>;
+  [storage in AnyOrigin['storage']]: ResourceMetaMap<OriginFromStorage<storage>>;
 };
 
 export type ResourceContentStorage = {
-  local: ResourceContentMap<LocalOrigin>;
-  cluster: ResourceContentMap<ClusterOrigin>;
-  preview: ResourceContentMap<PreviewOrigin>;
-  transient: ResourceContentMap<TransientOrigin>;
+  [storage in AnyOrigin['storage']]: ResourceContentMap<OriginFromStorage<storage>>;
 };
 
 export type ResourceStorageKey = keyof ResourceMetaStorage | keyof ResourceContentStorage;

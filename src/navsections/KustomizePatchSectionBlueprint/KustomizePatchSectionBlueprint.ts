@@ -80,8 +80,8 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: rawItem => rawItem.isSelected,
-      isHighlighted: rawItem => rawItem.isHighlighted,
+      isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
+      isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
       isDisabled: (_, scope) => Boolean(scope.isInClusterMode),
     },
     instanceHandler: {

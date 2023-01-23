@@ -8,14 +8,14 @@ import {
   uncheckResourceId,
 } from '@redux/reducers/main';
 import {activeResourcesSelector} from '@redux/selectors';
-import {isUnsavedResource} from '@redux/services/resource';
+import {isResourceHighlighted, isResourceSelected, isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
@@ -33,8 +33,8 @@ export type ResourceKindScopeType = {
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
   selectedResourceId: string | undefined;
-  selectedPath: string | undefined;
-  checkedResourceIds: string[];
+  selectedFilePath: string | undefined;
+  checkedResourceIds: ResourceIdentifier[];
   state: RootState;
 };
 
@@ -51,10 +51,9 @@ export function makeResourceKindNavSection(
       return {
         activeResources: activeResourcesSelector(state),
         resourceFilter: state.main.resourceFilter,
-        selectedResourceId: state.main.selectedResourceId,
-        selectedPath: state.main.selectedPath,
-        checkedResourceIds: state.main.checkedResourceIds,
-        state,
+        selectedResourceId: state.main.selection?.type === 'resource' ? state.main.selection.resourceId : undefined,
+        selectedFilePath: state.main.selection?.type === 'file' ? state.main.selection.filePath : undefined,
+        checkedResourceIdentifiers: state.main.checkedResourceIdentifiers,
       };
     },
     builder: {
@@ -105,15 +104,11 @@ export function makeResourceKindNavSection(
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
       builder: {
-        isSelected: rawItem => rawItem.isSelected,
-        isHighlighted: rawItem => rawItem.isHighlighted,
+        isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
+        isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
         isDirty: rawItem => isUnsavedResource(rawItem),
         isVisible: (rawItem, scope) => {
-          const isPassingFilter = isResourcePassingFilter(
-            rawItem,
-            scope.resourceFilter,
-            isInPreviewModeSelector(scope.state)
-          );
+          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
 
           return isPassingFilter;
         },

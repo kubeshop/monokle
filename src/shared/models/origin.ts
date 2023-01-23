@@ -60,3 +60,15 @@ export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isPreviewOrigin = PreviewOriginRuntype.guard;
 export const isTransientOrigin = TransientOriginRuntype.guard;
 export const isAnyOrigin = AnyOriginRuntype.guard;
+
+export type StorageFromOrigin<T extends AnyOrigin> = T extends {storage: infer Storage} ? Storage : never;
+
+export type OriginFromStorage<T extends AnyOrigin['storage']> = T extends 'local'
+  ? LocalOrigin
+  : T extends 'cluster'
+  ? ClusterOrigin
+  : T extends 'preview'
+  ? PreviewOrigin
+  : T extends 'transient'
+  ? TransientOrigin
+  : never;

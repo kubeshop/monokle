@@ -10,8 +10,14 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
-import {ResourceMap, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
-import {AnyOrigin} from '@shared/models/origin';
+import {
+  K8sResource,
+  ResourceContentMap,
+  ResourceMap,
+  ResourceMetaMap,
+  ResourceStorageKey,
+} from '@shared/models/k8sResource';
+import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles/colors';
@@ -84,12 +90,33 @@ export const activeResourceMetaMapSelector = createSelector(
   }
 );
 
-export const resourceMapSelector = createSelector(
-  [(state: RootState) => state, (state: RootState, resourceStorage: ResourceStorageKey) => resourceStorage],
-  (state, resourceStorage) => {
-    return merge(state.main.resourceMetaStorage[resourceStorage], state.main.resourceContentStorage[resourceStorage]);
-  }
-);
+// function getResourceMetaMap<Storage extends AnyOrigin['storage']>(
+//   resourceMetaStorage: ResourceMetaStorage,
+//   storageKey: Storage
+// ): ResourceMetaMap<OriginFromStorage<Storage>> {
+//   return resourceMetaStorage[storageKey];
+// }
+
+export function resourceMapSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceStorage: Storage
+): ResourceMap<OriginFromStorage<Storage>> {
+  return merge(state.main.resourceMetaStorage[resourceStorage], state.main.resourceContentStorage[resourceStorage]);
+}
+
+export function resourceMetaMapSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceStorage: Storage
+): ResourceMetaMap<OriginFromStorage<Storage>> {
+  return state.main.resourceMetaStorage[resourceStorage];
+}
+
+export function resourceContentMapSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceStorage: Storage
+): ResourceContentMap<OriginFromStorage<Storage>> {
+  return state.main.resourceContentStorage[resourceStorage];
+}
 
 export const activeResourceStorageKeySelector = createSelector(
   (state: RootState) => state,
@@ -112,18 +139,21 @@ export const activeResourceCountSelector = createSelector(
   }
 );
 
-export const resourceSelector = createSelector(
-  [
-    (state: RootState) => state.main,
-    (state: RootState, resourceId: string) => resourceId,
-    (state: RootState, resourceId: string, resourceStorage: ResourceStorageKey) => resourceStorage,
-  ],
-  (mainState, resourceId, resourceStorage) => {
-    const resourceMeta = mainState.resourceMetaStorage[resourceStorage][resourceId];
-    const resourceContent = mainState.resourceContentStorage[resourceStorage][resourceId];
-    return merge(resourceMeta, resourceContent);
+export function resourceSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceId: string,
+  resourceStorage: Storage | undefined
+): K8sResource<OriginFromStorage<Storage>> | undefined {
+  if (resourceStorage === undefined) {
+    return undefined;
   }
-);
+  const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
+  const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
+
+  const resourceMeta = resourceMetaMap[resourceId];
+  const resourceContent = resourceContentMap[resourceId];
+  return merge(resourceMeta, resourceContent);
+}
 
 export const selectedResourceSelector = createSelector(
   (state: RootState) => state,
