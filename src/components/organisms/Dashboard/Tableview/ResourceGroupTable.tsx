@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
@@ -22,16 +22,15 @@ const UNSORTED_VALUE = -9999999;
 export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
-  const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
 
-    const filteredDataSource = useMemo(() => {
+  const filteredDataSource = useMemo(() => {
     if (!filterText) {
       return dataSource;
     }
     return dataSource.filter(s => s.kind.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()));
-  });
+  }, [dataSource, filterText]);
 
   const setActiveMenu = (menuItem: IMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
@@ -109,6 +108,6 @@ export const resourceGroupColumns: ColumnsType<any> = [
     width: '150px',
     render: (menu: any) => <span>{menu.resourceCount}</span>,
     // eslint-disable-next-line no-unsafe-optional-chaining
-    sorter: (a: any, b: any) => a && b ? a.resourceCount - b.resourceCount : 0,
+    sorter: (a: any, b: any) => (a && b ? a.resourceCount - b.resourceCount : 0),
   },
 ];

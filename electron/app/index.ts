@@ -19,6 +19,7 @@ import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './util
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+// Bottom 2 lines prevent SSL errors that throws from browser
 app.commandLine.appendSwitch('ignore-certificate-errors');
 app.commandLine.appendSwitch('ignore-ssl-errors');
 

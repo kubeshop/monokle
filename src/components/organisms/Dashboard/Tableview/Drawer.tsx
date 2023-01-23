@@ -9,7 +9,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {applyResource} from '@redux/thunks/applyResource';
 
-import {ResourceRefsIconPopover} from '@components/molecules';
+import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import PodHandler from '@src/kindhandlers/Pod.handler';
@@ -17,7 +17,6 @@ import PodHandler from '@src/kindhandlers/Pod.handler';
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
 import {InfoTab} from './InfoTab';
-import {LogTab} from './LogTab';
 import {TerminalTab} from './TerminalTab';
 
 export const Drawer = () => {
@@ -111,7 +110,7 @@ export const Drawer = () => {
                   {
                     label: 'Logs',
                     key: 'Logs',
-                    children: <LogTab />,
+                    children: <Logs />,
                   },
                   {
                     label: 'Shell',
