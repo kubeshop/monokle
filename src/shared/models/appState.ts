@@ -3,7 +3,7 @@ import {CurrentMatch, FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
-import {ResourceContentStorage, ResourceMetaStorage} from './k8sResource';
+import {ResourceContentStorage, ResourceIdentifier, ResourceMetaStorage} from './k8sResource';
 import {AnyPreview} from './preview';
 import {AppSelection} from './selection';
 
@@ -37,6 +37,8 @@ type AppState = {
   clusterConnectionOptions: {
     isLoading?: boolean;
   };
+  checkedResourceIdentifiers: ResourceIdentifier[];
+
   /**
    * Whether the app's storage is rehydrating
    */
@@ -54,7 +56,6 @@ type AppState = {
   helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
-  checkedResourceIds: string[];
   /** the line number for the match in file */
   search: {
     searchQuery: string;

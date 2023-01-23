@@ -427,7 +427,7 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(resource: K8sResource | ResourceMeta | ResourceContent, selection: AppSelection) {
+export function isResourceSelected(resource: ResourceIdentifier, selection: AppSelection) {
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&

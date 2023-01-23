@@ -1,9 +1,10 @@
 import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
+import {isEqual} from 'lodash';
 import log from 'loglevel';
 
 import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
-import {deleteResource, removeResourceFromFile} from '@redux/services/resource';
+import {deleteResource, isResourceSelected, removeResourceFromFile} from '@redux/services/resource';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -18,14 +19,14 @@ import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk(
   'main/removeResources',
-  async (resourceIds: ResourceIdentifier[], thunkAPI: {getState: Function; dispatch: Function}) => {
+  async (resourceIdentifiers: ResourceIdentifier[], thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
 
     const nextMainState = createNextState(state.main, mainState => {
-      let deletedCheckedResourcesIds: string[] = [];
+      let deletedCheckedResourcesIdentifiers: ResourceIdentifier[] = [];
 
-      resourceIds.forEach(resourceId => {
-        const resourceMeta = mainState.resourceMetaStorage[resourceId.origin.storage][resourceId.id];
+      resourceIdentifiers.forEach(resourceIdentifier => {
+        const resourceMeta = mainState.resourceMetaStorage[resourceIdentifier.origin.storage][resourceIdentifier.id];
         if (!resourceMeta) {
           return;
         }
@@ -33,11 +34,11 @@ export const removeResources = createAsyncThunk(
         // TODO: after @monokle/validation is added, we will need to reprocess resources
         // updateReferringRefsOnDelete(resource, mainState.resourceMap);
 
-        if (mainState.checkedResourceIds.includes(resourceId.id)) {
-          deletedCheckedResourcesIds.push(resourceId.id);
+        if (mainState.checkedResourceIdentifiers.some(identifier => isEqual(identifier, resourceIdentifier))) {
+          deletedCheckedResourcesIdentifiers.push(resourceIdentifier);
         }
 
-        if (mainState.selection?.type === 'resource' && mainState.selection.resourceId === resourceId.id) {
+        if (mainState.selection?.type === 'resource' && isResourceSelected(resourceIdentifier, mainState.selection)) {
           clearSelectionReducer(mainState);
         }
 
@@ -79,8 +80,8 @@ export const removeResources = createAsyncThunk(
         }
       });
 
-      mainState.checkedResourceIds = mainState.checkedResourceIds.filter(
-        id => !deletedCheckedResourcesIds.includes(id)
+      mainState.checkedResourceIdentifiers = mainState.checkedResourceIdentifiers.filter(
+        id => !deletedCheckedResourcesIdentifiers.find(identifier => isEqual(identifier, id))
       );
     });
 
