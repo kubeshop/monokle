@@ -2,8 +2,9 @@ import {Button as RawButton, Switch as RawSwitch} from 'antd';
 
 import styled from 'styled-components';
 
-import {Icon as BaseIcon, PrimaryButton} from '@atoms';
+import {PrimaryButton} from '@atoms';
 
+import {Icon as BaseIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 export const Button = styled(RawButton)`

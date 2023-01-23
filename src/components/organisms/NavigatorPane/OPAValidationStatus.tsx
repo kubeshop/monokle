@@ -8,8 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateValidationIntegration} from '@redux/reducers/main';
 import {setLeftMenuSelection, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {Icon} from '@atoms';
-
+import {Icon} from '@monokle/components';
 import {OPA_INTEGRATION} from '@shared/models/integrations';
 
 import * as S from './OPAValidationStatus.styled';

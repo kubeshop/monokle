@@ -2,8 +2,7 @@ import React from 'react';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {Icon} from '@atoms';
-
+import {Icon} from '@monokle/components';
 import {ResourceRef} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
@@ -28,7 +27,7 @@ const RefIcon: React.FC<IProps> = props => {
   }
 
   if (isUnsatisfiedRef(resourceRef.type)) {
-    return <Icon name="warning" style={style} color={Colors.yellowWarning} />;
+    return <Icon name="warning" style={{...style, color: Colors.yellowWarning}} />;
   }
 
   return null;

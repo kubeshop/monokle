@@ -9,10 +9,11 @@ import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {handleFavoriteTemplate} from '@redux/reducers/appConfig';
 
-import {Icon, ImageIcon} from '@atoms';
+import {ImageIcon} from '@atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
 
+import {Icon} from '@monokle/components';
 import {AnyTemplate} from '@shared/models/template';
 
 import * as S from './TemplateInformation.styled';

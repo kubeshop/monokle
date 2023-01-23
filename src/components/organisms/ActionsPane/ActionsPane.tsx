@@ -45,7 +45,7 @@ import {
   Walkthrough,
 } from '@molecules';
 
-import {Icon, TabHeader} from '@atoms';
+import {TabHeader} from '@atoms';
 
 import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
 
@@ -55,6 +55,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
+import {Icon} from '@monokle/components';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
 import {K8sResource} from '@shared/models/k8sResource';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';

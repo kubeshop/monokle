@@ -2,8 +2,7 @@ import {useMemo} from 'react';
 
 import {EyeOutlined, FileOutlined} from '@ant-design/icons';
 
-import {Icon} from '@atoms';
-
+import {Icon} from '@monokle/components';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 
