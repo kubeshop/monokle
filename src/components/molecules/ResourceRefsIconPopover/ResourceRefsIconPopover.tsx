@@ -5,7 +5,7 @@ import {Popover} from 'antd';
 import {Icon} from '@atoms';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
 import RefsPopoverContent from './RefsPopoverContent';
@@ -21,7 +21,7 @@ const ResourceRefsIconPopover = ({
   isDisabled,
   isSelected,
 }: {
-  resource: K8sResource;
+  resource: ResourceMeta;
   type: 'incoming' | 'outgoing';
   isDisabled: boolean;
   isSelected: boolean;

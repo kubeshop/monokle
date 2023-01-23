@@ -12,8 +12,10 @@ import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models
 import {HelmValuesFile} from '@shared/models/helm';
 import {
   K8sResource,
+  ResourceContent,
   ResourceContentMap,
   ResourceMap,
+  ResourceMeta,
   ResourceMetaMap,
   ResourceStorageKey,
 } from '@shared/models/k8sResource';
@@ -149,10 +151,33 @@ export function resourceSelector<Storage extends AnyOrigin['storage']>(
   }
   const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
   const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
-
   const resourceMeta = resourceMetaMap[resourceId];
   const resourceContent = resourceContentMap[resourceId];
   return merge(resourceMeta, resourceContent);
+}
+
+export function resourceMetaSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceId: string,
+  resourceStorage: Storage | undefined
+): ResourceMeta<OriginFromStorage<Storage>> | undefined {
+  if (resourceStorage === undefined) {
+    return undefined;
+  }
+  const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
+  return resourceMetaMap[resourceId];
+}
+
+export function resourceContentSelector<Storage extends AnyOrigin['storage']>(
+  state: RootState,
+  resourceId: string,
+  resourceStorage: Storage | undefined
+): ResourceContent<OriginFromStorage<Storage>> | undefined {
+  if (resourceStorage === undefined) {
+    return undefined;
+  }
+  const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
+  return resourceContentMap[resourceId];
 }
 
 export const selectedResourceSelector = createSelector(

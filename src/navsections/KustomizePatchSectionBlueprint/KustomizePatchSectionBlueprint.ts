@@ -1,18 +1,22 @@
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
+import {isInClusterModeSelector, resourceMetaMapSelector} from '@redux/selectors';
+import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
+import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
+import {LocalOrigin} from '@shared/models/origin';
+import {AppSelection} from '@shared/models/selection';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizePatchPrefix from './KustomizePatchPrefix';
 import KustomizePatchSuffix from './KustomizePatchSuffix';
 
 export type KustomizePatchScopeType = {
-  resourceMap: ResourceMap;
+  localResourceMetaMap: ResourceMetaMap<LocalOrigin>;
   resourceFilter: ResourceFilterType;
-  selectedPath?: string;
-  selectedResourceId?: string;
+  selection: AppSelection | undefined;
+  highlights: AppSelection[] | undefined;
   isInClusterMode: boolean;
   isPreviewLoading: boolean;
   isFolderLoading: boolean;
@@ -20,42 +24,40 @@ export type KustomizePatchScopeType = {
 
 export const KUSTOMIZE_PATCH_SECTION_NAME = 'Patch Resources' as const;
 
-const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePatchScopeType> = {
+const KustomizePatchSectionBlueprint: SectionBlueprint<ResourceMeta<LocalOrigin>, KustomizePatchScopeType> = {
   name: KUSTOMIZE_PATCH_SECTION_NAME,
   id: KUSTOMIZE_PATCH_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
-    const kubeConfigPath = state.config.kubeConfig.path;
     return {
-      resourceMap: state.main.resourceMap,
+      localResourceMetaMap: resourceMetaMapSelector(state, 'local'),
       resourceFilter: state.main.resourceFilter,
-      selectedPath: state.main.selectedPath,
-      selectedResourceId: state.main.selectedResourceId,
-      isInClusterMode: Boolean(
-        state.main.previewResourceId && state.main.previewResourceId.endsWith(String(kubeConfigPath))
-      ),
-      isPreviewLoading: state.main.previewLoader.isLoading,
+      selection: state.main.selection,
+      highlights: state.main.highlights,
+      isInClusterMode: isInClusterModeSelector(state),
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
       isFolderLoading: state.ui.isFolderLoading,
     };
   },
   builder: {
     getRawItems: scope => {
-      return Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
+      return Object.values(scope.localResourceMetaMap).filter(resource => resource.name.startsWith('Patch:'));
     },
     getGroups: scope => {
-      const patchResources = Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
-      const patchResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
-        (acc, resource) => {
-          if (acc[resource.kind]) {
-            acc[resource.kind].push(resource);
-          } else {
-            acc[resource.kind] = [resource];
-          }
-          return acc;
-        },
-        {}
+      const patchResources = Object.values(scope.localResourceMetaMap).filter(resource =>
+        resource.name.startsWith('Patch:')
       );
+      const patchResourcesByKind: Record<string, ResourceMeta[]> = patchResources.reduce<
+        Record<string, ResourceMeta[]>
+      >((acc, resource) => {
+        if (acc[resource.kind]) {
+          acc[resource.kind].push(resource);
+        } else {
+          acc[resource.kind] = [resource];
+        }
+        return acc;
+      }, {});
       return Object.entries(patchResourcesByKind)
         .map(([resourceKind, resources]) => {
           return {
@@ -83,10 +85,15 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
       isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
       isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
       isDisabled: (_, scope) => Boolean(scope.isInClusterMode),
+      getMeta: rawItem => {
+        return {
+          resourceStorage: rawItem.origin.storage,
+        };
+      },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        dispatch(selectK8sResource({resourceId: itemInstance.id}));
+        dispatch(selectResource({resourceId: itemInstance.id, resourceStorage: itemInstance.meta.resourceStorage}));
       },
     },
     customization: {

@@ -1,5 +1,5 @@
 import {useAppSelector} from '@redux/hooks';
-import {resourceSelector} from '@redux/selectors';
+import {resourceMetaSelector} from '@redux/selectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
@@ -7,7 +7,9 @@ import {ItemCustomComponentProps} from '@shared/models/navigator';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
-  const resource = useAppSelector(state => resourceSelector(state, itemInstance.id, itemInstance.meta.resourceStorage));
+  const resource = useAppSelector(state =>
+    resourceMetaSelector(state, itemInstance.id, itemInstance.meta.resourceStorage)
+  );
   if (!resource) {
     return null;
   }
