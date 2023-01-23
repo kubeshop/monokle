@@ -23,7 +23,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
@@ -88,7 +88,7 @@ const ClusterResourceDiffModal = () => {
       return stringify(targetResource.content, {sortMapEntries: true});
     }
 
-    return stringify(removeIgnoredPathsFromResourceContent(targetResource.content, targetResource.namespace), {
+    return stringify(removeIgnoredPathsFromResourceObject(targetResource.content, targetResource.namespace), {
       sortMapEntries: true,
     });
   }, [isDiffModalVisible, shouldDiffIgnorePaths, targetResource]);

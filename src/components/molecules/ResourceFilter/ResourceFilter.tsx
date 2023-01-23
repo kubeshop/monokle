@@ -49,7 +49,7 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
+  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);

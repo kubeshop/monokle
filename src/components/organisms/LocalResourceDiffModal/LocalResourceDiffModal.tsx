@@ -37,7 +37,7 @@ import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecul
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -187,7 +187,7 @@ const DiffModal = () => {
       return matchingResourceText;
     }
 
-    const newDiffContentObject = removeIgnoredPathsFromResourceContent(
+    const newDiffContentObject = removeIgnoredPathsFromResourceObject(
       matchingResourcesById[selectedMatchingResourceId]
     );
     const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});

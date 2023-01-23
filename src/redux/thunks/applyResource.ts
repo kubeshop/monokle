@@ -81,7 +81,7 @@ export async function applyResource(
   context: string,
   namespace?: {name: string; new: boolean},
   options?: {
-    isClusterPreview?: boolean;
+    isInClusterMode?: boolean;
     shouldPerformDiff?: boolean;
     quiet?: boolean;
   }
@@ -113,7 +113,7 @@ export async function applyResource(
         dispatch(setApplyingResource(false));
 
         if (result.stdout) {
-          if (options?.isClusterPreview && kubeconfigPath) {
+          if (options?.isInClusterMode && kubeconfigPath) {
             getResourceFromCluster(resource, kubeconfigPath, context).then(resourceFromCluster => {
               delete resourceFromCluster?.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});

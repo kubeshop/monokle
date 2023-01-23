@@ -84,6 +84,13 @@ export const activeResourceMetaMapSelector = createSelector(
   }
 );
 
+export const resourceMapSelector = createSelector(
+  [(state: RootState) => state, (state: RootState, resourceStorage: ResourceStorageKey) => resourceStorage],
+  (state, resourceStorage) => {
+    return merge(state.main.resourceMetaStorage[resourceStorage], state.main.resourceContentStorage[resourceStorage]);
+  }
+);
+
 export const activeResourceStorageKeySelector = createSelector(
   (state: RootState) => state,
   (state): ResourceStorageKey => {
