@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {merge} from 'lodash';
+import {isEqual, merge} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -40,6 +40,7 @@ import {ValidationIntegration} from '@shared/models/integrations';
 import {
   K8sResource,
   ResourceContentMap,
+  ResourceIdentifier,
   ResourceMetaMap,
   isClusterResource,
   isLocalResource,
@@ -201,26 +202,30 @@ export const mainSlice = createSlice({
       // TODO: why is shouldEditorReload needed?
       state.selectionOptions.shouldEditorReload = action.payload;
     },
-    checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      if (!state.checkedResourceIds.includes(action.payload)) {
-        state.checkedResourceIds.push(action.payload);
+    checkResourceId: (state: Draft<AppState>, action: PayloadAction<ResourceIdentifier>) => {
+      if (!state.checkedResourceIdentifiers.includes(action.payload)) {
+        state.checkedResourceIdentifiers.push(action.payload);
       }
     },
-    uncheckResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => action.payload !== resourceId);
+    uncheckResourceId: (state: Draft<AppState>, action: PayloadAction<ResourceIdentifier>) => {
+      state.checkedResourceIdentifiers = state.checkedResourceIdentifiers.filter(
+        resourceId => !isEqual(action.payload, resourceId)
+      );
     },
-    checkMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+    checkMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<ResourceIdentifier[]>) => {
       action.payload.forEach(resourceId => {
-        if (!state.checkedResourceIds.includes(resourceId)) {
-          state.checkedResourceIds.push(resourceId);
+        if (!state.checkedResourceIdentifiers.find(r => isEqual(r, resourceId))) {
+          state.checkedResourceIdentifiers.push(resourceId);
         }
       });
     },
     uncheckAllResourceIds: (state: Draft<AppState>) => {
-      state.checkedResourceIds = [];
+      state.checkedResourceIdentifiers = [];
     },
-    uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
-      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
+    uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<ResourceIdentifier[]>) => {
+      state.checkedResourceIdentifiers = state.checkedResourceIdentifiers.filter(
+        resourceId => !action.payload.find(r => isEqual(r, resourceId))
+      );
     },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
       trackEvent('cluster/diff_resource');
@@ -323,7 +328,7 @@ export const mainSlice = createSlice({
         state.clusterConnectionOptions.isLoading = false;
         resetSelectionHistory(state);
         clearSelectionReducer(state);
-        state.checkedResourceIds = [];
+        state.checkedResourceIdentifiers = [];
 
         const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
 
@@ -342,7 +347,7 @@ export const mainSlice = createSlice({
       })
       .addCase(reloadClusterResources.fulfilled, state => {
         state.clusterConnectionOptions.isLoading = false;
-        state.checkedResourceIds = [];
+        state.checkedResourceIdentifiers = [];
 
         if (
           state.selection?.type === 'resource' &&
@@ -375,7 +380,7 @@ export const mainSlice = createSlice({
       clearSelectionReducer(state);
       clearPreviewReducer(state);
       resetSelectionHistory(state);
-      state.checkedResourceIds = [];
+      state.checkedResourceIdentifiers = [];
       state.isApplyingResource = false;
       state.resourceDiff = {
         targetResourceId: undefined,

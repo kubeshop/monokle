@@ -17,7 +17,7 @@ export const filterReducers = createSliceReducers('main', {
     state.resourceFilter = {labels: {}, annotations: {}};
   },
   updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
-    if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+    if (state.checkedResourceIdentifiers.length && !state.filtersToBeChanged) {
       state.filtersToBeChanged = action.payload;
       return;
     }
@@ -31,7 +31,7 @@ export const filterReducers = createSliceReducers('main', {
   extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
     const filter = action.payload;
 
-    if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+    if (state.checkedResourceIdentifiers.length && !state.filtersToBeChanged) {
       state.filtersToBeChanged = filter;
       return;
     }

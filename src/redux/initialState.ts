@@ -54,7 +54,7 @@ const initialAppState: AppState = {
     ),
   },
   notifications: [],
-  checkedResourceIds: [],
+  checkedResourceIdentifiers: [],
   registeredKindHandlers: [],
   prevConfEditor: {
     isOpen: false,

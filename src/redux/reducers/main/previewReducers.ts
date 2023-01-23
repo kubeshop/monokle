@@ -22,7 +22,7 @@ import {
 import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
 
 export const clearPreviewReducer = (state: Draft<AppState>) => {
-  state.checkedResourceIds = [];
+  state.checkedResourceIdentifiers = [];
   state.resourceMetaStorage.preview = {};
   state.resourceContentStorage.preview = {};
   state.preview = undefined;
@@ -35,7 +35,7 @@ export const previewReducers = createSliceReducers('main', {
       clearSelectedResourceOnPreviewExit(state);
     }
     clearPreviewReducer(state);
-    state.checkedResourceIds = [];
+    state.checkedResourceIdentifiers = [];
     state.resourceMetaStorage.preview = {};
     state.resourceContentStorage.preview = {};
     state.preview = undefined;
@@ -73,7 +73,7 @@ const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
   initialSelection?: AppSelection
 ) => {
   state.previewOptions.isLoading = false;
-  state.checkedResourceIds = [];
+  state.checkedResourceIdentifiers = [];
 
   const {metaMap, contentMap} = splitK8sResourceMap(payload.resources);
 
