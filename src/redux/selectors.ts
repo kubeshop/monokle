@@ -196,6 +196,17 @@ export const previewedValuesFileSelector = createSelector(
   }
 );
 
+export const selectedHelmValuesSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!selection || selection.type !== 'helm.values.file') {
+      return undefined;
+    }
+    return state.main.helmValuesMap[selection.valuesFileId];
+  }
+);
+
 export const previewedHelmChartSelector = createSelector(
   (state: RootState) => state,
   state => {
@@ -204,6 +215,17 @@ export const previewedHelmChartSelector = createSelector(
       return undefined;
     }
     return state.main.helmChartMap[preview.chartId];
+  }
+);
+
+export const previewedHelmConfigSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const preview = state.main.preview;
+    if (!preview || preview.type !== 'helm-config') {
+      return undefined;
+    }
+    return state.config.projectConfig?.helm?.previewConfigurationMap?.[preview.configId] ?? undefined;
   }
 );
 

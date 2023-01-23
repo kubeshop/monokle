@@ -1,5 +1,6 @@
 import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
+import {isInClusterModeSelector} from '@redux/selectors';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -26,15 +27,12 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
   rootSectionId: HELM_CHART_SECTION_NAME,
   childSectionIds: [],
   getScope: state => {
-    const kubeConfigPath = state.config.kubeConfig.path;
     return {
-      isInClusterMode: kubeConfigPath
-        ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
-        : false,
+      isInClusterMode: isInClusterModeSelector(state),
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
-      isPreviewLoading: state.main.previewLoader.isLoading,
-      isHelmChartPreview: state.main.previewType === 'helm',
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
+      isHelmChartPreview: state.main.preview?.type === 'helm',
       helmChartsLength: Object.values(state.main.helmChartMap).length,
     };
   },
