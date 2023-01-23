@@ -1,4 +1,5 @@
 import {SavedCommand, SettingsPanel} from './config';
+import {ResourceIdentifier} from './k8sResource';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -127,7 +128,7 @@ type UiState = {
   };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
-    resourcesIds: string[];
+    resourcesIds: ResourceIdentifier[];
   };
   isStartProjectPaneVisible: boolean;
   renameEntityModal: {

@@ -21,7 +21,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
@@ -31,7 +31,7 @@ import * as S from './CheckedResourcesActionMenu.styled';
 
 const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const resourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
@@ -41,18 +41,20 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const onClickDelete = useCallback(() => {
-    const resourcesToDelete = checkedResourceIds.map(resource => resourceMetaMap[resource]).filter(isDefined);
+    const resourcesToDelete = checkedResourceIdentifiers
+      .map(identifier => resourceMetaMap[identifier.id])
+      .filter(isDefined);
 
     deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
-  }, [checkedResourceIds, dispatch, resourceMetaMap]);
+  }, [checkedResourceIdentifiers, dispatch, resourceMetaMap]);
 
   const onClickUncheckAll = useCallback(() => {
     dispatch(uncheckAllResourceIds());
   }, [dispatch]);
 
   const onClickSaveToFileFolder = useCallback(() => {
-    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
-  }, [checkedResourceIds, dispatch]);
+    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIdentifiers));
+  }, [checkedResourceIdentifiers, dispatch]);
 
   const onClickDeployChecked = () => {
     setIsApplyModalVisible(true);
@@ -65,13 +67,15 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const areOnlyTransientResourcesChecked = useMemo(
     () =>
-      checkedResourceIds.map(resourceId => resourceMetaMap[resourceId]).every(r => r.origin.storage === 'transient'),
-    [checkedResourceIds, resourceMetaMap]
+      checkedResourceIdentifiers
+        .map(identifier => resourceMetaMap[identifier.id])
+        .every(r => r.origin.storage === 'transient'),
+    [checkedResourceIdentifiers, resourceMetaMap]
   );
 
   const checkedResources = useMemo(
-    () => checkedResourceIds.map(resource => resourceMetaMap[resource]).filter(isDefined),
-    [checkedResourceIds, resourceMetaMap]
+    () => checkedResourceIdentifiers.map(identifier => resourceMetaMap[identifier.id]).filter(isDefined),
+    [checkedResourceIdentifiers, resourceMetaMap]
   );
 
   const confirmModalTitle = useMemo(
@@ -83,7 +87,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     () => [
       {
         key: 'selected_resources',
-        label: `${checkedResourceIds.length} Selected`,
+        label: `${checkedResourceIdentifiers.length} Selected`,
         disabled: true,
       },
       ...(!isInPreviewMode || isInClusterMode
@@ -104,7 +108,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     ],
     [
       areOnlyTransientResourcesChecked,
-      checkedResourceIds.length,
+      checkedResourceIdentifiers.length,
       isInClusterMode,
       isInPreviewMode,
       onClickDelete,
@@ -140,9 +144,9 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: ResourceMeta[], dis
     onOk() {
       let alertMessage = '';
       return new Promise(resolve => {
-        const resourceIdsToRemove: string[] = [];
+        const resourceIdsToRemove: ResourceIdentifier[] = [];
         checkedResources.forEach(resource => {
-          resourceIdsToRemove.push(resource.id);
+          resourceIdsToRemove.push(resource);
           alertMessage += `${alertMessage && ' | '}${resource.name}\n`;
         });
         dispatch(removeResources(resourceIdsToRemove));

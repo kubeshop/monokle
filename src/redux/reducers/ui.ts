@@ -13,6 +13,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {SavedCommand, SettingsPanel} from '@shared/models/config';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -169,7 +170,7 @@ export const uiSlice = createSlice({
         type: action.payload,
       };
     },
-    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
         resourcesIds: action.payload,
