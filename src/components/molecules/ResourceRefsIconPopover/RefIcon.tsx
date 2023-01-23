@@ -1,10 +1,8 @@
 import React from 'react';
 
-import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
-
 import {Icon} from '@atoms';
 
-import {ResourceRef} from '@shared/models/k8sResource';
+import {ResourceRef, isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
 import {Colors} from '@shared/styles/colors';
 
 interface IProps {

@@ -84,6 +84,19 @@ export const activeResourceMetaMapSelector = createSelector(
   }
 );
 
+export const activeResourceStorageKeySelector = createSelector(
+  (state: RootState) => state,
+  (state): ResourceStorageKey => {
+    if (state.main.clusterConnection) {
+      return 'cluster';
+    }
+    if (state.main.preview) {
+      return 'preview';
+    }
+    return 'local';
+  }
+);
+
 export const activeResourceCountSelector = createSelector(
   (state: RootState) => state,
   state => {

@@ -2,10 +2,9 @@ import React, {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
-import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
-
 import {Icon} from '@atoms';
 
+import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 

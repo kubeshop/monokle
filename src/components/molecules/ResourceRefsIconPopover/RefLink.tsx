@@ -3,22 +3,22 @@ import React, {useMemo} from 'react';
 import path from 'path';
 
 import {ResourceRef, isUnsatisfiedRef} from '@monokle/validation';
-import {ResourceMap} from '@shared/models/k8sResource';
+import {ResourceMetaMap} from '@shared/models/k8sResource';
 
 import RefIcon from './RefIcon';
 import * as S from './RefLink.styled';
 
 interface IProps {
   isDisabled: boolean;
-  resourceMap: ResourceMap;
+  resourceMetaMap: ResourceMetaMap;
   resourceRef: ResourceRef;
   onClick?: (args?: any) => void;
 }
 
-const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMap) => {
+const getRefTargetName = (ref: ResourceRef, resourceMetaMap: ResourceMetaMap) => {
   if (ref.target?.type === 'resource') {
-    if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
-      return resourceMap[ref.target.resourceId].name;
+    if (ref.target.resourceId && resourceMetaMap[ref.target.resourceId]) {
+      return resourceMetaMap[ref.target.resourceId].name;
     }
   }
   if (ref.target?.type === 'file') {
@@ -28,10 +28,10 @@ const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMap) => {
 };
 
 const ResourceRefLink: React.FC<IProps> = props => {
-  const {isDisabled, resourceRef, resourceMap, onClick} = props;
+  const {isDisabled, resourceRef, resourceMetaMap, onClick} = props;
 
   const linkText = useMemo(() => {
-    const targetName = getRefTargetName(resourceRef, resourceMap);
+    const targetName = getRefTargetName(resourceRef, resourceMetaMap);
 
     if (resourceRef.target?.type === 'file') {
       return (
@@ -52,7 +52,7 @@ const ResourceRefLink: React.FC<IProps> = props => {
         );
       }
       if (resourceRef.target.resourceId) {
-        const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
+        const resourceKind = resourceMetaMap[resourceRef.target.resourceId].kind;
         return (
           <>
             <S.TargetName $isDisabled={isDisabled} $isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
@@ -73,7 +73,7 @@ const ResourceRefLink: React.FC<IProps> = props => {
     }
 
     return <span>{targetName}</span>;
-  }, [isDisabled, resourceMap, resourceRef]);
+  }, [isDisabled, resourceMetaMap, resourceRef]);
 
   const handleClick = (args: any) => {
     if (isDisabled || !onClick) {
