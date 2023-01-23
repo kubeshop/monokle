@@ -1,12 +1,13 @@
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
 import {unknownResourcesSelector} from '@redux/selectors';
-import {isUnsavedResource} from '@redux/services/resource';
+import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
+import {AppSelection} from '@shared/models/selection';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from '../K8sResourceSectionBlueprint/ResourceKindContextMenuWrapper';
@@ -20,6 +21,8 @@ export type UnknownResourceScopeType = {
   resourceFilter: ResourceFilterType;
   isPreviewLoading: boolean;
   isFolderLoading: boolean;
+  selection?: AppSelection;
+  highlights?: AppSelection[];
 };
 
 export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
@@ -33,8 +36,10 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     return {
       unknownResources: unknownResourcesSelector(state),
       resourceFilter: state.main.resourceFilter,
-      isPreviewLoading: state.main.previewLoader.isLoading,
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
       isFolderLoading: state.ui.isFolderLoading,
+      selection: state.main.selection,
+      highlights: state.main.highlights,
     };
   },
   builder: {
@@ -74,14 +79,23 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: rawItem => rawItem.isSelected,
-      isHighlighted: rawItem => rawItem.isHighlighted,
-      isDirty: rawItem => isUnsavedResource(rawItem),
+      isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
+      isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
+      isDirty: rawItem => rawItem.origin.storage === 'transient',
       isVisible: (rawItem, scope) => isResourcePassingFilter(rawItem, scope.resourceFilter),
+      getMeta: rawItem => {
+        return {
+          resourceStorage: rawItem.origin.storage,
+        };
+      },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        dispatch(selectK8sResource({resourceId: itemInstance.id}));
+        const resourceStorage = itemInstance.meta?.resourceStorage;
+        if (!resourceStorage) {
+          return;
+        }
+        dispatch(selectResource({resourceId: itemInstance.id, resourceStorage}));
       },
     },
     customization: {

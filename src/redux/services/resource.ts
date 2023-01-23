@@ -37,6 +37,7 @@ import {
   isLocalResource,
 } from '@shared/models/k8sResource';
 import {AnyOrigin, LocalOrigin, isLocalOrigin} from '@shared/models/origin';
+import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
@@ -433,6 +434,14 @@ export function isResourceSelected(resource: ResourceIdentifier, selection?: App
     selection.resourceId === resource.id &&
     selection.resourceStorage === resource.origin.storage
   );
+}
+
+export function isResourceHighlighted(resource: ResourceIdentifier, highlights?: AppSelection[]) {
+  return highlights?.some(highlight => isResourceSelected(resource, highlight)) || false;
+}
+
+export function isKustomizationPreviewed(kustomization: ResourceIdentifier, preview?: AnyPreview) {
+  return isKustomizePreview(preview) && preview.kustomizationId === kustomization.id;
 }
 
 export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(

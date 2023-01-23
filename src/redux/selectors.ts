@@ -2,6 +2,7 @@ import _, {merge} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {mapKeyValuesFromNestedObjects} from '@utils/objects';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -24,34 +25,33 @@ export const rootFolderSelector = createSelector(
   fileMap => fileMap[ROOT_FILE_ENTRY]?.filePath
 );
 
-// export const unknownResourcesSelector = (state: RootState) => {
-//   const isInPreviewMode = isInPreviewModeSelector(state);
-//   const unknownResources = Object.values(state.main.resourceMap).filter(
-//     resource =>
-//       !isKustomizationResource(resource) &&
-//       !getResourceKindHandler(resource.kind) &&
-//       !resource.name.startsWith('Patch:') &&
-//       (isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
-//   );
-//   return unknownResources;
-// };
+export const unknownResourcesSelector = (state: RootState) => {
+  const activeResourceMap = activeResourceMapSelector(state);
+  const unknownResources = Object.values(activeResourceMap).filter(
+    resource =>
+      !isKustomizationResource(resource) &&
+      !getResourceKindHandler(resource.kind) &&
+      !resource.name.startsWith('Patch:')
+  );
+  return unknownResources;
+};
 
-// export const filteredResourceSelector = createSelector(
-//   (state: RootState) => state.main.resourceMap,
-//   (state: RootState) => state.main.resourceFilter,
-//   (resourceMap, filter) => Object.values(resourceMap).filter(resource => isResourcePassingFilter(resource, filter))
-// );
+export const filteredResourceSelector = createSelector(
+  (state: RootState) => state.main.resourceFilter,
+  (state: RootState) => activeResourceMapSelector(state),
+  (filter, activeResourceMap) =>
+    Object.values(activeResourceMap).filter(resource => isResourcePassingFilter(resource, filter))
+);
 
-// export const filteredResourceMapSelector = createSelector(
-//   (state: RootState) => state,
-//   state =>
-//     _.keyBy(
-//       Object.values(state.main.resourceMap).filter(resource =>
-//         isResourcePassingFilter(resource, state.main.resourceFilter, isInPreviewModeSelector(state))
-//       ),
-//       'id'
-//     )
-// );
+export const filteredResourceMapSelector = createSelector(
+  (state: RootState) => state.main.resourceFilter,
+  (state: RootState) => activeResourceMapSelector(state),
+  (filter, activeResourceMap) =>
+    _.keyBy(
+      Object.values(activeResourceMap).filter(resource => isResourcePassingFilter(resource, filter)),
+      'id'
+    )
+);
 
 // export const kustomizationsSelector = createSelector(allResourcesSelector, resources =>
 //   resources.filter((r: K8sResource) => isKustomizationResource(r))
