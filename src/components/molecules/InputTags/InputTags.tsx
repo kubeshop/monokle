@@ -66,7 +66,7 @@ const InputTags: React.FC<IProps> = props => {
           ))
         : null}
 
-      <S.InputContainer $width={inputValue ? inputValue.length * 8 : 75}>
+      <S.InputContainer $width={inputValue ? inputValue.length * 8 : 80}>
         <S.Input
           autoFocus={autoFocus}
           disabled={disabled}
