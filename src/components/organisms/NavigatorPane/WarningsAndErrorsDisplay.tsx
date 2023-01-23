@@ -1,14 +1,15 @@
 import {useMemo} from 'react';
 
-import {Dropdown, Tag} from 'antd';
+import {Dropdown} from 'antd';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
+import {useAppSelector} from '@redux/hooks';
 import {filteredResourceSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
+
+import {useRefDropdownMenuItems} from '@hooks/useRefDropdownMenuItems';
 
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
@@ -18,17 +19,12 @@ import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 
-type Warning = {
+export type Warning = {
   id: string;
   type: string;
   name: string;
   count: number;
   namespace: string | undefined;
-};
-
-type RefDropdownMenuProps = {
-  type: 'error' | 'warning';
-  warnings: Warning[];
 };
 
 const sortWarnings = (warnings: Warning[]) =>
@@ -47,32 +43,6 @@ const sortWarnings = (warnings: Warning[]) =>
     }
     return a.name && b.name ? a.name.localeCompare(b.name) : 0;
   });
-
-const RefDropdownMenu = (props: RefDropdownMenuProps) => {
-  const {type, warnings} = props;
-
-  const dispatch = useAppDispatch();
-
-  const menuItems = useMemo(
-    () =>
-      warnings.map(warning => ({
-        key: warning.id,
-        label: (
-          <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
-            {warning.namespace && <Tag>{warning.namespace}</Tag>}
-            <span>{warning.name}</span>
-            <S.WarningCountContainer $type={type}>
-              <S.Icon $type={type} name={type} /> {warning.count}
-            </S.WarningCountContainer>
-            <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
-          </S.StyledMenuItem>
-        ),
-      })),
-    [dispatch, type, warnings]
-  );
-
-  return <S.StyledMenu items={menuItems} />;
-};
 
 function WarningsAndErrorsDisplay() {
   const filteredResources = useAppSelector(filteredResourceSelector);
@@ -140,17 +110,16 @@ function WarningsAndErrorsDisplay() {
     return sortWarnings([...schemaWarnings, ...policyWarnings]);
   }, [resources]);
 
+  const warningsRefDropdownMenuItems = useRefDropdownMenuItems('warning', warnings);
+  const errorsRefDropdownMenuItems = useRefDropdownMenuItems('error', errors);
+
   const warningsCount = useMemo(() => countResourceWarnings(resources), [resources]);
   const errorsCount = useMemo(() => countResourceErrors(resources), [resources]);
 
   return (
     <>
       {warningsCount > 0 && (
-        <Dropdown
-          overlay={<RefDropdownMenu type="warning" warnings={warnings} />}
-          trigger={['click']}
-          placement="bottom"
-        >
+        <Dropdown menu={{items: warningsRefDropdownMenuItems}} trigger={['click']} placement="bottom">
           <S.ErrorWarningContainer $type="warning">
             <Icon name="warning" />
             <S.Label>{warningsCount}</S.Label>
@@ -159,7 +128,7 @@ function WarningsAndErrorsDisplay() {
       )}
 
       {errorsCount > 0 && (
-        <Dropdown overlay={<RefDropdownMenu type="error" warnings={errors} />} trigger={['click']} placement="bottom">
+        <Dropdown menu={{items: errorsRefDropdownMenuItems}} trigger={['click']} placement="bottom">
           <S.ErrorWarningContainer $type="error">
             <Icon name="error" style={{paddingTop: '2px'}} />
             <S.Label>{errorsCount}</S.Label>
