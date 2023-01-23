@@ -3,10 +3,9 @@ import {useDebounce} from 'react-use';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import {SectionInstance} from '@shared/models/navigator';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ImagesSectionNameDisplay.styled';
 
@@ -21,7 +20,7 @@ const ImagesSectionNameDisplay: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const searchedValue = useAppSelector(state => state.main.imagesSearchedValue);
 

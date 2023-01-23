@@ -229,6 +229,17 @@ export const previewedHelmConfigSelector = createSelector(
   }
 );
 
+export const selectedImageSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!selection || selection.type !== 'image') {
+      return undefined;
+    }
+    return state.main.imagesList.find(image => image.id === selection.imageId);
+  }
+);
+
 export const kustomizationsSelector = createSelector(
   [
     (state: RootState) => state.main.resourceMetaStorage.local,
