@@ -8,18 +8,19 @@ import {isEqual} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourceMetaMapSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {findResourceMetaInStorage} from '@shared/utils/resource';
 
 const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const filtersToBeChanged = useAppSelector(state => state.main.filtersToBeChanged);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useAppSelector(activeResourceMetaMapSelector);
+  const resourceMetaStorage = useAppSelector(state => state.main.resourceMetaStorage);
 
   const constructNewFilter = useCallback(() => {
     if (!filtersToBeChanged) {
@@ -79,19 +80,19 @@ const ChangeFiltersConfirmModal: React.FC = () => {
   ]);
 
   const uncheckHiddenResources = useCallback(() => {
-    let uncheckingResourceIds: string[] = [];
+    let uncheckingResourceIdentifiers: ResourceIdentifier[] = [];
     let newFilter = constructNewFilter();
 
-    checkedResourceIds.forEach(id => {
-      const resource = resourceMap[id];
+    checkedResourceIdentifiers.forEach(identifier => {
+      const resourceMeta = findResourceMetaInStorage(identifier, resourceMetaStorage);
 
-      if (newFilter && !isResourcePassingFilter(resource, newFilter)) {
-        uncheckingResourceIds.push(resource.id);
+      if (newFilter && resourceMeta && !isResourcePassingFilter(resourceMeta, newFilter)) {
+        uncheckingResourceIdentifiers.push(identifier);
       }
     });
 
-    dispatch(uncheckMultipleResourceIds(uncheckingResourceIds));
-  }, [checkedResourceIds, constructNewFilter, dispatch, resourceMap]);
+    dispatch(uncheckMultipleResourceIds(uncheckingResourceIdentifiers));
+  }, [checkedResourceIdentifiers, constructNewFilter, dispatch, resourceMetaStorage]);
 
   useEffect(() => {
     if (!filtersToBeChanged) {
