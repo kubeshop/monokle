@@ -26,12 +26,18 @@ import {trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamespaces?: boolean) => {
+const getNonCustomClusterObjects = async (
+  kc: any,
+  kindsFilter: string[],
+  namespace?: string,
+  allNamespaces?: boolean
+) => {
   return Promise.allSettled(
     getRegisteredKindHandlers()
       .filter(
         handler =>
           !handler.isCustom &&
+          (kindsFilter.length ? kindsFilter.includes(handler.kind) : true) &&
           (allNamespaces ? true : namespace === '<not-namespaced>' ? !handler.isNamespaced : handler.isNamespaced)
       )
       .map(resourceKindHandler =>
@@ -51,6 +57,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
+  const kindsFilter: string[] = thunkAPI.getState().main.resourceFilter.kinds ?? [];
 
   let currentNamespace: string = clusterPreviewNamespace;
 
@@ -79,7 +86,7 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
 
       if (currentNamespace === '<all>') {
         results = await Promise.all(
-          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
+          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, kindsFilter, ca.namespace, true))
         );
       } else {
         if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
@@ -87,10 +94,10 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
           thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
         }
 
-        results = await getNonCustomClusterObjects(kc, currentNamespace);
+        results = await getNonCustomClusterObjects(kc, kindsFilter, currentNamespace);
       }
     } else {
-      results = await getNonCustomClusterObjects(kc);
+      results = await getNonCustomClusterObjects(kc, kindsFilter);
     }
 
     const resources = flatten(results);
@@ -131,15 +138,20 @@ const previewClusterHandler = async (payload: {context: string; port?: number}, 
           customResourceObjects = flatten(
             await Promise.all(
               clusterAccess.map((ca: ClusterAccess) =>
-                loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
+                loadCustomResourceObjects(kc, customResourceDefinitions, kindsFilter, ca.namespace)
               )
             )
           );
         } else {
-          customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, currentNamespace);
+          customResourceObjects = await loadCustomResourceObjects(
+            kc,
+            customResourceDefinitions,
+            kindsFilter,
+            currentNamespace
+          );
         }
       } else {
-        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, kindsFilter);
       }
 
       // if any were found we need to merge them into the preview-result
@@ -256,6 +268,7 @@ export function findDefaultVersion(crd: any) {
 async function loadCustomResourceObjects(
   kc: KubeConfig,
   customResourceDefinitions: K8sResource[],
+  kindsFilter: string[],
   namespace?: string,
   allNamespaces?: string
 ): Promise<string[]> {
@@ -268,6 +281,7 @@ async function loadCustomResourceObjects(
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (
           kindHandler &&
+          (kindsFilter.length ? kindsFilter.includes(kindHandler.kind) : true) &&
           (allNamespaces
             ? true
             : namespace === '<not-namespaced>'
