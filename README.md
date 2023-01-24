@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://monokle.io">Website</a> |
   <a href="https://kubeshop.github.io/monokle/">Documentation</a> |
-  <a href="https://discord.gg/uNuhy6GDyn">Discord</a> |
+  <a href="https://discord.gg/CzpqtfPjXV">Discord</a> |
   <a href="https://kubeshop.io/blog-projects/monokle">Blog</a>
 </p>
 
@@ -21,7 +21,7 @@
   <a href="https://github.com/kubeshop/monokle/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/kubeshop/monokle" alt="License" />
   </a>
-  <a href="https://discord.gg/kMJxmuYTMu">
+  <a href="https://discord.gg/CzpqtfPjXV">
     <img src="https://badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" />
   </a>
   <a href="https://github.com/kubeshop/monokle/tags">
@@ -109,5 +109,5 @@ Don't hesitate to provide any feedback you might have to help us prioritize and 
 
 ## Getting involved
 
-- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn).
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/CzpqtfPjXV).
 - Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing).
