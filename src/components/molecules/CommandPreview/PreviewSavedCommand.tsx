@@ -1,6 +1,6 @@
 import {useCallback, useMemo} from 'react';
 
-import {Button, Dropdown, Menu} from 'antd';
+import {Button, Dropdown} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
@@ -44,7 +44,7 @@ const PreviewSavedCommand = () => {
   }, [previewCommandId, savedCommandMap, onPreviewCommand]);
 
   return (
-    <Dropdown overlay={<Menu items={menuItems} />} trigger={['click']} placement="bottom">
+    <Dropdown menu={{items: menuItems}} trigger={['click']} placement="bottom">
       <Button type="link" style={{color: isCommandPreview ? Colors.purple8 : undefined}}>
         Preview saved command
         <DownOutlined />

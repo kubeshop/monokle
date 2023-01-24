@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -187,7 +187,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   }
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />}>
+    <ContextMenu items={menuItems}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>

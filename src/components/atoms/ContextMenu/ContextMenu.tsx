@@ -1,21 +1,21 @@
 import {ReactNode} from 'react';
 
-import {Dropdown} from 'antd';
+import {Dropdown, MenuProps} from 'antd';
 
 interface ContextMenuProps {
   children: ReactNode;
-  overlay: React.ReactElement;
+  items: MenuProps['items'];
   disabled?: boolean;
   triggerOnRightClick?: boolean;
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = props => {
-  const {overlay, children, disabled = false, triggerOnRightClick = false} = props;
+  const {children, disabled = false, items, triggerOnRightClick = false} = props;
 
   return (
     <Dropdown
       disabled={disabled}
-      overlay={overlay}
+      menu={{items}}
       trigger={triggerOnRightClick ? ['contextMenu'] : ['click']}
       placement="bottom"
     >
