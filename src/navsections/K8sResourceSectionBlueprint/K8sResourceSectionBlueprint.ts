@@ -1,7 +1,8 @@
+import {isEmpty, size} from 'lodash';
+
 import navSectionNames from '@constants/navSectionNames';
 
-import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourcesSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -10,11 +11,9 @@ import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
-import {RootState} from '@shared/models/rootState';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';
@@ -41,27 +40,33 @@ ResourceKindHandlers.forEach(kindHandler => {
 });
 
 const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
-  const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
+  const subsection: SectionBlueprint<
+    ResourceMeta,
+    {activeResourcesLength: number; checkedResourceIds: ResourceIdentifier[]}
+  > = {
     name: subsectionName,
     id: subsectionName,
     containerElementId: 'navigator-sections-container',
     childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
-      const activeResources = activeResourcesSelector(state);
-      return {activeResourcesLength: activeResources.length, checkedResourceIds: state.main.checkedResourceIds};
+      const activeResourceMetas = activeResourceMetaMapSelector(state);
+      return {
+        activeResourcesLength: size(activeResourceMetas),
+        checkedResourceIds: state.main.checkedResourceIdentifiers,
+      };
     },
     builder: {
       isInitialized: scope => {
         return scope.activeResourcesLength > 0;
       },
-      makeCheckable: scope => {
-        return {
-          checkedItemIds: scope.checkedResourceIds,
-          checkItemsActionCreator: checkMultipleResourceIds,
-          uncheckItemsActionCreator: uncheckMultipleResourceIds,
-        };
-      },
+      // makeCheckable: scope => {
+      //   return {
+      //     checkedItemIds: scope.checkedResourceIds,
+      //     checkItemsActionCreator: checkMultipleResourceIds,
+      //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+      //   };
+      // },
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
@@ -91,15 +96,14 @@ export type K8sResourceScopeType = {
   isFolderLoading: boolean;
   isFolderOpen: boolean;
   isPreviewLoading: boolean;
-  activeResources: K8sResource[];
+  activeResourceMetaMap: ResourceMetaMap;
   resourceFilter: ResourceFilterType;
-  checkedResourceIds: string[];
-  state: RootState;
+  checkedResourceIds: ResourceIdentifier[];
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
 
-const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
+const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
   containerElementId: 'navigator-sections-container',
@@ -109,11 +113,10 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     return {
       isFolderLoading: state.ui.isFolderLoading,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-      isPreviewLoading: state.main.previewLoader.isLoading,
-      activeResources: activeResourcesSelector(state),
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
+      activeResourceMetaMap: activeResourceMetaMapSelector(state),
       resourceFilter: state.main.resourceFilter,
-      checkedResourceIds: state.main.checkedResourceIds,
-      state,
+      checkedResourceIds: state.main.checkedResourceIdentifiers,
     };
   },
   builder: {
@@ -121,24 +124,24 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       return scope.isFolderLoading || scope.isPreviewLoading;
     },
     isInitialized: scope => {
-      return scope.activeResources.length > 0;
+      return !isEmpty(scope.activeResourceMetaMap);
     },
     isEmpty: scope => {
       return (
         scope.isFolderOpen &&
-        (scope.activeResources.length === 0 ||
-          scope.activeResources.every(
-            resource => !isResourcePassingFilter(resource, scope.resourceFilter, isInPreviewModeSelector(scope.state))
+        (isEmpty(scope.activeResourceMetaMap) ||
+          Object.values(scope.activeResourceMetaMap).every(
+            resource => !isResourcePassingFilter(resource, scope.resourceFilter)
           ))
       );
     },
-    makeCheckable: scope => {
-      return {
-        checkedItemIds: scope.checkedResourceIds,
-        checkItemsActionCreator: checkMultipleResourceIds,
-        uncheckItemsActionCreator: uncheckMultipleResourceIds,
-      };
-    },
+    // makeCheckable: scope => {
+    //   return {
+    //     checkedItemIds: scope.checkedResourceIds,
+    //     checkItemsActionCreator: checkMultipleResourceIds,
+    //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+    //   };
+    // },
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {

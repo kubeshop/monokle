@@ -1,35 +1,35 @@
 import {useAppSelector} from '@redux/hooks';
-import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {resourceMetaSelector} from '@redux/selectors';
 
-import {ResourceRefsIconPopover, ValidationErrorsPopover} from '@molecules';
+import {ResourceRefsIconPopover} from '@molecules';
 
+import {isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
-  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
-  if (!resource) {
-    return null;
-  }
+  const resourceMeta = useAppSelector(state =>
+    resourceMetaSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+  );
 
   return (
     <>
-      {resource.refs?.some(ref => isOutgoingRef(ref.type) || isUnsatisfiedRef(ref.type)) && (
+      {resourceMeta?.refs?.some(ref => isOutgoingRef(ref.type) || isUnsatisfiedRef(ref.type)) && (
         <ResourceRefsIconPopover
           isSelected={itemInstance.isSelected}
           isDisabled={itemInstance.isDisabled}
-          resource={resource}
+          resourceMeta={resourceMeta}
           type="outgoing"
         />
       )}
-      {(resource.validation?.errors || resource.issues?.errors) && (
+      {/* {(resource.validation?.errors || resource.issues?.errors) && (
         <ValidationErrorsPopover
           resource={resource}
           isSelected={itemInstance.isSelected}
           isDisabled={itemInstance.isDisabled}
         />
-      )}
+      )} */}
     </>
   );
 };

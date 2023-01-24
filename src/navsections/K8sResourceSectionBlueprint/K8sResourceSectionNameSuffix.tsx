@@ -2,11 +2,10 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import {ClusterColors} from '@shared/models/cluster';
 import {BackgroundColors, Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const S = {
   PreviewOutputTag: styled.div`
@@ -32,7 +31,7 @@ const S = {
 
 function K8sResourceSectionNameSuffix() {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 
   if (isInClusterMode) {

@@ -18,6 +18,7 @@
 // }
 
 // TODO: this component has to be reimplemented after the @monokle/validation library is integrated
+// search where this component is used and fix those places
 const ValidationErrorsPopover = () => {
   return <div />;
   // const {resource, isDisabled, isSelected} = props;

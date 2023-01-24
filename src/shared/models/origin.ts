@@ -9,6 +9,7 @@ import {AnyPreview, AnyPreviewRuntype} from './preview';
 export type LocalOrigin = {
   storage: 'local';
   filePath: string;
+  // fileOffset: number;
 };
 export type ClusterOrigin = {
   storage: 'cluster';

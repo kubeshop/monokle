@@ -3,8 +3,7 @@ import {useMemo} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {filteredResourceMapSelector} from '@redux/selectors';
 
-import {countResourceErrors, countResourceWarnings} from '@utils/resources';
-
+// import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 import {SectionCustomComponentProps} from '@shared/models/navigator';
 import {isDefined} from '@shared/utils/filter';
 
@@ -21,8 +20,11 @@ function ResourceKindSectionCounter({sectionInstance, onClick}: SectionCustomCom
     [itemIds, filteredResourceMap]
   );
 
-  const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);
-  const errorCount = useMemo(() => countResourceErrors(resources), [resources]);
+  // const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);
+  // const errorCount = useMemo(() => countResourceErrors(resources), [resources]);
+  // TODO: use the above code after the @monokle/validation library is integrated
+  const warningCount = 0;
+  const errorCount = 0;
 
   return (
     <>

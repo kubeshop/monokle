@@ -16,25 +16,25 @@ const baseIconStyle: React.CSSProperties = {
 };
 
 const ResourceRefsIconPopover = ({
-  resource,
+  resourceMeta,
   type,
   isDisabled,
   isSelected,
 }: {
-  resource: ResourceMeta;
+  resourceMeta: ResourceMeta;
   type: 'incoming' | 'outgoing';
   isDisabled: boolean;
   isSelected: boolean;
 }) => {
   const resourceRefs = useMemo(
     () =>
-      resource.refs?.filter(r => {
+      resourceMeta.refs?.filter(r => {
         if (type === 'incoming') {
           return isIncomingRef(r.type);
         }
         return isOutgoingRef(r.type) || isUnsatisfiedRef(r.type);
       }),
-    [resource, type]
+    [resourceMeta, type]
   );
   const hasUnsatisfiedRefs = useMemo(() => {
     if (type === 'incoming') {
@@ -63,7 +63,7 @@ const ResourceRefsIconPopover = ({
       mouseEnterDelay={0.5}
       placement="rightTop"
       content={
-        <RefsPopoverContent resource={resource} resourceRefs={resourceRefs}>
+        <RefsPopoverContent resource={resourceMeta} resourceRefs={resourceRefs}>
           {type === 'incoming' ? (
             <>
               Incoming Links <Icon name="incomingRefs" />

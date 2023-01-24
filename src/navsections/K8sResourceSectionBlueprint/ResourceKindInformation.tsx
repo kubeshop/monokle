@@ -5,6 +5,7 @@ import {Tooltip} from 'antd';
 import {DateTime} from 'luxon';
 
 import {useAppSelector} from '@redux/hooks';
+import {resourceContentSelector} from '@redux/selectors';
 
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 
@@ -12,25 +13,27 @@ import * as S from './ResourceKindInformation.styled';
 
 export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
-  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
+  const resourceContent = useAppSelector(state =>
+    resourceContentSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+  );
 
   const ageInfo = useMemo(() => {
-    if (!resource?.content?.metadata) {
+    if (!resourceContent?.object?.metadata) {
       return '';
     }
 
-    return DateTime.fromISO(resource.content.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
-  }, [resource]);
+    return DateTime.fromISO(resourceContent.object.metadata.creationTimestamp).toRelative()?.replace(' ago', '');
+  }, [resourceContent]);
 
   const statusInfo = useMemo(() => {
-    if (!resource?.content?.status?.phase) {
+    if (!resourceContent?.object?.status?.phase) {
       return '';
     }
 
-    return resource.content.status.phase;
-  }, [resource]);
+    return resourceContent.object.status.phase;
+  }, [resourceContent]);
 
-  if (!resource || (!ageInfo && !statusInfo)) {
+  if (!resourceContent || (!ageInfo && !statusInfo)) {
     return null;
   }
 

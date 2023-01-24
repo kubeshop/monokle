@@ -14,28 +14,35 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isFileResource, isUnsavedResource} from '@redux/services/resource';
+import {
+  activeResourceMetaMapSelector,
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+  knownResourceKindsSelector,
+  resourceSelector,
+} from '@redux/selectors';
+import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {ContextMenu} from '@atoms';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMap} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMetaMap, isLocalResource, isTransientResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {LocalOrigin} from '@shared/models/origin';
 
-function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMap, dispatch: AppDispatch) {
+function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMetaMap, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
 
-  if (isFileResource(resource)) {
-    const resourcesFromPath = getResourcesForPath(resource.filePath, resourceMap);
+  if (isLocalResource(resource)) {
+    const resourcesFromPath = getLocalResourceMetasForPath(
+      resource.origin.filePath,
+      resourceMap as ResourceMetaMap<LocalOrigin>
+    );
     if (resourcesFromPath.length === 1) {
-      title = `This action will delete the ${resource.filePath} file.\n${title}`;
+      title = `This action will delete the ${resource.origin.filePath} file.\n${title}`;
     }
-  } else if (!isUnsavedResource(resource)) {
+  } else if (!isTransientResource(resource)) {
     title = `This action will delete the resource from the Cluster.\n${title}`;
   }
 
@@ -44,7 +51,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        dispatch(removeResources([resource.id]));
+        dispatch(removeResources([{id: resource.id, origin: resource.origin}]));
         resolve({});
       });
     },
@@ -59,11 +66,13 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resource = useAppSelector(state =>
+    resourceSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+  );
+
+  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const shellCommand = useMemo(() => {
@@ -74,7 +83,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
     let terminalCommand = `${osPlatform !== 'win32' ? 'exec ' : ''}kubectl exec -i -t -n `;
     terminalCommand += `${resource.namespace || 'default'} ${resource.name}`;
 
-    const container = resource.content.spec?.containers?.[0];
+    const container = resource.object.spec?.containers?.[0];
 
     if (container) {
       terminalCommand += ` -c ${container.name} -- sh -c "clear; (bash || ash || sh)"`;
@@ -106,11 +115,11 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   };
 
   const onClickDelete = () => {
-    deleteResourceWithConfirm(resource, resourceMap, dispatch);
+    deleteResourceWithConfirm(resource, activeResourceMetaMap, dispatch);
   };
 
   const onClickSaveToFileFolder = () => {
-    dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
+    dispatch(openSaveResourcesToFileFolderModal([{id: resource.id, origin: resource.origin}]));
   };
 
   const onClickOpenShell = () => {
@@ -138,7 +147,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
           {key: 'divider-1', type: 'divider'},
         ]
       : []),
-    ...(isInPreviewMode || isUnsavedResource(resource)
+    ...(isInPreviewMode || isTransientResource(resource)
       ? [
           {
             key: 'save_to_file_folder',
@@ -160,7 +169,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
           },
         ]
       : []),
-    {key: 'delete', label: 'Delete', disabled: isInPreviewMode && previewType !== 'cluster', onClick: onClickDelete},
+    {key: 'delete', label: 'Delete', disabled: isInPreviewMode, onClick: onClickDelete},
   ];
 
   return (
