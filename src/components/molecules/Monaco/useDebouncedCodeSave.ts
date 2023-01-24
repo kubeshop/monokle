@@ -9,7 +9,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {ResourceMap} from '@shared/models/k8sResource';
+import {ResourceMetaMap} from '@shared/models/k8sResource';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,
@@ -17,7 +17,7 @@ function useDebouncedCodeSave(
   code: string,
   isDirty: boolean,
   isValid: boolean,
-  resourceMap: ResourceMap,
+  resourceMetaMap: ResourceMetaMap,
   selectedResourceId: string | undefined,
   selectedPath: string | undefined,
   setOrgCode: (newOrgCode: string) => void
@@ -40,7 +40,7 @@ function useDebouncedCodeSave(
       } catch (e) {
         log.warn(`Failed to update file ${e}`, dispatch);
       }
-    } else if (selectedResourceId && resourceMap[selectedResourceId]) {
+    } else if (selectedResourceId && resourceMetaMap[selectedResourceId]) {
       try {
         dispatch(updateResource({resourceId: selectedResourceId, text: value.toString()}));
         setOrgCode(value);

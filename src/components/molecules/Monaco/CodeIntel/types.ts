@@ -1,15 +1,15 @@
 import {monaco} from 'react-monaco-editor';
 
+import {ResourceRef} from '@monokle/validation';
 import {
   FileMapType,
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
   ResourceFilterType,
-  ResourceMap,
 } from '@shared/models/appState';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
-import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
 import {MonacoUiState} from '@shared/models/ui';
 
 export interface CodeIntelResponse {
@@ -19,7 +19,7 @@ export interface CodeIntelResponse {
 }
 
 export interface ShouldApplyCodeIntelParams {
-  selectedResource?: K8sResource;
+  selectedResourceMeta?: ResourceMeta;
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
   matchOptions?: CurrentMatch | null;
@@ -27,7 +27,7 @@ export interface ShouldApplyCodeIntelParams {
 }
 
 export interface CodeIntelParams {
-  selectedResource?: K8sResource;
+  selectedResourceMeta?: ResourceMeta;
   currentFile?: FileEntry;
   helmValuesMap?: HelmValuesMapType;
   helmChartMap?: HelmChartMapType;
@@ -36,12 +36,12 @@ export interface CodeIntelParams {
   code?: string;
   fileMap: FileMapType;
   setEditorSelection: (selection: Partial<MonacoUiState>) => void;
-  resource: K8sResource;
-  selectResource: (resourceId: string) => void;
+  resource?: K8sResource;
+  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
   selectImageHandler: (imageId: string) => void;
-  resourceMap: ResourceMap;
+  resourceMetaMap: ResourceMetaMap;
   model: monaco.editor.IModel | null;
   matchOptions?: CurrentMatch | null;
   lastChangedLine: number;

@@ -95,6 +95,19 @@ export const activeResourceMetaMapSelector = createSelector(
   }
 );
 
+export const activeResourceContentMapSelector = createSelector(
+  (state: RootState) => state,
+  (state): ResourceContentMap<AnyOrigin> => {
+    if (state.main.clusterConnection) {
+      return state.main.resourceContentStorage.cluster;
+    }
+    if (state.main.preview) {
+      return state.main.resourceContentStorage.preview;
+    }
+    return state.main.resourceContentStorage.local;
+  }
+);
+
 // function getResourceMetaMap<Storage extends AnyOrigin['storage']>(
 //   resourceMetaStorage: ResourceMetaStorage,
 //   storageKey: Storage

@@ -1,7 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {isUnsavedResource} from '@redux/services/resource';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {
@@ -15,21 +14,28 @@ import {
 
 import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual, isUnsatisfiedRef} from '@monokle/validation';
 import {FileMapType} from '@shared/models/appState';
-import {K8sResource, ResourceMap, isLocalResource, isPreviewResource} from '@shared/models/k8sResource';
+import {
+  ResourceMeta,
+  ResourceMetaMap,
+  ResourceStorageKey,
+  isLocalResource,
+  isPreviewResource,
+  isTransientResource,
+} from '@shared/models/k8sResource';
 
 function applyRefIntel(
-  resource: K8sResource,
-  selectResource: (resourceId: string) => void,
+  resourceMeta: ResourceMeta,
+  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void,
   selectFilePath: (filePath: string) => void,
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
   selectImage: (imageId: string) => void,
-  resourceMap: ResourceMap,
+  resourceMetaMap: ResourceMetaMap,
   fileMap: FileMapType
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   disposables: monaco.IDisposable[];
 } {
-  const refs = resource.refs ?? [];
+  const refs = resourceMeta.refs ?? [];
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
 
@@ -87,8 +93,8 @@ function applyRefIntel(
             () => {
               createResource(
                 matchRef,
-                resource.namespace,
-                isLocalResource(resource) ? getResourceFolder(resource) : undefined
+                resourceMeta.namespace,
+                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
               );
             }
           );
@@ -98,14 +104,18 @@ function applyRefIntel(
       }
       // add command for navigating to resource
       else if (matchRef.target.type === 'resource' && matchRef.target.resourceId) {
-        const outgoingRefResource = resourceMap[matchRef.target.resourceId];
-        if (!outgoingRefResource) {
+        const outgoingRefResourceMeta = resourceMetaMap[matchRef.target.resourceId];
+        if (!outgoingRefResourceMeta) {
           return;
         }
 
-        let text = `${outgoingRefResource.kind}: ${outgoingRefResource.name}`;
-        if (!isPreviewResource(outgoingRefResource) && !isUnsavedResource(outgoingRefResource)) {
-          text += ` in ${outgoingRefResource.filePath}`;
+        let text = `${outgoingRefResourceMeta.kind}: ${outgoingRefResourceMeta.name}`;
+        if (
+          !isPreviewResource(outgoingRefResourceMeta) &&
+          !isTransientResource(outgoingRefResourceMeta) &&
+          isLocalResource(outgoingRefResourceMeta)
+        ) {
+          text += ` in ${outgoingRefResourceMeta.origin.filePath}`;
         }
 
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, 'Select resource', () => {
@@ -188,11 +198,12 @@ function applyRefIntel(
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
               createResource(
                 matchRef,
-                resource.namespace,
-                isLocalResource(resource) ? getResourceFolder(resource) : undefined
+                resourceMeta.namespace,
+                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
               );
             } else if (matchRef.target?.type === 'resource' && matchRef.target.resourceId) {
-              selectResource(matchRef.target.resourceId);
+              // is the storage of the target resource the same as the current resource?
+              selectResource(matchRef.target.resourceId, resourceMeta.origin.storage);
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
             } else if (matchRef.target?.type === 'image') {

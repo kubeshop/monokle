@@ -25,14 +25,24 @@ import {
   extendResourceFilter,
   selectFile,
   selectImage,
-  selectK8sResource,
+  selectResource,
   setAutosavingStatus,
   setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {settingsSelector} from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationPatch} from '@redux/services/kustomize';
+import {
+  activeResourceContentMapSelector,
+  activeResourceMetaMapSelector,
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+  resourceContentMapSelector,
+  resourceMetaMapSelector,
+  resourceSelector,
+  selectedFilePathSelector,
+  selectedResourceSelector,
+  settingsSelector,
+} from '@redux/selectors';
+import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
@@ -42,11 +52,13 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ResourceRef} from '@monokle/validation';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
-import {ResourceRef} from '@shared/models/k8sResource';
+import {ResourceStorageKey} from '@shared/models/k8sResource';
+import {isHelmPreview} from '@shared/models/preview';
+import {isHelmValuesFileSelection} from '@shared/models/selection';
 import {NewResourceWizardInput} from '@shared/models/ui';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';
@@ -71,8 +83,12 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   return d.errors.length === 0 && isMap(d.contents);
 }
 
-const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void; resourceID?: string}) => {
-  const {diffSelectedResource, applySelection, resourceID} = props;
+const Monaco = (props: {
+  diffSelectedResource: () => void;
+  applySelection: () => void;
+  providedResource?: {id: string; storage: ResourceStorageKey};
+}) => {
+  const {diffSelectedResource, applySelection, providedResource} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -80,27 +96,37 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const preview = useAppSelector(state => state.main.preview);
+  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const activeResourceContentMap = useAppSelector(activeResourceContentMapSelector);
+  const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
+  const localResourceContentMap = useAppSelector(state => resourceContentMapSelector(state, 'local'));
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const selection = useAppSelector(state => state.main.selection);
   const settings = useAppSelector(settingsSelector);
-  const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
+  const shouldEditorReloadSelection = useAppSelector(state => state.main.selectionOptions.shouldEditorReload);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const selectedResource = useAppSelector(state =>
+    providedResource
+      ? resourceSelector(state, providedResource.id, providedResource.storage)
+      : selectedResourceSelector(state)
+  );
+  const selectedResourceId = selectedResource?.id;
 
   const resourcesFromSelectedPath = useMemo(() => {
-    if (!selectedPath) {
+    if (!selectedFilePath) {
       return [];
     }
-    return getResourcesForPath(selectedPath, resourceMap);
-  }, [selectedPath, resourceMap]);
+    return getLocalResourcesForPath(selectedFilePath, {
+      resourceMetaMap: localResourceMetaMap,
+      resourceContentMap: localResourceContentMap,
+    });
+  }, [selectedFilePath, localResourceMetaMap, localResourceContentMap]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -114,17 +140,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const selectedResource = useMemo(() => {
-    if (resourceID) {
-      return resourceMap[resourceID];
-    }
-    return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
-  }, [selectedResourceId, resourceMap, resourceID]);
-
-  const selectResource = (resourceId: string) => {
-    if (resourceMap[resourceId]) {
-      dispatch(selectK8sResource({resourceId}));
-    }
+  const triggerSelectResource = (resourceId: string, resourceStorage: ResourceStorageKey) => {
+    dispatch(selectResource({resourceId, resourceStorage}));
   };
 
   const selectFilePath = (filePath: string) => {
@@ -141,7 +158,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     const image = imagesList.find(im => im.id === imageId);
 
     if (image) {
-      dispatch(selectImage({image}));
+      dispatch(selectImage({imageId: image.id}));
     }
   };
 
@@ -166,16 +183,16 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectedResource:
       selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
-    resourceMap,
+    resourceMetaMap: activeResourceMetaMap,
     fileMap,
     imagesList,
     isEditorMounted,
-    selectResource,
+    selectResource: triggerSelectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
     filterResources,
     selectImageHandler,
-    selectedPath,
+    selectedPath: selectedFilePath,
     helmValuesMap,
     helmChartMap,
     helmTemplatesMap,
@@ -196,7 +213,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     String(userDataDir),
     String(k8sVersion),
     selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
-    selectedPath,
+    selectedFilePath,
     fileMap
   );
 
@@ -206,13 +223,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     code,
     isDirty,
     isValid,
-    resourceMap,
+    activeResourceMetaMap,
     selectedResourceId,
-    selectedPath,
+    selectedFilePath,
     setOrgCode
   );
 
-  useMonacoUiState(editor, selectedResourceId, selectedPath);
+  useMonacoUiState(editor, selectedResourceId, selectedFilePath);
 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
@@ -249,14 +266,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       setFirstCodeLoadedOnEditor(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResourceId, resourceMap]);
+  }, [code, selectedResourceId, activeResourceMetaMap]);
 
   useEffect(() => {
     let newCode = '';
     if (selectedResourceId) {
-      const resource = resourceMap[selectedResourceId];
-      if (resource) {
-        newCode = resource.text;
+      const resourceContent = activeResourceContentMap[selectedResourceId];
+      if (resourceContent) {
+        newCode = resourceContent.text;
         monaco.editor?.getModels()?.forEach(model => {
           if (!model.isAttachedToEditor()) {
             model.dispose();
@@ -264,8 +281,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
         });
         editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
-    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
-      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    } else if (selectedFilePath && selectedFilePath !== fileMap[ROOT_FILE_ENTRY].filePath) {
+      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFilePath);
       const fileStats = getFileStats(filePath);
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
@@ -289,14 +306,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     setDirty(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath, selectedResourceId]);
+  }, [selectedFilePath, selectedResourceId]);
 
   useEffect(() => {
-    if (!selectedPath || !shouldEditorReloadSelectedPath) {
+    if (!selectedFilePath || !shouldEditorReloadSelection) {
       return;
     }
     log.info('[Monaco]: selected file was updated outside Monokle - reading file...');
-    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFilePath);
     const fileStats = getFileStats(filePath);
     if (fileStats && fileStats.isFile()) {
       const newCode = fs.readFileSync(filePath, 'utf8');
@@ -309,7 +326,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath, shouldEditorReloadSelectedPath]);
+  }, [selectedFilePath, shouldEditorReloadSelection]);
 
   useEffect(() => {
     if (selectedResource && selectedResource.text !== code) {
@@ -329,26 +346,26 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode) {
+    if (isInClusterMode && !settings.allowEditInClusterMode) {
       return true;
     }
-    if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
-      return previewType !== 'kustomization' || !isKustomizationPatch(selectedResource);
-    }
-    if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
+    if (
+      isInPreviewMode &&
+      isHelmPreview(preview) &&
+      isHelmValuesFileSelection(selection) &&
+      preview.valuesFileId === selection.valuesFileId
+    ) {
       return true;
     }
-    return !selectedPath && !selectedResourceId;
+    return !selectedFilePath && !selectedResourceId;
   }, [
     isInPreviewMode,
+    isInClusterMode,
     selectedResourceId,
-    selectedResource,
-    previewResourceId,
-    selectedValuesFileId,
-    previewValuesFileId,
-    selectedPath,
-    previewType,
+    selectedFilePath,
     settings.allowEditInClusterMode,
+    preview,
+    selection,
   ]);
 
   const options = useMemo(() => {

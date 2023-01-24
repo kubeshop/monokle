@@ -11,7 +11,9 @@ const applyErrorIntel = (
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
 } => {
-  const validations = resource.validation?.errors ?? [];
+  // const validations = resource.validation?.errors ?? [];
+  // TODO: re-implement after @monokle/validation
+  const validations: any[] = [];
 
   const glyphs = validations.map(validation =>
     createGlyphDecoration(validation.errorPos?.line ?? 1, GlyphDecorationTypes.ErrorRef)

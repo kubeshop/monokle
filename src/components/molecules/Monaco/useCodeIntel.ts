@@ -9,8 +9,8 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import {codeIntels} from '@molecules/Monaco/CodeIntel/index';
 import {ShouldApplyCodeIntelParams} from '@molecules/Monaco/CodeIntel/types';
-import {applyAutocomplete} from '@molecules/Monaco/CodeIntel/util';
 
+import {ResourceRef} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {
   FileMapType,
@@ -19,10 +19,9 @@ import {
   HelmValuesMapType,
   ImagesListType,
   ResourceFilterType,
-  ResourceMap,
 } from '@shared/models/appState';
 import {CurrentMatch} from '@shared/models/fileEntry';
-import {K8sResource, ResourceRef} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
@@ -31,11 +30,11 @@ interface CodeIntelProps {
   isDirty: boolean;
   selectedResource: K8sResource | undefined;
   code: string | undefined;
-  resourceMap: ResourceMap;
+  resourceMetaMap: ResourceMetaMap;
   fileMap: FileMapType;
   imagesList: ImagesListType;
   isEditorMounted: boolean;
-  selectResource: (resourceId: string) => void;
+  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
@@ -75,7 +74,7 @@ function useCodeIntel(props: CodeIntelProps) {
     selectedResource,
     code,
     imagesList,
-    resourceMap,
+    resourceMetaMap,
     fileMap,
     isEditorMounted,
     selectResource,
@@ -116,7 +115,7 @@ function useCodeIntel(props: CodeIntelProps) {
     const shouldApplyParams: ShouldApplyCodeIntelParams = {
       helmValuesMap,
       currentFile,
-      selectedResource,
+      selectedResourceMeta: selectedResource,
       matchOptions,
       isSearchActive,
     };
@@ -141,12 +140,12 @@ function useCodeIntel(props: CodeIntelProps) {
               })
             );
           },
-          resource: selectedResource as K8sResource,
+          resource: selectedResource,
           selectResource,
           createResource,
           filterResources,
           selectImageHandler,
-          resourceMap,
+          resourceMetaMap,
           model: editor.getModel(),
           matchOptions,
         })
@@ -198,7 +197,7 @@ function useCodeIntel(props: CodeIntelProps) {
     code,
     isEditorMounted,
     selectedResource,
-    resourceMap,
+    resourceMetaMap,
     editor,
     imagesList,
     helmTemplatesMap,
@@ -206,15 +205,15 @@ function useCodeIntel(props: CodeIntelProps) {
     matchOptions,
   ]);
 
-  useEffect(() => {
-    if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
-      completionDisposableRef.current.dispose();
-    }
-    if (editor) {
-      completionDisposableRef.current = applyAutocomplete(resourceMap);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, resourceMap, editor]);
+  // useEffect(() => {
+  //   if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
+  //     completionDisposableRef.current.dispose();
+  //   }
+  //   if (editor) {
+  //     completionDisposableRef.current = applyAutocomplete(resourceMap);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedResource, resourceMap, editor]);
 }
 
 export default useCodeIntel;

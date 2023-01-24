@@ -1,4 +1,5 @@
 import fs from 'fs';
+import {merge} from 'lodash';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -271,8 +272,22 @@ export function readFiles(
  * Returns all local resource metas associated with the specified path
  */
 
-export function getLocalResourceMetasForPath(filePath: string, resourceMap: ResourceMetaMap<LocalOrigin>) {
-  return Object.values(resourceMap).filter(r => r.origin.filePath === filePath);
+export function getLocalResourceMetasForPath(filePath: string, resourceMetaMap: ResourceMetaMap<LocalOrigin>) {
+  return Object.values(resourceMetaMap).filter(r => r.origin.filePath === filePath);
+}
+
+/**
+ * Returns all local resources associated with the specified path
+ */
+
+export function getLocalResourcesForPath(
+  filePath: string,
+  stateArgs: {resourceMetaMap: ResourceMetaMap<LocalOrigin>; resourceContentMap: ResourceContentMap<LocalOrigin>}
+) {
+  const {resourceMetaMap, resourceContentMap} = stateArgs;
+  return Object.values(resourceMetaMap)
+    .filter(r => r.origin.filePath === filePath)
+    .map(meta => merge(meta, resourceContentMap[meta.id]));
 }
 
 /**
