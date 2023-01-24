@@ -4,7 +4,7 @@ import path from 'path';
 import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileEntry} from '@shared/models/fileEntry';
-import {K8sResource, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {LocalOrigin} from '@shared/models/origin';
 
 import {getLocalResourceMetasForPath} from './fileEntry';
@@ -56,7 +56,7 @@ export function isKustomizationResource(r: ResourceMeta | undefined) {
  * Checks if the specified resource is a kustomization patch
  */
 
-export function isKustomizationPatch(r: K8sResource | undefined) {
+export function isKustomizationPatch(r: ResourceMeta | undefined) {
   return r && r.name.startsWith('Patch: ');
 }
 

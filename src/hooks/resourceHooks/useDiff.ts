@@ -5,23 +5,21 @@ import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector, selectedResourceMetaSelector} from '@redux/selectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
-export const useDiff = (resource?: K8sResource) => {
+export const useDiff = (resource?: ResourceMeta) => {
   const dispatch = useAppDispatch();
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const selectedResource = useAppSelector(state =>
-    state.main.selectedResourceId ? state.main.resourceMap[state.main.selectedResourceId] : undefined
-  );
+  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
 
-  const currentResource = resource || selectedResource;
+  const currentResource = resource || selectedResourceMeta;
 
   const isDisabled = useMemo(() => {
     if (!isKubeConfigPathValid) {
