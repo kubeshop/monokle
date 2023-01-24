@@ -24,7 +24,7 @@ const NewPaneManager: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
