@@ -14,9 +14,11 @@ import {
   K8sResource,
   ResourceContent,
   ResourceContentMap,
+  ResourceContentStorage,
   ResourceMap,
   ResourceMeta,
   ResourceMetaMap,
+  ResourceMetaStorage,
   ResourceStorageKey,
 } from '@shared/models/k8sResource';
 import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
@@ -143,15 +145,19 @@ export const activeResourceCountSelector = createSelector(
 );
 
 export function resourceSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
+  state: RootState | {resourceMetaStorage: ResourceMetaStorage; resourceContentStorage: ResourceContentStorage},
   resourceId: string,
   resourceStorage: Storage | undefined
 ): K8sResource<OriginFromStorage<Storage>> | undefined {
   if (resourceStorage === undefined) {
     return undefined;
   }
-  const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
-  const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
+  const resourceMetaMap =
+    'main' in state ? state.main.resourceMetaStorage[resourceStorage] : state.resourceMetaStorage[resourceStorage];
+  const resourceContentMap =
+    'main' in state
+      ? state.main.resourceContentStorage[resourceStorage]
+      : state.resourceContentStorage[resourceStorage];
   const resourceMeta = resourceMetaMap[resourceId];
   const resourceContent = resourceContentMap[resourceId];
   return merge(resourceMeta, resourceContent);

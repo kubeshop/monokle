@@ -173,7 +173,7 @@ export const uiSlice = createSlice({
     openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
-        resourcesIds: action.payload,
+        resourcesIdentifiers: action.payload,
       };
     },
     closeSaveEditCommandModal: (state: Draft<UiState>) => {
@@ -190,7 +190,7 @@ export const uiSlice = createSlice({
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
-        resourcesIds: [],
+        resourcesIdentifiers: [],
       };
     },
     openCreateFileFolderModal: (

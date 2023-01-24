@@ -179,7 +179,7 @@ const initialUiState: UiState = {
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
-    resourcesIds: [],
+    resourcesIdentifiers: [],
   },
   renameEntityModal: {
     isOpen: false,

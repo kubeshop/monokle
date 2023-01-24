@@ -128,7 +128,7 @@ type UiState = {
   };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
-    resourcesIds: ResourceIdentifier[];
+    resourcesIdentifiers: ResourceIdentifier[];
   };
   isStartProjectPaneVisible: boolean;
   renameEntityModal: {
