@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard/slice';
+import {setActiveDashboardMenu, setDashboardSelection} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
@@ -205,7 +205,7 @@ const RefsPopoverContent = (props: {
   };
 
   const selectForDashboard = (r: ResourceMeta) => {
-    dispatch(setSelectedResourceId(r.id));
+    dispatch(setDashboardSelection({type: 'resource', resourceId: r.id, resourceStorage: 'cluster'}));
     dispatch(
       setActiveDashboardMenu({
         key: `${r.apiVersion}-${r.kind}`,
