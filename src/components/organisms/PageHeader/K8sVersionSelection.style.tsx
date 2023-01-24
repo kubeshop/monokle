@@ -17,6 +17,10 @@ export const Container = styled.div`
 export const MenuContainer = styled.div`
   background-color: ${Colors.grey1};
   width: 280px;
+
+  .selected-menu-item {
+    background-color: ${Colors.blue7};
+  }
 `;
 
 export const MenuDropdownList = styled.div`
