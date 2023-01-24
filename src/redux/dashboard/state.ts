@@ -7,6 +7,6 @@ export const initialState: DashboardState = {
     activeTab: 'Info',
   },
   tableDrawer: {
-    selectedResourceId: undefined,
+    resourceSelection: undefined,
   },
 };

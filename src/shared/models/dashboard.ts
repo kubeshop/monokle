@@ -17,6 +17,6 @@ export type DashboardState = {
     activeTab: 'Info' | 'Manifest';
   };
   tableDrawer: {
-    resourceSelection: ResourceSelection<'cluster'>;
+    resourceSelection?: ResourceSelection<'cluster'>;
   };
 };
