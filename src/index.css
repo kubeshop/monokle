@@ -423,3 +423,12 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .help-menu-dropdown .ant-dropdown-menu-item:hover {
   background-color: transparent;
 }
+
+.terminal-options-menu .ant-dropdown-menu-item {
+  cursor: default;
+  padding: 5px 12px 0px 12px;
+}
+
+.terminal-options-menu .ant-dropdown-menu-item:hover {
+  background-color: transparent;
+}

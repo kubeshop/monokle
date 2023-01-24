@@ -17,12 +17,11 @@ import {Icon} from '@atoms';
 
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
 
-import {useNewTerminalMenuItems} from '@hooks/menuItemsHooks';
+import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuItemsHooks';
 
 import {TerminalType} from '@shared/models/terminal';
 
 import TerminalPane from '../TerminalPane';
-import TerminalOptions from '../TerminalPane/TerminalOptions';
 import * as S from './BottomPaneManager.styled';
 
 const BottomPaneManager: React.FC = () => {
@@ -41,6 +40,7 @@ const BottomPaneManager: React.FC = () => {
   const [tabsContainerRef, {height: tabsContainerHeight}] = useMeasure<HTMLDivElement>();
 
   const {items: newTerminalMenuItems, onClick: onAddNewTerminalHandler} = useNewTerminalMenuItems();
+  const terminalOptionsMenuItems = useTerminalOptionsMenuItems();
 
   const onAddTerminalHandler = () => {
     const newTerminalId = uuidv4();
@@ -149,7 +149,12 @@ const BottomPaneManager: React.FC = () => {
 
           <PreviewSavedCommand />
 
-          <Dropdown mouseEnterDelay={0.5} placement="bottomRight" overlay={<TerminalOptions />}>
+          <Dropdown
+            open
+            mouseEnterDelay={0.5}
+            placement="bottomRight"
+            menu={{items: terminalOptionsMenuItems, className: 'terminal-options-menu'}}
+          >
             <S.EllipsisOutlined />
           </Dropdown>
 

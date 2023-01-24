@@ -23,7 +23,6 @@ const NewPaneManagerLeftMenu: React.FC = () => {
 
   return (
     <ActivityBar
-      style={{paddingBottom: 10}}
       activities={activities}
       extraActivities={extraActivities}
       isActive={isActive}
