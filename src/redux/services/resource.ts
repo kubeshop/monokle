@@ -92,9 +92,9 @@ export function getResourcesOfKind(resourceMap: ResourceMap, kind: string) {
  * Extracts all unique namespaces from resources in specified resourceMap
  */
 
-export function getNamespaces(resourceMap: ResourceMap) {
+export function getNamespaces(resourceMetaMap: ResourceMetaMap) {
   const namespaces: string[] = [];
-  Object.values(resourceMap).forEach(e => {
+  Object.values(resourceMetaMap).forEach(e => {
     if (e.kind === 'Namespace' && !namespaces.includes(e.name)) {
       namespaces.push(e.name);
     } else if (e.namespace && !namespaces.includes(e.namespace)) {
