@@ -9,7 +9,7 @@ import path from 'path';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -22,6 +22,7 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 // TODO: temporary solution for renaming value file

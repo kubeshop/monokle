@@ -34,7 +34,6 @@ import {
   activeResourceContentMapSelector,
   activeResourceMetaMapSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
   resourceContentMapSelector,
   resourceMetaMapSelector,
   resourceSelector,
@@ -59,6 +58,7 @@ import {ResourceStorageKey} from '@shared/models/k8sResource';
 import {isHelmPreview} from '@shared/models/preview';
 import {isHelmValuesFileSelection} from '@shared/models/selection';
 import {NewResourceWizardInput} from '@shared/models/ui';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';

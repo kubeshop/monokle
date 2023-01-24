@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew, resourceMapSelector} from '@redux/selectors';
+import {resourceMapSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {isResourceSelected} from '@redux/services/resource';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -25,6 +25,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`

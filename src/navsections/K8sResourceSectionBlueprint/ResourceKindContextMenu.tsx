@@ -23,7 +23,6 @@ import {
   activeResourceMapSelector,
   currentConfigSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
   knownResourceKindsSelector,
   kubeConfigContextColorSelector,
   resourceSelector,
@@ -47,7 +46,7 @@ import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {LocalOrigin} from '@shared/models/origin';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

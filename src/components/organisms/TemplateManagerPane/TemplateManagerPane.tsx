@@ -10,13 +10,14 @@ import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@con
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {TitleBar} from '@monokle/components';
 import {AnyTemplate} from '@shared/models/template';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';

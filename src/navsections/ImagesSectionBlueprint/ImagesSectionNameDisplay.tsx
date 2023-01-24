@@ -3,9 +3,10 @@ import {useDebounce} from 'react-use';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import {SectionInstance} from '@shared/models/navigator';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './ImagesSectionNameDisplay.styled';
 

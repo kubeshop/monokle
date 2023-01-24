@@ -10,7 +10,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -18,6 +18,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {SectionCustomComponentProps} from '@shared/models/navigator';
 import {NewResourceWizardInput} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

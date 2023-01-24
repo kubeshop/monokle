@@ -1,8 +1,9 @@
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './ImagesQuickAction.styled';
 

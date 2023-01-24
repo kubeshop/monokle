@@ -37,7 +37,7 @@ import {replaceInFiles} from '@utils/replaceInFiles';
 
 import {TitleBar} from '@monokle/components';
 import {CurrentMatch, FileEntry, MatchNode} from '@shared/models/fileEntry';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import TreeItem from '../FileTreePane/TreeItem';
 import {FilterTreeNode, TreeNode} from '../FileTreePane/types';
@@ -66,7 +66,7 @@ const SearchPane: React.FC = () => {
   const [isFindingMatches, setFindingMatches] = useState<boolean>(false);
   const searchCounter = useRef<{filesCount: number; totalMatchCount: number}>({filesCount: 0, totalMatchCount: 0});
   const debounceHandler = useRef<null | ReturnType<typeof setTimeout>>(null);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);

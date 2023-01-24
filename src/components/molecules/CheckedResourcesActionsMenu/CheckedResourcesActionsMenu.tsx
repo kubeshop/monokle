@@ -10,12 +10,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {
-  activeResourceMetaMapSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  kubeConfigContextColorSelector,
-} from '@redux/selectors';
+import {activeResourceMetaMapSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -24,7 +19,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';

@@ -25,7 +25,7 @@ import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -38,7 +38,7 @@ const NavPane: React.FC = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);

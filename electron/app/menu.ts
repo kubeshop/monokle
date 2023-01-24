@@ -6,7 +6,7 @@ import {NewVersionCode, Project} from '@shared/models/config';
 import type {RootState} from '@shared/models/rootState';
 import {defineHotkey} from '@shared/utils/hotkey';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
-import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
@@ -89,7 +89,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Refresh Folder',
         accelerator: defineHotkey(hotkeys.REFRESH_FOLDER.key),
-        enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        enabled: !isInPreviewModeSelectorNew(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
@@ -148,7 +148,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'Exit Preview',
-        enabled: isInPreviewModeSelector(state),
+        enabled: isInPreviewModeSelectorNew(state),
         click: () => {
           dispatch({type: 'main/stopPreviewLoader', payload: undefined});
           dispatch({type: 'main/clearPreviewAndSelectionHistory', payload: undefined});

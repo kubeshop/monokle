@@ -30,7 +30,7 @@ import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
-import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {activeProjectSelector, isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
@@ -50,7 +50,7 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);

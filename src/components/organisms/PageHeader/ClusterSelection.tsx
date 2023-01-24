@@ -15,7 +15,6 @@ import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/redu
 import {
   currentClusterAccessSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
   kubeConfigContextColorSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
@@ -32,7 +31,12 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {HighlightItems} from '@shared/models/ui';
 import {Size} from '@shared/models/window';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {activeProjectSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {
+  activeProjectSelector,
+  isInPreviewModeSelectorNew,
+  kubeConfigContextSelector,
+  kubeConfigPathValidSelector,
+} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 

@@ -18,7 +18,6 @@ import {
   allResourceKindsSelector,
   allResourceLabelsSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
 } from '@redux/selectors';
 
 import {InputTags, KeyValueInput} from '@atoms';
@@ -26,6 +25,8 @@ import {InputTags, KeyValueInput} from '@atoms';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
+
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 

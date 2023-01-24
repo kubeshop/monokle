@@ -22,7 +22,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 import {TreeItemProps} from './types';
@@ -78,7 +78,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const git = useAppSelector(state => state.git);
 
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);

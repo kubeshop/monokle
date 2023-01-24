@@ -40,7 +40,11 @@ import {useFeatureFlags} from '@utils/features';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
-import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {
+  isInPreviewModeSelectorNew,
+  kubeConfigContextSelector,
+  kubeConfigPathValidSelector,
+} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();
@@ -48,7 +52,7 @@ const HotKeysHandler = () => {
   const mainState = useAppSelector(state => state.main);
   const uiState = useAppSelector(state => state.ui);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);

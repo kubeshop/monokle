@@ -13,7 +13,7 @@ import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 import {Icon} from '@monokle/components';
 import {ResourceRefType} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import * as S from './WarningAndErrorsDisplay.styled';
 
@@ -75,7 +75,7 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
 
 function WarningsAndErrorsDisplay() {
   const filteredResources = useAppSelector(filteredResourceSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
 
   const resources = useMemo(() => {
     return filteredResources.filter(resource =>

@@ -2,10 +2,11 @@ import {rgba} from 'polished';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
 
 import {ClusterColors} from '@shared/models/cluster';
 import {BackgroundColors, Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 const S = {
   PreviewOutputTag: styled.div`

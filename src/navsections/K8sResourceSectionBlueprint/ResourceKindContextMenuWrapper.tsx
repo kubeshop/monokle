@@ -17,7 +17,6 @@ import {
 import {
   activeResourceMetaMapSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
   knownResourceKindsSelector,
   resourceSelector,
 } from '@redux/selectors';
@@ -30,6 +29,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMetaMap, isLocalResource, isTransientResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {LocalOrigin} from '@shared/models/origin';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMetaMap, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;

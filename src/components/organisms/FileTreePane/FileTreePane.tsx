@@ -38,7 +38,7 @@ import {sortFoldersFiles} from '@utils/fileExplorer';
 
 import {Icon, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelectorNew} from '@shared/utils/selectors';
 
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
@@ -48,7 +48,7 @@ import * as S from './styled';
 
 const FileTreePane: React.FC = () => {
   const [tree, setTree] = useState<TreeNode | null>(null);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
 
   const dispatch = useAppDispatch();
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
