@@ -25,7 +25,7 @@ import store from '@redux/store';
 import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
 
-import {useHelpMenuItems} from '@hooks/useHelpMenuItems';
+import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 

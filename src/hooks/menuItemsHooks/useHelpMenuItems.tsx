@@ -26,7 +26,7 @@ import {AnimationDurations} from '@shared/styles';
 import {Colors} from '@shared/styles/colors';
 import {openDiscord, openDocumentation, openFeedback, openGitHub} from '@shared/utils/shell';
 
-import {useAppVersion} from './useAppVersion';
+import {useAppVersion} from '../useAppVersion';
 
 export function useHelpMenuItems() {
   const dispatch = useAppDispatch();

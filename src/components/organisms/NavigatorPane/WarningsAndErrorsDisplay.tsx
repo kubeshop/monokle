@@ -9,7 +9,7 @@ import {filteredResourceSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
 
-import {useRefDropdownMenuItems} from '@hooks/useRefDropdownMenuItems';
+import {useRefDropdownMenuItems} from '@hooks/menuItemsHooks';
 
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 

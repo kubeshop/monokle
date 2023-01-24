@@ -12,7 +12,7 @@ import {setShowStartPageLearn, toggleNotifications, toggleStartProjectPane} from
 
 import {IconButton} from '@atoms';
 
-import {useHelpMenuItems} from '@hooks/useHelpMenuItems';
+import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
