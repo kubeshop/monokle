@@ -16,7 +16,12 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {isInClusterModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+  selectedResourceSelector,
+  settingsSelector,
+} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
@@ -26,7 +31,6 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {parseYamlDocument} from '@utils/yaml';
 
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
@@ -57,7 +61,7 @@ const FormEditor: React.FC<IProps> = props => {
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const selection = useAppSelector(state => state.main.selection);
   const selectedResource = useAppSelector(selectedResourceSelector);
   const settings = useAppSelector(settingsSelector);
