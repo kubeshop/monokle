@@ -3,7 +3,7 @@ import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@con
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane} from '@organisms';
+import {BottomPaneManager, DashboardPane, FileTreePane, GitPane} from '@organisms';
 import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
@@ -50,15 +50,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
-  },
-  {
-    type: 'panel',
-    name: 'search',
-    tooltip: 'Advanced Search',
-    icon: () => <Icon name="search" style={{fontSize: 16}} />,
-    component: <SearchPane />,
-    useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
   },
   {
