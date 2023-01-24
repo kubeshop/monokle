@@ -69,7 +69,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const resource = useAppSelector(state =>
-    resourceSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+    resourceSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
 
   const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);

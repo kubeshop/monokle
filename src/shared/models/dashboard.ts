@@ -1,3 +1,5 @@
+import {ResourceSelection} from './selection';
+
 export type DashboardMenu = {
   key: string;
   label: string;
@@ -15,6 +17,6 @@ export type DashboardState = {
     activeTab: 'Info' | 'Manifest';
   };
   tableDrawer: {
-    selectedResourceId?: string;
+    resourceSelection: ResourceSelection<'cluster'>;
   };
 };

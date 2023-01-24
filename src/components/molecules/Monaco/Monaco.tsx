@@ -57,7 +57,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceStorageKey} from '@shared/models/k8sResource';
 import {isHelmPreview} from '@shared/models/preview';
-import {isHelmValuesFileSelection} from '@shared/models/selection';
+import {ResourceSelection, isHelmValuesFileSelection} from '@shared/models/selection';
 import {NewResourceWizardInput} from '@shared/models/ui';
 
 import * as S from './Monaco.styled';
@@ -86,9 +86,9 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
 const Monaco = (props: {
   diffSelectedResource: () => void;
   applySelection: () => void;
-  providedResource?: {id: string; storage: ResourceStorageKey};
+  providedResourceSelection?: ResourceSelection;
 }) => {
-  const {diffSelectedResource, applySelection, providedResource} = props;
+  const {diffSelectedResource, applySelection, providedResourceSelection} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -112,9 +112,7 @@ const Monaco = (props: {
   const shouldEditorReloadSelection = useAppSelector(state => state.main.selectionOptions.shouldEditorReload);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const selectedResource = useAppSelector(state =>
-    providedResource
-      ? resourceSelector(state, providedResource.id, providedResource.storage)
-      : selectedResourceSelector(state)
+    providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
   );
   const selectedResourceId = selectedResource?.id;
 

@@ -100,7 +100,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resource = useAppSelector(state =>
-    resourceSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+    resourceSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
   const resourceMap = useAppSelector(activeResourceMapSelector);
   const isThisResourceSelected = useAppSelector(state =>

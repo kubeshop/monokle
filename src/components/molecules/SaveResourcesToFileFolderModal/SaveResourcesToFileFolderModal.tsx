@@ -188,8 +188,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       const resourceIdentifier = resourcesIdentifiers[i];
       const resource = resourceSelector(
         {resourceMetaStorage, resourceContentStorage},
-        resourceIdentifier.id,
-        resourceIdentifier.origin.storage
+        {id: resourceIdentifier.id, storage: resourceIdentifier.origin.storage}
       );
       if (!resource) {
         // eslint-disable-next-line no-continue
@@ -296,7 +295,12 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
 
       let existingFileNames: string[] = [];
       const resources = resourcesIdentifiers
-        .map(id => resourceSelector({resourceMetaStorage, resourceContentStorage}, id.id, id.origin.storage))
+        .map(identifier =>
+          resourceSelector(
+            {resourceMetaStorage, resourceContentStorage},
+            {id: identifier.id, storage: identifier.origin.storage}
+          )
+        )
         .filter(isDefined);
       const hasNameClash = resources.some(resource =>
         resources.filter(r => r.id !== resource.id).some(r => r.name === resource.name)
@@ -305,8 +309,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       resourcesIdentifiers.forEach(resourceIdentifier => {
         const resource = resourceSelector(
           {resourceMetaStorage, resourceContentStorage},
-          resourceIdentifier.id,
-          resourceIdentifier.origin.storage
+          {id: resourceIdentifier.id, storage: resourceIdentifier.origin.storage}
         );
         if (!resource) {
           return;

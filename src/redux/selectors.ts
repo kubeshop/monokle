@@ -24,7 +24,7 @@ import {
 import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
-import {isFileSelection, isResourceSelection} from '@shared/models/selection';
+import {ResourceSelection, isFileSelection, isResourceSelection} from '@shared/models/selection';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
@@ -157,11 +157,15 @@ export const activeResourceCountSelector = createSelector(
   }
 );
 
+/**
+ * Usage:
+ */
 export function resourceSelector<Storage extends AnyOrigin['storage']>(
   state: RootState | {resourceMetaStorage: ResourceMetaStorage; resourceContentStorage: ResourceContentStorage},
-  resourceId: string,
-  resourceStorage: Storage | undefined
+  args: {id: string; storage: Storage | undefined} | ResourceSelection<Storage>
 ): K8sResource<OriginFromStorage<Storage>> | undefined {
+  const resourceId = 'id' in args ? args.id : args.resourceId;
+  const resourceStorage = 'storage' in args ? args.storage : args.resourceStorage;
   if (resourceStorage === undefined) {
     return undefined;
   }
@@ -207,7 +211,7 @@ export const selectedResourceSelector = createSelector(
     if (!isResourceSelection(selection)) {
       return undefined;
     }
-    return resourceSelector(state, selection.resourceId, selection.resourceStorage);
+    return resourceSelector(state, selection);
   }
 );
 
@@ -278,7 +282,7 @@ export const previewedKustomizationSelector = createSelector(
     if (!preview || preview.type !== 'kustomize') {
       return undefined;
     }
-    return resourceSelector(state, preview.kustomizationId, 'local');
+    return resourceSelector(state, {id: preview.kustomizationId, storage: 'local'});
   }
 );
 

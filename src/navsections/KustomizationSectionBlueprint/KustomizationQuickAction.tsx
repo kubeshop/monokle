@@ -32,7 +32,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
 
-  const thisKustomization = useAppSelector(state => resourceSelector(state, itemInstance.id, 'local'));
+  const thisKustomization = useAppSelector(state => resourceSelector(state, {id: itemInstance.id, storage: 'local'}));
 
   const isThisPreviewed = useMemo(
     () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),
