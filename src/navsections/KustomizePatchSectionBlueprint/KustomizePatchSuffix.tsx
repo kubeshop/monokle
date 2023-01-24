@@ -7,17 +7,17 @@ import {ItemCustomComponentProps} from '@shared/models/navigator';
 
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
-  const resource = useAppSelector(state =>
+  const resourceMeta = useAppSelector(state =>
     resourceMetaSelector(state, itemInstance.id, itemInstance.meta.resourceStorage)
   );
-  if (!resource) {
+  if (!resourceMeta) {
     return null;
   }
   return (
     <ResourceRefsIconPopover
       isSelected={itemInstance.isSelected}
       isDisabled={itemInstance.isDisabled}
-      resource={resource}
+      resourceMeta={resourceMeta}
       type="outgoing"
     />
   );
