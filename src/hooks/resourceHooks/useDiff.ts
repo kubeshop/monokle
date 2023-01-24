@@ -12,30 +12,30 @@ import {AlertEnum, AlertType} from '@shared/models/alert';
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
-export const useDiff = (resource?: ResourceMeta) => {
+export const useDiff = (resourceMeta?: ResourceMeta) => {
   const dispatch = useAppDispatch();
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
 
-  const currentResource = resource || selectedResourceMeta;
+  const currentResourceMeta = resourceMeta || selectedResourceMeta;
 
   const isDisabled = useMemo(() => {
     if (!isKubeConfigPathValid) {
       return true;
     }
-    if (!currentResource) {
+    if (!currentResourceMeta) {
       return true;
     }
-    if (isKustomizationPatch(currentResource) || isKustomizationResource(currentResource)) {
+    if (isKustomizationPatch(currentResourceMeta) || isKustomizationResource(currentResourceMeta)) {
       return true;
     }
-    if (!knownResourceKinds.includes(currentResource.kind)) {
+    if (!knownResourceKinds.includes(currentResourceMeta.kind)) {
       return true;
     }
     return false;
-  }, [isKubeConfigPathValid, currentResource, knownResourceKinds]);
+  }, [isKubeConfigPathValid, currentResourceMeta, knownResourceKinds]);
 
   const tooltipTitle = useMemo(
     () => (isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid),
@@ -54,8 +54,8 @@ export const useDiff = (resource?: ResourceMeta) => {
       return;
     }
 
-    if (currentResource?.id) {
-      dispatch(openResourceDiffModal(currentResource.id));
+    if (currentResourceMeta?.id) {
+      dispatch(openResourceDiffModal(currentResourceMeta.id));
     }
   };
 

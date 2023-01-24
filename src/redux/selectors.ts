@@ -22,7 +22,7 @@ import {
 import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
-import {isResourceSelection} from '@shared/models/selection';
+import {isFileSelection, isResourceSelection} from '@shared/models/selection';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
@@ -200,6 +200,17 @@ export const selectedResourceMetaSelector = createSelector(
       return undefined;
     }
     return resourceMetaSelector(state, selection.resourceId, selection.resourceStorage);
+  }
+);
+
+export const selectedFilePathSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!isFileSelection(selection)) {
+      return undefined;
+    }
+    return selection.filePath;
   }
 );
 
