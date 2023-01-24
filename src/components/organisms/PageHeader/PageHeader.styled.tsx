@@ -8,8 +8,8 @@ import {
 
 import styled from 'styled-components';
 
-import {PreviewType} from '@shared/models/appState';
 import {ClusterColors} from '@shared/models/cluster';
+import {PreviewType} from '@shared/models/preview';
 import {AnimationDurations} from '@shared/styles';
 import {Colors, FontColors, PanelColors} from '@shared/styles/colors';
 
@@ -98,7 +98,8 @@ export const LogoContainer = styled.div`
 `;
 
 export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType; $kubeConfigContextColor?: ClusterColors}>`
-  background: ${props => getPreviewTheme(Colors.blackPure, props.$previewType, 0, true, props.$kubeConfigContextColor)};
+  background: ${props =>
+    getPreviewTheme(Colors.blackPure, props.$previewType, 0, true, true, props.$kubeConfigContextColor)};
   padding: 0;
   margin: 0;
   height: 8px;

@@ -6,7 +6,7 @@ import {isEmpty} from 'lodash';
 
 import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {kustomizationsSelector} from '@redux/selectors';
 
 import {ResourceSet} from '@shared/models/compare';
 import {kubeConfigPathValidSelector} from '@shared/utils/selectors';
@@ -25,9 +25,7 @@ export const ResourceSetTypeSelect: React.FC<Props> = ({side}) => {
     isEmpty(Object.values(state.config.projectConfig?.savedCommandMap || {}).filter(command => Boolean(command)))
   );
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  const isKustomizeDisabled = useAppSelector(
-    state => !Object.values(state.main.resourceMap).filter(r => isKustomizationResource(r)).length
-  );
+  const isKustomizeDisabled = useAppSelector(state => isEmpty(kustomizationsSelector(state)));
   const resourceSet = useAppSelector(state => selectResourceSet(state.compare, side));
 
   const handleSelectType = useCallback(
