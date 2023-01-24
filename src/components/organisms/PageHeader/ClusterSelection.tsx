@@ -15,6 +15,7 @@ import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/redu
 import {
   currentClusterAccessSelector,
   isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
   kubeConfigContextColorSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
@@ -31,12 +32,7 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {HighlightItems} from '@shared/models/ui';
 import {Size} from '@shared/models/window';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {
-  activeProjectSelector,
-  isInPreviewModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathValidSelector,
-} from '@shared/utils/selectors';
+import {activeProjectSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 
@@ -46,7 +42,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const clusterPreviewNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -151,6 +147,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           <S.CheckCircleOutlined
             $isKubeConfigPathValid={isKubeConfigPathValid}
             $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            $isInClusterMode={isInClusterMode}
             $previewType={previewType}
             $kubeConfigContextColor={kubeConfigContextColor}
           />
@@ -210,6 +207,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           {!isPreviewLoading && isInPreviewMode && size.width > 1350 && (
             <S.PreviewMode
               $isInPreviewMode={isInPreviewMode}
+              $isInClusterMode={isInClusterMode}
               $previewType={previewType}
               $kubeConfigContextColor={kubeConfigContextColor}
             >
