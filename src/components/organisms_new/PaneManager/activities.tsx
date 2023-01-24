@@ -10,7 +10,7 @@ import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
-import {SettingsPane} from '../SettingsPane';
+import SettingsPane from '../SettingsPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
@@ -21,6 +21,14 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     component: <FileTreePane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+  },
+  {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
   },
   {
     type: 'fullscreen',
@@ -59,14 +67,6 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: <SettingsTooltip />,
     icon: () => <SettingsOutlined />,
     component: <SettingsPane />,
-    useBadge: () => undefined,
-  },
-  {
-    type: 'panel',
-    name: 'dashboard',
-    tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
-    component: <DashboardPane />,
     useBadge: () => undefined,
   },
 ];

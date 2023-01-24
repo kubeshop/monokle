@@ -22,14 +22,13 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {Icon} from '@atoms';
-
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
+import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 import {LocalOrigin} from '@shared/models/origin';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';

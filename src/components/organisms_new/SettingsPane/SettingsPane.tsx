@@ -4,13 +4,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms';
 
-import DefaultLayout from '@assets/DefaultLayout.svg';
-import EditorLayout from '@assets/EditorLayout.svg';
-
-// import LayoutDark from '@assets/LayoutDark.svg';
-// import LayoutWhite from '@assets/LayoutWhite.svg';
 import {TitleBar} from '@monokle/components';
-import {activeProjectSelector} from '@shared/utils';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
@@ -19,7 +14,7 @@ import {GlobalSettings} from './GlobalSettings/GlobalSettings';
 import {PluginManager} from './PluginsManager/PluginManager';
 import * as S from './SettingsPane.styled';
 
-export const SettingsPane = () => {
+const SettingsPane = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
 
@@ -28,21 +23,12 @@ export const SettingsPane = () => {
     [activeProject, isStartProjectPaneVisible]
   );
 
-  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'global-settings' : 'validation');
+  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'validation' : 'current-project-settings');
 
   const tabItems = useMemo(
     () => [
       ...(activeProject && !isStartProjectPaneVisible
         ? [
-            {
-              key: 'validation',
-              label: <S.TabOption>Validation</S.TabOption>,
-              children: (
-                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
-                  <ValidationSettings />
-                </S.TabItemContainer>
-              ),
-            },
             {
               key: 'current-project-settings',
               label: <S.TabOption>Current project settings</S.TabOption>,
@@ -54,6 +40,15 @@ export const SettingsPane = () => {
             },
           ]
         : []),
+      {
+        key: 'validation',
+        label: <S.TabOption>Validation</S.TabOption>,
+        children: (
+          <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
+            <ValidationSettings />
+          </S.TabItemContainer>
+        ),
+      },
       ...(!activeProject || isStartProjectPaneVisible
         ? [
             {
@@ -91,12 +86,11 @@ export const SettingsPane = () => {
 
   return (
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
-      <TitleBarWrapper style={{padding: !isOnStartProjectPage ? '10px' : '0px'}}>
-        <TitleBar
-          title={!isOnStartProjectPage ? 'Settings' : 'Configure your layout'}
-          description={!isOnStartProjectPage ? null : <TitleCardDescription />}
-        />
-      </TitleBarWrapper>
+      {!isOnStartProjectPage && (
+        <TitleBarWrapper>
+          <TitleBar title="Settings" />
+        </TitleBarWrapper>
+      )}
 
       <S.Tabs
         defaultActiveKey="source"
@@ -108,59 +102,4 @@ export const SettingsPane = () => {
   );
 };
 
-export const TitleCardDescription = () => {
-  const [selectedLayout, setSelectedLayout] = useState('EDITOR');
-  // const [selectedTheme, setSelectedTheme] = useState('DARK');
-
-  return (
-    <S.DescriptionContainer>
-      <S.OptionsContainer>
-        <S.LayoutOption
-          $selected={selectedLayout === 'EDITOR'}
-          onClick={() => {
-            setSelectedLayout('EDITOR');
-          }}
-        >
-          <S.LayoutContainer>
-            <S.LayoutTitle>Editor Layout</S.LayoutTitle>
-            <S.LayoutContent>Left pane collapses when editing so you can focus</S.LayoutContent>
-          </S.LayoutContainer>
-          <img src={EditorLayout} />
-        </S.LayoutOption>
-
-        <S.LayoutOption
-          $selected={selectedLayout === 'DEFAULT'}
-          onClick={() => {
-            setSelectedLayout('DEFAULT');
-          }}
-        >
-          <S.LayoutContainer>
-            <S.LayoutTitle>Default Layout</S.LayoutTitle>
-            <S.LayoutContent>You manually show/hide and move your panes</S.LayoutContent>
-          </S.LayoutContainer>
-          <img src={DefaultLayout} />
-        </S.LayoutOption>
-      </S.OptionsContainer>
-
-      {/* <S.OptionsContainer>
-        <S.ThemeOption
-          $selected={selectedTheme === 'DARK'}
-          onClick={() => {
-            setSelectedTheme('DARK');
-          }}
-        >
-          <img src={LayoutDark} />
-        </S.ThemeOption>
-
-        <S.ThemeOption
-          $selected={selectedTheme === 'LIGHT'}
-          onClick={() => {
-            setSelectedTheme('LIGHT');
-          }}
-        >
-          <img src={LayoutWhite} />
-        </S.ThemeOption>
-      </S.OptionsContainer> */}
-    </S.DescriptionContainer>
-  );
-};
+export default SettingsPane;

@@ -31,7 +31,7 @@ const ValidationErrorsPopover = () => {
 
   // return (
   //   <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-  //     <Icon name="error" style={{marginLeft: 5}} color={isSelected ? Colors.blackPure : Colors.redError} />
+  //     <Icon name="error" style={{marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.redError}} />
   //   </Popover>
   // );
 };

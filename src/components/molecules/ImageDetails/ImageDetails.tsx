@@ -6,8 +6,7 @@ import numeral from 'numeral';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {Icon} from '@atoms';
-
+import {Icon} from '@monokle/components';
 import {DockerHubImage, DockerHubImageTags} from '@shared/models/image';
 import {openUrlInExternalBrowser} from '@shared/utils/shell';
 

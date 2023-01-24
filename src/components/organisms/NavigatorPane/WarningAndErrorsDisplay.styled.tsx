@@ -2,8 +2,7 @@ import {Menu} from 'antd';
 
 import styled from 'styled-components';
 
-import {Icon as RawIcon} from '@atoms';
-
+import {Icon as RawIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 export const ErrorWarningContainer = styled.div<{$type: 'warning' | 'error'}>`

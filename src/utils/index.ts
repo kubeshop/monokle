@@ -1,4 +1,6 @@
+import {existsSync} from 'fs';
 import {DateTime} from 'luxon';
+import path from 'path';
 
 let lastId: number = 0;
 
@@ -16,4 +18,8 @@ export const getRelativeDate = (isoDate: string | undefined) => {
     return DateTime.fromISO(isoDate).toRelative();
   }
   return '';
+};
+
+export const doesSchemaExist = (k8sVersion: string, userDataDir: string) => {
+  return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
 };

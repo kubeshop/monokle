@@ -22,22 +22,22 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
 
-import {Icon} from '@components/atoms';
 import BranchSelect from '@components/molecules/BranchSelect';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
+import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
-import CreateProject from './CreateProject';
 import {HelpMenu} from './HelpMenu';
+import {K8sVersionSelection} from './K8sVersionSelection';
+import {OPAChip} from './OPAChip';
 import * as S from './PageHeader.styled';
-import ProjectSelection from './ProjectSelection';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
@@ -133,6 +133,10 @@ const PageHeader = () => {
     });
   };
 
+  const onClickProjectHandler = () => {
+    dispatch(toggleStartProjectPane());
+  };
+
   useEffect(() => {
     if (previewResourceId) {
       setPreviewResource(resourceMap[previewResourceId]);
@@ -191,7 +195,10 @@ const PageHeader = () => {
           {activeProject && (
             <>
               <S.Divider type="vertical" />
-              <ProjectSelection />
+              <S.ActiveProjectButton onClick={onClickProjectHandler}>
+                <S.MenuOutlinedIcon />
+                <S.ProjectName>{activeProject.name}</S.ProjectName>
+              </S.ActiveProjectButton>
               {hasGitRepo ? (
                 <S.BranchSelectContainer>
                   <BranchSelect />
@@ -214,15 +221,6 @@ const PageHeader = () => {
                   </S.InitButton>
                 </Tooltip>
               )}
-              <CreateProject />
-            </>
-          )}
-          {isStartProjectPaneVisible && activeProject && (
-            <>
-              <S.Divider type="vertical" style={{margin: '0 0.5rem', height: '1rem'}} />
-              <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
-                Back to Project
-              </S.BackToProjectButton>
             </>
           )}
 
@@ -247,7 +245,13 @@ const PageHeader = () => {
           )}
         </div>
 
-        <div style={{display: 'flex', alignItems: 'center'}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+          {projectRootFolder && (
+            <>
+              <OPAChip />
+              <K8sVersionSelection />
+            </>
+          )}
           <ClusterSelection previewResource={previewResource} />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>

@@ -9,11 +9,7 @@ import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constant
 
 import {useAppDispatch} from '@redux/hooks';
 
-// import {reprocessAllResources, toggleRule} from '@redux/reducers/main';
-// import {toggleOPARules} from '@redux/validation/validation.slice';
-import {Icon} from '@atoms';
-
-import {IconNames} from '@shared/models/icons';
+import {Icon, IconNames} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
@@ -96,7 +92,10 @@ export function useOpenPolicyAgentTable(width: number) {
             SEVERITY_ORDER_MAP[b.severity] - SEVERITY_ORDER_MAP[a.severity] || b.securitySeverity - a.securitySeverity,
         }),
         render: (_value, record) => (
-          <Icon {...severityIconMapper(record.securitySeverity)} style={{height: 15, width: 15, paddingTop: 15}} />
+          <Icon
+            name={severityIconMapper(record.securitySeverity).name}
+            style={{height: 15, width: 15, paddingTop: 15, color: severityIconMapper(record.securitySeverity).color}}
+          />
         ),
       },
       {

@@ -17,8 +17,8 @@ export const LogText = styled(Text)`
   margin-bottom: 0;
   padding: 4px;
   font-size: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', -apple-system, BlinkMacSystemFont;
   font-variant: tabular-nums;
   font-style: normal;
   font-weight: 600;

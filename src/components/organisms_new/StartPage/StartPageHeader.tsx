@@ -8,18 +8,21 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
+import {setShowStartPageLearn, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 
 import {HelpMenu} from '@organisms/PageHeader/HelpMenu';
 
-import {IconButton, SearchInput} from '@atoms';
+import {IconButton} from '@atoms';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
+
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './StatePageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
@@ -28,10 +31,19 @@ const StartPageHeader: React.FC = () => {
   return (
     <S.StartPageHeaderContainer>
       <S.LogoContainer>
-        <S.Logo id="monokle-logo-header" src={MonokleKubeshopLogo} alt="Monokle" />
+        <S.Logo
+          id="monokle-logo-header"
+          src={MonokleKubeshopLogo}
+          alt="Monokle"
+          onClick={() => {
+            if (activeProject) {
+              dispatch(toggleStartProjectPane());
+            }
+          }}
+        />
       </S.LogoContainer>
 
-      <SearchInput style={{width: '340px'}} />
+      {/* <SearchInput style={{width: '340px'}} /> */}
 
       <S.ActionsContainer>
         <S.LearnButton

@@ -50,9 +50,9 @@ import {AlertEnum, ExtraContentType} from '@shared/models/alert';
 import {NewVersionCode, Project} from '@shared/models/config';
 import {StepEnum} from '@shared/models/walkthrough';
 import {Size} from '@shared/models/window';
-import {activeProjectSelector} from '@shared/utils';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
@@ -98,6 +98,7 @@ const App = () => {
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
+  const isPreviewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
@@ -393,7 +394,7 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          {activeProject && !isStartProjectPaneVisible && <PageHeader />}
+          {(isPreviewingCluster || (activeProject && !isStartProjectPaneVisible)) && <PageHeader />}
 
           <PaneManager />
         </S.MainContainer>
