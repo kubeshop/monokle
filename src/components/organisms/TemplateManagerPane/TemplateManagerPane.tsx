@@ -10,13 +10,13 @@ import {DEFAULT_PANE_TITLE_HEIGHT, TEMPLATES_HELP_URL, TOOLTIP_DELAY} from '@con
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {TitleBar} from '@monokle/components';
 import {AnyTemplate} from '@shared/models/template';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
@@ -47,7 +47,8 @@ const TemplatesManagerPane: React.FC = () => {
 
   const isLoadingExistingTemplates = useAppSelector(state => state.extension.isLoadingExistingTemplates);
   const isLoadingExistingTemplatePacks = useAppSelector(state => state.extension.isLoadingExistingTemplatePacks);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
@@ -149,7 +150,7 @@ const TemplatesManagerPane: React.FC = () => {
                     <TemplateInformation
                       key={path}
                       template={template}
-                      disabled={isInPreviewMode}
+                      disabled={isInPreviewMode || isInClusterMode}
                       onClickOpenTemplate={() => onClickOpenTemplate(template)}
                     />
                   ))}
