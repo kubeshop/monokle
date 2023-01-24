@@ -11,7 +11,7 @@ import {Primitive} from 'type-fest';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigPathSelector} from '@redux/selectors';
-import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
+import {createTransientResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
 
 import {TemplateFormRenderer} from '@components/molecules';
@@ -64,7 +64,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       if (isVanillaTemplate(template)) {
         trackEvent('edit/template_use', {templateID: template.id});
         setIsLoading(true);
-        createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
+        createTransientResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
             setCreatedResources(resources);
