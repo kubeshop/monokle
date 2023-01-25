@@ -226,7 +226,14 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               <>
                 <S.ClusterOutlined />
                 <Dropdown
-                  overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
+                  menu={{
+                    items: [
+                      {
+                        key: 'form',
+                        label: <ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />,
+                      },
+                    ],
+                  }}
                   overlayClassName="cluster-dropdown-item"
                   placement="bottomLeft"
                   arrow

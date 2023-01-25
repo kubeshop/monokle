@@ -150,7 +150,6 @@ const BottomPaneManager: React.FC = () => {
           <PreviewSavedCommand />
 
           <Dropdown
-            open
             mouseEnterDelay={0.5}
             placement="bottomRight"
             menu={{items: terminalOptionsMenuItems, className: 'terminal-options-menu'}}
