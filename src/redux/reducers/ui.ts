@@ -268,9 +268,6 @@ export const uiSlice = createSlice({
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
       state.kubeConfigBrowseSettings = {isOpen: true};
     },
-    setPreviewingCluster: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.previewingCluster = action.payload;
-    },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
@@ -411,7 +408,6 @@ export const {
   setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
-  setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
   setShowStartPageLearn,

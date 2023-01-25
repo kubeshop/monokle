@@ -183,7 +183,6 @@ type UiState = {
       currentStep: number;
     };
   };
-  previewingCluster?: boolean;
   startPageLearn: {
     isVisible: boolean;
   };
