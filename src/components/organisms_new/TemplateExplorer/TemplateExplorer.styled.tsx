@@ -1,6 +1,8 @@
-import {Modal as RawModal} from 'antd';
+import {Collapse, Modal as RawModal} from 'antd';
 
 import styled from 'styled-components';
+
+import {Colors} from '@shared/styles/colors';
 
 export const LeftContainer = styled.div`
   background-color: #1d1d1d;
@@ -19,3 +21,11 @@ export const Modal = styled(RawModal)`
     grid-template-columns: 2fr 3fr;
   }
 `;
+
+export const NoTemplatesMessage = styled.div`
+  color: ${Colors.grey9};
+  padding: 16px;
+  font-weight: 700;
+`;
+
+export const TemplatesCollapse = styled(Collapse)``;

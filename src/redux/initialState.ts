@@ -229,7 +229,7 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   templateExplorer: {
-    isVisible: true,
+    isVisible: false,
   },
 };
 
