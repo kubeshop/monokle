@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
-import {Badge, Button, Tooltip} from 'antd';
+import {Badge, Button, Dropdown, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
@@ -9,13 +9,14 @@ import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants'
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
+import {toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
+import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
@@ -44,6 +45,7 @@ const NavPane: React.FC = () => {
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
   const height = usePaneHeight();
+  const newResourceMenuItems = useNewResourceMenuItems();
 
   const appliedFilters = useMemo(
     () =>
@@ -56,10 +58,6 @@ const NavPane: React.FC = () => {
   );
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
-
-  const onClickNewResource = () => {
-    dispatch(openNewResourceWizard());
-  };
 
   const resourceFilterButtonHandler = () => {
     dispatch(toggleResourceFilters());
@@ -84,17 +82,23 @@ const NavPane: React.FC = () => {
             actions={
               <S.TitleBarRightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-                  <S.PlusButton
-                    id="create-resource-button"
-                    $disabled={!isFolderOpen || isInPreviewMode}
-                    $highlighted={highlightedItems.createResource}
-                    className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                    disabled={!isFolderOpen || isInPreviewMode}
-                    icon={<PlusOutlined />}
-                    size="small"
-                    type="link"
-                    onClick={onClickNewResource}
-                  />
+                  <Dropdown
+                    open
+                    trigger={['click']}
+                    menu={{items: newResourceMenuItems}}
+                    overlayClassName="dropdown-secondary"
+                  >
+                    <S.PlusButton
+                      id="create-resource-button"
+                      $disabled={!isFolderOpen || isInPreviewMode}
+                      $highlighted={highlightedItems.createResource}
+                      className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                      disabled={!isFolderOpen || isInPreviewMode}
+                      icon={<PlusOutlined />}
+                      size="small"
+                      type="link"
+                    />
+                  </Dropdown>
                 </Tooltip>
 
                 <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
