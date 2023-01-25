@@ -4,8 +4,7 @@ import {Popover} from 'antd';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import {Icon} from '@atoms';
-
+import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
@@ -51,6 +50,8 @@ const ResourceRefsIconPopover = ({
     return 'outgoingRefs';
   }, [type]);
 
+  const incomingColor = useMemo(() => (isSelected ? Colors.blackPure : Colors.blue10), [isSelected]);
+
   if (!resourceRefs || resourceRefs.length === 0) {
     return <span style={{minWidth: '20px'}} />;
   }
@@ -80,14 +81,16 @@ const ResourceRefsIconPopover = ({
       <S.IconsContainer>
         <Icon
           name={iconType}
-          style={type === 'incoming' ? {...baseIconStyle, marginRight: 5} : {...baseIconStyle, marginLeft: 5}}
-          color={isSelected ? Colors.blackPure : Colors.blue10}
+          style={
+            type === 'incoming'
+              ? {...baseIconStyle, marginRight: 5, color: incomingColor}
+              : {...baseIconStyle, marginLeft: 5, color: incomingColor}
+          }
         />
         {hasUnsatisfiedRefs && (
           <Icon
             name="warning"
-            style={{...baseIconStyle, marginLeft: 5}}
-            color={isSelected ? Colors.blackPure : Colors.yellowWarning}
+            style={{...baseIconStyle, marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.yellowWarning}}
           />
         )}
       </S.IconsContainer>

@@ -7,12 +7,11 @@ import {PREVIEW_PREFIX} from '@constants/constants';
 import {useAppSelector} from '@redux/hooks';
 import {filteredResourceSelector} from '@redux/selectors';
 
-import {Icon} from '@atoms';
-
 import {useRefDropdownMenuItems} from '@hooks/menuItemsHooks';
 
 import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 
+import {Icon} from '@monokle/components';
 import {ResourceRefType} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 import {isInPreviewModeSelector} from '@shared/utils/selectors';

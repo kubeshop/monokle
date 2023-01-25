@@ -13,12 +13,11 @@ import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 import {setTerminalShells} from '@redux/services/terminalShells';
 
-import {Icon} from '@atoms';
-
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
 
 import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuItemsHooks';
 
+import {Icon} from '@monokle/components';
 import {TerminalType} from '@shared/models/terminal';
 
 import TerminalPane from '../TerminalPane';

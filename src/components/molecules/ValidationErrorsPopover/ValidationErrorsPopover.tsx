@@ -2,10 +2,9 @@ import {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
-import Icon from '@atoms/Icon';
-
 import {countResourceErrors} from '@utils/resources';
 
+import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
@@ -28,7 +27,7 @@ const ValidationErrorsPopover: React.FC<IProps> = props => {
 
   return (
     <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-      <Icon name="error" style={{marginLeft: 5}} color={isSelected ? Colors.blackPure : Colors.redError} />
+      <Icon name="error" style={{marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.redError}} />
     </Popover>
   );
 };
