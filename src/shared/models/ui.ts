@@ -1,5 +1,5 @@
 import {SavedCommand, SettingsPanel} from './config';
-import {ResourceIdentifier} from './k8sResource';
+import {ResourceIdentifier, ResourceStorageKey} from './k8sResource';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -113,6 +113,7 @@ type UiState = {
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;
+    resourceStorage: ResourceStorageKey;
   };
   replaceImageModal?: {
     isOpen: boolean;

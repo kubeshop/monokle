@@ -34,6 +34,7 @@ import {
   ResourceMap,
   ResourceMeta,
   ResourceMetaMap,
+  ResourceStorageKey,
   isLocalResource,
 } from '@shared/models/k8sResource';
 import {AnyOrigin, LocalOrigin, isLocalOrigin} from '@shared/models/origin';
@@ -428,11 +429,14 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(resource: ResourceIdentifier, selection: AppSelection | undefined) {
+export function isResourceSelected(
+  resource: ResourceIdentifier | {id: string; storage: ResourceStorageKey},
+  selection: AppSelection | undefined
+) {
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&
-    selection.resourceStorage === resource.origin.storage
+    selection.resourceStorage === ('storage' in resource ? resource.storage : resource.origin.storage)
   );
 }
 

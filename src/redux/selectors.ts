@@ -108,6 +108,24 @@ export const activeResourceContentMapSelector = createSelector(
   }
 );
 
+export const selectedResourceMetaWithMapSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selectedResourceMeta = selectedResourceMetaSelector(state);
+    if (!selectedResourceMeta) {
+      return {
+        selectedResourceMeta: undefined,
+        resourceMetaMap: undefined,
+      };
+    }
+    const resourceMetaMap = resourceMetaMapSelector(state, selectedResourceMeta.origin.storage);
+    return {
+      selectedResourceMeta,
+      resourceMetaMap,
+    };
+  }
+);
+
 // function getResourceMetaMap<Storage extends AnyOrigin['storage']>(
 //   resourceMetaStorage: ResourceMetaStorage,
 //   storageKey: Storage

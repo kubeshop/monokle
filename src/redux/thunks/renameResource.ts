@@ -12,7 +12,7 @@ export const renameResource = (
   shouldUpdateRefs: boolean,
   resourceMap: ResourceMap,
   dispatch: AppDispatch,
-  selectedResourceId?: string
+  isResourceSelected?: boolean
 ) => {
   const resource = resourceMap[resourceId];
   if (!resource || !resource.object) {
@@ -48,7 +48,7 @@ export const renameResource = (
         updateResource({
           resourceId: dependentResource.id,
           text: newDependentResourceText,
-          preventSelectionAndHighlightsUpdate: selectedResourceId !== dependentResource.id,
+          preventSelectionAndHighlightsUpdate: !isResourceSelected,
         })
       );
     });
@@ -57,7 +57,7 @@ export const renameResource = (
     updateResource({
       resourceId,
       text: newResourceText,
-      preventSelectionAndHighlightsUpdate: selectedResourceId !== resourceId,
+      preventSelectionAndHighlightsUpdate: !isResourceSelected,
     })
   );
 };
