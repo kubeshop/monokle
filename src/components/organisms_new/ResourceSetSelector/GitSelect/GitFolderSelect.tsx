@@ -15,6 +15,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
 import {CompareSide, PartialResourceSet} from '@shared/models/compare';
 import {K8sResource} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
 
 import * as S from '../ResourceSetSelectColor.styled';
 
@@ -25,7 +26,10 @@ type IProps = {
 const GitFolderSelect: React.FC<IProps> = ({side}) => {
   const dispatch = useAppDispatch();
   const resourceSet = useAppSelector(state => selectGitResourceSet(state, side));
-  const resources = useAppSelector(state => state.compare.current[side]?.resources);
+  // TODO: can we avoid this type cast?
+  const resources = useAppSelector(state => state.compare.current[side]?.resources) as
+    | K8sResource<LocalOrigin>[]
+    | undefined;
   invariant(resourceSet, 'invalid_state');
 
   const [gitFileMap, setGitFileMap] = useState<FileMapType>();
@@ -70,11 +74,11 @@ const GitFolderSelect: React.FC<IProps> = ({side}) => {
 
 export default GitFolderSelect;
 
-const generateGitFileMap = (resources: K8sResource[]) => {
+const generateGitFileMap = (resources: K8sResource<LocalOrigin>[]) => {
   const fileMap: FileMapType = {};
   createRootFileEntry('', fileMap);
   fileMap[ROOT_FILE_ENTRY].children = [];
-  const filePaths = resources.map(r => `${sep}${r.filePath.replaceAll('/', sep)}`);
+  const filePaths = resources.map(r => `${sep}${r.origin.filePath.replaceAll('/', sep)}`);
   const folderPaths = [...new Set(filePaths.map(filePath => dirname(filePath)))].filter(
     folderPath => folderPath !== sep
   );

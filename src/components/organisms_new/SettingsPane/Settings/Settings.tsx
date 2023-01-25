@@ -27,7 +27,6 @@ import {
 } from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -163,9 +162,10 @@ export const Settings = ({
     }
   };
 
-  const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
-    dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
-  };
+  // TODO: revisit this after @monokle/validation is integrated
+  // const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
+  //   dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
+  // };
 
   const onChangeEnableHelmWithKustomize = (e: any) => {
     setLocalConfig({
@@ -455,12 +455,15 @@ export const Settings = ({
         </S.Div>
         <S.Div>
           <S.Span>Resource links processing</S.Span>
+
+          {/*
+            // TODO: revisit this after @monokle/validation is integrated
           <Checkbox
             checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
             onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
           >
             Ignore optional unsatisfied links
-          </Checkbox>
+          </Checkbox> */}
         </S.Div>
         <S.Div>
           <S.Span>Form Editor</S.Span>

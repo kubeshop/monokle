@@ -5,12 +5,14 @@ import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
+import {isEmpty} from 'lodash';
+
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector, isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
@@ -25,7 +27,6 @@ import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -33,13 +34,14 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const activeResources = useAppSelector(activeResourcesSelector);
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const hasAnyActiveResources = useAppSelector(state => !isEmpty(activeResourceMetaMapSelector(state)));
+
+  const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
@@ -67,7 +69,7 @@ const NavPane: React.FC = () => {
 
   return (
     <S.NavigatorPaneContainer>
-      {checkedResourceIds.length && !isPreviewLoading ? (
+      {checkedResourceIdentifiers.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
@@ -100,7 +102,7 @@ const NavPane: React.FC = () => {
                 <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
                     <Button
-                      disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                      disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || !hasAnyActiveResources}
                       type="link"
                       size="small"
                       icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}

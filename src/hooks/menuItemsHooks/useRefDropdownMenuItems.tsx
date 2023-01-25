@@ -5,7 +5,7 @@ import {Menu, MenuProps, Tag} from 'antd';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
 
 import {Warning} from '@components/organisms/NavigatorPane/WarningsAndErrorsDisplay';
 
@@ -20,7 +20,7 @@ export function useRefDropdownMenuItems(type: 'error' | 'warning', warnings: War
       warnings.map(warning => ({
         key: warning.id,
         label: (
-          <MenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
+          <MenuItem key={warning.id} onClick={() => dispatch(selectResource({resourceId: warning.id}))}>
             {warning.namespace && <Tag>{warning.namespace}</Tag>}
             <span>{warning.name}</span>
             <WarningCountContainer $type={type}>
