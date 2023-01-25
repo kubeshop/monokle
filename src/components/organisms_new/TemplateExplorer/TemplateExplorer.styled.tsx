@@ -41,6 +41,9 @@ export const PaddingWrapper = styled.div`
 `;
 
 export const TemplatesCollapse = styled(Collapse)`
+  max-height: calc(100% - 200px);
+  overflow-y: auto;
+
   .ant-collapse-header {
     padding-left: 25px !important;
   }
