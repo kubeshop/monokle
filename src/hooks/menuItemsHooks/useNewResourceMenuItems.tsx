@@ -7,7 +7,7 @@ import {FolderAddOutlined as RawFolderAddOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard, openTemplatesModal} from '@redux/reducers/ui';
 
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
@@ -37,6 +37,7 @@ export function useNewResourceMenuItems() {
             New from template
           </MenuItem>
         ),
+        onClick: () => dispatch(openTemplatesModal()),
       },
     ],
     [dispatch]

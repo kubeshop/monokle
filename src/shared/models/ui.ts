@@ -185,6 +185,9 @@ type UiState = {
   startPageLearn: {
     isVisible: boolean;
   };
+  templatesModal: {
+    isVisible: boolean;
+  };
 };
 
 export type {

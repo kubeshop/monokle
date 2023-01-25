@@ -228,6 +228,9 @@ const initialUiState: UiState = {
   startPageLearn: {
     isVisible: false,
   },
+  templatesModal: {
+    isVisible: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {
