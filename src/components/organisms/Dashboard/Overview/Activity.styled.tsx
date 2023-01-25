@@ -1,3 +1,5 @@
+import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -5,6 +7,7 @@ import Colors from '@styles/Colors';
 export const Container = styled.div`
   padding: 12px 8px 3px 8px;
   overflow-y: auto;
+  height: calc(100% - 32px);
 `;
 
 export const EventRow = styled.div<{$type: string}>`
@@ -23,6 +26,7 @@ export const EventRow = styled.div<{$type: string}>`
   :hover {
     background-color: ${Colors.grey10};
   }
+  cursor: pointer;
 `;
 
 export const TimeInfo = styled.div`
@@ -72,4 +76,34 @@ export const MessageText = styled.div`
 export const MessageHost = styled.div`
   font-size: 11px;
   color: ${Colors.blue7};
+`;
+
+export const ScrollToLatest = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background: rgba(20, 26, 27, 0.9);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+`;
+export const ScrollToOldest = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(20, 26, 27, 0.9);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+`;
+export const CloseOutlined = styled(RawCloseOutlined)`
+  color: ${Colors.grey8};
+  font-size: 11px;
+  padding: 4px;
+
+  :hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 `;

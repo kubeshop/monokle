@@ -56,7 +56,7 @@ const PaneManagerSplitView: React.FC = () => {
 
   if (!isInClusterMode && leftActiveMenu === 'dashboard') {
     if (isPreviewLoading) {
-      return <Skeleton active style={{margin: 20}} />;
+      return <Skeleton active style={{padding: 20}} />;
     }
     return <EmptyDashboard />;
   }

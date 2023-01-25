@@ -1,4 +1,8 @@
-import {DownOutlined as RawDownOutlined, PauseCircleFilled as RawPauseCircleFilled} from '@ant-design/icons';
+import {
+  DownOutlined as RawDownOutlined,
+  PauseCircleFilled as RawPauseCircleFilled,
+  PlayCircleFilled as RawPlayCircleFilled,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -18,7 +22,7 @@ export const Container = styled.div`
     'inventory-info activity activity';
 `;
 
-export const TitleBarContainer = styled.div`
+export const TitleBarContainer = styled.div<{$disableScroll?: boolean}>`
   & > div:nth-child(1) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -30,8 +34,10 @@ export const TitleBarContainer = styled.div`
   & > div:nth-child(2) {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    overflow: ${({$disableScroll}) => ($disableScroll ? 'hidden' : 'auto')};
+    padding: ${({$disableScroll}) => ($disableScroll ? '0px' : '9px 10px 6px 10px')};
     height: calc(100% - 32px);
-    overflow: auto;
+
     margin-top: 4px;
   }
 `;
@@ -42,12 +48,16 @@ export const ActionWrapper = styled.span`
   font-size: 12px;
 
   &:hover {
-    cursor: not-allowed;
+    cursor: pointer;
     text-decoration: underline;
   }
 `;
 
 export const PauseCircleFilled = styled(RawPauseCircleFilled)`
+  color: ${Colors.blue7};
+  margin-right: 4px;
+`;
+export const PlayCircleFilled = styled(RawPlayCircleFilled)`
   color: ${Colors.blue7};
   margin-right: 4px;
 `;

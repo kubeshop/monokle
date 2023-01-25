@@ -7,7 +7,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardMenuList, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -15,6 +15,7 @@ import {trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
+import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
 import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 import {IMenu} from './menu';
@@ -22,21 +23,21 @@ import {IMenu} from './menu';
 const DashboardPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
+  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [menu, setMenu] = useState<IMenu[]>([]);
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
 
   useEffect(() => {
     if (!filterText) {
-      setFilteredMenu(menu);
+      setFilteredMenu(menuList);
       return;
     }
 
     setFilteredMenu(
-      menu
+      menuList
         .map((menuItem: IMenu) => ({
           ...menuItem,
           children: menuItem.children?.filter((m: IMenu) => m.label.toLowerCase().includes(filterText.toLowerCase())),
@@ -49,7 +50,7 @@ const DashboardPane: React.FC = () => {
               0
         )
     );
-  }, [filterText, menu]);
+  }, [filterText, menuList]);
 
   useEffect(() => {
     let tempMenu: IMenu[] = [
@@ -101,7 +102,7 @@ const DashboardPane: React.FC = () => {
       errorCount: menuItem.children?.reduce((total: number, m: IMenu) => total + (m.errorCount ? m.errorCount : 0), 0),
     }));
 
-    setMenu(tempMenu);
+    dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
@@ -167,12 +168,16 @@ const DashboardPane: React.FC = () => {
       </S.HeaderContainer>
 
       {filteredMenu.map((parent: IMenu) =>
-        (parent.resourceCount && parent.resourceCount > 0) || parent.key === 'Overview' ? (
+        (parent.resourceCount && parent.resourceCount > 0) ||
+        ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 ? (
           <div key={parent.key}>
             <S.MainSection
-              $clickable={parent.key === 'Overview' || parent.key === 'Node'}
+              $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1}
               $active={activeMenu.key === parent.key}
-              onClick={() => (parent.key === 'Overview' || parent.key === 'Node') && setActiveMenu(parent)}
+              onClick={() =>
+                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 &&
+                setActiveMenu(parent)
+              }
             >
               {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
               <span>{parent.label}</span>
