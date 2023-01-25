@@ -332,6 +332,15 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   cursor: default;
 }
 
+.dropdown-custom-styling .ant-dropdown-menu {
+  padding: 0px;
+}
+
+.dropdown-custom-styling .ant-dropdown-menu-item {
+  padding: 0px;
+  cursor: default;
+}
+
 .cluster-color-popover {
   width: 130px;
 }

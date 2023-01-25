@@ -234,19 +234,27 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
               </>
             ) : (
               <Dropdown
-                overlay={
-                  <S.DropdownActionContainer>
-                    {isInClusterMode && selectedResource?.kind === 'Deployment' && (
-                      <>
-                        <Scale isDropdownActive />
-                        <Restart isDropdownActive />
-                      </>
-                    )}
-                    <InstallDeploy applySelection={applySelection} />
-                    <Diff />
-                  </S.DropdownActionContainer>
-                }
+                menu={{
+                  items: [
+                    {
+                      key: 'actions',
+                      label: (
+                        <S.DropdownActionContainer>
+                          {isInClusterMode && selectedResource?.kind === 'Deployment' && (
+                            <>
+                              <Scale isDropdownActive />
+                              <Restart isDropdownActive />
+                            </>
+                          )}
+                          <InstallDeploy applySelection={applySelection} />
+                          <Diff />
+                        </S.DropdownActionContainer>
+                      ),
+                    },
+                  ],
+                }}
                 placement="bottomLeft"
+                overlayClassName="dropdown-custom-styling"
               >
                 <S.EllipsisOutlined />
               </Dropdown>
