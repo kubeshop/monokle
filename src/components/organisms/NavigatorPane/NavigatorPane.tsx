@@ -83,7 +83,6 @@ const NavPane: React.FC = () => {
               <S.TitleBarRightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
                   <Dropdown
-                    open
                     trigger={['click']}
                     menu={{items: newResourceMenuItems}}
                     overlayClassName="dropdown-secondary"

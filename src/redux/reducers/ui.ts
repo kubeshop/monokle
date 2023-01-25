@@ -123,11 +123,11 @@ export const uiSlice = createSlice({
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
     },
-    openTemplatesModal: (state: Draft<UiState>) => {
-      state.templatesModal.isVisible = true;
+    openTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = true;
     },
-    closeTemplatesModal: (state: Draft<UiState>) => {
-      state.templatesModal.isVisible = false;
+    closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = false;
     },
     openRenameEntityModal: (
       state: Draft<UiState>,
@@ -384,7 +384,7 @@ export const {
   closeReplaceImageModal,
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
-  closeTemplatesModal,
+  closeTemplateExplorer,
   collapseNavSections,
   expandNavSections,
   handleWalkthroughStep,
@@ -403,7 +403,7 @@ export const {
   openReplaceImageModal,
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
-  openTemplatesModal,
+  openTemplateExplorer,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,

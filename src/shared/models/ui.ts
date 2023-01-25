@@ -185,7 +185,7 @@ type UiState = {
   startPageLearn: {
     isVisible: boolean;
   };
-  templatesModal: {
+  templateExplorer: {
     isVisible: boolean;
   };
 };

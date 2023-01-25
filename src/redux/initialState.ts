@@ -228,8 +228,8 @@ const initialUiState: UiState = {
   startPageLearn: {
     isVisible: false,
   },
-  templatesModal: {
-    isVisible: false,
+  templateExplorer: {
+    isVisible: true,
   },
 };
 
