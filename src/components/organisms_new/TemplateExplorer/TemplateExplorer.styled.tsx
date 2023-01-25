@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 export const LeftContainer = styled.div`
   background-color: #1d1d1d;
+  padding: 25px;
 `;
 
 export const Modal = styled(RawModal)`
