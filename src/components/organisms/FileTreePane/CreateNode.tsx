@@ -5,12 +5,13 @@ import textExtensions from 'text-extensions';
 
 import {ADDITIONAL_SUPPORTED_FILES, TOOLTIP_DELAY} from '@constants/constants';
 
-import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {getChildFilePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
-import {ResourceMap} from '@shared/models/k8sResource';
+import {ResourceMetaMap} from '@shared/models/k8sResource';
+import {LocalOrigin} from '@shared/models/origin';
 
 import {TreeNode} from './types';
 
@@ -19,13 +20,13 @@ import * as S from './styled';
 export const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
-  resourceMap: ResourceMap,
+  resourceMetaMap: ResourceMetaMap<LocalOrigin>,
   hideExcludedFilesInFileExplorer: boolean,
   hideUnsupportedFilesInFileExplorer: boolean,
   fileOrFolderContainedInFilter: string | undefined,
   rootFolderName: string
 ): TreeNode => {
-  const resources = getResourcesForPath(fileEntry?.filePath, resourceMap);
+  const resources = getLocalResourceMetasForPath(fileEntry?.filePath, resourceMetaMap);
   const root = fileMap[ROOT_FILE_ENTRY];
   const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
   const key = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
@@ -87,7 +88,7 @@ export const createNode = (
           createNode(
             childEntry,
             fileMap,
-            resourceMap,
+            resourceMetaMap,
             hideExcludedFilesInFileExplorer,
             hideUnsupportedFilesInFileExplorer,
             fileOrFolderContainedInFilter,
