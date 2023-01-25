@@ -53,7 +53,7 @@ export const MenuDropdownList = styled.div`
   }
 
   .ant-dropdown-menu-item:hover {
-    background-color: ${Colors.grey6000};
+    background-color: ${Colors.grey2};
   }
 `;
 

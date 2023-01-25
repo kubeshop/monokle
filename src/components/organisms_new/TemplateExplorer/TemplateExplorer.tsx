@@ -7,6 +7,7 @@ import {useAppSelector} from '@redux/hooks';
 import {TitleBar} from '@monokle/components';
 
 import TemplateCollapseHeader from './TemplateCollapseHeader';
+import TemplateCollapseItem from './TemplateCollapseItem';
 import * as S from './TemplateExplorer.styled';
 import TitleBarDescription from './TitleBarDescription';
 
@@ -15,15 +16,19 @@ const TemplateExplorer: React.FC = () => {
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
 
   return (
-    <S.Modal centered open={isOpen} width="85%" title="Create resources from a template" footer={null}>
+    <S.Modal open={isOpen} width="90%" title="Create resources from a template" footer={null}>
       <S.LeftContainer>
-        <TitleBar title="Templates" description={<TitleBarDescription />} />
+        <S.PaddingWrapper>
+          <TitleBar title="Templates" description={<TitleBarDescription />} />
+        </S.PaddingWrapper>
 
         {!isEmpty(pluginMap) ? (
           <S.TemplatesCollapse ghost>
             {Object.entries(pluginMap).map(([path, plugin]) => (
               <Collapse.Panel header={<TemplateCollapseHeader plugin={plugin} />} key={path}>
-                Test
+                {plugin.modules.map(module => (
+                  <TemplateCollapseItem key={module.path} path={module.path} />
+                ))}
               </Collapse.Panel>
             ))}
           </S.TemplatesCollapse>
