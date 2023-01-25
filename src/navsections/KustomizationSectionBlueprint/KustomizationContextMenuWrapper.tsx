@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -203,7 +203,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   ];
 
   return (
-    <ContextMenu disabled={!isPassingFilter} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={!isPassingFilter} items={menuItems} triggerOnRightClick>
       {children}
     </ContextMenu>
   );

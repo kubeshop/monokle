@@ -10,9 +10,9 @@ import {NotificationsTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setShowStartPageLearn, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 
-import {HelpMenu} from '@organisms/PageHeader/HelpMenu';
-
 import {IconButton} from '@atoms';
+
+import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
@@ -27,6 +27,8 @@ const StartPageHeader: React.FC = () => {
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+
+  const helpMenuItems = useHelpMenuItems();
 
   return (
     <S.StartPageHeaderContainer>
@@ -70,18 +72,18 @@ const StartPageHeader: React.FC = () => {
         </Tooltip>
 
         <Dropdown
+          menu={{
+            items: helpMenuItems,
+            onClick: () => {
+              setIsHelpMenuOpen(false);
+            },
+          }}
           open={isHelpMenuOpen}
-          placement="bottomLeft"
           onOpenChange={() => {
             setIsHelpMenuOpen(!isHelpMenuOpen);
           }}
-          overlay={
-            <HelpMenu
-              onMenuClose={() => {
-                setIsHelpMenuOpen(false);
-              }}
-            />
-          }
+          placement="bottomLeft"
+          overlayClassName="help-menu-dropdown"
         >
           <IconButton $size="large" style={{marginLeft: '5px'}}>
             <EllipsisOutlined />

@@ -4,7 +4,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
@@ -310,7 +310,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={isDisabled} items={menuItems} triggerOnRightClick>
       <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <S.TitleWrapper>
           <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
@@ -342,7 +342,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             )}
 
             {!isDisabled && (
-              <ContextMenu overlay={<Menu items={menuItems} />}>
+              <ContextMenu items={menuItems}>
                 <div
                   onClick={e => {
                     e.stopPropagation();

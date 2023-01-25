@@ -1,4 +1,4 @@
-import {Dropdown, Menu, Typography} from 'antd';
+import {Dropdown, Typography} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectK8sVersion} from '@redux/reducers/appConfig';
@@ -24,19 +24,17 @@ export const K8sVersionSelection = () => {
     }
   };
 
-  const menu = (
+  const menuItems = K8S_VERSIONS.map(version => ({
+    label: version,
+    key: version,
+    className: version === selectedK8SVersion ? 'selected-menu-item' : '',
+    onClick: () => handleK8SVersionChange(version),
+  }));
+
+  const dropdownRender = (menu: React.ReactNode) => (
     <S.MenuContainer>
-      <Menu>
-        {K8S_VERSIONS.map(version => (
-          <S.MenuItem
-            key={version}
-            $selected={version === selectedK8SVersion}
-            onClick={() => handleK8SVersionChange(version)}
-          >
-            <Typography.Text>{version}</Typography.Text>
-          </S.MenuItem>
-        ))}
-      </Menu>
+      {menu}
+
       <S.MenuBottom>
         <S.WarningText>
           Selecting another K8s Schema can bring <Typography.Text type="danger">new validation errors.</Typography.Text>
@@ -50,8 +48,9 @@ export const K8sVersionSelection = () => {
     <S.Container>
       <Dropdown
         arrow
-        overlay={menu}
+        menu={{items: menuItems}}
         placement="bottomLeft"
+        dropdownRender={dropdownRender}
         getPopupContainer={() => document.getElementById('k8sVList')!}
       >
         <Typography.Text style={{cursor: 'pointer'}}>

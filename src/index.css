@@ -323,6 +323,24 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   background: #111d2c;
 }
 
+.cluster-dropdown-item .ant-dropdown-menu {
+  padding: 0px;
+}
+
+.cluster-dropdown-item .ant-dropdown-menu-item {
+  padding: 0px;
+  cursor: default;
+}
+
+.dropdown-custom-styling .ant-dropdown-menu {
+  padding: 0px;
+}
+
+.dropdown-custom-styling .ant-dropdown-menu-item {
+  padding: 0px;
+  cursor: default;
+}
+
 .cluster-color-popover {
   width: 130px;
 }
@@ -410,4 +428,25 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 .filters-preset-dropdown .ant-select-item-option-content:hover .anticon {
   display: block;
+}
+
+.help-menu-dropdown .ant-dropdown-menu {
+  padding: 0;
+}
+
+.help-menu-dropdown .ant-dropdown-menu-item {
+  padding: 0;
+}
+
+.help-menu-dropdown .ant-dropdown-menu-item:hover {
+  background-color: transparent;
+}
+
+.terminal-options-menu .ant-dropdown-menu-item {
+  cursor: default;
+  padding: 5px 12px 0px 12px;
+}
+
+.terminal-options-menu .ant-dropdown-menu-item:hover {
+  background-color: transparent;
 }

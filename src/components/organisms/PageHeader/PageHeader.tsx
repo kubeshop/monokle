@@ -24,6 +24,8 @@ import store from '@redux/store';
 
 import BranchSelect from '@components/molecules/BranchSelect';
 
+import {useHelpMenuItems} from '@hooks/menuItemsHooks';
+
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
@@ -34,7 +36,6 @@ import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/sele
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
-import {HelpMenu} from './HelpMenu';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import {OPAChip} from './OPAChip';
 import * as S from './PageHeader.styled';
@@ -67,6 +68,8 @@ const PageHeader = () => {
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [isInitializingGitRepo, setIsInitializingGitRepo] = useState(false);
   const [showAutosaving, setShowAutosaving] = useState(false);
+
+  const helpMenuItems = useHelpMenuItems();
 
   const runningPreviewConfiguration = useAppSelector(state => {
     if (!state.main.previewConfigurationId) {
@@ -261,18 +264,18 @@ const PageHeader = () => {
           </Tooltip>
 
           <Dropdown
+            menu={{
+              items: helpMenuItems,
+              onClick: () => {
+                setIsHelpMenuOpen(false);
+              },
+            }}
             open={isHelpMenuOpen}
             onOpenChange={() => {
               setIsHelpMenuOpen(!isHelpMenuOpen);
             }}
-            overlay={
-              <HelpMenu
-                onMenuClose={() => {
-                  setIsHelpMenuOpen(false);
-                }}
-              />
-            }
             placement="bottomLeft"
+            overlayClassName="help-menu-dropdown"
           >
             <S.EllipsisOutlined />
           </Dropdown>

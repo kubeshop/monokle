@@ -28,11 +28,12 @@ function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableT
     <Dropdown
       open={tableVisible}
       onOpenChange={onTableToggle}
-      overlay={table}
+      menu={{items: [{key: 'table', label: table}]}}
       placement={tablePlacement}
       arrow
       trigger={['click']}
       disabled={remoteRepo?.authRequired}
+      overlayClassName="dropdown-custom-styling"
     >
       <Button loading={gitLoading} type="text">
         <Space>

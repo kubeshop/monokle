@@ -1,6 +1,6 @@
 import {useCallback, useMemo} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -207,7 +207,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   );
 
   return (
-    <ContextMenu disabled={isFiltered} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={isFiltered} items={menuItems} triggerOnRightClick>
       {children}
     </ContextMenu>
   );
