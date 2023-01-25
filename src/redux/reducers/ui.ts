@@ -13,7 +13,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {SavedCommand, SettingsPanel} from '@shared/models/config';
-import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceStorageKey} from '@shared/models/k8sResource';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -143,10 +143,14 @@ export const uiSlice = createSlice({
         absolutePathToEntity: '',
       };
     },
-    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    openRenameResourceModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<{resourceId: string; resourceStorage: ResourceStorageKey}>
+    ) => {
       state.renameResourceModal = {
         isOpen: true,
-        resourceId: action.payload,
+        resourceId: action.payload.resourceId,
+        resourceStorage: action.payload.resourceStorage,
       };
     },
     closeReplaceImageModal: (state: Draft<UiState>) => {

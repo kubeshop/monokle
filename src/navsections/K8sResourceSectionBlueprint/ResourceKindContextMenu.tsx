@@ -168,7 +168,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   }
 
   const onClickRename = () => {
-    dispatch(openRenameResourceModal(resource.id));
+    dispatch(openRenameResourceModal({resourceId: resource.id, resourceStorage: resource.origin.storage}));
   };
 
   const onClickClone = () => {

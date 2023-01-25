@@ -169,10 +169,6 @@ const initialUiState: UiState = {
     isOpen: false,
     fromTemplate: false,
   },
-  renameResourceModal: {
-    isOpen: false,
-    resourceId: '',
-  },
   saveEditCommandModal: {
     isOpen: false,
   },
