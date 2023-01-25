@@ -14,7 +14,7 @@ import {getFileStats} from '@utils/files';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {FileMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {loadResource} from '@shared/utils/resource';
 
 // @ts-ignore
@@ -32,7 +32,7 @@ let k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
-export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+export function getResourceSchema(resource: ResourceMeta, schemaVersion: string, userDataDir: string) {
   if (isKustomizationResource(resource)) {
     return kustomizeSchema;
   }
