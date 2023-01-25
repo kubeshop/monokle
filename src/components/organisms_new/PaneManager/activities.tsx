@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import {SettingOutlined} from '@ant-design/icons';
+
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
 
 import {BottomPaneManager, DashboardPane, FileTreePane, GitPane} from '@organisms';
-import {SettingsOutlined} from '@organisms/PageHeader/HelpMenu.styled';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
@@ -56,7 +57,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     type: 'fullscreen',
     name: 'settings',
     tooltip: <SettingsTooltip />,
-    icon: () => <SettingsOutlined />,
+    icon: () => <SettingOutlined />,
     component: <SettingsPane />,
     useBadge: () => undefined,
   },

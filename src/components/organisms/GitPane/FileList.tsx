@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 
-import {Checkbox, Dropdown, List, Menu, Modal, Space, Tooltip} from 'antd';
+import {Checkbox, Dropdown, List, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {isEqual} from 'lodash';
@@ -207,7 +207,7 @@ const FileList: React.FC<IProps> = props => {
               }}
             >
               {hovered?.name === item.name && hovered?.path === item.path && (
-                <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
+                <Dropdown menu={{items: renderMenuItems(item)}} trigger={['click']}>
                   <Space>
                     <Dots color={isSelected(item) ? Colors.blackPure : Colors.blue6} />
                   </Space>

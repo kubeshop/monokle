@@ -34,6 +34,11 @@ export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
+export function openFeedback() {
+  trackEvent('help/open_link', {linkType: 'feedback'});
+  shell.openExternal('https://49x902y6r6t.typeform.com/to/vkFBEYYt');
+}
+
 export function openLogs() {
   trackEvent('help/open_link', {linkType: 'logs'});
   shell.showItemInFolder(app.getPath('logs'));

@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -173,7 +173,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   ];
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu items={menuItems} triggerOnRightClick>
       {children}
     </ContextMenu>
   );

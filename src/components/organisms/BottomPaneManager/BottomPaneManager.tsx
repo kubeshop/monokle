@@ -15,12 +15,12 @@ import {setTerminalShells} from '@redux/services/terminalShells';
 
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
 
+import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuItemsHooks';
+
 import {Icon} from '@monokle/components';
 import {TerminalType} from '@shared/models/terminal';
 
 import TerminalPane from '../TerminalPane';
-import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';
-import TerminalOptions from '../TerminalPane/TerminalOptions';
 import * as S from './BottomPaneManager.styled';
 
 const BottomPaneManager: React.FC = () => {
@@ -37,6 +37,9 @@ const BottomPaneManager: React.FC = () => {
 
   const [bottomPaneManagerRef, {height}] = useMeasure<HTMLDivElement>();
   const [tabsContainerRef, {height: tabsContainerHeight}] = useMeasure<HTMLDivElement>();
+
+  const {items: newTerminalMenuItems, onClick: onAddNewTerminalHandler} = useNewTerminalMenuItems();
+  const terminalOptionsMenuItems = useTerminalOptionsMenuItems();
 
   const onAddTerminalHandler = () => {
     const newTerminalId = uuidv4();
@@ -130,7 +133,11 @@ const BottomPaneManager: React.FC = () => {
               <S.PlusCircleFilled onClick={onAddTerminalHandler} />
             </Tooltip>
 
-            <Dropdown overlay={<NewTerminalOptions />} placement="bottomLeft" trigger={['click']}>
+            <Dropdown
+              menu={{items: newTerminalMenuItems, onClick: menuItem => onAddNewTerminalHandler(menuItem.key)}}
+              placement="bottomLeft"
+              trigger={['click']}
+            >
               <S.DownOutlined />
             </Dropdown>
           </S.NewTabActions>
@@ -141,7 +148,11 @@ const BottomPaneManager: React.FC = () => {
 
           <PreviewSavedCommand />
 
-          <Dropdown mouseEnterDelay={0.5} placement="bottomRight" overlay={<TerminalOptions />}>
+          <Dropdown
+            mouseEnterDelay={0.5}
+            placement="bottomRight"
+            menu={{items: terminalOptionsMenuItems, className: 'terminal-options-menu'}}
+          >
             <S.EllipsisOutlined />
           </Dropdown>
 

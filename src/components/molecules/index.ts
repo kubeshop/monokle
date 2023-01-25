@@ -8,7 +8,6 @@ export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithName
 export {default as Monaco} from './Monaco';
 export {default as NotificationMarkdown} from './NotificationMarkdown';
 export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';
-export {default as PreviewDropdown} from './PreviewDropdown';
 export {default as QuickActionCompare} from './QuickActionCompare';
 export {default as QuickActionPreview} from './QuickActionPreview';
 export {default as ResourceDiff} from './ResourceDiff';

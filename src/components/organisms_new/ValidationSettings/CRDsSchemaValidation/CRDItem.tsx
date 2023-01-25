@@ -1,6 +1,5 @@
 import {useMemo, useState} from 'react';
 
-import {Menu} from 'antd';
 import {ItemType} from 'antd/lib/menu/hooks/useItems';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -48,7 +47,7 @@ const CRDItem: React.FC<IProps> = props => {
     >
       <span>{crd.kind}</span>
       {isHovered && (
-        <ContextMenu overlay={<Menu items={menuItems} />}>
+        <ContextMenu items={menuItems}>
           <S.DotsContainer
             onClick={e => {
               e.stopPropagation();
