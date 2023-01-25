@@ -9,7 +9,7 @@ import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, kubeConfigPathSelector, selectedResourceSelector} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+// import {restartPreview} from '@redux/services/preview';
 import restartDeployment from '@redux/services/restartDeployment';
 
 import {SecondaryButton} from '@atoms';
@@ -40,7 +40,8 @@ const Restart: React.FC<IProps> = props => {
       onOk() {
         if (name && namespace) {
           restartDeployment({currentContext, kubeConfigPath, name, namespace});
-          restartPreview(currentContext, 'cluster', dispatch);
+          // TODO: revisit this, cluster refactoring
+          // restartPreview(currentContext, 'cluster', dispatch);
         }
       },
       onCancel() {},
