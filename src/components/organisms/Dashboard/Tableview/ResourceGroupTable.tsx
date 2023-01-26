@@ -2,17 +2,16 @@ import {useMemo, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
 import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {IMenu} from '@components/organisms/DashboardPane/menu';
-
 import {useMainPaneDimensions} from '@utils/hooks';
-import {trackEvent} from '@utils/telemetry';
+
+import {DashboardMenu} from '@shared/models/dashboard';
+import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {Drawer} from './Drawer';
 import * as S from './Tableview.styled';
@@ -32,7 +31,7 @@ export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
     return dataSource.filter(s => s.kind.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()));
   }, [dataSource, filterText]);
 
-  const setActiveMenu = (menuItem: IMenu) => {
+  const setActiveMenu = (menuItem: DashboardMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
     dispatch(setActiveDashboardMenu(menuItem));
     dispatch(setSelectedResourceId());
@@ -64,7 +63,7 @@ export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
           onRow={(record: any) => {
             return {
               onClick: () => {
-                setActiveMenu(record.menu as IMenu);
+                setActiveMenu(record.menu as DashboardMenu);
               },
             };
           }}

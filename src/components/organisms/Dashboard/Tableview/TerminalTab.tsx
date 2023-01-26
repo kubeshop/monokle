@@ -5,9 +5,9 @@ import {useEffect, useRef} from 'react';
 import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './TerminalTab.styled';
 
