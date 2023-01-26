@@ -4,14 +4,14 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {setActiveDashboardMenu, setDashboardMenuList, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelection} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {resourceMapSelector} from '@redux/selectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {DashboardMenu} from '@shared/models/dashboard';
-import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -23,7 +23,7 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
   const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<DashboardMenu[]>([]);
@@ -112,7 +112,7 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
+  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, clusterResourceMap]);
 
   useEffect(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -121,34 +121,34 @@ const DashboardPane = () => {
   const setActiveMenu = (menuItem: DashboardMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
     dispatch(setActiveDashboardMenu(menuItem));
-    dispatch(setSelectedResourceId());
+    dispatch(setDashboardSelection());
   };
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(r => r.kind === kind).length;
+      return Object.values(clusterResourceMap).filter(r => r.kind === kind).length;
     },
-    [resourceMap]
+    [clusterResourceMap]
   );
 
+  // TODO: refactor after @monokle/validation integration
   const getErrorCount = useCallback(
     (kind: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(resource => resource.kind === kind)
-        .reduce((total: number, resource: K8sResource) => {
-          if (resource.issues && resource.issues.errors) {
-            total += resource.issues.errors.length;
-          }
-          if (resource.validation && resource.validation.errors) {
-            total += resource.validation.errors.length;
-          }
-          return total;
-        }, 0);
+      // return Object.values(clusterResourceMap)
+      //   .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      //   .filter(resource => resource.kind === kind)
+      //   .reduce((total: number, resource: K8sResource) => {
+      //     if (resource.issues && resource.issues.errors) {
+      //       total += resource.issues.errors.length;
+      //     }
+      //     if (resource.validation && resource.validation.errors) {
+      //       total += resource.validation.errors.length;
+      //     }
+      //     return total;
+      //   }, 0);
+      return 0;
     },
-    [resourceMap]
+    [clusterResourceMap]
   );
 
   return (
