@@ -5,7 +5,7 @@ import {Button, Select, Tooltip} from 'antd';
 
 import {ClearOutlined} from '@ant-design/icons';
 
-import {isEmpty, mapValues} from 'lodash';
+import {isEmpty, isEqual, mapValues} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 import {ResetFiltersTooltip} from '@constants/tooltips';
@@ -20,12 +20,15 @@ import {
   isInClusterModeSelector,
   isInPreviewModeSelectorNew,
 } from '@redux/selectors';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
+
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 
@@ -57,6 +60,8 @@ const ResourceFilter = () => {
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
 
   const allResourceKinds = useAppSelector(allResourceKindsSelector);
   const allResourceLabels = useAppSelector(allResourceLabelsSelector);
@@ -171,6 +176,10 @@ const ResourceFilter = () => {
       };
 
       dispatch(updateResourceFilter(updatedFilter));
+
+      if (isInClusterMode && !isEqual(resourceFilterKinds, updatedFilter.kinds)) {
+        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
+      }
     },
     DEFAULT_EDITOR_DEBOUNCE,
     [names, kinds, namespace, labels, annotations, fileOrFolderContainedIn]

@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {TitleBar} from '@monokle/components';
@@ -9,6 +11,8 @@ import {Status} from './Status';
 import {Utilization} from './Utilization';
 
 export const Overview = () => {
+  const [isActivityPaused, setIsActivityPaused] = useState(false);
+
   return (
     <S.Container>
       <S.TitleBarContainer style={{gridArea: 'status'}}>
@@ -22,8 +26,18 @@ export const Overview = () => {
       <S.TitleBarContainer style={{gridArea: 'inventory-info'}}>
         <TitleBar type="secondary" title="Inventory & Info" description={<InventoryInfo />} />
       </S.TitleBarContainer>
-      <S.TitleBarContainer style={{gridArea: 'activity'}}>
-        <TitleBar type="secondary" title="Activity" description={<Activity />} />
+      <S.TitleBarContainer style={{gridArea: 'activity'}} $disableScroll>
+        <TitleBar
+          type="secondary"
+          title="Activity"
+          description={<Activity paused={isActivityPaused} />}
+          actions={
+            <S.ActionWrapper onClick={() => setIsActivityPaused(!isActivityPaused)}>
+              {!isActivityPaused ? <S.PauseCircleFilled /> : <S.PlayCircleFilled />}
+              {!isActivityPaused ? <span>Pause</span> : <span>Play</span>}
+            </S.ActionWrapper>
+          }
+        />
       </S.TitleBarContainer>
     </S.Container>
   );

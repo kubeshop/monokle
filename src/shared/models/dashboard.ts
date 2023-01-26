@@ -15,6 +15,7 @@ export type DashboardState = {
   ui: {
     activeMenu: DashboardMenu;
     activeTab: 'Info' | 'Manifest';
+    menuList: Array<DashboardMenu>;
   };
   tableDrawer: {
     resourceSelection?: ResourceSelection<'cluster'>;
