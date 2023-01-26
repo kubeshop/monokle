@@ -16,7 +16,7 @@ import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
-import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
+import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
@@ -52,6 +52,7 @@ const PageHeader = () => {
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
@@ -78,6 +79,10 @@ const PageHeader = () => {
   const onClickLogoHandler = () => {
     if (!isStartProjectPaneVisible) {
       dispatch(toggleStartProjectPane());
+    }
+
+    if (isInQuickClusterMode) {
+      dispatch(setIsInQuickClusterMode(false));
     }
 
     if (isInClusterMode) {

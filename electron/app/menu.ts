@@ -290,7 +290,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Toggle Left Menu',
         accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
-          if (!state.ui.previewingCluster) {
+          if (!state.ui.isInQuickClusterMode) {
             dispatch({type: 'ui/toggleLeftMenu', payload: undefined});
           }
         },

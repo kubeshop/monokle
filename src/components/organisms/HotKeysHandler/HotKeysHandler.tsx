@@ -55,7 +55,7 @@ const HotKeysHandler = () => {
   const projectConfig = useAppSelector(currentConfigSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const currentResource = useAppSelector(selectedResourceSelector);
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -272,25 +272,25 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('file-explorer'));
     }
   });
 
   useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('kustomize-pane'));
     }
   });
 
   useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('helm-pane'));
     }
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('validation-pane'));
     }
   });
@@ -324,14 +324,14 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.FIND.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('search'));
       dispatch(setActiveTab('search'));
     }
   });
 
   useHotkeys(hotkeys.REPLACE.key, () => {
-    if (!previewingCluster) {
+    if (!isInQuickClusterMode) {
       dispatch(setLeftMenuSelection('search'));
       dispatch(setActiveTab('findReplace'));
     }

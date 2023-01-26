@@ -55,6 +55,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const size: Size = useWindowSize();
 
@@ -191,7 +192,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   return (
     <S.ClusterContainer id="ClusterContainer">
-      {(activeProject || isInClusterMode) && (
+      {(activeProject || isInQuickClusterMode) && (
         <>
           {/*
            // TODO: revisit this
@@ -261,7 +262,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       )}
 
       <>
-        {isKubeConfigPathValid && (activeProject || isInClusterMode) && (
+        {isKubeConfigPathValid && (activeProject || isInQuickClusterMode) && (
           <>
             {isInClusterMode && (
               <Tooltip placement="left" mouseEnterDelay={TOOLTIP_DELAY} title={ClusterNamespaceTooltip}>
