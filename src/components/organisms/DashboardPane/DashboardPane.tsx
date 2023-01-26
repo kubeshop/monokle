@@ -4,7 +4,7 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelection} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resourceMapSelector} from '@redux/selectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
@@ -26,7 +26,7 @@ const DashboardPane = () => {
   const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
   const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [menu, setMenu] = useState<DashboardMenu[]>([]);
+  const [menu, setMenu] = useState<DashboardMenu[]>([]); // TODO: how is this initialized?
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
 
@@ -121,7 +121,7 @@ const DashboardPane = () => {
   const setActiveMenu = (menuItem: DashboardMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
     dispatch(setActiveDashboardMenu(menuItem));
-    dispatch(setDashboardSelection());
+    dispatch(setDashboardSelectedResourceId());
   };
 
   const getResourceCount = useCallback(

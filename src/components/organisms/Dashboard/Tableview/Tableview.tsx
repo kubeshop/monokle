@@ -2,19 +2,19 @@ import {useEffect, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
-import {setSelectedResourceId} from '@redux/dashboard';
+import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
 import {Drawer} from './Drawer';
 import * as S from './Tableview.styled';
 
-export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; columns: ColumnsType<any>}) => {
+export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
   const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
@@ -51,14 +51,14 @@ export const Tableview = ({dataSource, columns}: {dataSource: K8sResource[]; col
           columns={columns}
           rowKey="id"
           scroll={{y: height - 212}}
-          rowClassName={(record: K8sResource | any) => (record.id === selectedResourceId ? 'selected' : '')}
+          rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky
-          onRow={(record: K8sResource | any) => {
+          onRow={(record: ResourceMeta | any) => {
             return {
               onClick: () => {
-                dispatch(setSelectedResourceId(record.id));
-                dispatch(selectK8sResource({resourceId: record.id}));
+                dispatch(setDashboardSelectedResourceId(record.id));
+                dispatch(selectResource({resourceId: record.id, resourceStorage: 'cluster'}));
               },
             };
           }}

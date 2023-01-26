@@ -1,7 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {DashboardMenu, DashboardState} from '@shared/models/dashboard';
-import {ResourceSelection} from '@shared/models/selection';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {initialState} from './state';
@@ -16,11 +15,8 @@ export const dashboardSlice = createSlice({
     setDashboardMenuList: (state: Draft<DashboardState>, action: PayloadAction<Array<DashboardMenu>>) => {
       state.ui.menuList = action.payload;
     },
-    setDashboardSelection: (
-      state: Draft<DashboardState>,
-      action: PayloadAction<ResourceSelection<'cluster'> | undefined>
-    ) => {
-      state.tableDrawer.resourceSelection = action.payload;
+    setDashboardSelectedResourceId: (state: Draft<DashboardState>, action: PayloadAction<string | undefined>) => {
+      state.tableDrawer.selectedResourceId = action.payload;
     },
     setActiveTab: (state: Draft<DashboardState>, action: PayloadAction<'Info' | 'Manifest'>) => {
       state.ui.activeTab = action.payload;
@@ -29,7 +25,7 @@ export const dashboardSlice = createSlice({
   },
 });
 
-export const {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelection, setActiveTab} =
+export const {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId, setActiveTab} =
   dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

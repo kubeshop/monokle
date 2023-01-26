@@ -1,9 +1,8 @@
-import {Popover, Tag} from 'antd';
+import {Tag} from 'antd';
 
 import {DateTime} from 'luxon';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
-import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import {timeAgo} from '@utils/timeAgo';
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
@@ -32,7 +31,7 @@ export const CellStatus = {
         (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
-  sorter: (a: K8sResource, b: K8sResource) => a.content?.status?.phase?.localeCompare(b.content?.status?.phase),
+  sorter: (a: K8sResource, b: K8sResource) => a.object?.status?.phase?.localeCompare(b.object?.status?.phase),
 };
 
 export const CellAge = {
@@ -42,8 +41,8 @@ export const CellAge = {
   width: '120px',
   render: ({metadata: {creationTimestamp}}: any) => <div>{timeAgo(creationTimestamp)}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    DateTime.fromISO(a.content.metadata?.creationTimestamp).toMillis() -
-    DateTime.fromISO(b.content.metadata?.creationTimestamp).toMillis(),
+    DateTime.fromISO(a.object.metadata?.creationTimestamp).toMillis() -
+    DateTime.fromISO(b.object.metadata?.creationTimestamp).toMillis(),
 };
 
 export const CellName = {
@@ -53,13 +52,13 @@ export const CellName = {
   width: '400px',
   render: (resource: K8sResource) => (
     <div style={{display: 'flex'}}>
-      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={resource} type="incoming" />
+      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resourceMeta={resource} type="incoming" />
       <div>{resource.name}</div>
-      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={resource} type="outgoing" />
+      <ResourceRefsIconPopover isSelected={false} isDisabled={false} resourceMeta={resource} type="outgoing" />
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.name.localeCompare(b.name),
-  defaultSortOrder: 'ascend',
+  // defaultSortOrder: 'ascend', // TODO: getting type error if I add this
 };
 
 export const CellNamespace = {
@@ -78,41 +77,44 @@ export const CellNode = {
   width: '240px',
   render: (content: any) => <div>{content?.spec?.nodeName}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.nodeName?.localeCompare(b?.content?.spec?.nodeName || '') || UNSORTED_VALUE,
+    a?.object?.spec?.nodeName?.localeCompare(b?.object?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
 
+// TODO: reimplement after @monokle/validation
 export const CellError = {
   title: 'Errors',
   dataIndex: '',
   key: 'error',
   width: '150px',
-  render: (resource: K8sResource) =>
-    !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
-      <span style={{padding: '2px 4px'}}>-</span>
-    ) : (
-      <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-        <S.ErrorCell>
-          {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
-            Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
-        </S.ErrorCell>
-      </Popover>
-    ),
-  sorter: (a: K8sResource, b: K8sResource) =>
-    Number(Number(a.validation?.errors?.length) + Number(a.issues?.errors?.length)) -
-      Number(Number(b.validation?.errors?.length) + Number(b.issues?.errors?.length)) || UNSORTED_VALUE,
+  // render: (resource: K8sResource) =>
+  //   !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
+  //     <span style={{padding: '2px 4px'}}>-</span>
+  //   ) : (
+  //     <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
+  //       <S.ErrorCell>
+  //         {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
+  //           Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
+  //       </S.ErrorCell>
+  //     </Popover>
+  //   ),
+  render: () => <span style={{padding: '2px 4px'}}>-</span>,
+  sorter: () => UNSORTED_VALUE,
+  // sorter: (a: K8sResource, b: K8sResource) =>
+  //   Number(Number(a.validation?.errors?.length) + Number(a.issues?.errors?.length)) -
+  //     Number(Number(b.validation?.errors?.length) + Number(b.issues?.errors?.length)) || UNSORTED_VALUE,
 };
 
 export const CellLabels = {
   title: 'Labels',
-  dataIndex: 'content',
+  dataIndex: 'object',
   width: '400px',
   key: 'labels',
-  render: (content: any) =>
-    content.metadata.labels ? (
-      Object.keys(content.metadata.labels).map(key => (
-        <div key={key + content.metadata.labels[key]}>
+  render: (object: any) =>
+    object.metadata.labels ? (
+      Object.keys(object.metadata.labels).map(key => (
+        <div key={key + object.metadata.labels[key]}>
           <Tag color="geekblue">
-            {key}={content.metadata.labels[key]}
+            {key}={object.metadata.labels[key]}
           </Tag>
         </div>
       ))
@@ -120,139 +122,139 @@ export const CellLabels = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Object.keys(a.content.metadata.labels).length - Object.keys(b.content.metadata.labels).length,
+    Object.keys(a.object.metadata.labels).length - Object.keys(b.object.metadata.labels).length,
 };
 
 export const CellRestartCount = {
   title: 'Restarts',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'restarts',
   width: '120px',
-  render: (content: any) =>
-    content?.status?.containerStatuses ? (
-      <span style={{padding: '2px 4px'}}>{content?.status?.containerStatuses[0]?.restartCount || 0}</span>
+  render: (object: any) =>
+    object?.status?.containerStatuses ? (
+      <span style={{padding: '2px 4px'}}>{object?.status?.containerStatuses[0]?.restartCount || 0}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a.content?.status?.containerStatuses && a.content?.status?.containerStatuses
-      ? Number(a.content?.status?.containerStatuses[0].restartCount) -
-        Number(b.content?.status?.containerStatuses[0].restartCount)
+    a.object?.status?.containerStatuses && a.object?.status?.containerStatuses
+      ? Number(a.object?.status?.containerStatuses[0].restartCount) -
+        Number(b.object?.status?.containerStatuses[0].restartCount)
       : UNSORTED_VALUE,
 };
 
 export const CellPodsCount = {
   title: 'Pods',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'pods',
   width: '120px',
-  render: (content: any) => (
+  render: (object: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.availableReplicas || 0} / {content?.status?.replicas || 0}
+      {object?.status?.availableReplicas || 0} / {object?.status?.replicas || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.content?.status?.availableReplicas) - Number(b.content?.status?.availableReplicas) || UNSORTED_VALUE,
+    Number(a.object?.status?.availableReplicas) - Number(b.object?.status?.availableReplicas) || UNSORTED_VALUE,
 };
 
 export const CellScheduledCount = {
   title: 'Scheduled',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'scheduled',
   width: '120px',
-  render: (content: any) => (
+  render: (object: any) => (
     <span style={{padding: '2px 4px'}}>
-      {content?.status?.currentNumberScheduled || 0} / {content?.status?.desiredNumberScheduled || 0}
+      {object?.status?.currentNumberScheduled || 0} / {object?.status?.desiredNumberScheduled || 0}
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.content?.status?.currentNumberScheduled) - Number(b.content?.status?.currentNumberScheduled) ||
+    Number(a.object?.status?.currentNumberScheduled) - Number(b.object?.status?.currentNumberScheduled) ||
     UNSORTED_VALUE,
 };
 
 export const CellType = {
   title: 'Type',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'type',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.type ? (
-      <span style={{padding: '2px 4px'}}>{content?.spec?.type}</span>
+  render: (object: any) =>
+    object?.spec?.type ? (
+      <span style={{padding: '2px 4px'}}>{object?.spec?.type}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.type?.localeCompare(b?.content?.spec?.type || '') || UNSORTED_VALUE,
+    a?.object?.spec?.type?.localeCompare(b?.object?.spec?.type || '') || UNSORTED_VALUE,
 };
 
 export const CellGroup = {
   title: 'Group',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'group',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.group ? (
-      <span style={{padding: '2px 4px'}}>{content?.spec?.group}</span>
+  render: (object: any) =>
+    object?.spec?.group ? (
+      <span style={{padding: '2px 4px'}}>{object?.spec?.group}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.group?.localeCompare(b?.content?.spec?.group || '') || UNSORTED_VALUE,
+    a?.object?.spec?.group?.localeCompare(b?.object?.spec?.group || '') || UNSORTED_VALUE,
 };
 
 export const CellScope = {
   title: 'Scope',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'scope',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.scope ? (
-      <span style={{padding: '2px 4px'}}>{content?.spec?.scope}</span>
+  render: (object: any) =>
+    object?.spec?.scope ? (
+      <span style={{padding: '2px 4px'}}>{object?.spec?.scope}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.scope?.localeCompare(b?.content?.spec?.scope || '') || UNSORTED_VALUE,
+    a?.object?.spec?.scope?.localeCompare(b?.object?.spec?.scope || '') || UNSORTED_VALUE,
 };
 
 export const CellKind = {
   title: 'Resource',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'kind',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.names?.kind ? (
-      <span style={{padding: '2px 4px'}}>{content?.spec?.names?.kind}</span>
+  render: (object: any) =>
+    object?.spec?.names?.kind ? (
+      <span style={{padding: '2px 4px'}}>{object?.spec?.names?.kind}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.spec?.names?.kind?.localeCompare(b?.content?.spec?.names?.kind || '') || UNSORTED_VALUE,
+    a?.object?.spec?.names?.kind?.localeCompare(b?.object?.spec?.names?.kind || '') || UNSORTED_VALUE,
 };
 
 export const CellVersion = {
   title: 'Version',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'storedVersions',
   width: '150px',
-  render: (content: any) =>
-    content?.status?.storedVersions ? (
-      <span style={{padding: '2px 4px'}}>{content?.status?.storedVersions[0]}</span>
+  render: (object: any) =>
+    object?.status?.storedVersions ? (
+      <span style={{padding: '2px 4px'}}>{object?.status?.storedVersions[0]}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.storedVersions[0]?.localeCompare(b?.content?.status?.storedVersions[0] || '') || UNSORTED_VALUE,
+    a?.object?.status?.storedVersions[0]?.localeCompare(b?.object?.status?.storedVersions[0] || '') || UNSORTED_VALUE,
 };
 
 export const CellPorts = {
   title: 'Ports',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'ports',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.ports ? (
-      content?.spec?.ports.map((data: {port: number; protocol: string}) => (
+  render: (object: any) =>
+    object?.spec?.ports ? (
+      object?.spec?.ports.map((data: {port: number; protocol: string}) => (
         <div key={data.port + data.protocol} style={{padding: '2px 4px'}}>
           {data.port}/{data.protocol}
         </div>
@@ -261,17 +263,17 @@ export const CellPorts = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.spec?.ports?.length) - Number(b?.content?.spec?.ports?.length) || UNSORTED_VALUE,
+    Number(a?.object?.spec?.ports?.length) - Number(b?.object?.spec?.ports?.length) || UNSORTED_VALUE,
 };
 
 export const CellIPs = {
   title: 'IPs',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'ips',
   width: '150px',
-  render: (content: any) =>
-    content?.spec?.clusterIPs ? (
-      content?.spec?.clusterIPs.map((data: string) => (
+  render: (object: any) =>
+    object?.spec?.clusterIPs ? (
+      object?.spec?.clusterIPs.map((data: string) => (
         <div key={data} style={{padding: '2px 4px'}}>
           {data}
         </div>
@@ -280,17 +282,17 @@ export const CellIPs = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.spec?.clusterIPs.length) - Number(b?.content?.spec?.clusterIPs.length) || UNSORTED_VALUE,
+    Number(a?.object?.spec?.clusterIPs.length) - Number(b?.object?.spec?.clusterIPs.length) || UNSORTED_VALUE,
 };
 
 export const CellEndpoints = {
   title: 'Endpoints',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'endpoints',
   width: '240px',
-  render: (content: any) =>
-    content?.subsets ? (
-      content?.subsets.map(
+  render: (object: any) =>
+    object?.subsets ? (
+      object?.subsets.map(
         (subset: {addresses: Array<{ip: string; nodeName: string}>; ports: Array<{port: number; protocol: string}>}) =>
           subset.addresses && subset.ports ? (
             subset.addresses.map(address =>
@@ -309,17 +311,17 @@ export const CellEndpoints = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.subsets?.length) - Number(b?.content?.subsets?.length) || UNSORTED_VALUE,
+    Number(a?.object?.subsets?.length) - Number(b?.object?.subsets?.length) || UNSORTED_VALUE,
 };
 
 export const LoadBalancerIPs = {
   title: 'LoadBalancers',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'loadbalancers',
   width: '150px',
-  render: (content: any) =>
-    content?.status?.loadBalancer?.ingress ? (
-      content?.status?.loadBalancer?.ingress.map((data: {ip: string}) => (
+  render: (object: any) =>
+    object?.status?.loadBalancer?.ingress ? (
+      object?.status?.loadBalancer?.ingress.map((data: {ip: string}) => (
         <div key={data.ip} style={{padding: '2px 4px'}}>
           {data.ip}
         </div>
@@ -328,32 +330,32 @@ export const LoadBalancerIPs = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.loadBalancer?.ingress?.length) -
-      Number(b?.content?.status?.loadBalancer?.ingress?.length) || UNSORTED_VALUE,
+    Number(a?.object?.status?.loadBalancer?.ingress?.length) -
+      Number(b?.object?.status?.loadBalancer?.ingress?.length) || UNSORTED_VALUE,
 };
 
 export const CellSecretType = {
   title: 'Type',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'secrettype',
   width: '150px',
-  render: (content: any) =>
-    content?.type ? (
-      <span style={{padding: '2px 4px'}}>{content?.type}</span>
+  render: (object: any) =>
+    object?.type ? (
+      <span style={{padding: '2px 4px'}}>{object?.type}</span>
     ) : (
       <span style={{padding: '2px 4px'}}>-</span>
     ),
-  sorter: (a: K8sResource, b: K8sResource) => a?.content?.type?.localeCompare(b?.content?.type || '') || UNSORTED_VALUE,
+  sorter: (a: K8sResource, b: K8sResource) => a?.object?.type?.localeCompare(b?.object?.type || '') || UNSORTED_VALUE,
 };
 
 export const CellAddresses = {
   title: 'Addresses',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'addresses',
   width: '240px',
-  render: (content: any) =>
-    content?.status?.addresses ? (
-      content?.status?.addresses.map((data: {address: string; type: string}) => (
+  render: (object: any) =>
+    object?.status?.addresses ? (
+      object?.status?.addresses.map((data: {address: string; type: string}) => (
         <div key={data.type + data.address} style={{padding: '2px 4px'}}>
           {data.type}: {data.address}
         </div>
@@ -362,101 +364,101 @@ export const CellAddresses = {
       <span style={{padding: '2px 4px'}}>-</span>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.addresses?.length) - Number(b?.content?.status?.addresses?.length) || UNSORTED_VALUE,
+    Number(a?.object?.status?.addresses?.length) - Number(b?.object?.status?.addresses?.length) || UNSORTED_VALUE,
 };
 
 export const CellNodeOS = {
   title: 'Operating System',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'nodeOS',
   width: '288px',
-  render: (content: any) => (
+  render: (object: any) => (
     <div>
-      {content?.status?.nodeInfo?.operatingSystem &&
-        content?.status?.nodeInfo?.osImage &&
-        content?.status?.nodeInfo?.architecture && (
+      {object?.status?.nodeInfo?.operatingSystem &&
+        object?.status?.nodeInfo?.osImage &&
+        object?.status?.nodeInfo?.architecture && (
           <div>
-            <span>{content?.status?.nodeInfo?.operatingSystem}, </span>
-            <span>{content?.status?.nodeInfo?.architecture}, </span>
-            <span>{content?.status?.nodeInfo?.osImage}</span>
+            <span>{object?.status?.nodeInfo?.operatingSystem}, </span>
+            <span>{object?.status?.nodeInfo?.architecture}, </span>
+            <span>{object?.status?.nodeInfo?.osImage}</span>
           </div>
         )}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.nodeInfo?.operatingSystem?.localeCompare(b?.content?.status?.nodeInfo?.operatingSystem || '') ||
+    a?.object?.status?.nodeInfo?.operatingSystem?.localeCompare(b?.object?.status?.nodeInfo?.operatingSystem || '') ||
     UNSORTED_VALUE,
 };
 
 export const CellNodeKubelet = {
   title: 'Kubelet',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'nodeKubelet',
   width: '180px',
-  render: (content: any) => <div>{content?.status?.nodeInfo?.kubeletVersion || '-'}</div>,
+  render: (object: any) => <div>{object?.status?.nodeInfo?.kubeletVersion || '-'}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.nodeInfo?.kubeletVersion?.localeCompare(b?.content?.status?.nodeInfo?.kubeletVersion || '') ||
+    a?.object?.status?.nodeInfo?.kubeletVersion?.localeCompare(b?.object?.status?.nodeInfo?.kubeletVersion || '') ||
     UNSORTED_VALUE,
 };
 
 export const CellNodeKernel = {
   title: 'Kernel',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'nodeKernel',
   width: '180px',
-  render: (content: any) => <div>{content?.status?.nodeInfo?.kernelVersion || '-'}</div>,
+  render: (object: any) => <div>{object?.status?.nodeInfo?.kernelVersion || '-'}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.nodeInfo?.kernelVersion.localeCompare(b?.content?.status?.nodeInfo?.kernelVersion || '') ||
+    a?.object?.status?.nodeInfo?.kernelVersion.localeCompare(b?.object?.status?.nodeInfo?.kernelVersion || '') ||
     UNSORTED_VALUE,
 };
 
 export const CellNodeContainerRuntime = {
   title: 'ContainerRuntime',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'containerRuntime',
   width: '180px',
-  render: (content: any) => <div>{content?.status?.nodeInfo?.containerRuntimeVersion || '-'}</div>,
+  render: (object: any) => <div>{object?.status?.nodeInfo?.containerRuntimeVersion || '-'}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.status?.nodeInfo?.containerRuntimeVersion.localeCompare(
-      b?.content?.status?.nodeInfo?.containerRuntimeVersion || ''
+    a?.object?.status?.nodeInfo?.containerRuntimeVersion.localeCompare(
+      b?.object?.status?.nodeInfo?.containerRuntimeVersion || ''
     ) || UNSORTED_VALUE,
 };
 
 export const CellNodeRoles = {
   title: 'Roles',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'nodeRoles',
   width: '210px',
-  render: (content: any) =>
-    content?.metadata?.labels ? (
+  render: (object: any) =>
+    object?.metadata?.labels ? (
       <div>
-        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
-        {isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
-          <span>{isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
+        {isDefined(object?.metadata?.labels['node-role.kubernetes.io/master']) && <span>master</span>}
+        {isDefined(object?.metadata?.labels['node-role.kubernetes.io/control-plane']) && (
+          <span>{isDefined(object?.metadata?.labels['node-role.kubernetes.io/master']) && ', '}control-plane</span>
         )}
-        {!isDefined(content?.metadata?.labels['node-role.kubernetes.io/master']) &&
-          !isDefined(content?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
+        {!isDefined(object?.metadata?.labels['node-role.kubernetes.io/master']) &&
+          !isDefined(object?.metadata?.labels['node-role.kubernetes.io/control-plane']) && <span>-</span>}
       </div>
     ) : (
       <div>-</div>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    a?.content?.metadata?.labels['node-role.kubernetes.io/control-plane']?.localeCompare(
-      b?.content?.metadata?.labels['node-role.kubernetes.io/control-plane'] || ''
+    a?.object?.metadata?.labels['node-role.kubernetes.io/control-plane']?.localeCompare(
+      b?.object?.metadata?.labels['node-role.kubernetes.io/control-plane'] || ''
     ) || UNSORTED_VALUE,
 };
 
 export const CellStorageCapacity = {
   title: 'Capacity',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'storageCapacity',
   width: '120px',
-  render: (content: any) =>
-    content?.status?.capacity?.storage ? (
-      <div>{convertBytesToGigabyte(memoryParser(content?.status?.capacity?.storage))}GB</div>
+  render: (object: any) =>
+    object?.status?.capacity?.storage ? (
+      <div>{convertBytesToGigabyte(memoryParser(object?.status?.capacity?.storage))}GB</div>
     ) : (
       <div>-</div>
     ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a?.content?.status?.capacity?.storage) - Number(b?.content?.status?.capacity?.storage) || UNSORTED_VALUE,
+    Number(a?.object?.status?.capacity?.storage) - Number(b?.object?.status?.capacity?.storage) || UNSORTED_VALUE,
 };

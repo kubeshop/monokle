@@ -1,5 +1,3 @@
-import {ResourceSelection} from './selection';
-
 export type DashboardMenu = {
   key: string;
   label: string;
@@ -18,6 +16,6 @@ export type DashboardState = {
     menuList: Array<DashboardMenu>;
   };
   tableDrawer: {
-    resourceSelection?: ResourceSelection<'cluster'>;
+    selectedResourceId?: string;
   };
 };

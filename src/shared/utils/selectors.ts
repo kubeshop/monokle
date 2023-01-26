@@ -1,4 +1,4 @@
-import {isBoolean} from 'lodash';
+import {isBoolean, size} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RootState} from '../models/rootState';
@@ -29,5 +29,19 @@ export const kubeConfigPathValidSelector = createSelector(
       return Boolean(config.kubeConfig.isPathValid);
     }
     return false;
+  }
+);
+
+export const transientResourceCountSelector = createSelector(
+  (state: RootState) => state.main.resourceMetaStorage,
+  metaStorage => {
+    return size(metaStorage.transient);
+  }
+);
+
+export const isInPreviewModeSelector = createSelector(
+  (state: RootState) => state.main.preview,
+  preview => {
+    return Boolean(preview);
   }
 );

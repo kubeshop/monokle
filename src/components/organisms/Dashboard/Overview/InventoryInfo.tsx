@@ -1,7 +1,8 @@
 import {useCallback} from 'react';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {resourceMapSelector} from '@redux/selectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -18,28 +19,26 @@ import * as S from './InventoryInfo.styled';
 
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(
-          (resource: K8sResource) =>
-            (apiVersion ? resource.content.apiVersion === apiVersion : true) && resource.kind === kind
-        );
+      return Object.values(clusterResourceMap).filter(
+        (resource: K8sResource) =>
+          (apiVersion ? resource.object.apiVersion === apiVersion : true) && resource.kind === kind
+      );
     },
-    [resourceMap]
+    [clusterResourceMap]
   );
 
   const getNodes = useCallback(() => {
-    return Object.values(resourceMap).filter(
-      (resource: K8sResource) => resource.content.apiVersion === 'v1' && resource.kind === 'Node'
+    return Object.values(clusterResourceMap).filter(
+      resource => resource.object.apiVersion === 'v1' && resource.kind === 'Node'
     );
-  }, [resourceMap]);
+  }, [clusterResourceMap]);
 
   const podsCapacity = useCallback(() => {
-    return getNodes().reduce((total, node) => total + Number(node.content.status?.capacity?.pods), 0);
+    return getNodes().reduce((total, node) => total + Number(node.object.status?.capacity?.pods), 0);
   }, [getNodes]);
 
   const setActiveMenu = (kindHandler: ResourceKindHandler) => {
@@ -49,7 +48,7 @@ export const InventoryInfo = () => {
         label: kindHandler.kind,
       })
     );
-    dispatch(setSelectedResourceId());
+    dispatch(setDashboardSelectedResourceId());
   };
 
   return (
@@ -104,11 +103,11 @@ export const InventoryInfo = () => {
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>
-          <S.Description>{getNodes()[0]?.content?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
+          <S.Description>{getNodes()[0]?.object?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Container Runtime</S.Title>
-          <S.Description>{getNodes()[0]?.content?.status?.nodeInfo?.containerRuntimeVersion || '-'}</S.Description>
+          <S.Description>{getNodes()[0]?.object?.status?.nodeInfo?.containerRuntimeVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
       </S.ClusterInfoContainer>
       <S.HorizontalLine />

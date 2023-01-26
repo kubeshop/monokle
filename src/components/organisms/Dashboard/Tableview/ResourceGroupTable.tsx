@@ -2,7 +2,7 @@ import {useMemo, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -34,7 +34,7 @@ export const ResourceGroupTable = ({dataSource}: {dataSource: any[]}) => {
   const setActiveMenu = (menuItem: DashboardMenu) => {
     trackEvent('dashboard/selectKind', {kind: menuItem.key});
     dispatch(setActiveDashboardMenu(menuItem));
-    dispatch(setSelectedResourceId());
+    dispatch(setDashboardSelectedResourceId());
   };
 
   return (
