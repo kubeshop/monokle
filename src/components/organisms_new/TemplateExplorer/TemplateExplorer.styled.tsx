@@ -38,6 +38,9 @@ export const NoTemplatesMessage = styled.div`
 
 export const PaddingWrapper = styled.div`
   padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 export const TemplatesCollapse = styled(Collapse)`
