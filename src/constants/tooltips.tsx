@@ -74,7 +74,7 @@ export const ApplyTooltip = () => (
   <HotkeyLabel text="Deploy this resource to your selected cluster" name="APPLY_SELECTION" />
 );
 export const ClusterModeTooltip = () => (
-  <HotkeyLabel text="Retrieve and show resources in selected context" name="PREVIEW_CLUSTER" />
+  <HotkeyLabel text="Retrieve and show resources in selected context" name="LOAD_CLUSTER" />
 );
 export const DiffTooltip = () => (
   <HotkeyLabel text="Diff this resource against your selected cluster" name="DIFF_RESOURCE" />
