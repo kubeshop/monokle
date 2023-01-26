@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
@@ -46,16 +46,11 @@ const PageHeader = () => {
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
-  const preview = useAppSelector(state => state.main.preview);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   // const resourceMap = useAppSelector(state => state.main.resourceMap);
 

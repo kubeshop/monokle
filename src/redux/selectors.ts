@@ -24,7 +24,12 @@ import {
 import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
-import {ResourceSelection, isFileSelection, isResourceSelection} from '@shared/models/selection';
+import {
+  ResourceSelection,
+  isFileSelection,
+  isPreviewConfigurationSelection,
+  isResourceSelection,
+} from '@shared/models/selection';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
@@ -105,6 +110,24 @@ export const activeResourceContentMapSelector = createSelector(
       return state.main.resourceContentStorage.preview;
     }
     return state.main.resourceContentStorage.local;
+  }
+);
+
+export const selectedResourceWithMapSelector = createSelector(
+  (state: RootState) => state,
+  (state): {selectedResource: K8sResource | undefined; resourceMap: ResourceMap | undefined} => {
+    const selectedResource = selectedResourceSelector(state);
+    if (!selectedResource) {
+      return {
+        selectedResource: undefined,
+        resourceMap: undefined,
+      };
+    }
+    const resourceMap = resourceMapSelector(state, selectedResource.origin.storage);
+    return {
+      selectedResource,
+      resourceMap,
+    };
   }
 );
 
@@ -255,6 +278,17 @@ export const selectedFilePathSelector = createSelector(
   }
 );
 
+export const selectedHelmConfigSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!isPreviewConfigurationSelection(selection)) {
+      return undefined;
+    }
+    return state.config.projectConfig?.helm?.previewConfigurationMap?.[selection.previewConfigurationId];
+  }
+);
+
 export const allResourcesMetaSelector = createSelector(
   (state: RootState) => state.main,
   mainState => {
@@ -356,6 +390,17 @@ export const selectedImageSelector = createSelector(
       return undefined;
     }
     return state.main.imagesList.find(image => image.id === selection.imageId);
+  }
+);
+
+export const selectedImageIdSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const selection = state.main.selection;
+    if (!selection || selection.type !== 'image') {
+      return undefined;
+    }
+    return selection.imageId;
   }
 );
 

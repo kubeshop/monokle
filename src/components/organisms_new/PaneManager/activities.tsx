@@ -4,6 +4,7 @@ import {SettingOutlined} from '@ant-design/icons';
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {BottomPaneManager, DashboardPane, FileTreePane, GitPane} from '@organisms';
 
@@ -21,7 +22,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="explorer" />,
     component: <FileTreePane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(isInClusterModeSelector),
   },
   {
     type: 'panel',
@@ -38,7 +39,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(isInClusterModeSelector),
   },
   {
     type: 'panel',
@@ -51,7 +52,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(isInClusterModeSelector),
   },
   {
     type: 'fullscreen',
@@ -71,6 +72,6 @@ export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
     component: <BottomPaneManager />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(isInClusterModeSelector),
   },
 ];
