@@ -14,11 +14,11 @@ const NewPaneManagerLeftMenu: React.FC = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const isActive = useMemo(
-    () => Boolean(activeProject || previewingCluster) && leftActive,
-    [activeProject, leftActive, previewingCluster]
+    () => Boolean(activeProject || isInQuickClusterMode) && leftActive,
+    [activeProject, leftActive, isInQuickClusterMode]
   );
 
   return (

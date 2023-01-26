@@ -186,6 +186,7 @@ type UiState = {
   startPageLearn: {
     isVisible: boolean;
   };
+  isInQuickClusterMode?: boolean;
 };
 
 export type {

@@ -38,7 +38,7 @@ export function useStartPageOptions() {
         content: <NewProject />,
         title: 'Start something new',
       },
-      'cluster-preview': {
+      'quick-cluster-mode': {
         icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
         label: 'Cluster preview',
         content: null,

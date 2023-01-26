@@ -333,6 +333,9 @@ export const uiSlice = createSlice({
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
     },
+    setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.isInQuickClusterMode = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -425,5 +428,6 @@ export const {
   setActiveTab,
   openScaleModal,
   closeScaleModal,
+  setIsInQuickClusterMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;
