@@ -4,6 +4,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import DaemonSetHandler from '@src/kindhandlers/DaemonSet.handler';
 import DeploymentHandler from '@src/kindhandlers/Deployment.handler';
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -20,14 +22,18 @@ import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 
 import {K8sResource} from '@shared/models/k8sResource';
 
+import {CLICKAKBLE_RESOURCE_GROUPS} from '.';
 import * as S from './Dashboard.styled';
 import {Overview} from './Overview/Overview';
+import {ResourceGroupTable} from './Tableview/ResourceGroupTable';
 import {
   CellAddresses,
   CellAge,
   CellEndpoints,
   CellError,
+  CellGroup,
   CellIPs,
+  CellKind,
   CellLabels,
   CellName,
   CellNamespace,
@@ -39,16 +45,19 @@ import {
   CellPorts,
   CellRestartCount,
   CellScheduledCount,
+  CellScope,
   CellSecretType,
   CellStatus,
   CellStorageCapacity,
   CellType,
+  CellVersion,
   LoadBalancerIPs,
 } from './Tableview/TableCells';
 import {Tableview} from './Tableview/Tableview';
 
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
+  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const {height} = useMainPaneDimensions();
 
@@ -57,23 +66,47 @@ const Dashboard: React.FC = () => {
       .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
       .filter(
         (resource: K8sResource) =>
-          (activeMenu.key.split('-')[0] ? resource.content.apiVersion === activeMenu.key.split('-')[0] : true) &&
+          activeMenu.key.replace(`${resource.content.apiVersion}-`, '') === resource.kind &&
           resource.kind === activeMenu.label
       );
   }, [resourceMap, activeMenu]);
 
+  const getContent = useCallback(() => {
+    if (activeMenu.key === 'Overview') {
+      return <Overview />;
+    }
+    if (CLICKAKBLE_RESOURCE_GROUPS.findIndex(m => m === activeMenu.key) > -1) {
+      return (
+        <ResourceGroupTable
+          dataSource={
+            menuList
+              .find(m => m.key === activeMenu.key)
+              ?.children?.map(
+                k =>
+                  getResourceKindHandler(k.label) && {
+                    ...getResourceKindHandler(k.label),
+                    menu: k,
+                  }
+              )
+              .filter(k => Boolean(k)) || []
+          }
+        />
+      );
+    }
+    if (activeMenu.key !== 'Overview') {
+      return (
+        <Tableview
+          dataSource={filterResources()}
+          columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
+        />
+      );
+    }
+  }, [activeMenu, filterResources, menuList]);
+
   return (
     <S.Container $paneHeight={height}>
       <S.Header title={activeMenu.label} />
-      <S.Content>
-        {activeMenu.key === 'Overview' && <Overview />}
-        {activeMenu.key !== 'Overview' && (
-          <Tableview
-            dataSource={filterResources()}
-            columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
-          />
-        )}
-      </S.Content>
+      <S.Content>{getContent()}</S.Content>
     </S.Container>
   );
 };
@@ -94,6 +127,7 @@ export const resourceKindColumns = {
   [SecretHandler.kind]: [CellName, CellError, CellNamespace, CellSecretType, CellAge],
   [PersistentVolumeClaimHandler.kind]: [CellName, CellError, CellNamespace, CellStatus, CellStorageCapacity, CellAge],
   [PersistentVolumeHandler.kind]: [CellName, CellError, CellNamespace, CellStatus, CellStorageCapacity, CellAge],
+  [CustomResourceDefinitionHandler.kind]: [CellKind, CellGroup, CellVersion, CellScope, CellAge],
   Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKernel, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
 };

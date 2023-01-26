@@ -185,6 +185,66 @@ export const CellType = {
     a?.content?.spec?.type?.localeCompare(b?.content?.spec?.type || '') || UNSORTED_VALUE,
 };
 
+export const CellGroup = {
+  title: 'Group',
+  dataIndex: 'content',
+  key: 'group',
+  width: '150px',
+  render: (content: any) =>
+    content?.spec?.group ? (
+      <span style={{padding: '2px 4px'}}>{content?.spec?.group}</span>
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.spec?.group?.localeCompare(b?.content?.spec?.group || '') || UNSORTED_VALUE,
+};
+
+export const CellScope = {
+  title: 'Scope',
+  dataIndex: 'content',
+  key: 'scope',
+  width: '150px',
+  render: (content: any) =>
+    content?.spec?.scope ? (
+      <span style={{padding: '2px 4px'}}>{content?.spec?.scope}</span>
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.spec?.scope?.localeCompare(b?.content?.spec?.scope || '') || UNSORTED_VALUE,
+};
+
+export const CellKind = {
+  title: 'Resource',
+  dataIndex: 'content',
+  key: 'kind',
+  width: '150px',
+  render: (content: any) =>
+    content?.spec?.names?.kind ? (
+      <span style={{padding: '2px 4px'}}>{content?.spec?.names?.kind}</span>
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.spec?.names?.kind?.localeCompare(b?.content?.spec?.names?.kind || '') || UNSORTED_VALUE,
+};
+
+export const CellVersion = {
+  title: 'Version',
+  dataIndex: 'content',
+  key: 'storedVersions',
+  width: '150px',
+  render: (content: any) =>
+    content?.status?.storedVersions ? (
+      <span style={{padding: '2px 4px'}}>{content?.status?.storedVersions[0]}</span>
+    ) : (
+      <span style={{padding: '2px 4px'}}>-</span>
+    ),
+  sorter: (a: K8sResource, b: K8sResource) =>
+    a?.content?.status?.storedVersions[0]?.localeCompare(b?.content?.status?.storedVersions[0] || '') || UNSORTED_VALUE,
+};
+
 export const CellPorts = {
   title: 'Ports',
   dataIndex: 'content',

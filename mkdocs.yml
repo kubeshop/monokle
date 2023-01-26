@@ -37,7 +37,8 @@ nav:
   - Working with Clusters:
     - Cluster Integration: cluster-integration.md
     - Cluster Mode: cluster-mode.md
-  - Compare & Sync:  
+    - Troubleshooting Connections: cluster-issues.md
+  - Compare & Sync:
     - Resource Compare: compare-sync.md
     - Compare Subfolders: compare-subfolders.md
   - Deploy/Diff: apply-and-diff.md

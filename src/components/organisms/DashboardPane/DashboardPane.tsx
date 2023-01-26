@@ -4,7 +4,7 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardMenuList, setSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -15,12 +15,14 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
 import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
+  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
@@ -30,7 +32,7 @@ const DashboardPane = () => {
 
   useEffect(() => {
     if (!filterText) {
-      setFilteredMenu(menu);
+      setFilteredMenu(menuList);
       return;
     }
 
@@ -52,7 +54,7 @@ const DashboardPane = () => {
             ) > 0
         )
     );
-  }, [filterText, menu]);
+  }, [filterText, menuList]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -107,7 +109,7 @@ const DashboardPane = () => {
       ),
     }));
 
-    setMenu(tempMenu);
+    dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
@@ -173,12 +175,16 @@ const DashboardPane = () => {
       </S.HeaderContainer>
 
       {filteredMenu.map((parent: DashboardMenu) =>
-        (parent.resourceCount && parent.resourceCount > 0) || parent.key === 'Overview' ? (
+        (parent.resourceCount && parent.resourceCount > 0) ||
+        ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 ? (
           <div key={parent.key}>
             <S.MainSection
-              $clickable={parent.key === 'Overview' || parent.key === 'Node'}
+              $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1}
               $active={activeMenu.key === parent.key}
-              onClick={() => (parent.key === 'Overview' || parent.key === 'Node') && setActiveMenu(parent)}
+              onClick={() =>
+                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 &&
+                setActiveMenu(parent)
+              }
             >
               {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}
               <span>{parent.label}</span>
