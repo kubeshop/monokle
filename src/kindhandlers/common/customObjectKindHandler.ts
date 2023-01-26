@@ -7,7 +7,7 @@ import path from 'path';
 import navSectionNames from '@constants/navSectionNames';
 
 import {extractSchema} from '@redux/services/schema';
-import {findDefaultVersion} from '@redux/thunks/loadCluster';
+import {findDefaultVersionForCRD} from '@redux/thunks/cluster';
 
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
@@ -107,7 +107,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
   const spec = crd.spec;
   const kind = spec.names.kind;
   const kindGroup = spec.group;
-  const kindVersion = findDefaultVersion(crd);
+  const kindVersion = findDefaultVersionForCRD(crd);
 
   if (kindVersion) {
     const kindPlural = spec.names.plural;
@@ -225,7 +225,7 @@ const createNamespacedCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
-        const defaultVersion = findDefaultVersion(crd.object);
+        const defaultVersion = findDefaultVersionForCRD(crd.object);
         if (defaultVersion) {
           return options.namespace
             ? customObjectsApi.listNamespacedCustomObject(
@@ -244,7 +244,7 @@ const createNamespacedCustomObjectKindHandler = (
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
-            const defaultVersion = findDefaultVersion(response.body);
+            const defaultVersion = findDefaultVersionForCRD(response.body);
             return options.namespace
               ? customObjectsApi.listNamespacedCustomObject(
                   kindGroup,
@@ -313,7 +313,7 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
-        const defaultVersion = findDefaultVersion(crd.object);
+        const defaultVersion = findDefaultVersionForCRD(crd.object);
         if (defaultVersion) {
           return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
         }
@@ -324,7 +324,7 @@ const createClusterCustomObjectKindHandler = (
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
-            const defaultVersion = findDefaultVersion(response.body);
+            const defaultVersion = findDefaultVersionForCRD(response.body);
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
           () => {
