@@ -5,6 +5,7 @@ export const initialState: DashboardState = {
   ui: {
     activeMenu: {key: 'Overview', label: 'Overview'},
     activeTab: 'Info',
+    menuList: [],
   },
   tableDrawer: {
     selectedResourceId: undefined,

@@ -5,7 +5,7 @@ import {Button, Select, Tooltip} from 'antd';
 
 import {ClearOutlined} from '@ant-design/icons';
 
-import {isEmpty, mapValues} from 'lodash';
+import {isEmpty, isEqual, mapValues} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 import {ResetFiltersTooltip} from '@constants/tooltips';
@@ -13,7 +13,8 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
+import {restartPreview} from '@redux/services/preview';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
@@ -21,7 +22,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 
@@ -48,11 +49,14 @@ const ResourceFilter = () => {
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
@@ -179,6 +183,10 @@ const ResourceFilter = () => {
       };
 
       dispatch(updateResourceFilter(updatedFilter));
+
+      if (isInClusterMode && !isEqual(resourceFilterKinds, updatedFilter.kinds)) {
+        restartPreview(kubeConfigContext, 'cluster', dispatch);
+      }
     },
     DEFAULT_EDITOR_DEBOUNCE,
     [names, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
