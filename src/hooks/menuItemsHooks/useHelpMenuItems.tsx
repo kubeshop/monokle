@@ -20,6 +20,7 @@ import {
   openReleaseNotesDrawer,
   toggleSettings,
 } from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {StepEnum} from '@shared/models/walkthrough';
 import {AnimationDurations} from '@shared/styles';
@@ -30,7 +31,7 @@ import {useAppVersion} from '../useAppVersion';
 
 export function useHelpMenuItems() {
   const dispatch = useAppDispatch();
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const appVersion = useAppVersion();
 
@@ -55,7 +56,7 @@ export function useHelpMenuItems() {
         key: 'settings',
         onClick: () => dispatch(toggleSettings()),
       },
-      ...(!previewingCluster
+      ...(!isInClusterMode
         ? [
             {
               label: (
@@ -84,7 +85,7 @@ export function useHelpMenuItems() {
               <HelpLink type="link" size="small" onClick={() => dispatch(openReleaseNotesDrawer())}>
                 New in {parsedAppVersion || 'this version'}
               </HelpLink>
-              {!previewingCluster && (
+              {!isInClusterMode && (
                 <HelpLink
                   type="link"
                   size="small"
@@ -119,7 +120,7 @@ export function useHelpMenuItems() {
         onClick: () => openFeedback(),
       },
     ],
-    [dispatch, parsedAppVersion, previewingCluster]
+    [dispatch, parsedAppVersion, isInClusterMode]
   );
 
   return items;
