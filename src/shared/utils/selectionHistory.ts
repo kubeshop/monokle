@@ -6,6 +6,7 @@ import {AppSelection} from '@shared/models/selection';
 
 import {findResourceMetaInStorage} from './resource';
 
+// TODO: this should become a thunk so we don't have to pass resourceMetaStorage to it...
 export const selectFromHistory = (
   direction: 'left' | 'right',
   currentSelectionHistoryIndex: number | undefined,

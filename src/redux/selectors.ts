@@ -9,6 +9,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
+import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {
   K8sResource,
@@ -413,6 +414,22 @@ export const kustomizationsSelector = createSelector(
     return Object.values(resourceMetaMap)
       .filter(resource => isKustomizationResource(resource))
       .map(resource => merge(resource, resourceContentMap[resource.id]));
+  }
+);
+
+export const rootFileEntrySelector = createSelector(
+  (state: RootState) => state.main.fileMap,
+  fileMap => {
+    const rootFileEntry: FileEntry | undefined = fileMap[ROOT_FILE_ENTRY];
+    return rootFileEntry;
+  }
+);
+
+export const rootFilePathSelector = createSelector(
+  (state: RootState) => state.main.fileMap,
+  fileMap => {
+    const rootFileEntry: FileEntry | undefined = fileMap[ROOT_FILE_ENTRY];
+    return rootFileEntry.filePath;
   }
 );
 
