@@ -9,6 +9,8 @@ import {closeTemplateExplorer} from '@redux/reducers/ui';
 
 import {useFilteredPluginMap} from '@hooks/useFilteredPluginMap';
 
+import EmptySelectedTemplate from '@assets/EmptySelectedTemplate.svg';
+
 import {SearchInput, TitleBar} from '@monokle/components';
 
 import TemplateCollapseHeader from './TemplateCollapseHeader';
@@ -20,6 +22,7 @@ const TemplateExplorer: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
+  const selectedTemplatePath = useAppSelector(state => state.ui.templateExplorer.selectedTemplatePath);
 
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
@@ -81,6 +84,15 @@ const TemplateExplorer: React.FC = () => {
           <S.NoTemplatesMessage>No templates found.</S.NoTemplatesMessage>
         )}
       </S.LeftContainer>
+
+      <S.RightContainer>
+        {!selectedTemplatePath ? (
+          <>
+            <S.EmptyImage src={EmptySelectedTemplate} />
+            <S.EmptyText>Select your desired template from the list</S.EmptyText>
+          </>
+        ) : null}
+      </S.RightContainer>
     </S.Modal>
   );
 };

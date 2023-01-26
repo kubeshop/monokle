@@ -4,6 +4,20 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
+export const EmptyImage = styled.img`
+  margin-left: 50px;
+`;
+
+export const EmptyText = styled.div`
+  display: inline-block;
+  font-weight: 600;
+  color: ${Colors.grey9};
+  max-width: 160px;
+  transform: translateY(25px);
+  margin-left: 15px;
+  margin-top: 50px;
+`;
+
 export const LeftContainer = styled.div`
   background-color: #1d1d1d;
 `;
@@ -41,6 +55,10 @@ export const PaddingWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+`;
+
+export const RightContainer = styled.div`
+  padding: 25px;
 `;
 
 export const TemplatesCollapse = styled(Collapse)`
