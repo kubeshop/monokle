@@ -129,6 +129,9 @@ export const uiSlice = createSlice({
     closeTemplateExplorer: (state: Draft<UiState>) => {
       state.templateExplorer.isVisible = false;
     },
+    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.templateExplorer.selectedTemplatePath = action.payload;
+    },
     openRenameEntityModal: (
       state: Draft<UiState>,
       action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
@@ -417,6 +420,7 @@ export const {
   setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
+  setSelectedTemplatePath,
   setShowStartPageLearn,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,

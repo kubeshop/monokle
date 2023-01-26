@@ -187,6 +187,7 @@ type UiState = {
   };
   templateExplorer: {
     isVisible: boolean;
+    selectedTemplatePath?: string;
   };
 };
 

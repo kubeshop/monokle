@@ -6,7 +6,7 @@ export const ArrowIconExpanded = styled.span`
   display: flex;
   align-items: center;
 
-  &: after {
+  &:after {
     right: 3px;
     top: 50%;
     content: '';
@@ -22,7 +22,7 @@ export const ArrowIconClosed = styled.span`
   display: flex;
   align-items: center;
 
-  &: after {
+  &:after {
     right: 3px;
     top: 50%;
     content: '';

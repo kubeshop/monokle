@@ -27,17 +27,17 @@ export const StyledButton = styled(Button)<{type?: string}>`
 `;
 
 export const CloseButton = styled(Button)`
-    border: none;
-    outline: none;
-    position: absolute;
-    top: -18px;
-    right: -6px;
-    transition: all 0.2s ease-in;
+  border: none;
+  outline: none;
+  position: absolute;
+  top: -18px;
+  right: -6px;
+  transition: all 0.2s ease-in;
 
-    &:hover, &:focus {
-        color: ${Colors.whitePure};
-    }
-}
+  &:hover,
+  &:focus {
+    color: ${Colors.whitePure};
+  }
 `;
 
 export const Description = styled.p`
