@@ -1,4 +1,4 @@
-import _, {merge} from 'lodash';
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {mapKeyValuesFromNestedObjects} from '@utils/objects';
@@ -36,6 +36,7 @@ import {isDefined} from '@shared/utils/filter';
 
 import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
+import {joinK8sResource, joinK8sResourceMap} from './services/resource';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -79,12 +80,12 @@ export const activeResourceMapSelector = createSelector(
   (state: RootState) => state,
   (state): ResourceMap<AnyOrigin> => {
     if (state.main.clusterConnection) {
-      return merge(state.main.resourceMetaStorage.cluster, state.main.resourceContentStorage.cluster);
+      return joinK8sResourceMap(state.main.resourceMetaStorage.cluster, state.main.resourceContentStorage.cluster);
     }
     if (state.main.preview) {
-      return merge(state.main.resourceMetaStorage.preview, state.main.resourceContentStorage.preview);
+      return joinK8sResourceMap(state.main.resourceMetaStorage.preview, state.main.resourceContentStorage.preview);
     }
-    return merge(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local);
+    return joinK8sResourceMap(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local);
   }
 );
 
@@ -161,7 +162,10 @@ export function resourceMapSelector<Storage extends AnyOrigin['storage']>(
   state: RootState,
   resourceStorage: Storage
 ): ResourceMap<OriginFromStorage<Storage>> {
-  return merge(state.main.resourceMetaStorage[resourceStorage], state.main.resourceContentStorage[resourceStorage]);
+  return joinK8sResourceMap(
+    state.main.resourceMetaStorage[resourceStorage],
+    state.main.resourceContentStorage[resourceStorage]
+  );
 }
 
 export function resourceMetaMapSelector<Storage extends AnyOrigin['storage']>(
@@ -219,7 +223,7 @@ export function resourceSelector<Storage extends AnyOrigin['storage']>(
       : state.resourceContentStorage[resourceStorage];
   const resourceMeta = resourceMetaMap[resourceId];
   const resourceContent = resourceContentMap[resourceId];
-  return merge(resourceMeta, resourceContent);
+  return {...resourceMeta, ...resourceContent};
 }
 
 export function resourceMetaSelector<Storage extends AnyOrigin['storage']>(
@@ -413,7 +417,7 @@ export const kustomizationsSelector = createSelector(
   (resourceMetaMap, resourceContentMap) => {
     return Object.values(resourceMetaMap)
       .filter(resource => isKustomizationResource(resource))
-      .map(resource => merge(resource, resourceContentMap[resource.id]));
+      .map(resource => joinK8sResource(resource, resourceContentMap[resource.id]));
   }
 );
 
@@ -429,7 +433,7 @@ export const rootFilePathSelector = createSelector(
   (state: RootState) => state.main.fileMap,
   fileMap => {
     const rootFileEntry: FileEntry | undefined = fileMap[ROOT_FILE_ENTRY];
-    return rootFileEntry.filePath;
+    return rootFileEntry?.filePath;
   }
 );
 

@@ -1,12 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {merge} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
 import {currentConfigSelector} from '@redux/selectors';
-import {extractK8sResources} from '@redux/services/resource';
+import {extractK8sResources, joinK8sResource} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
@@ -45,7 +44,7 @@ export const previewKustomization = createAsyncThunk<
     return {};
   }
 
-  const kustomization = merge(kustomizationMeta, kustomizationContent);
+  const kustomization = joinK8sResource(kustomizationMeta, kustomizationContent);
 
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   const folder = path.join(rootFolder, path.dirname(kustomization.origin.filePath));

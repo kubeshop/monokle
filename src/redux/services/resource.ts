@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {merge, uniq} from 'lodash';
+import {uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -225,7 +225,7 @@ export function removeResourceFromFile(
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
-  const resourceMap: ResourceMap = merge(resourceMetaMap, resourceContentMap);
+  const resourceMap: ResourceMap = joinK8sResourceMap(resourceMetaMap, resourceContentMap);
 
   if (!isLocalResource(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
@@ -473,6 +473,13 @@ export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
   return {meta, content};
 }
 
+export function joinK8sResource<Origin extends AnyOrigin = AnyOrigin>(
+  meta: ResourceMeta<Origin>,
+  content: ResourceContent<Origin>
+): K8sResource<Origin> {
+  return {...meta, ...content};
+}
+
 export function splitK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
   resourceMap: ResourceMap<Origin> | K8sResource<Origin>[]
 ) {
@@ -484,4 +491,18 @@ export function splitK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
     contentMap[resource.id] = content;
   });
   return {metaMap, contentMap};
+}
+
+export function joinK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
+  metaMap: ResourceMetaMap<Origin>,
+  contentMap: ResourceContentMap<Origin>
+) {
+  const resourceMap: ResourceMap<Origin> = {};
+  Object.values(metaMap).forEach(meta => {
+    const content = contentMap[meta.id];
+    if (content) {
+      resourceMap[meta.id] = {...meta, ...content};
+    }
+  });
+  return resourceMap;
 }

@@ -1,10 +1,8 @@
-import {merge} from 'lodash';
-
 import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import initialState from '@redux/initialState';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
-import {getResourcesOfKind} from '@redux/services/resource';
+import {getResourcesOfKind, joinK8sResourceMap} from '@redux/services/resource';
 
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {AppConfig} from '@shared/models/config';
@@ -47,7 +45,7 @@ export function readManifests(rootFolder: string) {
     helmTemplatesMap,
   });
 
-  const resourceMap = merge(resourceMetaMap, resourceContentMap);
+  const resourceMap = joinK8sResourceMap(resourceMetaMap, resourceContentMap);
 
   return {resourceMap, fileMap, files, helmChartMap, helmValuesMap};
 }

@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {isEqual, merge} from 'lodash';
+import {isEqual} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -9,7 +9,7 @@ import initialState from '@redux/initialState';
 import {setAlert} from '@redux/reducers/alert';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {joinK8sResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -401,7 +401,7 @@ export const mainSlice = createSlice({
       action.payload.resourcePayloads.forEach(resourcePayload => {
         const resourceMeta = state.resourceMetaStorage.local[resourcePayload.resourceId];
         const resourceContent = state.resourceContentStorage.local[resourcePayload.resourceId];
-        const resource = merge(resourceMeta, resourceContent);
+        const resource = joinK8sResource(resourceMeta, resourceContent);
         const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
 

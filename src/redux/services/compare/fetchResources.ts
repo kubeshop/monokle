@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {flatten, merge, sortBy} from 'lodash';
+import {flatten, sortBy} from 'lodash';
 import log from 'loglevel';
 import path, {sep} from 'path';
 import invariant from 'tiny-invariant';
@@ -40,7 +40,7 @@ import {isDefined} from '@shared/utils/filter';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 import getClusterObjects from '../getClusterObjects';
-import {extractK8sResources} from '../resource';
+import {extractK8sResources, joinK8sResource, joinK8sResourceMap} from '../resource';
 
 export async function fetchResources(state: RootState, options: ResourceSet): Promise<K8sResource[]> {
   const {type} = options;
@@ -68,9 +68,9 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
 }
 
 function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sResource<LocalOrigin>[] {
-  return Object.values(merge(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local)).filter(r =>
-    r.origin.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`)
-  );
+  return Object.values(
+    joinK8sResourceMap(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local)
+  ).filter(r => r.origin.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`));
 }
 
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource<LocalOrigin>[]> {
@@ -315,7 +315,7 @@ async function previewKustomizeResources(
     const projectConfig = currentConfigSelector(state);
     const kustomizationMeta = state.main.resourceMetaStorage.local[options.kustomizationId];
     const kustomizationContent = state.main.resourceContentStorage.local[options.kustomizationId];
-    const kustomization = merge(kustomizationMeta, kustomizationContent);
+    const kustomization = joinK8sResource(kustomizationMeta, kustomizationContent);
     const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
     const folder = path.join(rootFolder, path.dirname(kustomization.origin.filePath));
     const result = await runKustomize(folder, projectConfig);

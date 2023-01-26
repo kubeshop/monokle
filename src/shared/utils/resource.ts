@@ -1,11 +1,11 @@
 import 'electron';
 
 import {existsSync, readFileSync} from 'fs';
-import {merge} from 'lodash';
 import path from 'path';
 
 import {
   K8sResource,
+  ResourceContent,
   ResourceContentMap,
   ResourceContentStorage,
   ResourceIdentifier,
@@ -66,5 +66,14 @@ export function findResourceInStorage<Origin extends AnyOrigin>(
   const storageKey = 'storage' in resourceIdentifier ? resourceIdentifier.storage : resourceIdentifier.origin.storage;
   const resourceMetaMap = metaStorage[storageKey] as ResourceMetaMap<Origin>;
   const resourceContentMap = contentStorage[storageKey] as ResourceContentMap<Origin>;
-  return merge(resourceMetaMap[resourceIdentifier.id], resourceContentMap[resourceIdentifier.id]);
+  return joinK8sResource(resourceMetaMap[resourceIdentifier.id], resourceContentMap[resourceIdentifier.id]);
+}
+
+// TODO: the split and join functions for resource and resourceMaps should be moved to the shared folder
+// this is here temporarily because imports from redux services are restricted
+function joinK8sResource<Origin extends AnyOrigin = AnyOrigin>(
+  meta: ResourceMeta<Origin>,
+  content: ResourceContent<Origin>
+): K8sResource<Origin> {
+  return {...meta, ...content};
 }

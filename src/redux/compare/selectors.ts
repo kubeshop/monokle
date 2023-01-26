@@ -1,8 +1,9 @@
-import {groupBy, merge} from 'lodash';
+import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
+import {joinK8sResource} from '@redux/services/resource';
 
 import {getApiVersionGroup} from '@utils/resources';
 
@@ -126,7 +127,7 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   const {kustomizationId} = resourceSet;
 
   const currentKustomization = kustomizationId
-    ? merge(
+    ? joinK8sResource(
         state.main.resourceMetaStorage.local[kustomizationId],
         state.main.resourceContentStorage.local[kustomizationId]
       )

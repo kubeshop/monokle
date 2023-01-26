@@ -1,5 +1,4 @@
 import fs from 'fs';
-import {merge} from 'lodash';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -40,7 +39,13 @@ import {K8sResource, ResourceContentMap, ResourceIdentifier, ResourceMetaMap} fr
 import {LocalOrigin} from '@shared/models/origin';
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
 
-import {deleteResource, extractK8sResources, hasSupportedResourceContent, splitK8sResource} from './resource';
+import {
+  deleteResource,
+  extractK8sResources,
+  hasSupportedResourceContent,
+  joinK8sResource,
+  splitK8sResource,
+} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: ResourceIdentifier[];
@@ -287,7 +292,7 @@ export function getLocalResourcesForPath(
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   return Object.values(resourceMetaMap)
     .filter(r => r.origin.filePath === filePath)
-    .map(meta => merge(meta, resourceContentMap[meta.id]));
+    .map(meta => joinK8sResource(meta, resourceContentMap[meta.id]));
 }
 
 /**

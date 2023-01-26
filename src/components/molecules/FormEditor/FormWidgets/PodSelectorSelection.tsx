@@ -2,9 +2,10 @@ import React, {useEffect, useState} from 'react';
 
 import {Select} from 'antd';
 
-import {merge, uniq} from 'lodash';
+import {uniq} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
+import {resourceMapSelector} from '@redux/selectors';
 import {getResourcesOfKind} from '@redux/services/resource';
 
 import * as S from './styled';
@@ -16,9 +17,7 @@ const EMPTY_VALUE = 'NONE';
 
 export const PodSelectorSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMap = useAppSelector(state =>
-    merge(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local)
-  );
+  const resourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
   const [podSelectors, setPodSelectors] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
