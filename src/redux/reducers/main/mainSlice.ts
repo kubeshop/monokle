@@ -11,7 +11,7 @@ import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/s
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {loadClusterResources, reloadClusterResources} from '@redux/thunks/loadCluster';
+import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -361,6 +361,10 @@ export const mainSlice = createSlice({
         state.clusterConnectionOptions.isLoading = false;
         state.clusterConnection = undefined;
       });
+
+    builder.addCase(stopClusterConnection.fulfilled, state => {
+      resetSelectionHistory(state);
+    });
 
     builder.addCase(setRootFolder.pending, state => {
       const existingHelmCharts: HelmChart[] = JSON.parse(JSON.stringify(Object.values(state.helmChartMap)));

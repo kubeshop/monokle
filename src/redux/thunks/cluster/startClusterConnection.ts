@@ -7,30 +7,30 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {openKubectlProxy} from '@shared/utils/commands/kubectl';
 
-import {loadClusterResources, reloadClusterResources} from './loadCluster';
+import {loadClusterResources, reloadClusterResources} from './loadClusterResources';
 
-export type StartClusterPreviewPayload = {
-  clusterContext: string;
+export type StartClusterConnectionPayload = {
+  context: string;
   isRestart?: boolean;
 };
 
 const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
 
-export const startClusterPreview = createAsyncThunk<
+export const startClusterConnection = createAsyncThunk<
   void,
-  StartClusterPreviewPayload,
+  StartClusterConnectionPayload,
   {dispatch: AppDispatch; state: RootState}
->('main/startClusterPreview', async (payload, thunkAPI) => {
-  const {clusterContext, isRestart} = payload;
+>('main/startClusterConnection', async (payload, thunkAPI) => {
+  const {context, isRestart} = payload;
 
   const clusterProxyPort = thunkAPI.getState().config.clusterProxyPort;
   const shouldUseKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
   if (!shouldUseKubectlProxy) {
     if (isRestart) {
-      thunkAPI.dispatch(reloadClusterResources({context: clusterContext}));
+      thunkAPI.dispatch(reloadClusterResources({context}));
     } else {
-      thunkAPI.dispatch(loadClusterResources({context: clusterContext}));
+      thunkAPI.dispatch(loadClusterResources({context}));
     }
 
     return;
@@ -38,9 +38,9 @@ export const startClusterPreview = createAsyncThunk<
 
   if (clusterProxyPort) {
     if (isRestart) {
-      thunkAPI.dispatch(reloadClusterResources({context: clusterContext, port: clusterProxyPort}));
+      thunkAPI.dispatch(reloadClusterResources({context, port: clusterProxyPort}));
     } else {
-      thunkAPI.dispatch(loadClusterResources({context: clusterContext, port: clusterProxyPort}));
+      thunkAPI.dispatch(loadClusterResources({context, port: clusterProxyPort}));
     }
     return;
   }
@@ -64,9 +64,9 @@ export const startClusterPreview = createAsyncThunk<
       thunkAPI.dispatch(setClusterProxyPort(proxyPort));
 
       if (isRestart) {
-        thunkAPI.dispatch(reloadClusterResources({context: clusterContext, port: proxyPort}));
+        thunkAPI.dispatch(reloadClusterResources({context, port: proxyPort}));
       } else {
-        thunkAPI.dispatch(loadClusterResources({context: clusterContext, port: proxyPort}));
+        thunkAPI.dispatch(loadClusterResources({context, port: proxyPort}));
       }
     }
   };
