@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Welcome to Monokle Desktop 🧐 - K8s configuration analysis and version control editor!
+  🧐 Monokle streamlines the process of creating, analyzing, and deploying Kubernetes configurations by providing a unified visual tool for authoring YAML manifests, validating policies, and managing live clusters. 
 </p>
 
 <p align="center">
