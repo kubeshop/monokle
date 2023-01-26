@@ -12,7 +12,7 @@ export const dashboardSlice = createSlice({
     setActiveDashboardMenu: (state: Draft<DashboardState>, action: PayloadAction<DashboardMenu>) => {
       state.ui.activeMenu = action.payload;
     },
-    setDashboardMenuList: (state: Draft<DashboardState>, action: PayloadAction<Array<IMenu>>) => {
+    setDashboardMenuList: (state: Draft<DashboardState>, action: PayloadAction<Array<DashboardMenu>>) => {
       state.ui.menuList = action.payload;
     },
     setSelectedResourceId: (state: Draft<DashboardState>, action: PayloadAction<string | undefined>) => {
