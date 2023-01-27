@@ -532,6 +532,11 @@ export const configSlice = createSlice({
           dsn: action.payload.SENTRY_DSN,
           tracesSampleRate: 0.6,
           beforeSend: event => {
+            // TODO: Skip errors related to model.getModeId for now, should fix in 2.0
+            // also why is it model.getModeId and not model.getModelId? is it a typo?
+            if (event.exception?.values?.some(v => v.value?.includes('model.getModeId'))) {
+              return null;
+            }
             // we have to get this from electron store to get the most updated value
             // because the state object in this action is a snapshot of the state at the moment of executing the reducer
             const disableErrorReporting = electronStore.get('appConfig.disableErrorReporting');

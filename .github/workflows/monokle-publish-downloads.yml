@@ -89,6 +89,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Package
         run: |
@@ -216,6 +217,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Package
         run: |
@@ -315,6 +317,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Package
         run: |
