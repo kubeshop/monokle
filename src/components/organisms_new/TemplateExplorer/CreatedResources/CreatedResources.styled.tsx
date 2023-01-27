@@ -9,8 +9,9 @@ export const CreatedResourceLabel = styled.p`
 `;
 
 export const CreatedResourceKind = styled.span`
-  margin-left: 10px;
+  margin: 0px 15px 0px 5px;
   font-style: italic;
+  color: ${Colors.grey7};
 `;
 
 export const CreatedResourceName = styled.span`

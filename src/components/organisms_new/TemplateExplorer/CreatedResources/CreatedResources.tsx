@@ -1,9 +1,13 @@
 import {Tag} from 'antd';
+import Link from 'antd/lib/typography/Link';
+
+import {SelectOutlined} from '@ant-design/icons';
 
 import {isEmpty} from 'lodash';
 
 import {useAppDispatch} from '@redux/hooks';
-import {setSelectedTemplatePath} from '@redux/reducers/ui';
+import {selectK8sResource} from '@redux/reducers/main';
+import {closeTemplateExplorer, setSelectedTemplatePath} from '@redux/reducers/ui';
 
 import {K8sResource} from '@shared/models/k8sResource';
 
@@ -18,6 +22,11 @@ const CreatedResources: React.FC<IProps> = props => {
   const {createdResources, resultMessage} = props;
 
   const dispatch = useAppDispatch();
+
+  const onSelectResourceHandler = (resource: K8sResource) => {
+    dispatch(selectK8sResource({resourceId: resource.id}));
+    dispatch(closeTemplateExplorer());
+  };
 
   return (
     <>
@@ -35,6 +44,9 @@ const CreatedResources: React.FC<IProps> = props => {
                   {resource.namespace && <Tag title={resource.namespace} />}
                   <S.CreatedResourceName>{resource.name}*</S.CreatedResourceName>
                   <S.CreatedResourceKind>{resource.kind}</S.CreatedResourceKind>
+                  <Link>
+                    <SelectOutlined onClick={() => onSelectResourceHandler(resource)} />
+                  </Link>
                 </li>
               );
             })}

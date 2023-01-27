@@ -31,7 +31,7 @@ export const TemplateInformationCollapse = styled(Collapse)`
   }
 
   .ant-collapse-content {
-    background-color: rgba(25, 31, 33, 0.7) !important;
+    background-color: rgba(25, 31, 33, 0.1) !important;
     border-radius: 0px 0px 4px 4px !important;
   }
 `;
