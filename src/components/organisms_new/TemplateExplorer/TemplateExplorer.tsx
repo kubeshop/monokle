@@ -16,6 +16,7 @@ import {SearchInput, TitleBar} from '@monokle/components';
 import TemplateCollapseHeader from './TemplateCollapseHeader';
 import TemplateCollapseItem from './TemplateCollapseItem';
 import * as S from './TemplateExplorer.styled';
+import TemplateInformation from './TemplateInformation';
 import TitleBarDescription from './TitleBarDescription';
 
 const TemplateExplorer: React.FC = () => {
@@ -91,7 +92,9 @@ const TemplateExplorer: React.FC = () => {
             <S.EmptyImage src={EmptySelectedTemplate} />
             <S.EmptyText>Select your desired template from the list</S.EmptyText>
           </>
-        ) : null}
+        ) : (
+          <TemplateInformation />
+        )}
       </S.RightContainer>
     </S.Modal>
   );
