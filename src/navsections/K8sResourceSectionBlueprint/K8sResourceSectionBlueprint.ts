@@ -5,7 +5,6 @@ import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
