@@ -21,7 +21,13 @@ import * as S from './TemplateForm.styled';
 
 type FormDataList = Record<string, Primitive>[];
 
-const TemplateForm: React.FC = () => {
+type IProps = {
+  width: number;
+};
+
+const TemplateForm: React.FC<IProps> = props => {
+  const {width} = props;
+
   const dispatch = useAppDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -120,7 +126,7 @@ const TemplateForm: React.FC = () => {
 
   return (
     <>
-      <S.Steps current={activeFormIndex} items={stepsItems} />
+      <S.Steps $count={stepsItems.length} $width={width} current={activeFormIndex} items={stepsItems} />
 
       <S.FormContainer>
         {loading ? (

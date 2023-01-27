@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Collapse} from 'antd';
 
@@ -28,6 +29,8 @@ const TemplateExplorer: React.FC = () => {
 
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
+
+  const [rightContainerRef, {width: rigthContainerWidth}] = useMeasure<HTMLDivElement>();
 
   const filteredPluginMap = useFilteredPluginMap(searchValue);
 
@@ -87,7 +90,7 @@ const TemplateExplorer: React.FC = () => {
         )}
       </S.LeftContainer>
 
-      <S.RightContainer>
+      <S.RightContainer ref={rightContainerRef}>
         {!selectedTemplatePath ? (
           <>
             <S.EmptyImage src={EmptySelectedTemplate} />
@@ -97,7 +100,7 @@ const TemplateExplorer: React.FC = () => {
           <>
             <TemplateInformation />
 
-            <TemplateForm />
+            <TemplateForm width={rigthContainerWidth} />
           </>
         )}
       </S.RightContainer>

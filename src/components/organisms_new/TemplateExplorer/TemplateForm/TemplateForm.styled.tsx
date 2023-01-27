@@ -8,7 +8,13 @@ export const FormContainer = styled.div`
   margin-top: 30px;
 `;
 
-export const Steps = styled(RawSteps)`
+export const Steps = styled(RawSteps)<{$width: number; $count: number}>`
+  max-width: ${({$width}) => $width}px;
+  overflow-x: auto;
+  display: grid;
+  grid-template-columns: ${({$count}) => `repeat(${$count - 1}, minmax(min-content, 1fr)) min-content`};
+  padding-bottom: 6px;
+
   .ant-steps-item-description {
     max-width: 150px !important;
     overflow: hidden;
