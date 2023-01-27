@@ -93,7 +93,7 @@ export type K8sResourceScopeType = {
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
   checkedResourceIds: string[];
-  state: RootState;
+  isInPreviewMode?: boolean;
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
@@ -112,7 +112,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       activeResources: activeResourcesSelector(state),
       resourceFilter: state.main.resourceFilter,
       checkedResourceIds: state.main.checkedResourceIds,
-      state,
+      isInPreviewMode: isInPreviewModeSelector(state),
     };
   },
   builder: {
@@ -127,7 +127,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
         scope.isFolderOpen &&
         (scope.activeResources.length === 0 ||
           scope.activeResources.every(
-            resource => !isResourcePassingFilter(resource, scope.resourceFilter, isInPreviewModeSelector(scope.state))
+            resource => !isResourcePassingFilter(resource, scope.resourceFilter, scope.isInPreviewMode)
           ))
       );
     },

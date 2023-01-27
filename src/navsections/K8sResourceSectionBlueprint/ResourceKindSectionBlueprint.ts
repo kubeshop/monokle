@@ -34,7 +34,7 @@ export type ResourceKindScopeType = {
   selectedResourceId: string | undefined;
   selectedPath: string | undefined;
   checkedResourceIds: string[];
-  state: RootState;
+  isInPreviewMode?: boolean;
 };
 
 export function makeResourceKindNavSection(
@@ -53,7 +53,7 @@ export function makeResourceKindNavSection(
         selectedResourceId: state.main.selectedResourceId,
         selectedPath: state.main.selectedPath,
         checkedResourceIds: state.main.checkedResourceIds,
-        state,
+        isInPreviewMode: isInPreviewModeSelector(state),
       };
     },
     builder: {
@@ -108,11 +108,7 @@ export function makeResourceKindNavSection(
         isHighlighted: rawItem => rawItem.isHighlighted,
         isDirty: rawItem => isUnsavedResource(rawItem),
         isVisible: (rawItem, scope) => {
-          const isPassingFilter = isResourcePassingFilter(
-            rawItem,
-            scope.resourceFilter,
-            isInPreviewModeSelector(scope.state)
-          );
+          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter, scope.isInPreviewMode);
 
           return isPassingFilter;
         },
