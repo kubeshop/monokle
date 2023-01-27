@@ -1,15 +1,19 @@
-# Using Monokle Desktop vs Monokle Cloud
+# Using Monokle Desktop and Monokle Cloud
 
 Monokle is available via both a locally installed desktop version and a cloud version to use without having to install in your environment. Monokle also includes a CLI and GitHub action that can be used to integrate in your development workflow.
 
 
 ## **Monokle Desktop**
 
+**Monokle Desktop** is for engineers that create and maintain high-quality Kubernetes Deployments.
+
 The desktop version focuses on enabling anybody to manage manifests and configuration independently of their knowledge level, before and after deployment, with specific features for creation of content easily through templates and snippets for single developers and platform engineers.
 
 To start working with Monokle Desktop, please follow this [Getting Started](getting-started.md) guide 🚀</em>.
 
 ## **Monokle Cloud**
+
+**Monokle Cloud** is for teams managing and validating their Kubernetes deployments in Git.
 
 Monokle Cloud focuses on configuration visibility and policy enforcing. It helps to improve the security of the deployments in GitOps adding information about resources and policies applicable, making it easier to make decisions about whether to merge or not a PR, through the use of linters, policies and RBAC into the PR process and allowing collaboration.
 
