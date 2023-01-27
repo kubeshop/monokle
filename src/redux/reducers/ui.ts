@@ -129,7 +129,7 @@ export const uiSlice = createSlice({
     closeTemplateExplorer: (state: Draft<UiState>) => {
       state.templateExplorer.isVisible = false;
     },
-    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
       state.templateExplorer.selectedTemplatePath = action.payload;
     },
     openRenameEntityModal: (

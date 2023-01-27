@@ -23,6 +23,7 @@ export const Descriptions = styled(RawDescriptions)`
 
 export const TemplateInformationCollapse = styled(Collapse)`
   border-radius: 4px;
+  margin-bottom: 30px;
 
   .ant-collapse-header {
     background-color: #191f21;
