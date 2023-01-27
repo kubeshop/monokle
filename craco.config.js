@@ -4,10 +4,20 @@ const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
 const lodash = require('lodash');
 const path = require('path');
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 module.exports = {
   webpack: {
-    plugins: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})],
+    devtool: 'source-map',
+    plugins: [
+      new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true}),
+      new SentryWebpackPlugin({
+        org: 'kubeshop',
+        project: 'monokle-desktop',
+        include: './build',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      }),
+    ],
     configure: webpackConfig => {
       webpackConfig.node = {__dirname: false};
       webpackConfig.target = 'electron-renderer';
