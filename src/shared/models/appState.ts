@@ -33,9 +33,11 @@ type AppState = {
   clusterConnection?: {
     context: string;
     kubeConfigPath: string;
+    namespace: string;
   };
   clusterConnectionOptions: {
     isLoading?: boolean;
+    lastNamespaceLoaded?: string;
   };
   checkedResourceIdentifiers: ResourceIdentifier[];
 

@@ -11,6 +11,8 @@ import {loadClusterResources, reloadClusterResources} from './loadClusterResourc
 
 export type StartClusterConnectionPayload = {
   context: string;
+  // TODO: maybe this should be required to catch all places where it should be passed?..
+  namespace?: string;
   isRestart?: boolean;
 };
 
@@ -21,16 +23,16 @@ export const startClusterConnection = createAsyncThunk<
   StartClusterConnectionPayload,
   {dispatch: AppDispatch; state: RootState}
 >('main/startClusterConnection', async (payload, thunkAPI) => {
-  const {context, isRestart} = payload;
+  const {context, namespace, isRestart} = payload;
 
   const clusterProxyPort = thunkAPI.getState().config.clusterProxyPort;
   const shouldUseKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
   if (!shouldUseKubectlProxy) {
     if (isRestart) {
-      thunkAPI.dispatch(reloadClusterResources({context}));
+      thunkAPI.dispatch(reloadClusterResources({context, namespace}));
     } else {
-      thunkAPI.dispatch(loadClusterResources({context}));
+      thunkAPI.dispatch(loadClusterResources({context, namespace}));
     }
 
     return;
@@ -38,9 +40,9 @@ export const startClusterConnection = createAsyncThunk<
 
   if (clusterProxyPort) {
     if (isRestart) {
-      thunkAPI.dispatch(reloadClusterResources({context, port: clusterProxyPort}));
+      thunkAPI.dispatch(reloadClusterResources({context, namespace, port: clusterProxyPort}));
     } else {
-      thunkAPI.dispatch(loadClusterResources({context, port: clusterProxyPort}));
+      thunkAPI.dispatch(loadClusterResources({context, namespace, port: clusterProxyPort}));
     }
     return;
   }
@@ -64,9 +66,9 @@ export const startClusterConnection = createAsyncThunk<
       thunkAPI.dispatch(setClusterProxyPort(proxyPort));
 
       if (isRestart) {
-        thunkAPI.dispatch(reloadClusterResources({context, port: proxyPort}));
+        thunkAPI.dispatch(reloadClusterResources({context, namespace, port: proxyPort}));
       } else {
-        thunkAPI.dispatch(loadClusterResources({context, port: proxyPort}));
+        thunkAPI.dispatch(loadClusterResources({context, namespace, port: proxyPort}));
       }
     }
   };

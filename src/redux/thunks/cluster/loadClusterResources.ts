@@ -8,7 +8,6 @@ import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {setClusterPreviewNamespace} from '@redux/reducers/appConfig';
 import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {extractK8sResources} from '@redux/services/resource';
@@ -43,14 +42,16 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamesp
   );
 };
 
-const loadClusterResourcesHandler = async (payload: {context: string; port?: number}, thunkAPI: any) => {
-  const {context, port} = payload;
+const loadClusterResourcesHandler = async (
+  payload: {context: string; namespace?: string; port?: number},
+  thunkAPI: any
+) => {
+  const {context, port, namespace} = payload;
   const startTime = new Date().getTime();
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-  const clusterPreviewNamespace = thunkAPI.getState().config.clusterPreviewNamespace;
 
-  let currentNamespace: string = clusterPreviewNamespace;
+  let currentNamespace: string = namespace || '<all>';
 
   try {
     let kc = createKubeClient(kubeConfigPath, context);
@@ -79,7 +80,6 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
       } else {
         if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
           currentNamespace = clusterAccess[0].namespace;
-          thunkAPI.dispatch(setClusterPreviewNamespace(currentNamespace));
         }
 
         results = await getNonCustomClusterObjects(kc, currentNamespace);
@@ -155,7 +155,7 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
       executionTime: endTime - startTime,
     });
 
-    startWatchingResources(thunkAPI.dispatch, kc, clusterResourceMap, clusterPreviewNamespace);
+    startWatchingResources(thunkAPI.dispatch, kc, clusterResourceMap, currentNamespace);
 
     const alert: AlertType = {
       type: AlertEnum.Success,
@@ -168,6 +168,7 @@ const loadClusterResourcesHandler = async (payload: {context: string; port?: num
       alert,
       context,
       kubeConfigPath,
+      namespace: currentNamespace,
     };
   } catch (e: any) {
     log.error(e);
@@ -184,8 +185,9 @@ export const loadClusterResources = createAsyncThunk<
     resources: K8sResource<ClusterOrigin>[];
     context: string;
     kubeConfigPath: string;
+    namespace: string;
   },
-  {context: string; port?: number},
+  {context: string; namespace?: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;
@@ -197,8 +199,9 @@ export const reloadClusterResources = createAsyncThunk<
     resources: K8sResource<ClusterOrigin>[];
     context: string;
     kubeConfigPath: string;
+    namespace: string;
   },
-  {context: string; port?: number},
+  {context: string; namespace?: string; port?: number},
   {
     dispatch: AppDispatch;
     state: RootState;

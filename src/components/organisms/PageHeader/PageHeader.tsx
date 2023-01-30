@@ -34,7 +34,7 @@ import {Icon} from '@monokle/components';
 import {activeProjectSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
-// import ClusterSelection from './ClusterSelection';
+import ClusterSelection from './ClusterSelection';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import {OPAChip} from './OPAChip';
 import * as S from './PageHeader.styled';
@@ -241,14 +241,12 @@ const PageHeader = () => {
               <K8sVersionSelection />
             </>
           )}
-          {/* TODO: revisit this <ClusterSelection previewResource={previewResource} /> */}
-
+          <ClusterSelection />
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">
               <S.BellOutlined onClick={toggleNotificationsDrawer} />
             </Badge>
           </Tooltip>
-
           <Dropdown
             menu={{
               items: helpMenuItems,

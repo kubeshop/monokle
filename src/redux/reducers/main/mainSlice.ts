@@ -334,7 +334,13 @@ export const mainSlice = createSlice({
 
         state.resourceMetaStorage.cluster = metaMap;
         state.resourceContentStorage.cluster = contentMap;
-        state.clusterConnection = {context: action.payload.context, kubeConfigPath: action.payload.kubeConfigPath};
+        state.clusterConnection = {
+          context: action.payload.context,
+          namespace: action.payload.namespace,
+          kubeConfigPath: action.payload.kubeConfigPath,
+        };
+        state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
+        electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
       })
       .addCase(loadClusterResources.rejected, state => {
         state.clusterConnectionOptions.isLoading = false;
@@ -345,7 +351,7 @@ export const mainSlice = createSlice({
       .addCase(reloadClusterResources.pending, state => {
         state.clusterConnectionOptions.isLoading = true;
       })
-      .addCase(reloadClusterResources.fulfilled, state => {
+      .addCase(reloadClusterResources.fulfilled, (state, action) => {
         state.clusterConnectionOptions.isLoading = false;
         state.checkedResourceIdentifiers = [];
 
@@ -356,6 +362,18 @@ export const mainSlice = createSlice({
         ) {
           clearSelectionReducer(state);
         }
+
+        const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
+
+        state.resourceMetaStorage.cluster = metaMap;
+        state.resourceContentStorage.cluster = contentMap;
+        state.clusterConnection = {
+          context: action.payload.context,
+          namespace: action.payload.namespace,
+          kubeConfigPath: action.payload.kubeConfigPath,
+        };
+        state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
+        electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
       })
       .addCase(reloadClusterResources.rejected, state => {
         state.clusterConnectionOptions.isLoading = false;
@@ -364,6 +382,8 @@ export const mainSlice = createSlice({
 
     builder.addCase(stopClusterConnection.fulfilled, state => {
       resetSelectionHistory(state);
+      state.clusterConnectionOptions.isLoading = false;
+      state.clusterConnection = undefined;
     });
 
     builder.addCase(setRootFolder.pending, state => {

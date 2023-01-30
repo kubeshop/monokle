@@ -162,6 +162,9 @@ export const startWatchingResources = async (
     watchResource(dispatch, handler, kubeConfig, clusterResourceMap, handler.kindPlural)
   );
   watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, clusterResourceMap);
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
   intervalId = setInterval(() => {
     if (resourcesToUpdate.length > 0) {
       dispatch(

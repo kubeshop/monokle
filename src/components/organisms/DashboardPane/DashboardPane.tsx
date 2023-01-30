@@ -24,7 +24,7 @@ const DashboardPane = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
-  const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
+  const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [menu, setMenu] = useState<DashboardMenu[]>([]); // TODO: how is this initialized?
   const [filteredMenu, setFilteredMenu] = useState<any>([]);

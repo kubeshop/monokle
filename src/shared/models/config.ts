@@ -74,7 +74,6 @@ interface AppConfig {
     [name: string]: ClusterColors;
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
-  clusterPreviewNamespace: string;
 }
 
 type ClusterAccess = {
