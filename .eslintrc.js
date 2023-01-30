@@ -42,7 +42,7 @@ module.exports = {
           // disallow imports in src from electron
           {target: './src', from: './electron'},
           // disallow imports in shared from src
-          {target: './src/shared', from: './src', except: ['./shared']},
+          {target: './src/shared', from: './src', except: ['./shared', './assets']},
           // disallow imports in shared from electron
           {target: './src/shared', from: './electron'},
         ],

@@ -11,6 +11,7 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {LearnTopicType} from '@monokle/components/dist/types';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {SavedCommand, SettingsPanel} from '@shared/models/config';
 import {
@@ -333,6 +334,9 @@ export const uiSlice = createSlice({
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.startPageLearn.isVisible = action.payload;
     },
+    setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
+      state.startPageLearn.learnTopic = action.payload;
+    },
     handleWalkthroughStep: (
       state: Draft<UiState>,
       action: PayloadAction<{step: number; collection: WalkthroughCollection}>
@@ -422,6 +426,7 @@ export const {
   setRightMenuSelection,
   setSelectedTemplatePath,
   setShowStartPageLearn,
+  setStartPageLearnTopic,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,
