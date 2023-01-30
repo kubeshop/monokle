@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
@@ -9,7 +9,7 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
-import {closeCreateProjectModal, openTemplateExplorer, setTemplateProjectCreate} from '@redux/reducers/ui';
+import {closeCreateProjectModal} from '@redux/reducers/ui';
 
 import {FileExplorer} from '@atoms';
 
@@ -21,6 +21,10 @@ import {AnyTemplate} from '@shared/models/template';
 import {Colors} from '@shared/styles/colors';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
+import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';
+import TemplateModal from '../TemplateModal';
+
 export enum FormSteps {
   STEP_ONE = 1,
   STEP_TWO = 2,
@@ -29,7 +33,9 @@ export enum FormSteps {
 const CreateProjectModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+  const templateMap = useAppSelector(state => state.extension.templateMap);
   const uiState = useAppSelector(state => state.ui.createProjectModal);
+  const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
   const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
   const [formValues, setFormValues] = useState({name: '', rootFolder: projectsRootPath});
@@ -94,11 +100,9 @@ const CreateProjectModal: React.FC = () => {
   const onFinish = (values: {name: string; rootFolder: string}) => {
     setFormValues({...values});
     setIsEditingRoothPath(false);
-
     if (uiState.fromTemplate && formStep === FormSteps.STEP_ONE) {
       setFormStep(FormSteps.STEP_TWO);
     }
-
     if (!uiState.fromTemplate && values.rootFolder && values.name) {
       trackEvent('app_start/create_project', {from: 'scratch'});
       dispatch(setCreateProject({...values}));
@@ -123,7 +127,24 @@ const CreateProjectModal: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState.isOpen]);
 
-  const closeModal = useCallback(() => {
+  const onClickOpenTemplate = (template: AnyTemplate) => {
+    setSelectedTemplate(template);
+  };
+
+  const onTemplateModalClose = (status: string) => {
+    if (status === 'PREVIEW') {
+      setIsModalHid(true);
+    }
+    if (status === 'DONE') {
+      closeModal();
+    }
+
+    if (status === 'CANCELED') {
+      setSelectedTemplate(undefined);
+    }
+  };
+
+  const closeModal = () => {
     setFormValues({name: '', rootFolder: ''});
     setIsEditingRoothPath(false);
     createProjectForm.resetFields();
@@ -133,23 +154,17 @@ const CreateProjectModal: React.FC = () => {
     setSubmitEnabled(false);
     setIsFormValid(false);
     dispatch(closeCreateProjectModal());
-  }, [createProjectForm, dispatch]);
+  };
 
   useEffect(() => {
-    const {name, rootFolder} = createProjectForm.getFieldsValue();
+    if (formStep === 1) {
+      const {name, rootFolder} = createProjectForm.getFieldsValue();
 
-    if (!name || !rootFolder) {
-      return;
+      if (name && rootFolder) {
+        setIsFormValid(true);
+      }
     }
-
-    if (formStep === FormSteps.STEP_ONE) {
-      setIsFormValid(true);
-    } else if (formStep === FormSteps.STEP_TWO) {
-      setTemplateProjectCreate({name, rootFolder});
-      closeModal();
-      openTemplateExplorer();
-    }
-  }, [closeModal, createProjectForm, formStep]);
+  }, [createProjectForm, formStep]);
 
   if (!uiState.isOpen) {
     return null;
@@ -195,59 +210,83 @@ const CreateProjectModal: React.FC = () => {
         </>
       }
     >
-      <Form
-        layout="vertical"
-        form={createProjectForm}
-        onFinish={onFinish}
-        initialValues={() => formValues}
-        onFieldsChange={field => {
-          const name = field.filter(item => _.includes(item.name.toString(), 'name'));
-          if (name && name.length > 0) {
-            setFormValues({...formValues, name: name[0].value});
-            setIsEditingRoothPath(false);
-          }
-          const rootFolder = field.filter(item => _.includes(item.name.toString(), 'rootFolder'));
-          if (rootFolder && rootFolder.length > 0) {
-            setFormValues({...formValues, rootFolder: rootFolder[0].value});
-            setIsEditingRoothPath(true);
-          }
-        }}
-      >
-        <Form.Item
-          name="name"
-          label="Project Name"
-          required
-          tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
-          rules={[
-            {
-              required: true,
-              message: 'Please provide your project name!',
-            },
-          ]}
+      {formStep === FormSteps.STEP_ONE ? (
+        <Form
+          layout="vertical"
+          form={createProjectForm}
+          onFinish={onFinish}
+          initialValues={() => formValues}
+          onFieldsChange={field => {
+            const name = field.filter(item => _.includes(item.name.toString(), 'name'));
+            if (name && name.length > 0) {
+              setFormValues({...formValues, name: name[0].value});
+              setIsEditingRoothPath(false);
+            }
+            const rootFolder = field.filter(item => _.includes(item.name.toString(), 'rootFolder'));
+            if (rootFolder && rootFolder.length > 0) {
+              setFormValues({...formValues, rootFolder: rootFolder[0].value});
+              setIsEditingRoothPath(true);
+            }
+          }}
         >
-          <Input ref={inputRef} />
-        </Form.Item>
+          <Form.Item
+            name="name"
+            label="Project Name"
+            required
+            tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
+            rules={[
+              {
+                required: true,
+                message: 'Please provide your project name!',
+              },
+            ]}
+          >
+            <Input ref={inputRef} />
+          </Form.Item>
 
-        <Form.Item label="Location" required tooltip="The local path where your project will live.">
-          <Input.Group compact>
-            <Form.Item
-              name="rootFolder"
-              noStyle
-              rules={[
-                {
-                  required: true,
-                  message: 'Please provide your local path!',
-                },
-              ]}
-            >
-              <Input style={{width: 'calc(100% - 100px)'}} />
-            </Form.Item>
-            <Button style={{width: '100px'}} onClick={openFileExplorer}>
-              Browse
-            </Button>
-          </Input.Group>
-        </Form.Item>
-      </Form>
+          <Form.Item label="Location" required tooltip="The local path where your project will live.">
+            <Input.Group compact>
+              <Form.Item
+                name="rootFolder"
+                noStyle
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please provide your local path!',
+                  },
+                ]}
+              >
+                <Input style={{width: 'calc(100% - 100px)'}} />
+              </Form.Item>
+              <Button style={{width: '100px'}} onClick={openFileExplorer}>
+                Browse
+              </Button>
+            </Input.Group>
+          </Form.Item>
+        </Form>
+      ) : (
+        <S.TemplatesContainer $height={400}>
+          {selectedTemplate && (
+            <TemplateModal template={selectedTemplate} projectToCreate={formValues} onClose={onTemplateModalClose} />
+          )}
+
+          {Object.values(templateMap)
+            .sort((a, b) => {
+              if (favoriteTemplates.includes(a.id)) return -1;
+              if (favoriteTemplates.includes(b.id)) return 1;
+              return 0;
+            })
+            .map(template => (
+              <TemplateInformation
+                key={template.id}
+                template={template}
+                actionType="button"
+                actionLabel="Use this Template"
+                onClickOpenTemplate={() => onClickOpenTemplate(template)}
+              />
+            ))}
+        </S.TemplatesContainer>
+      )}
 
       <FileExplorer {...fileExplorerProps} />
     </Modal>

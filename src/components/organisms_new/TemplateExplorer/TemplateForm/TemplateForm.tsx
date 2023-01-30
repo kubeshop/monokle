@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -106,6 +106,7 @@ const TemplateForm: React.FC<IProps> = props => {
           setLoading(false);
         });
     },
+
     [projectCreateData, template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
   );
 
@@ -122,6 +123,11 @@ const TemplateForm: React.FC<IProps> = props => {
     },
     [currentFormDataList, onClickSubmit, template.forms.length]
   );
+
+  useEffect(() => {
+    setActiveFormIndex(0);
+    setResultMessage('');
+  }, [template]);
 
   if (!template) {
     return null;

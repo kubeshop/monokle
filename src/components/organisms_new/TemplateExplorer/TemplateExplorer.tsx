@@ -6,7 +6,7 @@ import {Collapse} from 'antd';
 import {debounce, isEmpty} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {closeTemplateExplorer} from '@redux/reducers/ui';
+import {closeTemplateExplorer, setTemplateProjectCreate} from '@redux/reducers/ui';
 
 import {useFilteredPluginMap} from '@hooks/useFilteredPluginMap';
 
@@ -25,6 +25,7 @@ const TemplateExplorer: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
+  const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
   const selectedTemplatePath = useAppSelector(state => state.ui.templateExplorer.selectedTemplatePath);
 
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -44,6 +45,10 @@ const TemplateExplorer: React.FC = () => {
     }, 500);
   }, []);
 
+  const onCloseHandler = () => {
+    dispatch(closeTemplateExplorer());
+  };
+
   useEffect(() => {
     return () => {
       debouncedSetSearchValue.cancel();
@@ -52,16 +57,8 @@ const TemplateExplorer: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {}, [searchValue]);
-
   return (
-    <S.Modal
-      open={isOpen}
-      width="90%"
-      title="Create resources from a template"
-      footer={null}
-      onCancel={() => dispatch(closeTemplateExplorer())}
-    >
+    <S.Modal open={isOpen} width="90%" title="Create resources from a template" footer={null} onCancel={onCloseHandler}>
       <S.LeftContainer>
         <S.PaddingWrapper>
           <TitleBar title="Templates" description={<TitleBarDescription />} />

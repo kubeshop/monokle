@@ -1,7 +1,9 @@
 import {isEqual} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectedTemplatePath} from '@redux/reducers/ui';
+import {setSelectedTemplatePath, setTemplateProjectCreate} from '@redux/reducers/ui';
+
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './TemplateCollapseItem.styled';
 
@@ -13,14 +15,21 @@ const TemplateCollapseItem: React.FC<IProps> = props => {
   const {path} = props;
 
   const dispatch = useAppDispatch();
-  const template = useAppSelector(state => state.extension.templateMap[path]);
+  const activeProject = useAppSelector(activeProjectSelector);
+  const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
   const selectedTemplatePath = useAppSelector(state => state.ui.templateExplorer.selectedTemplatePath);
+  const template = useAppSelector(state => state.extension.templateMap[path]);
+
+  const onClickHandler = () => {
+    dispatch(setSelectedTemplatePath(path));
+
+    if (activeProject && projectCreateData) {
+      dispatch(setTemplateProjectCreate(undefined));
+    }
+  };
 
   return (
-    <S.ItemContainer
-      $selected={isEqual(path, selectedTemplatePath)}
-      onClick={() => dispatch(setSelectedTemplatePath(path))}
-    >
+    <S.ItemContainer $selected={isEqual(path, selectedTemplatePath)} onClick={onClickHandler}>
       {template.name}
     </S.ItemContainer>
   );

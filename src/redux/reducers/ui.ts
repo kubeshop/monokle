@@ -127,12 +127,14 @@ export const uiSlice = createSlice({
       state.templateExplorer.isVisible = true;
     },
     closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.selectedTemplatePath = undefined;
       state.templateExplorer.isVisible = false;
+      state.templateExplorer.projectCreate = undefined;
     },
     setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
       state.templateExplorer.selectedTemplatePath = action.payload;
     },
-    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project>) => {
+    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
       state.templateExplorer.projectCreate = action.payload;
     },
     openRenameEntityModal: (

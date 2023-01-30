@@ -9,7 +9,7 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
-import {closeCreateProjectModal} from '@redux/reducers/ui';
+import {closeCreateProjectModal, openTemplateExplorer, setTemplateProjectCreate} from '@redux/reducers/ui';
 
 import {FileExplorer} from '@atoms';
 
@@ -44,11 +44,13 @@ const CreateProjectModal: React.FC = () => {
     createProjectForm.validateFields().then(values => {
       const {rootFolder, name} = values;
 
-      console.log('Here');
-
       if (!uiState.fromTemplate) {
         trackEvent('app_start/create_project', {from: 'scratch'});
         dispatch(setCreateProject({name, rootFolder}));
+        onCloseModalHandler();
+      } else {
+        dispatch(setTemplateProjectCreate({name, rootFolder}));
+        dispatch(openTemplateExplorer());
         onCloseModalHandler();
       }
     });
