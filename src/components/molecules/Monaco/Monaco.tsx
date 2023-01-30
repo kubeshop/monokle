@@ -8,15 +8,9 @@ import log from 'loglevel';
 // eslint-disable-next-line import/no-duplicates
 import 'monaco-editor';
 // eslint-disable-next-line import/no-duplicates
-import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import {Uri} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {Document, ParsedNode, isMap} from 'yaml';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -66,18 +60,20 @@ import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
 import useMonacoUiState from './useMonacoUiState';
 
-// @ts-ignore
 window.MonacoEnvironment = {
-  // @ts-ignore
-  getWorker(workerId, label) {
-    if (label === 'yaml') {
-      return new YamlWorker();
+  getWorker(moduleId, label) {
+    switch (label) {
+      case 'editorWorkerService':
+        return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url));
+      case 'json':
+        return new Worker(new URL('monaco-editor/esm/vs/language/json/json.worker.js', import.meta.url));
+      case 'yaml':
+        return new Worker(new URL('monaco-yaml/yaml.worker.js', import.meta.url));
+      default:
+        throw new Error(`Unknown label ${label}`);
     }
-    return new EditorWorker();
   },
 };
-
-const {yaml} = languages || {};
 
 function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   return d.errors.length === 0 && isMap(d.contents);
@@ -207,7 +203,6 @@ const Monaco = (props: {
   );
 
   useResourceYamlSchema(
-    yaml,
     String(userDataDir),
     String(k8sVersion),
     selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),

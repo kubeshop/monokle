@@ -6,7 +6,6 @@ import {Button, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import {parse, stringify} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -35,9 +34,6 @@ import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';
-
-// @ts-ignore
-const {yaml} = languages || {};
 
 const options = {
   renderSideBySide: true,
@@ -73,7 +69,7 @@ const ResourceDiff = (props: {
 
   const windowSize = useWindowSize();
 
-  useResourceYamlSchema(yaml, String(userDataDir), String(k8sVersion), localResource);
+  useResourceYamlSchema(String(userDataDir), String(k8sVersion), localResource);
 
   const confirmModalTitle = useMemo(
     () =>
