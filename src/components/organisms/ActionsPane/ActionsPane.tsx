@@ -55,6 +55,8 @@ import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoP
 import {useDiff} from '@hooks/resourceHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {useSelectorWithRef} from '@utils/hooks';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -69,14 +71,15 @@ import ActionsPaneHeader from './ActionsPaneHeader';
 // TODO: we should also check if the selectedFile entry has only one resource and if so, to set the selectedResource to be that for this component
 const ActionsPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [kubeConfigPath, kubeConfigPathRef] = useSelectorWithRef(kubeConfigPathSelector);
+  const [kubeConfigContext, kubeConfigContextRef] = useSelectorWithRef(kubeConfigContextSelector);
+  const [projectConfig, projectConfigRef] = useSelectorWithRef(currentConfigSelector);
+
+  const [helmChartMap, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
@@ -84,10 +87,17 @@ const ActionsPane: React.FC = () => {
   const selectedHelmValues = useAppSelector(selectedHelmValuesSelector);
   const isClusterModeLoading = useAppSelector(state => state.main.clusterConnectionOptions.isLoading);
   const {selectedResource, resourceMap} = useAppSelector(selectedResourceWithMapSelector);
+  const selectedResourceRef = useRef(selectedResource);
+  selectedResourceRef.current = selectedResource;
+  const resourceMapRef = useRef(resourceMap);
+  resourceMapRef.current = resourceMap;
+
+  const selectedResourceId = selectedResource?.id;
+  const selectedHelmValuesId = selectedHelmValues?.id;
 
   const selection = useAppSelector(state => state.main.selection);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const [isInClusterMode, isInClusterModeRef] = useSelectorWithRef(isInClusterModeSelector);
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -120,11 +130,14 @@ const ActionsPane: React.FC = () => {
     }
   }, [isButtonShrinked, tabsList]);
 
-  const isKustomization = useMemo(() => isKustomizationResource(selectedResource), [selectedResource]);
-  const resourceKindHandler = useMemo(
-    () => (selectedResource && !isKustomization ? getResourceKindHandler(selectedResource.kind) : undefined),
-    [isKustomization, selectedResource]
+  const isKustomization = useMemo(
+    () => (selectedResourceId ? isKustomizationResource(selectedResourceRef.current) : false),
+    [selectedResourceId, selectedResourceRef]
   );
+  const resourceKindHandler = useMemo(() => {
+    const resourceKind = selectedResourceRef.current?.kind;
+    return selectedResourceId && !isKustomization && resourceKind ? getResourceKindHandler(resourceKind) : undefined;
+  }, [isKustomization, selectedResourceId, selectedResourceRef]);
 
   const confirmModalTitle = useMemo(() => {
     if (!selectedResource) {
@@ -155,14 +168,28 @@ const ActionsPane: React.FC = () => {
   );
 
   const applySelection = useCallback(() => {
-    if (selectedHelmValues) {
+    if (selectedHelmValuesId) {
       setIsHelmChartApplyModalVisible(true);
-    } else if (selectedResource) {
+    } else if (selectedResourceId) {
       setIsApplyModalVisible(true);
     } else if (selectedFilePath) {
-      applyFileWithConfirm(selectedFilePath, fileMap, dispatch, kubeConfigPath, kubeConfigContext);
+      applyFileWithConfirm(
+        selectedFilePath,
+        fileMapRef.current,
+        dispatch,
+        kubeConfigPathRef.current,
+        kubeConfigContextRef.current
+      );
     }
-  }, [selectedResource, fileMap, kubeConfigPath, selectedFilePath, dispatch, selectedHelmValues, kubeConfigContext]);
+  }, [
+    selectedResourceId,
+    selectedHelmValuesId,
+    selectedFilePath,
+    dispatch,
+    fileMapRef,
+    kubeConfigPathRef,
+    kubeConfigContextRef,
+  ]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -175,16 +202,33 @@ const ActionsPane: React.FC = () => {
 
   const onClickApplyResource = useCallback(
     (namespace?: {name: string; new: boolean}) => {
-      if (!selectedResource || !resourceMap) {
+      if (!selectedResourceId || !resourceMapRef.current) {
         setIsApplyModalVisible(false);
         return;
       }
-      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-        isInClusterMode,
-      });
+      applyResource(
+        selectedResourceId,
+        resourceMapRef.current,
+        fileMapRef.current,
+        dispatch,
+        projectConfigRef.current,
+        kubeConfigContextRef.current,
+        namespace,
+        {
+          isInClusterMode: isInClusterModeRef.current,
+        }
+      );
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeConfigContext, projectConfig, resourceMap, selectedResource, isInClusterMode]
+    [
+      dispatch,
+      fileMapRef,
+      kubeConfigContextRef,
+      projectConfigRef,
+      resourceMapRef,
+      selectedResourceId,
+      isInClusterModeRef,
+    ]
   );
 
   const onClickApplyHelmChart = useCallback(
@@ -196,17 +240,17 @@ const ActionsPane: React.FC = () => {
 
       applyHelmChart(
         selectedHelmValues,
-        helmChartMap[selectedHelmValues.helmChartId],
-        fileMap,
+        helmChartMapRef.current[selectedHelmValues.helmChartId],
+        fileMapRef.current,
         dispatch,
-        kubeConfigPath,
-        kubeConfigContext,
+        kubeConfigPathRef.current,
+        kubeConfigContextRef.current,
         namespace,
         shouldCreateNamespace
       );
       setIsHelmChartApplyModalVisible(false);
     },
-    [dispatch, fileMap, helmChartMap, kubeConfigPath, kubeConfigContext, selectedHelmValues]
+    [dispatch, fileMapRef, helmChartMapRef, kubeConfigPathRef, kubeConfigContextRef, selectedHelmValues]
   );
 
   useEffect(() => {
@@ -268,7 +312,7 @@ const ActionsPane: React.FC = () => {
             {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
-              (selectedResource || selectedFilePath || selectedHelmValues) && (
+              (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && (
                 <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
               )
             ) : null}
@@ -286,15 +330,15 @@ const ActionsPane: React.FC = () => {
                   {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
                     <S.Skeleton active />
                   ) : activeTabKey === 'form' ? (
-                    selectedFilePath && schemaForSelectedPath && !selectedResource ? (
+                    selectedFilePath && schemaForSelectedPath && !selectedResourceRef.current ? (
                       <FormEditor
                         formSchema={extractFormSchema(schemaForSelectedPath)}
                         formUiSchema={getUiSchemaForPath(selectedFilePath)}
                       />
-                    ) : isKustomization && selectedResource ? (
+                    ) : isKustomization && selectedResourceRef.current ? (
                       <FormEditor
                         formSchema={extractFormSchema(
-                          getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                          getResourceSchema(selectedResourceRef.current, String(k8sVersion), String(userDataDir))
                         )}
                       />
                     ) : resourceKindHandler?.formEditorOptions ? (
@@ -310,7 +354,7 @@ const ActionsPane: React.FC = () => {
             },
           ]
         : []),
-      ...(selectedResource?.kind === 'Pod' && isInClusterMode
+      ...(selectedResourceId && selectedResourceRef.current?.kind === 'Pod' && isInClusterMode
         ? [
             {
               key: 'logs',
@@ -330,6 +374,7 @@ const ActionsPane: React.FC = () => {
         : []),
     ],
     [
+      selectedResourceId,
       activeTabKey,
       applySelection,
       diffSelectedResource,
@@ -341,8 +386,8 @@ const ActionsPane: React.FC = () => {
       resourceKindHandler,
       schemaForSelectedPath,
       selectedFilePath,
-      selectedResource,
-      selectedHelmValues,
+      selectedResourceRef,
+      selectedHelmValuesId,
       userDataDir,
       isPreviewLoading,
       isClusterModeLoading,

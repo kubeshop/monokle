@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
@@ -42,7 +42,7 @@ export const useDiff = (resourceMeta?: ResourceMeta) => {
     [isKubeConfigPathValid]
   );
 
-  const diffSelectedResource = () => {
+  const diffSelectedResource = useCallback(() => {
     if (!kubeConfigContext) {
       const alert: AlertType = {
         type: AlertEnum.Error,
@@ -57,7 +57,7 @@ export const useDiff = (resourceMeta?: ResourceMeta) => {
     if (currentResourceMeta?.id) {
       dispatch(openResourceDiffModal(currentResourceMeta.id));
     }
-  };
+  }, [currentResourceMeta?.id, kubeConfigContext, dispatch]);
 
   return {diffSelectedResource, isDisabled, tooltipTitle};
 };
