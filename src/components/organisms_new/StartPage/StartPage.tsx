@@ -1,7 +1,5 @@
 import {useEffect, useState} from 'react';
 
-import {WALK_THROUGH_STEPS} from '@constants/walkthrough';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setLeftMenuSelection,
@@ -18,6 +16,7 @@ import {useStartPageOptions} from '@hooks/useStartPageOptions';
 import {useWindowSize} from '@utils/hooks';
 
 import {WalkThrough} from '@monokle/components';
+import {WALK_THROUGH_STEPS} from '@shared/constants/walkthrough';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './StartPage.styled';
