@@ -1,3 +1,5 @@
+import {LearnTopicType} from '@monokle/components/dist/types';
+
 import {Project, SavedCommand, SettingsPanel} from './config';
 
 export enum HighlightItems {
@@ -184,6 +186,7 @@ type UiState = {
   previewingCluster?: boolean;
   startPageLearn: {
     isVisible: boolean;
+    learnTopic?: LearnTopicType;
   };
   templateExplorer: {
     isVisible: boolean;

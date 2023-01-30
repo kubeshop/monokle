@@ -466,3 +466,11 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .terminal-options-menu .ant-dropdown-menu-item:hover {
   background-color: transparent;
 }
+
+.walkthrough-modal ul li::marker {
+  color: #1d1d1d;
+}
+
+.walkthrough-modal .ant-modal-content .ant-modal-body {
+  background-color: currentColor !important;
+}
