@@ -123,6 +123,15 @@ export const uiSlice = createSlice({
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
     },
+    openTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = true;
+    },
+    closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = false;
+    },
+    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
+      state.templateExplorer.selectedTemplatePath = action.payload;
+    },
     openRenameEntityModal: (
       state: Draft<UiState>,
       action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
@@ -378,6 +387,7 @@ export const {
   closeReplaceImageModal,
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
+  closeTemplateExplorer,
   collapseNavSections,
   expandNavSections,
   handleWalkthroughStep,
@@ -396,6 +406,7 @@ export const {
   openReplaceImageModal,
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
+  openTemplateExplorer,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
@@ -409,6 +420,7 @@ export const {
   setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
+  setSelectedTemplatePath,
   setShowStartPageLearn,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,

@@ -350,6 +350,22 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   padding: 10px 16px 12px;
 }
 
+.dropdown-secondary .ant-dropdown-menu {
+  padding: 0;
+}
+
+.dropdown-secondary .ant-dropdown-menu-item {
+  background-color: #177ddc;
+}
+
+.dropdown-secondary .ant-dropdown-menu-item:not(:last-child) {
+  border-bottom: 1px solid #0a0d0e;
+}
+
+.dropdown-secondary .ant-dropdown-menu-item:hover {
+  background-color: rgba(23, 125, 220, 0.75);
+}
+
 .ant-notification.ant-notification-topRight {
   z-index: 1051;
 }

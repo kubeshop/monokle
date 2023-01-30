@@ -185,6 +185,10 @@ type UiState = {
   startPageLearn: {
     isVisible: boolean;
   };
+  templateExplorer: {
+    isVisible: boolean;
+    selectedTemplatePath?: string;
+  };
 };
 
 export type {
