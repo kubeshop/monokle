@@ -6,7 +6,7 @@ import {Collapse} from 'antd';
 import {debounce, isEmpty} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {closeTemplateExplorer, setTemplateProjectCreate} from '@redux/reducers/ui';
+import {closeTemplateExplorer} from '@redux/reducers/ui';
 
 import {useFilteredPluginMap} from '@hooks/useFilteredPluginMap';
 
@@ -25,7 +25,6 @@ const TemplateExplorer: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
-  const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
   const selectedTemplatePath = useAppSelector(state => state.ui.templateExplorer.selectedTemplatePath);
 
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
