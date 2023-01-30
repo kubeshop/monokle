@@ -72,9 +72,6 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
     resourceSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
 
-  console.log('ITEM_INSTANCE', itemInstance);
-  console.log('RESOURCE', resource);
-
   const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 

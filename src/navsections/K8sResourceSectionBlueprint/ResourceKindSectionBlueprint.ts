@@ -71,7 +71,7 @@ export function makeResourceKindNavSection(
         return {resourceKind: kindHandler.kind};
       },
       isInitialized: scope => {
-        return isEmpty(scope.activeResourceMetaMap);
+        return !isEmpty(scope.activeResourceMetaMap);
       },
       // TODO: reimplement checkable
       // makeCheckable: scope => {
@@ -104,7 +104,6 @@ export function makeResourceKindNavSection(
         isDirty: rawItem => isTransientResource(rawItem),
         isVisible: (rawItem, scope) => {
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
-
           return isPassingFilter;
         },
         isCheckable: () => true,
