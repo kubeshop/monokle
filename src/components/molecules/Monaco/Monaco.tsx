@@ -1,5 +1,5 @@
 /* eslint-disable import/order */
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -41,6 +41,7 @@ import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
+import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -86,7 +87,11 @@ const Monaco = (props: {
 }) => {
   const {diffSelectedResource, applySelection, providedResourceSelection} = props;
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+
+  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [activeResourceMetaMap, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
+  const [activeResourceContentMap, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
+
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -96,11 +101,10 @@ const Monaco = (props: {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const preview = useAppSelector(state => state.main.preview);
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
-  const activeResourceContentMap = useAppSelector(activeResourceContentMapSelector);
+
   const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
   const localResourceContentMap = useAppSelector(state => resourceContentMapSelector(state, 'local'));
-  const selectedFilePath = useAppSelector(selectedFilePathSelector);
+  const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(selectedFilePathSelector);
   const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selection = useAppSelector(state => state.main.selection);
@@ -110,7 +114,8 @@ const Monaco = (props: {
   const selectedResource = useAppSelector(state =>
     providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
   );
-  const selectedResourceId = selectedResource?.id;
+  const selectedResourceIdRef = useRef(selectedResource?.id);
+  selectedResourceIdRef.current = selectedResource?.id;
 
   const resourcesFromSelectedPath = useMemo(() => {
     if (!selectedFilePath) {
@@ -124,15 +129,13 @@ const Monaco = (props: {
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
-  const [code, setCode] = useState('');
-  const [orgCode, setOrgCode] = useState<string>('');
-  const [isDirty, setDirty] = useState(false);
-  const [isValid, setValid] = useState(true);
-  const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
-  const [isEditorMounted, setEditorMounted] = useState(false);
-
+  const [code, setCode, codeRef] = useStateWithRef('');
+  const isDirtyRef = useRef(false);
+  const isValidRef = useRef(true);
+  const firstCodeLoadedOnEditorRef = useRef(false);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const originalCodeRef = useRef<string>('');
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const triggerSelectResource = (resourceId: string, resourceStorage: ResourceStorageKey) => {
     dispatch(selectResource({resourceId, resourceStorage}));
@@ -173,14 +176,13 @@ const Monaco = (props: {
   };
 
   useCodeIntel({
-    editor,
+    editor: editorRef.current,
     selectedResource:
       selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
     resourceMetaMap: activeResourceMetaMap,
     fileMap,
     imagesList,
-    isEditorMounted,
     selectResource: triggerSelectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
@@ -191,11 +193,11 @@ const Monaco = (props: {
     helmChartMap,
     helmTemplatesMap,
     matchOptions,
-    isDirty,
+    isDirty: isDirtyRef.current,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
-    editor,
+    editorRef.current,
     hiddenInputRef,
     fileMap,
     applySelection,
@@ -210,72 +212,82 @@ const Monaco = (props: {
     fileMap
   );
 
-  useDebouncedCodeSave(
-    editor,
-    orgCode,
-    code,
-    isDirty,
-    isValid,
-    activeResourceMetaMap,
-    selectedResourceId,
-    selectedFilePath,
-    setOrgCode
+  const debouncedSaveContent = useDebouncedCodeSave(
+    editorRef,
+    originalCodeRef,
+    activeResourceMetaMapRef,
+    selectedResourceIdRef,
+    selectedFilePathRef
   );
 
-  useMonacoUiState(editor, selectedResourceId, selectedFilePath);
+  useMonacoUiState(editorRef.current, selectedResourceIdRef.current, selectedFilePath);
 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
 
-    setEditor(e);
+    editorRef.current = e;
 
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
-    setEditorMounted(true);
   };
 
   const onChange = (newValue: any) => {
+    if (!newValue || typeof newValue !== 'string') {
+      return;
+    }
     dispatch(setLastChangedLine(0));
-    setDirty(orgCode !== newValue);
+    isDirtyRef.current = originalCodeRef.current !== newValue;
     setCode(newValue);
 
     if (!autosavingStatus) {
       dispatch(setAutosavingStatus(true));
     }
 
-    if (selectedResourceId) {
+    if (selectedResourceIdRef.current) {
       // this will slow things down if document gets large - need to find a better solution...
       const documents = parseAllYamlDocuments(newValue);
       // only accept single document changes for now
-      setValid(documents.length === 1 && isValidResourceDocument(documents[0]));
+      isValidRef.current = documents.length === 1 && isValidResourceDocument(documents[0]);
     } else {
-      setValid(true);
+      isValidRef.current = true;
+    }
+
+    // try to save
+    if (!isDirtyRef.current || !isValidRef.current) {
+      return;
+    }
+
+    if (originalCodeRef.current !== undefined && originalCodeRef.current !== newValue) {
+      debouncedSaveContent.current(newValue);
     }
   };
 
   useEffect(() => {
-    if (!firstCodeLoadedOnEditor) {
-      setFirstCodeLoadedOnEditor(true);
+    if (!firstCodeLoadedOnEditorRef.current) {
+      firstCodeLoadedOnEditorRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResourceId, activeResourceMetaMap]);
+  }, [code]);
 
   useEffect(() => {
     let newCode = '';
-    if (selectedResourceId) {
-      const resourceContent = activeResourceContentMap[selectedResourceId];
+    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY].filePath;
+    if (selectedResource?.id) {
+      const resourceContent = activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
+        if (codeRef.current === resourceContent.text) {
+          return;
+        }
         newCode = resourceContent.text;
         monaco.editor?.getModels()?.forEach(model => {
           if (!model.isAttachedToEditor()) {
             model.dispose();
           }
         });
-        editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+        editorRef.current?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
-    } else if (selectedFilePath && selectedFilePath !== fileMap[ROOT_FILE_ENTRY].filePath) {
-      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFilePath);
+    } else if (rootFilePath && selectedFilePath && selectedFilePath !== rootFilePath) {
+      const filePath = path.join(rootFilePath, selectedFilePath);
       const fileStats = getFileStats(filePath);
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
@@ -287,55 +299,50 @@ const Monaco = (props: {
 
         // monaco has no language registered for tpl extension so use yaml instead (as these could be Helm templates)
         if (filePath.toLowerCase().endsWith('.tpl')) {
-          editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+          editorRef.current?.setModel(monaco.editor.createModel(newCode, 'yaml'));
         } else {
-          editor?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
+          editorRef.current?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
         }
       }
     }
 
     setCode(newCode);
-    setOrgCode(newCode);
-    setDirty(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFilePath, selectedResourceId]);
+    originalCodeRef.current = newCode;
+    isDirtyRef.current = false;
+  }, [selectedFilePath, selectedResource?.id, codeRef, activeResourceContentMapRef, fileMapRef, setCode]);
 
   useEffect(() => {
-    if (!selectedFilePath || !shouldEditorReloadSelection) {
+    if (!selectedFilePathRef.current || !shouldEditorReloadSelection) {
       return;
     }
     log.info('[Monaco]: selected file was updated outside Monokle - reading file...');
-    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFilePath);
+    const notFoundWarning = '[Monaco]: selected file was updated outside Monokle - unable to read file';
+    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY].filePath;
+    if (!rootFilePath) {
+      log.warn(notFoundWarning);
+      return;
+    }
+    const filePath = path.join(rootFilePath, selectedFilePathRef.current);
     const fileStats = getFileStats(filePath);
     if (fileStats && fileStats.isFile()) {
       const newCode = fs.readFileSync(filePath, 'utf8');
       setCode(newCode);
-      setOrgCode(newCode);
-      setDirty(false);
+      originalCodeRef.current = newCode;
+      isDirtyRef.current = false;
       dispatch(editorHasReloadedSelectedPath(false));
     } else {
-      log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
+      log.warn(notFoundWarning);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFilePath, shouldEditorReloadSelection]);
+  }, [shouldEditorReloadSelection, selectedFilePathRef, fileMapRef, setCode, dispatch]);
 
   useEffect(() => {
-    if (selectedResource && selectedResource.text !== code) {
-      setCode(selectedResource.text);
+    if (editorRef.current && lastChangedLine) {
+      editorRef.current.revealLineInCenter(lastChangedLine);
+    } else if (editorRef.current) {
+      editorRef.current.revealLineNearTop(1);
+      editorRef.current.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource]);
-
-  useEffect(() => {
-    if (editor && lastChangedLine) {
-      editor.revealLineInCenter(lastChangedLine);
-    } else if (editor) {
-      editor.revealLineNearTop(1);
-      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
-    }
-  }, [editor, selectedResourceId, firstCodeLoadedOnEditor, lastChangedLine]);
+  }, [lastChangedLine]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
@@ -350,11 +357,11 @@ const Monaco = (props: {
     ) {
       return true;
     }
-    return !selectedFilePath && !selectedResourceId;
+    return !selectedFilePath && !selectedResource;
   }, [
     isInPreviewMode,
     isInClusterMode,
-    selectedResourceId,
+    selectedResource,
     selectedFilePath,
     settings.allowEditInClusterMode,
     preview,
@@ -380,7 +387,7 @@ const Monaco = (props: {
       <S.HiddenInputContainer>
         <S.HiddenInput ref={hiddenInputRef} type="text" />
       </S.HiddenInputContainer>
-      {firstCodeLoadedOnEditor && (
+      {firstCodeLoadedOnEditorRef.current && (
         <MonacoEditor
           width={containerWidth}
           height={containerHeight}

@@ -33,7 +33,6 @@ interface CodeIntelProps {
   resourceMetaMap: ResourceMetaMap;
   fileMap: FileMapType;
   imagesList: ImagesListType;
-  isEditorMounted: boolean;
   selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
@@ -76,7 +75,6 @@ function useCodeIntel(props: CodeIntelProps) {
     imagesList,
     resourceMetaMap,
     fileMap,
-    isEditorMounted,
     selectResource,
     selectFilePath,
     createResource,
@@ -193,17 +191,7 @@ function useCodeIntel(props: CodeIntelProps) {
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    code,
-    isEditorMounted,
-    selectedResource,
-    resourceMetaMap,
-    editor,
-    imagesList,
-    helmTemplatesMap,
-    helmValuesMap,
-    matchOptions,
-  ]);
+  }, [code, selectedResource, resourceMetaMap, editor, imagesList, helmTemplatesMap, helmValuesMap, matchOptions]);
 
   // useEffect(() => {
   //   if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
