@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Button, Divider, Skeleton} from 'antd';
+import {Button, Skeleton} from 'antd';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
@@ -16,7 +16,6 @@ import {VALID_IMAGE_NAME_REGEX} from '@constants/constants';
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
 import {TemplateForm} from '@shared/models/template';
-import {Colors} from '@shared/styles/colors';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 
@@ -77,8 +76,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       setErrorMessage("Couldn't read the schemas for this template form.");
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [templateForm]);
 
   if (isLoading) {
     return <Skeleton />;
@@ -90,9 +88,6 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   return (
     <TemplateFormErrorBoundary>
-      <h2>{templateForm.name}</h2>
-      <p style={{color: Colors.grey7}}>{templateForm.description}</p>
-      <Divider />
       <Form
         onSubmit={e => onSubmit(e.formData)}
         schema={schema}

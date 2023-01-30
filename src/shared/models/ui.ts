@@ -188,6 +188,10 @@ type UiState = {
     isVisible: boolean;
     learnTopic?: LearnTopicType;
   };
+  templateExplorer: {
+    isVisible: boolean;
+    selectedTemplatePath?: string;
+  };
 };
 
 export type {

@@ -131,6 +131,11 @@ export const createWindow = (givenPath?: string) => {
     dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Downloaded, data: null}});
   });
 
+  win.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
+    event.preventDefault();
+    callback(true);
+  });
+
   win.webContents.on('dom-ready', async () => {
     if (isDev) {
       win.webContents.openDevTools();

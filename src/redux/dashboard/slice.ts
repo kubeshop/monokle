@@ -12,6 +12,9 @@ export const dashboardSlice = createSlice({
     setActiveDashboardMenu: (state: Draft<DashboardState>, action: PayloadAction<DashboardMenu>) => {
       state.ui.activeMenu = action.payload;
     },
+    setDashboardMenuList: (state: Draft<DashboardState>, action: PayloadAction<Array<DashboardMenu>>) => {
+      state.ui.menuList = action.payload;
+    },
     setSelectedResourceId: (state: Draft<DashboardState>, action: PayloadAction<string | undefined>) => {
       state.tableDrawer.selectedResourceId = action.payload;
     },
@@ -22,6 +25,7 @@ export const dashboardSlice = createSlice({
   },
 });
 
-export const {setActiveDashboardMenu, setSelectedResourceId, setActiveTab} = dashboardSlice.actions;
+export const {setActiveDashboardMenu, setDashboardMenuList, setSelectedResourceId, setActiveTab} =
+  dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

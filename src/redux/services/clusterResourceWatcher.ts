@@ -136,7 +136,7 @@ const watchResource = async (
       }
     },
     (error: any) => {
-      log.warn(kindHandler.clusterApiVersion, kindHandler.kind, error.message);
+      log.warn(kindHandler.clusterApiVersion, kindHandler.kind, error?.message);
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
@@ -155,7 +155,7 @@ export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sRes
   return resource;
 };
 
-export const startWatchingResources = (
+export const startWatchingResources = async (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
   previewResources: ResourceMapType,

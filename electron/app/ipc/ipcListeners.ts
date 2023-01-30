@@ -1,9 +1,12 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
+import stream from 'stream';
 
 import {
   DOWNLOAD_PLUGIN,
@@ -58,6 +61,14 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
+
+let commandStream: stream.Readable = new stream.Readable();
+commandStream._read = () => {};
+let outputStream: stream.Writable | null = null;
+
+if (outputStream) {
+  (outputStream as stream.Writable).end();
+}
 
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
@@ -351,4 +362,50 @@ ipcMain.on('shell.ptyProcessKillAll', () => {
   Object.keys(ptyProcessMap).forEach(id => {
     killTerminal(id);
   });
+});
+
+ipcMain.on('pod.terminal.command', (event, command) => {
+  commandStream.push(`${command}`);
+});
+
+ipcMain.on('pod.terminal.close', () => {
+  if (outputStream) {
+    outputStream.end();
+  }
+});
+
+ipcMain.on('pod.terminal.init', (event, args) => {
+  const {previewKubeConfigPath, podNamespace, podName, containerName, webContentsId} = args;
+  if (!webContentsId) {
+    return;
+  }
+
+  outputStream = new stream.Writable();
+
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+  outputStream._write = (chunk, encoding, next) => {
+    if (chunk && currentWebContents) {
+      currentWebContents.send('pod.terminal.output', chunk.toString());
+    }
+    next();
+  };
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const exec = new k8s.Exec(kc);
+  exec.exec(
+    podNamespace,
+    podName,
+    containerName,
+    ['/bin/sh', '-c', 'clear; (bash || ash || sh)'],
+    outputStream,
+    outputStream,
+    commandStream,
+    true,
+    (status: k8s.V1Status) => {
+      if (currentWebContents) {
+        currentWebContents.send('pod.terminal.output', status.message);
+      }
+    }
+  );
 });

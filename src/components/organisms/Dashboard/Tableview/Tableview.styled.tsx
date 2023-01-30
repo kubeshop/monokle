@@ -43,7 +43,7 @@ export const Table = styled(RawTable)`
   }
 
   & .ant-table-header {
-    background-color: ${Colors.grey6000};
+    background-color: ${Colors.grey2};
     border-radius: 4px 4px 0 0;
     margin: 0;
     .ant-table-thead {
@@ -72,15 +72,15 @@ export const Table = styled(RawTable)`
       }
 
       :hover {
-        background-color: ${Colors.grey6000};
+        background-color: ${Colors.grey2};
       }
 
       &.selected {
         background-color: ${Colors.blue9};
-        color: ${Colors.grey6000};
+        color: ${Colors.grey2};
         svg {
           path {
-            color: ${Colors.grey6000} !important;
+            color: ${Colors.grey2} !important;
           }
         }
       }
