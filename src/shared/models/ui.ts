@@ -1,6 +1,6 @@
 import {LearnTopicType} from '@monokle/components/dist/types';
 
-import {SavedCommand, SettingsPanel} from './config';
+import {Project, SavedCommand, SettingsPanel} from './config';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -191,6 +191,7 @@ type UiState = {
   templateExplorer: {
     isVisible: boolean;
     selectedTemplatePath?: string;
+    projectCreate?: Project;
   };
 };
 

@@ -44,6 +44,10 @@ const TemplateExplorer: React.FC = () => {
     }, 500);
   }, []);
 
+  const onCloseHandler = () => {
+    dispatch(closeTemplateExplorer());
+  };
+
   useEffect(() => {
     return () => {
       debouncedSetSearchValue.cancel();
@@ -52,16 +56,8 @@ const TemplateExplorer: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {}, [searchValue]);
-
   return (
-    <S.Modal
-      open={isOpen}
-      width="90%"
-      title="Create resources from a template"
-      footer={null}
-      onCancel={() => dispatch(closeTemplateExplorer())}
-    >
+    <S.Modal open={isOpen} width="90%" title="Create resources from a template" footer={null} onCancel={onCloseHandler}>
       <S.LeftContainer>
         <S.PaddingWrapper>
           <TitleBar title="Templates" description={<TitleBarDescription />} />

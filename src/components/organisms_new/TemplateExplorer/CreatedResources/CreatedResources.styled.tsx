@@ -18,6 +18,9 @@ export const CreatedResourceName = styled.span`
   margin-left: 10px;
   color: ${Colors.yellow7};
 `;
+export const Description = styled.div`
+  padding: 22px 22px 18px 22px;
+`;
 
 export const DoneButton = styled(Button)`
   margin-top: 25px;
@@ -31,4 +34,8 @@ export const TextArea = styled(Input.TextArea)`
     width: 0;
     background: transparent;
   }
+`;
+
+export const Title = styled.div`
+  padding: 5px;
 `;

@@ -13,7 +13,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {LearnTopicType} from '@monokle/components/dist/types';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {SavedCommand, SettingsPanel} from '@shared/models/config';
+import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -128,10 +128,15 @@ export const uiSlice = createSlice({
       state.templateExplorer.isVisible = true;
     },
     closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.selectedTemplatePath = undefined;
       state.templateExplorer.isVisible = false;
+      state.templateExplorer.projectCreate = undefined;
     },
     setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
       state.templateExplorer.selectedTemplatePath = action.payload;
+    },
+    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
+      state.templateExplorer.projectCreate = action.payload;
     },
     openRenameEntityModal: (
       state: Draft<UiState>,
@@ -427,6 +432,7 @@ export const {
   setSelectedTemplatePath,
   setShowStartPageLearn,
   setStartPageLearnTopic,
+  setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,
