@@ -91,6 +91,9 @@ const Monaco = (props: {
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
   const [activeResourceMetaMap, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
   const [activeResourceContentMap, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
+  const [selectedResource, selectedResourceRef] = useSelectorWithRef(state =>
+    providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
+  );
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
@@ -111,9 +114,7 @@ const Monaco = (props: {
   const settings = useAppSelector(settingsSelector);
   const shouldEditorReloadSelection = useAppSelector(state => state.main.selectionOptions.shouldEditorReload);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
-  const selectedResource = useAppSelector(state =>
-    providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
-  );
+
   const selectedResourceIdRef = useRef(selectedResource?.id);
   selectedResourceIdRef.current = selectedResource?.id;
 
@@ -207,9 +208,10 @@ const Monaco = (props: {
   useResourceYamlSchema(
     String(userDataDir),
     String(k8sVersion),
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
+    selectedResource?.id || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0]?.id : undefined),
+    selectedResourceRef,
     selectedFilePath,
-    fileMap
+    fileMapRef
   );
 
   const debouncedSaveContent = useDebouncedCodeSave(

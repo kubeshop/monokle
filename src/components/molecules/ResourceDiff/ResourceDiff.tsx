@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -53,6 +53,9 @@ const ResourceDiff = (props: {
   const dispatch = useAppDispatch();
   const {localResource, clusterResourceText, onApply} = props;
 
+  const localResourceRef = useRef(localResource);
+  localResourceRef.current = localResource;
+
   const fileMap = useAppSelector(state => state.main.fileMap);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -69,7 +72,7 @@ const ResourceDiff = (props: {
 
   const windowSize = useWindowSize();
 
-  useResourceYamlSchema(String(userDataDir), String(k8sVersion), localResource);
+  useResourceYamlSchema(String(userDataDir), String(k8sVersion), localResource.id, localResourceRef);
 
   const confirmModalTitle = useMemo(
     () =>

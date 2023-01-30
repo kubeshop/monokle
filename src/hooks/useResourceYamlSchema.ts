@@ -12,12 +12,13 @@ import {K8sResource} from '@shared/models/k8sResource';
 function useResourceYamlSchema(
   userDataDir: string,
   k8sVersion: string,
-  resource?: K8sResource,
+  selectedResourceId?: string,
+  selectedResourceRef?: React.MutableRefObject<K8sResource | undefined>,
   selectedPath?: string,
-  fileMap?: FileMapType
+  fileMapRef?: React.MutableRefObject<FileMapType>
 ) {
   useEffect(() => {
-    if (!resource && !selectedPath) {
+    if (!selectedResourceRef?.current && !selectedPath) {
       setDiagnosticsOptions({
         validate: false,
       });
@@ -27,11 +28,14 @@ function useResourceYamlSchema(
     let resourceSchema;
     let validate = true;
 
-    if (resource) {
-      resourceSchema = getResourceSchema(resource, k8sVersion, userDataDir);
-      validate = resourceSchema && !isKustomizationPatch(resource) && hasSupportedResourceContent(resource);
-    } else if (selectedPath && fileMap) {
-      resourceSchema = getSchemaForPath(selectedPath, fileMap);
+    if (selectedResourceRef?.current) {
+      resourceSchema = getResourceSchema(selectedResourceRef.current, k8sVersion, userDataDir);
+      validate =
+        resourceSchema &&
+        !isKustomizationPatch(selectedResourceRef.current) &&
+        hasSupportedResourceContent(selectedResourceRef.current);
+    } else if (selectedPath && fileMapRef?.current) {
+      resourceSchema = getSchemaForPath(selectedPath, fileMapRef.current);
       validate = resourceSchema !== undefined;
     }
 
@@ -40,7 +44,7 @@ function useResourceYamlSchema(
       enableSchemaRequest: true,
       hover: true,
       completion: true,
-      isKubernetes: Boolean(resource),
+      isKubernetes: Boolean(selectedResourceRef?.current),
       format: true,
       schemas: [
         {
@@ -50,8 +54,7 @@ function useResourceYamlSchema(
         },
       ],
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resource, selectedPath, fileMap, k8sVersion]);
+  }, [selectedResourceId, selectedPath, k8sVersion, userDataDir, fileMapRef, selectedResourceRef]);
 }
 
 export default useResourceYamlSchema;
