@@ -1,5 +1,5 @@
 /* eslint-disable import/order */
-import {useEffect, useMemo, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -94,12 +94,12 @@ const Monaco = (props: {
   const [selectedResource, selectedResourceRef] = useSelectorWithRef(state =>
     providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
   );
+  const [autosavingStatus, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imagesList = useAppSelector(state => state.main.imagesList);
-  const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -198,9 +198,9 @@ const Monaco = (props: {
   });
 
   const {registerStaticActions} = useEditorKeybindings(
-    editorRef.current,
+    editorRef,
     hiddenInputRef,
-    fileMap,
+    fileMapRef,
     applySelection,
     diffSelectedResource
   );
@@ -224,46 +224,52 @@ const Monaco = (props: {
 
   useMonacoUiState(editorRef.current, selectedResourceIdRef.current, selectedFilePath);
 
-  const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
-    registerStaticActions(e);
+  const editorDidMount = useCallback(
+    (e: monaco.editor.IStandaloneCodeEditor) => {
+      registerStaticActions(e);
 
-    editorRef.current = e;
+      editorRef.current = e;
 
-    e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
-    e.revealLineNearTop(1);
-    e.setSelection(new monaco.Selection(0, 0, 0, 0));
-  };
+      e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
+      e.revealLineNearTop(1);
+      e.setSelection(new monaco.Selection(0, 0, 0, 0));
+    },
+    [registerStaticActions]
+  );
 
-  const onChange = (newValue: any) => {
-    if (!newValue || typeof newValue !== 'string') {
-      return;
-    }
-    dispatch(setLastChangedLine(0));
-    isDirtyRef.current = originalCodeRef.current !== newValue;
-    setCode(newValue);
+  const onChange = useCallback(
+    (newValue: any) => {
+      if (!newValue || typeof newValue !== 'string') {
+        return;
+      }
+      dispatch(setLastChangedLine(0));
+      isDirtyRef.current = originalCodeRef.current !== newValue;
+      setCode(newValue);
 
-    if (!autosavingStatus) {
-      dispatch(setAutosavingStatus(true));
-    }
+      if (!autosavingStatusRef.current) {
+        dispatch(setAutosavingStatus(true));
+      }
 
-    if (selectedResourceIdRef.current) {
-      // this will slow things down if document gets large - need to find a better solution...
-      const documents = parseAllYamlDocuments(newValue);
-      // only accept single document changes for now
-      isValidRef.current = documents.length === 1 && isValidResourceDocument(documents[0]);
-    } else {
-      isValidRef.current = true;
-    }
+      if (selectedResourceIdRef.current) {
+        // this will slow things down if document gets large - need to find a better solution...
+        const documents = parseAllYamlDocuments(newValue);
+        // only accept single document changes for now
+        isValidRef.current = documents.length === 1 && isValidResourceDocument(documents[0]);
+      } else {
+        isValidRef.current = true;
+      }
 
-    // try to save
-    if (!isDirtyRef.current || !isValidRef.current) {
-      return;
-    }
+      // try to save
+      if (!isDirtyRef.current || !isValidRef.current) {
+        return;
+      }
 
-    if (originalCodeRef.current !== undefined && originalCodeRef.current !== newValue) {
-      debouncedSaveContent.current(newValue);
-    }
-  };
+      if (originalCodeRef.current !== undefined && originalCodeRef.current !== newValue) {
+        debouncedSaveContent.current(newValue);
+      }
+    },
+    [autosavingStatusRef, debouncedSaveContent, dispatch, setCode]
+  );
 
   useEffect(() => {
     if (!firstCodeLoadedOnEditorRef.current) {
@@ -389,18 +395,16 @@ const Monaco = (props: {
       <S.HiddenInputContainer>
         <S.HiddenInput ref={hiddenInputRef} type="text" />
       </S.HiddenInputContainer>
-      {firstCodeLoadedOnEditorRef.current && (
-        <MonacoEditor
-          width={containerWidth}
-          height={containerHeight}
-          language="yaml"
-          theme={KUBESHOP_MONACO_THEME}
-          value={code}
-          options={options}
-          onChange={onChange}
-          editorDidMount={editorDidMount}
-        />
-      )}
+      <MonacoEditor
+        width={containerWidth}
+        height={containerHeight}
+        language="yaml"
+        theme={KUBESHOP_MONACO_THEME}
+        value={code}
+        options={options}
+        onChange={onChange}
+        editorDidMount={editorDidMount}
+      />
     </S.MonacoContainer>
   );
 };
