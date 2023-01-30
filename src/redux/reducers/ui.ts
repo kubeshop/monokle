@@ -12,7 +12,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {SavedCommand, SettingsPanel} from '@shared/models/config';
+import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -131,6 +131,9 @@ export const uiSlice = createSlice({
     },
     setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
       state.templateExplorer.selectedTemplatePath = action.payload;
+    },
+    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project>) => {
+      state.templateExplorer.projectCreate = action.payload;
     },
     openRenameEntityModal: (
       state: Draft<UiState>,
@@ -422,6 +425,7 @@ export const {
   setRightMenuSelection,
   setSelectedTemplatePath,
   setShowStartPageLearn,
+  setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,

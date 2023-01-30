@@ -5,6 +5,7 @@ import {Skeleton} from 'antd';
 import {Primitive} from 'type-fest';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
@@ -31,6 +32,7 @@ const TemplateForm: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
   const template = useAppSelector(
     state => state.extension.templateMap[state.ui.templateExplorer.selectedTemplatePath ?? '']
   );
@@ -56,6 +58,11 @@ const TemplateForm: React.FC<IProps> = props => {
 
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
+      if (projectCreateData) {
+        trackEvent('app_start/create_project', {from: 'template', templateID: template.id});
+        dispatch(setCreateProject({...projectCreateData}));
+      }
+
       if (isVanillaTemplate(template)) {
         trackEvent('edit/template_use', {templateID: template.id});
         setLoading(true);
@@ -99,7 +106,7 @@ const TemplateForm: React.FC<IProps> = props => {
           setLoading(false);
         });
     },
-    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
+    [projectCreateData, template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
   );
 
   const setFormData = useCallback(

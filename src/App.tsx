@@ -61,7 +61,7 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
-const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const CreateProjectModal = React.lazy(() => import('@organismsNew/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
