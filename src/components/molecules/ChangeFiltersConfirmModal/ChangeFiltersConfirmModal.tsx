@@ -9,18 +9,18 @@ import {isEqual} from 'lodash';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds} from '@redux/reducers/main';
 
+import {useSelectorWithRef} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
-import {findResourceMetaInStorage} from '@shared/utils/resource';
 
 const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const filtersToBeChanged = useAppSelector(state => state.main.filtersToBeChanged);
-  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMetaStorage = useAppSelector(state => state.main.resourceMetaStorage);
+  const [, resourceFilterRef] = useSelectorWithRef(state => state.main.resourceFilter);
+  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
 
   const constructNewFilter = useCallback(() => {
     if (!filtersToBeChanged) {
@@ -29,27 +29,27 @@ const ChangeFiltersConfirmModal: React.FC = () => {
 
     let newFilter: ResourceFilterType = {
       namespace: filtersToBeChanged.namespace
-        ? filtersToBeChanged.namespace === resourceFilter.namespace
+        ? filtersToBeChanged.namespace === resourceFilterRef.current.namespace
           ? undefined
           : filtersToBeChanged.namespace
-        : resourceFilter.namespace,
+        : resourceFilterRef.current.namespace,
       kinds: filtersToBeChanged.kinds
-        ? isEqual(filtersToBeChanged.kinds, resourceFilter.kinds)
+        ? isEqual(filtersToBeChanged.kinds, resourceFilterRef.current.kinds)
           ? undefined
           : filtersToBeChanged.kinds
-        : resourceFilter.kinds,
+        : resourceFilterRef.current.kinds,
       fileOrFolderContainedIn: filtersToBeChanged.fileOrFolderContainedIn
-        ? filtersToBeChanged.fileOrFolderContainedIn === resourceFilter.fileOrFolderContainedIn
+        ? filtersToBeChanged.fileOrFolderContainedIn === resourceFilterRef.current.fileOrFolderContainedIn
           ? undefined
           : filtersToBeChanged.fileOrFolderContainedIn
-        : resourceFilter.fileOrFolderContainedIn,
+        : resourceFilterRef.current.fileOrFolderContainedIn,
       names: filtersToBeChanged.names
-        ? isEqual(filtersToBeChanged.names, resourceFilter.names)
+        ? isEqual(filtersToBeChanged.names, resourceFilterRef.current.names)
           ? undefined
           : filtersToBeChanged.names
-        : resourceFilter.names,
-      labels: resourceFilter.labels,
-      annotations: resourceFilter.annotations,
+        : resourceFilterRef.current.names,
+      labels: resourceFilterRef.current.labels,
+      annotations: resourceFilterRef.current.annotations,
     };
 
     Object.keys(filtersToBeChanged.labels).forEach(key => {
@@ -69,22 +69,14 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     });
 
     return newFilter;
-  }, [
-    filtersToBeChanged,
-    resourceFilter.annotations,
-    resourceFilter.fileOrFolderContainedIn,
-    resourceFilter.kinds,
-    resourceFilter.labels,
-    resourceFilter.names,
-    resourceFilter.namespace,
-  ]);
+  }, [filtersToBeChanged, resourceFilterRef]);
 
   const uncheckHiddenResources = useCallback(() => {
     let uncheckingResourceIdentifiers: ResourceIdentifier[] = [];
     let newFilter = constructNewFilter();
 
     checkedResourceIdentifiers.forEach(identifier => {
-      const resourceMeta = findResourceMetaInStorage(identifier, resourceMetaStorage);
+      const resourceMeta = resourceMetaMapByStorageRef.current[identifier.storage][identifier.id];
 
       if (newFilter && resourceMeta && !isResourcePassingFilter(resourceMeta, newFilter)) {
         uncheckingResourceIdentifiers.push(identifier);
@@ -92,7 +84,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     });
 
     dispatch(uncheckMultipleResourceIds(uncheckingResourceIdentifiers));
-  }, [checkedResourceIdentifiers, constructNewFilter, dispatch, resourceMetaStorage]);
+  }, [checkedResourceIdentifiers, constructNewFilter, dispatch, resourceMetaMapByStorageRef]);
 
   useEffect(() => {
     if (!filtersToBeChanged) {

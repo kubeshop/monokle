@@ -1,17 +1,15 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
 import {FileMapType, ImagesListType} from '@shared/models/appState';
-import {ResourceMetaStorage} from '@shared/models/k8sResource';
+import {ResourceMetaMapByStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
-
-import {findResourceMetaInStorage} from './resource';
 
 // TODO: this should become a thunk so we don't have to pass resourceMetaStorage to it...
 export const selectFromHistory = (
   direction: 'left' | 'right',
   currentSelectionHistoryIndex: number | undefined,
   selectionHistory: AppSelection[],
-  resourceMetaStorage: ResourceMetaStorage,
+  resourceMetaMapByStorage: ResourceMetaMapByStorage,
   fileMap: FileMapType,
   imagesList: ImagesListType,
   dispatch: (action: AnyAction) => void
@@ -19,10 +17,7 @@ export const selectFromHistory = (
   let removedSelectionHistoryEntriesCount = 0;
   const newSelectionHistory = selectionHistory.filter(selection => {
     if (selection.type === 'resource') {
-      const resource = findResourceMetaInStorage(
-        {id: selection.resourceId, storage: selection.resourceStorage},
-        resourceMetaStorage
-      );
+      const resource = resourceMetaMapByStorage[selection.resourceIdentifier.storage][selection.resourceIdentifier.id];
       if (resource) {
         return true;
       }
@@ -99,8 +94,7 @@ export const selectFromHistory = (
     dispatch({
       type: 'main/selectK8sResource',
       payload: {
-        resourceId: nextSelection.resourceId,
-        resourceStorage: nextSelection.resourceStorage,
+        resourceIdentifier: nextSelection.resourceIdentifier,
         isVirtualSelection: true,
       },
     });

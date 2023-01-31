@@ -33,9 +33,10 @@ export const kubeConfigPathValidSelector = createSelector(
 );
 
 export const transientResourceCountSelector = createSelector(
-  (state: RootState) => state.main.resourceMetaStorage,
-  metaStorage => {
-    return size(metaStorage.transient);
+  // TODO: could we memoize this for only the count? maybe a new `createCountSelector`?
+  (state: RootState) => state.main.resourceMetaMapByStorage.transient,
+  transientMetaStorage => {
+    return size(transientMetaStorage);
   }
 );
 
