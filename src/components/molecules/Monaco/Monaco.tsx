@@ -242,7 +242,7 @@ const Monaco = (props: {
       if (!newValue || typeof newValue !== 'string') {
         return;
       }
-      dispatch(setLastChangedLine(0));
+      dispatch(setLastChangedLine(0)); // TODO: why do we set this to 0? shouldn't we set it to the current line?
       isDirtyRef.current = originalCodeRef.current !== newValue;
       setCode(newValue);
 
