@@ -26,7 +26,6 @@ const DashboardPane = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [menu, setMenu] = useState<DashboardMenu[]>([]);
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
 
@@ -37,7 +36,7 @@ const DashboardPane = () => {
     }
 
     setFilteredMenu(
-      menu
+      menuList
         .map((menuItem: DashboardMenu) => ({
           ...menuItem,
           children: menuItem.children?.filter((m: DashboardMenu) =>
