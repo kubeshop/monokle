@@ -7,20 +7,17 @@ import {AnyPreview, AnyPreviewRuntype} from './preview';
  */
 
 export type LocalOrigin = {
-  storage: 'local';
   filePath: string;
   // fileOffset: number;
 };
 export type ClusterOrigin = {
-  storage: 'cluster';
   context: string;
 };
 export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
-  storage: 'preview';
   preview: Preview;
 };
 export type TransientOrigin = {
-  storage: 'transient';
+  // TODO: createdFrom?: 'template' | 'cluster'; ? do we need this?
 };
 
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientOrigin;
@@ -61,15 +58,3 @@ export const isClusterOrigin = ClusterOriginRuntype.guard;
 export const isPreviewOrigin = PreviewOriginRuntype.guard;
 export const isTransientOrigin = TransientOriginRuntype.guard;
 export const isAnyOrigin = AnyOriginRuntype.guard;
-
-export type StorageFromOrigin<T extends AnyOrigin> = T extends {storage: infer Storage} ? Storage : never;
-
-export type OriginFromStorage<T extends AnyOrigin['storage']> = T extends 'local'
-  ? LocalOrigin
-  : T extends 'cluster'
-  ? ClusterOrigin
-  : T extends 'preview'
-  ? PreviewOrigin
-  : T extends 'transient'
-  ? TransientOrigin
-  : never;

@@ -1,7 +1,6 @@
 import {AppState, FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
 import {K8sResource, ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 import {AppSelection} from '@shared/models/selection';
 
 import {getChildFilePath, getLocalResourceMetasForPath} from './fileEntry';
@@ -45,7 +44,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
 
 export function createChildrenResourcesHighlights(
   fileEntry: FileEntry,
-  resourceMetaMap: ResourceMetaMap<LocalOrigin>,
+  resourceMetaMap: ResourceMetaMap<'local'>,
   fileMap: FileMapType
 ) {
   let highlights: AppSelection[] = [];

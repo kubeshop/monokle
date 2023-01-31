@@ -1,7 +1,7 @@
 import {LearnTopicType} from '@monokle/components/dist/types';
 
 import {Project, SavedCommand, SettingsPanel} from './config';
-import {ResourceIdentifier, ResourceStorageKey} from './k8sResource';
+import {ResourceIdentifier} from './k8sResource';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -114,8 +114,7 @@ type UiState = {
   };
   renameResourceModal?: {
     isOpen: boolean;
-    resourceId: string;
-    resourceStorage: ResourceStorageKey;
+    resourceIdentifier: ResourceIdentifier;
   };
   replaceImageModal?: {
     isOpen: boolean;

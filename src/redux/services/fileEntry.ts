@@ -35,8 +35,13 @@ import {
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
-import {K8sResource, ResourceContentMap, ResourceIdentifier, ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
+import {
+  K8sResource,
+  ResourceContentMap,
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMap,
+} from '@shared/models/k8sResource';
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
 
 import {
@@ -131,8 +136,8 @@ export function getRootFolder(fileMap: FileMapType) {
  * if all contained resources are supported
  */
 
-export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType): K8sResource<LocalOrigin>[] {
-  const result: K8sResource<LocalOrigin>[] = [];
+export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType): K8sResource<'local'>[] {
+  const result: K8sResource<'local'>[] = [];
 
   try {
     fileEntry.isSupported = true;
@@ -164,8 +169,8 @@ export function readFiles(
   folder: string,
   stateArgs: {
     projectConfig: ProjectConfig;
-    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
-    resourceContentMap: ResourceContentMap<LocalOrigin>;
+    resourceMetaMap: ResourceMetaMap<'local'>;
+    resourceContentMap: ResourceContentMap<'local'>;
     fileMap: FileMapType;
     helmChartMap: HelmChartMapType;
     helmValuesMap: HelmValuesMapType;
@@ -277,7 +282,7 @@ export function readFiles(
  * Returns all local resource metas associated with the specified path
  */
 
-export function getLocalResourceMetasForPath(filePath: string, resourceMetaMap: ResourceMetaMap<LocalOrigin>) {
+export function getLocalResourceMetasForPath(filePath: string, resourceMetaMap: ResourceMetaMap<'local'>) {
   return Object.values(resourceMetaMap).filter(r => r.origin.filePath === filePath);
 }
 
@@ -287,7 +292,7 @@ export function getLocalResourceMetasForPath(filePath: string, resourceMetaMap: 
 
 export function getLocalResourcesForPath(
   filePath: string,
-  stateArgs: {resourceMetaMap: ResourceMetaMap<LocalOrigin>; resourceContentMap: ResourceContentMap<LocalOrigin>}
+  stateArgs: {resourceMetaMap: ResourceMetaMap<'local'>; resourceContentMap: ResourceContentMap<'local'>}
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   return Object.values(resourceMetaMap)
@@ -300,7 +305,7 @@ export function getLocalResourcesForPath(
  * specified resource
  */
 
-export function getAbsoluteResourceFolder(resource: ResourceIdentifier<LocalOrigin>, fileMap: FileMapType) {
+export function getAbsoluteResourceFolder(resource: ResourceMeta<'local'>, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
     resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf(path.sep))
@@ -312,7 +317,7 @@ export function getAbsoluteResourceFolder(resource: ResourceIdentifier<LocalOrig
  * specified resource
  */
 
-export function getResourceFolder(resource: ResourceIdentifier<LocalOrigin>) {
+export function getResourceFolder(resource: ResourceMeta<'local'>) {
   return resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf('/'));
 }
 
@@ -320,7 +325,7 @@ export function getResourceFolder(resource: ResourceIdentifier<LocalOrigin>) {
  * Returns the absolute path to the file that containing specified resource
  */
 
-export function getAbsoluteResourcePath(resource: ResourceIdentifier<LocalOrigin>, fileMap: FileMapType) {
+export function getAbsoluteResourcePath(resource: ResourceMeta<'local'>, fileMap: FileMapType) {
   return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.origin.filePath);
 }
 
@@ -368,9 +373,9 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource<LocalOrigin>[] {
+export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource<'local'>[] {
   const fileContent = fileMap[relativePath].text || '';
-  return extractK8sResources(fileContent, {storage: 'local', filePath: relativePath});
+  return extractK8sResources(fileContent, 'local', {filePath: relativePath});
 }
 
 /**
@@ -442,7 +447,10 @@ function reloadHelmChartFile(fileEntry: FileEntry, fileMap: FileMapType, helmCha
 }
 
 function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
-  const existingResourcesFromFile = getLocalResourceMetasForPath(fileEntry.filePath, state.resourceMetaStorage.local);
+  const existingResourcesFromFile = getLocalResourceMetasForPath(
+    fileEntry.filePath,
+    state.resourceMetaMapByStorage.local
+  );
   let wasAnyResourceSelected = false;
 
   // delete old resources in file since we can't be sure the updated file contains the same resource(s)
@@ -455,8 +463,8 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
       wasAnyResourceSelected = true;
     }
     deleteResource(resource, {
-      resourceMetaMap: state.resourceMetaStorage.local,
-      resourceContentMap: state.resourceContentStorage.local,
+      resourceMetaMap: state.resourceMetaMapByStorage.local,
+      resourceContentMap: state.resourceContentMapByStorage.local,
     });
   });
 
@@ -469,8 +477,8 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
   const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
   newResourcesFromFile.forEach(resource => {
     const {meta, content} = splitK8sResource(resource);
-    state.resourceMetaStorage.local[meta.id] = meta;
-    state.resourceContentStorage.local[meta.id] = content;
+    state.resourceMetaMapByStorage.local[meta.id] = meta;
+    state.resourceContentMapByStorage.local[meta.id] = content;
   });
 
   if (wasAnyResourceSelected) {
@@ -630,8 +638,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
     resourcesFromFile.forEach(resource => {
       const {meta, content} = splitK8sResource(resource);
-      state.resourceMetaStorage.local[meta.id] = meta;
-      state.resourceContentStorage.local[meta.id] = content;
+      state.resourceMetaMapByStorage.local[meta.id] = meta;
+      state.resourceContentMapByStorage.local[meta.id] = content;
     });
 
     // TODO: after adding a file, the validation listener should reprocess the resources
@@ -655,8 +663,8 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
     });
     folderEntry.children = readFiles(absolutePath, {
       projectConfig,
-      resourceMetaMap: state.resourceMetaStorage.local,
-      resourceContentMap: state.resourceContentStorage.local,
+      resourceMetaMap: state.resourceMetaMapByStorage.local,
+      resourceContentMap: state.resourceContentMapByStorage.local,
       fileMap: state.fileMap,
       helmChartMap: state.helmChartMap,
       helmValuesMap: state.helmValuesMap,
@@ -711,13 +719,13 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
 
 export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
-  const resourcesForPath = getLocalResourceMetasForPath(fileEntry.filePath, state.resourceMetaStorage.local);
+  const resourcesForPath = getLocalResourceMetasForPath(fileEntry.filePath, state.resourceMetaMapByStorage.local);
   if (resourcesForPath.length > 0) {
     resourcesForPath.forEach(resource => {
       removalSideEffect.removedResources.push(resource);
       deleteResource(resource, {
-        resourceMetaMap: state.resourceMetaStorage.local,
-        resourceContentMap: state.resourceContentStorage.local,
+        resourceMetaMap: state.resourceMetaMapByStorage.local,
+        resourceContentMap: state.resourceContentMapByStorage.local,
       });
     });
 
@@ -804,7 +812,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
   } else if (
     state.selection?.type === 'resource' &&
     state.selection.resourceStorage === 'local' &&
-    !state.resourceMetaStorage.local[state.selection.resourceId]
+    !state.resourceMetaMapByStorage.local[state.selection.resourceId]
   ) {
     clearSelectionReducer(state);
   }
@@ -838,7 +846,7 @@ export function highlightResourcesFromFile({filePath, state}: {filePath: string;
 
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
-    getLocalResourceMetasForPath(parent.filePath, state.resourceMetaStorage.local).forEach(r => {
+    getLocalResourceMetasForPath(parent.filePath, state.resourceMetaMapByStorage.local).forEach(r => {
       highlights.push({
         type: 'resource',
         resourceId: r.id,
@@ -849,7 +857,7 @@ export function highlightResourcesFromFile({filePath, state}: {filePath: string;
     if (parent.children) {
       const childrenHighlights = createChildrenResourcesHighlights(
         parent,
-        state.resourceMetaStorage.local,
+        state.resourceMetaMapByStorage.local,
         state.fileMap
       );
       highlights.push(...childrenHighlights);

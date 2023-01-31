@@ -145,8 +145,7 @@ const watchResource = async (
 };
 
 export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), {
-    storage: 'cluster',
+  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), 'cluster', {
     context: kubeConfig.currentContext,
   });
   return resource;

@@ -26,7 +26,6 @@ import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@shared/models/helm';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 
 import {splitK8sResource} from './resource';
 
@@ -199,8 +198,8 @@ export function processHelmChartFolder(
   files: string[],
   stateArgs: {
     projectConfig: ProjectConfig;
-    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
-    resourceContentMap: ResourceContentMap<LocalOrigin>;
+    resourceMetaMap: ResourceMetaMap<'local'>;
+    resourceContentMap: ResourceContentMap<'local'>;
     fileMap: FileMapType;
     helmChartMap: HelmChartMapType;
     helmValuesMap: HelmValuesMapType;

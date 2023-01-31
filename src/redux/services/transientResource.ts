@@ -66,7 +66,8 @@ export function createTransientResource(
 
   const newResource: K8sResource = {
     name: input.name,
-    origin: {storage: 'transient'},
+    storage: 'transient',
+    origin: {},
     id: newResourceId,
     kind: input.kind,
     apiVersion: input.apiVersion,
@@ -109,7 +110,8 @@ export function createMultipleTransientResources(
 
     const newResource: K8sResource = {
       id: uuidv4(),
-      origin: {storage: 'transient'},
+      storage: 'transient',
+      origin: {},
       name: input.name,
       kind: input.kind,
       namespace: input.namespace,

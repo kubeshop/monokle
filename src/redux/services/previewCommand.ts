@@ -8,7 +8,6 @@ import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
-import {PreviewOrigin} from '@shared/models/origin';
 import {CommandPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
@@ -19,7 +18,7 @@ import {extractK8sResources} from './resource';
 
 export const previewSavedCommand = createAsyncThunk<
   {
-    resources: K8sResource<PreviewOrigin<CommandPreview>>[];
+    resources: K8sResource<'preview'>[];
     preview: CommandPreview;
   },
   string,
@@ -54,8 +53,7 @@ export const previewSavedCommand = createAsyncThunk<
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, {
-      storage: 'preview',
+    const resources = extractK8sResources(result.stdout, 'preview', {
       preview: {type: 'command', commandId: command.id},
     });
 

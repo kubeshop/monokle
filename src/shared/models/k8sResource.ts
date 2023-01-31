@@ -198,3 +198,13 @@ export type ResourceMetaMapByStorage = {
 export type ResourceContentMapByStorage = {
   [storage in ResourceStorage]: ResourceContentMap<storage>;
 };
+
+export type OriginFromStorage<T extends ResourceStorage> = T extends 'local'
+  ? LocalOrigin
+  : T extends 'cluster'
+  ? ClusterOrigin
+  : T extends 'preview'
+  ? PreviewOrigin
+  : T extends 'transient'
+  ? TransientOrigin
+  : never;

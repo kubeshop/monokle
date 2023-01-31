@@ -27,8 +27,6 @@ import {
   ResourceSet,
 } from '@shared/models/compare';
 import {K8sResource} from '@shared/models/k8sResource';
-import {ClusterOrigin, LocalOrigin, PreviewOrigin} from '@shared/models/origin';
-import {HelmConfigPreview, HelmPreview, KustomizePreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {
   createHelmInstallCommand,
@@ -67,13 +65,13 @@ export async function fetchResources(state: RootState, options: ResourceSet): Pr
   }
 }
 
-function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sResource<LocalOrigin>[] {
+function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sResource<'local'>[] {
   return Object.values(
-    joinK8sResourceMap(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local)
+    joinK8sResourceMap(state.main.resourceMetaMapByStorage.local, state.main.resourceContentMapByStorage.local)
   ).filter(r => r.origin.filePath.startsWith(options.folder === '<root>' ? '' : `${options.folder}${sep}`));
 }
 
-async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource<LocalOrigin>[]> {
+async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource<'local'>[]> {
   const {commitHash = ''} = options;
 
   const filesContent: Record<string, string> = await promiseFromIpcRenderer(
@@ -86,7 +84,7 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
   );
 
   return Object.entries(filesContent)
-    .flatMap(([filePath, content]) => extractK8sResources(content, {storage: 'local', filePath}))
+    .flatMap(([filePath, content]) => extractK8sResources(content, 'local', {filePath}))
     .filter(resource =>
       `${sep}${resource.origin.filePath.replaceAll('/', sep)}`.startsWith(
         options.folder === '<root>' ? '' : `${options.folder}${sep}`
@@ -112,8 +110,7 @@ async function fetchCommandResources(state: RootState, options: CommandResourceS
     throw new Error(msg);
   }
 
-  const resources = extractK8sResources(result.stdout, {
-    storage: 'preview',
+  const resources = extractK8sResources(result.stdout, 'preview', {
     preview: {type: 'command', commandId: command.id},
   });
   return resources;
@@ -122,7 +119,7 @@ async function fetchCommandResources(state: RootState, options: CommandResourceS
 async function fetchResourcesFromCluster(
   state: RootState,
   options: ClusterResourceSet
-): Promise<K8sResource<ClusterOrigin>[]> {
+): Promise<K8sResource<'cluster'>[]> {
   try {
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
@@ -140,7 +137,7 @@ async function fetchResourcesFromCluster(
     }
 
     const allYaml = fulfilledResults.map(r => (r as any).value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-    return extractK8sResources(allYaml, {storage: 'cluster', context: kc.currentContext});
+    return extractK8sResources(allYaml, 'cluster', {context: kc.currentContext});
   } catch (err) {
     log.debug('fetch resources from cluster failed', err);
     throw err;
@@ -159,10 +156,7 @@ function extractResultFromHelmOutput(result: string) {
   return data;
 }
 
-async function previewHelmResources(
-  state: RootState,
-  options: HelmResourceSet
-): Promise<K8sResource<PreviewOrigin<HelmPreview>>[]> {
+async function previewHelmResources(state: RootState, options: HelmResourceSet): Promise<K8sResource<'preview'>[]> {
   try {
     const {chartId, valuesId} = options;
     const projectConfig = currentConfigSelector(state);
@@ -220,8 +214,7 @@ async function previewHelmResources(
     }
 
     let data = extractResultFromHelmOutput(result.stdout);
-    const resources = extractK8sResources(data, {
-      storage: 'preview',
+    const resources = extractK8sResources(data, 'preview', {
       preview: {type: 'helm', valuesFileId: valuesFile.id, chartId: valuesFile.helmChartId},
     });
 
@@ -235,7 +228,7 @@ async function previewHelmResources(
 async function previewCustomHelmResources(
   state: RootState,
   options: CustomHelmResourceSet
-): Promise<K8sResource<PreviewOrigin<HelmConfigPreview>>[]> {
+): Promise<K8sResource<'preview'>[]> {
   try {
     const {chartId, configId} = options;
     const projectConfig = currentConfigSelector(state);
@@ -281,8 +274,7 @@ async function previewCustomHelmResources(
 
     let data = extractResultFromHelmOutput(result.stdout);
 
-    const resources = extractK8sResources(data, {
-      storage: 'preview',
+    const resources = extractK8sResources(data, 'preview', {
       preview: {type: 'helm-config', configId: helmConfig.id},
     });
     return resources;
@@ -310,11 +302,11 @@ function checkAllFilesExist(files: string[], root: string): void {
 async function previewKustomizeResources(
   state: RootState,
   options: KustomizeResourceSet
-): Promise<K8sResource<PreviewOrigin<KustomizePreview>>[]> {
+): Promise<K8sResource<'preview'>[]> {
   try {
     const projectConfig = currentConfigSelector(state);
-    const kustomizationMeta = state.main.resourceMetaStorage.local[options.kustomizationId];
-    const kustomizationContent = state.main.resourceContentStorage.local[options.kustomizationId];
+    const kustomizationMeta = state.main.resourceMetaMapByStorage.local[options.kustomizationId];
+    const kustomizationContent = state.main.resourceContentMapByStorage.local[options.kustomizationId];
     const kustomization = joinK8sResource(kustomizationMeta, kustomizationContent);
     const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
     const folder = path.join(rootFolder, path.dirname(kustomization.origin.filePath));
@@ -325,8 +317,7 @@ async function previewKustomizeResources(
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, {
-      storage: 'preview',
+    const resources = extractK8sResources(result.stdout, 'preview', {
       preview: {type: 'kustomize', kustomizationId: kustomization.id},
     });
     return resources;

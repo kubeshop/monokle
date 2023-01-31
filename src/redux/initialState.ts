@@ -13,13 +13,13 @@ import {PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
-  resourceMetaStorage: {
+  resourceMetaMapByStorage: {
     local: {},
     cluster: {},
     preview: {},
     transient: {},
   },
-  resourceContentStorage: {
+  resourceContentMapByStorage: {
     local: {},
     cluster: {},
     preview: {},

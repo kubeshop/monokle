@@ -140,9 +140,8 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     apiVersion: rawResource.apiVersion,
     object: cloneDeep(rawResource),
     text: jsonToYaml(rawResource),
-    origin: {
-      storage: 'transient',
-    },
+    storage: 'transient',
+    origin: {},
     isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };

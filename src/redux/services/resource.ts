@@ -28,16 +28,17 @@ import {ClusterAccess} from '@shared/models/config';
 import {K8sObject} from '@shared/models/k8s';
 import {
   K8sResource,
+  OriginFromStorage,
   ResourceContent,
   ResourceContentMap,
   ResourceIdentifier,
   ResourceMap,
   ResourceMeta,
   ResourceMetaMap,
-  ResourceStorageKey,
+  ResourceStorage,
   isLocalResource,
 } from '@shared/models/k8sResource';
-import {AnyOrigin, LocalOrigin, isLocalOrigin} from '@shared/models/origin';
+import {isLocalOrigin} from '@shared/models/origin';
 import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {createKubeClient} from '@shared/utils/kubeclient';
@@ -217,11 +218,11 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
 }
 
 export function removeResourceFromFile(
-  removedResource: ResourceMeta<LocalOrigin>,
+  removedResource: ResourceMeta<'local'>,
   fileMap: FileMapType,
   stateArgs: {
-    resourceMetaMap: ResourceMetaMap<LocalOrigin>;
-    resourceContentMap: ResourceContentMap<LocalOrigin>;
+    resourceMetaMap: ResourceMetaMap<'local'>;
+    resourceContentMap: ResourceContentMap<'local'>;
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
@@ -299,13 +300,13 @@ function extractNamespace(content: any) {
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
-  fileContent: string,
-  origin: Origin
-): K8sResource<Origin>[] {
+export function extractK8sResources<
+  Storage extends ResourceStorage = ResourceStorage,
+  Origin extends OriginFromStorage<Storage> = OriginFromStorage<Storage>
+>(fileContent: string, storage: Storage, origin: Origin): K8sResource<Storage>[] {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
-  const result: K8sResource<Origin>[] = [];
+  const result: K8sResource<Storage>[] = [];
   let splitDocs: any;
 
   if (documents) {
@@ -331,8 +332,9 @@ export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
         if (resourceObject && resourceObject.apiVersion && resourceObject.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
-          let resource: K8sResource<Origin> = {
+          let resource: K8sResource<Storage> = {
             name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
+            storage,
             origin,
             id: (resourceObject.metadata && resourceObject.metadata.uid) || uuidv4(),
             kind: resourceObject.kind,
@@ -384,8 +386,9 @@ export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
           isKustomizationFilePath(origin.filePath) &&
           documents.length === 1
         ) {
-          let resource: K8sResource<Origin> = {
+          let resource: K8sResource<Storage> = {
             name: createResourceName(resourceObject, origin.filePath),
+            storage,
             origin,
             id: uuidv4(),
             kind: KUSTOMIZATION_KIND,
@@ -409,9 +412,9 @@ export function extractK8sResources<Origin extends AnyOrigin = AnyOrigin>(
 /**
  * Deletes the specified resource from internal caches and the specified resourceMap
  */
-export function deleteResource<Origin extends AnyOrigin>(
-  resource: ResourceIdentifier<Origin>,
-  stateArgs: {resourceMetaMap: ResourceMetaMap<Origin>; resourceContentMap: ResourceContentMap<Origin>}
+export function deleteResource<Storage extends ResourceStorage>(
+  resource: ResourceIdentifier<Storage>,
+  stateArgs: {resourceMetaMap: ResourceMetaMap<Storage>; resourceContentMap: ResourceContentMap<Storage>}
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   delete resourceMetaMap[resource.id];
@@ -429,14 +432,11 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(
-  resource: ResourceIdentifier | {id: string; storage: ResourceStorageKey},
-  selection: AppSelection | undefined
-) {
+export function isResourceSelected(resource: ResourceIdentifier, selection: AppSelection | undefined) {
   return (
     isResourceSelection(selection) &&
     selection.resourceId === resource.id &&
-    selection.resourceStorage === ('storage' in resource ? resource.storage : resource.origin.storage)
+    selection.resourceStorage === resource.storage
   );
 }
 
@@ -448,11 +448,12 @@ export function isKustomizationPreviewed(kustomization: ResourceIdentifier, prev
   return isKustomizePreview(preview) && preview.kustomizationId === kustomization.id;
 }
 
-export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
-  resource: K8sResource<Origin>
-): {meta: ResourceMeta<Origin>; content: ResourceContent<Origin>} {
-  const meta: ResourceMeta<Origin> = {
+export function splitK8sResource<Storage extends ResourceStorage = ResourceStorage>(
+  resource: K8sResource<Storage>
+): {meta: ResourceMeta<Storage>; content: ResourceContent<Storage>} {
+  const meta: ResourceMeta<Storage> = {
     id: resource.id,
+    storage: resource.storage,
     origin: resource.origin,
     name: resource.name,
     kind: resource.kind,
@@ -464,27 +465,27 @@ export function splitK8sResource<Origin extends AnyOrigin = AnyOrigin>(
     isClusterScoped: resource.isClusterScoped,
     range: resource.range,
   };
-  const content: ResourceContent<Origin> = {
+  const content: ResourceContent<Storage> = {
     id: resource.id,
-    origin: resource.origin,
+    storage: resource.storage,
     text: resource.text,
     object: resource.object,
   };
   return {meta, content};
 }
 
-export function joinK8sResource<Origin extends AnyOrigin = AnyOrigin>(
-  meta: ResourceMeta<Origin>,
-  content: ResourceContent<Origin>
-): K8sResource<Origin> {
+export function joinK8sResource<Storage extends ResourceStorage = ResourceStorage>(
+  meta: ResourceMeta<Storage>,
+  content: ResourceContent<Storage>
+): K8sResource<Storage> {
   return {...meta, ...content};
 }
 
-export function splitK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
-  resourceMap: ResourceMap<Origin> | K8sResource<Origin>[]
+export function splitK8sResourceMap<Storage extends ResourceStorage = ResourceStorage>(
+  resourceMap: ResourceMap<Storage> | K8sResource<Storage>[]
 ) {
-  const metaMap: ResourceMetaMap<Origin> = {};
-  const contentMap: ResourceContentMap<Origin> = {};
+  const metaMap: ResourceMetaMap<Storage> = {};
+  const contentMap: ResourceContentMap<Storage> = {};
   Object.values(resourceMap).forEach(resource => {
     const {meta, content} = splitK8sResource(resource);
     metaMap[resource.id] = meta;
@@ -493,11 +494,11 @@ export function splitK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
   return {metaMap, contentMap};
 }
 
-export function joinK8sResourceMap<Origin extends AnyOrigin = AnyOrigin>(
-  metaMap: ResourceMetaMap<Origin>,
-  contentMap: ResourceContentMap<Origin>
+export function joinK8sResourceMap<Storage extends ResourceStorage = ResourceStorage>(
+  metaMap: ResourceMetaMap<Storage>,
+  contentMap: ResourceContentMap<Storage>
 ) {
-  const resourceMap: ResourceMap<Origin> = {};
+  const resourceMap: ResourceMap<Storage> = {};
   Object.values(metaMap).forEach(meta => {
     const content = contentMap[meta.id];
     if (content) {

@@ -1,22 +1,22 @@
 import * as Rt from 'runtypes';
 
-type HelmPreview = {
+export type HelmPreview = {
   type: 'helm';
   valuesFileId: string;
   chartId: string;
 };
 
-type HelmConfigPreview = {
+export type HelmConfigPreview = {
   type: 'helm-config';
   configId: string;
 };
 
-type KustomizePreview = {
+export type KustomizePreview = {
   type: 'kustomize';
   kustomizationId: string;
 };
 
-type CommandPreview = {
+export type CommandPreview = {
   type: 'command';
   commandId: string;
 };

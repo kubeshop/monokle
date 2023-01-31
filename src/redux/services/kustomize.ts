@@ -5,7 +5,6 @@ import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants'
 
 import {FileEntry} from '@shared/models/fileEntry';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 
 import {getLocalResourceMetasForPath} from './fileEntry';
 
@@ -64,7 +63,7 @@ export function isKustomizationPatch(r: ResourceMeta | undefined) {
  * Checks if the specified fileEntry is a kustomization file
  */
 
-export function isKustomizationFile(fileEntry: FileEntry, resourceMetaMap: ResourceMetaMap<LocalOrigin>) {
+export function isKustomizationFile(fileEntry: FileEntry, resourceMetaMap: ResourceMetaMap<'local'>) {
   if (fileEntry?.filePath && isKustomizationFilePath(fileEntry.filePath)) {
     const resources = getLocalResourceMetasForPath(fileEntry.filePath, resourceMetaMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
