@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
+import {useMount} from 'react-use';
 
 import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
@@ -6,8 +7,10 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {resourceMapSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector, resourceMapSelector} from '@redux/selectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
@@ -23,11 +26,12 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
+  const [, clusterResourceMapRef] = useSelectorWithRef(state => resourceMapSelector(state, 'cluster'));
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
   useEffect(() => {
     if (!filterText) {
@@ -111,23 +115,26 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, clusterResourceMap]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMapRef]);
 
-  useEffect(() => {
+  useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-  }, [dispatch]);
+  });
 
-  const setActiveMenu = (menuItem: DashboardMenu) => {
-    trackEvent('dashboard/selectKind', {kind: menuItem.key});
-    dispatch(setActiveDashboardMenu(menuItem));
-    dispatch(setDashboardSelectedResourceId());
-  };
+  const setActiveMenu = useCallback(
+    (menuItem: DashboardMenu) => {
+      trackEvent('dashboard/selectKind', {kind: menuItem.key});
+      dispatch(setActiveDashboardMenu(menuItem));
+      dispatch(setDashboardSelectedResourceId());
+    },
+    [dispatch]
+  );
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(clusterResourceMap).filter(r => r.kind === kind).length;
+      return Object.values(clusterResourceMapRef.current).filter(r => r.kind === kind).length;
     },
-    [clusterResourceMap]
+    [clusterResourceMapRef]
   );
 
   // TODO: refactor after @monokle/validation integration
@@ -147,7 +154,7 @@ const DashboardPane = () => {
       //   }, 0);
       return 0;
     },
-    [clusterResourceMap]
+    [clusterResourceMapRef]
   );
 
   return (
