@@ -14,7 +14,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {LearnTopicType} from '@monokle/components/dist/types';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
-import {ResourceIdentifier, ResourceStorageKey} from '@shared/models/k8sResource';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -158,14 +158,10 @@ export const uiSlice = createSlice({
         absolutePathToEntity: '',
       };
     },
-    openRenameResourceModal: (
-      state: Draft<UiState>,
-      action: PayloadAction<{resourceId: string; resourceStorage: ResourceStorageKey}>
-    ) => {
+    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier>) => {
       state.renameResourceModal = {
         isOpen: true,
-        resourceId: action.payload.resourceId,
-        resourceStorage: action.payload.resourceStorage,
+        resourceIdentifier: action.payload,
       };
     },
     closeReplaceImageModal: (state: Draft<UiState>) => {

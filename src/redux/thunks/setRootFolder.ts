@@ -18,7 +18,6 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {GitChangedFile, GitRepo} from '@shared/models/git';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -38,8 +37,8 @@ export const setRootFolder = createAsyncThunk<
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const terminalState = thunkAPI.getState().terminal;
 
-  const resourceMetaMap: ResourceMetaMap<LocalOrigin> = {};
-  const resourceContentMap: ResourceContentMap<LocalOrigin> = {};
+  const resourceMetaMap: ResourceMetaMap<'local'> = {};
+  const resourceContentMap: ResourceContentMap<'local'> = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};

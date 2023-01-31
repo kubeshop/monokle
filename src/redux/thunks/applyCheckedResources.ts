@@ -19,8 +19,8 @@ export const applyCheckedResources = createAsyncThunk<
   const resourcesToApply = checkedResources
     .map(identifier =>
       findResourceInStorage(identifier, {
-        metaStorage: state.main.resourceMetaStorage,
-        contentStorage: state.main.resourceContentStorage,
+        metaStorage: state.main.resourceMetaMapByStorage,
+        contentStorage: state.main.resourceContentMapByStorage,
       })
     )
     .filter(isDefined);

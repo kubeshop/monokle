@@ -19,7 +19,6 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**
@@ -50,7 +49,7 @@ function applyK8sResource(
  */
 
 function applyKustomization(
-  resource: K8sResource<LocalOrigin>,
+  resource: K8sResource<'local'>,
   fileMap: FileMapType,
   context: string,
   projectConfig: ProjectConfig,
@@ -125,7 +124,7 @@ export async function applyResource(
                   })
                 );
               } else {
-                const newK8sResource = extractK8sResources(updatedResourceText, {storage: 'cluster', context})[0];
+                const newK8sResource = extractK8sResources(updatedResourceText, 'cluster', {context})[0];
                 dispatch(addResource(newK8sResource));
               }
 

@@ -3,7 +3,7 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 import log from 'loglevel';
 
 import {UpdateMultipleResourcesPayload, performResourceContentUpdate} from '@redux/reducers/main';
-import {activeResourceMapSelector} from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {RootState} from '@shared/models/rootState';
 

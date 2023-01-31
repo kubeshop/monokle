@@ -15,7 +15,6 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
-import {PreviewOrigin} from '@shared/models/origin';
 import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {runCommandInMainThread} from '@shared/utils/commands';
@@ -27,7 +26,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 export const runPreviewConfiguration = createAsyncThunk<
   {
-    resources: K8sResource<PreviewOrigin<HelmConfigPreview>>[];
+    resources: K8sResource<'preview'>[];
     preview: HelmConfigPreview;
   },
   string,
@@ -131,8 +130,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
 
-    const resources = extractK8sResources(result.stdout, {
-      storage: 'preview',
+    const resources = extractK8sResources(result.stdout, 'preview', {
       preview,
     });
 

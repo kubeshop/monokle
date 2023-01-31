@@ -14,7 +14,6 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandResult} from '@shared/models/commands';
 import {ProjectConfig} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
-import {PreviewOrigin} from '@shared/models/origin';
 import {KustomizePreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
@@ -26,7 +25,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 export const previewKustomization = createAsyncThunk<
   {
-    resources: K8sResource<PreviewOrigin>[];
+    resources: K8sResource<'preview'>[];
     preview: KustomizePreview;
   },
   string,
@@ -36,8 +35,8 @@ export const previewKustomization = createAsyncThunk<
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
 
-  const kustomizationMeta = state.resourceMetaStorage.local[resourceId];
-  const kustomizationContent = state.resourceContentStorage.local[resourceId];
+  const kustomizationMeta = state.resourceMetaMapByStorage.local[resourceId];
+  const kustomizationContent = state.resourceContentMapByStorage.local[resourceId];
 
   if (!kustomizationMeta || !kustomizationContent) {
     log.error(`Couldn't find the meta or content for kustomization with id ${resourceId}`);
@@ -68,8 +67,7 @@ export const previewKustomization = createAsyncThunk<
 
   const preview = {type: 'kustomize', kustomizationId: kustomization.id} as const;
 
-  const resources = extractK8sResources(result.stdout, {
-    storage: 'preview',
+  const resources = extractK8sResources(result.stdout, 'preview', {
     preview,
   });
 

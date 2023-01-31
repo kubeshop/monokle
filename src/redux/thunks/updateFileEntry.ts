@@ -59,15 +59,14 @@ export const updateFileEntry = createAsyncThunk(
               }
             }
           } else {
-            getLocalResourceMetasForPath(fileEntry.filePath, mainState.resourceMetaStorage.local).forEach(r => {
+            getLocalResourceMetasForPath(fileEntry.filePath, mainState.resourceMetaMapByStorage.local).forEach(r => {
               deleteResource(r, {
-                resourceMetaMap: mainState.resourceMetaStorage.local,
-                resourceContentMap: mainState.resourceContentStorage.local,
+                resourceMetaMap: mainState.resourceMetaMapByStorage.local,
+                resourceContentMap: mainState.resourceContentMapByStorage.local,
               });
             });
 
-            const extractedResources = extractK8sResources(payload.text, {
-              storage: 'local',
+            const extractedResources = extractK8sResources(payload.text, 'local', {
               filePath: filePath.substring(rootFolder.length),
             });
 
@@ -91,11 +90,13 @@ export const updateFileEntry = createAsyncThunk(
 
             // TODO: is this correct?
             Object.values(extractedResources).forEach(r => {
-              mainState.resourceMetaStorage.local[r.id] = r;
+              mainState.resourceMetaMapByStorage.local[r.id] = r;
               mainState.highlights.push({
                 type: 'resource',
-                resourceId: r.id,
-                resourceStorage: r.origin.storage,
+                resourceIdentifier: {
+                  id: r.id,
+                  storage: r.storage,
+                },
               });
               // resourceIds.push(r.id); // this is from the commented out code above
             });

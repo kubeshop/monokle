@@ -4,7 +4,7 @@ import log from 'loglevel';
 
 import {performResourceContentUpdate} from '@redux/reducers/main';
 import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
-import {activeResourceMapSelector} from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
 
@@ -58,7 +58,7 @@ export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, 
           performResourceContentUpdate(resource, text, fileMap);
 
           if (!preventSelectionAndHighlightsUpdate) {
-            selectResourceReducer(mainState, {resourceId: resource.id, resourceStorage: resource.origin.storage});
+            selectResourceReducer(mainState, {resourceIdentifier: resource});
           }
         }
 

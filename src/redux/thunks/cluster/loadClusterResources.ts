@@ -19,7 +19,6 @@ import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
-import {ClusterOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -104,11 +103,10 @@ const loadClusterResourcesHandler = async (
     const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 
     const clusterResourceMap = Object.values(
-      extractK8sResources(allYaml, {
-        storage: 'cluster',
+      extractK8sResources(allYaml, 'cluster', {
         context,
       })
-    ).reduce((acc: ResourceMap<ClusterOrigin>, resource) => {
+    ).reduce((acc: ResourceMap<'cluster'>, resource) => {
       acc[resource.id] = resource;
       return acc;
     }, {});
@@ -139,7 +137,7 @@ const loadClusterResourcesHandler = async (
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
         const customResourcesYaml = customResourceObjects.join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const customResources = extractK8sResources(customResourcesYaml, {storage: 'cluster', context});
+        const customResources = extractK8sResources(customResourcesYaml, 'cluster', {context});
         customResources.forEach(r => {
           clusterResourceMap[r.id] = r;
         });
@@ -182,7 +180,7 @@ const loadClusterResourcesHandler = async (
 
 export const loadClusterResources = createAsyncThunk<
   {
-    resources: K8sResource<ClusterOrigin>[];
+    resources: K8sResource<'cluster'>[];
     context: string;
     kubeConfigPath: string;
     namespace: string;
@@ -196,7 +194,7 @@ export const loadClusterResources = createAsyncThunk<
 
 export const reloadClusterResources = createAsyncThunk<
   {
-    resources: K8sResource<ClusterOrigin>[];
+    resources: K8sResource<'cluster'>[];
     context: string;
     kubeConfigPath: string;
     namespace: string;

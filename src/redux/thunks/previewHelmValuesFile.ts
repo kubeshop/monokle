@@ -7,14 +7,13 @@ import {errorMsg} from '@utils/error';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
-import {PreviewOrigin} from '@shared/models/origin';
 import {HelmPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
 export const previewHelmValuesFile = createAsyncThunk<
   {
-    resources: K8sResource<PreviewOrigin<HelmPreview>>[];
+    resources: K8sResource<'preview'>[];
     preview: HelmPreview;
   },
   string,

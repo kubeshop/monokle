@@ -26,7 +26,7 @@ export const removeResources = createAsyncThunk(
       let deletedCheckedResourcesIdentifiers: ResourceIdentifier[] = [];
 
       resourceIdentifiers.forEach(resourceIdentifier => {
-        const resourceMeta = mainState.resourceMetaStorage[resourceIdentifier.origin.storage][resourceIdentifier.id];
+        const resourceMeta = mainState.resourceMetaMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
         if (!resourceMeta) {
           return;
         }
@@ -44,16 +44,16 @@ export const removeResources = createAsyncThunk(
 
         if (isTransientResourceMeta(resourceMeta)) {
           deleteResource(resourceMeta, {
-            resourceMetaMap: mainState.resourceMetaStorage.transient,
-            resourceContentMap: mainState.resourceContentStorage.transient,
+            resourceMetaMap: mainState.resourceMetaMapByStorage.transient,
+            resourceContentMap: mainState.resourceContentMapByStorage.transient,
           });
           return;
         }
 
         if (isLocalResourceMeta(resourceMeta)) {
           removeResourceFromFile(resourceMeta, mainState.fileMap, {
-            resourceMetaMap: mainState.resourceMetaStorage.local,
-            resourceContentMap: mainState.resourceContentStorage.local,
+            resourceMetaMap: mainState.resourceMetaMapByStorage.local,
+            resourceContentMap: mainState.resourceContentMapByStorage.local,
           });
           return;
         }
@@ -69,8 +69,8 @@ export const removeResources = createAsyncThunk(
             if (kindHandler?.deleteResourceInCluster) {
               kindHandler.deleteResourceInCluster(kubeClient, resourceMeta);
               deleteResource(resourceMeta, {
-                resourceMetaMap: mainState.resourceMetaStorage.cluster,
-                resourceContentMap: mainState.resourceContentStorage.cluster,
+                resourceMetaMap: mainState.resourceMetaMapByStorage.cluster,
+                resourceContentMap: mainState.resourceContentMapByStorage.cluster,
               });
             }
           } catch (err) {
