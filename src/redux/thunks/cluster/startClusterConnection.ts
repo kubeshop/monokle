@@ -1,6 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {setClusterProxyPort} from '@redux/reducers/appConfig';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {stopPreview} from '@redux/services/preview';
 
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -28,13 +29,16 @@ export const startClusterConnection = createAsyncThunk<
   const clusterProxyPort = thunkAPI.getState().config.clusterProxyPort;
   const shouldUseKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
+  if (isRestart) {
+    disconnectFromCluster();
+  }
+
   if (!shouldUseKubectlProxy) {
     if (isRestart) {
       thunkAPI.dispatch(reloadClusterResources({context, namespace}));
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace}));
     }
-
     return;
   }
 
