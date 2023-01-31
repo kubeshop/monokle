@@ -1,8 +1,5 @@
-import _ from 'lodash';
+import {isBoolean} from 'lodash';
 import {createSelector} from 'reselect';
-
-import {mapKeyValuesFromNestedObjects} from '@utils/objects';
-import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -11,265 +8,17 @@ import {AppState} from '@shared/models/appState';
 import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
-import {
-  K8sResource,
-  ResourceContent,
-  ResourceContentMap,
-  ResourceContentStorage,
-  ResourceMap,
-  ResourceMeta,
-  ResourceMetaMap,
-  ResourceMetaStorage,
-  ResourceStorageKey,
-} from '@shared/models/k8sResource';
-import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
-import {
-  ResourceSelection,
-  isFileSelection,
-  isPreviewConfigurationSelection,
-  isResourceSelection,
-} from '@shared/models/selection';
+import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
-import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
-import {joinK8sResource, joinK8sResourceMap} from './services/resource';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
   fileMap => fileMap[ROOT_FILE_ENTRY]?.filePath
-);
-
-export const unknownResourcesSelector = (state: RootState) => {
-  const activeResourceMap = activeResourceMapSelector(state);
-  const unknownResources = Object.values(activeResourceMap).filter(
-    resource =>
-      !isKustomizationResource(resource) &&
-      !getResourceKindHandler(resource.kind) &&
-      !resource.name.startsWith('Patch:')
-  );
-  return unknownResources;
-};
-
-export const filteredResourceSelector = createSelector(
-  (state: RootState) => state.main.resourceFilter,
-  (state: RootState) => activeResourceMapSelector(state),
-  (filter, activeResourceMap) =>
-    Object.values(activeResourceMap).filter(resource => isResourcePassingFilter(resource, filter))
-);
-
-export const filteredResourceMapSelector = createSelector(
-  (state: RootState) => state.main.resourceFilter,
-  (state: RootState) => activeResourceMapSelector(state),
-  (filter, activeResourceMap) =>
-    _.keyBy(
-      Object.values(activeResourceMap).filter(resource => isResourcePassingFilter(resource, filter)),
-      'id'
-    )
-);
-
-// export const kustomizationsSelector = createSelector(allResourcesSelector, resources =>
-//   resources.filter((r: K8sResource) => isKustomizationResource(r))
-// );
-
-// TODO: should we merge the Unsaved storage into these or do we handle those differently directly in the Navigator?
-export const activeResourceMapSelector = createSelector(
-  (state: RootState) => state,
-  (state): ResourceMap<AnyOrigin> => {
-    if (state.main.clusterConnection) {
-      return joinK8sResourceMap(state.main.resourceMetaStorage.cluster, state.main.resourceContentStorage.cluster);
-    }
-    if (state.main.preview) {
-      return joinK8sResourceMap(state.main.resourceMetaStorage.preview, state.main.resourceContentStorage.preview);
-    }
-    return joinK8sResourceMap(state.main.resourceMetaStorage.local, state.main.resourceContentStorage.local);
-  }
-);
-
-export const activeResourceMetaMapSelector = createSelector(
-  (state: RootState) => state,
-  (state): ResourceMetaMap<AnyOrigin> => {
-    if (state.main.clusterConnection) {
-      return state.main.resourceMetaStorage.cluster;
-    }
-    if (state.main.preview) {
-      return state.main.resourceMetaStorage.preview;
-    }
-    return state.main.resourceMetaStorage.local;
-  }
-);
-
-export const activeResourceContentMapSelector = createSelector(
-  (state: RootState) => state,
-  (state): ResourceContentMap<AnyOrigin> => {
-    if (state.main.clusterConnection) {
-      return state.main.resourceContentStorage.cluster;
-    }
-    if (state.main.preview) {
-      return state.main.resourceContentStorage.preview;
-    }
-    return state.main.resourceContentStorage.local;
-  }
-);
-
-export const selectedResourceWithMapSelector = createSelector(
-  (state: RootState) => state,
-  (state): {selectedResource: K8sResource | undefined; resourceMap: ResourceMap | undefined} => {
-    const selectedResource = selectedResourceSelector(state);
-    if (!selectedResource) {
-      return {
-        selectedResource: undefined,
-        resourceMap: undefined,
-      };
-    }
-    const resourceMap = resourceMapSelector(state, selectedResource.origin.storage);
-    return {
-      selectedResource,
-      resourceMap,
-    };
-  }
-);
-
-export const selectedResourceMetaWithMapSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selectedResourceMeta = selectedResourceMetaSelector(state);
-    if (!selectedResourceMeta) {
-      return {
-        selectedResourceMeta: undefined,
-        resourceMetaMap: undefined,
-      };
-    }
-    const resourceMetaMap = resourceMetaMapSelector(state, selectedResourceMeta.origin.storage);
-    return {
-      selectedResourceMeta,
-      resourceMetaMap,
-    };
-  }
-);
-
-// function getResourceMetaMap<Storage extends AnyOrigin['storage']>(
-//   resourceMetaStorage: ResourceMetaStorage,
-//   storageKey: Storage
-// ): ResourceMetaMap<OriginFromStorage<Storage>> {
-//   return resourceMetaStorage[storageKey];
-// }
-
-export function resourceMapSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceStorage: Storage
-): ResourceMap<OriginFromStorage<Storage>> {
-  return joinK8sResourceMap(
-    state.main.resourceMetaStorage[resourceStorage],
-    state.main.resourceContentStorage[resourceStorage]
-  );
-}
-
-export function resourceMetaMapSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceStorage: Storage
-): ResourceMetaMap<OriginFromStorage<Storage>> {
-  return state.main.resourceMetaStorage[resourceStorage];
-}
-
-export function resourceContentMapSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceStorage: Storage
-): ResourceContentMap<OriginFromStorage<Storage>> {
-  return state.main.resourceContentStorage[resourceStorage];
-}
-
-export const activeResourceStorageKeySelector = createSelector(
-  (state: RootState) => state,
-  (state): ResourceStorageKey => {
-    if (state.main.clusterConnection) {
-      return 'cluster';
-    }
-    if (state.main.preview) {
-      return 'preview';
-    }
-    return 'local';
-  }
-);
-
-export const activeResourceCountSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const activeResourceMetaMap = activeResourceMetaMapSelector(state);
-    return Object.keys(activeResourceMetaMap).length;
-  }
-);
-
-/**
- * Usage:
- */
-export function resourceSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState | {resourceMetaStorage: ResourceMetaStorage; resourceContentStorage: ResourceContentStorage},
-  args: {id: string; storage: Storage | undefined} | ResourceSelection<Storage>
-): K8sResource<OriginFromStorage<Storage>> | undefined {
-  const resourceId = 'id' in args ? args.id : args.resourceId;
-  const resourceStorage = 'storage' in args ? args.storage : args.resourceStorage;
-  if (resourceStorage === undefined) {
-    return undefined;
-  }
-  const resourceMetaMap =
-    'main' in state ? state.main.resourceMetaStorage[resourceStorage] : state.resourceMetaStorage[resourceStorage];
-  const resourceContentMap =
-    'main' in state
-      ? state.main.resourceContentStorage[resourceStorage]
-      : state.resourceContentStorage[resourceStorage];
-  const resourceMeta = resourceMetaMap[resourceId];
-  const resourceContent = resourceContentMap[resourceId];
-  return {...resourceMeta, ...resourceContent};
-}
-
-export function resourceMetaSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceId: string,
-  resourceStorage: Storage | undefined
-): ResourceMeta<OriginFromStorage<Storage>> | undefined {
-  if (resourceStorage === undefined) {
-    return undefined;
-  }
-  const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
-  return resourceMetaMap[resourceId];
-}
-
-export function resourceContentSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceId: string,
-  resourceStorage: Storage | undefined
-): ResourceContent<OriginFromStorage<Storage>> | undefined {
-  if (resourceStorage === undefined) {
-    return undefined;
-  }
-  const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
-  return resourceContentMap[resourceId];
-}
-
-export const selectedResourceSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
-    if (!isResourceSelection(selection)) {
-      return undefined;
-    }
-    return resourceSelector(state, selection);
-  }
-);
-
-export const selectedResourceMetaSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
-    if (!isResourceSelection(selection)) {
-      return undefined;
-    }
-    return resourceMetaSelector(state, selection.resourceId, selection.resourceStorage);
-  }
 );
 
 export const selectedFilePathSelector = createSelector(
@@ -291,55 +40,6 @@ export const selectedHelmConfigSelector = createSelector(
       return undefined;
     }
     return state.config.projectConfig?.helm?.previewConfigurationMap?.[selection.previewConfigurationId];
-  }
-);
-
-export const allResourcesMetaSelector = createSelector(
-  (state: RootState) => state.main,
-  mainState => {
-    // TODO: maybe we should have a constant for the ResourceStorageKey type so we could map the values?
-    return [
-      ...Object.values(mainState.resourceMetaStorage.local),
-      ...Object.values(mainState.resourceMetaStorage.preview),
-      ...Object.values(mainState.resourceMetaStorage.cluster),
-      ...Object.values(mainState.resourceMetaStorage.transient),
-    ];
-  }
-);
-
-export const allResourceKindsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const knownResourceKinds = knownResourceKindsSelector(state);
-    const allResources = allResourcesMetaSelector(state);
-    return allResources.filter(r => !knownResourceKinds.includes(r.kind)).map(r => r.kind);
-  }
-);
-
-export const allResourceLabelsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const allResources = allResourcesMetaSelector(state);
-    return mapKeyValuesFromNestedObjects(allResources, resource => resource.labels || {});
-  }
-);
-
-export const allResourceAnnotationsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const allResources = allResourcesMetaSelector(state);
-    return mapKeyValuesFromNestedObjects(allResources, resource => resource.annotations || {});
-  }
-);
-
-export const previewedKustomizationSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const preview = state.main.preview;
-    if (!preview || preview.type !== 'kustomize') {
-      return undefined;
-    }
-    return resourceSelector(state, {id: preview.kustomizationId, storage: 'local'});
   }
 );
 
@@ -406,18 +106,6 @@ export const selectedImageIdSelector = createSelector(
       return undefined;
     }
     return selection.imageId;
-  }
-);
-
-export const kustomizationsSelector = createSelector(
-  [
-    (state: RootState) => state.main.resourceMetaStorage.local,
-    (state: RootState) => state.main.resourceContentStorage.local,
-  ],
-  (resourceMetaMap, resourceContentMap) => {
-    return Object.values(resourceMetaMap)
-      .filter(resource => isKustomizationResource(resource))
-      .map(resource => joinK8sResource(resource, resourceContentMap[resource.id]));
   }
 );
 
@@ -566,7 +254,7 @@ export const kubeConfigPathSelector = createSelector(
 export const kubeConfigPathValidSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (_.isBoolean(config.kubeConfig.isPathValid)) {
+    if (isBoolean(config.kubeConfig.isPathValid)) {
       return Boolean(config.kubeConfig.isPathValid);
     }
     return false;
