@@ -1,10 +1,10 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
 
-import _ from 'lodash';
+import _, {isEqual} from 'lodash';
 import {DateTime} from 'luxon';
 import {Merge} from 'type-fest';
 
@@ -12,6 +12,7 @@ import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/das
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resourceMapSelector} from '@redux/selectors';
 
+import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
 
 import EventHandler from '@src/kindhandlers/EventHandler';
@@ -22,23 +23,20 @@ import * as S from './Activity.styled';
 
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
-  const [pausedResource, setPausedResource] = useState<K8sResource | undefined>();
+  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'), isEqual);
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [events, setEvents] = useState<Merge<K8sResource, {eventTime: string}>[]>([]);
+  const [events, setEvents, eventsRef] = useStateWithRef<Merge<K8sResource, {eventTime: string}>[]>([]);
   const [tempEventLength, setTempEventLength] = useState(0);
 
-  useEffect(() => {
+  const pausedResource = useMemo<K8sResource | undefined>(() => {
     if (paused) {
-      setPausedResource(events[0]);
-    } else {
-      setPausedResource(undefined);
+      return eventsRef.current[0];
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused]);
+    return undefined;
+  }, [paused, eventsRef]);
 
   useEffect(() => {
     if (scrollPosition > 100) {
@@ -56,27 +54,30 @@ export const Activity = ({paused}: {paused?: boolean}) => {
     }
   }, [scrollPosition, containerRef]);
 
-  const handleScroll = (event: any) => {
-    setScrollPosition(event.target.scrollTop);
-  };
+  const handleScroll = useCallback(
+    () => (event: any) => {
+      setScrollPosition(event.target.scrollTop);
+    },
+    []
+  );
 
-  const handleCloseToLatest = (e: any) => {
+  const handleCloseToLatest = useCallback((e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToLatestVisible(false);
-  };
+  }, []);
 
-  const handleCloseToOldest = (e: any) => {
+  const handleCloseToOldest = useCallback((e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToOldestVisible(false);
-  };
+  }, []);
 
   useEffect(() => {
-    if (containerRef && containerRef.current && !pausedResource && events.length !== tempEventLength) {
+    if (containerRef && containerRef.current && !pausedResource && eventsRef.current.length !== tempEventLength) {
       setScrollPosition(0);
       containerRef.current.scrollTop = 0;
-      setTempEventLength(events.length);
+      setTempEventLength(eventsRef.current.length);
     }
     setEvents(
       _.sortBy(
@@ -93,8 +94,7 @@ export const Activity = ({paused}: {paused?: boolean}) => {
         'eventTime'
       ).reverse()
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clusterResourceMap, tempEventLength, pausedResource]);
+  }, [clusterResourceMap, tempEventLength, pausedResource, setEvents, eventsRef]);
 
   return (
     <S.Container ref={containerRef} onScroll={handleScroll}>

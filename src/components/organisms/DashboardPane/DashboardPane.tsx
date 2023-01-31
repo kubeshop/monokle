@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useMount} from 'react-use';
 
 import {FundProjectionScreenOutlined} from '@ant-design/icons';
@@ -25,39 +25,34 @@ import * as S from './DashboardPane.style';
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
-  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
+  const [, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
   const [, clusterResourceMapRef] = useSelectorWithRef(state => resourceMapSelector(state, 'cluster'));
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
-  useEffect(() => {
+  const filteredMenu = useMemo(() => {
     if (!filterText) {
-      setFilteredMenu(menuList);
-      return;
+      return menuListRef.current;
     }
-
-    setFilteredMenu(
-      menuList
-        .map((menuItem: DashboardMenu) => ({
-          ...menuItem,
-          children: menuItem.children?.filter((m: DashboardMenu) =>
-            m.label.toLowerCase().includes(filterText.toLowerCase())
-          ),
-        }))
-        .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
-        .filter(
-          (menuItem: DashboardMenu) =>
-            menuItem.children &&
-            menuItem.children?.reduce(
-              (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-              0
-            ) > 0
-        )
-    );
-  }, [filterText, menuList]);
+    return menuListRef.current
+      .map((menuItem: DashboardMenu) => ({
+        ...menuItem,
+        children: menuItem.children?.filter((m: DashboardMenu) =>
+          m.label.toLowerCase().includes(filterText.toLowerCase())
+        ),
+      }))
+      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
+      .filter(
+        (menuItem: DashboardMenu) =>
+          menuItem.children &&
+          menuItem.children?.reduce(
+            (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
+            0
+          ) > 0
+      );
+  }, [filterText, menuListRef]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -188,8 +183,9 @@ const DashboardPane = () => {
               $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1}
               $active={activeMenu.key === parent.key}
               onClick={() =>
-                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 &&
-                setActiveMenu(parent)
+                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1
+                  ? setActiveMenu(parent)
+                  : undefined
               }
             >
               {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}

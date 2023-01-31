@@ -3,7 +3,7 @@ import {useCallback} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {resourceMapSelector} from '@redux/selectors';
 
-import {useMainPaneDimensions} from '@utils/hooks';
+import {useMainPaneDimensions, useSelectorWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -57,15 +57,17 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
+  const [clusterResourceMap, clusterResourceMapRef] = useSelectorWithRef(state =>
+    resourceMapSelector(state, 'cluster')
+  );
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
-    return Object.values(clusterResourceMap).filter(
+    return Object.values(clusterResourceMapRef.current).filter(
       resource =>
         activeMenu.key.replace(`${resource.apiVersion}-`, '') === resource.kind && resource.kind === activeMenu.label
     );
-  }, [clusterResourceMap, activeMenu]);
+  }, [activeMenu, clusterResourceMapRef]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {
