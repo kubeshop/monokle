@@ -28,15 +28,18 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
 };
 
 interface IProps {
+  defaultFormData: Record<string, Primitive>;
+  isFirstForm: boolean;
   isLastForm: boolean;
   templateForm: TemplateForm;
+  onBackHandler: () => void;
   onSubmit: (formData: any) => void;
 }
 
 const TemplateFormRenderer: React.FC<IProps> = props => {
-  const {templateForm, isLastForm, onSubmit} = props;
+  const {defaultFormData, templateForm, isFirstForm, isLastForm, onBackHandler, onSubmit} = props;
 
-  const [formData, setFormData] = useState<Record<string, Primitive>>({});
+  const [formData, setFormData] = useState<Record<string, Primitive>>(defaultFormData);
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
@@ -99,6 +102,12 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
         customValidate={customValidate}
         validator={validator}
       >
+        {!isFirstForm && (
+          <Button style={{marginRight: '10px'}} onClick={onBackHandler}>
+            Back
+          </Button>
+        )}
+
         <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
           {isLastForm ? 'Submit' : 'Next'}
         </Button>
