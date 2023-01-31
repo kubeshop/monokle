@@ -1,4 +1,6 @@
-import {SavedCommand, SettingsPanel} from './config';
+import {LearnTopicType} from '@monokle/components/dist/types';
+
+import {Project, SavedCommand, SettingsPanel} from './config';
 import {ResourceIdentifier, ResourceStorageKey} from './k8sResource';
 
 export enum HighlightItems {
@@ -185,6 +187,12 @@ type UiState = {
   };
   startPageLearn: {
     isVisible: boolean;
+    learnTopic?: LearnTopicType;
+  };
+  templateExplorer: {
+    isVisible: boolean;
+    selectedTemplatePath?: string;
+    projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
 };

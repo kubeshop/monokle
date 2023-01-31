@@ -11,8 +11,9 @@ import initialState from '@redux/initialState';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {LearnTopicType} from '@monokle/components/dist/types';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {SavedCommand, SettingsPanel} from '@shared/models/config';
+import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {ResourceIdentifier, ResourceStorageKey} from '@shared/models/k8sResource';
 import {
   HighlightItems,
@@ -123,6 +124,20 @@ export const uiSlice = createSlice({
     closeNewResourceWizard: (state: Draft<UiState>) => {
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
+    },
+    openTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = true;
+    },
+    closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.selectedTemplatePath = undefined;
+      state.templateExplorer.isVisible = false;
+      state.templateExplorer.projectCreate = undefined;
+    },
+    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
+      state.templateExplorer.selectedTemplatePath = action.payload;
+    },
+    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
+      state.templateExplorer.projectCreate = action.payload;
     },
     openRenameEntityModal: (
       state: Draft<UiState>,
@@ -326,6 +341,9 @@ export const uiSlice = createSlice({
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.startPageLearn.isVisible = action.payload;
     },
+    setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
+      state.startPageLearn.learnTopic = action.payload;
+    },
     handleWalkthroughStep: (
       state: Draft<UiState>,
       action: PayloadAction<{step: number; collection: WalkthroughCollection}>
@@ -383,6 +401,7 @@ export const {
   closeReplaceImageModal,
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
+  closeTemplateExplorer,
   collapseNavSections,
   expandNavSections,
   handleWalkthroughStep,
@@ -401,6 +420,7 @@ export const {
   openReplaceImageModal,
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
+  openTemplateExplorer,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
@@ -413,7 +433,10 @@ export const {
   setPaneConfiguration,
   setRightMenuIsActive,
   setRightMenuSelection,
+  setSelectedTemplatePath,
   setShowStartPageLearn,
+  setStartPageLearnTopic,
+  setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,

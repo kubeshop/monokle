@@ -61,7 +61,7 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
-const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const CreateProjectModal = React.lazy(() => import('@organismsNew/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
@@ -78,6 +78,7 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
+const TemplateExplorer = React.lazy(() => import('@organismsNew/TemplateExplorer'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -111,6 +112,7 @@ const App = () => {
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
+  const isTemplateExplorerVisible = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
@@ -467,6 +469,7 @@ const App = () => {
               <ReleaseNotes onClose={onCloseReleaseNotes} />
             </Modal>
           )}
+          {isTemplateExplorerVisible && <TemplateExplorer />}
         </Suspense>
       </S.AppContainer>
     </AppContext.Provider>

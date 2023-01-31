@@ -26,7 +26,6 @@ const DashboardPane = () => {
   const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [menu, setMenu] = useState<DashboardMenu[]>([]); // TODO: how is this initialized?
   const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
 
@@ -37,7 +36,7 @@ const DashboardPane = () => {
     }
 
     setFilteredMenu(
-      menu
+      menuList
         .map((menuItem: DashboardMenu) => ({
           ...menuItem,
           children: menuItem.children?.filter((m: DashboardMenu) =>

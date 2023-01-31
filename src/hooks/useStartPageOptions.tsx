@@ -1,17 +1,29 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {PlusOutlined, SendOutlined, SettingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {useAppDispatch} from '@redux/hooks';
+import {setStartPageLearnTopic} from '@redux/reducers/ui';
+
 import {NewProject, SettingsPane} from '@organismsNew';
 
 import {ProjectsList} from '@moleculesNew';
 
-import {Icon, LearnPage} from '@monokle/components';
+import {Icon, LearnPage, LearnTopicType} from '@monokle/components';
 import {openDiscord, openDocumentation, openTutorialVideo} from '@shared/utils/shell';
 
 export function useStartPageOptions() {
+  const dispatch = useAppDispatch();
+
+  const onLearnCardClickHandler = useCallback(
+    (topic: LearnTopicType) => {
+      dispatch(setStartPageLearnTopic(topic));
+    },
+    [dispatch]
+  );
+
   const options = useMemo(
     () => ({
       'recent-projects': {
@@ -58,13 +70,13 @@ export function useStartPageOptions() {
                 openTutorialVideo();
               }
             }}
-            onLearnCardClick={() => {}}
+            onLearnCardClick={onLearnCardClickHandler}
           />
         ),
         title: 'Learn',
       },
     }),
-    []
+    [onLearnCardClickHandler]
   );
 
   return options;
