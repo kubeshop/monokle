@@ -6,7 +6,7 @@ import {SelectOutlined} from '@ant-design/icons';
 import {isEmpty} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
 import {closeTemplateExplorer, setSelectedTemplatePath} from '@redux/reducers/ui';
 
 import {TitleBar} from '@monokle/components';
@@ -26,7 +26,7 @@ const CreatedResources: React.FC<IProps> = props => {
   const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
 
   const onSelectResourceHandler = (resource: K8sResource) => {
-    dispatch(selectK8sResource({resourceId: resource.id}));
+    dispatch(selectResource({resourceId: resource.id, resourceStorage: resource.origin.storage}));
     dispatch(closeTemplateExplorer());
   };
 
