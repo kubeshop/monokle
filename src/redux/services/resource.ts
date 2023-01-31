@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {uniq} from 'lodash';
+import {isEqual, uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -432,12 +432,8 @@ export function hasSupportedResourceContent(resource: K8sResource): boolean {
   return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
-export function isResourceSelected(resource: ResourceIdentifier, selection: AppSelection | undefined) {
-  return (
-    isResourceSelection(selection) &&
-    selection.resourceId === resource.id &&
-    selection.resourceStorage === resource.storage
-  );
+export function isResourceSelected(resourceIdentifier: ResourceIdentifier, selection: AppSelection | undefined) {
+  return isResourceSelection(selection) && isEqual(selection.resourceIdentifier, resourceIdentifier);
 }
 
 export function isResourceHighlighted(resource: ResourceIdentifier, highlights: AppSelection[] | undefined) {

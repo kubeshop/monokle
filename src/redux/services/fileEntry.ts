@@ -457,8 +457,8 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
   existingResourcesFromFile.forEach(resource => {
     if (
       state.selection?.type === 'resource' &&
-      state.selection.resourceStorage === 'local' &&
-      state.selection.resourceId === resource.id
+      state.selection.resourceIdentifier.storage === 'local' &&
+      state.selection.resourceIdentifier.id === resource.id
     ) {
       wasAnyResourceSelected = true;
     }
@@ -485,8 +485,10 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
     if (existingResourcesFromFile.length === 1 && newResourcesFromFile.length === 1) {
       const newResourceSelection: ResourceSelection = {
         type: 'resource',
-        resourceId: newResourcesFromFile[0].id,
-        resourceStorage: 'local',
+        resourceIdentifier: {
+          id: newResourcesFromFile[0].id,
+          storage: 'local',
+        },
       };
       selectResourceReducer(state, newResourceSelection);
     } else {
@@ -811,8 +813,8 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     clearSelectionReducer(state);
   } else if (
     state.selection?.type === 'resource' &&
-    state.selection.resourceStorage === 'local' &&
-    !state.resourceMetaMapByStorage.local[state.selection.resourceId]
+    state.selection.resourceIdentifier.storage === 'local' &&
+    !state.resourceMetaMapByStorage.local[state.selection.resourceIdentifier.id]
   ) {
     clearSelectionReducer(state);
   }
@@ -849,8 +851,10 @@ export function highlightResourcesFromFile({filePath, state}: {filePath: string;
     getLocalResourceMetasForPath(parent.filePath, state.resourceMetaMapByStorage.local).forEach(r => {
       highlights.push({
         type: 'resource',
-        resourceId: r.id,
-        resourceStorage: 'local',
+        resourceIdentifier: {
+          id: r.id,
+          storage: 'local',
+        },
       });
     });
 

@@ -6,84 +6,104 @@ import {joinK8sResource} from '@redux/services/resource';
 import {
   K8sResource,
   ResourceContent,
-  ResourceContentStorage,
+  ResourceIdentifier,
   ResourceMeta,
-  ResourceMetaStorage,
+  ResourceStorage,
 } from '@shared/models/k8sResource';
-import {AnyOrigin, OriginFromStorage} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
-import {ResourceSelection, isResourceSelection} from '@shared/models/selection';
+import {isResourceSelection} from '@shared/models/selection';
 
-export function resourceSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState | {resourceMetaStorage: ResourceMetaStorage; resourceContentStorage: ResourceContentStorage},
-  args: {id: string; storage: Storage | undefined} | ResourceSelection<Storage>
-): K8sResource<OriginFromStorage<Storage>> | undefined {
-  const resourceId = 'id' in args ? args.id : args.resourceId;
-  const resourceStorage = 'storage' in args ? args.storage : args.resourceStorage;
-  if (resourceStorage === undefined) {
-    return undefined;
-  }
-  const resourceMetaMap =
-    'main' in state ? state.main.resourceMetaStorage[resourceStorage] : state.resourceMetaStorage[resourceStorage];
-  const resourceContentMap =
-    'main' in state
-      ? state.main.resourceContentStorage[resourceStorage]
-      : state.resourceContentStorage[resourceStorage];
-  const resourceMeta = resourceMetaMap[resourceId];
-  const resourceContent = resourceContentMap[resourceId];
-  return {...resourceMeta, ...resourceContent};
-}
+import {createDeepEqualSelector} from './utils';
 
-export function resourceMetaSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceId: string,
-  resourceStorage: Storage | undefined
-): ResourceMeta<OriginFromStorage<Storage>> | undefined {
-  if (resourceStorage === undefined) {
-    return undefined;
-  }
-  const resourceMetaMap = state.main.resourceMetaStorage[resourceStorage];
-  return resourceMetaMap[resourceId];
-}
+const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+  return createDeepEqualSelector(
+    [
+      (state: RootState) => state.main.resourceMetaMapByStorage[storage],
+      (state: RootState) => state.main.resourceContentMapByStorage[storage],
+      (state: RootState, resourceId: string) => resourceId,
+    ],
+    (resourceMetaMap, resourceContentMap, resourceId): K8sResource<Storage> => {
+      return joinK8sResource(resourceMetaMap[resourceId], resourceContentMap[resourceId]);
+    }
+  );
+};
 
-export function resourceContentSelector<Storage extends AnyOrigin['storage']>(
-  state: RootState,
-  resourceId: string,
-  resourceStorage: Storage | undefined
-): ResourceContent<OriginFromStorage<Storage>> | undefined {
-  if (resourceStorage === undefined) {
-    return undefined;
+export const localResourceSelector = createResourceSelector('local');
+export const clusterResourceSelector = createResourceSelector('cluster');
+export const previewResourceSelector = createResourceSelector('preview');
+export const transientResourceSelector = createResourceSelector('transient');
+export const resourceSelector = (state: RootState, resourceIdentifier: ResourceIdentifier) => {
+  if (resourceIdentifier.storage === 'local') {
+    return localResourceSelector(state, resourceIdentifier.id);
   }
-  const resourceContentMap = state.main.resourceContentStorage[resourceStorage];
-  return resourceContentMap[resourceId];
-}
+  if (resourceIdentifier.storage === 'cluster') {
+    return clusterResourceSelector(state, resourceIdentifier.id);
+  }
+  if (resourceIdentifier.storage === 'preview') {
+    return previewResourceSelector(state, resourceIdentifier.id);
+  }
+  if (resourceIdentifier.storage === 'transient') {
+    return transientResourceSelector(state, resourceIdentifier.id);
+  }
+};
+
+export const resourceMetaSelector = createSelector(
+  [
+    (state: RootState) => state.main.resourceMetaMapByStorage,
+    (state: RootState, resourceIdentifier: ResourceIdentifier) => resourceIdentifier,
+  ],
+  (resourceMetaMapByStorage, resourceIdentifier): ResourceMeta<typeof resourceIdentifier.storage> => {
+    return resourceMetaMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
+  }
+);
+
+export const resourceContentSelector = createSelector(
+  [
+    (state: RootState) => state.main.resourceContentMapByStorage,
+    (state: RootState, resourceIdentifier: ResourceIdentifier) => resourceIdentifier,
+  ],
+  (resourceContentMapByStorage, resourceIdentifier): ResourceContent<typeof resourceIdentifier.storage> => {
+    return resourceContentMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
+  }
+);
 
 export const selectedResourceSelector = createSelector(
-  (state: RootState) => state,
-  state => {
+  (state: RootState) => {
     const selection = state.main.selection;
     if (!isResourceSelection(selection)) {
       return undefined;
     }
-    return resourceSelector(state, selection);
-  }
+    return resourceSelector(state, selection.resourceIdentifier);
+  },
+  resource => resource
 );
 
 export const selectedResourceMetaSelector = createSelector(
-  (state: RootState) => state,
-  state => {
+  (state: RootState) => {
     const selection = state.main.selection;
     if (!isResourceSelection(selection)) {
       return undefined;
     }
-    return resourceMetaSelector(state, selection.resourceId, selection.resourceStorage);
-  }
+    return resourceMetaSelector(state, selection.resourceIdentifier);
+  },
+  resource => resource
 );
 
-export const kustomizationsSelector = createSelector(
+export const selectedResourceContentSelector = createSelector(
+  (state: RootState) => {
+    const selection = state.main.selection;
+    if (!isResourceSelection(selection)) {
+      return undefined;
+    }
+    return resourceContentSelector(state, selection.resourceIdentifier);
+  },
+  resource => resource
+);
+
+export const kustomizationsSelector = createDeepEqualSelector(
   [
-    (state: RootState) => state.main.resourceMetaStorage.local,
-    (state: RootState) => state.main.resourceContentStorage.local,
+    (state: RootState) => state.main.resourceMetaMapByStorage.local,
+    (state: RootState) => state.main.resourceContentMapByStorage.local,
   ],
   (resourceMetaMap, resourceContentMap) => {
     return Object.values(resourceMetaMap)
@@ -92,49 +112,16 @@ export const kustomizationsSelector = createSelector(
   }
 );
 
-export const previewedKustomizationSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const preview = state.main.preview;
+export const previewedKustomizationSelector = createDeepEqualSelector(
+  [
+    (state: RootState) => state.main.resourceMetaMapByStorage.local,
+    (state: RootState) => state.main.resourceContentMapByStorage.local,
+    (state: RootState) => state.main.preview,
+  ],
+  (resourceMetaMap, resourceContentMap, preview) => {
     if (!preview || preview.type !== 'kustomize') {
       return undefined;
     }
-    return resourceSelector(state, {id: preview.kustomizationId, storage: 'local'});
+    return joinK8sResource(resourceMetaMap[preview.kustomizationId], resourceContentMap[preview.kustomizationId]);
   }
 );
-
-// export const selectedResourceWithMapSelector = createSelector(
-//   (state: RootState) => state,
-//   (state): {selectedResource: K8sResource | undefined; resourceMap: ResourceMap | undefined} => {
-//     const selectedResource = selectedResourceSelector(state);
-//     if (!selectedResource) {
-//       return {
-//         selectedResource: undefined,
-//         resourceMap: undefined,
-//       };
-//     }
-//     const resourceMap = resourceMapSelector(state, selectedResource.origin.storage);
-//     return {
-//       selectedResource,
-//       resourceMap,
-//     };
-//   }
-// );
-
-// export const selectedResourceMetaWithMapSelector = createSelector(
-//   (state: RootState) => state,
-//   state => {
-//     const selectedResourceMeta = selectedResourceMetaSelector(state);
-//     if (!selectedResourceMeta) {
-//       return {
-//         selectedResourceMeta: undefined,
-//         resourceMetaMap: undefined,
-//       };
-//     }
-//     const resourceMetaMap = resourceMetaMapSelector(state, selectedResourceMeta.origin.storage);
-//     return {
-//       selectedResourceMeta,
-//       resourceMetaMap,
-//     };
-//   }
-// );

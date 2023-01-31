@@ -1,6 +1,6 @@
 import * as Rt from 'runtypes';
 
-import {ResourceStorage} from './k8sResource';
+import {ResourceIdentifier, ResourceIdentifierRuntype, ResourceStorage} from './k8sResource';
 
 const FileSelectionRuntype = Rt.Record({
   type: Rt.Literal('file'),
@@ -14,14 +14,12 @@ const HelmValuesFileSelectionRuntype = Rt.Record({
 
 export type ResourceSelection<Storage extends ResourceStorage = ResourceStorage> = {
   type: 'resource';
-  resourceStorage: Storage;
-  resourceId: string;
+  resourceIdentifier: ResourceIdentifier<Storage>;
 };
 
 const ResourceSelectionRuntype: Rt.Runtype<ResourceSelection> = Rt.Record({
   type: Rt.Literal('resource'),
-  resourceStorage: Rt.Union(Rt.Literal('local'), Rt.Literal('cluster'), Rt.Literal('preview')),
-  resourceId: Rt.String,
+  resourceIdentifier: ResourceIdentifierRuntype,
 });
 
 const ImageSelectionRuntype = Rt.Record({

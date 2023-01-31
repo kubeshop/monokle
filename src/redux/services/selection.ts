@@ -56,8 +56,10 @@ export function createChildrenResourcesHighlights(
       getLocalResourceMetasForPath(child.filePath, resourceMetaMap).forEach(e => {
         highlights.push({
           type: 'resource',
-          resourceId: e.id,
-          resourceStorage: 'local',
+          resourceIdentifier: {
+            id: e.id,
+            storage: e.storage,
+          },
         });
       });
       if (child.children) {

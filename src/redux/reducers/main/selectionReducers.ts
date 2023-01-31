@@ -4,7 +4,7 @@ import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceStorageKey} from '@shared/models/k8sResource';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
@@ -24,10 +24,10 @@ export const selectFileReducer = (state: AppState, payload: {filePath: string; i
 
 export const selectResourceReducer = (
   state: AppState,
-  payload: {resourceId: string; resourceStorage: ResourceStorageKey; isVirtualSelection?: boolean}
+  payload: {resourceIdentifier: ResourceIdentifier; isVirtualSelection?: boolean}
 ) => {
-  const storage = payload.resourceStorage;
-  const resource = state.resourceMetaStorage[storage][payload.resourceId];
+  const identifier = payload.resourceIdentifier;
+  const resource = state.resourceMetaMapByStorage[identifier.storage][identifier.id];
 
   if (!resource) {
     return;
@@ -36,8 +36,10 @@ export const selectResourceReducer = (
 
   state.selection = {
     type: 'resource',
-    resourceId: resource.id,
-    resourceStorage: storage,
+    resourceIdentifier: {
+      id: resource.id,
+      storage: resource.storage,
+    },
   };
 
   // TODO: highlight resources from resource.refs
@@ -58,8 +60,7 @@ export const selectionReducers = createSliceReducers('main', {
   selectResource: (
     state: Draft<AppState>,
     action: PayloadAction<{
-      resourceId: string;
-      resourceStorage: ResourceStorageKey;
+      resourceIdentifier: ResourceIdentifier;
       isVirtualSelection?: boolean;
     }>
   ) => {
@@ -133,8 +134,10 @@ export function highlightResourcesUsingImage(image: ImageType, state: AppState) 
   image.resourcesIds.forEach(resourceId => {
     highlights.push({
       type: 'resource',
-      resourceId,
-      resourceStorage: 'local', // TODO: images will have to store the resource storage as well
+      resourceIdentifier: {
+        id: resourceId,
+        storage: 'local', // TODO: images will have to identify resources using identifiers
+      },
     });
   });
 
@@ -142,7 +145,7 @@ export function highlightResourcesUsingImage(image: ImageType, state: AppState) 
 }
 
 export const clearSelectedResourceOnPreviewExit = (state: AppState) => {
-  if (state.selection?.type === 'resource' && state.selection.resourceStorage === 'preview') {
+  if (state.selection?.type === 'resource' && state.selection.resourceIdentifier.storage === 'preview') {
     state.selection = undefined;
   }
 };

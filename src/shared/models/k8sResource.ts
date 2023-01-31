@@ -32,7 +32,7 @@ export type ResourceIdentifier<Storage extends ResourceStorage = ResourceStorage
   // origin: Origin;
 };
 
-const ResourceIdentifierRuntype: Rt.Runtype<ResourceIdentifier<ResourceStorage>> = Rt.Record({
+export const ResourceIdentifierRuntype: Rt.Runtype<ResourceIdentifier<ResourceStorage>> = Rt.Record({
   id: Rt.String,
   storage: ResourceStorageRuntype,
   // origin: AnyOriginRuntype,
