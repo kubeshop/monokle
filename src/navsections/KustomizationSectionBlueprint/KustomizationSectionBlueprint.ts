@@ -1,5 +1,6 @@
 import {selectResource} from '@redux/reducers/main';
-import {isInClusterModeSelector, resourceMetaMapSelector} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {isKustomizationPreviewed, isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
@@ -9,7 +10,6 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
-import {LocalOrigin} from '@shared/models/origin';
 import {AnyPreview} from '@shared/models/preview';
 import {AppSelection} from '@shared/models/selection';
 
@@ -23,7 +23,7 @@ import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay
 import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationScopeType = {
-  localResourceMetaMap: ResourceMetaMap<LocalOrigin>;
+  localResourceMetaMap: ResourceMetaMap<'local'>;
   resourceFilters: ResourceFilterType;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
@@ -37,14 +37,14 @@ export type KustomizationScopeType = {
 
 export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
 
-const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<LocalOrigin>, KustomizationScopeType> = {
+const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, KustomizationScopeType> = {
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
-      localResourceMetaMap: resourceMetaMapSelector(state, 'local'),
+      localResourceMetaMap: localResourceMetaMapSelector(state),
       resourceFilters: state.main.resourceFilter,
       isInClusterMode: isInClusterModeSelector(state),
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
@@ -98,13 +98,15 @@ const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<LocalOrigin>,
         ),
       getMeta: rawItem => {
         return {
-          resourceStorage: rawItem.origin.storage,
+          resourceStorage: rawItem.storage,
         };
       },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        dispatch(selectResource({resourceId: itemInstance.id, resourceStorage: itemInstance.meta.resourceStorage}));
+        dispatch(
+          selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta.resourceStorage}})
+        );
       },
     },
     customization: {

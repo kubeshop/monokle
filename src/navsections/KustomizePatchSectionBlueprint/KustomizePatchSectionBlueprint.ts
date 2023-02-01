@@ -1,11 +1,11 @@
 import {selectResource} from '@redux/reducers/main';
-import {isInClusterModeSelector, resourceMetaMapSelector} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
-import {LocalOrigin} from '@shared/models/origin';
 import {AppSelection} from '@shared/models/selection';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -13,7 +13,7 @@ import KustomizePatchPrefix from './KustomizePatchPrefix';
 import KustomizePatchSuffix from './KustomizePatchSuffix';
 
 export type KustomizePatchScopeType = {
-  localResourceMetaMap: ResourceMetaMap<LocalOrigin>;
+  localResourceMetaMap: ResourceMetaMap<'local'>;
   resourceFilter: ResourceFilterType;
   selection: AppSelection | undefined;
   highlights: AppSelection[] | undefined;
@@ -24,14 +24,14 @@ export type KustomizePatchScopeType = {
 
 export const KUSTOMIZE_PATCH_SECTION_NAME = 'Patch Resources' as const;
 
-const KustomizePatchSectionBlueprint: SectionBlueprint<ResourceMeta<LocalOrigin>, KustomizePatchScopeType> = {
+const KustomizePatchSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, KustomizePatchScopeType> = {
   name: KUSTOMIZE_PATCH_SECTION_NAME,
   id: KUSTOMIZE_PATCH_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
-      localResourceMetaMap: resourceMetaMapSelector(state, 'local'),
+      localResourceMetaMap: localResourceMetaMapSelector(state),
       resourceFilter: state.main.resourceFilter,
       selection: state.main.selection,
       highlights: state.main.highlights,
@@ -87,13 +87,15 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<ResourceMeta<LocalOrigin>
       isDisabled: (_, scope) => Boolean(scope.isInClusterMode),
       getMeta: rawItem => {
         return {
-          resourceStorage: rawItem.origin.storage,
+          resourceStorage: rawItem.storage,
         };
       },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        dispatch(selectResource({resourceId: itemInstance.id, resourceStorage: itemInstance.meta.resourceStorage}));
+        dispatch(
+          selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta.resourceStorage}})
+        );
       },
     },
     customization: {

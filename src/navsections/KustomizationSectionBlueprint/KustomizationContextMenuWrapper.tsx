@@ -9,7 +9,8 @@ import path from 'path';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, resourceMapSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {localResourceSelector} from '@redux/selectors/resourceSelectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -21,9 +22,7 @@ import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {K8sResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
-import {LocalOrigin} from '@shared/models/origin';
 import {showItemInFolder} from '@shared/utils/shell';
 
 const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
@@ -36,7 +35,6 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
 
   const areMenuItemsDisabled = useMemo(() => isInClusterMode || isInPreviewMode, [isInClusterMode, isInPreviewMode]);
 
@@ -45,10 +43,8 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const resource = useMemo(
-    () => localResourceMap[itemInstance.id] as K8sResource<LocalOrigin> | undefined,
-    [itemInstance.id, localResourceMap]
-  );
+  const resource = useAppSelector(state => localResourceSelector(state, itemInstance.id));
+
   const absolutePath = useMemo(
     () => (resource?.origin.filePath ? getAbsoluteFilePath(resource.origin.filePath, fileMap) : undefined),
     [fileMap, resource?.origin.filePath]

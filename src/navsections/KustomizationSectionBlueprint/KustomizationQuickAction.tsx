@@ -9,7 +9,7 @@ import {
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
-import {resourceMapSelector, resourceSelector} from '@redux/selectors';
+import {localResourceSelector} from '@redux/selectors/resourceSelectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {isKustomizationPreviewed, isResourceSelected} from '@redux/services/resource';
 
@@ -27,12 +27,11 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const filters = useAppSelector(state => state.main.resourceFilter);
-  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
 
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
 
-  const thisKustomization = useAppSelector(state => resourceSelector(state, {id: itemInstance.id, storage: 'local'}));
+  const thisKustomization = useAppSelector(state => localResourceSelector(state, itemInstance.id));
 
   const isThisPreviewed = useMemo(
     () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),
@@ -40,14 +39,13 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   );
 
   const isPassingFilter = useMemo(
-    () =>
-      localResourceMap[itemInstance.id] ? isResourcePassingFilter(localResourceMap[itemInstance.id], filters) : false,
-    [filters, itemInstance.id, localResourceMap]
+    () => (thisKustomization ? isResourcePassingFilter(thisKustomization, filters) : false),
+    [filters, thisKustomization]
   );
 
   const selectAndPreviewKustomization = useCallback(() => {
     if (thisKustomization && !isResourceSelected(thisKustomization, selection)) {
-      dispatch(selectResource({resourceId: thisKustomization.id, resourceStorage: 'local'}));
+      dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
     if (!isThisPreviewed) {
       startPreview({type: 'kustomize', kustomizationId: itemInstance.id}, dispatch);
@@ -58,7 +56,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
 
   const reloadPreview = useCallback(() => {
     if (thisKustomization && isResourceSelected(thisKustomization, selection)) {
-      dispatch(selectResource({resourceId: itemInstance.id, resourceStorage: 'local'}));
+      dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
 
     restartPreview({type: 'kustomize', kustomizationId: itemInstance.id}, dispatch);
