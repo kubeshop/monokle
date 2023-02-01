@@ -2,7 +2,8 @@ import {useEffect, useState} from 'react';
 
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector, resourceMapSelector} from '@redux/selectors';
+import {currentConfigSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {applyResource} from '@redux/thunks/applyResource';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
@@ -20,7 +21,7 @@ import {TerminalTab} from './TerminalTab';
 export const Drawer = () => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const [localResource, setLocalResource] = useState<K8sResource | undefined>();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
   const projectConfig = useAppSelector(currentConfigSelector);

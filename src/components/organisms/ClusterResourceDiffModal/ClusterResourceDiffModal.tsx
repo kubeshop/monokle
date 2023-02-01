@@ -14,12 +14,8 @@ import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@c
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  resourceMapSelector,
-} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {clusterResourceMapSelector, localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -49,8 +45,8 @@ const ClusterResourceDiffModal = () => {
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
+  const localResourceMap = useAppSelector(localResourceMapSelector);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();

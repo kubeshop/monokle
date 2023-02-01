@@ -58,7 +58,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
             return {
               onClick: () => {
                 dispatch(setDashboardSelectedResourceId(record.id));
-                dispatch(selectResource({resourceId: record.id, resourceStorage: 'cluster'}));
+                dispatch(selectResource({resourceIdentifier: {id: record.id, storage: 'cluster'}}));
               },
             };
           }}

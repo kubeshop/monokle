@@ -6,12 +6,9 @@ import {setActiveDashboardMenu, setActiveTab, setDashboardSelectedResourceId} fr
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {
-  resourceMapSelector,
-  resourceSelector,
-  selectedFilePathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
+import {selectedFilePathSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
 import RefLink from '@components/molecules/ResourceRefsIconPopover/RefLink';
 import {getRefKind} from '@components/molecules/ResourceRefsIconPopover/RefsPopoverContent';
@@ -176,7 +173,7 @@ export const CreationTimestamp = ({time}: {time: string}) => {
 
 export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resource: K8sResource}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'));
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedResource = useAppSelector(selectedResourceSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
@@ -263,7 +260,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
 
   const triggerSelectResource = (selectedId: string) => {
     if (clusterResourceMap[selectedId]) {
-      dispatch(selectResource({resourceId: selectedId, resourceStorage: 'cluster'}));
+      dispatch(selectResource({resourceIdentifier: {id: selectedId, storage: 'cluster'}}));
     }
   };
 

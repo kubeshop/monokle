@@ -6,7 +6,7 @@ import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {useAppSelector} from '@redux/hooks';
-import {resourceSelector} from '@redux/selectors';
+import {resourceSelector} from '@redux/selectors/resourceSelectors';
 
 import * as S from './TerminalTab.styled';
 

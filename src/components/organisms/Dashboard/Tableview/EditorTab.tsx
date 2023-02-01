@@ -10,7 +10,7 @@ export const EditorTab = () => {
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
 
   const resourceSelection: ResourceSelection | undefined = selectedResourceId
-    ? {type: 'resource', resourceId: selectedResourceId, resourceStorage: 'cluster'}
+    ? {type: 'resource', resourceIdentifier: {id: selectedResourceId, storage: 'cluster'}}
     : undefined;
 
   return (

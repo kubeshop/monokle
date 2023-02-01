@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {resourceMapSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions, useSelectorWithRef} from '@utils/hooks';
 
@@ -57,9 +57,7 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const [clusterResourceMap, clusterResourceMapRef] = useSelectorWithRef(state =>
-    resourceMapSelector(state, 'cluster')
-  );
+  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {

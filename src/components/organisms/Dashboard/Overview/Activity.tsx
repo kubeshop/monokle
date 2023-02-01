@@ -4,13 +4,13 @@ import {Button} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
 
-import _, {isEqual} from 'lodash';
+import {sortBy} from 'lodash';
 import {DateTime} from 'luxon';
 import {Merge} from 'type-fest';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {resourceMapSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
@@ -23,7 +23,7 @@ import * as S from './Activity.styled';
 
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(state => resourceMapSelector(state, 'cluster'), isEqual);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,7 +80,7 @@ export const Activity = ({paused}: {paused?: boolean}) => {
       setTempEventLength(eventsRef.current.length);
     }
     setEvents(
-      _.sortBy(
+      sortBy(
         Object.values(clusterResourceMap)
           .filter(
             resource =>
