@@ -1,5 +1,6 @@
 import {selectImage} from '@redux/reducers/main';
-import {activeResourceMapSelector, selectedImageSelector} from '@redux/selectors';
+import {selectedImageSelector} from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ImagesListType} from '@shared/models/appState';
@@ -51,7 +52,8 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     imagesList: state.main.imagesList,
     imagesSearchedValue: state.main.imagesSearchedValue,
     selectedImage: selectedImageSelector(state),
-    selectedK8sResourceId: state.main.selection?.type === 'resource' ? state.main.selection.resourceId : undefined,
+    selectedK8sResourceId:
+      state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined,
   }),
   builder: {
     getRawItems: scope => scope.imagesList,

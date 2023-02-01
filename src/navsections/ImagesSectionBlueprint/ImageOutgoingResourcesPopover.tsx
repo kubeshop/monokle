@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceSelected} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
@@ -42,8 +42,8 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
   }, [activeResourceMetaMap, resourcesIds]);
 
   const handleOnResourceClick = (resource: ResourceMeta, ref: ResourceRef) => {
-    if (!isResourceSelected({id: resource.id, origin: resource.origin}, selection)) {
-      dispatch(selectResource({resourceId: resource.id, resourceStorage: resource.origin.storage}));
+    if (!isResourceSelected(resource, selection)) {
+      dispatch(selectResource({resourceIdentifier: resource}));
     }
 
     const refRange = getRefRange(ref);
