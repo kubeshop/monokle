@@ -1,7 +1,9 @@
 import {useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {filteredResourceMapSelector} from '@redux/selectors';
+import {filteredResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 // import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 import {SectionCustomComponentProps} from '@shared/models/navigator';
@@ -13,11 +15,11 @@ function ResourceKindSectionCounter({sectionInstance, onClick}: SectionCustomCom
   const {id, isSelected, itemIds} = sectionInstance;
 
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
-  const filteredResourceMap = useAppSelector(filteredResourceMapSelector);
+  const [, filteredResourceMapRef] = useSelectorWithRef(filteredResourceMapSelector);
 
   const resources = useMemo(
-    () => itemIds.map(itemId => filteredResourceMap[itemId]).filter(isDefined),
-    [itemIds, filteredResourceMap]
+    () => itemIds.map(itemId => filteredResourceMapRef.current[itemId]).filter(isDefined),
+    [itemIds, filteredResourceMapRef]
   );
 
   // const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);

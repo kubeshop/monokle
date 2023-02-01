@@ -3,7 +3,7 @@ import {isEmpty} from 'lodash';
 import navSectionNames from '@constants/navSectionNames';
 
 import {selectResource} from '@redux/reducers/main';
-import {activeResourceMetaMapSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -112,13 +112,15 @@ export function makeResourceKindNavSection(
         // },
         getMeta: rawItem => {
           return {
-            resourceStorage: rawItem.origin.storage,
+            resourceStorage: rawItem.storage,
           };
         },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
-          dispatch(selectResource({resourceId: itemInstance.id, resourceStorage: itemInstance.meta?.resourceStorage}));
+          dispatch(
+            selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage}})
+          );
         },
         // onCheck: (itemIstance, dispatch) => {
         //   if (itemIstance.isChecked) {

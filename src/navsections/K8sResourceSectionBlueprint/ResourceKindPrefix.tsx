@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter} from '@redux/reducers/main';
-import {resourceMetaSelector} from '@redux/selectors';
+import {resourceMetaSelector} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
@@ -36,7 +36,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const resourceMeta = useAppSelector(state =>
-    resourceMetaSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+    resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
   const filterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
 

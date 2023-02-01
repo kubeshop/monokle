@@ -14,13 +14,9 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {
-  activeResourceMetaMapSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  knownResourceKindsSelector,
-  resourceSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, knownResourceKindsSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {resourceSelector} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -29,7 +25,6 @@ import {ContextMenu} from '@atoms';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMetaMap, isLocalResource, isTransientResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
-import {LocalOrigin} from '@shared/models/origin';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMetaMap, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
@@ -37,7 +32,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
   if (isLocalResource(resource)) {
     const resourcesFromPath = getLocalResourceMetasForPath(
       resource.origin.filePath,
-      resourceMap as ResourceMetaMap<LocalOrigin>
+      resourceMap as ResourceMetaMap<'local'>
     );
     if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.origin.filePath} file.\n${title}`;
@@ -51,7 +46,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        dispatch(removeResources([{id: resource.id, origin: resource.origin}]));
+        dispatch(removeResources([resource]));
         resolve({});
       });
     },
@@ -97,7 +92,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   }
 
   const onClickRename = () => {
-    dispatch(openRenameResourceModal({resourceId: resource.id, resourceStorage: resource.origin.storage}));
+    dispatch(openRenameResourceModal(resource));
   };
 
   const onClickClone = () => {
@@ -119,7 +114,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   };
 
   const onClickSaveToFileFolder = () => {
-    dispatch(openSaveResourcesToFileFolderModal([{id: resource.id, origin: resource.origin}]));
+    dispatch(openSaveResourcesToFileFolderModal([resource]));
   };
 
   const onClickOpenShell = () => {

@@ -5,7 +5,7 @@ import {Tooltip} from 'antd';
 import {DateTime} from 'luxon';
 
 import {useAppSelector} from '@redux/hooks';
-import {resourceContentSelector} from '@redux/selectors';
+import {resourceContentSelector} from '@redux/selectors/resourceSelectors';
 
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 
@@ -14,7 +14,7 @@ import * as S from './ResourceKindInformation.styled';
 export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const resourceContent = useAppSelector(state =>
-    resourceContentSelector(state, itemInstance.id, itemInstance.meta?.resourceStorage)
+    resourceContentSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
 
   const ageInfo = useMemo(() => {

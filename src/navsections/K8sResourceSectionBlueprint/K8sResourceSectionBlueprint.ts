@@ -2,7 +2,7 @@ import {isEmpty, size} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {activeResourceMetaMapSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 

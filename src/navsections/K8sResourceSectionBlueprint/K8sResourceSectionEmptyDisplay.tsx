@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {HighlightItems} from '@shared/models/ui';
