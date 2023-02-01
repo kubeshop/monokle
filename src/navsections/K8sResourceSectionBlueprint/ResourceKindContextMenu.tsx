@@ -23,9 +23,9 @@ import {
   currentConfigSelector,
   isInClusterModeSelector,
   isInPreviewModeSelectorNew,
-  knownResourceKindsSelector,
   kubeConfigContextColorSelector,
 } from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {resourceSelector} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';

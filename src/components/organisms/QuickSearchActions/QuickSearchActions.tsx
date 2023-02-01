@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resetResourceFilter, selectResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 

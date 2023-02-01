@@ -1,7 +1,6 @@
 import {keyBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {knownResourceKindsSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResourceMap} from '@redux/services/resource';
 
@@ -13,6 +12,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {ResourceContentMap, ResourceMap, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
+import {knownResourceKindsSelector} from './resourceKindSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const createResourceMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {

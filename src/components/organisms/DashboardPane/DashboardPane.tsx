@@ -7,7 +7,7 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {registeredKindHandlersSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 

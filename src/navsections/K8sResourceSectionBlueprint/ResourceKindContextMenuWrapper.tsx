@@ -14,7 +14,8 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, knownResourceKindsSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {resourceSelector} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';

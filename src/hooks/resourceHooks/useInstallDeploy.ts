@@ -4,7 +4,8 @@ import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
-import {knownResourceKindsSelector, selectedFilePathSelector} from '@redux/selectors';
+import {selectedFilePathSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';

@@ -12,7 +12,7 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {registeredKindHandlersSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';

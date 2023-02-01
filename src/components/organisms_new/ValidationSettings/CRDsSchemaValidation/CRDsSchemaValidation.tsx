@@ -10,7 +10,7 @@ import {parse} from 'yaml';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {registeredKindHandlersSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 
 import {FileExplorer} from '@components/atoms';
 

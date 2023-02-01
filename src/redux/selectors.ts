@@ -1,13 +1,10 @@
 import {createSelector} from 'reselect';
 
-import {getResourceKindHandler} from '@src/kindhandlers';
-
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
 import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
-import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {RootState} from '@shared/models/rootState';
 import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
 import {Colors} from '@shared/styles/colors';
@@ -236,24 +233,5 @@ export const kubeConfigPathValidSelector = createSelector(
   (state: RootState) => state.config.kubeConfig.isPathValid,
   isPathValid => {
     return Boolean(isPathValid);
-  }
-);
-
-export const registeredKindHandlersSelector = createSelector(
-  (state: RootState) => state.main.registeredKindHandlers,
-  registeredKindHandlers => {
-    return registeredKindHandlers
-      .map(kind => getResourceKindHandler(kind))
-      .filter((handler): handler is ResourceKindHandler => handler !== undefined);
-  }
-);
-
-export const knownResourceKindsSelector = createSelector(
-  (state: RootState) => state.main.registeredKindHandlers,
-  registeredKindHandlers => {
-    return registeredKindHandlers
-      .map(kind => getResourceKindHandler(kind))
-      .filter((handler): handler is ResourceKindHandler => handler !== undefined)
-      .map(handler => handler.kind);
   }
 );

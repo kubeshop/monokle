@@ -21,7 +21,6 @@ import {
   selectImage,
   selectResource,
   setAutosavingStatus,
-  setLastChangedLine,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {
@@ -245,7 +244,7 @@ const Monaco = (props: {
       if (!newValue || typeof newValue !== 'string') {
         return;
       }
-      dispatch(setLastChangedLine(0)); // TODO: why do we set this to 0? shouldn't we set it to the current line?
+      // dispatch(setLastChangedLine(0)); // TODO: why do we set this to 0? shouldn't we set it to the current line?
       isDirtyRef.current = originalCodeRef.current !== newValue;
       setCode(newValue);
 
