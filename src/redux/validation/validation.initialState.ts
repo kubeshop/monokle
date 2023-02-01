@@ -1,7 +1,7 @@
-import {ValidationSliceState} from '@shared/models/validation';
+import {ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 
-export const validationInitialState: ValidationSliceState = {
+export const validationInitialState: ValidationState = {
   config: electronStore.get('validation.config') || {
     plugins: {
       'kubernetes-schema': true,
@@ -26,5 +26,7 @@ export const validationInitialState: ValidationSliceState = {
   },
   lastResponse: undefined,
   loadRequestId: undefined,
+  metadata: undefined,
+  rules: undefined,
   status: 'uninitialized',
 };

@@ -3,15 +3,41 @@ import {isAnyOf} from '@reduxjs/toolkit';
 import {AppListenerFn} from '@redux/listeners/base';
 
 import {toggleOPARules, toggleValidation} from './validation.slice';
-import {loadValidation} from './validation.thunks';
+import {loadValidation, validateResources} from './validation.thunks';
 
-const reloadListener: AppListenerFn = listen => {
+const loadListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(toggleOPARules, toggleValidation),
-    async effect(_action, {dispatch}) {
-      await dispatch(loadValidation());
+    async effect(action, {dispatch, delay, signal, cancelActiveListeners}) {
+      cancelActiveListeners();
+      await delay(1);
+      const loading = dispatch(loadValidation());
+      signal.addEventListener('abort', () => loading.abort());
+      await loading;
     },
   });
 };
 
-export const validationListeners = [reloadListener];
+const validateListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(loadValidation.fulfilled),
+    async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      cancelActiveListeners();
+
+      // if (getState().resources.previewLoading) {
+      //   return;
+      // }
+
+      const validatorsLoading = getState().validation.status === 'loading';
+      if (validatorsLoading) return;
+
+      await delay(1);
+      if (signal.aborted) return;
+      const response = dispatch(validateResources());
+      signal.addEventListener('abort', () => response.abort());
+      await response;
+    },
+  });
+};
+
+export const validationListeners = [loadListener, validateListener];
