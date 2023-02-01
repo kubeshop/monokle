@@ -9,6 +9,7 @@ import {CORE_PLUGINS} from '@shared/constants/validation';
 import {K8sResource} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs} from '@shared/models/validation';
+import electronStore from '@shared/utils/electronStore';
 import {isDefined} from '@shared/utils/filter';
 
 import {RESOURCE_PARSER, VALIDATOR} from './validation.services';
@@ -24,6 +25,7 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     };
 
     merge(config, state.config);
+    electronStore.set('validation.config', config);
 
     await VALIDATOR.preload(config);
 
