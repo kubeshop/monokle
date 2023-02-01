@@ -1,11 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {joinK8sResource} from '@redux/services/resource';
 import applyMultipleResources from '@redux/thunks/applyMultipleResources';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
-import {findResourceInStorage} from '@shared/utils/resource';
 
 export const applyCheckedResources = createAsyncThunk<
   void,
@@ -18,10 +18,10 @@ export const applyCheckedResources = createAsyncThunk<
 
   const resourcesToApply = checkedResources
     .map(identifier =>
-      findResourceInStorage(identifier, {
-        metaStorage: state.main.resourceMetaMapByStorage,
-        contentStorage: state.main.resourceContentMapByStorage,
-      })
+      joinK8sResource(
+        state.main.resourceMetaMapByStorage[identifier.storage][identifier.id],
+        state.main.resourceContentMapByStorage[identifier.storage][identifier.id]
+      )
     )
     .filter(isDefined);
 

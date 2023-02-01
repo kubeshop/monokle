@@ -10,7 +10,6 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {AppState} from '@shared/models/appState';
 import {K8sResource} from '@shared/models/k8sResource';
-import {PreviewOrigin} from '@shared/models/origin';
 import {AnyPreview} from '@shared/models/preview';
 import {
   AppSelection,
@@ -23,8 +22,8 @@ import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux
 
 export const clearPreviewReducer = (state: Draft<AppState>) => {
   state.checkedResourceIdentifiers = [];
-  state.resourceMetaStorage.preview = {};
-  state.resourceContentStorage.preview = {};
+  state.resourceMetaMapByStorage.preview = {};
+  state.resourceContentMapByStorage.preview = {};
   state.preview = undefined;
   state.previewOptions = {};
 };
@@ -36,8 +35,8 @@ export const previewReducers = createSliceReducers('main', {
     }
     clearPreviewReducer(state);
     state.checkedResourceIdentifiers = [];
-    state.resourceMetaStorage.preview = {};
-    state.resourceContentStorage.preview = {};
+    state.resourceMetaMapByStorage.preview = {};
+    state.resourceContentMapByStorage.preview = {};
     state.preview = undefined;
     state.previewOptions = {};
   },
@@ -52,7 +51,7 @@ export const previewReducers = createSliceReducers('main', {
 });
 
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
-  if (state.selection?.type === 'resource' && state.selection.resourceStorage === 'preview') {
+  if (state.selection?.type === 'resource' && state.selection.resourceIdentifier.storage === 'preview') {
     clearSelection(state);
   }
 };
@@ -69,7 +68,7 @@ export const onPreviewRejected = (state: AppState) => {
 
 const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
   state: AppState,
-  payload: {resources: K8sResource<PreviewOrigin<Preview>>[]; preview: Preview},
+  payload: {resources: K8sResource<'preview'>[]; preview: Preview},
   initialSelection?: AppSelection
 ) => {
   state.previewOptions.isLoading = false;
@@ -77,8 +76,8 @@ const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
 
   const {metaMap, contentMap} = splitK8sResourceMap(payload.resources);
 
-  state.resourceMetaStorage.preview = metaMap;
-  state.resourceContentStorage.preview = contentMap;
+  state.resourceMetaMapByStorage.preview = metaMap;
+  state.resourceContentMapByStorage.preview = contentMap;
 
   if (initialSelection) {
     state.selection = initialSelection;
@@ -94,9 +93,11 @@ export const previewExtraReducers = createSliceExtraReducers('main', builder => 
     .addCase(previewKustomization.fulfilled, (state, action) => {
       const initialSelection: ResourceSelection = {
         type: 'resource',
-        resourceId: action.payload.preview.kustomizationId,
-        resourceStorage: 'local',
-      } as const;
+        resourceIdentifier: {
+          id: action.payload.preview.kustomizationId,
+          storage: 'local',
+        },
+      };
 
       onPreviewSuccess(state, action.payload, initialSelection);
     })

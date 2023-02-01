@@ -45,7 +45,6 @@ import {
   isClusterResource,
   isLocalResource,
 } from '@shared/models/k8sResource';
-import {LocalOrigin, PreviewOrigin} from '@shared/models/origin';
 import {PreviewType} from '@shared/models/preview';
 import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
@@ -59,8 +58,8 @@ import {clearSelectionReducer, selectionReducers} from './selectionReducers';
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
   fileMap: FileMapType;
-  resourceMetaMap: ResourceMetaMap<LocalOrigin>;
-  resourceContentMap: ResourceContentMap<LocalOrigin>;
+  resourceMetaMap: ResourceMetaMap<'local'>;
+  resourceContentMap: ResourceContentMap<'local'>;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   helmTemplatesMap: HelmTemplatesMapType;
@@ -86,8 +85,8 @@ export type UpdateFilesEntryPayload = {
 
 export type SetPreviewDataPayload = {
   // TODO: probably need to add info about what type of preview this is and what was it's source (helm chart id, kustomization id, etc)
-  previewResourceMetaMap?: ResourceMetaMap<PreviewOrigin>;
-  previewResourceContentMap?: ResourceContentMap<PreviewOrigin>;
+  previewResourceMetaMap?: ResourceMetaMap<'preview'>;
+  previewResourceContentMap?: ResourceContentMap<'preview'>;
   alert?: AlertType;
   previewKubeConfigPath?: string;
   previewKubeConfigContext?: string;
@@ -129,9 +128,9 @@ const addResourceReducer = (state: AppState, resource: K8sResource) => {
   const {meta, content} = splitK8sResource(resource);
   // TODO: how can we fix the types here?
   // @ts-ignore
-  state.resourceMetaStorage[meta.origin.storage] = meta;
+  state.resourceMetaMapByStorage[meta.origin.storage] = meta;
   // @ts-ignore
-  state.resourceContentStorage[content.origin.storage] = content;
+  state.resourceContentMapByStorage[content.origin.storage] = content;
 };
 
 export const mainSlice = createSlice({
@@ -294,14 +293,14 @@ export const mainSlice = createSlice({
           return;
         }
         const {meta, content} = splitK8sResource(r);
-        state.resourceMetaStorage.cluster[r.id] = meta;
-        state.resourceContentStorage.cluster[r.id] = content;
+        state.resourceMetaMapByStorage.cluster[r.id] = meta;
+        state.resourceContentMapByStorage.cluster[r.id] = content;
       });
     },
     deleteMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
-        delete state.resourceMetaStorage.cluster[r.id];
-        delete state.resourceContentStorage.cluster[r.id];
+        delete state.resourceMetaMapByStorage.cluster[r.id];
+        delete state.resourceContentMapByStorage.cluster[r.id];
       });
     },
   },
@@ -332,8 +331,8 @@ export const mainSlice = createSlice({
 
         const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
 
-        state.resourceMetaStorage.cluster = metaMap;
-        state.resourceContentStorage.cluster = contentMap;
+        state.resourceMetaMapByStorage.cluster = metaMap;
+        state.resourceContentMapByStorage.cluster = contentMap;
         state.clusterConnection = {
           context: action.payload.context,
           namespace: action.payload.namespace,
@@ -357,16 +356,16 @@ export const mainSlice = createSlice({
 
         if (
           state.selection?.type === 'resource' &&
-          state.selection.resourceStorage === 'cluster' &&
-          !state.resourceMetaStorage.cluster[state.selection.resourceId]
+          state.selection.resourceIdentifier.storage === 'cluster' &&
+          !state.resourceMetaMapByStorage.cluster[state.selection.resourceIdentifier.id]
         ) {
           clearSelectionReducer(state);
         }
 
         const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
 
-        state.resourceMetaStorage.cluster = metaMap;
-        state.resourceContentStorage.cluster = contentMap;
+        state.resourceMetaMapByStorage.cluster = metaMap;
+        state.resourceContentMapByStorage.cluster = contentMap;
         state.clusterConnection = {
           context: action.payload.context,
           namespace: action.payload.namespace,
@@ -394,8 +393,8 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
-      state.resourceMetaStorage.local = action.payload.resourceMetaMap;
-      state.resourceContentStorage.local = action.payload.resourceContentMap;
+      state.resourceMetaMapByStorage.local = action.payload.resourceMetaMap;
+      state.resourceContentMapByStorage.local = action.payload.resourceContentMap;
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
@@ -419,8 +418,8 @@ export const mainSlice = createSlice({
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
 
       action.payload.resourcePayloads.forEach(resourcePayload => {
-        const resourceMeta = state.resourceMetaStorage.local[resourcePayload.resourceId];
-        const resourceContent = state.resourceContentStorage.local[resourcePayload.resourceId];
+        const resourceMeta = state.resourceMetaMapByStorage.local[resourcePayload.resourceId];
+        const resourceContent = state.resourceContentMapByStorage.local[resourcePayload.resourceId];
         const resource = joinK8sResource(resourceMeta, resourceContent);
         const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
@@ -466,7 +465,6 @@ export const mainSlice = createSlice({
 
         if (resource) {
           resource.origin = {
-            storage: 'local',
             filePath: relativeFilePath,
           };
           resource.range = resourcePayload.resourceRange;
@@ -474,8 +472,7 @@ export const mainSlice = createSlice({
           if (state.selection?.type === 'file' && state.selection.filePath === relativeFilePath) {
             state.highlights.push({
               type: 'resource',
-              resourceId: resource.id,
-              resourceStorage: resource.origin.storage,
+              resourceIdentifier: resource,
             });
           }
         }
