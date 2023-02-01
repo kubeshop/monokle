@@ -17,13 +17,14 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {resourceSelector} from '@redux/selectors';
+import {joinK8sResource} from '@redux/services/resource';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {useSelectorWithRef} from '@utils/hooks';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -112,8 +113,8 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
   const resourcesIdentifiers = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIdentifiers);
 
-  const resourceMetaStorage = useAppSelector(state => state.main.resourceMetaStorage);
-  const resourceContentStorage = useAppSelector(state => state.main.resourceContentStorage);
+  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
+  const [, resourceContentMapByStorageRef] = useSelectorWithRef(state => state.main.resourceContentMapByStorage);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [savingDestination, setSavingDestination] = useState<'saveToFolder' | 'appendToFile'>('saveToFolder');
@@ -186,9 +187,9 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
 
     for (let i = 0; i < resourcesIdentifiers.length; i += 1) {
       const resourceIdentifier = resourcesIdentifiers[i];
-      const resource = resourceSelector(
-        {resourceMetaStorage, resourceContentStorage},
-        {id: resourceIdentifier.id, storage: resourceIdentifier.origin.storage}
+      const resource = joinK8sResource(
+        resourceMetaMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id],
+        resourceContentMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id]
       );
       if (!resource) {
         // eslint-disable-next-line no-continue
@@ -213,11 +214,11 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
       }
 
-      if (resource.origin.storage === 'transient') {
+      if (resource.storage === 'transient') {
         transientResources.push({resource, absolutePath});
       } else {
         // TODO: this should probably become a thunk that can get the resource content from the store
-        // because it would be nicer to not require us to have the entire resourceContentStorage in this component
+        // because it would be nicer to not require us to have the entire resourceContentMapByStorage in this component
         const cleanResourceContent = removeIgnoredPathsFromResourceObject(resource.object);
         let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
 
@@ -296,9 +297,9 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       let existingFileNames: string[] = [];
       const resources = resourcesIdentifiers
         .map(identifier =>
-          resourceSelector(
-            {resourceMetaStorage, resourceContentStorage},
-            {id: identifier.id, storage: identifier.origin.storage}
+          joinK8sResource(
+            resourceMetaMapByStorageRef.current[identifier.storage][identifier.id],
+            resourceContentMapByStorageRef.current[identifier.storage][identifier.id]
           )
         )
         .filter(isDefined);
@@ -307,9 +308,9 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       );
 
       resourcesIdentifiers.forEach(resourceIdentifier => {
-        const resource = resourceSelector(
-          {resourceMetaStorage, resourceContentStorage},
-          {id: resourceIdentifier.id, storage: resourceIdentifier.origin.storage}
+        const resource = joinK8sResource(
+          resourceMetaMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id],
+          resourceContentMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id]
         );
         if (!resource) {
           return;
@@ -343,8 +344,8 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
     foldersList,
     savingDestination,
     resourcesIdentifiers,
-    resourceMetaStorage,
-    resourceContentStorage,
+    resourceMetaMapByStorageRef,
+    resourceContentMapByStorageRef,
     selectedFolder,
   ]);
 

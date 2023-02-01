@@ -21,7 +21,7 @@ import {
   ResourceFilterType,
 } from '@shared/models/appState';
 import {CurrentMatch} from '@shared/models/fileEntry';
-import {K8sResource, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier, ResourceMetaMap} from '@shared/models/k8sResource';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
@@ -33,7 +33,7 @@ interface CodeIntelProps {
   resourceMetaMap: ResourceMetaMap;
   fileMap: FileMapType;
   imagesList: ImagesListType;
-  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void;
+  selectResource: (resourceIdentifier: ResourceIdentifier) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;

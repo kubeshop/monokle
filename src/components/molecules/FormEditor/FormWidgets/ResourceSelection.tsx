@@ -5,6 +5,7 @@ import {Select} from 'antd';
 import {uniq} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './styled';
 
@@ -19,7 +20,7 @@ ResourceSelection.defaultProps = {
 
 export function ResourceSelection(props: any) {
   const {value, onChange, disabled, options, readonly} = props;
-  const resourceMetaMap = useAppSelector(state => state.main.resourceMetaStorage.local);
+  const resourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const [resourceNames, setResourceNames] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();

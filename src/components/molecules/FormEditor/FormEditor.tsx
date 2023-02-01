@@ -16,12 +16,8 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  selectedResourceSelector,
-  settingsSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, settingsSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';

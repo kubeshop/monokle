@@ -15,9 +15,9 @@ import {
 import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual, isUnsatisfiedRef} from '@monokle/validation';
 import {FileMapType} from '@shared/models/appState';
 import {
+  ResourceIdentifier,
   ResourceMeta,
   ResourceMetaMap,
-  ResourceStorageKey,
   isLocalResource,
   isPreviewResource,
   isTransientResource,
@@ -25,7 +25,7 @@ import {
 
 function applyRefIntel(
   resourceMeta: ResourceMeta,
-  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void,
+  selectResource: (resourceIdentifier: ResourceIdentifier) => void,
   selectFilePath: (filePath: string) => void,
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
   selectImage: (imageId: string) => void,
@@ -203,7 +203,7 @@ function applyRefIntel(
               );
             } else if (matchRef.target?.type === 'resource' && matchRef.target.resourceId) {
               // is the storage of the target resource the same as the current resource?
-              selectResource(matchRef.target.resourceId, resourceMeta.origin.storage);
+              selectResource({id: matchRef.target.resourceId, storage: resourceMeta.storage});
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
             } else if (matchRef.target?.type === 'image') {

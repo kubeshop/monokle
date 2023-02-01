@@ -4,7 +4,11 @@ import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/das
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector, activeResourceStorageKeySelector} from '@redux/selectors';
+import {
+  activeResourceMetaMapSelector,
+  activeResourceStorageSelector,
+  localResourceMetaMapSelector,
+} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getRefRange} from '@utils/refs';
@@ -40,8 +44,8 @@ const RefsPopoverContent = (props: {
   const {children, resourceRefs, resource} = props;
   const dispatch = useAppDispatch();
   const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
-  const activeResourceStorageKey = useAppSelector(activeResourceStorageKeySelector);
-  const localResourceMetaMap = useAppSelector(state => state.main.resourceMetaStorage.local);
+  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
@@ -111,7 +115,7 @@ const RefsPopoverContent = (props: {
 
   const triggerSelectResource = (selectedId: string) => {
     if (activeResourceMetaMap[selectedId]) {
-      dispatch(selectResource({resourceId: selectedId, resourceStorage: activeResourceStorageKey}));
+      dispatch(selectResource({resourceIdentifier: {id: selectedId, storage: activeResourceStorage}}));
     }
   };
 
@@ -141,7 +145,7 @@ const RefsPopoverContent = (props: {
     trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
-      if (selection?.type === 'resource' && selection.resourceId !== resource.id) {
+      if (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id) {
         triggerSelectResource(resource.id);
       }
 
@@ -165,7 +169,7 @@ const RefsPopoverContent = (props: {
         return;
       }
 
-      if (selection?.type === 'resource' && selection.resourceId !== targetResourceMeta.id) {
+      if (selection?.type === 'resource' && selection.resourceIdentifier.id !== targetResourceMeta.id) {
         triggerSelectResource(targetResourceMeta.id);
       }
 

@@ -6,7 +6,8 @@ import {Select} from 'antd';
 import {uniq} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
-import {selectedResourceSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -19,7 +20,7 @@ const EMPTY_VALUE = 'NONE';
 
 export const NamespaceSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMetaMap = useAppSelector(state => state.main.resourceMetaStorage.local);
+  const resourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const selectedResource = useSelector(selectedResourceSelector);
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();

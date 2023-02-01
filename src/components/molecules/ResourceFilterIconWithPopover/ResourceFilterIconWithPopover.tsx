@@ -5,7 +5,8 @@ import {Badge} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourceCountSelector, isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {IconWithPopover} from '@atoms';
 

@@ -7,7 +7,8 @@ import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigPathSelector, selectedResourceSelector} from '@redux/selectors';
+import {kubeConfigPathSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';

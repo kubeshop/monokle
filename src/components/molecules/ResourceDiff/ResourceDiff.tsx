@@ -11,12 +11,8 @@ import {parse, stringify} from 'yaml';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  resourceMapSelector,
-} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -29,7 +25,6 @@ import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
@@ -46,7 +41,7 @@ const options = {
 
 // TODO: this component will need some refactoring, we should find a way to avoid getting an entire resourceMap
 const ResourceDiff = (props: {
-  localResource: K8sResource<LocalOrigin>;
+  localResource: K8sResource<'local'>;
   clusterResourceText: string;
   onApply?: () => void;
 }) => {
@@ -61,7 +56,7 @@ const ResourceDiff = (props: {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
+  const localResourceMap = useAppSelector(localResourceMapSelector);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
@@ -164,7 +159,7 @@ const ResourceDiff = (props: {
           type="primary"
           ghost
           onClick={handleReplace}
-          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent || localResource.origin.storage !== 'local'}
+          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent || localResource.storage !== 'local'}
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>

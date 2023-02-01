@@ -25,17 +25,18 @@ import {
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {
-  activeResourceContentMapSelector,
-  activeResourceMetaMapSelector,
   isInClusterModeSelector,
   isInPreviewModeSelectorNew,
-  resourceContentMapSelector,
-  resourceMetaMapSelector,
-  resourceSelector,
   selectedFilePathSelector,
-  selectedResourceSelector,
   settingsSelector,
 } from '@redux/selectors';
+import {
+  activeResourceContentMapSelector,
+  activeResourceMetaMapSelector,
+  localResourceContentMapSelector,
+  localResourceMetaMapSelector,
+} from '@redux/selectors/resourceMapSelectors';
+import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
@@ -50,7 +51,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {ResourceRef} from '@monokle/validation';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
-import {ResourceStorageKey} from '@shared/models/k8sResource';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isHelmPreview} from '@shared/models/preview';
 import {ResourceSelection, isHelmValuesFileSelection} from '@shared/models/selection';
 import {NewResourceWizardInput} from '@shared/models/ui';
@@ -90,11 +91,13 @@ const Monaco = (props: {
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
   const [activeResourceMetaMap, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
-  const [activeResourceContentMap, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
+  const [, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
   const [selectedResource, selectedResourceRef] = useSelectorWithRef(state =>
-    providedResourceSelection ? resourceSelector(state, providedResourceSelection) : selectedResourceSelector(state)
+    providedResourceSelection
+      ? resourceSelector(state, providedResourceSelection.resourceIdentifier)
+      : selectedResourceSelector(state)
   );
-  const [autosavingStatus, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
+  const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
@@ -105,8 +108,8 @@ const Monaco = (props: {
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const preview = useAppSelector(state => state.main.preview);
 
-  const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
-  const localResourceContentMap = useAppSelector(state => resourceContentMapSelector(state, 'local'));
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const localResourceContentMap = useAppSelector(localResourceContentMapSelector);
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(selectedFilePathSelector);
   const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
@@ -138,8 +141,8 @@ const Monaco = (props: {
   const originalCodeRef = useRef<string>('');
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const triggerSelectResource = (resourceId: string, resourceStorage: ResourceStorageKey) => {
-    dispatch(selectResource({resourceId, resourceStorage}));
+  const triggerSelectResource = (resourceIdentifier: ResourceIdentifier) => {
+    dispatch(selectResource({resourceIdentifier}));
   };
 
   const selectFilePath = (filePath: string) => {

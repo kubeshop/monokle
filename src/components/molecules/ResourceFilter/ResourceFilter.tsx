@@ -13,13 +13,12 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {
   allResourceAnnotationsSelector,
   allResourceKindsSelector,
   allResourceLabelsSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-} from '@redux/selectors';
+} from '@redux/selectors/resourceMapSelectors';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {InputTags, KeyValueInput} from '@atoms';

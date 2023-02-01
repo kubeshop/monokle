@@ -9,7 +9,7 @@ import {
   ResourceFilterType,
 } from '@shared/models/appState';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
-import {K8sResource, ResourceMeta, ResourceMetaMap, ResourceStorageKey} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {MonacoUiState} from '@shared/models/ui';
 
 export interface CodeIntelResponse {
@@ -37,7 +37,7 @@ export interface CodeIntelParams {
   fileMap: FileMapType;
   setEditorSelection: (selection: Partial<MonacoUiState>) => void;
   resource?: K8sResource;
-  selectResource: (resourceId: string, resourceStorage: ResourceStorageKey) => void;
+  selectResource: (resourceIdentifier: ResourceIdentifier) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined;
   filterResources: (filter: ResourceFilterType) => void;
   selectImageHandler: (imageId: string) => void;

@@ -10,12 +10,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {
-  activeResourceMetaMapSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  kubeConfigContextColorSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -69,7 +65,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     () =>
       checkedResourceIdentifiers
         .map(identifier => resourceMetaMap[identifier.id])
-        .every(r => r.origin.storage === 'transient'),
+        .every(r => r.storage === 'transient'),
     [checkedResourceIdentifiers, resourceMetaMap]
   );
 

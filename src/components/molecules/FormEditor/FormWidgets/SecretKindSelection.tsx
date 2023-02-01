@@ -5,7 +5,7 @@ import {Select} from 'antd';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {resourceMapSelector} from '@redux/selectors';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {K8sResource} from '@shared/models/k8sResource';
 
@@ -20,7 +20,7 @@ const FormContainer = styled.div`
 
 export const SecretKindSelection = ({schema, onChange, formData, disabled}: any) => {
   const {secretType} = schema;
-  const resourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
+  const resourceMap = useAppSelector(localResourceMapSelector);
   const [refs, setRefs] = useState<string[]>([]);
   const [properties, setProperties] = useState<string[]>([]);
   const [selectedRef, setSelectedRef] = useState<string | undefined>(
