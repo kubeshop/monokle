@@ -26,7 +26,7 @@ const CreatedResources: React.FC<IProps> = props => {
   const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
 
   const onSelectResourceHandler = (resource: K8sResource) => {
-    dispatch(selectResource({resourceId: resource.id, resourceStorage: resource.origin.storage}));
+    dispatch(selectResource({resourceIdentifier: resource}));
     dispatch(closeTemplateExplorer());
   };
 
