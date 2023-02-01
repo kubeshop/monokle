@@ -1,14 +1,14 @@
 import {useCallback} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {resourceMetaMapSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
 export const usePreview = () => {
-  const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
 

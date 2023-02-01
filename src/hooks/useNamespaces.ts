@@ -1,7 +1,7 @@
 import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourceMetaMapSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getNamespaces} from '@redux/services/resource';
 
 export const ALL_NAMESPACES = '<all>';
@@ -10,6 +10,7 @@ export const NO_NAMESPACE = '<none>';
 export function useNamespaces(options: {
   extra?: ('all' | 'none' | 'default')[];
 }): [string[], Dispatch<SetStateAction<string[]>>] {
+  // TODO: maybe this should become a selector
   const activeNamespaces = useAppSelector(state => getNamespaces(activeResourceMetaMapSelector(state)));
   const optionsExtra = useRef<string[]>([]);
   optionsExtra.current = options.extra || [];

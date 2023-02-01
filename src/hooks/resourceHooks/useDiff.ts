@@ -5,7 +5,8 @@ import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {knownResourceKindsSelector, selectedResourceMetaSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
+import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
