@@ -17,6 +17,8 @@ import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
+import {useSelectorWithRef} from '@utils/hooks';
+
 import {TitleBar} from '@monokle/components';
 import {ResourceMeta, isTransientResource} from '@shared/models/k8sResource';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
@@ -36,20 +38,21 @@ interface IProps {
 const ActionsPaneHeader: React.FC<IProps> = props => {
   const {selectedResourceMeta, applySelection, actionsPaneWidth} = props;
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
+  const [, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
+  const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
+  const [selectionHistory, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
+
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const resourceMetaStorage = useAppSelector(state => state.main.resourceMetaStorage);
   const selectedHelmConfig = useAppSelector(selectedHelmConfigSelector);
-  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const selectedImage = useAppSelector(selectedImageSelector);
 
   const onClickEditPreviewConfiguration = useCallback(() => {
     if (!selectedHelmConfig) {
       return;
     }
-    const chart = Object.values(helmChartMap).find(c => c.filePath === selectedHelmConfig.helmChartFilePath);
+    const chart = Object.values(helmChartMapRef.current).find(c => c.filePath === selectedHelmConfig.helmChartFilePath);
     if (!chart) {
       return;
     }
@@ -59,7 +62,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
         previewConfigurationId: selectedHelmConfig.id,
       })
     );
-  }, [dispatch, selectedHelmConfig, helmChartMap]);
+  }, [dispatch, selectedHelmConfig, helmChartMapRef]);
 
   const onClickRunPreviewConfiguration = useCallback(() => {
     if (!selectedHelmConfig) {
@@ -72,26 +75,26 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const onClickLeftArrow = useCallback(() => {
     selectFromHistory(
       'left',
-      selectionHistory.index,
-      selectionHistory.current,
-      resourceMetaStorage,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
-  }, [dispatch, fileMap, imagesList, resourceMetaStorage, selectionHistory]);
+  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
 
   const onClickRightArrow = useCallback(() => {
     selectFromHistory(
       'right',
-      selectionHistory.index,
-      selectionHistory.current,
-      resourceMetaStorage,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
-  }, [dispatch, fileMap, imagesList, resourceMetaStorage, selectionHistory]);
+  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
 
   const isLeftArrowEnabled = useMemo(
     () =>
@@ -115,11 +118,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     return isTransientResource(selectedResourceMeta);
   }, [selectedResourceMeta]);
 
-  const onSaveHandler = () => {
+  const onSaveHandler = useCallback(() => {
     if (selectedResourceMeta) {
       dispatch(openSaveResourcesToFileFolderModal([selectedResourceMeta]));
     }
-  };
+  }, [dispatch, selectedResourceMeta]);
 
   const showActionsDropdown = useMemo(
     () =>

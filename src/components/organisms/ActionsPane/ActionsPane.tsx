@@ -27,9 +27,10 @@ import {
   kubeConfigPathSelector,
   selectedFilePathSelector,
   selectedHelmValuesSelector,
-  selectedResourceWithMapSelector,
   settingsSelector,
 } from '@redux/selectors';
+import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -72,9 +73,9 @@ import ActionsPaneHeader from './ActionsPaneHeader';
 const ActionsPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-  const [kubeConfigPath, kubeConfigPathRef] = useSelectorWithRef(kubeConfigPathSelector);
+  const [, kubeConfigPathRef] = useSelectorWithRef(kubeConfigPathSelector);
   const [kubeConfigContext, kubeConfigContextRef] = useSelectorWithRef(kubeConfigContextSelector);
-  const [projectConfig, projectConfigRef] = useSelectorWithRef(currentConfigSelector);
+  const [, projectConfigRef] = useSelectorWithRef(currentConfigSelector);
 
   const [helmChartMap, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
@@ -86,9 +87,12 @@ const ActionsPane: React.FC = () => {
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedHelmValues = useAppSelector(selectedHelmValuesSelector);
   const isClusterModeLoading = useAppSelector(state => state.main.clusterConnectionOptions.isLoading);
-  const {selectedResource, resourceMap} = useAppSelector(selectedResourceWithMapSelector);
+  const selectedResource = useAppSelector(selectedResourceSelector);
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
+  const resourceMap = useAppSelector(state =>
+    selectedResource ? resourceMapSelector(state, selectedResource?.storage) : undefined
+  );
   const resourceMapRef = useRef(resourceMap);
   resourceMapRef.current = resourceMap;
 

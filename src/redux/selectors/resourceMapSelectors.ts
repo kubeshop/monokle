@@ -30,20 +30,20 @@ export const localResourceMapSelector = createResourceMapSelector('local');
 export const clusterResourceMapSelector = createResourceMapSelector('cluster');
 export const previewResourceMapSelector = createResourceMapSelector('preview');
 export const transientResourceMapSelector = createResourceMapSelector('transient');
-// export const resourceMapSelector = <Storage extends ResourceStorage>(state: RootState, storage: Storage) => {
-//   if (storage === 'local') {
-//     return localResourceMapSelector(state);
-//   }
-//   if (storage === 'cluster') {
-//     return clusterResourceMapSelector(state);
-//   }
-//   if (storage === 'preview') {
-//     return previewResourceMapSelector(state);
-//   }
-//   if (storage === 'transient') {
-//     return transientResourceMapSelector(state);
-//   }
-// };
+export const resourceMapSelector = <Storage extends ResourceStorage>(state: RootState, storage: Storage) => {
+  if (storage === 'local') {
+    return localResourceMapSelector(state);
+  }
+  if (storage === 'cluster') {
+    return clusterResourceMapSelector(state);
+  }
+  if (storage === 'preview') {
+    return previewResourceMapSelector(state);
+  }
+  if (storage === 'transient') {
+    return transientResourceMapSelector(state);
+  }
+};
 // TODO: should we merge the Unsaved storage into these or do we handle those differently directly in the Navigator?
 export const activeResourceMapSelector = createDeepEqualSelector(
   [

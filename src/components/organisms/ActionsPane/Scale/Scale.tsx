@@ -7,9 +7,10 @@ import {ScaleTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigPathSelector, selectedResourceSelector} from '@redux/selectors';
-// import {restartPreview} from '@redux/services/preview';
+import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {SecondaryButton} from '@atoms';
 
@@ -46,8 +47,8 @@ const Scale: React.FC<IProps> = props => {
       toggleScaling(true);
       await scaleDeployment({name, replicas, namespace, currentContext, kubeConfigPath});
       toggleScaling(false);
-      // TODO: revisit this after cluster refactoring
-      // restartPreview(currentContext, 'cluster', dispatch);
+      // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
+      dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
     }
     dispatch(closeScaleModal());
   };
