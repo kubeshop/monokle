@@ -1,11 +1,10 @@
-import {isBoolean} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
-import {AppConfig, HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
+import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
@@ -77,31 +76,31 @@ export const previewedHelmChartSelector = createSelector(
 );
 
 export const previewedHelmConfigSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const preview = state.main.preview;
+  [
+    (state: RootState) => state.main.preview,
+    (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
+  ],
+  (preview, previewConfigurationMap) => {
     if (!preview || preview.type !== 'helm-config') {
       return undefined;
     }
-    return state.config.projectConfig?.helm?.previewConfigurationMap?.[preview.configId] ?? undefined;
+    return previewConfigurationMap?.[preview.configId] ?? undefined;
   }
 );
 
 export const selectedImageSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  [(state: RootState) => state.main.selection, (state: RootState) => state.main.imagesList],
+  (selection, imagesList) => {
     if (!selection || selection.type !== 'image') {
       return undefined;
     }
-    return state.main.imagesList.find(image => image.id === selection.imageId);
+    return imagesList.find(image => image.id === selection.imageId);
   }
 );
 
 export const selectedImageIdSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  (state: RootState) => state.main.selection,
+  selection => {
     if (!selection || selection.type !== 'image') {
       return undefined;
     }
@@ -110,20 +109,15 @@ export const selectedImageIdSelector = createSelector(
 );
 
 export const rootFileEntrySelector = createSelector(
-  (state: RootState) => state.main.fileMap,
-  fileMap => {
-    const rootFileEntry: FileEntry | undefined = fileMap[ROOT_FILE_ENTRY];
+  (state: RootState) => state.main.fileMap[ROOT_FILE_ENTRY],
+  (rootFileEntry: FileEntry | undefined) => {
     return rootFileEntry;
   }
 );
 
-export const rootFilePathSelector = createSelector(
-  (state: RootState) => state.main.fileMap,
-  fileMap => {
-    const rootFileEntry: FileEntry | undefined = fileMap[ROOT_FILE_ENTRY];
-    return rootFileEntry?.filePath;
-  }
-);
+export const rootFilePathSelector = createSelector(rootFileEntrySelector, rootFileEntry => {
+  return rootFileEntry?.filePath;
+});
 
 export const helmChartsSelector = createSelector(
   (state: RootState) => state.main.helmChartMap,
@@ -145,11 +139,14 @@ export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConf
   return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
 };
 
+export const selectCurrentKubeConfig = createSelector(
+  (state: RootState) => state.config.kubeConfig,
+  kubeConfig => kubeConfig
+);
+
 export const isInClusterModeSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const kubeConfig = selectCurrentKubeConfig(state);
-    const clusterConnectionContext = state.main.clusterConnection?.context;
+  [selectCurrentKubeConfig, state => state.main.clusterConnection?.context],
+  (kubeConfig, clusterConnectionContext) => {
     return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
   }
 );
@@ -157,12 +154,14 @@ export const isInClusterModeSelector = createSelector(
 // TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
 // the previous selector returned `true` even if you were in ClusterMode but that's no longer desired
 export const isInPreviewModeSelectorNew = createSelector(
-  (state: RootState) => state,
-  state => {
-    return Boolean(state.main.preview);
+  (state: RootState) => state.main.preview,
+  preview => {
+    return Boolean(preview);
   }
 );
 
+// TODO: is this recomputin each time the state.config changes?
+// should we use the deep euqality check?
 export const currentConfigSelector = createSelector(
   (state: RootState) => state.config,
   config => {
@@ -172,98 +171,73 @@ export const currentConfigSelector = createSelector(
   }
 );
 
-export const settingsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentConfig: ProjectConfig = currentConfigSelector(state);
-    return currentConfig.settings || {};
-  }
-);
+export const settingsSelector = createSelector(currentConfigSelector, currentConfig => {
+  return currentConfig.settings || {};
+});
 
-export const scanExcludesSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.scanExcludes || [];
-  }
-);
+export const scanExcludesSelector = createSelector(currentConfigSelector, currentConfig => {
+  return currentConfig.scanExcludes || [];
+});
 
-export const fileIncludesSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.fileIncludes || [];
-  }
-);
+export const fileIncludesSelector = createSelector(currentConfigSelector, currentConfig => {
+  currentConfig.fileIncludes || [];
+});
 
 export const kubeConfigContextColorSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (!config.kubeConfig.currentContext) {
+  [
+    (state: RootState) => state.config.kubeConfig.currentContext,
+    (state: RootState) => state.config.kubeConfigContextsColors,
+  ],
+  (currentContext, kubeConfigContextsColors) => {
+    if (!currentContext) {
       return Colors.volcano8;
     }
 
-    return config.kubeConfigContextsColors[config.kubeConfig.currentContext] || Colors.volcano8;
+    return kubeConfigContextsColors[currentContext] || Colors.volcano8;
   }
 );
 
-export const currentKubeContext = (configState: AppConfig) => {
-  if (configState.kubeConfig.currentContext) {
-    return configState.kubeConfig.currentContext;
-  }
-
-  return '';
-};
-
 export const kubeConfigContextsSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (config.kubeConfig.contexts) {
-      return config.kubeConfig.contexts;
+  (state: RootState) => state.config.kubeConfig.contexts,
+  contexts => {
+    if (contexts) {
+      return contexts;
     }
     return [];
   }
 );
 
+export const currentKubeContextSelector = createSelector(
+  (state: RootState) => state.config.kubeConfig.currentContext,
+  context => context
+);
+
 export const currentClusterAccessSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    let currentContext = currentKubeContext(config);
+  [currentKubeContextSelector, (state: RootState) => state.config.clusterAccess],
+  (currentContext, clusterAccess) => {
     if (!currentContext) {
       return [];
     }
-
-    if (!config?.kubeConfig?.currentContext) {
-      return [];
-    }
-
-    return config.clusterAccess?.filter(ca => ca.context === currentContext) || [];
+    return clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
 );
 
 export const kubeConfigPathSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (config.kubeConfig.path) {
-      return config.kubeConfig.path;
+  (state: RootState) => state.config.kubeConfig.path,
+  kubeConfigPath => {
+    if (kubeConfigPath) {
+      return kubeConfigPath;
     }
     return '';
   }
 );
 
 export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (isBoolean(config.kubeConfig.isPathValid)) {
-      return Boolean(config.kubeConfig.isPathValid);
-    }
-    return false;
+  (state: RootState) => state.config.kubeConfig.isPathValid,
+  isPathValid => {
+    return Boolean(isPathValid);
   }
 );
-
-export const selectCurrentKubeConfig = (state: RootState) => {
-  return state.config.kubeConfig;
-};
 
 export const registeredKindHandlersSelector = createSelector(
   (state: RootState) => state.main.registeredKindHandlers,

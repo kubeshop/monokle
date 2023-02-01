@@ -22,8 +22,13 @@ const createResourceSelector = <Storage extends ResourceStorage>(storage: Storag
       (state: RootState) => state.main.resourceContentMapByStorage[storage],
       (state: RootState, resourceId: string) => resourceId,
     ],
-    (resourceMetaMap, resourceContentMap, resourceId): K8sResource<Storage> => {
-      return joinK8sResource(resourceMetaMap[resourceId], resourceContentMap[resourceId]);
+    (resourceMetaMap, resourceContentMap, resourceId): K8sResource<Storage> | undefined => {
+      const meta = resourceMetaMap[resourceId];
+      const content = resourceContentMap[resourceId];
+      if (!meta || !content) {
+        return undefined;
+      }
+      return joinK8sResource(meta, content);
     }
   );
 };
@@ -122,6 +127,11 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
     if (!preview || preview.type !== 'kustomize') {
       return undefined;
     }
-    return joinK8sResource(resourceMetaMap[preview.kustomizationId], resourceContentMap[preview.kustomizationId]);
+    const meta = resourceMetaMap[preview.kustomizationId];
+    const content = resourceContentMap[preview.kustomizationId];
+    if (!meta || !content) {
+      return undefined;
+    }
+    return joinK8sResource(meta, content);
   }
 );
