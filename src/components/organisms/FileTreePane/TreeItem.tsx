@@ -11,12 +11,8 @@ import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 import path from 'path';
 
 import {useAppSelector} from '@redux/hooks';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  resourceMetaMapSelector,
-  selectedFilePathSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
@@ -79,7 +75,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(selectedFilePathSelector);
-  const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const git = useAppSelector(state => state.git);
 

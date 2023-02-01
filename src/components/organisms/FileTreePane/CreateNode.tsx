@@ -11,7 +11,6 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
-import {LocalOrigin} from '@shared/models/origin';
 
 import {TreeNode} from './types';
 
@@ -20,7 +19,7 @@ import * as S from './styled';
 export const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
-  resourceMetaMap: ResourceMetaMap<LocalOrigin>,
+  resourceMetaMap: ResourceMetaMap<'local'>,
   hideExcludedFilesInFileExplorer: boolean,
   hideUnsupportedFilesInFileExplorer: boolean,
   fileOrFolderContainedInFilter: string | undefined,

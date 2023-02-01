@@ -17,10 +17,10 @@ import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui'
 import {
   isInClusterModeSelector,
   isInPreviewModeSelectorNew,
-  resourceMetaMapSelector,
   selectedFilePathSelector,
   settingsSelector,
 } from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -62,10 +62,10 @@ const FileTreePane: React.FC = () => {
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
-  const localResourceMetaMap = useAppSelector(state => resourceMetaMapSelector(state, 'local'));
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const selectedPath = useAppSelector(selectedFilePathSelector);
   const localResourceSelection = useAppSelector(state =>
-    isResourceSelection(state.main.selection) && state.main.selection.resourceStorage === 'local'
+    isResourceSelection(state.main.selection) && state.main.selection.resourceIdentifier.storage === 'local'
       ? state.main.selection
       : undefined
   );
@@ -147,7 +147,7 @@ const FileTreePane: React.FC = () => {
 
   useEffect(() => {
     if (localResourceSelection && tree) {
-      const resource = localResourceMetaMap[localResourceSelection.resourceId];
+      const resource = localResourceMetaMap[localResourceSelection.resourceIdentifier.id];
 
       if (resource) {
         const filePath = resource.origin.filePath;

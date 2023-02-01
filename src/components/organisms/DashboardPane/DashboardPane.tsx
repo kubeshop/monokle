@@ -7,7 +7,8 @@ import navSectionNames from '@constants/navSectionNames';
 
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {registeredKindHandlersSelector, resourceMapSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {useSelectorWithRef} from '@utils/hooks';
@@ -26,7 +27,7 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const [, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
-  const [, clusterResourceMapRef] = useSelectorWithRef(state => resourceMapSelector(state, 'cluster'));
+  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
