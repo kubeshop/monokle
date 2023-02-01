@@ -7,7 +7,7 @@ import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
 import {VALIDATOR} from './validation.services';
-import {loadValidation} from './validation.thunks';
+import {loadValidation, validateResources} from './validation.thunks';
 
 export const validationSlice = createSlice({
   name: 'validation',
@@ -77,6 +77,13 @@ export const validationSlice = createSlice({
       if (state.loadRequestId !== meta.requestId) return;
       state.status = 'loaded';
       state.loadRequestId = undefined;
+    });
+
+    builder.addCase(validateResources.fulfilled, (state, action) => {
+      if (action.payload) {
+        // @ts-ignore
+        state.lastResponse = action.payload;
+      }
     });
   },
 });

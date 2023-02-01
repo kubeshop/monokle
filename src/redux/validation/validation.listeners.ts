@@ -1,6 +1,7 @@
 import {isAnyOf} from '@reduxjs/toolkit';
 
 import {AppListenerFn} from '@redux/listeners/base';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {toggleOPARules, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
@@ -40,4 +41,16 @@ const validateListener: AppListenerFn = listen => {
   });
 };
 
-export const validationListeners = [loadListener, validateListener];
+// TODO: this is a temporary solution to run validation after the root folder is set
+const runValidation: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(setRootFolder.fulfilled),
+    async effect(_action, {dispatch}) {
+      const loading = dispatch(loadValidation());
+      await loading;
+      dispatch(validateResources());
+    },
+  });
+};
+
+export const validationListeners = [loadListener, validateListener, runValidation];

@@ -375,7 +375,7 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
 
 export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource<'local'>[] {
   const fileContent = fileMap[relativePath].text || '';
-  return extractK8sResources(fileContent, 'local', {filePath: relativePath});
+  return extractK8sResources(fileContent, 'local', {filePath: relativePath, fileOffset: 0});
 }
 
 /**

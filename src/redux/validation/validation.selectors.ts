@@ -5,7 +5,10 @@ import {createSelector} from '@reduxjs/toolkit';
 import {useAppSelector} from '@redux/hooks';
 
 import {RuleLevel, ValidationResult, getFileId, getResourceId} from '@monokle/validation';
+import {RootState} from '@shared/models/rootState';
 import {ValidationState} from '@shared/models/validation';
+
+import {VALIDATOR} from './validation.services';
 
 export const useValidationSelector: TypedUseSelectorHook<ValidationState> = selector =>
   useAppSelector(state => selector(state.validation));
@@ -148,3 +151,9 @@ export const opaRuleCountSelector = (state: ValidationState) => {
     return sum + value;
   }, 0);
 };
+
+export const pluginEnabledSelector = createSelector(
+  (state: RootState, id: string) => state.validation.config?.plugins?.[id],
+  (_: RootState, id: string) => id,
+  (_config, id): boolean => VALIDATOR.getPlugin(id)?.enabled ?? false
+);

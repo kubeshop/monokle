@@ -43,7 +43,7 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
         id: rule.id,
         name: rule.name,
         shortDescription: rule.shortDescription.text,
-        fullDescription: `${rule.fullDescription.text} ${rule.help.text}`,
+        fullDescription: `${rule.fullDescription?.text} ${rule.help.text}`,
         learnMoreUrl: rule.helpUri,
         enabled,
         severity,

@@ -7,6 +7,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import initialState from '@redux/initialState';
 import {setAlert} from '@redux/reducers/alert';
+import {resourceContentMapSelector, resourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {joinK8sResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
@@ -20,6 +21,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
+import {processResourceRefs} from '@redux/validation/validation.thunks';
 
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -46,6 +48,7 @@ import {
   isLocalResource,
 } from '@shared/models/k8sResource';
 import {PreviewType} from '@shared/models/preview';
+import {RootState} from '@shared/models/rootState';
 import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -466,6 +469,7 @@ export const mainSlice = createSlice({
         if (resource) {
           resource.origin = {
             filePath: relativeFilePath,
+            fileOffset: 0, // TODO: get the correct offset
           };
           resource.range = resourcePayload.resourceRange;
 
@@ -505,6 +509,19 @@ export const mainSlice = createSlice({
 
     builder.addCase(updateFileEntries.fulfilled, (state, action) => {
       return action.payload;
+    });
+
+    // TODO: does this work properly?
+    builder.addCase(processResourceRefs.fulfilled, (state, action) => {
+      action.payload.forEach((resource: K8sResource) => {
+        const resourceMetaMap = resourceMetaMapSelector({main: state} as RootState, resource.storage);
+        const resourceContentMap = resourceContentMapSelector({main: state} as RootState, resource.storage);
+        const {meta, content} = splitK8sResource(resource);
+        if (resourceMetaMap && resourceContentMap) {
+          resourceMetaMap[resource.id] = meta;
+          resourceContentMap[resource.id] = content;
+        }
+      });
     });
 
     // TODO: how do we make this work with the new resource storage?

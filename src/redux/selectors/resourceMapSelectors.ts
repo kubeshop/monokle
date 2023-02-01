@@ -74,6 +74,23 @@ export const localResourceMetaMapSelector = createResourceMetaMapSelector('local
 export const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
 export const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
 export const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
+export const resourceMetaMapSelector = <Storage extends ResourceStorage>(
+  state: RootState,
+  storage: Storage
+): ResourceMetaMap<Storage> | undefined => {
+  if (storage === 'local') {
+    return localResourceMetaMapSelector(state) as ResourceMetaMap<Storage>;
+  }
+  if (storage === 'cluster') {
+    return clusterResourceMetaMapSelector(state) as ResourceMetaMap<Storage>;
+  }
+  if (storage === 'preview') {
+    return previewResourceMetaMapSelector(state) as ResourceMetaMap<Storage>;
+  }
+  if (storage === 'transient') {
+    return transientResourceMetaMapSelector(state) as ResourceMetaMap<Storage>;
+  }
+};
 export const activeResourceMetaMapSelector = createSelector(
   [
     (state: RootState) => state.main.resourceMetaMapByStorage,
@@ -102,6 +119,20 @@ export const localResourceContentMapSelector = createResourceContentMapSelector(
 export const clusterResourceContentMapSelector = createResourceContentMapSelector('cluster');
 export const previewResourceContentMapSelector = createResourceContentMapSelector('preview');
 export const transientResourceContentMapSelector = createResourceContentMapSelector('transient');
+export const resourceContentMapSelector = <Storage extends ResourceStorage>(state: RootState, storage: Storage) => {
+  if (storage === 'local') {
+    return localResourceContentMapSelector(state);
+  }
+  if (storage === 'cluster') {
+    return clusterResourceContentMapSelector(state);
+  }
+  if (storage === 'preview') {
+    return previewResourceContentMapSelector(state);
+  }
+  if (storage === 'transient') {
+    return transientResourceContentMapSelector(state);
+  }
+};
 export const activeResourceContentMapSelector = createSelector(
   [
     (state: RootState) => state.main.resourceContentMapByStorage,

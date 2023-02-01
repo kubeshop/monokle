@@ -68,6 +68,7 @@ export const updateFileEntry = createAsyncThunk(
 
             const extractedResources = extractK8sResources(payload.text, 'local', {
               filePath: filePath.substring(rootFolder.length),
+              fileOffset: 0,
             });
 
             // TODO: re-implement when we have @monokle/validation

@@ -84,7 +84,7 @@ async function fetchGitResources(state: RootState, options: GitResourceSet): Pro
   );
 
   return Object.entries(filesContent)
-    .flatMap(([filePath, content]) => extractK8sResources(content, 'local', {filePath}))
+    .flatMap(([filePath, content]) => extractK8sResources(content, 'local', {filePath, fileOffset: 0}))
     .filter(resource =>
       `${sep}${resource.origin.filePath.replaceAll('/', sep)}`.startsWith(
         options.folder === '<root>' ? '' : `${options.folder}${sep}`

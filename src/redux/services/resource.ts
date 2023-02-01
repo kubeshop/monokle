@@ -328,6 +328,15 @@ export function extractK8sResources<
         }
 
         const resourceObject = doc.toJS();
+        const rawFileOffset = lineCounter.linePos(doc.range[0]).line;
+        const fileOffset = rawFileOffset === 1 ? 0 : rawFileOffset;
+
+        const transformedOrigin = isLocalOrigin(origin)
+          ? {
+              ...origin,
+              fileOffset,
+            }
+          : origin;
 
         if (resourceObject && resourceObject.apiVersion && resourceObject.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
@@ -335,7 +344,7 @@ export function extractK8sResources<
           let resource: K8sResource<Storage> = {
             name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
             storage,
-            origin,
+            origin: transformedOrigin,
             id: (resourceObject.metadata && resourceObject.metadata.uid) || uuidv4(),
             kind: resourceObject.kind,
             apiVersion: resourceObject.apiVersion,
@@ -389,7 +398,7 @@ export function extractK8sResources<
           let resource: K8sResource<Storage> = {
             name: createResourceName(resourceObject, origin.filePath),
             storage,
-            origin,
+            origin: transformedOrigin,
             id: uuidv4(),
             kind: KUSTOMIZATION_KIND,
             apiVersion: KUSTOMIZATION_API_VERSION,

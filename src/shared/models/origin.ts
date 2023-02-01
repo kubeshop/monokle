@@ -8,7 +8,7 @@ import {AnyPreview, AnyPreviewRuntype} from './preview';
 
 export type LocalOrigin = {
   filePath: string;
-  // fileOffset: number;
+  fileOffset: number;
 };
 export type ClusterOrigin = {
   context: string;
@@ -29,6 +29,7 @@ export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientO
 export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
   storage: Rt.Literal('local'),
   filePath: Rt.String,
+  fileOffset: Rt.Number,
 });
 export const ClusterOriginRuntype: Rt.Runtype<ClusterOrigin> = Rt.Record({
   storage: Rt.Literal('cluster'),
