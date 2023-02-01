@@ -12,6 +12,7 @@ import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/mod
 
 import CompareSyncPane from '../CompareSyncPane';
 import SettingsPane from '../SettingsPane';
+import ValidationPane from '../ValidationPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
@@ -37,6 +38,15 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     tooltip: 'Compare resources',
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
+    useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+  },
+  {
+    type: 'panel',
+    name: 'validation',
+    tooltip: 'View validation errors',
+    icon: () => <Icon name="validation" />,
+    component: <ValidationPane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },

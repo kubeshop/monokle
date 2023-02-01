@@ -7,3 +7,4 @@ export {default as SettingsPane} from './SettingsPane';
 export {default as StartPage} from './StartPage';
 export {default as TemplateExplorer} from './TemplateExplorer';
 export {default as ValidationSettings} from './ValidationSettings';
+export {default as ValidationPane} from './ValidationPane';
