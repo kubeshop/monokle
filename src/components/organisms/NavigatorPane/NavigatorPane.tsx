@@ -1,18 +1,16 @@
-import {useMemo} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import {Badge, Button, Dropdown, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {isEmpty} from 'lodash';
-
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleResourceFilters} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector, isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
@@ -26,7 +24,6 @@ import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSec
 
 import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
 
 import * as S from './NavigatorPane.styled';
@@ -35,31 +32,26 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const hasAnyActiveResources = useAppSelector(state => !isEmpty(activeResourceMetaMapSelector(state)));
+  const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
-  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
+
+  const appliedFiltersCount = useAppSelector(state => {
+    return Object.entries(state.main.resourceFilter)
+      .map(([key, value]) => {
+        return {filterName: key, filterValue: value};
+      })
+      .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length;
+  });
 
   const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
-
-  const appliedFilters = useMemo(
-    () =>
-      Object.entries(resourceFilters)
-        .map(([key, value]) => {
-          return {filterName: key, filterValue: value};
-        })
-        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length),
-    [resourceFilters]
-  );
-
-  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
   const resourceFilterButtonHandler = () => {
     dispatch(toggleResourceFilters());
@@ -102,13 +94,13 @@ const NavPane: React.FC = () => {
                   </Dropdown>
                 </Tooltip>
 
-                <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                <Badge count={appliedFiltersCount} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
                     <Button
                       disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || !hasAnyActiveResources}
                       type="link"
                       size="small"
-                      icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                      icon={<FilterOutlined style={appliedFiltersCount ? {color: Colors.greenOkay} : {}} />}
                       onClick={resourceFilterButtonHandler}
                     />
                   </Tooltip>

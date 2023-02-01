@@ -12,7 +12,8 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {registeredKindHandlersSelector, resourceMapSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
@@ -73,7 +74,7 @@ const NewResourceWizard = () => {
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const localResourceMap = useAppSelector(state => resourceMapSelector(state, 'local'));
+  const localResourceMap = useAppSelector(localResourceMapSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const [namespaces] = useNamespaces({extra: ['none', 'default']});

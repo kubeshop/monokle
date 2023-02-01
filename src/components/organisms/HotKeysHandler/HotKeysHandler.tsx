@@ -24,8 +24,9 @@ import {
   kubeConfigPathSelector,
   rootFilePathSelector,
   selectedFilePathSelector,
-  selectedResourceWithMapSelector,
 } from '@redux/selectors';
+import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {stopPreview} from '@redux/services/preview';
@@ -40,6 +41,7 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
@@ -59,11 +61,15 @@ const HotKeysHandler = () => {
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const rootFilePath = useAppSelector(rootFilePathSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
-  const resourceMetaStorage = useAppSelector(state => state.main.resourceMetaStorage);
-  const imagesList = useAppSelector(state => state.main.imagesList);
-  const {selectedResource, resourceMap} = useAppSelector(selectedResourceWithMapSelector);
+  const selectedResource = useAppSelector(selectedResourceSelector);
+
+  const [, resourceMapRef] = useSelectorWithRef(state =>
+    selectedResource ? resourceMapSelector(state, selectedResource?.storage) : undefined
+  );
+  const [, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
+  const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
+  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -111,19 +117,28 @@ const HotKeysHandler = () => {
     if (selectedResource) {
       setIsApplyModalVisible(true);
     } else if (selectedFilePath) {
-      applyFileWithConfirm(selectedFilePath, fileMap, dispatch, kubeConfigPath, kubeConfigContext);
+      applyFileWithConfirm(selectedFilePath, fileMapRef.current, dispatch, kubeConfigPath, kubeConfigContext);
     }
-  }, [selectedResource, fileMap, kubeConfigPath, kubeConfigContext, selectedFilePath, dispatch]);
+  }, [selectedResource, fileMapRef, kubeConfigPath, kubeConfigContext, selectedFilePath, dispatch]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (!selectedResource || !resourceMap) {
+    if (!selectedResource || !resourceMapRef.current) {
       setIsApplyModalVisible(false);
       return;
     }
 
-    applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-      isInClusterMode,
-    });
+    applyResource(
+      selectedResource.id,
+      resourceMapRef.current,
+      fileMapRef.current,
+      dispatch,
+      projectConfig,
+      kubeConfigContext,
+      namespace,
+      {
+        isInClusterMode,
+      }
+    );
     setIsApplyModalVisible(false);
   };
 
@@ -206,11 +221,11 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
     selectFromHistory(
       'left',
-      selectionHistory.index,
-      selectionHistory.current,
-      resourceMetaStorage,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
   });
@@ -218,11 +233,11 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD.key, () => {
     selectFromHistory(
       'right',
-      selectionHistory.index,
-      selectionHistory.current,
-      resourceMetaStorage,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
   });

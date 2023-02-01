@@ -21,13 +21,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
 import {
-  activeResourceMapSelector,
   currentClusterAccessSelector,
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';

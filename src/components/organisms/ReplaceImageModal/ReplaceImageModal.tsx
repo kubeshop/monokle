@@ -4,7 +4,7 @@ import {Form, Input, Modal} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeReplaceImageModal} from '@redux/reducers/ui';
-import {activeResourceMapSelector} from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {replaceImageTag} from '@redux/thunks/replaceImageTag';
 
 const ReplaceImageModal: React.FC = () => {

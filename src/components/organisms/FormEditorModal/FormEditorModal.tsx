@@ -5,7 +5,7 @@ import {Button, Col, Modal, Row} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLastChangedLine} from '@redux/reducers/main';
-import {selectedResourceMetaSelector} from '@redux/selectors';
+import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 

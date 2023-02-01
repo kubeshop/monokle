@@ -9,11 +9,9 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resetResourceFilter, selectResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
-import {
-  activeResourceMetaMapSelector,
-  knownResourceKindsSelector,
-  selectedResourceMetaSelector,
-} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -21,7 +19,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceFilterType} from '@shared/models/appState';
-import {ResourceStorageKey} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -83,11 +81,10 @@ const applyFilterWithConfirm = (
 };
 
 const selectK8sResourceWithConfirm = (
-  identifier: {resourceId: string; resourceStorage: ResourceStorageKey},
+  resourceIdentifier: ResourceIdentifier,
   resourceName: string,
   dispatch: AppDispatch
 ) => {
-  const {resourceId, resourceStorage} = identifier;
   let title = `Are you sure you want to select ${resourceName}? It will reset the currently applied filters.`;
   Modal.confirm({
     title,
@@ -95,7 +92,7 @@ const selectK8sResourceWithConfirm = (
     onOk() {
       return new Promise(resolve => {
         dispatch(resetResourceFilter());
-        dispatch(selectResource({resourceId, resourceStorage}));
+        dispatch(selectResource({resourceIdentifier}));
         dispatch(closeQuickSearchActionsPopup());
         resolve({});
       });
@@ -140,7 +137,7 @@ const QuickSearchActionsV3: React.FC = () => {
   );
 
   const applyOption = useCallback(
-    (type: string, option: string, resourceStorage?: ResourceStorageKey) => {
+    (type: string, option: string, resourceStorage?: ResourceStorage) => {
       if (type === 'namespace' || type === 'kinds') {
         if (resourceFilter[type]) {
           if (resourceFilter[type] !== option) {
@@ -158,13 +155,13 @@ const QuickSearchActionsV3: React.FC = () => {
       } else if (type === 'resource' && resourceStorage) {
         if (!filteredResources[option]) {
           selectK8sResourceWithConfirm(
-            {resourceId: option, resourceStorage},
+            {id: option, storage: resourceStorage},
             activeResourceMetaMap[option].name,
             dispatch
           );
         } else {
           if (selectedResourceMeta?.id !== option) {
-            dispatch(selectResource({resourceId: option, resourceStorage}));
+            dispatch(selectResource({resourceIdentifier: {id: option, storage: resourceStorage}}));
           }
           dispatch(closeQuickSearchActionsPopup());
         }
@@ -257,7 +254,7 @@ const QuickSearchActionsV3: React.FC = () => {
           );
 
           filteredOpt.push({
-            value: `resource:${resourceEntry[0]}:${resourceEntry[1].origin.storage}`,
+            value: `resource:${resourceEntry[0]}:${resourceEntry[1].storage}`,
             label: optionLabel,
           });
         }
@@ -329,7 +326,7 @@ const QuickSearchActionsV3: React.FC = () => {
         onSearch={value => setSearchingValue(value)}
         onSelect={(value: string) => {
           // options are of type : `type:value`
-          applyOption(value.split(':')[0], value.split(':')[1], value.split(':')[2] as ResourceStorageKey);
+          applyOption(value.split(':')[0], value.split(':')[1], value.split(':')[2] as ResourceStorage);
         }}
         filterOption={(inputValue, opt) => {
           if (opt?.options?.length) {

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
-import {resourceMapSelector} from '@redux/selectors';
+import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceSelected} from '@redux/services/resource';
 import {renameResource} from '@redux/thunks/renameResource';
 
@@ -18,17 +18,15 @@ const CheckboxContainer = styled.div`
 
 const RenameResourceModel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const {isOpen, resourceId, resourceStorage} = useAppSelector(
-    state => state.ui.renameResourceModal || {isOpen: undefined, resourceId: undefined, resourceStorage: undefined}
+  const {isOpen, resourceIdentifier} = useAppSelector(
+    state => state.ui.renameResourceModal || {isOpen: undefined, resourceIdentifier: undefined}
   );
 
   const resourceMap = useAppSelector(state =>
-    resourceStorage ? resourceMapSelector(state, resourceStorage) : undefined
+    resourceIdentifier ? resourceMapSelector(state, resourceIdentifier.storage) : undefined
   );
   const isThisResourceSelected = useAppSelector(state =>
-    resourceId && resourceStorage
-      ? isResourceSelected({id: resourceId, storage: resourceStorage}, state.main.selection)
-      : undefined
+    resourceIdentifier ? isResourceSelected(resourceIdentifier, state.main.selection) : undefined
   );
   const [newResourceName, setNewResourceName] = useState<string>();
   const [resource, setResource] = useState<K8sResource>();
@@ -39,22 +37,22 @@ const RenameResourceModel: React.FC = () => {
   const inputNameRef = useRef<any>();
 
   useEffect(() => {
-    if (resourceId && resourceMap) {
-      const newResource = resourceMap[resourceId];
+    if (resourceIdentifier && resourceMap) {
+      const newResource = resourceMap[resourceIdentifier.id];
       if (newResource) {
         setResource(newResource);
         setNewResourceName(newResource.name);
       }
     }
-    if (!resourceId || isOpen === false) {
+    if (!resourceIdentifier || isOpen === false) {
       setResource(undefined);
       setNewResourceName(undefined);
     }
     setShouldUpdateRefs(false);
     inputNameRef?.current?.focus();
-  }, [resourceId, isOpen, resourceMap]);
+  }, [resourceIdentifier, isOpen, resourceMap]);
 
-  if (!resource || !resourceStorage || !resourceMap) {
+  if (!resource || !resourceIdentifier || !resourceMap) {
     return null;
   }
 
