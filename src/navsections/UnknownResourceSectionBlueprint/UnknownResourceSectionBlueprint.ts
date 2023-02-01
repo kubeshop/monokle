@@ -1,5 +1,5 @@
 import {selectResource} from '@redux/reducers/main';
-import {unknownResourcesSelector} from '@redux/selectors';
+import {unknownResourcesSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -81,11 +81,11 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     builder: {
       isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
       isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
-      isDirty: rawItem => rawItem.origin.storage === 'transient',
+      isDirty: rawItem => rawItem.storage === 'transient',
       isVisible: (rawItem, scope) => isResourcePassingFilter(rawItem, scope.resourceFilter),
       getMeta: rawItem => {
         return {
-          resourceStorage: rawItem.origin.storage,
+          resourceStorage: rawItem.storage,
         };
       },
     },
@@ -95,7 +95,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
         if (!resourceStorage) {
           return;
         }
-        dispatch(selectResource({resourceId: itemInstance.id, resourceStorage}));
+        dispatch(selectResource({resourceIdentifier: {id: itemInstance.id, storage: resourceStorage}}));
       },
     },
     customization: {
