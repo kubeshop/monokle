@@ -229,7 +229,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             return;
           }
           // TODO: the openResourceDiffModal will have to get the origin as well
-          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selection.resourceId});
+          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selection.resourceIdentifier});
         },
       },
     ],
@@ -262,7 +262,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             'left',
             state.main.selectionHistory.index,
             state.main.selectionHistory.current,
-            state.main.resourceMetaStorage,
+            state.main.resourceMetaMapByStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch
@@ -278,7 +278,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             'right',
             state.main.selectionHistory.index,
             state.main.selectionHistory.current,
-            state.main.resourceMetaStorage,
+            state.main.resourceMetaMapByStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch

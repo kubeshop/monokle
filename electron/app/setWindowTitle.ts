@@ -9,7 +9,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow, projectN
   }
 
   const preview = state.main.preview;
-  const localResourceMetaMap = state.main.resourceMetaStorage.local;
+  const localResourceMetaMap = state.main.resourceMetaMapByStorage.local;
   const clusterConnection = state.main.clusterConnection;
   const helmValuesMap = state.main.helmValuesMap;
   const helmChartMap = state.main.helmChartMap;
