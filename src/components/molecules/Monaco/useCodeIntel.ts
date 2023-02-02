@@ -21,7 +21,7 @@ import {
   ResourceFilterType,
 } from '@shared/models/appState';
 import {CurrentMatch} from '@shared/models/fileEntry';
-import {K8sResource, ResourceIdentifier, ResourceMetaMap} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
@@ -43,6 +43,7 @@ interface CodeIntelProps {
   helmValuesMap?: HelmValuesMapType;
   helmTemplatesMap?: HelmTemplatesMapType;
   matchOptions?: CurrentMatch | null;
+  activeResourceStorage: ResourceStorage;
 }
 
 function replaceInFile(matchOptions: CurrentMatch, editor: monaco.editor.IStandaloneCodeEditor, dispatch: AppDispatch) {
@@ -86,6 +87,7 @@ function useCodeIntel(props: CodeIntelProps) {
     helmTemplatesMap,
     matchOptions,
     isDirty,
+    activeResourceStorage,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -146,6 +148,7 @@ function useCodeIntel(props: CodeIntelProps) {
           resourceMetaMap,
           model: editor.getModel(),
           matchOptions,
+          activeResourceStorage,
         })
         .then(data => {
           if (!data) {

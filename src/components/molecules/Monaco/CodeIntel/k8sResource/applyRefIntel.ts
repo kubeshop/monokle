@@ -18,6 +18,7 @@ import {
   ResourceIdentifier,
   ResourceMeta,
   ResourceMetaMap,
+  ResourceStorage,
   isLocalResource,
   isPreviewResource,
   isTransientResource,
@@ -30,7 +31,8 @@ function applyRefIntel(
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
   selectImage: (imageId: string) => void,
   resourceMetaMap: ResourceMetaMap,
-  fileMap: FileMapType
+  fileMap: FileMapType,
+  activeResourceStorage: ResourceStorage
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   disposables: monaco.IDisposable[];
@@ -119,8 +121,7 @@ function applyRefIntel(
         }
 
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, 'Select resource', () => {
-          // @ts-ignore
-          selectResource(matchRef.target?.resourceId);
+          selectResource({id: (matchRef.target as any).resourceId, storage: activeResourceStorage});
         });
         commandMarkdownLinkList.push(commandMarkdownLink);
         newDisposables.push(commandDisposable);
@@ -135,8 +136,7 @@ function applyRefIntel(
           `${outgoingRefFile.name}`,
           'Select file',
           () => {
-            // @ts-ignore
-            selectFilePath(matchRef.target?.filePath);
+            selectFilePath((matchRef.target as any).filePath);
           }
         );
         commandMarkdownLinkList.push(commandMarkdownLink);

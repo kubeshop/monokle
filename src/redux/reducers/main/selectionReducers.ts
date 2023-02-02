@@ -27,7 +27,8 @@ export const selectResourceReducer = (
   payload: {resourceIdentifier: ResourceIdentifier; isVirtualSelection?: boolean}
 ) => {
   const identifier = payload.resourceIdentifier;
-  const resource = state.resourceMetaMapByStorage[identifier.storage][identifier.id];
+  const resourceMetaMap = state.resourceMetaMapByStorage[identifier.storage];
+  const resource = resourceMetaMap[identifier.id];
 
   if (!resource) {
     return;

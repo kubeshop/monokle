@@ -32,6 +32,7 @@ import {
 import {
   activeResourceContentMapSelector,
   activeResourceMetaMapSelector,
+  activeResourceStorageSelector,
   localResourceContentMapSelector,
   localResourceMetaMapSelector,
 } from '@redux/selectors/resourceMapSelectors';
@@ -97,6 +98,7 @@ const Monaco = (props: {
       : selectedResourceSelector(state)
   );
   const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
+  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
@@ -197,6 +199,7 @@ const Monaco = (props: {
     helmTemplatesMap,
     matchOptions,
     isDirty: isDirtyRef.current,
+    activeResourceStorage: activeResourceStorageRef.current,
   });
 
   const {registerStaticActions} = useEditorKeybindings(

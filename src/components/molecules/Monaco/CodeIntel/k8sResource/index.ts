@@ -24,6 +24,7 @@ export const resourceCodeIntel: CodeIntelApply = {
     fileMap,
     model,
     lastChangedLine,
+    activeResourceStorage,
   }) => {
     const disposables: monaco.IDisposable[] = [];
     const decorations: monaco.editor.IModelDeltaDecoration[] = [];
@@ -48,7 +49,8 @@ export const resourceCodeIntel: CodeIntelApply = {
       createResource,
       selectImageHandler,
       resourceMetaMap,
-      fileMap
+      fileMap,
+      activeResourceStorage
     );
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);

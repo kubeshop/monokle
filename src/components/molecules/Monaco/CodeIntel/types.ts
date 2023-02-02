@@ -9,7 +9,13 @@ import {
   ResourceFilterType,
 } from '@shared/models/appState';
 import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
-import {K8sResource, ResourceIdentifier, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMap,
+  ResourceStorage,
+} from '@shared/models/k8sResource';
 import {MonacoUiState} from '@shared/models/ui';
 
 export interface CodeIntelResponse {
@@ -45,6 +51,7 @@ export interface CodeIntelParams {
   model: monaco.editor.IModel | null;
   matchOptions?: CurrentMatch | null;
   lastChangedLine: number;
+  activeResourceStorage: ResourceStorage;
 }
 
 export interface CodeIntelApply {
