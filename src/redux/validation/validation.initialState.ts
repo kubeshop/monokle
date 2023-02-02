@@ -50,4 +50,5 @@ export const validationInitialState: ValidationState = {
   metadata: undefined,
   rules: undefined,
   status: 'uninitialized',
+  validationOverview: {},
 };

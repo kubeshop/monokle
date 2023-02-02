@@ -1,5 +1,3 @@
-import {LearnTopicType} from '@monokle/components/dist/types';
-
 import {Project, SavedCommand, SettingsPanel} from './config';
 import {ResourceIdentifier} from './k8sResource';
 
@@ -186,7 +184,6 @@ type UiState = {
   };
   startPageLearn: {
     isVisible: boolean;
-    learnTopic?: LearnTopicType;
   };
   templateExplorer: {
     isVisible: boolean;

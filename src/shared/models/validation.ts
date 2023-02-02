@@ -6,11 +6,17 @@ import type {
   RefPosition,
   RuleMetadataWithConfig,
   ValidationResponse,
+  ValidationResult,
 } from '@monokle/validation';
 
 import type {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
+
+export type SelectedProblem = {
+  problem: ValidationResult;
+  selectedFrom: 'resource' | 'file';
+};
 
 export type ValidationState = {
   config: Config;
@@ -26,6 +32,9 @@ export type ValidationState = {
    * The rule metadata and configuration for all plugins.
    */
   rules?: Record<PluginName, RuleMetadataWithConfig[]>;
+  validationOverview: {
+    selectedProblem?: SelectedProblem;
+  };
 };
 
 export type ResourceValidationError = {

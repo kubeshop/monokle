@@ -1,6 +1,8 @@
 import {Image} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
+import {useValidationSelector} from '@redux/validation/validation.selectors';
+import {setSelectedProblem} from '@redux/validation/validation.slice';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
@@ -9,7 +11,9 @@ import {TitleBar, ValidationOverview} from '@monokle/components';
 import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
-  const lastResponse = useAppSelector(state => state.validation.lastResponse);
+  const dispatch = useAppDispatch();
+  const lastResponse = useValidationSelector(state => state.lastResponse);
+  const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
 
   if (!lastResponse) {
     return null;
@@ -29,7 +33,11 @@ const ValidationPane: React.FC = () => {
         }
       />
 
-      <ValidationOverview validationResponse={lastResponse} />
+      <ValidationOverview
+        selectedProblem={selectedProblem}
+        validationResponse={lastResponse}
+        onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
+      />
     </S.ValidationPaneContainer>
   );
 };
