@@ -235,13 +235,10 @@ const PageHeader = () => {
         </div>
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
-          {projectRootFolder && (
-            <>
-              <OPAChip />
-              <K8sVersionSelection />
-            </>
-          )}
+          {projectRootFolder && <OPAChip />}
+          <K8sVersionSelection />
           <ClusterSelection />
+
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">
               <S.BellOutlined onClick={toggleNotificationsDrawer} />

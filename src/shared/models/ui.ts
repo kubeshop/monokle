@@ -193,6 +193,8 @@ type UiState = {
   isInQuickClusterMode?: boolean;
 };
 
+type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
+
 export type {
   LayoutSizeType,
   LeftMenuBottomSelectionType,
@@ -207,4 +209,5 @@ export type {
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
+  LearnTopicType,
 };

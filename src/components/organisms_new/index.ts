@@ -1,5 +1,6 @@
 export {default as CompareSyncPane} from './CompareSyncPane';
 export {default as CreateProjectModal} from './CreateProjectModal';
+export {default as LearnPage} from './LearnPage';
 export {default as NavigatorPane} from './NavigatorPane';
 export {default as NewProject} from './NewProject';
 export {default as PaneManager} from './PaneManager';

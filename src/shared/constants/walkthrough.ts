@@ -8,7 +8,7 @@ import publishStep2 from '@assets/walkthrough/publish_step2.svg';
 import validateStep1 from '@assets/walkthrough/validate_step1.svg';
 import validateStep2 from '@assets/walkthrough/validate_step2.svg';
 
-import {LearnTopicType} from '@monokle/components';
+import {LearnTopicType} from '@shared/models';
 
 export const WALK_THROUGH_STEPS: Record<LearnTopicType, {index: number; src: string}[]> = {
   explore: [
