@@ -1,29 +1,16 @@
-import {useCallback, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {PlusOutlined, SendOutlined, SettingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {useAppDispatch} from '@redux/hooks';
-import {setStartPageLearnTopic} from '@redux/reducers/ui';
-
-import {NewProject, SettingsPane} from '@organismsNew';
+import {LearnPage, NewProject, SettingsPane} from '@organismsNew';
 
 import {ProjectsList} from '@moleculesNew';
 
-import {Icon, LearnPage, LearnTopicType} from '@monokle/components';
-import {openDiscord, openDocumentation, openTutorialVideo} from '@shared/utils/shell';
+import {Icon} from '@monokle/components';
 
 export function useStartPageOptions() {
-  const dispatch = useAppDispatch();
-
-  const onLearnCardClickHandler = useCallback(
-    (topic: LearnTopicType) => {
-      dispatch(setStartPageLearnTopic(topic));
-    },
-    [dispatch]
-  );
-
   const options = useMemo(
     () => ({
       'recent-projects': {
@@ -59,24 +46,11 @@ export function useStartPageOptions() {
       learn: {
         icon: null,
         label: 'Learn',
-        content: (
-          <LearnPage
-            onHelpfulResourceCardClick={topic => {
-              if (topic === 'documentation') {
-                openDocumentation();
-              } else if (topic === 'discord') {
-                openDiscord();
-              } else if (topic === 'video-tutorial') {
-                openTutorialVideo();
-              }
-            }}
-            onLearnCardClick={onLearnCardClickHandler}
-          />
-        ),
+        content: <LearnPage />,
         title: 'Learn',
       },
     }),
-    [onLearnCardClickHandler]
+    []
   );
 
   return options;

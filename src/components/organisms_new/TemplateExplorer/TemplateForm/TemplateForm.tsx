@@ -149,8 +149,11 @@ const TemplateForm: React.FC<IProps> = props => {
         ) : activeForm ? (
           <TemplateFormRenderer
             key={activeFormIndex}
+            defaultFormData={currentFormDataList[activeFormIndex]}
+            isFirstForm={activeFormIndex === 0}
             isLastForm={activeFormIndex === template.forms.length - 1}
             templateForm={activeForm}
+            onBackHandler={() => setActiveFormIndex(prev => prev - 1)}
             onSubmit={formData => {
               setFormData(activeFormIndex, formData);
             }}

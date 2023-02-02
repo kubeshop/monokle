@@ -73,7 +73,7 @@ const NavPane: React.FC = () => {
         <TitleBarWrapper>
           <TitleBar
             type="secondary"
-            title="Resources"
+            title="Kubernetes Resources"
             description={
               <div style={{display: 'flex', alignItems: 'center'}}>
                 <WarningsAndErrorsDisplay /> <OPAValidationStatus />
