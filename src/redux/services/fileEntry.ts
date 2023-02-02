@@ -66,19 +66,17 @@ interface CreateFileEntryArgs {
   fileEntryPath: string;
   fileMap: FileMapType;
   helmChartId?: string;
-  text?: string;
   extension: string;
 }
 
 // TODO: Maybe text shouldn't be optional
-export function createFileEntry({fileEntryPath, fileMap, helmChartId, text, extension}: CreateFileEntryArgs) {
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     isExcluded: false,
     isSupported: false,
     helmChartId,
-    text,
     extension,
   };
 
@@ -136,12 +134,12 @@ export function getRootFolder(fileMap: FileMapType) {
  * if all contained resources are supported
  */
 
-export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType): K8sResource<'local'>[] {
+export function extractResourcesForFileEntry(fileEntry: FileEntry, rootFolderPath: string): K8sResource<'local'>[] {
   const result: K8sResource<'local'>[] = [];
 
   try {
     fileEntry.isSupported = true;
-    extractK8sResourcesFromFile(fileEntry.filePath, fileMap).forEach(resource => {
+    extractK8sResourcesFromFile(fileEntry.filePath, rootFolderPath).forEach(resource => {
       // TODO: shouldn't we filter out resources that are not supported?
       if (!hasSupportedResourceContent(resource)) {
         fileEntry.isSupported = false;
@@ -211,23 +209,24 @@ export function readFiles(
       )
     );
   } else {
+    // TODO: we should also filter files from .gitignore
     filterGitFolder(files).forEach(file => {
-      let text;
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
 
       const isDir = getFileStats(filePath)?.isDirectory();
 
       const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
-      const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
-
-      if (!isDir && !isExcluded && isIncluded) {
-        text = fs.readFileSync(path.join(filePath), 'utf8');
-      }
+      // const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
 
       let extension = isDir ? '' : path.extname(fileEntryPath);
 
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, text});
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension});
+      // TODO: should we handle these differenly?
+      // fileEntry.isExcluded = Boolean(isExcluded);
+      // fileEntry.isSupported = Boolean(isIncluded);
+
+      console.log(fileEntry.name, isExcluded);
 
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
@@ -263,7 +262,8 @@ export function readFiles(
           fileMap,
         });
       } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, fileMap);
+        console.log('Extracting resources for file entry: ', fileEntry.name);
+        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
           const {meta, content} = splitK8sResource(resource);
           resourceMetaMap[meta.id] = meta;
@@ -373,8 +373,9 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource<'local'>[] {
-  const fileContent = fileMap[relativePath].text || '';
+export function extractK8sResourcesFromFile(relativePath: string, rootFolderPath: string): K8sResource<'local'>[] {
+  const fileContent = fs.readFileSync(path.join(rootFolderPath, relativePath), 'utf8');
+  console.log({relativePath, fileContent});
   return extractK8sResources(fileContent, 'local', {filePath: relativePath, fileOffset: 0});
 }
 
@@ -453,6 +454,8 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
   );
   let wasAnyResourceSelected = false;
 
+  const rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+
   // delete old resources in file since we can't be sure the updated file contains the same resource(s)
   existingResourcesFromFile.forEach(resource => {
     if (
@@ -474,7 +477,7 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
 
   // TODO: when resources from file are reloaded, they will have to be reprocessed by the validation listener
 
-  const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
+  const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolderPath);
   newResourcesFromFile.forEach(resource => {
     const {meta, content} = splitK8sResource(resource);
     state.resourceMetaMapByStorage.local[meta.id] = meta;
@@ -509,10 +512,10 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     return;
   }
 
-  const fileStats = getFileStats(absolutePath);
-  if (fileStats && fileStats.isFile()) {
-    fileEntry.text = fs.readFileSync(absolutePath, 'utf-8');
-  }
+  // const fileStats = getFileStats(absolutePath);
+  // if (fileStats && fileStats.isFile()) {
+  //   fileEntry.text = fs.readFileSync(absolutePath, 'utf-8');
+  // }
   fileEntry.timestamp = absolutePathTimestamp;
   let wasFileSelected = state.selection?.type === 'file' && state.selection.filePath === fileEntry.filePath;
 
@@ -619,9 +622,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
-  const fileText = fs.readFileSync(absolutePath, 'utf8');
   const extension = path.extname(absolutePath);
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, text: fileText, extension});
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, extension});
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
@@ -637,7 +639,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   }
   // seems to be a regular manifest file
   else {
-    const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
+    const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolderEntry.filePath);
     resourcesFromFile.forEach(resource => {
       const {meta, content} = splitK8sResource(resource);
       state.resourceMetaMapByStorage.local[meta.id] = meta;
