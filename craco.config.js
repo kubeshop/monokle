@@ -1,4 +1,4 @@
-const CracoAlias = require('craco-alias');
+const {CracoAliasPlugin} = require('react-app-alias-ex');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
@@ -7,7 +7,24 @@ const path = require('path');
 
 module.exports = {
   webpack: {
-    plugins: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})],
+    plugins: {
+      add: [
+        new MonacoWebpackPlugin({
+          languages: ['yaml'],
+          globalAPI: true,
+          customLanguages: [
+            {
+              label: 'yaml',
+              entry: 'monaco-yaml',
+              worker: {
+                id: 'monaco-yaml/yamlWorker',
+                entry: 'monaco-yaml/yaml.worker',
+              },
+            },
+          ],
+        }),
+      ],
+    },
     configure: webpackConfig => {
       webpackConfig.node = {__dirname: false};
       webpackConfig.target = 'electron-renderer';
@@ -44,14 +61,8 @@ module.exports = {
   },
   plugins: [
     {
-      plugin: CracoAlias,
-      options: {
-        source: 'tsconfig',
-        baseUrl: './',
-        tsConfigPath: './paths.json',
-        unsafeAllowModulesOutsideOfSrc: false,
-        debug: false,
-      },
+      plugin: CracoAliasPlugin,
+      options: {},
     },
     {
       plugin: CracoLessPlugin,

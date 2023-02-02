@@ -1,12 +1,17 @@
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
+import {isInClusterModeSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationPreviewed, isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ResourceFilterType, ResourceMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
+import {AnyPreview} from '@shared/models/preview';
+import {AppSelection} from '@shared/models/selection';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -18,45 +23,42 @@ import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay
 import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationScopeType = {
-  resourceMap: ResourceMapType;
-  previewResourceId: string | undefined;
+  localResourceMetaMap: ResourceMetaMap<'local'>;
   resourceFilters: ResourceFilterType;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
-  selectedPath: string | undefined;
-  selectedResourceId: string | undefined;
+  selection: AppSelection | undefined;
+  highlights: AppSelection[] | undefined;
+  preview: AnyPreview | undefined;
   isPreviewLoading: boolean;
   isKustomizationPreview: boolean;
 };
 
 export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
 
-const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
+const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, KustomizationScopeType> = {
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
-    const kubeConfigPath = state.config.kubeConfig.path;
     return {
-      resourceMap: state.main.resourceMap,
-      previewResourceId: state.main.previewResourceId,
+      localResourceMetaMap: localResourceMetaMapSelector(state),
       resourceFilters: state.main.resourceFilter,
+      isInClusterMode: isInClusterModeSelector(state),
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
-      isInClusterMode: kubeConfigPath
-        ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
-        : false,
-      selectedPath: state.main.selectedPath,
-      selectedResourceId: state.main.selectedResourceId,
-      isPreviewLoading: state.main.previewLoader.isLoading,
-      isKustomizationPreview: state.main.previewType === 'kustomization',
+      selection: state.main.selection,
+      highlights: state.main.highlights,
+      preview: state.main.preview,
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
+      isKustomizationPreview: state.main.preview?.type === 'kustomize',
     };
   },
   builder: {
     getRawItems: scope => {
-      return Object.values(scope.resourceMap)
+      return Object.values(scope.localResourceMetaMap)
         .filter(i => isKustomizationResource(i))
         .sort((a, b) => a.name.localeCompare(b.name));
     },
@@ -85,18 +87,26 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
-      isHighlighted: rawItem => rawItem.isHighlighted,
+      isSelected: (rawItem, scope) =>
+        isResourceSelected(rawItem, scope.selection) || isKustomizationPreviewed(rawItem, scope.preview),
+      isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
       isDisabled: (rawItem, scope) =>
         Boolean(
-          (scope.previewResourceId && scope.previewResourceId !== rawItem.id) ||
+          (scope.preview?.type === 'kustomize' && scope.preview.kustomizationId !== rawItem.id) ||
             scope.isInClusterMode ||
-            !isResourcePassingFilter(scope.resourceMap[rawItem.id], scope.resourceFilters)
+            !isResourcePassingFilter(rawItem, scope.resourceFilters)
         ),
+      getMeta: rawItem => {
+        return {
+          resourceStorage: rawItem.storage,
+        };
+      },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        dispatch(selectK8sResource({resourceId: itemInstance.id}));
+        dispatch(
+          selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta.resourceStorage}})
+        );
       },
     },
     customization: {

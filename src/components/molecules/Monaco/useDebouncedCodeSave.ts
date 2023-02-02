@@ -1,67 +1,46 @@
+import {useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
-import {useDebounce} from 'react-use';
 
+import {debounce} from 'lodash';
 import log from 'loglevel';
-
-import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMetaMap} from '@shared/models/k8sResource';
 
 function useDebouncedCodeSave(
-  editor: monaco.editor.IStandaloneCodeEditor | null,
-  orgCode: string,
-  code: string,
-  isDirty: boolean,
-  isValid: boolean,
-  resourceMap: ResourceMapType,
-  selectedResourceId: string | undefined,
-  selectedPath: string | undefined,
-  setOrgCode: (newOrgCode: string) => void
+  editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>,
+  originalCodeRef: React.MutableRefObject<string>,
+  resourceMetaMapRef: React.MutableRefObject<ResourceMetaMap>,
+  selectedResourceIdRef: React.MutableRefObject<string | undefined>,
+  selectedPathRef: React.MutableRefObject<string | undefined>
 ) {
   const dispatch = useAppDispatch();
-  const saveContent = () => {
-    let value = null;
-    if (editor) {
-      value = editor.getValue();
-    } else {
-      return;
-    }
+  const debouncedSaveContent = useRef(
+    debounce((code: string) => {
+      // is a file and no resource selected?
+      if (selectedPathRef.current && !selectedResourceIdRef) {
+        try {
+          dispatch(updateFileEntry({path: selectedPathRef.current, text: code}));
 
-    // is a file and no resource selected?
-    if (selectedPath && !selectedResourceId) {
-      try {
-        dispatch(updateFileEntry({path: selectedPath, text: value}));
-
-        setOrgCode(value);
-      } catch (e) {
-        log.warn(`Failed to update file ${e}`, dispatch);
+          originalCodeRef.current = code;
+        } catch (e) {
+          log.warn(`Failed to update file ${e}`, dispatch);
+        }
+      } else if (selectedResourceIdRef.current && resourceMetaMapRef.current[selectedResourceIdRef.current]) {
+        try {
+          dispatch(updateResource({resourceId: selectedResourceIdRef.current, text: code.toString()}));
+          originalCodeRef.current = code;
+        } catch (e) {
+          log.warn(`Failed to update resource ${e}`, dispatch);
+        }
       }
-    } else if (selectedResourceId && resourceMap[selectedResourceId]) {
-      try {
-        dispatch(updateResource({resourceId: selectedResourceId, text: value.toString()}));
-        setOrgCode(value);
-      } catch (e) {
-        log.warn(`Failed to update resource ${e}`, dispatch);
-      }
-    }
-  };
-
-  useDebounce(
-    () => {
-      if (!isDirty || !isValid) {
-        return;
-      }
-      if (orgCode !== undefined && code !== undefined && orgCode !== code) {
-        saveContent();
-      }
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [code]
+    }, 500)
   );
+
+  return debouncedSaveContent;
 }
 
 export default useDebouncedCodeSave;

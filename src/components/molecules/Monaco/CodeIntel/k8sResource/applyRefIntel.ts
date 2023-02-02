@@ -1,8 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {areRefPosEqual, isPreviewResource, isUnsavedResource} from '@redux/services/resource';
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from '@molecules/Monaco/editorConstants';
 import {
@@ -14,22 +12,32 @@ import {
   createMarkdownString,
 } from '@molecules/Monaco/editorHelpers';
 
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
-import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
+import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual, isUnsatisfiedRef} from '@monokle/validation';
+import {FileMapType} from '@shared/models/appState';
+import {
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMap,
+  ResourceStorage,
+  isLocalResource,
+  isPreviewResource,
+  isTransientResource,
+} from '@shared/models/k8sResource';
 
 function applyRefIntel(
-  resource: K8sResource,
-  selectResource: (resourceId: string) => void,
+  resourceMeta: ResourceMeta,
+  selectResource: (resourceIdentifier: ResourceIdentifier) => void,
   selectFilePath: (filePath: string) => void,
-  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
   selectImage: (imageId: string) => void,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType
+  resourceMetaMap: ResourceMetaMap,
+  fileMap: FileMapType,
+  activeResourceStorage: ResourceStorage
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   disposables: monaco.IDisposable[];
 } {
-  const refs = resource.refs ?? [];
+  const refs = resourceMeta.refs ?? [];
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
 
@@ -85,7 +93,11 @@ function applyRefIntel(
             `Create ${matchRef.target.resourceKind}`,
             'Create Resource',
             () => {
-              createResource(matchRef, resource.namespace, getResourceFolder(resource));
+              createResource(
+                matchRef,
+                resourceMeta.namespace,
+                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
+              );
             }
           );
           commandMarkdownLinkList.push(commandMarkdownLink);
@@ -94,19 +106,22 @@ function applyRefIntel(
       }
       // add command for navigating to resource
       else if (matchRef.target.type === 'resource' && matchRef.target.resourceId) {
-        const outgoingRefResource = resourceMap[matchRef.target.resourceId];
-        if (!outgoingRefResource) {
+        const outgoingRefResourceMeta = resourceMetaMap[matchRef.target.resourceId];
+        if (!outgoingRefResourceMeta) {
           return;
         }
 
-        let text = `${outgoingRefResource.kind}: ${outgoingRefResource.name}`;
-        if (!isPreviewResource(outgoingRefResource) && !isUnsavedResource(outgoingRefResource)) {
-          text += ` in ${outgoingRefResource.filePath}`;
+        let text = `${outgoingRefResourceMeta.kind}: ${outgoingRefResourceMeta.name}`;
+        if (
+          !isPreviewResource(outgoingRefResourceMeta) &&
+          !isTransientResource(outgoingRefResourceMeta) &&
+          isLocalResource(outgoingRefResourceMeta)
+        ) {
+          text += ` in ${outgoingRefResourceMeta.origin.filePath}`;
         }
 
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, 'Select resource', () => {
-          // @ts-ignore
-          selectResource(matchRef.target?.resourceId);
+          selectResource({id: (matchRef.target as any).resourceId, storage: activeResourceStorage});
         });
         commandMarkdownLinkList.push(commandMarkdownLink);
         newDisposables.push(commandDisposable);
@@ -121,8 +136,7 @@ function applyRefIntel(
           `${outgoingRefFile.name}`,
           'Select file',
           () => {
-            // @ts-ignore
-            selectFilePath(matchRef.target?.filePath);
+            selectFilePath((matchRef.target as any).filePath);
           }
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
@@ -182,9 +196,14 @@ function applyRefIntel(
             : 'Open resource',
           () => {
             if (isUnsatisfiedRef(matchRef.type) && createResource) {
-              createResource(matchRef, resource.namespace, getResourceFolder(resource));
+              createResource(
+                matchRef,
+                resourceMeta.namespace,
+                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
+              );
             } else if (matchRef.target?.type === 'resource' && matchRef.target.resourceId) {
-              selectResource(matchRef.target.resourceId);
+              // is the storage of the target resource the same as the current resource?
+              selectResource({id: matchRef.target.resourceId, storage: resourceMeta.storage});
             } else if (matchRef.target?.type === 'file' && matchRef.target.filePath) {
               selectFilePath(matchRef.target.filePath);
             } else if (matchRef.target?.type === 'image') {

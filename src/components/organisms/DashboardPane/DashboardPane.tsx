@@ -1,17 +1,21 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useMount} from 'react-use';
 
 import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {setActiveDashboardMenu, setDashboardMenuList, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {DashboardMenu} from '@shared/models/dashboard';
-import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -22,38 +26,34 @@ import * as S from './DashboardPane.style';
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
-  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedNamespace = useAppSelector(state => state.config.clusterPreviewNamespace);
+  const [, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
+  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
+  const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
-  const [filteredMenu, setFilteredMenu] = useState<any>([]);
   const [filterText, setFilterText] = useState<string>('');
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
-  useEffect(() => {
+  const filteredMenu = useMemo(() => {
     if (!filterText) {
-      setFilteredMenu(menuList);
-      return;
+      return menuListRef.current;
     }
-
-    setFilteredMenu(
-      menuList
-        .map((menuItem: DashboardMenu) => ({
-          ...menuItem,
-          children: menuItem.children?.filter((m: DashboardMenu) =>
-            m.label.toLowerCase().includes(filterText.toLowerCase())
-          ),
-        }))
-        .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
-        .filter(
-          (menuItem: DashboardMenu) =>
-            menuItem.children &&
-            menuItem.children?.reduce(
-              (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-              0
-            ) > 0
-        )
-    );
-  }, [filterText, menuList]);
+    return menuListRef.current
+      .map((menuItem: DashboardMenu) => ({
+        ...menuItem,
+        children: menuItem.children?.filter((m: DashboardMenu) =>
+          m.label.toLowerCase().includes(filterText.toLowerCase())
+        ),
+      }))
+      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
+      .filter(
+        (menuItem: DashboardMenu) =>
+          menuItem.children &&
+          menuItem.children?.reduce(
+            (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
+            0
+          ) > 0
+      );
+  }, [filterText, menuListRef]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -111,43 +111,46 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getRegisteredKindHandlers(), leftMenu, selectedNamespace, resourceMap]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMapRef]);
 
-  useEffect(() => {
+  useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-  }, [dispatch]);
+  });
 
-  const setActiveMenu = (menuItem: DashboardMenu) => {
-    trackEvent('dashboard/selectKind', {kind: menuItem.key});
-    dispatch(setActiveDashboardMenu(menuItem));
-    dispatch(setSelectedResourceId());
-  };
+  const setActiveMenu = useCallback(
+    (menuItem: DashboardMenu) => {
+      trackEvent('dashboard/selectKind', {kind: menuItem.key});
+      dispatch(setActiveDashboardMenu(menuItem));
+      dispatch(setDashboardSelectedResourceId());
+    },
+    [dispatch]
+  );
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(r => r.kind === kind).length;
+      return Object.values(clusterResourceMapRef.current).filter(r => r.kind === kind).length;
     },
-    [resourceMap]
+    [clusterResourceMapRef]
   );
 
+  // TODO: refactor after @monokle/validation integration
   const getErrorCount = useCallback(
     (kind: string) => {
-      return Object.values(resourceMap)
-        .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-        .filter(resource => resource.kind === kind)
-        .reduce((total: number, resource: K8sResource) => {
-          if (resource.issues && resource.issues.errors) {
-            total += resource.issues.errors.length;
-          }
-          if (resource.validation && resource.validation.errors) {
-            total += resource.validation.errors.length;
-          }
-          return total;
-        }, 0);
+      // return Object.values(clusterResourceMap)
+      //   .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      //   .filter(resource => resource.kind === kind)
+      //   .reduce((total: number, resource: K8sResource) => {
+      //     if (resource.issues && resource.issues.errors) {
+      //       total += resource.issues.errors.length;
+      //     }
+      //     if (resource.validation && resource.validation.errors) {
+      //       total += resource.validation.errors.length;
+      //     }
+      //     return total;
+      //   }, 0);
+      return 0;
     },
-    [resourceMap]
+    [clusterResourceMapRef]
   );
 
   return (
@@ -181,8 +184,9 @@ const DashboardPane = () => {
               $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1}
               $active={activeMenu.key === parent.key}
               onClick={() =>
-                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1 &&
-                setActiveMenu(parent)
+                ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === parent.key) > -1
+                  ? setActiveMenu(parent)
+                  : undefined
               }
             >
               {parent.key === 'Overview' && <FundProjectionScreenOutlined style={{marginRight: '8px'}} />}

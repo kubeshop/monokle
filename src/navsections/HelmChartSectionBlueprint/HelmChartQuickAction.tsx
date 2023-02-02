@@ -7,7 +7,12 @@ import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} fr
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {selectHelmConfig, selectHelmValues} from '@redux/selectors';
+import {
+  previewedHelmConfigSelector,
+  previewedValuesFileSelector,
+  selectHelmValues,
+  selectedHelmValuesSelector,
+} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
@@ -22,29 +27,29 @@ import {defineHotkey} from '@shared/utils/hotkey';
 import * as S from './HelmChartQuickAction.styled';
 
 const selectQuickActionData = (state: RootState, itemId: string) => {
+  const previewedHelmValuesFile = previewedValuesFileSelector(state);
+  const previewedHelmConfig = previewedHelmConfigSelector(state);
   const thisValuesFile = selectHelmValues(state.main, itemId);
   invariant(thisValuesFile, 'values not found');
 
-  const selectedValuesFile = selectHelmValues(state.main, state.main.selectedPreviewConfigurationId);
-  const previewingHelmValues = selectHelmValues(state.main, state.main.previewValuesFileId);
-  const previewingHelmConfig = selectHelmConfig(state, state.main.previewConfigurationId);
+  const selectedHelmValues = selectedHelmValuesSelector(state);
 
-  const isAnyPreviewing = isDefined(previewingHelmValues) || isDefined(previewingHelmConfig);
-  const isThisPreviewing = itemId === previewingHelmValues?.id;
-  const isThisSelected = thisValuesFile?.id === selectedValuesFile?.id;
+  const isAnyPreviewing = isDefined(previewedHelmValuesFile) || isDefined(previewedHelmConfig);
+  const isThisPreviewing = itemId === previewedHelmValuesFile?.id;
+  const isThisSelected = thisValuesFile?.id === selectedHelmValues?.id;
   const isFiltered = !thisValuesFile.filePath.startsWith(state.main.resourceFilter.fileOrFolderContainedIn || '');
 
-  const previewingResourceSet: ResourceSet | undefined = previewingHelmConfig
+  const previewingResourceSet: ResourceSet | undefined = previewedHelmConfig
     ? {
         type: 'helm-custom',
         chartId: thisValuesFile.helmChartId,
-        configId: previewingHelmConfig.id,
+        configId: previewedHelmConfig.id,
       }
-    : previewingHelmValues
+    : previewedHelmValuesFile
     ? {
         type: 'helm',
-        chartId: previewingHelmValues.helmChartId,
-        valuesId: previewingHelmValues.id,
+        chartId: previewedHelmValuesFile.helmChartId,
+        valuesId: previewedHelmValuesFile.id,
       }
     : undefined;
 
@@ -57,24 +62,26 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   const {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} =
     useAppSelector(state => selectQuickActionData(state, itemInstance.id));
 
+  const helmValuesFile = useAppSelector(state => state.main.helmValuesMap[itemInstance.id]);
+
   const selectAndPreviewHelmValuesFile = useCallback(() => {
     if (!isThisSelected) {
       dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
     }
     if (!isThisPreviewing) {
-      startPreview(itemInstance.id, 'helm', dispatch);
+      startPreview({type: 'helm', valuesFileId: itemInstance.id, chartId: helmValuesFile.helmChartId}, dispatch);
     } else {
       stopPreview(dispatch);
     }
-  }, [isThisSelected, isThisPreviewing, dispatch, itemInstance.id]);
+  }, [isThisSelected, isThisPreviewing, itemInstance.id, helmValuesFile.helmChartId, dispatch]);
 
   const reloadPreview = useCallback(() => {
     if (!isThisSelected) {
       dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
     }
 
-    restartPreview(itemInstance.id, 'helm', dispatch);
-  }, [isThisSelected, itemInstance.id, dispatch]);
+    restartPreview({type: 'helm', valuesFileId: itemInstance.id, chartId: helmValuesFile.helmChartId}, dispatch);
+  }, [isThisSelected, itemInstance.id, helmValuesFile.helmChartId, dispatch]);
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();

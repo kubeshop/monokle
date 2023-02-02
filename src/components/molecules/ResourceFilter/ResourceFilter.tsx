@@ -13,8 +13,13 @@ import {ResetFiltersTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
-import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {
+  allResourceAnnotationsSelector,
+  allResourceKindsSelector,
+  allResourceLabelsSelector,
+} from '@redux/selectors/resourceMapSelectors';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {InputTags, KeyValueInput} from '@atoms';
 
@@ -22,7 +27,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 
@@ -46,39 +51,26 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
+  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const allResourceKinds = useMemo(() => {
-    return [
-      ...new Set([
-        ...knownResourceKinds,
-        ...Object.values(resourceMap)
-          .filter(r => !knownResourceKinds.includes(r.kind))
-          .map(r => r.kind),
-      ]),
-    ].sort();
-  }, [knownResourceKinds, resourceMap]);
+  const allResourceKinds = useAppSelector(allResourceKindsSelector);
+  const allResourceLabels = useAppSelector(allResourceLabelsSelector);
+  const allResourceAnnotations = useAppSelector(allResourceAnnotationsSelector);
 
-  const allLabelsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
-  }, [resourceMap]);
-  const allLabelsSchema = useMemo(() => mapValues(allLabelsData, () => 'string'), [allLabelsData]);
-
-  const allAnnotationsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
-  }, [resourceMap]);
-  const allAnnotationsSchema = useMemo(() => mapValues(allAnnotationsData, () => 'string'), [allAnnotationsData]);
+  const allLabelsSchema = useMemo(() => mapValues(allResourceLabels, () => 'string'), [allResourceLabels]);
+  const allAnnotationsSchema = useMemo(
+    () => mapValues(allResourceAnnotations, () => 'string'),
+    [allResourceAnnotations]
+  );
 
   const fileOrFolderContainedInOptions = useMemo(() => {
     return Object.keys(fileMap).map(option => (
@@ -185,7 +177,7 @@ const ResourceFilter = () => {
       dispatch(updateResourceFilter(updatedFilter));
 
       if (isInClusterMode && !isEqual(resourceFilterKinds, updatedFilter.kinds)) {
-        restartPreview(kubeConfigContext, 'cluster', dispatch);
+        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
@@ -297,7 +289,7 @@ const ResourceFilter = () => {
         <KeyValueInput
           label="Labels:"
           schema={allLabelsSchema}
-          availableValuesByKey={allLabelsData}
+          availableValuesByKey={allResourceLabels}
           value={labels}
           onChange={updateLabels}
           disabled={areFiltersDisabled}
@@ -309,7 +301,7 @@ const ResourceFilter = () => {
           disabled={areFiltersDisabled}
           label="Annotations:"
           schema={allAnnotationsSchema}
-          availableValuesByKey={allAnnotationsData}
+          availableValuesByKey={allResourceAnnotations}
           value={annotations}
           onChange={updateAnnotations}
         />
@@ -319,7 +311,7 @@ const ResourceFilter = () => {
         <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
         <S.SelectStyled
           defaultValue={ROOT_OPTIONS}
-          disabled={isInPreviewMode || areFiltersDisabled}
+          disabled={isInPreviewMode || isInClusterMode || areFiltersDisabled}
           showSearch
           value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
@@ -329,28 +321,6 @@ const ResourceFilter = () => {
       </S.Field>
     </S.Container>
   );
-};
-
-const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
-  const keyValues: Record<string, string[]> = {};
-  Object.values(objectList).forEach(currentObject => {
-    const nestedObject = getNestedObject(currentObject);
-    if (nestedObject) {
-      Object.entries(nestedObject).forEach(([key, value]) => {
-        if (typeof value !== 'string') {
-          return;
-        }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
-          }
-        } else {
-          keyValues[key] = [value];
-        }
-      });
-    }
-  });
-  return keyValues;
 };
 
 export default ResourceFilter;

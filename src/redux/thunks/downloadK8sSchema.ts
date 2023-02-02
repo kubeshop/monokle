@@ -5,7 +5,8 @@ import path from 'path';
 
 import {downloadSchema} from '@redux/services/k8sVersionService';
 
-import {AppDispatch, RootState} from '@shared/models';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {RootState} from '@shared/models/rootState';
 
 export const downloadK8sSchema = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'config/downloadK8sSchema',

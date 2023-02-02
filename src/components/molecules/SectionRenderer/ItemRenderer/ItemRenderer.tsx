@@ -40,7 +40,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const {instanceHandler} = blueprint;
 
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);

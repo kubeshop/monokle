@@ -42,7 +42,7 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
     if (!previewConfiguration) {
       return;
     }
-    startPreview(previewConfiguration.id, 'helm-preview-config', dispatch);
+    startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
   }, [dispatch, previewConfiguration]);
 
   const onClickEdit = useCallback(() => {

@@ -1,4 +1,4 @@
-import {isBoolean} from 'lodash';
+import {isBoolean, size} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RootState} from '../models/rootState';
@@ -6,15 +6,6 @@ import {RootState} from '../models/rootState';
 export const activeProjectSelector = createSelector(
   (state: RootState) => state.config,
   config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
-);
-
-export const isInPreviewModeSelector = createSelector(
-  (state: RootState) => state,
-  state =>
-    Boolean(state.main.previewResourceId) ||
-    Boolean(state.main.previewValuesFileId) ||
-    Boolean(state.main.previewConfigurationId) ||
-    Boolean(state.main.previewCommandId)
 );
 
 export const kubeConfigContextSelector = createSelector(
@@ -41,7 +32,17 @@ export const kubeConfigPathValidSelector = createSelector(
   }
 );
 
-export const unsavedResourcesSelector = createSelector(
-  (state: RootState) => state.main.resourceMap,
-  resourceMap => Object.values(resourceMap).filter(resource => resource.filePath.startsWith('unsaved://'))
+export const transientResourceCountSelector = createSelector(
+  // TODO: could we memoize this for only the count? maybe a new `createCountSelector`?
+  (state: RootState) => state.main.resourceMetaMapByStorage.transient,
+  transientMetaStorage => {
+    return size(transientMetaStorage);
+  }
+);
+
+export const isInPreviewModeSelector = createSelector(
+  (state: RootState) => state.main.preview,
+  preview => {
+    return Boolean(preview);
+  }
 );

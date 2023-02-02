@@ -11,7 +11,9 @@ function applyPolicyIntel(resource: K8sResource): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   markers: monaco.editor.IMarkerData[];
 } {
-  const issues = resource.issues?.errors ?? [];
+  // TODO: re-implement after @monokle/validation
+  // const issues = resource.issues?.errors ?? [];
+  const issues: any[] = [];
 
   const glyphs = issues.map(issue => {
     const rule = issue.rule!;

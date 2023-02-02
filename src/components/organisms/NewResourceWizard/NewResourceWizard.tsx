@@ -12,10 +12,11 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {registeredKindHandlersSelector} from '@redux/selectors';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getResourceKindSchema} from '@redux/services/schema';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
-import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
+import {createTransientResource} from '@redux/services/transientResource';
+import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
 import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -73,7 +74,7 @@ const NewResourceWizard = () => {
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const localResourceMap = useAppSelector(localResourceMapSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
@@ -130,7 +131,7 @@ const NewResourceWizard = () => {
     // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
     // created kindHandlers
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [registeredKindHandlers, resourceMap]
+    [registeredKindHandlers, localResourceMap]
   );
 
   const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
@@ -149,13 +150,14 @@ const NewResourceWizard = () => {
 
     let selectedFolderResources;
     if (selectedFolder === ROOT_FILE_ENTRY) {
-      selectedFolderResources = Object.values(resourceMap).filter(
-        resource => resource.filePath.split(path.sep).length === 2
+      selectedFolderResources = Object.values(localResourceMap).filter(
+        resource => resource.origin.filePath.split(path.sep).length === 2
       );
     } else {
-      selectedFolderResources = Object.values(resourceMap).filter(
+      selectedFolderResources = Object.values(localResourceMap).filter(
         resource =>
-          resource.filePath.split(path.sep).length > 2 && getDirname(resource.filePath).endsWith(selectedFolder)
+          resource.origin.filePath.split(path.sep).length > 2 &&
+          getDirname(resource.origin.filePath).endsWith(selectedFolder)
       );
     }
     const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
@@ -189,7 +191,7 @@ const NewResourceWizard = () => {
 
         if (kindHandler) {
           setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
-          const newFilteredResources = Object.values(resourceMap).filter(
+          const newFilteredResources = Object.values(localResourceMap).filter(
             resource => resource.kind === defaultValues.kind
           );
           setFilteredResources(newFilteredResources);
@@ -200,17 +202,17 @@ const NewResourceWizard = () => {
     } else if (visible && !defaultValues) {
       setResourceKindOptions(kindsByApiVersion);
     }
-  }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, resourceMap]);
+  }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, localResourceMap]);
 
   useEffect(() => {
     const currentKind = form.getFieldValue('kind');
     if (!currentKind) {
-      setFilteredResources(Object.values(resourceMap));
+      setFilteredResources(Object.values(localResourceMap));
       return;
     }
-    setFilteredResources(Object.values(resourceMap).filter(resource => resource.kind === currentKind));
+    setFilteredResources(Object.values(localResourceMap).filter(resource => resource.kind === currentKind));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap]);
+  }, [localResourceMap]);
 
   useEffect(() => {
     if (defaultInput?.targetFolder && isFolderOpen) {
@@ -238,7 +240,7 @@ const NewResourceWizard = () => {
   const closeWizard = () => {
     setSubmitDisabled(true);
     setResourceKindOptions(kindsByApiVersion);
-    setFilteredResources(Object.values(resourceMap));
+    setFilteredResources(Object.values(localResourceMap));
     dispatch(closeNewResourceWizard());
   };
 
@@ -294,7 +296,7 @@ const NewResourceWizard = () => {
     }
 
     if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
-      const selectedResource = resourceMap[data.selectedResourceId];
+      const selectedResource = localResourceMap[data.selectedResourceId];
 
       if (selectedResource && lastKindRef.current !== selectedResource.kind) {
         const kindHandler = getResourceKindHandler(selectedResource.kind);
@@ -318,11 +320,11 @@ const NewResourceWizard = () => {
       const currentKind = form.getFieldValue('kind');
 
       if (!currentKind) {
-        setFilteredResources(Object.values(resourceMap));
+        setFilteredResources(Object.values(localResourceMap));
         return;
       }
 
-      const newFilteredResources = Object.values(resourceMap).filter(resource => resource.kind === currentKind);
+      const newFilteredResources = Object.values(localResourceMap).filter(resource => resource.kind === currentKind);
       setFilteredResources(newFilteredResources);
       const currentSelectedResourceId = form.getFieldValue('selectedResourceId');
 
@@ -359,10 +361,10 @@ const NewResourceWizard = () => {
 
     const selectedResource =
       formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
-        ? resourceMap[formValues.selectedResourceId]
+        ? localResourceMap[formValues.selectedResourceId]
         : undefined;
 
-    let jsonTemplate = selectedResource?.content;
+    let jsonTemplate = selectedResource?.object;
     if (generateRandom) {
       const schema = getResourceKindSchema(formValues.kind, k8sVersion, String(userDataDir));
       if (schema) {
@@ -385,7 +387,7 @@ const NewResourceWizard = () => {
       }
     }
 
-    const newResource = createUnsavedResource(
+    const newResource = createTransientResource(
       {
         name: formValues.name,
         kind: formValues.kind,
@@ -415,7 +417,7 @@ const NewResourceWizard = () => {
       }
 
       dispatch(
-        saveUnsavedResources({
+        saveTransientResources({
           resourcePayloads: [{resource: newResource, absolutePath}],
           saveMode: savingDestination === 'saveToFolder' ? savingDestination : 'appendToFile',
         })

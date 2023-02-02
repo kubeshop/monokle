@@ -5,7 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {extractObjectsFromYaml} from '@redux/services/manifest-utils';
 import {interpolateTemplate} from '@redux/services/templates';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
+import {createTransientResource} from '@redux/services/transientResource';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
@@ -67,7 +67,7 @@ export const previewReferencedHelmChart = async (
     const [yamlOutput, notes] = stdout.split('NOTES:');
     const objects = extractObjectsFromYaml(yamlOutput);
     objects.forEach(obj => {
-      const resource = createUnsavedResource(
+      const resource = createTransientResource(
         {
           name: obj.metadata.name,
           kind: obj.kind,

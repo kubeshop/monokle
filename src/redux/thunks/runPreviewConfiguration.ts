@@ -5,8 +5,8 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+import {extractK8sResources} from '@redux/services/resource';
+import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {buildHelmCommand} from '@utils/helm';
 
@@ -14,6 +14,8 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -23,7 +25,10 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 export const runPreviewConfiguration = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<'preview'>[];
+    preview: HelmConfigPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
@@ -35,10 +40,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
   const kubeconfig = configState.kubeConfig.path;
-  const k8sVersion = configState.projectConfig?.k8sVersion;
-  const userDataDir = configState.userDataDir;
   const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
-  const policyPlugins = mainState.policies.plugins;
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
@@ -126,17 +128,16 @@ export const runPreviewConfiguration = createAsyncThunk<
   trackEvent('preview/helm_preview_configuration', {executionTime: endTime - startTime});
 
   if (result.stdout) {
-    return createPreviewResult(
-      String(k8sVersion),
-      String(userDataDir),
-      result.stdout,
-      previewConfiguration.id,
-      'Helm Preview',
-      mainState.resourceRefsProcessingOptions,
-      undefined,
-      undefined,
-      {policyPlugins}
-    );
+    const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
+
+    const resources = extractK8sResources(result.stdout, 'preview', {
+      preview,
+    });
+
+    return {
+      resources,
+      preview,
+    };
   }
 
   return createRejectionWithAlert(

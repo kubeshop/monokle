@@ -3,6 +3,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
+import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
   HelmChartEventEmitter,
   createHelmChart,
@@ -18,13 +19,7 @@ import {
   isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
-import {
-  clearResourceSelections,
-  highlightChildrenResources,
-  updateSelectionAndHighlights,
-} from '@redux/services/selection';
+import {createChildrenResourcesHighlights} from '@redux/services/selection';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {filterGitFolder} from '@utils/git';
@@ -36,23 +31,29 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ResourceMapType,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
-import {K8sResource} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  ResourceContentMap,
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMap,
+} from '@shared/models/k8sResource';
+import {AppSelection, ResourceSelection} from '@shared/models/selection';
 
 import {
   deleteResource,
   extractK8sResources,
   hasSupportedResourceContent,
-  reprocessKustomizations,
-  reprocessResources,
+  joinK8sResource,
+  splitK8sResource,
 } from './resource';
 
 type PathRemovalSideEffect = {
-  removedResources: K8sResource[];
+  removedResources: ResourceIdentifier[];
   removedHelmCharts: HelmChart[];
   removedHelmValuesFiles: HelmValuesFile[];
 };
@@ -135,18 +136,18 @@ export function getRootFolder(fileMap: FileMapType) {
  * if all contained resources are supported
  */
 
-export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) {
-  const result: K8sResource[] = [];
+export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType): K8sResource<'local'>[] {
+  const result: K8sResource<'local'>[] = [];
 
   try {
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(fileEntry.filePath, fileMap).forEach(resource => {
+      // TODO: shouldn't we filter out resources that are not supported?
       if (!hasSupportedResourceContent(resource)) {
         fileEntry.isSupported = false;
         return;
       }
 
-      resourceMap[resource.id] = resource;
       result.push(resource);
     });
   } catch (e) {
@@ -166,15 +167,20 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: File
 
 export function readFiles(
   folder: string,
-  projectConfig: ProjectConfig,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  helmChartMap: HelmChartMapType,
-  helmValuesMap: HelmValuesMapType,
-  helmTemplatesMap: HelmTemplatesMapType,
+  stateArgs: {
+    projectConfig: ProjectConfig;
+    resourceMetaMap: ResourceMetaMap<'local'>;
+    resourceContentMap: ResourceContentMap<'local'>;
+    fileMap: FileMapType;
+    helmChartMap: HelmChartMapType;
+    helmValuesMap: HelmValuesMapType;
+    helmTemplatesMap: HelmTemplatesMapType;
+  },
   depth: number = 1,
   helmChart?: HelmChart
 ) {
+  const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
+    stateArgs;
   const files = fs.readdirSync(folder);
   const result: string[] = [];
 
@@ -192,12 +198,15 @@ export function readFiles(
         folder,
         rootFolder,
         files,
-        projectConfig,
-        resourceMap,
-        fileMap,
-        helmChartMap,
-        helmValuesMap,
-        helmTemplatesMap,
+        {
+          projectConfig,
+          resourceMetaMap,
+          resourceContentMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap,
+          helmTemplatesMap,
+        },
         depth
       )
     );
@@ -233,12 +242,15 @@ export function readFiles(
         } else {
           fileEntry.children = readFiles(
             filePath,
-            projectConfig,
-            resourceMap,
-            fileMap,
-            helmChartMap,
-            helmValuesMap,
-            helmTemplatesMap,
+            {
+              projectConfig,
+              resourceMetaMap,
+              resourceContentMap,
+              fileMap,
+              helmChartMap,
+              helmValuesMap,
+              helmTemplatesMap,
+            },
             depth + 1,
             helmChart
           );
@@ -251,7 +263,12 @@ export function readFiles(
           fileMap,
         });
       } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
+        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, fileMap);
+        resourcesFromFile.forEach(resource => {
+          const {meta, content} = splitK8sResource(resource);
+          resourceMetaMap[meta.id] = meta;
+          resourceContentMap[meta.id] = content;
+        });
       }
 
       result.push(fileEntry.name);
@@ -262,11 +279,25 @@ export function readFiles(
 }
 
 /**
- * Returns all resources associated with the specified path
+ * Returns all local resource metas associated with the specified path
  */
 
-export function getResourcesForPath(filePath: string, resourceMap: ResourceMapType) {
-  return Object.values(resourceMap).filter(r => r.filePath === filePath);
+export function getLocalResourceMetasForPath(filePath: string, resourceMetaMap: ResourceMetaMap<'local'>) {
+  return Object.values(resourceMetaMap).filter(r => r.origin.filePath === filePath);
+}
+
+/**
+ * Returns all local resources associated with the specified path
+ */
+
+export function getLocalResourcesForPath(
+  filePath: string,
+  stateArgs: {resourceMetaMap: ResourceMetaMap<'local'>; resourceContentMap: ResourceContentMap<'local'>}
+) {
+  const {resourceMetaMap, resourceContentMap} = stateArgs;
+  return Object.values(resourceMetaMap)
+    .filter(r => r.origin.filePath === filePath)
+    .map(meta => joinK8sResource(meta, resourceContentMap[meta.id]));
 }
 
 /**
@@ -274,10 +305,10 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
  * specified resource
  */
 
-export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
+export function getAbsoluteResourceFolder(resource: ResourceMeta<'local'>, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
-    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
+    resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf(path.sep))
   );
 }
 
@@ -286,16 +317,16 @@ export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMa
  * specified resource
  */
 
-export function getResourceFolder(resource: K8sResource) {
-  return resource.filePath.substr(0, resource.filePath.lastIndexOf('/'));
+export function getResourceFolder(resource: ResourceMeta<'local'>) {
+  return resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf('/'));
 }
 
 /**
  * Returns the absolute path to the file that containing specified resource
  */
 
-export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.filePath);
+export function getAbsoluteResourcePath(resource: ResourceMeta<'local'>, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.origin.filePath);
 }
 
 /**
@@ -342,9 +373,9 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource[] {
+export function extractK8sResourcesFromFile(relativePath: string, fileMap: FileMapType): K8sResource<'local'>[] {
   const fileContent = fileMap[relativePath].text || '';
-  return extractK8sResources(fileContent, relativePath);
+  return extractK8sResources(fileContent, 'local', {filePath: relativePath, fileOffset: 0});
 }
 
 /**
@@ -415,52 +446,53 @@ function reloadHelmChartFile(fileEntry: FileEntry, fileMap: FileMapType, helmCha
   }
 }
 
-function reloadResourcesFromFileEntry(
-  fileEntry: FileEntry,
-  state: AppState,
-  schemaVersion: string,
-  userDataDir: string
-) {
-  const existingResourcesFromFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
+  const existingResourcesFromFile = getLocalResourceMetasForPath(
+    fileEntry.filePath,
+    state.resourceMetaMapByStorage.local
+  );
   let wasAnyResourceSelected = false;
 
   // delete old resources in file since we can't be sure the updated file contains the same resource(s)
   existingResourcesFromFile.forEach(resource => {
-    if (state.selectedResourceId === resource.id) {
-      updateSelectionAndHighlights(state, resource);
+    if (
+      state.selection?.type === 'resource' &&
+      state.selection.resourceIdentifier.storage === 'local' &&
+      state.selection.resourceIdentifier.id === resource.id
+    ) {
       wasAnyResourceSelected = true;
     }
-    deleteResource(resource, state.resourceMap);
+    deleteResource(resource, {
+      resourceMetaMap: state.resourceMetaMapByStorage.local,
+      resourceContentMap: state.resourceContentMapByStorage.local,
+    });
   });
 
-  if (state.selectedPath === fileEntry.filePath) {
-    state.selectedPath = undefined;
-    state.selectedResourceId = undefined;
-    clearResourceSelections(state.resourceMap);
+  if (state.selection?.type === 'file' && state.selection.filePath === fileEntry.filePath) {
+    clearSelectionReducer(state);
   }
 
-  const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
-  if (newResourcesFromFile.length > 0) {
-    reprocessResources(
-      schemaVersion,
-      userDataDir,
-      newResourcesFromFile.map(r => r.id),
-      state.resourceMap,
-      state.fileMap,
-      state.resourceRefsProcessingOptions,
-      {
-        policyPlugins: state.policies.plugins,
-      }
-    );
-  }
+  // TODO: when resources from file are reloaded, they will have to be reprocessed by the validation listener
+
+  const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
+  newResourcesFromFile.forEach(resource => {
+    const {meta, content} = splitK8sResource(resource);
+    state.resourceMetaMapByStorage.local[meta.id] = meta;
+    state.resourceContentMapByStorage.local[meta.id] = content;
+  });
 
   if (wasAnyResourceSelected) {
     if (existingResourcesFromFile.length === 1 && newResourcesFromFile.length === 1) {
-      updateSelectionAndHighlights(state, newResourcesFromFile[0]);
+      const newResourceSelection: ResourceSelection = {
+        type: 'resource',
+        resourceIdentifier: {
+          id: newResourcesFromFile[0].id,
+          storage: 'local',
+        },
+      };
+      selectResourceReducer(state, newResourceSelection);
     } else {
-      state.selectedPath = undefined;
-      state.selectedResourceId = undefined;
-      clearResourceSelections(state.resourceMap);
+      clearSelectionReducer(state);
     }
   }
 }
@@ -469,13 +501,7 @@ function reloadResourcesFromFileEntry(
  * Updates the fileEntry from the specified path - and its associated resources
  */
 
-export function reloadFile(
-  absolutePath: string,
-  fileEntry: FileEntry,
-  state: AppState,
-  projectConfig: ProjectConfig,
-  userDataDir: string
-) {
+export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState, projectConfig: ProjectConfig) {
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
@@ -488,17 +514,17 @@ export function reloadFile(
     fileEntry.text = fs.readFileSync(absolutePath, 'utf-8');
   }
   fileEntry.timestamp = absolutePathTimestamp;
-  let wasFileSelected = state.selectedPath === fileEntry.filePath;
+  let wasFileSelected = state.selection?.type === 'file' && state.selection.filePath === fileEntry.filePath;
 
   if (isHelmChartFile(absolutePath)) {
     reloadHelmChartFile(fileEntry, state.fileMap, state.helmChartMap);
   } else if (shouldReloadResourcesFromFile(fileEntry, projectConfig)) {
-    reloadResourcesFromFileEntry(fileEntry, state, getK8sVersion(projectConfig), userDataDir);
+    reloadResourcesFromFileEntry(fileEntry, state);
   }
 
   if (wasFileSelected) {
-    selectFilePath({filePath: fileEntry.filePath, state});
-    state.shouldEditorReloadSelectedPath = true;
+    selectFileReducer(state, {filePath: fileEntry.filePath});
+    state.selectionOptions.shouldEditorReload = true;
   }
 }
 
@@ -589,7 +615,7 @@ function addHelmChartFile(
  * Helm Charts/Values and regular resource files
  */
 
-function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
@@ -611,19 +637,14 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   }
   // seems to be a regular manifest file
   else {
-    const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
+    const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap);
+    resourcesFromFile.forEach(resource => {
+      const {meta, content} = splitK8sResource(resource);
+      state.resourceMetaMapByStorage.local[meta.id] = meta;
+      state.resourceContentMapByStorage.local[meta.id] = content;
+    });
 
-    if (resourcesFromFile.length > 0) {
-      reprocessResources(
-        getK8sVersion(projectConfig),
-        userDataDir,
-        resourcesFromFile.map(r => r.id),
-        state.resourceMap,
-        state.fileMap,
-        state.resourceRefsProcessingOptions,
-        {policyPlugins: state.policies.plugins}
-      );
-    }
+    // TODO: after adding a file, the validation listener should reprocess the resources
   }
 
   return fileEntry;
@@ -642,15 +663,15 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       fileMap: state.fileMap,
       extension: path.extname(absolutePath),
     });
-    folderEntry.children = readFiles(
-      absolutePath,
+    folderEntry.children = readFiles(absolutePath, {
       projectConfig,
-      state.resourceMap,
-      state.fileMap,
-      state.helmChartMap,
-      state.helmValuesMap,
-      state.helmTemplatesMap
-    );
+      resourceMetaMap: state.resourceMetaMapByStorage.local,
+      resourceContentMap: state.resourceContentMapByStorage.local,
+      fileMap: state.fileMap,
+      helmChartMap: state.helmChartMap,
+      helmValuesMap: state.helmValuesMap,
+      helmTemplatesMap: state.helmTemplatesMap,
+    });
     return folderEntry;
   }
 
@@ -661,7 +682,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   const parentPath = absolutePath.slice(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -677,7 +698,7 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
     }
     const fileEntry = isDirectory
       ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig, userDataDir);
+      : addFile(absolutePath, state, projectConfig);
 
     if (fileEntry) {
       parentEntry.children = parentEntry.children || [];
@@ -685,8 +706,7 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
       parentEntry.children.sort();
     }
 
-    // reprocess since the added fileEntry might be included by a kustomization
-    reprocessKustomizations(state.resourceMap, state.fileMap);
+    // TODO: reprocess kustomization since the added fileEntry might be included by a kustomization
 
     return fileEntry;
   }
@@ -701,11 +721,14 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
 
 export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
-  const resourcesForPath = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+  const resourcesForPath = getLocalResourceMetasForPath(fileEntry.filePath, state.resourceMetaMapByStorage.local);
   if (resourcesForPath.length > 0) {
     resourcesForPath.forEach(resource => {
       removalSideEffect.removedResources.push(resource);
-      deleteResource(resource, state.resourceMap);
+      deleteResource(resource, {
+        resourceMetaMap: state.resourceMetaMapByStorage.local,
+        resourceContentMap: state.resourceContentMapByStorage.local,
+      });
     });
 
     return;
@@ -786,12 +809,14 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     removeFile(fileEntry, state, removalSideEffect);
   }
 
-  if (state.selectedPath && !state.fileMap[state.selectedPath]) {
-    state.selectedPath = undefined;
-    clearResourceSelections(state.resourceMap);
-  } else if (state.selectedResourceId && !state.resourceMap[state.selectedResourceId]) {
-    state.selectedResourceId = undefined;
-    clearResourceSelections(state.resourceMap);
+  if (state.selection?.type === 'file' && !state.fileMap[state.selection.filePath]) {
+    clearSelectionReducer(state);
+  } else if (
+    state.selection?.type === 'resource' &&
+    state.selection.resourceIdentifier.storage === 'local' &&
+    !state.resourceMetaMapByStorage.local[state.selection.resourceIdentifier.id]
+  ) {
+    clearSelectionReducer(state);
   }
 
   // remove from parent
@@ -804,38 +829,44 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     }
   }
 
-  // clear refs
-  removalSideEffect.removedResources.forEach(r => updateReferringRefsOnDelete(r, state.resourceMap));
+  // TODO: clear refs from the removed file
 
-  // update kustomizations
-  reprocessKustomizations(state.resourceMap, state.fileMap);
+  // TODO: reprocess kustomizations
 }
 
 /**
- * Selects the specified filePath - used by several reducers
+ * Highlights all resources in the specified file
  */
 
-export function selectFilePath({filePath, state}: {filePath: string; state: AppState}) {
+export function highlightResourcesFromFile({filePath, state}: {filePath: string; state: AppState}) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
-  clearResourceSelections(state.resourceMap);
+
+  state.selection = undefined;
+  state.selectionOptions = {};
+
+  const highlights: AppSelection[] = [];
 
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
-    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-      r.isHighlighted = true;
+    getLocalResourceMetasForPath(parent.filePath, state.resourceMetaMapByStorage.local).forEach(r => {
+      highlights.push({
+        type: 'resource',
+        resourceIdentifier: {
+          id: r.id,
+          storage: 'local',
+        },
+      });
     });
 
     if (parent.children) {
-      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
+      const childrenHighlights = createChildrenResourcesHighlights(
+        parent,
+        state.resourceMetaMapByStorage.local,
+        state.fileMap
+      );
+      highlights.push(...childrenHighlights);
     }
-
-    Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.isSelected = valuesFile.filePath === filePath;
-    });
   }
 
-  state.selectedResourceId = undefined;
-  state.selectedPreviewConfigurationId = undefined;
-  state.selectedImage = undefined;
-  state.selectedPath = filePath;
+  state.highlights = highlights;
 }

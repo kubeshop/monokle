@@ -549,10 +549,6 @@ export const configSlice = createSlice({
         log.warn("Couldn't initialize Sentry.");
       }
     },
-    setClusterPreviewNamespace: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      state.clusterPreviewNamespace = action.payload;
-      electronStore.set('appConfig.clusterPreviewNamespace', action.payload);
-    },
     setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
       state.clusterProxyPort = action.payload;
     },
@@ -604,7 +600,6 @@ export const {
   removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
-  setClusterPreviewNamespace,
   setCurrentContext,
   setFilterObjects,
   setKubeConfig,

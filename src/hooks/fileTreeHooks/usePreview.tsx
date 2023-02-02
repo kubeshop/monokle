@@ -1,13 +1,14 @@
 import {useCallback} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {getResourcesForPath} from '@redux/services/fileEntry';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
 export const usePreview = () => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
 
@@ -15,20 +16,20 @@ export const usePreview = () => {
 
   const onPreview = useCallback(
     (relativePath: string) => {
-      const resources = getResourcesForPath(relativePath, resourceMap);
-      if (resources && resources.length === 1 && isKustomizationResource(resources[0])) {
-        startPreview(resources[0].id, 'kustomization', dispatch);
+      const resourceMetas = getLocalResourceMetasForPath(relativePath, localResourceMetaMap);
+      if (resourceMetas && resourceMetas.length === 1 && isKustomizationResource(resourceMetas[0])) {
+        startPreview({type: 'kustomize', kustomizationId: resourceMetas[0].id}, dispatch);
       } else {
         const fileEntry = fileMap[relativePath];
         if (fileEntry) {
           const valuesFile = getHelmValuesFile(fileEntry, helmValuesMap);
           if (valuesFile) {
-            startPreview(valuesFile.id, 'helm', dispatch);
+            startPreview({type: 'helm', valuesFileId: valuesFile.id, chartId: valuesFile.helmChartId}, dispatch);
           }
         }
       }
     },
-    [dispatch, fileMap, helmValuesMap, resourceMap]
+    [dispatch, fileMap, helmValuesMap, localResourceMetaMap]
   );
 
   return {onPreview};

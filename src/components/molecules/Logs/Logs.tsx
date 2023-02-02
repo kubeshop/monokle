@@ -8,6 +8,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigPathSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
@@ -29,8 +30,7 @@ const logOptions = {
 const Logs = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId) || 0;
-  const resource = useAppSelector(state => state.main.resourceMap[selectedResourceId]);
+  const selectedResource = useAppSelector(selectedResourceSelector);
   const [logs, setLogs] = useState<LogLineType[]>([]);
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const Logs = () => {
     const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
     const k8sLog = new k8s.Log(kc);
     const logStream = new stream.PassThrough();
-    if (resource && resource.kind === 'Pod') {
-      const containerName = resource.content?.spec?.containers[0]?.name;
+    if (selectedResource && selectedResource.kind === 'Pod') {
+      const containerName = selectedResource.object?.spec?.containers[0]?.name;
 
       logStream.on('data', (chunk: any) => {
         setLogs((prevLogs: LogLineType[]) => [
@@ -51,17 +51,19 @@ const Logs = () => {
         ]);
       });
 
-      if (resource.namespace) {
-        k8sLog.log(resource.namespace, resource.name, containerName, logStream, logOptions).catch((err: Error) => {
-          log.error(err);
-        });
+      if (selectedResource.namespace) {
+        k8sLog
+          .log(selectedResource.namespace, selectedResource.name, containerName, logStream, logOptions)
+          .catch((err: Error) => {
+            log.error(err);
+          });
       }
     }
 
     return () => {
       logStream.destroy();
     };
-  }, [kubeConfigContext, kubeConfigPath, resource]);
+  }, [kubeConfigContext, kubeConfigPath, selectedResource]);
 
   return (
     <S.LogContainer>

@@ -4,6 +4,7 @@ import {useInterval} from 'react-use';
 import {Tooltip} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -19,7 +20,7 @@ import {Colors} from '@shared/styles/colors';
 import * as S from './Utilization.styled';
 
 export const Utilization = () => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const [averageCpuUsage, setAverageCpuUsage] = useState(0);
   const [totalCpu, setTotalCpu] = useState(0);
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
@@ -50,19 +51,18 @@ export const Utilization = () => {
   }, [utilizationData]);
 
   const getTotalCapacity = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+    return Object.values(clusterResourceMap)
       .filter(
         (resource: K8sResource) =>
-          resource.content.apiVersion === NodeHandler.clusterApiVersion && resource.kind === NodeHandler.kind
+          resource.object.apiVersion === NodeHandler.clusterApiVersion && resource.kind === NodeHandler.kind
       )
       .reduce((total: number, node: K8sResource) => {
-        if (node.content?.status?.capacity && node.content?.status?.capacity['ephemeral-storage']) {
-          return total + memoryParser(node.content?.status?.capacity['ephemeral-storage']);
+        if (node.object?.status?.capacity && node.object?.status?.capacity['ephemeral-storage']) {
+          return total + memoryParser(node.object?.status?.capacity['ephemeral-storage']);
         }
         return total;
       }, 0);
-  }, [resourceMap]);
+  }, [clusterResourceMap]);
 
   return (
     <S.Container>

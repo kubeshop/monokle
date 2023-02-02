@@ -5,22 +5,22 @@ import {Badge} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourcesSelector, isInClusterModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {IconWithPopover} from '@atoms';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import ResourceFilter from '../ResourceFilter';
 
 const ResourceFilterIconWithPopover: React.FC = () => {
-  const activeResources = useAppSelector(activeResourcesSelector);
+  const activeResourceCount = useAppSelector(activeResourceCountSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
   const appliedFilters = useMemo(() => {
@@ -39,7 +39,7 @@ const ResourceFilterIconWithPopover: React.FC = () => {
         popoverContent={<ResourceFilter />}
         popoverTrigger="click"
         iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-        isDisabled={(!doesRootFileEntryExist && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+        isDisabled={(!doesRootFileEntryExist && !isInClusterMode && !isInPreviewMode) || activeResourceCount === 0}
       />
     </Badge>
   );

@@ -30,12 +30,12 @@ const applyMultipleResources = async (
 
   const yamlToApply = resourcesToApply
     .map(r => {
-      const resourceContent = _.cloneDeep(r.content);
-      if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
-        delete resourceContent.metadata.namespace;
+      const resourceObject = _.cloneDeep(r.object);
+      if (namespace && namespace.name !== resourceObject.metadata?.namespace) {
+        delete resourceObject.metadata.namespace;
       }
 
-      return stringify(resourceContent);
+      return stringify(resourceObject);
     })
     .reduce<string>((fullYaml, currentText) => {
       if (doesTextStartWithYamlDocumentDelimiter(currentText)) {

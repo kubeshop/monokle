@@ -1,25 +1,20 @@
+import {isEmpty} from 'lodash';
+
 import navSectionNames from '@constants/navSectionNames';
 
-import {
-  checkMultipleResourceIds,
-  checkResourceId,
-  selectK8sResource,
-  uncheckMultipleResourceIds,
-  uncheckResourceId,
-} from '@redux/reducers/main';
-import {activeResourcesSelector} from '@redux/selectors';
-import {isUnsavedResource} from '@redux/services/resource';
+import {selectResource} from '@redux/reducers/main';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta, ResourceMetaMap, isTransientResource} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
-import {RootState} from '@shared/models/rootState';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {AppSelection} from '@shared/models/selection';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';
@@ -30,36 +25,34 @@ import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
 export type ResourceKindScopeType = {
-  activeResources: K8sResource[];
+  activeResourceMetaMap: ResourceMetaMap;
   resourceFilter: ResourceFilterType;
-  selectedResourceId: string | undefined;
-  selectedPath: string | undefined;
-  checkedResourceIds: string[];
-  state: RootState;
+  selection: AppSelection | undefined;
+  highlights: AppSelection[] | undefined;
+  checkedResourceIdentifiers: ResourceIdentifier[];
 };
 
 export function makeResourceKindNavSection(
   kindHandler: ResourceKindHandler
-): SectionBlueprint<K8sResource, ResourceKindScopeType> {
+): SectionBlueprint<ResourceMeta, ResourceKindScopeType> {
   const kindSectionName = kindHandler.navigatorPath[2];
-  const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
+  const sectionBlueprint: SectionBlueprint<ResourceMeta, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
     containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
-        activeResources: activeResourcesSelector(state),
+        activeResourceMetaMap: activeResourceMetaMapSelector(state),
         resourceFilter: state.main.resourceFilter,
-        selectedResourceId: state.main.selectedResourceId,
-        selectedPath: state.main.selectedPath,
-        checkedResourceIds: state.main.checkedResourceIds,
-        state,
+        selection: state.main.selection,
+        highlights: state.main.highlights,
+        checkedResourceIdentifiers: state.main.checkedResourceIdentifiers,
       };
     },
     builder: {
       getRawItems: scope => {
-        return scope.activeResources
+        return Object.values(scope.activeResourceMetaMap)
           .filter(r => resourceMatchesKindHandler(r, kindHandler))
           .sort((a, b) => {
             if (a.namespace && !b.namespace) {
@@ -78,15 +71,16 @@ export function makeResourceKindNavSection(
         return {resourceKind: kindHandler.kind};
       },
       isInitialized: scope => {
-        return scope.activeResources.length > 0;
+        return !isEmpty(scope.activeResourceMetaMap);
       },
-      makeCheckable: scope => {
-        return {
-          checkedItemIds: scope.checkedResourceIds,
-          checkItemsActionCreator: checkMultipleResourceIds,
-          uncheckItemsActionCreator: uncheckMultipleResourceIds,
-        };
-      },
+      // TODO: reimplement checkable
+      // makeCheckable: scope => {
+      //   return {
+      //     checkedItemIds: scope.checkedResourceIdentifiers.map(r => r.id),
+      //     checkItemsActionCreator: checkMultipleResourceIds,
+      //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+      //   };
+      // },
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
@@ -105,34 +99,36 @@ export function makeResourceKindNavSection(
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
       builder: {
-        isSelected: rawItem => rawItem.isSelected,
-        isHighlighted: rawItem => rawItem.isHighlighted,
-        isDirty: rawItem => isUnsavedResource(rawItem),
+        isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
+        isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
+        isDirty: rawItem => isTransientResource(rawItem),
         isVisible: (rawItem, scope) => {
-          const isPassingFilter = isResourcePassingFilter(
-            rawItem,
-            scope.resourceFilter,
-            isInPreviewModeSelector(scope.state)
-          );
-
+          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
         isCheckable: () => true,
-        isChecked: (itemInstance, scope) => {
-          return scope.checkedResourceIds.includes(itemInstance.id);
+        // isChecked: (itemInstance, scope) => {
+        //   return scope.checkedResourceIds.includes(itemInstance.id);
+        // },
+        getMeta: rawItem => {
+          return {
+            resourceStorage: rawItem.storage,
+          };
         },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
-          dispatch(selectK8sResource({resourceId: itemInstance.id}));
+          dispatch(
+            selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage}})
+          );
         },
-        onCheck: (itemIstance, dispatch) => {
-          if (itemIstance.isChecked) {
-            dispatch(uncheckResourceId(itemIstance.id));
-          } else {
-            dispatch(checkResourceId(itemIstance.id));
-          }
-        },
+        // onCheck: (itemIstance, dispatch) => {
+        //   if (itemIstance.isChecked) {
+        //     dispatch(uncheckResourceId(itemIstance.id));
+        //   } else {
+        //     dispatch(checkResourceId(itemIstance.id));
+        //   }
+        // },
       },
       customization: {
         prefix: {component: ResourceKindPrefix},

@@ -7,7 +7,5 @@ export const initialState: DashboardState = {
     activeTab: 'Info',
     menuList: [],
   },
-  tableDrawer: {
-    selectedResourceId: undefined,
-  },
+  tableDrawer: {},
 };

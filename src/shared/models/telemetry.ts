@@ -5,6 +5,8 @@ import {machineIdSync} from 'node-machine-id';
 import {getSegmentClient} from '@shared/utils/segment';
 import {isRendererThread} from '@shared/utils/thread';
 
+import {PreviewType} from './preview';
+
 const machineId: string = machineIdSync();
 
 export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: EventMap[TEvent]) => {
@@ -50,7 +52,7 @@ export type EventMap = {
   'preview/kustomize': {resourcesCount?: number; executionTime: number};
   'preview/cluster': {resourcesCount: number; executionTime: number};
   'preview/command': {resourcesCount: number; executionTime: number};
-  'preview/restart': {type: 'helm' | 'kustomization' | 'cluster' | 'helm-preview-config' | 'command'};
+  'preview/restart': {type: PreviewType};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;

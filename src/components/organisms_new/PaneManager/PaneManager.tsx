@@ -24,23 +24,23 @@ const NewPaneManager: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const {height, width} = useMainPaneDimensions();
 
   const gridColumns = useMemo(() => {
-    if ((!activeProject && !previewingCluster) || isStartProjectPaneVisible) {
+    if ((!activeProject && !isInQuickClusterMode) || isStartProjectPaneVisible) {
       return '1fr';
     }
 
     return 'max-content 1fr';
-  }, [activeProject, isStartProjectPaneVisible, previewingCluster]);
+  }, [activeProject, isStartProjectPaneVisible, isInQuickClusterMode]);
 
   const topPaneFlex = useMemo(
     () => (bottomSelection ? 1 - layout.bottomPaneHeight / height : 1),
@@ -78,7 +78,7 @@ const NewPaneManager: React.FC = () => {
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : (activeProject || previewingCluster) && !isStartProjectPaneVisible ? (
+      ) : (activeProject || isInQuickClusterMode) && !isStartProjectPaneVisible ? (
         <>
           <PaneManagerLeftMenu />
 

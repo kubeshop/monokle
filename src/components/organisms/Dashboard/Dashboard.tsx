@@ -1,8 +1,9 @@
 import {useCallback} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {useMainPaneDimensions} from '@utils/hooks';
+import {useMainPaneDimensions, useSelectorWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -19,8 +20,6 @@ import ReplicaSetHandler from '@src/kindhandlers/ReplicaSet.handler';
 import SecretHandler from '@src/kindhandlers/Secret.handler';
 import ServiceHandler from '@src/kindhandlers/Service.handler';
 import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
-
-import {K8sResource} from '@shared/models/k8sResource';
 
 import {CLICKAKBLE_RESOURCE_GROUPS} from '.';
 import * as S from './Dashboard.styled';
@@ -58,18 +57,15 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(
-        (resource: K8sResource) =>
-          activeMenu.key.replace(`${resource.content.apiVersion}-`, '') === resource.kind &&
-          resource.kind === activeMenu.label
-      );
-  }, [resourceMap, activeMenu]);
+    return Object.values(clusterResourceMapRef.current).filter(
+      resource =>
+        activeMenu.key.replace(`${resource.apiVersion}-`, '') === resource.kind && resource.kind === activeMenu.label
+    );
+  }, [activeMenu, clusterResourceMapRef]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {

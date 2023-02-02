@@ -30,7 +30,7 @@ import {useAppVersion} from '../useAppVersion';
 
 export function useHelpMenuItems() {
   const dispatch = useAppDispatch();
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const appVersion = useAppVersion();
 
@@ -55,7 +55,7 @@ export function useHelpMenuItems() {
         key: 'settings',
         onClick: () => dispatch(toggleSettings()),
       },
-      ...(!previewingCluster
+      ...(!isInQuickClusterMode
         ? [
             {
               label: (
@@ -84,7 +84,7 @@ export function useHelpMenuItems() {
               <HelpLink type="link" size="small" onClick={() => dispatch(openReleaseNotesDrawer())}>
                 New in {parsedAppVersion || 'this version'}
               </HelpLink>
-              {!previewingCluster && (
+              {!isInQuickClusterMode && (
                 <HelpLink
                   type="link"
                   size="small"
@@ -119,7 +119,7 @@ export function useHelpMenuItems() {
         onClick: () => openFeedback(),
       },
     ],
-    [dispatch, parsedAppVersion, previewingCluster]
+    [dispatch, parsedAppVersion, isInQuickClusterMode]
   );
 
   return items;

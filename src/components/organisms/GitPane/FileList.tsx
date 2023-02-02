@@ -10,7 +10,8 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {setGitLoading, setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {clearSelectedPath, selectFile} from '@redux/reducers/main';
+import {clearSelection, selectFile} from '@redux/reducers/main';
+import {selectedFilePathSelector} from '@redux/selectors';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 
 import {Dots} from '@components/atoms';
@@ -38,8 +39,8 @@ const FileList: React.FC<IProps> = props => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedGitFile = useAppSelector(state => state.git.selectedItem);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [hovered, setHovered] = useState<GitChangedFile | null>(null);
@@ -129,8 +130,8 @@ const FileList: React.FC<IProps> = props => {
       fileMap[item.path].filePath.startsWith(fileOrFolderContainedInFilter || '')
     ) {
       dispatch(selectFile({filePath: item.path}));
-    } else if (selectedPath) {
-      dispatch(clearSelectedPath());
+    } else if (selectedFilePath) {
+      dispatch(clearSelection());
     }
   };
 

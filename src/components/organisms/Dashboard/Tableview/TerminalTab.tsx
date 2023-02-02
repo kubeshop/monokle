@@ -6,26 +6,25 @@ import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {useAppSelector} from '@redux/hooks';
-
-import {K8sResource} from '@shared/models/k8sResource';
+import {resourceSelector} from '@redux/selectors/resourceSelectors';
 
 import * as S from './TerminalTab.styled';
 
 export const TerminalTab = ({resourceId}: {resourceId: string}) => {
-  const previewKubeConfigPath = useAppSelector(state => state.main.previewKubeConfigPath);
+  const clusterConnection = useAppSelector(state => state.main.clusterConnection);
   const terminalContainerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal>();
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
   const addonRef = useRef<FitAddon>();
-  const resource: K8sResource = useAppSelector(state => state.main.resourceMap[resourceId]);
+  const resource = useAppSelector(state => resourceSelector(state, {id: resourceId, storage: 'cluster'}));
   useEffect(() => {
-    if (webContentsId && resource && previewKubeConfigPath) {
+    if (webContentsId && resource && clusterConnection) {
       ipcRenderer.send('pod.terminal.init', {
-        previewKubeConfigPath,
+        previewKubeConfigPath: clusterConnection.context,
         podNamespace: resource.namespace,
         podName: resource.name,
-        containerName: resource.content.spec.containers[0].name,
+        containerName: resource.object.spec.containers[0].name,
         webContentsId,
       });
     }
@@ -34,7 +33,7 @@ export const TerminalTab = ({resourceId}: {resourceId: string}) => {
       ipcRenderer.send('pod.terminal.close');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [previewKubeConfigPath, resource, webContentsId]);
+  }, [clusterConnection, resource, webContentsId]);
 
   useEffect(() => {
     if (!terminalContainerRef.current || terminalContainerRef.current.childElementCount !== 0) {

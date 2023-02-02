@@ -29,7 +29,6 @@ export {default as RenameEntityModal} from './RenameEntityModal';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as ReplaceImageModal} from './ReplaceImageModal';
 export {default as SaveEditCommandModal} from './SaveEditCommandModal';
-export {default as SearchPane} from './SearchPane';
 export {default as SettingsManager} from './SettingsManager';
 export {default as TerminalPane} from './TerminalPane';
 export {default as UpdateNotice} from './UpdateNotice';

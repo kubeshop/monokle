@@ -14,13 +14,12 @@ import CommandLabel from './CommandLabel';
 
 const PreviewSavedCommand = () => {
   const dispatch = useAppDispatch();
-  const isCommandPreview = useAppSelector(state => state.main.previewType === 'command');
-  const previewCommandId = useAppSelector(state => state.main.previewCommandId);
+  const preview = useAppSelector(state => state.main.preview);
   const savedCommandMap = useAppSelector(state => state.config.projectConfig?.savedCommandMap || {});
 
   const onPreviewCommand = useCallback(
     (command: SavedCommand) => {
-      startPreview(command.id, 'command', dispatch);
+      startPreview({type: 'command', commandId: command.id}, dispatch);
     },
     [dispatch]
   );
@@ -38,14 +37,16 @@ const PreviewSavedCommand = () => {
     }
     return savedCommands.map(command => ({
       key: command.id,
-      label: <CommandLabel command={command} isPreviewed={previewCommandId === command.id} />,
+      label: (
+        <CommandLabel command={command} isPreviewed={preview?.type === 'command' && preview.commandId === command.id} />
+      ),
       onClick: () => onPreviewCommand(command),
     }));
-  }, [previewCommandId, savedCommandMap, onPreviewCommand]);
+  }, [preview, savedCommandMap, onPreviewCommand]);
 
   return (
     <Dropdown menu={{items: menuItems}} trigger={['click']} placement="bottom">
-      <Button type="link" style={{color: isCommandPreview ? Colors.purple8 : undefined}}>
+      <Button type="link" style={{color: preview?.type === 'command' ? Colors.purple8 : undefined}}>
         Preview saved command
         <DownOutlined />
       </Button>

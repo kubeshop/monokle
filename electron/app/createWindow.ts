@@ -14,7 +14,7 @@ import {StartupFlags} from '@shared/models/startupFlag';
 import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import utilsElectronStore from '@shared/utils/electronStore';
 import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
-import {activeProjectSelector, unsavedResourcesSelector} from '@shared/utils/selectors';
+import {activeProjectSelector, transientResourceCountSelector} from '@shared/utils/selectors';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -147,7 +147,7 @@ export const createWindow = (givenPath?: string) => {
       createMenu(storeState, dispatch);
       let projectName = activeProjectSelector(storeState)?.name;
       setWindowTitle(storeState, win, projectName);
-      unsavedResourceCount = unsavedResourcesSelector(storeState).length;
+      unsavedResourceCount = transientResourceCountSelector(storeState);
       const segmentClient = getSegmentClient();
 
       if (storeState.config.disableEventTracking) {

@@ -56,7 +56,7 @@ const SettingsManager: React.FC = () => {
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [activeTab, setActiveTab] = useState<string>(
@@ -79,10 +79,10 @@ const SettingsManager: React.FC = () => {
   };
 
   useEffect(() => {
-    if (previewingCluster || !activeProject) {
+    if (isInQuickClusterMode || !activeProject) {
       setActiveTab(SettingsPanel.DefaultProjectSettings);
     }
-  }, [activeProject, previewingCluster]);
+  }, [activeProject, isInQuickClusterMode]);
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));

@@ -2,13 +2,13 @@ import {useCallback, useMemo} from 'react';
 
 import {Tag} from 'antd';
 
-import {setActiveDashboardMenu, setActiveTab, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {areRefPosEqual} from '@redux/services/resource';
-import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {selectedFilePathSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
 import RefLink from '@components/molecules/ResourceRefsIconPopover/RefLink';
 import {getRefKind} from '@components/molecules/ResourceRefsIconPopover/RefsPopoverContent';
@@ -16,7 +16,15 @@ import {getRefKind} from '@components/molecules/ResourceRefsIconPopover/RefsPopo
 import {getRefRange} from '@utils/refs';
 import {timeAgo} from '@utils/timeAgo';
 
-import {K8sResource, ResourceRef, ResourceRefType} from '@shared/models/k8sResource';
+import {
+  ResourceRef,
+  ResourceRefType,
+  areRefPosEqual,
+  isIncomingRef,
+  isOutgoingRef,
+  isUnsatisfiedRef,
+} from '@monokle/validation';
+import {K8sResource} from '@shared/models/k8sResource';
 import {MonacoRange} from '@shared/models/ui';
 import {isDefined} from '@shared/utils/filter';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -25,30 +33,30 @@ import * as S from './InfoTab.styled';
 import * as TableStyle from './TableCells.styled';
 
 export const InfoTab = ({resourceId}: {resourceId: string}) => {
-  const resource: K8sResource = useAppSelector(state => state.main.resourceMap[resourceId]);
+  const resource = useAppSelector(state => resourceSelector(state, {id: resourceId, storage: 'cluster'}));
 
   return (
     <>
       {resource && (
         <S.Container>
           {resource.namespace && <Namespace namespace={resource.namespace} />}
-          {resource.content?.metadata?.labels && <Labels labels={resource.content?.metadata?.labels} />}
-          {resource?.content?.metadata?.annotations && (
-            <Annotations annotations={resource?.content?.metadata?.annotations} />
+          {resource.object?.metadata?.labels && <Labels labels={resource.object?.metadata?.labels} />}
+          {resource?.object?.metadata?.annotations && (
+            <Annotations annotations={resource?.object?.metadata?.annotations} />
           )}
-          {resource.content?.spec?.nodeName && <NodeName name={resource.content?.spec?.nodeName} />}
-          {resource.content?.status?.phase && <Phase phase={resource.content?.status?.phase} />}
-          {resource.content?.metadata?.labels && <Roles labels={resource.content?.metadata?.labels} />}
-          {resource.content?.status?.nodeInfo?.kubeletVersion && (
-            <KubernetesVersion version={resource.content?.status?.nodeInfo?.kubeletVersion} />
+          {resource.object?.spec?.nodeName && <NodeName name={resource.object?.spec?.nodeName} />}
+          {resource.object?.status?.phase && <Phase phase={resource.object?.status?.phase} />}
+          {resource.object?.metadata?.labels && <Roles labels={resource.object?.metadata?.labels} />}
+          {resource.object?.status?.nodeInfo?.kubeletVersion && (
+            <KubernetesVersion version={resource.object?.status?.nodeInfo?.kubeletVersion} />
           )}
-          {resource.content?.status?.nodeInfo?.containerRuntimeVersion && (
-            <ContainerRuntimeVersion version={resource.content?.status?.nodeInfo?.containerRuntimeVersion} />
+          {resource.object?.status?.nodeInfo?.containerRuntimeVersion && (
+            <ContainerRuntimeVersion version={resource.object?.status?.nodeInfo?.containerRuntimeVersion} />
           )}
           <RefLinks type="incoming" resource={resource} />
           <RefLinks type="outgoing" resource={resource} />
-          {resource.content?.metadata?.creationTimestamp && (
-            <CreationTimestamp time={resource.content.metadata.creationTimestamp} />
+          {resource.object?.metadata?.creationTimestamp && (
+            <CreationTimestamp time={resource.object.metadata.creationTimestamp} />
           )}
         </S.Container>
       )}
@@ -165,12 +173,11 @@ export const CreationTimestamp = ({time}: {time: string}) => {
 
 export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resource: K8sResource}) => {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const selectedResource = useAppSelector(selectedResourceSelector);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
+  const preview = useAppSelector(state => state.main.preview);
 
   const resourceRefs = useMemo(
     () =>
@@ -185,16 +192,18 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
 
   const isRefLinkDisabled = useCallback(
     (ref: ResourceRef) => {
-      if (previewType === 'kustomization' && ref.target?.type === 'resource') {
-        const targetResourceId = ref.target.resourceId;
-        const targetResource = targetResourceId ? resourceMap[targetResourceId] : undefined;
-        if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
-          return true;
-        }
-      }
+      // TODO: revisit this logic
+      // if (preview?.type === 'kustomize' && ref.target?.type === 'resource') {
+      //   const targetResourceId = ref.target.resourceId;
+      //   const targetResource = targetResourceId ? clusterResourceMap[targetResourceId] : undefined;
+      //   if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
+      //     return true;
+      //   }
+      // }
       return false;
     },
-    [resourceMap, previewResourceId, previewType]
+    []
+    // [resourceMap, previewResourceId, previewType]
   );
 
   const processedRefsWithKeys: Array<{ref: ResourceRef; key: string}> | undefined = useMemo(() => {
@@ -202,8 +211,8 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       resourceRefs &&
       resourceRefs
         .sort((a, b) => {
-          let kindA = getRefKind(a, resourceMap);
-          let kindB = getRefKind(b, resourceMap);
+          let kindA = getRefKind(a, clusterResourceMap);
+          let kindB = getRefKind(b, clusterResourceMap);
 
           if (kindA && kindB) {
             return kindA.localeCompare(kindB);
@@ -247,11 +256,11 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
           return {ref, key};
         })
     );
-  }, [resourceRefs, resourceMap]);
+  }, [resourceRefs, clusterResourceMap]);
 
-  const selectResource = (selectedId: string) => {
-    if (resourceMap[selectedId]) {
-      dispatch(selectK8sResource({resourceId: selectedId}));
+  const triggerSelectResource = (selectedId: string) => {
+    if (clusterResourceMap[selectedId]) {
+      dispatch(selectResource({resourceIdentifier: {id: selectedId, storage: 'cluster'}}));
     }
   };
 
@@ -282,8 +291,9 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
     trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
-      if (selectedResourceId !== resource.id) {
-        selectResource(resource.id);
+      if (selectedResource?.id !== resource.id) {
+        // TODO: could this select a resource from another storage?
+        triggerSelectResource(resource.id);
       }
 
       const refRange = getRefRange(ref);
@@ -301,13 +311,14 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       if (!ref.target.resourceId) {
         return;
       }
-      const targetResource = resourceMap[ref.target.resourceId];
+      const targetResource = clusterResourceMap[ref.target.resourceId];
       if (!targetResource) {
         return;
       }
 
-      if (selectedResourceId !== targetResource.id) {
-        selectResource(targetResource.id);
+      if (selectedResource?.id !== targetResource.id) {
+        // TODO: could this select a resource from another storage?
+        triggerSelectResource(targetResource.id);
       }
 
       const targetOutgoingRef = targetResource.refs?.find(
@@ -324,7 +335,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       }
     }
     if (ref.target?.type === 'file') {
-      if (selectedPath !== ref.target.filePath) {
+      if (selectedFilePath !== ref.target.filePath) {
         selectFilePath(ref.target.filePath);
       }
     }
@@ -335,7 +346,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       if (!ref.target.resourceId) {
         return;
       }
-      const targetResource = resourceMap[ref.target.resourceId];
+      const targetResource = clusterResourceMap[ref.target.resourceId];
       if (!targetResource) {
         return;
       }
@@ -347,11 +358,11 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
   };
 
   const selectForDashboard = (r: K8sResource) => {
-    dispatch(setSelectedResourceId(r.id));
+    dispatch(setDashboardSelectedResourceId(r.id));
     dispatch(
       setActiveDashboardMenu({
-        key: `${r.content.apiVersion}-${r.content.kind}`,
-        label: r.content.kind,
+        key: `${r.object.apiVersion}-${r.object.kind}`,
+        label: r.object.kind,
       })
     );
   };
@@ -374,7 +385,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
             <RefLink
               isDisabled={isRefLinkDisabled(ref)}
               resourceRef={ref}
-              resourceMap={resourceMap}
+              resourceMetaMap={clusterResourceMap}
               onClick={(e: Event) => {
                 e.preventDefault();
                 e.stopPropagation();
