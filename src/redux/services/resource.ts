@@ -473,6 +473,7 @@ export function splitK8sResource<Storage extends ResourceStorage = ResourceStora
     namespace: resource.namespace,
     isClusterScoped: resource.isClusterScoped,
     range: resource.range,
+    refs: resource.refs,
   };
   const content: ResourceContent<Storage> = {
     id: resource.id,
