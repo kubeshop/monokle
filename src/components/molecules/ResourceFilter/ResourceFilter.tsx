@@ -111,7 +111,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     handleChange({
       names: null,
       kinds: null,
-      namespace: null,
+      namespaces: null,
       labels: {},
       annotations: {},
       fileOrFolderContainedIn: null,
