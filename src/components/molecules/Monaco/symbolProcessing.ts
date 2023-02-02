@@ -41,7 +41,7 @@ function addNamespaceFilterLink(
       `${namespace}`,
       'Add/remove namespace to/from current filter',
       () => {
-        filterResources({namespace, labels: {}, annotations: {}});
+        filterResources({namespaces: [namespace], labels: {}, annotations: {}});
       }
     );
     newDisposables.push(commandDisposable);

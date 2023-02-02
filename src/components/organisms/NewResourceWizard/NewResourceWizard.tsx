@@ -72,7 +72,6 @@ const NewResourceWizard = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
 
@@ -107,13 +106,11 @@ const NewResourceWizard = () => {
       defaultInput
         ? {
             ...defaultInput,
-            namespace: resourceFilterNamespace || defaultInput.namespace || SELECT_OPTION_NONE,
+            namespace: defaultInput.namespace || SELECT_OPTION_NONE,
             selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
           }
-        : resourceFilterNamespace
-        ? ({namespace: resourceFilterNamespace} as NewResourceWizardInput)
         : ({namespace: SELECT_OPTION_NONE} as NewResourceWizardInput),
-    [defaultInput, resourceFilterNamespace]
+    [defaultInput]
   );
 
   const kindsByApiVersion = useMemo(
@@ -560,7 +557,7 @@ const NewResourceWizard = () => {
               ),
               icon: <InfoCircleOutlined />,
             }}
-            initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
+            initialValue={SELECT_OPTION_NONE}
           >
             <Select
               showSearch

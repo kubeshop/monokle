@@ -283,9 +283,9 @@ const DiffModal = () => {
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
           setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
         }
-      } else if (resourceFilter.namespace) {
-        const foundResourceFromCluster = resourcesFromCluster.find(
-          r => r.metadata.namespace === resourceFilter.namespace
+      } else if (resourceFilter.namespaces) {
+        const foundResourceFromCluster = resourcesFromCluster.find(r =>
+          resourceFilter.namespaces?.includes(r.metadata.namespace)
         );
         if (foundResourceFromCluster) {
           hasClusterMatchingResource = true;
@@ -310,7 +310,7 @@ const DiffModal = () => {
     kubeConfigContext,
     dispatch,
     resourceMap,
-    resourceFilter.namespace,
+    resourceFilter.namespaces,
     targetResource,
     isDiffModalVisible,
     configState,

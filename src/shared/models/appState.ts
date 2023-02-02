@@ -182,9 +182,9 @@ type ResourceDiffType = {
 };
 
 type ResourceFilterType = {
-  names?: string[];
+  name?: string;
   kinds?: string[];
-  namespace?: string;
+  namespaces?: string[];
   labels: Record<string, string | null>;
   annotations: Record<string, string | null>;
   fileOrFolderContainedIn?: string;

@@ -117,13 +117,9 @@ const NavPane: React.FC = () => {
         </TitleBarWrapper>
       )}
 
-      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
-        {isResourceFiltersOpen && (
-          <ReflexElement style={{background: Colors.black9}} flex={0.4} minSize={100}>
-            <ResourceFilter />
-          </ReflexElement>
-        )}
+      <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
 
+      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         {isResourceFiltersOpen && <ReflexSplitter />}
 
         <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>

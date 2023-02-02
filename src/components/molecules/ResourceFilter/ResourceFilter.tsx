@@ -1,59 +1,38 @@
-import {useEffect, useMemo, useState} from 'react';
-import {useDebounce} from 'react-use';
+import {useCallback, useMemo} from 'react';
 
-import {Button, Select, Tooltip} from 'antd';
+import {Select} from 'antd';
 
-import {ClearOutlined} from '@ant-design/icons';
-
-import {isEmpty, isEqual, mapValues} from 'lodash';
-
-import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
-import {ResetFiltersTooltip} from '@constants/tooltips';
+import {isEqual, omit} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {openFiltersPresetModal, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {restartPreview} from '@redux/services/preview';
 
-import {InputTags, KeyValueInput} from '@atoms';
-
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {useWindowSize} from '@utils/hooks';
-
+import {Filter, FilterField, KeyValueInput, NewKeyValueInput} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants';
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
-import * as S from './ResourceFilter.styled';
+export const NAVIGATOR_FILTER_BODY_HEIGHT = 375;
 
-const ALL_OPTIONS = '<all>';
-const ROOT_OPTIONS = '<root>';
+export type Props = {
+  active: boolean;
+  onToggle: () => void;
+};
 
-const {Option} = Select;
-
-const ResourceFilter = () => {
+const ResourceFilter = ({active, onToggle}: Props) => {
   const dispatch = useAppDispatch();
 
-  const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
-  const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
-  const [labels, setLabels] = useState<Record<string, string | null>>({});
-  const [kinds, setKinds] = useState<string[]>([]);
-  const [names, setNames] = useState<string[]>([]);
-  const [namespace, setNamespace] = useState<string>();
-  const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
-
-  const {width: windowWidth} = useWindowSize();
-
-  const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
+  const [allNamespaces] = useNamespaces({});
 
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isPaneWideEnough = useAppSelector(
-    state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
-  );
+
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
@@ -73,114 +52,42 @@ const ResourceFilter = () => {
   const allLabelsData = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
   }, [resourceMap]);
-  const allLabelsSchema = useMemo(() => mapValues(allLabelsData, () => 'string'), [allLabelsData]);
 
   const allAnnotationsData = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
   }, [resourceMap]);
-  const allAnnotationsSchema = useMemo(() => mapValues(allAnnotationsData, () => 'string'), [allAnnotationsData]);
-
-  const fileOrFolderContainedInOptions = useMemo(() => {
-    return Object.keys(fileMap).map(option => (
-      <Option key={option} value={option}>
-        {option}
-      </Option>
-    ));
-  }, [fileMap]);
-
-  const isSavePresetDisabled = useMemo(
-    () =>
-      !names.length &&
-      !kinds.length &&
-      (!namespace || namespace === ALL_OPTIONS) &&
-      isEmpty(labels) &&
-      isEmpty(annotations) &&
-      (!fileOrFolderContainedIn || fileOrFolderContainedIn === ROOT_OPTIONS),
-    [annotations, fileOrFolderContainedIn, kinds.length, labels, names, namespace]
-  );
-
-  const resetFilters = () => {
-    setWasLocalUpdate(true);
-    setNames([]);
-    setKinds([]);
-    setNamespace(ALL_OPTIONS);
-    setLabels({});
-    setAnnotations({});
-    setFileOrFolderContainedIn(ROOT_OPTIONS);
-  };
-
-  const updateNames = (newName: string, type: 'add' | 'remove') => {
-    setWasLocalUpdate(true);
-
-    if (type === 'add') {
-      setNames([...names, newName]);
-    } else if (type === 'remove') {
-      setNames(names.filter(name => name !== newName));
-    }
-  };
-
-  const updateLabels = (newLabels: Record<string, string | null>) => {
-    setWasLocalUpdate(true);
-    setLabels(newLabels);
-  };
-  const updateAnnotations = (newAnnotations: Record<string, string | null>) => {
-    setWasLocalUpdate(true);
-    setAnnotations(newAnnotations);
-  };
-
-  const updateKinds = (selectedKinds: string[]) => {
-    setWasLocalUpdate(true);
-    if (selectedKinds.length > 1) {
-      if (!kinds.includes(ALL_OPTIONS) && selectedKinds.includes(ALL_OPTIONS)) {
-        setKinds([ALL_OPTIONS]);
-      } else {
-        setKinds(selectedKinds.filter(kind => kind !== ALL_OPTIONS));
-      }
-      return;
-    }
-    setKinds(selectedKinds);
-  };
-
-  const updateNamespace = (selectedNamespace: string) => {
-    setWasLocalUpdate(true);
-    if (selectedNamespace === ALL_OPTIONS) {
-      setNamespace(undefined);
-    } else {
-      setNamespace(selectedNamespace);
-    }
-  };
 
   const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
-    setWasLocalUpdate(true);
-    if (selectedFileOrFolder === ALL_OPTIONS) {
-      setFileOrFolderContainedIn(undefined);
+    if (selectedFileOrFolder === ROOT_FILE_ENTRY) {
+      handleChange({fileOrFolderContainedIn: undefined});
     } else {
-      setFileOrFolderContainedIn(selectedFileOrFolder);
+      handleChange({fileOrFolderContainedIn: selectedFileOrFolder});
     }
   };
 
-  const onClickLoadPreset = () => {
-    dispatch(openFiltersPresetModal('load'));
-  };
+  const autocompleteOptions = useMemo(() => {
+    return {
+      namespaces: allNamespaces?.map(n => ({value: n})) ?? [],
+      kinds: allResourceKinds?.map(n => ({value: n})) ?? [],
+      labels: Object.keys(allLabelsData)?.map(n => ({value: n})) ?? [],
+      annotations: Object.keys(allAnnotationsData)?.map(n => ({value: n})) ?? [],
+      files: Object.keys(fileMap).map(option => ({value: option})) ?? [],
+    };
+  }, [allNamespaces, allResourceKinds, allLabelsData, allAnnotationsData, fileMap]);
 
-  const onClickSavePreset = () => {
-    dispatch(openFiltersPresetModal('save'));
-  };
+  const hasActiveFilters = useMemo(
+    () =>
+      Object.entries(filtersMap)
+        .map(([key, value]) => {
+          return {filterName: key, filterValue: value};
+        })
+        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length > 0,
+    [filtersMap]
+  );
 
-  useDebounce(
-    () => {
-      if (!wasLocalUpdate) {
-        return;
-      }
-
-      const updatedFilter = {
-        names,
-        kinds: kinds.includes(ALL_OPTIONS) ? undefined : kinds,
-        namespace: namespace === ALL_OPTIONS ? undefined : namespace,
-        labels,
-        annotations,
-        fileOrFolderContainedIn: fileOrFolderContainedIn === ROOT_OPTIONS ? undefined : fileOrFolderContainedIn,
-      };
+  const handleChange = useCallback(
+    (delta: Partial<any>) => {
+      const updatedFilter = {...filtersMap, ...delta};
 
       dispatch(updateResourceFilter(updatedFilter));
 
@@ -188,146 +95,168 @@ const ResourceFilter = () => {
         restartPreview(kubeConfigContext, 'cluster', dispatch);
       }
     },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [names, kinds, namespace, labels, annotations, fileOrFolderContainedIn]
+    [dispatch, filtersMap, isInClusterMode, kubeConfigContext, resourceFilterKinds]
   );
 
-  useEffect(() => {
-    if (!wasLocalUpdate) {
-      setNames(filtersMap.names || []);
-      setKinds(filtersMap.kinds || []);
-      setNamespace(filtersMap.namespace);
-      setLabels(filtersMap.labels);
-      setAnnotations(filtersMap.annotations);
-      setFileOrFolderContainedIn(filtersMap.fileOrFolderContainedIn);
-    }
-  }, [wasLocalUpdate, filtersMap]);
+  const handleSearched = useCallback(
+    (newSearch: string) => {
+      handleChange({
+        name: newSearch,
+      });
+    },
+    [handleChange]
+  );
 
-  useEffect(() => {
-    setWasLocalUpdate(false);
-  }, [filtersMap]);
+  const handleClear = useCallback(() => {
+    handleChange({
+      names: null,
+      kinds: null,
+      namespace: null,
+      labels: {},
+      annotations: {},
+      fileOrFolderContainedIn: null,
+    });
+  }, [handleChange]);
+
+  const onKindChangeHandler = useCallback(
+    (selectedKinds: string[]) => {
+      handleChange({kinds: selectedKinds});
+    },
+    [handleChange]
+  );
+
+  const onKindClearHandler = useCallback(() => {
+    handleChange({kinds: null});
+  }, [handleChange]);
+
+  const onNamespaceChangeHandler = useCallback(
+    (namespaces: string[]) => {
+      handleChange({namespaces});
+    },
+    [handleChange]
+  );
+
+  const onNamespaceClearHandler = useCallback(() => {
+    handleChange({namespaces: null});
+  }, [handleChange]);
+
+  const handleUpsertLabelFilter = useCallback(
+    ([key, value]: any) => {
+      handleChange({
+        labels: {...filtersMap.labels, [key]: value},
+      });
+    },
+    [handleChange, filtersMap.labels]
+  );
+
+  const handleRemoveLabelFilter = useCallback(
+    (key: string) => {
+      handleChange({
+        labels: omit(filtersMap.labels, key),
+      });
+    },
+    [handleChange, filtersMap.labels]
+  );
+
+  const handleUpsertAnnotationFilter = useCallback(
+    ([key, value]: any) => {
+      handleChange({
+        annotations: {...filtersMap.annotations, [key]: value},
+      });
+    },
+    [handleChange, filtersMap.annotations]
+  );
+
+  const handleRemoveAnnotationFilter = useCallback(
+    (key: string) => {
+      handleChange({
+        annotations: omit(filtersMap.annotations, key),
+      });
+    },
+    [handleChange, filtersMap.annotations]
+  );
+
+  const onClearFileOrFolderContainedInHandler = useCallback(() => {
+    handleChange({fileOrFolderContainedIn: null});
+  }, [handleChange]);
 
   return (
-    <S.Container>
-      <S.TitleContainer>
-        <S.TitleLabel>
-          FILTER <S.CaretUpOutlined onClick={() => dispatch(toggleResourceFilters())} />
-        </S.TitleLabel>
+    <Filter
+      height={NAVIGATOR_FILTER_BODY_HEIGHT}
+      search={filtersMap?.name}
+      onClear={handleClear}
+      onSearch={handleSearched}
+      active={active}
+      hasActiveFilters={hasActiveFilters}
+      onToggle={onToggle}
+    >
+      <FilterField name="Kind">
+        <Select
+          mode="tags"
+          value={filtersMap.kinds || []}
+          placeholder="Select one or more kinds.."
+          options={autocompleteOptions.kinds}
+          onChange={onKindChangeHandler}
+          onClear={onKindClearHandler}
+          style={{width: '100%'}}
+        />
+      </FilterField>
 
-        <S.TitleActions>
-          <S.PresetButton type="link" onClick={onClickLoadPreset}>
-            Load {isPaneWideEnough ? 'preset' : ''}
-          </S.PresetButton>
-          <S.PresetButton disabled={isSavePresetDisabled} type="link" onClick={onClickSavePreset}>
-            Save {isPaneWideEnough ? 'preset' : ''}
-          </S.PresetButton>
+      <FilterField name="Namespace">
+        <Select
+          style={{width: '100%'}}
+          placeholder="Select one or more namespaces.."
+          value={filtersMap.namespaces}
+          options={autocompleteOptions.namespaces}
+          onChange={onNamespaceChangeHandler}
+          onClear={onNamespaceClearHandler}
+          allowClear
+        />
+      </FilterField>
 
-          <Tooltip title={ResetFiltersTooltip}>
-            <Button
-              disabled={areFiltersDisabled}
-              icon={<ClearOutlined />}
-              size="small"
-              type="link"
-              onClick={resetFilters}
+      <FilterField name="Labels">
+        <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />
+
+        {Object.entries(filtersMap.labels).map(([key, value]) => {
+          return (
+            <KeyValueInput
+              key={key}
+              pair={[key, String(value || '')]}
+              onDelete={handleRemoveLabelFilter}
+              onChange={handleUpsertLabelFilter}
             />
-          </Tooltip>
-        </S.TitleActions>
-      </S.TitleContainer>
+          );
+        })}
+      </FilterField>
 
-      <S.Field>
-        <S.FieldLabel>Name(s):</S.FieldLabel>
+      <FilterField name="Annotations">
+        <NewKeyValueInput onAddKeyValue={handleUpsertAnnotationFilter} keyOptions={autocompleteOptions.annotations} />
 
-        <InputTags
-          autoFocus
-          disabled={areFiltersDisabled}
-          helperValue="name"
-          placeholder="Enter name"
-          tags={names}
-          warningMessage="Name already exists!"
-          onTagAdd={tag => updateNames(tag, 'add')}
-          onTagRemove={tag => updateNames(tag, 'remove')}
-        />
-      </S.Field>
+        {Object.entries(filtersMap.annotations).map(([key, value]) => {
+          return (
+            <KeyValueInput
+              key={key}
+              pair={[key, String(value || '')]}
+              onDelete={handleRemoveAnnotationFilter}
+              onChange={handleUpsertAnnotationFilter}
+            />
+          );
+        })}
+      </FilterField>
 
-      <S.Field>
-        <S.FieldLabel>Kind:</S.FieldLabel>
-        <Select
-          disabled={areFiltersDisabled}
-          placeholder="Select one or multiple kinds"
-          showArrow
-          showSearch
-          mode="multiple"
-          style={{width: '100%'}}
-          value={kinds || []}
-          onChange={updateKinds}
-        >
-          {allResourceKinds.map(resourceKind => (
-            <Option key={resourceKind} value={resourceKind}>
-              {resourceKind}
-            </Option>
-          ))}
-        </Select>
-      </S.Field>
-
-      <S.Field>
-        <S.FieldLabel>Namespace:</S.FieldLabel>
+      <FilterField name="Contained in file/folder:">
         <Select
           showSearch
-          disabled={areFiltersDisabled}
-          defaultValue={ALL_OPTIONS}
-          value={namespace || ALL_OPTIONS}
-          onChange={updateNamespace}
-          style={{width: '100%'}}
-        >
-          {allNamespaces.map(ns => {
-            if (typeof ns !== 'string') {
-              return null;
-            }
-
-            return (
-              <Option key={ns} value={ns}>
-                {ns}
-              </Option>
-            );
-          })}
-        </Select>
-      </S.Field>
-
-      <S.Field>
-        <KeyValueInput
-          label="Labels:"
-          schema={allLabelsSchema}
-          availableValuesByKey={allLabelsData}
-          value={labels}
-          onChange={updateLabels}
-          disabled={areFiltersDisabled}
-        />
-      </S.Field>
-
-      <S.Field>
-        <KeyValueInput
-          disabled={areFiltersDisabled}
-          label="Annotations:"
-          schema={allAnnotationsSchema}
-          availableValuesByKey={allAnnotationsData}
-          value={annotations}
-          onChange={updateAnnotations}
-        />
-      </S.Field>
-
-      <S.Field>
-        <S.FieldLabel>Contained in file/folder:</S.FieldLabel>
-        <S.SelectStyled
-          defaultValue={ROOT_OPTIONS}
           disabled={isInPreviewMode || areFiltersDisabled}
-          showSearch
-          value={fileOrFolderContainedIn || ROOT_OPTIONS}
+          value={filtersMap.fileOrFolderContainedIn}
+          defaultValue={ROOT_FILE_ENTRY}
           onChange={updateFileOrFolderContainedIn}
-        >
-          {fileOrFolderContainedInOptions}
-        </S.SelectStyled>
-      </S.Field>
-    </S.Container>
+          options={autocompleteOptions.files}
+          onClear={onClearFileOrFolderContainedInHandler}
+          allowClear
+        />
+      </FilterField>
+    </Filter>
   );
 };
 

@@ -36,7 +36,7 @@ const ResourceFilterIconWithPopover: React.FC = () => {
   return (
     <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
       <IconWithPopover
-        popoverContent={<ResourceFilter />}
+        popoverContent={<ResourceFilter active onToggle={() => {}} />}
         popoverTrigger="click"
         iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
         isDisabled={(!doesRootFileEntryExist && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}

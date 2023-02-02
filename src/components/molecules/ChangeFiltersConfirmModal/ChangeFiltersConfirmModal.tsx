@@ -26,11 +26,11 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     }
 
     let newFilter: ResourceFilterType = {
-      namespace: filtersToBeChanged.namespace
-        ? filtersToBeChanged.namespace === resourceFilter.namespace
+      namespaces: filtersToBeChanged.namespaces
+        ? isEqual(filtersToBeChanged.namespaces, resourceFilter.namespaces)
           ? undefined
-          : filtersToBeChanged.namespace
-        : resourceFilter.namespace,
+          : filtersToBeChanged.namespaces
+        : resourceFilter.namespaces,
       kinds: filtersToBeChanged.kinds
         ? isEqual(filtersToBeChanged.kinds, resourceFilter.kinds)
           ? undefined
@@ -41,11 +41,11 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           ? undefined
           : filtersToBeChanged.fileOrFolderContainedIn
         : resourceFilter.fileOrFolderContainedIn,
-      names: filtersToBeChanged.names
-        ? isEqual(filtersToBeChanged.names, resourceFilter.names)
+      name: filtersToBeChanged.name
+        ? filtersToBeChanged.name === resourceFilter.name
           ? undefined
-          : filtersToBeChanged.names
-        : resourceFilter.names,
+          : filtersToBeChanged.name
+        : resourceFilter.name,
       labels: resourceFilter.labels,
       annotations: resourceFilter.annotations,
     };
@@ -73,8 +73,8 @@ const ChangeFiltersConfirmModal: React.FC = () => {
     resourceFilter.fileOrFolderContainedIn,
     resourceFilter.kinds,
     resourceFilter.labels,
-    resourceFilter.names,
-    resourceFilter.namespace,
+    resourceFilter.name,
+    resourceFilter.namespaces,
   ]);
 
   const uncheckHiddenResources = useCallback(() => {

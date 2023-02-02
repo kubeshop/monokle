@@ -35,10 +35,12 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
-  const filterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const filterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
 
   const applyNamespaceFilter = useCallback(() => {
-    dispatch(extendResourceFilter({namespace: resource.namespace, labels: {}, annotations: {}}));
+    if (resource.namespace) {
+      dispatch(extendResourceFilter({namespaces: [resource.namespace], labels: {}, annotations: {}}));
+    }
   }, [resource, dispatch]);
 
   if (!resource) {
@@ -53,7 +55,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
         resource={resource}
         type="incoming"
       />
-      {resource.namespace && !filterNamespace && (
+      {resource.namespace && !filterNamespaces && (
         <Popover
           title="Filter"
           overlayClassName="resource-prefix-popover-overlay"

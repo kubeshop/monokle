@@ -7,7 +7,7 @@ export function isPassingKeyValueFilter(target: any, keyValueFilter: Record<stri
     if (!target[key]) {
       return false;
     }
-    if (value !== null) {
+    if (value !== null && value?.length > 0) {
       return target[key] === value;
     }
     return true;

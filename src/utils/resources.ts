@@ -10,11 +10,7 @@ import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType, isInPreviewMode?: boolean) {
-  if (
-    filters.names &&
-    filters.names.length &&
-    !filters.names.some(name => resource.name.toLowerCase().includes(name.toLowerCase()))
-  ) {
+  if (filters.name && filters.name.length && !resource.name.includes(filters.name.toLowerCase())) {
     return false;
   }
 
@@ -22,12 +18,10 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     return false;
   }
 
-  if (filters.namespace) {
-    const resourceNamespace = resource.namespace || 'default';
-    if (resourceNamespace !== filters.namespace) {
-      return false;
-    }
+  if (filters.namespaces?.length && !filters.namespaces?.includes(resource?.namespace || 'default')) {
+    return false;
   }
+
   if (
     !isInPreviewMode &&
     filters.fileOrFolderContainedIn &&
