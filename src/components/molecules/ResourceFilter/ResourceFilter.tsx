@@ -3,6 +3,7 @@ import {useCallback, useMemo} from 'react';
 import {Select} from 'antd';
 
 import {isEqual, omit} from 'lodash';
+import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
@@ -181,82 +182,84 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   }, [handleChange]);
 
   return (
-    <Filter
-      height={NAVIGATOR_FILTER_BODY_HEIGHT}
-      search={filtersMap?.name}
-      onClear={handleClear}
-      onSearch={handleSearched}
-      active={active}
-      hasActiveFilters={hasActiveFilters}
-      onToggle={onToggle}
-    >
-      <FilterField name="Kind">
-        <Select
-          mode="tags"
-          value={filtersMap.kinds || []}
-          placeholder="Select one or more kinds.."
-          options={autocompleteOptions.kinds}
-          onChange={onKindChangeHandler}
-          onClear={onKindClearHandler}
-          style={{width: '100%'}}
-        />
-      </FilterField>
+    <Container>
+      <Filter
+        height={NAVIGATOR_FILTER_BODY_HEIGHT}
+        search={filtersMap?.name}
+        onClear={handleClear}
+        onSearch={handleSearched}
+        active={active}
+        hasActiveFilters={hasActiveFilters}
+        onToggle={onToggle}
+      >
+        <FilterField name="Kind">
+          <Select
+            mode="tags"
+            value={filtersMap.kinds || []}
+            placeholder="Select one or more kinds.."
+            options={autocompleteOptions.kinds}
+            onChange={onKindChangeHandler}
+            onClear={onKindClearHandler}
+            style={{width: '100%'}}
+          />
+        </FilterField>
 
-      <FilterField name="Namespace">
-        <Select
-          style={{width: '100%'}}
-          placeholder="Select one or more namespaces.."
-          value={filtersMap.namespaces}
-          options={autocompleteOptions.namespaces}
-          onChange={onNamespaceChangeHandler}
-          onClear={onNamespaceClearHandler}
-          allowClear
-        />
-      </FilterField>
+        <FilterField name="Namespace">
+          <Select
+            style={{width: '100%'}}
+            placeholder="Select one or more namespaces.."
+            value={filtersMap.namespaces}
+            options={autocompleteOptions.namespaces}
+            onChange={onNamespaceChangeHandler}
+            onClear={onNamespaceClearHandler}
+            allowClear
+          />
+        </FilterField>
 
-      <FilterField name="Labels">
-        <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />
+        <FilterField name="Labels">
+          <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />
 
-        {Object.entries(filtersMap.labels).map(([key, value]) => {
-          return (
-            <KeyValueInput
-              key={key}
-              pair={[key, String(value || '')]}
-              onDelete={handleRemoveLabelFilter}
-              onChange={handleUpsertLabelFilter}
-            />
-          );
-        })}
-      </FilterField>
+          {Object.entries(filtersMap.labels).map(([key, value]) => {
+            return (
+              <KeyValueInput
+                key={key}
+                pair={[key, String(value || '')]}
+                onDelete={handleRemoveLabelFilter}
+                onChange={handleUpsertLabelFilter}
+              />
+            );
+          })}
+        </FilterField>
 
-      <FilterField name="Annotations">
-        <NewKeyValueInput onAddKeyValue={handleUpsertAnnotationFilter} keyOptions={autocompleteOptions.annotations} />
+        <FilterField name="Annotations">
+          <NewKeyValueInput onAddKeyValue={handleUpsertAnnotationFilter} keyOptions={autocompleteOptions.annotations} />
 
-        {Object.entries(filtersMap.annotations).map(([key, value]) => {
-          return (
-            <KeyValueInput
-              key={key}
-              pair={[key, String(value || '')]}
-              onDelete={handleRemoveAnnotationFilter}
-              onChange={handleUpsertAnnotationFilter}
-            />
-          );
-        })}
-      </FilterField>
+          {Object.entries(filtersMap.annotations).map(([key, value]) => {
+            return (
+              <KeyValueInput
+                key={key}
+                pair={[key, String(value || '')]}
+                onDelete={handleRemoveAnnotationFilter}
+                onChange={handleUpsertAnnotationFilter}
+              />
+            );
+          })}
+        </FilterField>
 
-      <FilterField name="Contained in file/folder:">
-        <Select
-          showSearch
-          disabled={isInPreviewMode || areFiltersDisabled}
-          value={filtersMap.fileOrFolderContainedIn}
-          defaultValue={ROOT_FILE_ENTRY}
-          onChange={updateFileOrFolderContainedIn}
-          options={autocompleteOptions.files}
-          onClear={onClearFileOrFolderContainedInHandler}
-          allowClear
-        />
-      </FilterField>
-    </Filter>
+        <FilterField name="Contained in file/folder:">
+          <Select
+            showSearch
+            disabled={isInPreviewMode || areFiltersDisabled}
+            value={filtersMap.fileOrFolderContainedIn}
+            defaultValue={ROOT_FILE_ENTRY}
+            onChange={updateFileOrFolderContainedIn}
+            options={autocompleteOptions.files}
+            onClear={onClearFileOrFolderContainedInHandler}
+            allowClear
+          />
+        </FilterField>
+      </Filter>
+    </Container>
   );
 };
 
@@ -283,3 +286,9 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
 };
 
 export default ResourceFilter;
+
+const Container = styled.div`
+  & > div {
+    padding: 0 10px !important;
+  }
+`;
