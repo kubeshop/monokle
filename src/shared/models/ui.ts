@@ -1,5 +1,3 @@
-import {LearnTopicType} from '@monokle/components/dist/types';
-
 import {Project, SavedCommand, SettingsPanel} from './config';
 
 export enum HighlightItems {
@@ -195,6 +193,8 @@ type UiState = {
   };
 };
 
+type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
+
 export type {
   LayoutSizeType,
   LeftMenuBottomSelectionType,
@@ -209,4 +209,5 @@ export type {
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
+  LearnTopicType,
 };
