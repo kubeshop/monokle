@@ -162,6 +162,7 @@
     "redux-thunk": "2.4.2",
     "replace-in-file": "6.3.5",
     "reselect": "4.1.7",
+    "rooks": "^7.4.3",
     "runtypes": "6.6.0",
     "semver": "7.3.8",
     "shelljs": "0.8.5",

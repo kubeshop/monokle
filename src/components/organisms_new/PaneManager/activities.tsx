@@ -5,12 +5,13 @@ import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@con
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, DashboardPane, FileTreePane, GitPane} from '@organisms';
+import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
+import ExplorerPane from '../ExplorerPane';
 import SettingsPane from '../SettingsPane';
 import ValidationPane from '../ValidationPane';
 
@@ -20,7 +21,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'explorer',
     tooltip: <FileExplorerTabTooltip />,
     icon: () => <Icon name="explorer" />,
-    component: <FileTreePane />,
+    component: <ExplorerPane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
