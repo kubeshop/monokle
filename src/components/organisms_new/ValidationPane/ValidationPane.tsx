@@ -13,6 +13,7 @@ import * as S from './ValidationPane.styled';
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const lastResponse = useValidationSelector(state => state.lastResponse);
+  const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
 
   if (!lastResponse) {
@@ -34,6 +35,7 @@ const ValidationPane: React.FC = () => {
       />
 
       <ValidationOverview
+        newProblemsIntroducedType={newProblemsIntroducedType}
         selectedProblem={selectedProblem}
         validationResponse={lastResponse}
         onProblemSelect={problem => dispatch(setSelectedProblem(problem))}

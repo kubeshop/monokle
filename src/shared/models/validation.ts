@@ -12,6 +12,7 @@ import type {
 import type {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
+export type NewProblemsIntroducedType = 'initial' | 'k8s-schema' | 'rule';
 
 export type SelectedProblem = {
   problem: ValidationResult;
@@ -34,6 +35,7 @@ export type ValidationState = {
   rules?: Record<PluginName, RuleMetadataWithConfig[]>;
   validationOverview: {
     selectedProblem?: SelectedProblem;
+    newProblemsIntroducedType: NewProblemsIntroducedType;
   };
 };
 

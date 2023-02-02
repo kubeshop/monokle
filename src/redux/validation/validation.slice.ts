@@ -2,7 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_TRIVY_PLUGIN, RuleMap} from '@monokle/validation';
 import {ValidationIntegrationId} from '@shared/models/integrations';
-import {SelectedProblem, ValidationState} from '@shared/models/validation';
+import {NewProblemsIntroducedType, SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
@@ -15,6 +15,10 @@ export const validationSlice = createSlice({
   reducers: {
     clearValidation: (state: Draft<ValidationState>) => {
       state.lastResponse = undefined;
+    },
+
+    setNewProblemsIntroducedType: (state: Draft<ValidationState>, action: PayloadAction<NewProblemsIntroducedType>) => {
+      state.validationOverview.newProblemsIntroducedType = action.payload;
     },
 
     setSelectedProblem: (state: Draft<ValidationState>, action: PayloadAction<SelectedProblem>) => {
@@ -92,5 +96,6 @@ export const validationSlice = createSlice({
   },
 });
 
-export const {clearValidation, setSelectedProblem, toggleOPARules, toggleValidation} = validationSlice.actions;
+export const {clearValidation, setNewProblemsIntroducedType, setSelectedProblem, toggleOPARules, toggleValidation} =
+  validationSlice.actions;
 export default validationSlice.reducer;
