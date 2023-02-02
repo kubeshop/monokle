@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setStartPageLearnTopic} from '@redux/reducers/ui';
 
 import {Icon, LearnCard, LearnPage as LearnPageContainer} from '@monokle/components';
-import {LearnTopicType} from '@shared/models';
+import {LearnTopicType} from '@shared/models/ui';
 import {openDiscord, openDocumentation, openTutorialVideo} from '@shared/utils';
 
 import WalkThroughModal from './WalkThroughModal';
