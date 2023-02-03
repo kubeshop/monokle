@@ -226,8 +226,6 @@ export function readFiles(
       // fileEntry.isExcluded = Boolean(isExcluded);
       // fileEntry.isSupported = Boolean(isIncluded);
 
-      console.log(fileEntry.name, isExcluded);
-
       if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
@@ -262,7 +260,7 @@ export function readFiles(
           fileMap,
         });
       } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        console.log('Extracting resources for file entry: ', fileEntry.name);
+        log.info('Extracting resources for file entry: ', fileEntry.name);
         const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
           const {meta, content} = splitK8sResource(resource);
@@ -375,7 +373,6 @@ export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMa
 
 export function extractK8sResourcesFromFile(relativePath: string, rootFolderPath: string): K8sResource<'local'>[] {
   const fileContent = fs.readFileSync(path.join(rootFolderPath, relativePath), 'utf8');
-  console.log({relativePath, fileContent});
   return extractK8sResources(fileContent, 'local', {filePath: relativePath, fileOffset: 0});
 }
 
