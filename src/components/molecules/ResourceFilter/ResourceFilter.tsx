@@ -10,13 +10,13 @@ import {updateResourceFilter} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {
+  activeResourceMetaMapSelector,
   allResourceAnnotationsSelector,
   allResourceKindsSelector,
   allResourceLabelsSelector,
 } from '@redux/selectors/resourceMapSelectors';
+import {getNamespaces} from '@redux/services/resource';
 import {startClusterConnection} from '@redux/thunks/cluster';
-
-import {useNamespaces} from '@hooks/useNamespaces';
 
 import {Filter, FilterField, KeyValueInput, NewKeyValueInput} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -32,7 +32,7 @@ export type Props = {
 const ResourceFilter = ({active, onToggle}: Props) => {
   const dispatch = useAppDispatch();
 
-  const [allNamespaces] = useNamespaces({});
+  const allNamespaces = useAppSelector(state => getNamespaces(activeResourceMetaMapSelector(state)));
 
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);

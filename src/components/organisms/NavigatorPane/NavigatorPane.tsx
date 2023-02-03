@@ -1,16 +1,16 @@
+import {useCallback} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
-import {Badge, Button, Dropdown, Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
-import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined} from '@ant-design/icons';
 
 import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants';
-import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
+import {NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleResourceFilters} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
-import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
 
@@ -24,7 +24,6 @@ import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSec
 
 import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {Colors} from '@shared/styles/colors';
 
 import * as S from './NavigatorPane.styled';
 import OPAValidationStatus from './OPAValidationStatus';
@@ -32,30 +31,20 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
-  const appliedFiltersCount = useAppSelector(state => {
-    return Object.entries(state.main.resourceFilter)
-      .map(([key, value]) => {
-        return {filterName: key, filterValue: value};
-      })
-      .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length;
-  });
-
   const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
 
-  const resourceFilterButtonHandler = () => {
+  const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
-  };
+  }, [dispatch]);
 
   return (
     <S.NavigatorPaneContainer>
@@ -93,27 +82,14 @@ const NavPane: React.FC = () => {
                     />
                   </Dropdown>
                 </Tooltip>
-
-                <Badge count={appliedFiltersCount} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
-                    <Button
-                      disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || !hasAnyActiveResources}
-                      type="link"
-                      size="small"
-                      icon={<FilterOutlined style={appliedFiltersCount ? {color: Colors.greenOkay} : {}} />}
-                      onClick={resourceFilterButtonHandler}
-                    />
-                  </Tooltip>
-                </Badge>
               </S.TitleBarRightButtons>
             }
           />
         </TitleBarWrapper>
       )}
-
       <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
 
-      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
+      <ReflexContainer orientation="horizontal" style={{height: height - 40, marginTop: 8}}>
         {isResourceFiltersOpen && <ReflexSplitter />}
 
         <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
