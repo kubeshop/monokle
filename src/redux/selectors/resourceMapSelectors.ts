@@ -168,6 +168,11 @@ export const activeResourceCountSelector = createSelector(
   activeResourceMetaMap => Object.keys(activeResourceMetaMap).length
 );
 
+export const transientResourceCountSelector = createSelector(
+  transientResourceMetaMapSelector,
+  transientResourceMetaMap => Object.keys(transientResourceMetaMap).length
+);
+
 export const filteredResourceSelector = createDeepEqualSelector(
   (state: RootState) => state.main.resourceFilter,
   activeResourceMapSelector,

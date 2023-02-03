@@ -1,8 +1,13 @@
-import {isEmpty, size} from 'lodash';
+import {isEmpty} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {
+  activeResourceCountSelector,
+  activeResourceMetaMapSelector,
+  transientResourceCountSelector,
+  transientResourceMetaMapSelector,
+} from '@redux/selectors/resourceMapSelectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -42,7 +47,7 @@ ResourceKindHandlers.forEach(kindHandler => {
 const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
   const subsection: SectionBlueprint<
     ResourceMeta,
-    {activeResourcesLength: number; checkedResourceIds: ResourceIdentifier[]}
+    {activeResourcesLength: number; transientResourcesLength: number; checkedResourceIds: ResourceIdentifier[]}
   > = {
     name: subsectionName,
     id: subsectionName,
@@ -50,9 +55,9 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
     childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
-      const activeResourceMetas = activeResourceMetaMapSelector(state);
       return {
-        activeResourcesLength: size(activeResourceMetas),
+        activeResourcesLength: activeResourceCountSelector(state),
+        transientResourcesLength: transientResourceCountSelector(state),
         checkedResourceIds: state.main.checkedResourceIdentifiers,
       };
     },
@@ -97,6 +102,7 @@ export type K8sResourceScopeType = {
   isFolderOpen: boolean;
   isPreviewLoading: boolean;
   activeResourceMetaMap: ResourceMetaMap;
+  transientResourceMetaMap: ResourceMetaMap<'transient'>;
   resourceFilter: ResourceFilterType;
   checkedResourceIds: ResourceIdentifier[];
 };
@@ -115,6 +121,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceSco
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
       activeResourceMetaMap: activeResourceMetaMapSelector(state),
+      transientResourceMetaMap: transientResourceMetaMapSelector(state),
       resourceFilter: state.main.resourceFilter,
       checkedResourceIds: state.main.checkedResourceIdentifiers,
     };
@@ -124,15 +131,18 @@ const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceSco
       return scope.isFolderLoading || scope.isPreviewLoading;
     },
     isInitialized: scope => {
-      return !isEmpty(scope.activeResourceMetaMap);
+      return !isEmpty(scope.activeResourceMetaMap) || !isEmpty(scope.transientResourceMetaMap);
     },
     isEmpty: scope => {
       return (
         scope.isFolderOpen &&
-        (isEmpty(scope.activeResourceMetaMap) ||
-          Object.values(scope.activeResourceMetaMap).every(
+        ((isEmpty(scope.activeResourceMetaMap) && isEmpty(scope.transientResourceMetaMap)) ||
+          (Object.values(scope.activeResourceMetaMap).every(
             resource => !isResourcePassingFilter(resource, scope.resourceFilter)
-          ))
+          ) &&
+            Object.values(scope.transientResourceMetaMap).every(
+              resource => !isResourcePassingFilter(resource, scope.resourceFilter)
+            )))
       );
     },
     // makeCheckable: scope => {
