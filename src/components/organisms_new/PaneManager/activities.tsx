@@ -5,13 +5,15 @@ import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@con
 
 import {useAppSelector} from '@redux/hooks';
 
-import {BottomPaneManager, DashboardPane, FileTreePane, GitPane, SearchPane} from '@organisms';
+import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
+import ExplorerPane from '../ExplorerPane';
 import SettingsPane from '../SettingsPane';
+import ValidationPane from '../ValidationPane';
 
 export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
   {
@@ -19,9 +21,9 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     name: 'explorer',
     tooltip: <FileExplorerTabTooltip />,
     icon: () => <Icon name="explorer" />,
-    component: <FileTreePane />,
+    component: <ExplorerPane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
   {
     type: 'panel',
@@ -38,7 +40,16 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+  },
+  {
+    type: 'panel',
+    name: 'validation',
+    tooltip: 'View validation errors',
+    icon: () => <Icon name="validation" />,
+    component: <ValidationPane />,
+    useBadge: () => undefined,
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
   {
     type: 'panel',
@@ -51,16 +62,7 @@ export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
-  },
-  {
-    type: 'panel',
-    name: 'search',
-    tooltip: 'Advanced Search',
-    icon: () => <Icon name="search" style={{fontSize: 16}} />,
-    component: <SearchPane />,
-    useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
   {
     type: 'fullscreen',
@@ -80,6 +82,6 @@ export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
     component: <BottomPaneManager />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.previewingCluster)),
+    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
 ];

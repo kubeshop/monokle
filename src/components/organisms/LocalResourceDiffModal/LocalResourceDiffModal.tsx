@@ -27,6 +27,7 @@ import {
   kubeConfigContextColorSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
+import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -35,7 +36,7 @@ import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecul
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -60,16 +61,15 @@ const DiffModal = () => {
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMap = useAppSelector(activeResourceMapSelector);
   const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
-      ? state.main.resourceMap[state.main.resourceDiff.targetResourceId]
+      ? activeResourceMapSelector(state)[state.main.resourceDiff.targetResourceId]
       : undefined
   );
 
@@ -124,7 +124,7 @@ const DiffModal = () => {
       const resource = resourceMap[targetResource.id];
       if (resource) {
         applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-          isClusterPreview: previewType === 'cluster',
+          isInClusterMode,
           shouldPerformDiff: true,
         });
       }
@@ -174,7 +174,7 @@ const DiffModal = () => {
     if (
       !isDiffModalVisible ||
       !matchingResourceText ||
-      !targetResource?.content ||
+      !targetResource?.object ||
       !selectedMatchingResourceId ||
       !matchingResourcesById ||
       !hasDiffModalLoaded
@@ -186,7 +186,7 @@ const DiffModal = () => {
       return matchingResourceText;
     }
 
-    const newDiffContentObject = removeIgnoredPathsFromResourceContent(
+    const newDiffContentObject = removeIgnoredPathsFromResourceObject(
       matchingResourcesById[selectedMatchingResourceId]
     );
     const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
@@ -247,7 +247,7 @@ const DiffModal = () => {
         const alert: AlertType = {
           type: AlertEnum.Error,
           title: 'Diff failed',
-          message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from cluster [${kubeConfigContext}]`,
+          message: `Failed to retrieve ${targetResource.object.kind} ${targetResource.object.metadata.name} from cluster [${kubeConfigContext}]`,
         };
 
         dispatch(setAlert(alert));
@@ -304,7 +304,7 @@ const DiffModal = () => {
       setHasDiffModalLoaded(true);
     };
 
-    setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
+    setTargetResourceText(stringify(targetResource.object, {sortMapEntries: true}));
     getClusterResources();
   }, [
     kubeConfigContext,
@@ -435,7 +435,7 @@ const DiffModal = () => {
       {applyModalType === ModalTypes.toCluster && (
         <ModalConfirmWithNamespaceSelect
           isVisible={Boolean(applyModalType)}
-          resources={targetResource ? [targetResource] : []}
+          resourceMetaList={targetResource ? [targetResource] : []}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setApplyModalType(null)}

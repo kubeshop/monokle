@@ -1,4 +1,5 @@
 import {Project, SavedCommand, SettingsPanel} from './config';
+import {ResourceIdentifier} from './k8sResource';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -111,7 +112,7 @@ type UiState = {
   };
   renameResourceModal?: {
     isOpen: boolean;
-    resourceId: string;
+    resourceIdentifier: ResourceIdentifier;
   };
   replaceImageModal?: {
     isOpen: boolean;
@@ -127,7 +128,7 @@ type UiState = {
   };
   saveResourcesToFileFolderModal: {
     isOpen: boolean;
-    resourcesIds: string[];
+    resourcesIdentifiers: ResourceIdentifier[];
   };
   isStartProjectPaneVisible: boolean;
   renameEntityModal: {
@@ -181,7 +182,6 @@ type UiState = {
       currentStep: number;
     };
   };
-  previewingCluster?: boolean;
   startPageLearn: {
     isVisible: boolean;
     learnTopic?: LearnTopicType;
@@ -191,6 +191,7 @@ type UiState = {
     selectedTemplatePath?: string;
     projectCreate?: Project;
   };
+  isInQuickClusterMode?: boolean;
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});

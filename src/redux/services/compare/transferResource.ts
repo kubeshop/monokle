@@ -3,8 +3,6 @@ import {KubernetesObject} from '@kubernetes/client-node';
 import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
-
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
@@ -74,7 +72,7 @@ async function deployResourceToCluster(
       {
         context: currentContext,
         namespace,
-        input: jsonToYaml(source.content),
+        input: jsonToYaml(source.object),
       },
       {
         KUBECONFIG: kubeConfigPath,
@@ -97,15 +95,18 @@ async function deployResourceToCluster(
     const sourceCopy = structuredClone(source);
     sourceCopy.namespace = namespace;
     const clusterContent = await getResourceFromCluster(sourceCopy, kubeConfigPath, currentContext);
-    updatedContent = clusterContent ?? source.content;
+    updatedContent = clusterContent ?? source.object;
   } catch {
-    updatedContent = source.content;
+    updatedContent = source.object;
   }
 
   const id = target?.id ?? uuid();
   const resource = createResource(updatedContent, {
     id,
-    filePath: `${PREVIEW_PREFIX}://${currentContext}/${id}`,
+    origin: {
+      storage: 'cluster',
+      context: currentContext,
+    },
   });
 
   return resource;
@@ -123,7 +124,7 @@ async function extractResourceToLocal(
     return result;
   }
 
-  return createResource(source.content, {
+  return createResource(source.object, {
     name: source.name,
   });
 }
@@ -137,13 +138,10 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     name,
     kind: rawResource.kind,
     apiVersion: rawResource.apiVersion,
-    content: cloneDeep(rawResource),
+    object: cloneDeep(rawResource),
     text: jsonToYaml(rawResource),
-    fileId: `${UNSAVED_PREFIX}${id}`,
-    filePath: `${UNSAVED_PREFIX}${id}`,
-    fileOffset: 0,
-    isHighlighted: false,
-    isSelected: false,
+    storage: 'transient',
+    origin: {},
     isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };

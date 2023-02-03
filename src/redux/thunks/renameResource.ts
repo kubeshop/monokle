@@ -1,31 +1,31 @@
 import {stringify} from 'yaml';
 
-import {isIncomingRef} from '@redux/services/resourceRefs';
 import {updateResource} from '@redux/thunks/updateResource';
 
+import {isIncomingRef} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMapType} from '@shared/models/appState';
+import {ResourceMap} from '@shared/models/k8sResource';
 
 export const renameResource = (
   resourceId: string,
   newResourceName: string,
   shouldUpdateRefs: boolean,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   dispatch: AppDispatch,
-  selectedResourceId?: string
+  isResourceSelected?: boolean
 ) => {
   const resource = resourceMap[resourceId];
-  if (!resource || !resource.content) {
+  if (!resource || !resource.object) {
     return;
   }
-  const newResourceContent = {
-    ...resource.content,
+  const newResourceObject = {
+    ...resource.object,
     metadata: {
-      ...(resource.content.metadata || {}),
+      ...(resource.object.metadata || {}),
       name: newResourceName,
     },
   };
-  const newResourceText = stringify(newResourceContent);
+  const newResourceText = stringify(newResourceObject);
   if (shouldUpdateRefs && resource.refs) {
     resource.refs.forEach(ref => {
       if (!isIncomingRef(ref.type) || !(ref.target?.type === 'resource' && ref.target.resourceId)) {
@@ -48,7 +48,7 @@ export const renameResource = (
         updateResource({
           resourceId: dependentResource.id,
           text: newDependentResourceText,
-          preventSelectionAndHighlightsUpdate: selectedResourceId !== dependentResource.id,
+          preventSelectionAndHighlightsUpdate: !isResourceSelected,
         })
       );
     });
@@ -57,7 +57,7 @@ export const renameResource = (
     updateResource({
       resourceId,
       text: newResourceText,
-      preventSelectionAndHighlightsUpdate: selectedResourceId !== resourceId,
+      preventSelectionAndHighlightsUpdate: !isResourceSelected,
     })
   );
 };

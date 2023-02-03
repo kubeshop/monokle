@@ -11,7 +11,7 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
@@ -19,14 +19,14 @@ import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
 interface IProps {
   isVisible: boolean;
-  resources?: K8sResource[];
+  resourceMetaList?: ResourceMeta[];
   title: string | JSX.Element;
   onOk: (namespace?: {name: string; new: boolean}) => void;
   onCancel: () => void;
 }
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
-  const {isVisible, resources = [], title, onCancel, onOk} = props;
+  const {isVisible, resourceMetaList = [], title, onCancel, onOk} = props;
 
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
@@ -34,7 +34,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 
-  const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources, defaultClusterNamespace);
+  const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
   const [namespaces] = useTargetClusterNamespaces();
 
   const hasOneNamespaceWithFullAccess = clusterAccess?.length === 1 && clusterAccess[0].hasFullAccess;
@@ -73,9 +73,12 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
 
-  const clusterScopedResourcesCount = useMemo(() => resources.filter(r => r.isClusterScoped).length, [resources]);
-  const hasClusterScopedResources = useMemo(() => resources.some(r => !r.isClusterScoped), [resources]);
-  const onlyClusterScopedResources = useMemo(() => resources.every(r => !r.isClusterScoped), [resources]);
+  const clusterScopedResourcesCount = useMemo(
+    () => resourceMetaList.filter(r => r.isClusterScoped).length,
+    [resourceMetaList]
+  );
+  const hasClusterScopedResources = useMemo(() => resourceMetaList.some(r => !r.isClusterScoped), [resourceMetaList]);
+  const onlyClusterScopedResources = useMemo(() => resourceMetaList.every(r => !r.isClusterScoped), [resourceMetaList]);
 
   useEffect(() => {
     if (onlyClusterScopedResources) {

@@ -1,15 +1,18 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
 
-import _ from 'lodash';
+import {sortBy} from 'lodash';
 import {DateTime} from 'luxon';
+import {Merge} from 'type-fest';
 
-import {setActiveDashboardMenu, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
+import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
 
 import EventHandler from '@src/kindhandlers/EventHandler';
@@ -20,23 +23,20 @@ import * as S from './Activity.styled';
 
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [pausedResource, setPausedResource] = useState<K8sResource | undefined>();
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [events, setEvents] = useState<K8sResource[]>([]);
+  const [events, setEvents, eventsRef] = useStateWithRef<Merge<K8sResource, {eventTime: string}>[]>([]);
   const [tempEventLength, setTempEventLength] = useState(0);
 
-  useEffect(() => {
+  const pausedResource = useMemo<K8sResource | undefined>(() => {
     if (paused) {
-      setPausedResource(events[0]);
-    } else {
-      setPausedResource(undefined);
+      return eventsRef.current[0];
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused]);
+    return undefined;
+  }, [paused, eventsRef]);
 
   useEffect(() => {
     if (scrollPosition > 100) {
@@ -54,46 +54,47 @@ export const Activity = ({paused}: {paused?: boolean}) => {
     }
   }, [scrollPosition, containerRef]);
 
-  const handleScroll = (event: any) => {
-    setScrollPosition(event.target.scrollTop);
-  };
+  const handleScroll = useCallback(
+    () => (event: any) => {
+      setScrollPosition(event.target.scrollTop);
+    },
+    []
+  );
 
-  const handleCloseToLatest = (e: any) => {
+  const handleCloseToLatest = useCallback((e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToLatestVisible(false);
-  };
+  }, []);
 
-  const handleCloseToOldest = (e: any) => {
+  const handleCloseToOldest = useCallback((e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToOldestVisible(false);
-  };
+  }, []);
 
   useEffect(() => {
-    if (containerRef && containerRef.current && !pausedResource && events.length !== tempEventLength) {
+    if (containerRef && containerRef.current && !pausedResource && eventsRef.current.length !== tempEventLength) {
       setScrollPosition(0);
       containerRef.current.scrollTop = 0;
-      setTempEventLength(events.length);
+      setTempEventLength(eventsRef.current.length);
     }
     setEvents(
-      _.sortBy(
-        Object.values(resourceMap)
-          .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
+      sortBy(
+        Object.values(clusterResourceMap)
           .filter(
-            (resource: K8sResource) =>
-              resource.content.apiVersion === EventHandler.clusterApiVersion && resource.kind === EventHandler.kind
+            resource =>
+              resource.object.apiVersion === EventHandler.clusterApiVersion && resource.kind === EventHandler.kind
           )
           .map(resource => ({
             ...resource,
             eventTime:
-              resource.content.eventTime || resource.content.deprecatedLastTimestamp || resource.content.lastTimestamp,
+              resource.object.eventTime || resource.object.deprecatedLastTimestamp || resource.object.lastTimestamp,
           })),
         'eventTime'
       ).reverse()
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap, tempEventLength, pausedResource]);
+  }, [clusterResourceMap, tempEventLength, pausedResource, setEvents, eventsRef]);
 
   return (
     <S.Container ref={containerRef} onScroll={handleScroll}>
@@ -132,10 +133,10 @@ export const Activity = ({paused}: {paused?: boolean}) => {
           </Button>
         </S.ScrollToOldest>
       )}
-      {events.map(({content, eventTime, id}: K8sResource | any) => (
+      {events.map(({object, eventTime, id}) => (
         <S.EventRow
-          key={content.metadata.uid}
-          $type={content.type}
+          key={object.metadata.uid}
+          $type={object.type}
           onClick={() => {
             dispatch(
               setActiveDashboardMenu({
@@ -143,17 +144,17 @@ export const Activity = ({paused}: {paused?: boolean}) => {
                 label: EventHandler.kind,
               })
             );
-            dispatch(setSelectedResourceId(id));
+            dispatch(setDashboardSelectedResourceId(id));
           }}
         >
           <S.TimeInfo>
             <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
             <S.MessageCount>
-              <span>{content.deprecatedCount || content.count}</span>
+              <span>{object.deprecatedCount || object.count}</span>
               <span> times in the last </span>
               <span>
                 {
-                  DateTime.fromISO(content.deprecatedLastTimestamp || content.lastTimestamp)
+                  DateTime.fromISO(object.deprecatedLastTimestamp || object.lastTimestamp)
                     .diff(DateTime.fromISO(eventTime), ['hours', 'minutes', 'seconds', 'milliseconds'])
                     .toObject().hours
                 }
@@ -162,20 +163,20 @@ export const Activity = ({paused}: {paused?: boolean}) => {
             </S.MessageCount>
           </S.TimeInfo>
           <S.MessageInfo>
-            <S.MessageText>{content.message || content.note}</S.MessageText>
+            <S.MessageText>{object.message || object.note}</S.MessageText>
             <S.MessageHost>
               <span>
-                {content?.deprecatedSource?.host ||
-                  content?.deprecatedSource?.component ||
-                  content?.source?.host ||
-                  content?.reportingController ||
+                {object?.deprecatedSource?.host ||
+                  object?.deprecatedSource?.component ||
+                  object?.source?.host ||
+                  object?.reportingController ||
                   '- '}
                 :
               </span>
-              <span> {content.metadata.name}</span>
+              <span> {object.metadata.name}</span>
             </S.MessageHost>
           </S.MessageInfo>
-          <S.NamespaceInfo>{content.metadata.namespace || '-'}</S.NamespaceInfo>
+          <S.NamespaceInfo>{object.metadata.namespace || '-'}</S.NamespaceInfo>
         </S.EventRow>
       ))}
     </S.Container>

@@ -14,7 +14,7 @@ import {
   updateProjectKubeConfig,
 } from '@redux/reducers/appConfig';
 
-import {AlertEnum} from '@shared/models';
+import {AlertEnum} from '@shared/models/alert';
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
 import {getKubeAccess} from '@shared/utils/kubeclient';
 import {watchFunctions} from '@shared/utils/watch';

@@ -2,8 +2,6 @@ import _ from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
-
 import {setAlert} from '@redux/reducers/alert';
 import {addResource, openResourceDiffModal, setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
@@ -18,9 +16,9 @@ import {errorAlert, successAlert} from '@utils/alert';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {FileMapType, ResourceMapType} from '@shared/models/appState';
+import {FileMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**
@@ -33,13 +31,13 @@ function applyK8sResource(
   kubeconfig?: string,
   namespace?: {name: string; new: boolean}
 ) {
-  const resourceContent = _.cloneDeep(resource.content);
-  if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
-    delete resourceContent.metadata.namespace;
+  const resourceObject = _.cloneDeep(resource.object);
+  if (namespace && namespace.name !== resourceObject.metadata?.namespace) {
+    delete resourceObject.metadata.namespace;
   }
 
   return applyYamlToCluster({
-    yaml: stringify(resourceContent),
+    yaml: stringify(resourceObject),
     context,
     kubeconfig,
     namespace,
@@ -51,7 +49,7 @@ function applyK8sResource(
  */
 
 function applyKustomization(
-  resource: K8sResource,
+  resource: K8sResource<'local'>,
   fileMap: FileMapType,
   context: string,
   projectConfig: ProjectConfig,
@@ -75,14 +73,14 @@ function applyKustomization(
 
 export async function applyResource(
   resourceId: string,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   fileMap: FileMapType,
   dispatch: AppDispatch,
   projectConfig: ProjectConfig,
   context: string,
   namespace?: {name: string; new: boolean},
   options?: {
-    isClusterPreview?: boolean;
+    isInClusterMode?: boolean;
     shouldPerformDiff?: boolean;
     quiet?: boolean;
   }
@@ -96,9 +94,10 @@ export async function applyResource(
       try {
         const kubeconfigPath = projectConfig.kubeConfig?.path;
         const isKustomization = isKustomizationResource(resource);
-        const result = isKustomization
-          ? await applyKustomization(resource, fileMap, context, projectConfig, namespace)
-          : await applyK8sResource(resource, context, kubeconfigPath, namespace);
+        const result =
+          isKustomization && isLocalResource(resource)
+            ? await applyKustomization(resource, fileMap, context, projectConfig, namespace)
+            : await applyK8sResource(resource, context, kubeconfigPath, namespace);
 
         if (isKustomization) {
           trackEvent('cluster/deploy_kustomization');
@@ -113,7 +112,7 @@ export async function applyResource(
         dispatch(setApplyingResource(false));
 
         if (result.stdout) {
-          if (options?.isClusterPreview && kubeconfigPath) {
+          if (options?.isInClusterMode && kubeconfigPath) {
             getResourceFromCluster(resource, kubeconfigPath, context).then(resourceFromCluster => {
               delete resourceFromCluster?.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});
@@ -125,7 +124,7 @@ export async function applyResource(
                   })
                 );
               } else {
-                const newK8sResource = extractK8sResources(updatedResourceText, PREVIEW_PREFIX + kubeconfigPath)[0];
+                const newK8sResource = extractK8sResources(updatedResourceText, 'cluster', {context})[0];
                 dispatch(addResource(newK8sResource));
               }
 

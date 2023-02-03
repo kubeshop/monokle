@@ -3,13 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
-
-import {
-  deleteMultipleClusterResources,
-  setIsClusterConnected,
-  updateMultipleClusterResources,
-} from '@redux/reducers/main';
+import {deleteMultipleClusterResources, updateMultipleClusterResources} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -17,8 +11,7 @@ import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandl
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
-import {ResourceMapType} from '@shared/models/appState';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import {extractK8sResources} from './resource';
@@ -91,7 +84,7 @@ const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType,
+  previewResources: ResourceMap,
   plural?: string
 ) => {
   if (
@@ -111,7 +104,7 @@ const watchResource = async (
     {allowWatchBookmarks: false},
     async (type: string, apiObj: any) => {
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
-      const resource: K8sResource = processResource(apiObj, kubeConfig);
+      const resource: K8sResource = extractClusterResourceFromObject(apiObj, kubeConfig);
 
       if (type === 'ADDED' && !previewResources[resource.id]) {
         if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
@@ -144,27 +137,30 @@ const watchResource = async (
       }
       if (isClusterConnected === isClusterDisconnected()) {
         isClusterConnected = !isClusterDisconnected();
-        dispatch(setIsClusterConnected(!isClusterDisconnected()));
+        // TODO: after finishing the refactoring, what should we do with the following line?
+        // dispatch(setIsClusterConnected(!isClusterDisconnected()));
       }
     }
   );
 };
 
-export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), PREVIEW_PREFIX + kubeConfig.currentContext);
+export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
+  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), 'cluster', {
+    context: kubeConfig.currentContext,
+  });
   return resource;
 };
 
 export const startWatchingResources = async (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType,
+  clusterResourceMap: ResourceMap,
   namespace: string
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
-    watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural)
+    watchResource(dispatch, handler, kubeConfig, clusterResourceMap, handler.kindPlural)
   );
-  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, previewResources);
+  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, clusterResourceMap);
   intervalId = setInterval(() => {
     if (resourcesToUpdate.length > 0) {
       dispatch(
@@ -208,6 +204,9 @@ export const disconnectFromCluster = () => {
   }
 };
 
-export const isClusterDisconnected = () => {
+/**
+ * Indicates if all elements in the "watchers" object have a "status" property less than 0
+ */
+export const isClusterDisconnected = (): boolean => {
   return Object.values(watchers).reduce((output: boolean, watcher) => output && watcher.status < 0, true);
 };

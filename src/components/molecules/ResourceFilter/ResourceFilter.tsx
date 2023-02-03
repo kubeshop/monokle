@@ -7,14 +7,20 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {isInClusterModeSelector, knownResourceKindsSelector} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
+import {
+  allResourceAnnotationsSelector,
+  allResourceKindsSelector,
+  allResourceLabelsSelector,
+} from '@redux/selectors/resourceMapSelectors';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {Filter, FilterField, KeyValueInput, NewKeyValueInput} from '@monokle/components';
-import {ROOT_FILE_ENTRY} from '@shared/constants';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 export const NAVIGATOR_FILTER_BODY_HEIGHT = 375;
 
@@ -28,35 +34,20 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   const [allNamespaces] = useNamespaces({});
 
-  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIds.length));
+  const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const allResourceKinds = useMemo(() => {
-    return [
-      ...new Set([
-        ...knownResourceKinds,
-        ...Object.values(resourceMap)
-          .filter(r => !knownResourceKinds.includes(r.kind))
-          .map(r => r.kind),
-      ]),
-    ].sort();
-  }, [knownResourceKinds, resourceMap]);
-
-  const allLabelsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
-  }, [resourceMap]);
-
-  const allAnnotationsData = useMemo<Record<string, string[]>>(() => {
-    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
-  }, [resourceMap]);
+  const allResourceKinds = useAppSelector(allResourceKindsSelector);
+  const allResourceLabels = useAppSelector(allResourceLabelsSelector);
+  const allResourceAnnotations = useAppSelector(allResourceAnnotationsSelector);
 
   const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
     if (selectedFileOrFolder === ROOT_FILE_ENTRY) {
@@ -70,11 +61,11 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     return {
       namespaces: allNamespaces?.map(n => ({value: n})) ?? [],
       kinds: allResourceKinds?.map(n => ({value: n})) ?? [],
-      labels: Object.keys(allLabelsData)?.map(n => ({value: n})) ?? [],
-      annotations: Object.keys(allAnnotationsData)?.map(n => ({value: n})) ?? [],
+      labels: Object.keys(allResourceLabels)?.map(n => ({value: n})) ?? [],
+      annotations: Object.keys(allResourceAnnotations)?.map(n => ({value: n})) ?? [],
       files: Object.keys(fileMap).map(option => ({value: option})) ?? [],
     };
-  }, [allNamespaces, allResourceKinds, allLabelsData, allAnnotationsData, fileMap]);
+  }, [allNamespaces, allResourceKinds, allResourceLabels, allResourceAnnotations, fileMap]);
 
   const hasActiveFilters = useMemo(
     () =>
@@ -93,7 +84,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
       dispatch(updateResourceFilter(updatedFilter));
 
       if (isInClusterMode && !isEqual(resourceFilterKinds, updatedFilter.kinds)) {
-        restartPreview(kubeConfigContext, 'cluster', dispatch);
+        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
       }
     },
     [dispatch, filtersMap, isInClusterMode, kubeConfigContext, resourceFilterKinds]
@@ -261,28 +252,6 @@ const ResourceFilter = ({active, onToggle}: Props) => {
       </Filter>
     </Container>
   );
-};
-
-const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
-  const keyValues: Record<string, string[]> = {};
-  Object.values(objectList).forEach(currentObject => {
-    const nestedObject = getNestedObject(currentObject);
-    if (nestedObject) {
-      Object.entries(nestedObject).forEach(([key, value]) => {
-        if (typeof value !== 'string') {
-          return;
-        }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
-          }
-        } else {
-          keyValues[key] = [value];
-        }
-      });
-    }
-  });
-  return keyValues;
 };
 
 export default ResourceFilter;

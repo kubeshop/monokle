@@ -6,8 +6,8 @@ export const hotkeys = createHotkeys({
     key: `ctrl+\,, command+\,`,
     category: 'tool',
   },
-  PREVIEW_CLUSTER: {
-    name: 'Preview Cluster',
+  LOAD_CLUSTER: {
+    name: 'Load Cluster',
     key: 'ctrl+i, command+i',
     category: 'tool',
   },

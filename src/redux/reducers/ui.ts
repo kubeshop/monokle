@@ -13,6 +13,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
   HighlightItems,
   LayoutSizeType,
@@ -157,10 +158,10 @@ export const uiSlice = createSlice({
         absolutePathToEntity: '',
       };
     },
-    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier>) => {
       state.renameResourceModal = {
         isOpen: true,
-        resourceId: action.payload,
+        resourceIdentifier: action.payload,
       };
     },
     closeReplaceImageModal: (state: Draft<UiState>) => {
@@ -184,10 +185,10 @@ export const uiSlice = createSlice({
         type: action.payload,
       };
     },
-    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
-        resourcesIds: action.payload,
+        resourcesIdentifiers: action.payload,
       };
     },
     closeSaveEditCommandModal: (state: Draft<UiState>) => {
@@ -204,7 +205,7 @@ export const uiSlice = createSlice({
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
-        resourcesIds: [],
+        resourcesIdentifiers: [],
       };
     },
     openCreateFileFolderModal: (
@@ -278,9 +279,6 @@ export const uiSlice = createSlice({
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
       state.kubeConfigBrowseSettings = {isOpen: true};
     },
-    setPreviewingCluster: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.previewingCluster = action.payload;
-    },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
@@ -349,6 +347,9 @@ export const uiSlice = createSlice({
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
     },
+    setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.isInQuickClusterMode = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -366,7 +367,7 @@ export const uiSlice = createSlice({
 
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
+          !Object.values(action.payload.resourceMetaMap).some(r => isKustomizationResource(r))
         ) {
           state.leftMenu.selection = 'file-explorer';
         }
@@ -426,7 +427,6 @@ export const {
   setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
-  setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
   setSelectedTemplatePath,
@@ -447,5 +447,6 @@ export const {
   setActiveTab,
   openScaleModal,
   closeScaleModal,
+  setIsInQuickClusterMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;

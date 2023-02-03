@@ -7,7 +7,7 @@ import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 
 import {doesSchemaExist} from '@utils/index';
 
-import {K8S_VERSIONS} from '@shared/constants';
+import {K8S_VERSIONS} from '@shared/constants/k8s';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './K8sVersionSelection.style';

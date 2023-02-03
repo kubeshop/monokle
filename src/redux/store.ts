@@ -13,7 +13,7 @@ import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
-import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
+import {mainSlice} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
@@ -38,8 +38,6 @@ combineListeners([
   compareListeners.resourceFetchListener('right'),
   compareListeners.compareListener,
   compareListeners.filterListener,
-  resourceMapChangedListener,
-  imageSelectedListener,
   removedTerminalListener,
   crdsPathChangedListener,
   ...validationListeners,

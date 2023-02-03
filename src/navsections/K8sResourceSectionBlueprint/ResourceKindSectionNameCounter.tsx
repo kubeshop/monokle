@@ -1,10 +1,11 @@
 import {useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {filteredResourceMapSelector} from '@redux/selectors';
+import {filteredResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {countResourceErrors, countResourceWarnings} from '@utils/resources';
+import {useSelectorWithRef} from '@utils/hooks';
 
+// import {countResourceErrors, countResourceWarnings} from '@utils/resources';
 import {SectionCustomComponentProps} from '@shared/models/navigator';
 import {isDefined} from '@shared/utils/filter';
 
@@ -14,15 +15,18 @@ function ResourceKindSectionCounter({sectionInstance, onClick}: SectionCustomCom
   const {id, isSelected, itemIds} = sectionInstance;
 
   const isCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(id));
-  const filteredResourceMap = useAppSelector(filteredResourceMapSelector);
+  const [, filteredResourceMapRef] = useSelectorWithRef(filteredResourceMapSelector);
 
   const resources = useMemo(
-    () => itemIds.map(itemId => filteredResourceMap[itemId]).filter(isDefined),
-    [itemIds, filteredResourceMap]
+    () => itemIds.map(itemId => filteredResourceMapRef.current[itemId]).filter(isDefined),
+    [itemIds, filteredResourceMapRef]
   );
 
-  const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);
-  const errorCount = useMemo(() => countResourceErrors(resources), [resources]);
+  // const warningCount = useMemo(() => countResourceWarnings(resources), [resources]);
+  // const errorCount = useMemo(() => countResourceErrors(resources), [resources]);
+  // TODO: use the above code after the @monokle/validation library is integrated
+  const warningCount = 0;
+  const errorCount = 0;
 
   return (
     <>

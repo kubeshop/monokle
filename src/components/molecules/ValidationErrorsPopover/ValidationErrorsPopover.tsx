@@ -1,35 +1,39 @@
-import {useMemo} from 'react';
+// import {useMemo} from 'react';
 
-import {Popover} from 'antd';
+// import {Popover} from 'antd';
 
-import {countResourceErrors} from '@utils/resources';
+// import Icon from '@atoms/Icon';
 
-import {Icon} from '@monokle/components';
-import {K8sResource} from '@shared/models/k8sResource';
-import {Colors} from '@shared/styles/colors';
+// import {countResourceErrors} from '@utils/resources';
 
-import ErrorsPopoverContent from './ErrorsPopoverContent';
+// import {K8sResource} from '@shared/models/k8sResource';
+// import {Colors} from '@shared/styles/colors';
 
-interface IProps {
-  isDisabled: boolean;
-  isSelected: boolean;
-  resource: K8sResource;
-}
+// import ErrorsPopoverContent from './ErrorsPopoverContent';
 
-const ValidationErrorsPopover: React.FC<IProps> = props => {
-  const {resource, isDisabled, isSelected} = props;
+// interface IProps {
+//   isDisabled: boolean;
+//   isSelected: boolean;
+//   resource: K8sResource;
+// }
 
-  const errorCount = useMemo(() => countResourceErrors([resource]), [resource]);
+// TODO: this component has to be reimplemented after the @monokle/validation library is integrated
+// search where this component is used and fix those places
+const ValidationErrorsPopover = () => {
+  return <div />;
+  // const {resource, isDisabled, isSelected} = props;
 
-  if (isDisabled || errorCount === 0) {
-    return null;
-  }
+  // const errorCount = useMemo(() => countResourceErrors([resource]), [resource]);
 
-  return (
-    <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-      <Icon name="error" style={{marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.redError}} />
-    </Popover>
-  );
+  // if (isDisabled || errorCount === 0) {
+  //   return null;
+  // }
+
+  // return (
+  //   <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
+  //     <Icon name="error" style={{marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.redError}} />
+  //   </Popover>
+  // );
 };
 
 export default ValidationErrorsPopover;

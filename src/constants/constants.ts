@@ -1,9 +1,7 @@
 import {PaneConfiguration} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
 
-export const PREVIEW_PREFIX = 'preview://';
 export const CLUSTER_DIFF_PREFIX = 'clusterDiff://';
-export const UNSAVED_PREFIX = 'unsaved://';
 export const YAML_DOCUMENT_DELIMITER = '---';
 export const YAML_DOCUMENT_DELIMITER_NEW_LINE = '---\n';
 export const TOOLTIP_DELAY = 1.0;

@@ -2,8 +2,8 @@ import {useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setIsInQuickClusterMode,
   setLeftMenuSelection,
-  setPreviewingCluster,
   setShowStartPageLearn,
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
@@ -19,7 +19,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
 
-type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'cluster-preview' | 'learn';
+type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'quick-cluster-mode' | 'learn';
 
 const StartPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,10 +34,10 @@ const StartPage: React.FC = () => {
 
   const options = useStartPageOptions();
 
-  const onClickClusterPreview = () => {
-    trackEvent('dashboard/open', {from: 'start-screen-quick-cluster-preview'});
+  const onClickQuickClusterLoad = () => {
+    trackEvent('dashboard/open', {from: 'start-screen-quick-quick-cluster-mode'});
     dispatch(setLeftMenuSelection('dashboard'));
-    dispatch(setPreviewingCluster(true));
+    dispatch(setIsInQuickClusterMode(true));
     dispatch(toggleStartProjectPane());
   };
 
@@ -60,8 +60,8 @@ const StartPage: React.FC = () => {
               key={key}
               $active={!isStartPageLearnVisible && key === selectedOption}
               onClick={() => {
-                if (key === 'cluster-preview') {
-                  onClickClusterPreview();
+                if (key === 'quick-cluster-mode') {
+                  onClickQuickClusterLoad();
                   return;
                 }
 

@@ -14,12 +14,13 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
-import {isUnsavedResource} from '@redux/services/resource';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta, isTransientResource} from '@shared/models/k8sResource';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
 
 import * as S from './ActionsPaneHeader.styled';
@@ -29,119 +30,110 @@ import Restart from './Restart/Restart';
 import Scale from './Scale/Scale';
 
 interface IProps {
-  selectedResource: K8sResource | undefined;
+  selectedResourceMeta: ResourceMeta | undefined;
   applySelection: () => void;
   actionsPaneWidth: number;
 }
 
 const ActionsPaneHeader: React.FC<IProps> = props => {
-  const {selectedResource, applySelection, actionsPaneWidth} = props;
-
+  const {selectedResourceMeta, applySelection, actionsPaneWidth} = props;
   const dispatch = useAppDispatch();
-  const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedImage = useAppSelector(state => state.main.selectedImage);
-  const selectedPreviewConfigurationId = useAppSelector(state => state.main.selectedPreviewConfigurationId);
-  const selectedPreviewConfiguration = useAppSelector(state => {
-    if (!selectedPreviewConfigurationId) {
-      return undefined;
-    }
-    return state.config.projectConfig?.helm?.previewConfigurationMap?.[selectedPreviewConfigurationId];
-  });
+  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
+  const [, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
+  const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
+  const [selectionHistory, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
 
-  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const selectedHelmConfig = useAppSelector(selectedHelmConfigSelector);
+  const selectedImage = useAppSelector(selectedImageSelector);
 
   const onClickEditPreviewConfiguration = useCallback(() => {
-    if (!selectedPreviewConfiguration) {
+    if (!selectedHelmConfig) {
       return;
     }
-    const chart = Object.values(helmChartMap).find(c => c.filePath === selectedPreviewConfiguration.helmChartFilePath);
+    const chart = Object.values(helmChartMapRef.current).find(c => c.filePath === selectedHelmConfig.helmChartFilePath);
     if (!chart) {
       return;
     }
     dispatch(
       openPreviewConfigurationEditor({
         helmChartId: chart.id,
-        previewConfigurationId: selectedPreviewConfiguration.id,
+        previewConfigurationId: selectedHelmConfig.id,
       })
     );
-  }, [dispatch, selectedPreviewConfiguration, helmChartMap]);
+  }, [dispatch, selectedHelmConfig, helmChartMapRef]);
 
   const onClickRunPreviewConfiguration = useCallback(() => {
-    if (!selectedPreviewConfiguration) {
+    if (!selectedHelmConfig) {
       return;
     }
 
-    startPreview(selectedPreviewConfiguration.id, 'helm-preview-config', dispatch);
-  }, [dispatch, selectedPreviewConfiguration]);
+    startPreview({type: 'helm-config', configId: selectedHelmConfig.id}, dispatch);
+  }, [dispatch, selectedHelmConfig]);
 
   const onClickLeftArrow = useCallback(() => {
     selectFromHistory(
       'left',
-      currentSelectionHistoryIndex,
-      selectionHistory,
-      resourceMap,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesList, resourceMap, selectionHistory]);
+  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
 
   const onClickRightArrow = useCallback(() => {
     selectFromHistory(
       'right',
-      currentSelectionHistoryIndex,
-      selectionHistory,
-      resourceMap,
-      fileMap,
-      imagesList,
+      selectionHistoryRef.current.index,
+      selectionHistoryRef.current.current,
+      resourceMetaMapByStorageRef.current,
+      fileMapRef.current,
+      imagesListRef.current,
       dispatch
     );
-  }, [currentSelectionHistoryIndex, dispatch, fileMap, imagesList, resourceMap, selectionHistory]);
+  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
 
   const isLeftArrowEnabled = useMemo(
     () =>
-      selectionHistory.length > 1 &&
-      (currentSelectionHistoryIndex === undefined ||
-        (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0)),
-    [currentSelectionHistoryIndex, selectionHistory.length]
+      selectionHistory.current.length > 1 &&
+      (selectionHistory.index === undefined || (selectionHistory.index && selectionHistory.index > 0)),
+    [selectionHistory]
   );
 
   const isRightArrowEnabled = useMemo(
     () =>
-      selectionHistory.length > 1 &&
-      currentSelectionHistoryIndex !== undefined &&
-      currentSelectionHistoryIndex < selectionHistory.length - 1,
-    [currentSelectionHistoryIndex, selectionHistory.length]
+      selectionHistory.current.length > 1 &&
+      selectionHistory.index !== undefined &&
+      selectionHistory.index < selectionHistory.current.length - 1,
+    [selectionHistory]
   );
 
   const isSelectedResourceUnsaved = useMemo(() => {
-    if (!selectedResource) {
+    if (!selectedResourceMeta) {
       return false;
     }
-    return isUnsavedResource(selectedResource);
-  }, [selectedResource]);
+    return isTransientResource(selectedResourceMeta);
+  }, [selectedResourceMeta]);
 
-  const onSaveHandler = () => {
-    if (selectedResource) {
-      dispatch(openSaveResourcesToFileFolderModal([selectedResource.id]));
+  const onSaveHandler = useCallback(() => {
+    if (selectedResourceMeta) {
+      dispatch(openSaveResourcesToFileFolderModal([selectedResourceMeta]));
     }
-  };
+  }, [dispatch, selectedResourceMeta]);
 
   const showActionsDropdown = useMemo(
     () =>
       !(
         actionsPaneWidth <
-        PANE_CONSTRAINT_VALUES.minEditPane - (isInClusterMode && selectedResource?.kind === 'Deployment' ? 0 : 105)
+        PANE_CONSTRAINT_VALUES.minEditPane - (isInClusterMode && selectedResourceMeta?.kind === 'Deployment' ? 0 : 105)
       ),
-    [actionsPaneWidth, isInClusterMode, selectedResource?.kind]
+    [actionsPaneWidth, isInClusterMode, selectedResourceMeta?.kind]
   );
 
-  if (selectedPreviewConfigurationId) {
+  if (selectedHelmConfig) {
     return (
       <TitleBar
         title="Helm Command"
@@ -223,7 +215,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           <S.ButtonContainer>
             {showActionsDropdown ? (
               <>
-                {isInClusterMode && selectedResource?.kind === 'Deployment' && (
+                {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
                   <>
                     <Scale />
                     <Restart />
@@ -240,7 +232,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                       key: 'actions',
                       label: (
                         <S.DropdownActionContainer>
-                          {isInClusterMode && selectedResource?.kind === 'Deployment' && (
+                          {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
                             <>
                               <Scale isDropdownActive />
                               <Restart isDropdownActive />

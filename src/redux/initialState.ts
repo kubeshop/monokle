@@ -13,11 +13,32 @@ import {PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
+  resourceMetaMapByStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+    transient: {},
+  },
+  resourceContentMapByStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+    transient: {},
+  },
+  selection: undefined,
+  selectionOptions: {},
+  selectionHistory: {
+    current: [],
+    previous: [],
+    index: 0,
+  },
+  highlights: [],
+  previewOptions: {},
+  clusterConnectionOptions: {
+    lastNamespaceLoaded: electronStore.get('appConfig.lastNamespaceLoaded') || 'default',
+  },
   isRehydrating: false,
   wasRehydrated: false,
-  selectionHistory: [],
-  previousSelectionHistory: [],
-  resourceMap: {},
   resourceFilter: {
     labels: {},
     annotations: {},
@@ -26,11 +47,7 @@ const initialAppState: AppState = {
   helmChartMap: {},
   helmValuesMap: {},
   helmTemplatesMap: {},
-  previewLoader: {
-    isLoading: false,
-  },
   resourceDiff: {},
-  isSelectingFile: false,
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
@@ -38,12 +55,8 @@ const initialAppState: AppState = {
       false
     ),
   },
-  policies: {
-    plugins: [],
-  },
   notifications: [],
-  shouldEditorReloadSelectedPath: false,
-  checkedResourceIds: [],
+  checkedResourceIdentifiers: [],
   registeredKindHandlers: [],
   prevConfEditor: {
     isOpen: false,
@@ -65,7 +78,6 @@ const initialAppState: AppState = {
     currentMatch: null,
   },
   lastChangedLine: 0,
-  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -116,7 +128,6 @@ const initialAppConfigState: AppConfig = {
   clusterAccess: [],
   isAccessLoading: false,
   kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
-  clusterPreviewNamespace: electronStore.get('appConfig.clusterPreviewNamespace') || 'default',
 };
 
 const initialAlertState: AlertState = {};
@@ -159,17 +170,13 @@ const initialUiState: UiState = {
     isOpen: false,
     fromTemplate: false,
   },
-  renameResourceModal: {
-    isOpen: false,
-    resourceId: '',
-  },
   saveEditCommandModal: {
     isOpen: false,
   },
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
-    resourcesIds: [],
+    resourcesIdentifiers: [],
   },
   renameEntityModal: {
     isOpen: false,

@@ -29,7 +29,7 @@ import {
 } from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
+// import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {closeKubeConfigBrowseSetting, openKubeConfigBrowseSetting} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema} from '@redux/services/k8sVersionService';
@@ -163,9 +163,9 @@ export const Settings = ({
     }
   };
 
-  const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
-    dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
-  };
+  // const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
+  //   dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
+  // };
 
   const onChangeEnableHelmWithKustomize = (e: any) => {
     setLocalConfig({
@@ -460,12 +460,15 @@ export const Settings = ({
       </S.Div>
       <S.Div>
         <S.Span>Resource links processing</S.Span>
+
+        {/*
+        // TODO: revisit this after implementing @monokle/validation
         <Checkbox
           checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
           onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
         >
           Ignore optional unsatisfied links
-        </Checkbox>
+        </Checkbox> */}
       </S.Div>
       <S.Div>
         <S.Span>Form Editor</S.Span>

@@ -16,8 +16,8 @@ import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
-import {setLayoutSize, setPreviewingCluster, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
@@ -31,8 +31,7 @@ import {promiseFromIpcRenderer} from '@utils/promises';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
-import {K8sResource} from '@shared/models/k8sResource';
-import {activeProjectSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {activeProjectSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import ClusterSelection from './ClusterSelection';
@@ -47,21 +46,14 @@ const PageHeader = () => {
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
-  const previewingCluster = useAppSelector(state => state.ui.previewingCluster);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
 
@@ -71,14 +63,12 @@ const PageHeader = () => {
 
   const helpMenuItems = useHelpMenuItems();
 
-  const runningPreviewConfiguration = useAppSelector(state => {
-    if (!state.main.previewConfigurationId) {
-      return undefined;
-    }
-    return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
-  });
-
-  const [previewResource, setPreviewResource] = useState<K8sResource>();
+  // const runningPreviewConfiguration = useAppSelector(state => {
+  //   if (!state.main.previewConfigurationId) {
+  //     return undefined;
+  //   }
+  //   return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
+  // });
 
   const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 
@@ -91,8 +81,8 @@ const PageHeader = () => {
       dispatch(toggleStartProjectPane());
     }
 
-    if (previewingCluster) {
-      dispatch(setPreviewingCluster(false));
+    if (isInQuickClusterMode) {
+      dispatch(setIsInQuickClusterMode(false));
     }
 
     if (isInClusterMode) {
@@ -141,14 +131,6 @@ const PageHeader = () => {
   };
 
   useEffect(() => {
-    if (previewResourceId) {
-      setPreviewResource(resourceMap[previewResourceId]);
-    } else {
-      setPreviewResource(undefined);
-    }
-  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap, runningPreviewConfiguration]);
-
-  useEffect(() => {
     if (pageHeaderHeight) {
       dispatch(setLayoutSize({...layoutSize, header: pageHeaderHeight}));
     }
@@ -187,7 +169,11 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && <S.PreviewRow $previewType={previewType} $kubeConfigContextColor={kubeConfigContextColor} />}
+      {/* {isInPreviewMode &&
+        <S.PreviewRow
+          // $previewType={previewType}
+          $kubeConfigContextColor={kubeConfigContextColor} />
+      } */}
 
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
@@ -251,14 +237,13 @@ const PageHeader = () => {
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
           {projectRootFolder && <OPAChip />}
           <K8sVersionSelection />
-          <ClusterSelection previewResource={previewResource} />
+          <ClusterSelection />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">
               <S.BellOutlined onClick={toggleNotificationsDrawer} />
             </Badge>
           </Tooltip>
-
           <Dropdown
             menu={{
               items: helpMenuItems,

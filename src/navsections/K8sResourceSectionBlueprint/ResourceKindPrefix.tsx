@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter} from '@redux/reducers/main';
+import {resourceMetaSelector} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
@@ -34,16 +35,20 @@ const StyledTag = styled(Tag)<{$isSelected: boolean}>`
 const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
-  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
+
+  const resourceMeta = useAppSelector(state =>
+    resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
+  );
   const filterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
 
   const applyNamespaceFilter = useCallback(() => {
-    if (resource.namespace) {
-      dispatch(extendResourceFilter({namespaces: [resource.namespace], labels: {}, annotations: {}}));
+    if (!resourceMeta) {
+      return;
     }
-  }, [resource, dispatch]);
+    dispatch(extendResourceFilter({namespaces: [String(resourceMeta.namespace)], labels: {}, annotations: {}}));
+  }, [resourceMeta, dispatch]);
 
-  if (!resource) {
+  if (!resourceMeta) {
     return null;
   }
 
@@ -52,21 +57,22 @@ const Prefix = (props: ItemCustomComponentProps) => {
       <ResourceRefsIconPopover
         isSelected={itemInstance.isSelected}
         isDisabled={itemInstance.isDisabled}
-        resource={resource}
+        resourceMeta={resourceMeta}
         type="incoming"
       />
-      {resource.namespace && !filterNamespaces && (
+
+      {resourceMeta.namespace && !filterNamespaces && (
         <Popover
           title="Filter"
           overlayClassName="resource-prefix-popover-overlay"
           content={
             <Button type="link" onClick={applyNamespaceFilter} style={{padding: 0}}>
-              Set namespace filter to {resource.namespace}
+              Set namespace filter to {resourceMeta.namespace}
             </Button>
           }
         >
           <StyledTag $isSelected={itemInstance.isSelected} color="default">
-            {resource.namespace}
+            {resourceMeta.namespace}
           </StyledTag>
         </Popover>
       )}

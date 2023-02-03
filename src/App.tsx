@@ -19,7 +19,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
+import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
@@ -99,7 +99,7 @@ const App = () => {
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
-  const isPreviewingCluster = useAppSelector(state => state.ui.previewingCluster);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
@@ -374,9 +374,10 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    dispatch(reprocessAllResources());
-  }, [k8sVersion, dispatch]);
+  // TODO: this should happen in the validation listener after we add @monokle/validation
+  // useEffect(() => {
+  //   dispatch(reprocessAllResources());
+  // }, [k8sVersion, dispatch]);
 
   const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
@@ -395,7 +396,7 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          {(isPreviewingCluster || (activeProject && !isStartProjectPaneVisible)) && <PageHeader />}
+          {(isInQuickClusterMode || (activeProject && !isStartProjectPaneVisible)) && <PageHeader />}
 
           <PaneManager />
         </S.MainContainer>

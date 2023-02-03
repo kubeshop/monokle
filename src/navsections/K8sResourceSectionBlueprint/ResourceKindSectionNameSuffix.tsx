@@ -10,6 +10,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -17,7 +18,6 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {SectionCustomComponentProps} from '@shared/models/navigator';
 import {NewResourceWizardInput} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const SuffixContainer = styled.span`
   display: inline-block;
@@ -39,7 +39,8 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   const dispatch = useAppDispatch();
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isSectionCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(sectionInstance.id));
 
   const resourceKind = useMemo(() => {
@@ -71,7 +72,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
             type="link"
             onClick={createResource}
             size="small"
-            disabled={isInPreviewMode}
+            disabled={isInPreviewMode || isInClusterMode}
             style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
           />
         </Tooltip>

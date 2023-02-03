@@ -1,32 +1,33 @@
 import {useCallback} from 'react';
 
-import {useAppSelector} from '@redux/hooks';
+import {size} from 'lodash';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {useAppSelector} from '@redux/hooks';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './Status.styled';
 
 export const Status = () => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
 
   const getResourceCount = useCallback(() => {
-    return Object.values(resourceMap).filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .length;
-  }, [resourceMap]);
+    return size(clusterResourceMap);
+  }, [clusterResourceMap]);
 
+  // TODO: re-implement this after @monokle/validation
   const getErrorCount = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .reduce((total: number, resource: K8sResource) => {
-        if (resource.issues && resource.issues.errors) {
-          total += resource.issues.errors.length;
-        }
-        if (resource.validation && resource.validation.errors) {
-          total += resource.validation.errors.length;
-        }
-        return total;
-      }, 0);
-  }, [resourceMap]);
+    // return Object.values(clusterResourceMap)
+    //   .reduce((total: number, resource: K8sResource) => {
+    //     if (resource.issues && resource.issues.errors) {
+    //       total += resource.issues.errors.length;
+    //     }
+    //     if (resource.validation && resource.validation.errors) {
+    //       total += resource.validation.errors.length;
+    //     }
+    //     return total;
+    //   }, 0);
+    return 0;
+  }, [clusterResourceMap]);
 
   return (
     <S.Container>

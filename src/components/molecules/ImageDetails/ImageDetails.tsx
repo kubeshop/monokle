@@ -14,7 +14,13 @@ import * as S from './ImageDetails.styled';
 import ImageTags from './ImageTags';
 
 const ImageDetails: React.FC = () => {
-  const selectedImage = useAppSelector(state => state.main.selectedImage);
+  const selectedImage = useAppSelector(state => {
+    const selectedImageId = state.main.selection?.type === 'image' && state.main.selection?.imageId;
+    if (!selectedImageId) {
+      return undefined;
+    }
+    return state.main.imagesList.find(i => i.id === selectedImageId);
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [imageInfo, setImageInfo] = useState<DockerHubImage>();

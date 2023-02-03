@@ -2,9 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
-
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const ServiceHandler: ResourceKindHandler = {
@@ -15,7 +13,7 @@ const ServiceHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedService(resource.name, resource.namespace || 'default');
   },
@@ -26,11 +24,10 @@ const ServiceHandler: ResourceKindHandler = {
       : await k8sCoreV1Api.listServiceForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespacedService(resource.name, resource.namespace || 'default');
   },
-  outgoingRefMappers: createPodSelectorOutgoingRefMappers(),
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/service/',
 };
 

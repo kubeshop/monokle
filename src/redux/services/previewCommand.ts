@@ -1,8 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
-
-import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
@@ -10,6 +7,8 @@ import {errorMsg} from '@utils/error';
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
+import {CommandPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
@@ -18,7 +17,10 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {extractK8sResources} from './resource';
 
 export const previewSavedCommand = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<'preview'>[];
+    preview: CommandPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
@@ -51,7 +53,9 @@ export const previewSavedCommand = createAsyncThunk<
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
+    const resources = extractK8sResources(result.stdout, 'preview', {
+      preview: {type: 'command', commandId: command.id},
+    });
 
     if (!resources.length) {
       return createRejectionWithAlert(

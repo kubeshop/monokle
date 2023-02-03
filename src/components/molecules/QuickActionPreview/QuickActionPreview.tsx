@@ -22,7 +22,7 @@ const QuickActionPreview: React.FC<IProps> = props => {
   const {reloadPreview, selectAndPreview} = props;
 
   const dispatch = useAppDispatch();
-  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
 
   const exitPreview = () => {
     stopPreview(dispatch);

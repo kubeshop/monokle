@@ -7,9 +7,11 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {resetResourceFilter, selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
+import {resetResourceFilter, selectResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
-import {knownResourceKindsSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
+import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -17,6 +19,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -77,16 +80,19 @@ const applyFilterWithConfirm = (
   });
 };
 
-const selectK8sResourceWithConfirm = (resourceId: string, resourceName: string, dispatch: AppDispatch) => {
+const selectK8sResourceWithConfirm = (
+  resourceIdentifier: ResourceIdentifier,
+  resourceName: string,
+  dispatch: AppDispatch
+) => {
   let title = `Are you sure you want to select ${resourceName}? It will reset the currently applied filters.`;
-
   Modal.confirm({
     title,
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
         dispatch(resetResourceFilter());
-        dispatch(selectK8sResource({resourceId}));
+        dispatch(selectResource({resourceIdentifier}));
         dispatch(closeQuickSearchActionsPopup());
         resolve({});
       });
@@ -101,8 +107,8 @@ const QuickSearchActionsV3: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const [namespaces] = useNamespaces({extra: ['default']});
@@ -113,23 +119,25 @@ const QuickSearchActionsV3: React.FC = () => {
     return [
       ...new Set([
         ...knownResourceKinds,
-        ...Object.values(resourceMap)
+        ...Object.values(activeResourceMetaMap)
           .filter(r => !knownResourceKinds.includes(r.kind))
           .map(r => r.kind),
       ]),
     ].sort();
-  }, [knownResourceKinds, resourceMap]);
+  }, [knownResourceKinds, activeResourceMetaMap]);
 
   const filteredResources = useMemo(
     () =>
       Object.fromEntries(
-        Object.entries(resourceMap).filter(([, resource]) => isResourcePassingFilter(resource, resourceFilter))
+        Object.entries(activeResourceMetaMap).filter(([, resource]) =>
+          isResourcePassingFilter(resource, resourceFilter)
+        )
       ),
-    [resourceFilter, resourceMap]
+    [resourceFilter, activeResourceMetaMap]
   );
 
   const applyOption = useCallback(
-    (type: string, option: string) => {
+    (type: string, option: string, resourceStorage?: ResourceStorage) => {
       if (type === 'namespaces' || type === 'kinds') {
         if (resourceFilter[type]) {
           if (!resourceFilter[type]?.includes(option)) {
@@ -144,18 +152,22 @@ const QuickSearchActionsV3: React.FC = () => {
           );
           dispatch(closeQuickSearchActionsPopup());
         }
-      } else if (type === 'resource') {
+      } else if (type === 'resource' && resourceStorage) {
         if (!filteredResources[option]) {
-          selectK8sResourceWithConfirm(option, resourceMap[option].name, dispatch);
+          selectK8sResourceWithConfirm(
+            {id: option, storage: resourceStorage},
+            activeResourceMetaMap[option].name,
+            dispatch
+          );
         } else {
-          if (selectedResourceId !== option) {
-            dispatch(selectK8sResource({resourceId: option}));
+          if (selectedResourceMeta?.id !== option) {
+            dispatch(selectResource({resourceIdentifier: {id: option, storage: resourceStorage}}));
           }
           dispatch(closeQuickSearchActionsPopup());
         }
       }
     },
-    [dispatch, filteredResources, resourceFilter, resourceMap, selectedResourceId]
+    [dispatch, filteredResources, resourceFilter, activeResourceMetaMap, selectedResourceMeta]
   );
 
   const matchingCharactersLabel = useCallback(
@@ -207,7 +219,7 @@ const QuickSearchActionsV3: React.FC = () => {
       return filteredOpt;
     }, [] as {value: string; label: JSX.Element}[]);
 
-    const resourceOptions = Object.entries(resourceMap)
+    const resourceOptions = Object.entries(activeResourceMetaMap)
       .sort((a, b) => {
         const resA = a[1];
         const resB = b[1];
@@ -241,7 +253,10 @@ const QuickSearchActionsV3: React.FC = () => {
             </div>
           );
 
-          filteredOpt.push({value: `resource:${resourceEntry[0]}`, label: optionLabel});
+          filteredOpt.push({
+            value: `resource:${resourceEntry[0]}:${resourceEntry[1].storage}`,
+            label: optionLabel,
+          });
         }
 
         return filteredOpt;
@@ -252,7 +267,7 @@ const QuickSearchActionsV3: React.FC = () => {
       {label: LabelMapper['namespace'], options: namespaceOptions},
       {label: LabelMapper['resource'], options: resourceOptions},
     ];
-  }, [allResourceKinds, matchingCharactersLabel, namespaces, resourceMap, searchingValue]);
+  }, [allResourceKinds, matchingCharactersLabel, namespaces, activeResourceMetaMap, searchingValue]);
 
   const previousInputListFirstChild = useRef<any>(null);
 
@@ -311,7 +326,7 @@ const QuickSearchActionsV3: React.FC = () => {
         onSearch={value => setSearchingValue(value)}
         onSelect={(value: string) => {
           // options are of type : `type:value`
-          applyOption(value.split(':')[0], value.split(':')[1]);
+          applyOption(value.split(':')[0], value.split(':')[1], value.split(':')[2] as ResourceStorage);
         }}
         filterOption={(inputValue, opt) => {
           if (opt?.options?.length) {

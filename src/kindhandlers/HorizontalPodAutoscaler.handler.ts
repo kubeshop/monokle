@@ -2,7 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
@@ -13,7 +13,7 @@ const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.autoscaling.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const autoscalingV1Api = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
     return autoscalingV1Api.readNamespacedHorizontalPodAutoscaler(
       resource.name,
@@ -28,7 +28,7 @@ const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
       : await autoscalingV1Api.listHorizontalPodAutoscalerForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const autoscalingV1Api = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
     await autoscalingV1Api.deleteNamespacedHorizontalPodAutoscaler(resource.name, resource.namespace || 'default');
   },

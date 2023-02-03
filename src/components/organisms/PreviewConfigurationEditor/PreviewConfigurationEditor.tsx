@@ -167,7 +167,7 @@ const PreviewConfigurationEditor = () => {
 
       dispatch(closePreviewConfigurationEditor());
       if (shouldRunPreview) {
-        startPreview(input.id, 'helm-preview-config', dispatch);
+        startPreview({configId: input.id, type: 'helm-config'}, dispatch);
       }
     },
     [

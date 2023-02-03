@@ -9,7 +9,7 @@ import {GitSliceState} from './git';
 import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
-import {ValidationSliceState} from './validation';
+import {ValidationState} from './validation';
 
 /**
  * This is the redux store root state
@@ -26,7 +26,7 @@ type RootState = {
   navigator: NavigatorState;
   terminal: TerminalState;
   ui: UiState;
-  validation: ValidationSliceState;
+  validation: ValidationState;
   dashboard: DashboardState;
 };
 
