@@ -63,7 +63,7 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
     },
     builder: {
       isInitialized: scope => {
-        return scope.activeResourcesLength > 0;
+        return scope.activeResourcesLength > 0 || scope.transientResourcesLength > 0;
       },
       // makeCheckable: scope => {
       //   return {

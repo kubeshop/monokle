@@ -1,5 +1,3 @@
-import {isEmpty} from 'lodash';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {selectResource} from '@redux/reducers/main';
@@ -75,7 +73,8 @@ export function makeResourceKindNavSection(
         return {resourceKind: kindHandler.kind};
       },
       isInitialized: scope => {
-        return !isEmpty(scope.filteredResources);
+        const filteredResources = scope[`${kindSectionName}-filteredResources`] as ResourceMeta[];
+        return filteredResources.length > 0;
       },
       // TODO: reimplement checkable
       // makeCheckable: scope => {
@@ -110,7 +109,7 @@ export function makeResourceKindNavSection(
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
-        isCheckable: () => true,
+        // isCheckable: () => true,
         // isChecked: (itemInstance, scope) => {
         //   return scope.checkedResourceIds.includes(itemInstance.id);
         // },
