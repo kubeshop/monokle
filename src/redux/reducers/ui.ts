@@ -8,7 +8,6 @@ import {Entries} from 'type-fest';
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import initialState from '@redux/initialState';
-import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -19,7 +18,6 @@ import {
   LayoutSizeType,
   LearnTopicType,
   LeftMenuBottomSelectionType,
-  LeftMenuSelectionType,
   MonacoUiState,
   NewLeftMenuSelectionType,
   NewResourceWizardInput,
@@ -72,10 +70,7 @@ export const uiSlice = createSlice({
         electronStore.set('ui.leftMenu.bottomSelection', action.payload);
       }
     },
-    setLeftMenuSelection: (
-      state: Draft<UiState>,
-      action: PayloadAction<LeftMenuSelectionType | NewLeftMenuSelectionType>
-    ) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<NewLeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -364,16 +359,6 @@ export const uiSlice = createSlice({
         const folders = nodes.filter(node => node.children?.length);
         const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
         state.leftMenu.expandedFolders = folderKeys;
-
-        if (
-          state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMetaMap).some(r => isKustomizationResource(r))
-        ) {
-          state.leftMenu.selection = 'file-explorer';
-        }
-        if (state.leftMenu.selection === 'helm-pane' && Object.values(action.payload.helmChartMap).length === 0) {
-          state.leftMenu.selection = 'file-explorer';
-        }
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;

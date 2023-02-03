@@ -80,7 +80,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       return;
     }
 
-    dispatch(setLeftMenuSelection('file-explorer'));
+    dispatch(setLeftMenuSelection('explorer'));
     dispatch(selectFile({filePath: resource.origin.filePath}));
   };
 

@@ -4,6 +4,8 @@ import {useAppDispatch} from '@redux/hooks';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem} from '@redux/validation/validation.slice';
 
+import {useMainPaneDimensions} from '@utils/hooks';
+
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
 import {TitleBar, ValidationOverview} from '@monokle/components';
@@ -15,6 +17,8 @@ const ValidationPane: React.FC = () => {
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
+
+  const {height} = useMainPaneDimensions();
 
   if (!lastResponse) {
     return null;
@@ -35,6 +39,8 @@ const ValidationPane: React.FC = () => {
       />
 
       <ValidationOverview
+        containerStyle={{marginTop: '20px'}}
+        height={height - 190}
         newProblemsIntroducedType={newProblemsIntroducedType}
         selectedProblem={selectedProblem}
         validationResponse={lastResponse}

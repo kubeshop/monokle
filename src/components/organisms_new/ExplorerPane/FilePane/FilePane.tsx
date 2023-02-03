@@ -251,7 +251,7 @@ const FilePane: React.FC = () => {
             <span id="file-explorer-count">
               <b>{filesOnly.length || 0} files</b>
             </span>{' '}
-            in <span id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</span>
+            in <span id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY]?.filePath}</span>
           </S.RootFolderText>
         }
       />

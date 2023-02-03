@@ -80,11 +80,9 @@ export const DiffTooltip = () => (
   <HotkeyLabel text="Diff this resource against your selected cluster" name="DIFF_RESOURCE" />
 );
 export const FileExplorerTabTooltip = () => <HotkeyLabel text="View File Explorer" name="OPEN_EXPLORER_TAB" />;
-export const HelmTabTooltip = () => <HotkeyLabel text="View Helm Charts" name="OPEN_HELM_TAB" />;
 export const InstallValuesFileTooltip = () => (
   <HotkeyLabel text="Install Helm Chart using this values file in your selected cluster" name="APPLY_SELECTION" />
 );
-export const KustomizeTabTooltip = () => <HotkeyLabel text="View Kustomizations" name="OPEN_KUSTOMIZATION_TAB" />;
 export const NewResourceTooltip = () => <HotkeyLabel text="Create new resource" name="CREATE_NEW_RESOURCE" />;
 export const QuickFilterTooltip = () => <HotkeyLabel text="Filter results" name="OPEN_QUICK_SEARCH" />;
 export const ReloadFolderTooltip = () => (

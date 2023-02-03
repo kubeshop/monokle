@@ -31,7 +31,7 @@ export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, 
   }, [highlightNode]);
 
   useUpdateEffect(() => {
-    if (leftMenuSelection !== 'search' && leftMenuSelection !== 'file-explorer') {
+    if (leftMenuSelection !== 'search' && leftMenuSelection !== 'explorer') {
       return;
     }
 

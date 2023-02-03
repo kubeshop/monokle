@@ -86,16 +86,6 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+shift+e, command+shift+e',
     category: 'navigation',
   },
-  OPEN_KUSTOMIZATION_TAB: {
-    name: 'Open Kustomization Tab',
-    key: 'ctrl+shift+k, command+shift+k',
-    category: 'navigation',
-  },
-  OPEN_HELM_TAB: {
-    name: 'Open Helm Tab',
-    key: 'ctrl+shift+h, command+shift+h',
-    category: 'navigation',
-  },
   OPEN_VALIDATION_TAB: {
     name: 'Open Validation Tab',
     key: 'ctrl+shift+v, command+shift+v',
@@ -114,11 +104,6 @@ export const hotkeys = createHotkeys({
   OPEN_QUICK_SEARCH: {
     name: 'Open Quick Search',
     key: 'ctrl+p, ctrl+shift+p, command+p, command+shift+p',
-    category: 'navigation',
-  },
-  OPEN_TUTORIAL_PAGE: {
-    name: 'Open Tutorial Page',
-    key: 'ctrl+shift+t, command+shift+t',
     category: 'navigation',
   },
   OPEN_NEW_WINDOW: {
