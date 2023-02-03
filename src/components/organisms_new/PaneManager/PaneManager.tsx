@@ -14,6 +14,7 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
+import ErrorPane from '../ErrorPane';
 import StartPage from '../StartPage';
 import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
@@ -104,6 +105,8 @@ const NewPaneManager: React.FC = () => {
                       <GitOpsView />
                     ) : currentActivity?.name === 'dashboard' ? (
                       <Dashboard />
+                    ) : currentActivity?.name === 'validation' ? (
+                      <ErrorPane />
                     ) : (
                       <ActionsPane />
                     )
