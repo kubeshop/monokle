@@ -36,9 +36,16 @@ export function formatGitChangedFiles(
       f => path.join(projectFolderPath, f.filePath) === path.join(gitFolderPath, gitFile.path)
     );
 
-    let modifiedContent = foundFile?.text || '';
+    // let modifiedContent = foundFile?.text || '';
 
-    if (!modifiedContent && fileType !== 'deleted') {
+    // if (!modifiedContent && fileType !== 'deleted') {
+    //   modifiedContent = readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
+    // }
+
+    // TODO: is this assumption correct now that fileEntry.text no longer exists?
+    let modifiedContent = '';
+
+    if (fileType !== 'deleted') {
       modifiedContent = readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
     }
 

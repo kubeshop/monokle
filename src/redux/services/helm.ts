@@ -261,7 +261,7 @@ export function processHelmChartFolder(
           fileMap,
         });
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, fileMap);
+        const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
           const {meta, content} = splitK8sResource(resource);
           resourceMetaMap[meta.id] = meta;
