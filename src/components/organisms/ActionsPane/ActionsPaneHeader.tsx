@@ -8,7 +8,7 @@ import {PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {
   EditPreviewConfigurationTooltip,
   RunPreviewConfigurationTooltip,
-  SaveUnsavedResourceTooltip,
+  SaveTransientResourceTooltip,
 } from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -20,7 +20,7 @@ import {startPreview} from '@redux/services/preview';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
-import {ResourceMeta, isTransientResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
 
 import * as S from './ActionsPaneHeader.styled';
@@ -111,11 +111,11 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     [selectionHistory]
   );
 
-  const isSelectedResourceUnsaved = useMemo(() => {
+  const isSelectedResourceTransient = useMemo(() => {
     if (!selectedResourceMeta) {
       return false;
     }
-    return isTransientResource(selectedResourceMeta);
+    return selectedResourceMeta.storage === 'transient';
   }, [selectedResourceMeta]);
 
   const onSaveHandler = useCallback(() => {
@@ -204,8 +204,8 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
             icon={<RightOutlined />}
           />
 
-          {isSelectedResourceUnsaved && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
+          {isSelectedResourceTransient && (
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveTransientResourceTooltip}>
               <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
                 Save
               </S.SaveButton>

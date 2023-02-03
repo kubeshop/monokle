@@ -8,12 +8,7 @@ import {deleteResource, isResourceSelected, removeResourceFromFile} from '@redux
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {
-  ResourceIdentifier,
-  isClusterResourceMeta,
-  isLocalResourceMeta,
-  isTransientResourceMeta,
-} from '@shared/models/k8sResource';
+import {ResourceIdentifier, isClusterResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
@@ -42,7 +37,7 @@ export const removeResources = createAsyncThunk(
           clearSelectionReducer(mainState);
         }
 
-        if (isTransientResourceMeta(resourceMeta)) {
+        if (resourceMeta.storage === 'transient') {
           deleteResource(resourceMeta, {
             resourceMetaMap: mainState.resourceMetaMapByStorage.transient,
             resourceContentMap: mainState.resourceContentMapByStorage.transient,

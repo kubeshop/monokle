@@ -24,7 +24,7 @@ import {removeResources} from '@redux/thunks/removeResources';
 import {ContextMenu} from '@atoms';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {K8sResource, ResourceMetaMap, isLocalResource, isTransientResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMetaMap, dispatch: AppDispatch) {
@@ -38,7 +38,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.origin.filePath} file.\n${title}`;
     }
-  } else if (!isTransientResource(resource)) {
+  } else if (resource.storage === 'cluster') {
     title = `This action will delete the resource from the Cluster.\n${title}`;
   }
 
@@ -143,7 +143,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
           {key: 'divider-1', type: 'divider'},
         ]
       : []),
-    ...(isInPreviewMode || isTransientResource(resource)
+    ...(isInPreviewMode || resource.storage === 'transient'
       ? [
           {
             key: 'save_to_file_folder',
