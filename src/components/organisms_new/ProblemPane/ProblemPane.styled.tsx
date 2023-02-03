@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import {BackgroundColors} from '@shared/styles';
 
-export const ErrorPaneContainer = styled.div`
+export const ProblemPaneContainer = styled.div`
   background-color: ${BackgroundColors.darkThemeBackground};
   height: 100%;
   padding: 10px 10px 25px 25px;
