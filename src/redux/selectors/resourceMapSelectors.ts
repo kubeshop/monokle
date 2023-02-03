@@ -97,14 +97,14 @@ export const activeResourceMetaMapSelector = createSelector(
     (state: RootState) => state.main.clusterConnection,
     (state: RootState) => state.main.preview,
   ],
-  (resourceMetaStorage, clusterConnection, preview): ResourceMetaMap<ResourceStorage> => {
+  (resourceMetaMapByStorage, clusterConnection, preview): ResourceMetaMap<ResourceStorage> => {
     if (clusterConnection) {
-      return resourceMetaStorage.cluster;
+      return resourceMetaMapByStorage.cluster;
     }
     if (preview) {
-      return resourceMetaStorage.preview;
+      return resourceMetaMapByStorage.preview;
     }
-    return resourceMetaStorage.local;
+    return resourceMetaMapByStorage.local;
   }
 );
 
