@@ -14,6 +14,7 @@ import {alertSlice} from './reducers/alert';
 import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
+import {imageListParserListener} from './reducers/main/mainListeners';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {removedTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
@@ -41,6 +42,7 @@ combineListeners([
   removedTerminalListener,
   crdsPathChangedListener,
   ...validationListeners,
+  imageListParserListener,
 ]);
 
 const appReducer = combineReducers({
