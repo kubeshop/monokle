@@ -42,15 +42,16 @@ export function makeResourceKindNavSection(
     getScope: state => {
       const activeResourceMetaMap = activeResourceMetaMapSelector(state);
       const transientResourceMetaMap = transientResourceMetaMapSelector(state);
+      const newFilteredResources = [
+        ...Object.values(activeResourceMetaMap),
+        ...Object.values(transientResourceMetaMap),
+      ].filter(r => resourceMatchesKindHandler(r, kindHandler));
       return {
         resourceFilter: state.main.resourceFilter,
         selection: state.main.selection,
         highlights: state.main.highlights,
         checkedResourceIdentifiers: state.main.checkedResourceIdentifiers,
-        [`${kindSectionName}-filteredResources`]: [
-          ...Object.values(activeResourceMetaMap),
-          ...Object.values(transientResourceMetaMap),
-        ].filter(r => resourceMatchesKindHandler(r, kindHandler)),
+        [`${kindSectionName}-filteredResources`]: newFilteredResources,
       };
     },
     builder: {
@@ -71,10 +72,6 @@ export function makeResourceKindNavSection(
       },
       getMeta: () => {
         return {resourceKind: kindHandler.kind};
-      },
-      isInitialized: scope => {
-        const filteredResources = scope[`${kindSectionName}-filteredResources`] as ResourceMeta[];
-        return filteredResources.length > 0;
       },
       // TODO: reimplement checkable
       // makeCheckable: scope => {
