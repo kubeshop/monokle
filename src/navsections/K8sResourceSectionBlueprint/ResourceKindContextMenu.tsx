@@ -42,7 +42,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {K8sResource, ResourceMap, isLocalResource, isTransientResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResource';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
@@ -66,7 +66,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.origin.filePath} file.\n${title}`;
     }
-  } else if (!isTransientResource(resource)) {
+  } else if (resource.storage === 'cluster') {
     title = `This action will delete the resource from the Cluster.\n${title}`;
   }
 
@@ -225,7 +225,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
           {key: 'divider-2', type: 'divider'},
         ]
       : []),
-    ...(isInPreviewMode || isTransientResource(resource)
+    ...(isInPreviewMode || resource.storage === 'transient'
       ? [
           {
             key: 'save_to_file_folder',

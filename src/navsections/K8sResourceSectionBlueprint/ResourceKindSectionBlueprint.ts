@@ -9,7 +9,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {ResourceIdentifier, ResourceMeta, isTransientResource} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {AppSelection} from '@shared/models/selection';
@@ -101,7 +101,7 @@ export function makeResourceKindNavSection(
       builder: {
         isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
         isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
-        isDirty: rawItem => isTransientResource(rawItem),
+        isDirty: rawItem => rawItem.storage === 'transient',
         isVisible: (rawItem, scope) => {
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;

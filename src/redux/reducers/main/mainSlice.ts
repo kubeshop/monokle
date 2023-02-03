@@ -128,11 +128,14 @@ export const performResourceContentUpdate = (resource: K8sResource, newText: str
 
 const addResourceReducer = (state: AppState, resource: K8sResource) => {
   const {meta, content} = splitK8sResource(resource);
-  // TODO: how can we fix the types here?
-  // @ts-ignore
-  state.resourceMetaMapByStorage[meta.origin.storage] = meta;
-  // @ts-ignore
-  state.resourceContentMapByStorage[content.origin.storage] = content;
+
+  const resourceMetaMap = state.resourceMetaMapByStorage[meta.storage] as ResourceMetaMap<typeof resource.storage>;
+  resourceMetaMap[meta.id] = meta;
+
+  const resourceContentMap = state.resourceContentMapByStorage[content.storage] as ResourceContentMap<
+    typeof resource.storage
+  >;
+  resourceContentMap[content.id] = content;
 };
 
 export const mainSlice = createSlice({

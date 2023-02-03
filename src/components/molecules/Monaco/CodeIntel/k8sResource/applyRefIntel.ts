@@ -20,8 +20,6 @@ import {
   ResourceMetaMap,
   ResourceStorage,
   isLocalResource,
-  isPreviewResource,
-  isTransientResource,
 } from '@shared/models/k8sResource';
 
 function applyRefIntel(
@@ -112,11 +110,7 @@ function applyRefIntel(
         }
 
         let text = `${outgoingRefResourceMeta.kind}: ${outgoingRefResourceMeta.name}`;
-        if (
-          !isPreviewResource(outgoingRefResourceMeta) &&
-          !isTransientResource(outgoingRefResourceMeta) &&
-          isLocalResource(outgoingRefResourceMeta)
-        ) {
+        if (isLocalResource(outgoingRefResourceMeta)) {
           text += ` in ${outgoingRefResourceMeta.origin.filePath}`;
         }
 

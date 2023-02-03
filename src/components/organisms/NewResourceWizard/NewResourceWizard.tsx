@@ -364,105 +364,102 @@ const NewResourceWizard = () => {
     return `${filename}.yaml`;
   }, []);
 
-  const createResourceProcessing = useCallback(
-    () => () => {
-      const formValues = form.getFieldsValue();
+  const createResourceProcessing = useCallback(() => {
+    const formValues = form.getFieldsValue();
 
-      const selectedResourceMeta =
-        formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
-          ? localResourceMetaMapRef.current[formValues.selectedResourceId]
-          : undefined;
+    const selectedResourceMeta =
+      formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
+        ? localResourceMetaMapRef.current[formValues.selectedResourceId]
+        : undefined;
 
-      const selectedResourceContent =
-        formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
-          ? localResourceContentMapRef.current[formValues.selectedResourceId]
-          : undefined;
+    const selectedResourceContent =
+      formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
+        ? localResourceContentMapRef.current[formValues.selectedResourceId]
+        : undefined;
 
-      const selectedResource =
-        selectedResourceMeta && selectedResourceContent
-          ? joinK8sResource(selectedResourceMeta, selectedResourceContent)
-          : undefined;
+    const selectedResource =
+      selectedResourceMeta && selectedResourceContent
+        ? joinK8sResource(selectedResourceMeta, selectedResourceContent)
+        : undefined;
 
-      let jsonTemplate = selectedResource?.object;
-      if (generateRandomRef.current) {
-        const schema = getResourceKindSchema(formValues.kind, k8sVersionRef.current, String(userDataDirRef.current));
-        if (schema) {
-          JSONSchemaFaker.option('failOnInvalidTypes', false);
-          JSONSchemaFaker.option('failOnInvalidFormat', false);
-          JSONSchemaFaker.option('useExamplesValue', true);
-          JSONSchemaFaker.option('useDefaultValue', true);
-          JSONSchemaFaker.option('maxItems', 1);
-          JSONSchemaFaker.option('alwaysFakeOptionals', true);
+    let jsonTemplate = selectedResource?.object;
+    if (generateRandomRef.current) {
+      const schema = getResourceKindSchema(formValues.kind, k8sVersionRef.current, String(userDataDirRef.current));
+      if (schema) {
+        JSONSchemaFaker.option('failOnInvalidTypes', false);
+        JSONSchemaFaker.option('failOnInvalidFormat', false);
+        JSONSchemaFaker.option('useExamplesValue', true);
+        JSONSchemaFaker.option('useDefaultValue', true);
+        JSONSchemaFaker.option('maxItems', 1);
+        JSONSchemaFaker.option('alwaysFakeOptionals', true);
 
-          const value: any = JSONSchemaFaker.generate(schema);
-          if (value) {
-            delete value.status;
-            delete value.metadata;
-            delete value.kind;
-            delete value.apiVersion;
+        const value: any = JSONSchemaFaker.generate(schema);
+        if (value) {
+          delete value.status;
+          delete value.metadata;
+          delete value.kind;
+          delete value.apiVersion;
 
-            jsonTemplate = value;
-          }
+          jsonTemplate = value;
         }
       }
+    }
 
-      const newResource = createTransientResource(
-        {
-          name: formValues.name,
-          kind: formValues.kind,
-          namespace:
-            formValues.namespace === SELECT_OPTION_NONE || !getResourceKindHandler(formValues.kind)?.isNamespaced
-              ? undefined
-              : formValues.namespace,
-          apiVersion: formValues.apiVersion,
-        },
-        dispatch,
-        jsonTemplate
-      );
-
-      if (savingDestinationRef.current !== 'doNotSave') {
-        let absolutePath;
-
-        const fullFileName = getFullFileName(formValues.name);
-        if (savingDestinationRef.current === 'saveToFolder' && selectedFolderRef.current) {
-          absolutePath =
-            selectedFolderRef.current === ROOT_FILE_ENTRY
-              ? path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName)
-              : path.join(rootFolderEntryRef.current.filePath, selectedFolderRef.current, path.sep, fullFileName);
-        } else if (savingDestinationRef.current === 'saveToFile' && selectedFileRef.current) {
-          absolutePath = path.join(rootFolderEntryRef.current.filePath, selectedFileRef.current);
-        } else {
-          absolutePath = path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName);
-        }
-
-        dispatch(
-          saveTransientResources({
-            resourcePayloads: [{resource: newResource, absolutePath}],
-            saveMode: savingDestinationRef.current === 'saveToFolder' ? savingDestinationRef.current : 'appendToFile',
-          })
-        );
-      }
-
-      setSavingDestination('doNotSave');
-      closeWizard();
-    },
-    [
+    const newResource = createTransientResource(
+      {
+        name: formValues.name,
+        kind: formValues.kind,
+        namespace:
+          formValues.namespace === SELECT_OPTION_NONE || !getResourceKindHandler(formValues.kind)?.isNamespaced
+            ? undefined
+            : formValues.namespace,
+        apiVersion: formValues.apiVersion,
+      },
       dispatch,
-      getFullFileName,
-      form,
-      closeWizard,
-      savingDestinationRef,
-      setSavingDestination,
-      rootFolderEntryRef,
-      generateRandomRef,
-      k8sVersionRef,
-      localResourceMetaMapRef,
-      localResourceContentMapRef,
-      selectedFileRef,
-      selectedFolderRef,
-      userDataDirRef,
-    ]
-  );
+      jsonTemplate
+    );
+
+    if (savingDestinationRef.current !== 'doNotSave') {
+      let absolutePath;
+
+      const fullFileName = getFullFileName(formValues.name);
+      if (savingDestinationRef.current === 'saveToFolder' && selectedFolderRef.current) {
+        absolutePath =
+          selectedFolderRef.current === ROOT_FILE_ENTRY
+            ? path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName)
+            : path.join(rootFolderEntryRef.current.filePath, selectedFolderRef.current, path.sep, fullFileName);
+      } else if (savingDestinationRef.current === 'saveToFile' && selectedFileRef.current) {
+        absolutePath = path.join(rootFolderEntryRef.current.filePath, selectedFileRef.current);
+      } else {
+        absolutePath = path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName);
+      }
+
+      dispatch(
+        saveTransientResources({
+          resourcePayloads: [{resource: newResource, absolutePath}],
+          saveMode: savingDestinationRef.current === 'saveToFolder' ? savingDestinationRef.current : 'appendToFile',
+        })
+      );
+    }
+
+    setSavingDestination('doNotSave');
+    closeWizard();
+  }, [
+    dispatch,
+    getFullFileName,
+    form,
+    closeWizard,
+    savingDestinationRef,
+    setSavingDestination,
+    rootFolderEntryRef,
+    generateRandomRef,
+    k8sVersionRef,
+    localResourceMetaMapRef,
+    localResourceContentMapRef,
+    selectedFileRef,
+    selectedFolderRef,
+    userDataDirRef,
+  ]);
 
   const onFinish = useCallback(
     (data: any) => {

@@ -35,6 +35,7 @@ import {
   activeResourceStorageSelector,
   localResourceContentMapSelector,
   localResourceMetaMapSelector,
+  transientResourceContentMapSelector,
 } from '@redux/selectors/resourceMapSelectors';
 import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {getLocalResourcesForPath} from '@redux/services/fileEntry';
@@ -92,6 +93,7 @@ const Monaco = (props: {
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
   const [activeResourceMetaMap, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
   const [, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
+  const [, transientResourceContentMapRef] = useSelectorWithRef(transientResourceContentMapSelector);
   const [selectedResource, selectedResourceRef] = useSelectorWithRef(state =>
     providedResourceSelection
       ? resourceSelector(state, providedResourceSelection.resourceIdentifier)
@@ -286,7 +288,10 @@ const Monaco = (props: {
     let newCode = '';
     const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY].filePath;
     if (selectedResource?.id) {
-      const resourceContent = activeResourceContentMapRef.current?.[selectedResource.id];
+      const resourceContent =
+        selectedResource.storage === 'transient'
+          ? transientResourceContentMapRef.current[selectedResource.id]
+          : activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
         if (codeRef.current === resourceContent.text) {
           return;
@@ -322,7 +327,16 @@ const Monaco = (props: {
     setCode(newCode);
     originalCodeRef.current = newCode;
     isDirtyRef.current = false;
-  }, [selectedFilePath, selectedResource?.id, codeRef, activeResourceContentMapRef, fileMapRef, setCode]);
+  }, [
+    selectedFilePath,
+    selectedResource?.id,
+    selectedResource?.storage,
+    codeRef,
+    activeResourceContentMapRef,
+    transientResourceContentMapRef,
+    fileMapRef,
+    setCode,
+  ]);
 
   useEffect(() => {
     if (!selectedFilePathRef.current || !shouldEditorReloadSelection) {
