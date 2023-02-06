@@ -9,7 +9,7 @@ import {AppConfig, NewVersionCode} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
 import {NavigatorState} from '@shared/models/navigator';
 import {TerminalState} from '@shared/models/terminal';
-import {NewLeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
+import {LeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
@@ -132,7 +132,7 @@ const initialAppConfigState: AppConfig = {
 
 const initialAlertState: AlertState = {};
 
-const uiLeftMenuSelection = NewLeftMenuSelectionOptions.includes(electronStore.get('ui.leftMenu.selection'))
+const uiLeftMenuSelection = LeftMenuSelectionOptions.includes(electronStore.get('ui.leftMenu.selection'))
   ? electronStore.get('ui.leftMenu.selection')
   : 'explorer';
 const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');

@@ -18,8 +18,8 @@ import {
   LayoutSizeType,
   LearnTopicType,
   LeftMenuBottomSelectionType,
+  LeftMenuSelectionType,
   MonacoUiState,
-  NewLeftMenuSelectionType,
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
@@ -70,7 +70,7 @@ export const uiSlice = createSlice({
         electronStore.set('ui.leftMenu.bottomSelection', action.payload);
       }
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<NewLeftMenuSelectionType>) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
