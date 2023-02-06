@@ -58,6 +58,7 @@ const FilePane: React.FC = () => {
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const fileMap = useAppSelector(state => state.main.fileMap);
+
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
@@ -69,8 +70,7 @@ const FilePane: React.FC = () => {
       ? state.main.selection
       : undefined
   );
-
-  const rootEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+  const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
   const {onFileSelect} = useFileSelect();
   const {onPreview} = usePreview();
@@ -107,7 +107,7 @@ const FilePane: React.FC = () => {
 
   const refreshFolder = useCallback(() => {
     setFolder(rootEntry.filePath);
-  }, [rootEntry.filePath, setFolder]);
+  }, [rootEntry?.filePath, setFolder]);
 
   const {onExcludeFromProcessing, onIncludeToProcessing} = useProcessing(refreshFolder);
 
@@ -253,7 +253,7 @@ const FilePane: React.FC = () => {
             <span id="file-explorer-count">
               <b>{filesOnly.length || 0} files</b>
             </span>{' '}
-            in <span id="file-explorer-project-name">{rootEntry.filePath}</span>
+            in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
           </S.RootFolderText>
         }
       />
