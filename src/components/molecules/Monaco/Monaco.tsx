@@ -114,7 +114,6 @@ const Monaco = (props: {
   const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const localResourceContentMap = useAppSelector(localResourceContentMapSelector);
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(selectedFilePathSelector);
-  const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selection = useAppSelector(state => state.main.selection);
   const settings = useAppSelector(settingsSelector);
@@ -199,7 +198,6 @@ const Monaco = (props: {
     helmValuesMap,
     helmChartMap,
     helmTemplatesMap,
-    matchOptions,
     isDirty: isDirtyRef.current,
     activeResourceStorage: activeResourceStorageRef.current,
   });

@@ -1,22 +1,6 @@
 /**
  * A file or folder in the file system.
  */
-
-type MatchNode = {
-  lineNumber: number;
-  start: number;
-  end: number;
-  currentMatchNumber: number;
-  wholeLine: string;
-  matchesInLine: string[];
-};
-
-type CurrentMatch = {
-  matchesInFile: MatchNode[];
-  currentMatchIdx: number;
-  replaceWith?: string;
-};
-
 type FileEntry = {
   /** the name of the file */
   name: string;
@@ -36,4 +20,8 @@ type FileEntry = {
   helmChartId?: string;
 };
 
-export type {CurrentMatch, FileEntry, MatchNode};
+type FileSideEffect = {
+  affectedResourceIds: string[];
+};
+
+export type {FileEntry, FileSideEffect};

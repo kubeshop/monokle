@@ -4,8 +4,6 @@ import {DataNode} from 'antd/lib/tree';
 
 import {DeleteEntityCallback} from '@utils/files';
 
-import {MatchNode} from '@shared/models/fileEntry';
-
 export interface ProcessingEntity {
   processingEntityID?: string;
   processingType?: 'delete' | 'rename';
@@ -60,7 +58,4 @@ export interface TreeNode {
 
 export interface FilterTreeNode extends Omit<TreeNode, 'children'> {
   children: MatchLine[];
-  matchCount?: number;
-  matches?: RegExpMatchArray | null;
-  matchLines?: MatchNode[][];
 }
