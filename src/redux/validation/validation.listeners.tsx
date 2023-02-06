@@ -86,9 +86,13 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
 
       const clusterSchemaVersions = [
         ...new Set(
-          nodeResources.map(resource =>
-            resource.object?.status?.nodeInfo?.kubeletVersion?.split('+')[0].substring(1).trim()
-          )
+          nodeResources.map(resource => {
+            const kubeletVersion = esource.object?.status?.nodeInfo?.kubeletVersion;
+            if (typeof kubeletVersion !== 'string') {
+              return undefined;
+            }
+            return kubeletVersion.split('+')[0].substring(1).trim()
+          }).filter(isDefined)
         ),
       ];
 
