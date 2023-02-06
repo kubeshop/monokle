@@ -6,7 +6,7 @@ import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@red
 import {ImagesListType} from '@shared/models/appState';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
 
-import {setLeftMenuSelection, toggleLeftMenu} from '../ui';
+import {toggleLeftMenu} from '../ui';
 import {selectImage, setImagesList} from './mainSlice';
 
 function parseImages(resourceMetaMap: ResourceMetaMap) {
@@ -70,9 +70,10 @@ export const imageSelectedListener: AppListenerFn = listen => {
         dispatch(toggleLeftMenu());
       }
 
-      if (leftMenu.selection !== 'images-pane') {
-        dispatch(setLeftMenuSelection('images-pane'));
-      }
+      // TODO: images are inside accordiong
+      // if (leftMenu.selection !== 'images-pane') {
+      //   dispatch(setLeftMenuSelection('images-pane'));
+      // }
     },
   });
 };

@@ -70,6 +70,8 @@ const FilePane: React.FC = () => {
       : undefined
   );
 
+  const rootEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+
   const {onFileSelect} = useFileSelect();
   const {onPreview} = usePreview();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
@@ -89,12 +91,12 @@ const FilePane: React.FC = () => {
   const treeRef = useRef<any>();
   const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
 
-  const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
+  const isButtonDisabled = !rootEntry;
   const isCollapsed = expandedFolders.length === 0 || expandedFolders.length === 1;
 
   const rootFolderName = useMemo(() => {
-    return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
-  }, [fileMap]);
+    return rootEntry ? path.basename(rootEntry.filePath) : ROOT_FILE_ENTRY;
+  }, [rootEntry]);
 
   const setFolder = useCallback(
     (folder: string) => {
@@ -104,8 +106,8 @@ const FilePane: React.FC = () => {
   );
 
   const refreshFolder = useCallback(() => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
-  }, [fileMap, setFolder]);
+    setFolder(rootEntry.filePath);
+  }, [rootEntry.filePath, setFolder]);
 
   const {onExcludeFromProcessing, onIncludeToProcessing} = useProcessing(refreshFolder);
 
@@ -115,7 +117,6 @@ const FilePane: React.FC = () => {
       return;
     }
 
-    const rootEntry = fileMap[ROOT_FILE_ENTRY];
     const treeData =
       rootEntry &&
       createNode(
@@ -138,6 +139,7 @@ const FilePane: React.FC = () => {
     fileOrFolderContainedInFilter,
     rootFolderName,
     dispatch,
+    rootEntry,
   ]);
 
   /**
