@@ -1,26 +1,34 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState} from 'react';
+import {useDebounce} from 'react-use';
 
 import {Select} from 'antd';
 
-import {isEqual, omit} from 'lodash';
+import {isEmpty, isEqual, omit} from 'lodash';
 import styled from 'styled-components';
+
+import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+import {openFiltersPresetModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
-import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {
-  activeResourceMetaMapSelector,
   allResourceAnnotationsSelector,
   allResourceKindsSelector,
   allResourceLabelsSelector,
 } from '@redux/selectors/resourceMapSelectors';
-import {getNamespaces} from '@redux/services/resource';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {Filter, FilterField, KeyValueInput, NewKeyValueInput} from '@monokle/components';
+import {useNamespaces} from '@hooks/useNamespaces';
+
+import {useWindowSize} from '@utils/hooks';
+
+import {Filter, FilterField, FilterHeader, KeyValueInput, NewKeyValueInput} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
+
+import * as S from './ResourceFilter.styled';
 
 export const NAVIGATOR_FILTER_BODY_HEIGHT = 375;
 
@@ -31,16 +39,17 @@ export type Props = {
 
 const ResourceFilter = ({active, onToggle}: Props) => {
   const dispatch = useAppDispatch();
+  const {width: windowWidth} = useWindowSize();
 
-  const allNamespaces = useAppSelector(state => getNamespaces(activeResourceMetaMapSelector(state)));
-
+  const [allNamespaces] = useNamespaces({extra: []});
+  const isPaneWideEnough = useAppSelector(
+    state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
+  );
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
-  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const resourceFilterKinds = useAppSelector(state => state.main.resourceFilter.kinds ?? []);
@@ -49,13 +58,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const allResourceLabels = useAppSelector(allResourceLabelsSelector);
   const allResourceAnnotations = useAppSelector(allResourceAnnotationsSelector);
 
-  const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
-    if (selectedFileOrFolder === ROOT_FILE_ENTRY) {
-      handleChange({fileOrFolderContainedIn: undefined});
-    } else {
-      handleChange({fileOrFolderContainedIn: selectedFileOrFolder});
-    }
-  };
+  const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
 
   const autocompleteOptions = useMemo(() => {
     return {
@@ -67,28 +70,31 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     };
   }, [allNamespaces, allResourceKinds, allResourceLabels, allResourceAnnotations, fileMap]);
 
+  const isSavePresetDisabled = useMemo(() => {
+    return (
+      isEmpty(localResourceFilter?.name) &&
+      isEmpty(localResourceFilter?.kinds) &&
+      isEmpty(localResourceFilter?.namespaces) &&
+      isEmpty(localResourceFilter?.labels) &&
+      isEmpty(localResourceFilter?.annotations) &&
+      (!localResourceFilter?.fileOrFolderContainedIn ||
+        localResourceFilter?.fileOrFolderContainedIn === ROOT_FILE_ENTRY)
+    );
+  }, [localResourceFilter]);
+
   const hasActiveFilters = useMemo(
     () =>
-      Object.entries(filtersMap)
+      Object.entries(localResourceFilter)
         .map(([key, value]) => {
           return {filterName: key, filterValue: value};
         })
         .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length > 0,
-    [filtersMap]
+    [localResourceFilter]
   );
 
-  const handleChange = useCallback(
-    (delta: Partial<any>) => {
-      const updatedFilter = {...filtersMap, ...delta};
-
-      dispatch(updateResourceFilter(updatedFilter));
-
-      if (isInClusterMode && !isEqual(resourceFilterKinds, updatedFilter.kinds)) {
-        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
-      }
-    },
-    [dispatch, filtersMap, isInClusterMode, kubeConfigContext, resourceFilterKinds]
-  );
+  const handleChange = useCallback((delta: Partial<any>) => {
+    setLocalResourceFilter(prevState => ({...prevState, ...delta}));
+  }, []);
 
   const handleSearched = useCallback(
     (newSearch: string) => {
@@ -101,7 +107,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   const handleClear = useCallback(() => {
     handleChange({
-      names: null,
+      name: null,
       kinds: null,
       namespaces: null,
       labels: {},
@@ -135,58 +141,105 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const handleUpsertLabelFilter = useCallback(
     ([key, value]: any) => {
       handleChange({
-        labels: {...filtersMap.labels, [key]: value},
+        labels: {...localResourceFilter.labels, [key]: value},
       });
     },
-    [handleChange, filtersMap.labels]
+    [handleChange, localResourceFilter.labels]
   );
 
   const handleRemoveLabelFilter = useCallback(
     (key: string) => {
       handleChange({
-        labels: omit(filtersMap.labels, key),
+        labels: omit(localResourceFilter.labels, key),
       });
     },
-    [handleChange, filtersMap.labels]
+    [handleChange, localResourceFilter.labels]
   );
 
   const handleUpsertAnnotationFilter = useCallback(
     ([key, value]: any) => {
       handleChange({
-        annotations: {...filtersMap.annotations, [key]: value},
+        annotations: {...localResourceFilter.annotations, [key]: value},
       });
     },
-    [handleChange, filtersMap.annotations]
+    [handleChange, localResourceFilter.annotations]
   );
 
   const handleRemoveAnnotationFilter = useCallback(
     (key: string) => {
       handleChange({
-        annotations: omit(filtersMap.annotations, key),
+        annotations: omit(localResourceFilter.annotations, key),
       });
     },
-    [handleChange, filtersMap.annotations]
+    [handleChange, localResourceFilter.annotations]
   );
 
   const onClearFileOrFolderContainedInHandler = useCallback(() => {
     handleChange({fileOrFolderContainedIn: null});
   }, [handleChange]);
 
+  const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
+    if (selectedFileOrFolder === ROOT_FILE_ENTRY) {
+      handleChange({fileOrFolderContainedIn: undefined});
+    } else {
+      handleChange({fileOrFolderContainedIn: selectedFileOrFolder});
+    }
+  };
+
+  const onClickLoadPreset = useCallback(() => {
+    dispatch(openFiltersPresetModal('load'));
+  }, [dispatch]);
+
+  const onClickSavePreset = useCallback(() => {
+    dispatch(openFiltersPresetModal('save'));
+  }, [dispatch]);
+
+  useDebounce(
+    () => {
+      if (isEqual(localResourceFilter, filtersMap)) {
+        return;
+      }
+
+      dispatch(updateResourceFilter(localResourceFilter));
+
+      if (isInClusterMode && !isEqual(resourceFilterKinds, localResourceFilter.kinds)) {
+        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [localResourceFilter]
+  );
+
   return (
     <Container>
       <Filter
         height={NAVIGATOR_FILTER_BODY_HEIGHT}
-        search={filtersMap?.name}
+        search={localResourceFilter?.name}
         onClear={handleClear}
         onSearch={handleSearched}
         active={active}
         hasActiveFilters={hasActiveFilters}
         onToggle={onToggle}
+        header={
+          <FilterHeader
+            onClear={handleClear}
+            filterActions={
+              <>
+                <S.FilterActionButton type="text" disabled={isSavePresetDisabled} onClick={onClickSavePreset}>
+                  Save {isPaneWideEnough ? 'preset' : ''}
+                </S.FilterActionButton>
+                <S.FilterActionButton type="text" onClick={onClickLoadPreset}>
+                  Load {isPaneWideEnough ? 'preset' : ''}
+                </S.FilterActionButton>
+              </>
+            }
+          />
+        }
       >
         <FilterField name="Kind">
           <Select
             mode="tags"
-            value={filtersMap.kinds || []}
+            value={localResourceFilter.kinds || []}
             placeholder="Select one or more kinds.."
             options={autocompleteOptions.kinds}
             onChange={onKindChangeHandler}
@@ -197,9 +250,10 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
         <FilterField name="Namespace">
           <Select
+            mode="tags"
             style={{width: '100%'}}
             placeholder="Select one or more namespaces.."
-            value={filtersMap.namespaces}
+            value={localResourceFilter.namespaces}
             options={autocompleteOptions.namespaces}
             onChange={onNamespaceChangeHandler}
             onClear={onNamespaceClearHandler}
@@ -210,7 +264,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         <FilterField name="Labels">
           <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />
 
-          {Object.entries(filtersMap.labels).map(([key, value]) => {
+          {Object.entries(localResourceFilter.labels).map(([key, value]) => {
             return (
               <KeyValueInput
                 key={key}
@@ -225,7 +279,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         <FilterField name="Annotations">
           <NewKeyValueInput onAddKeyValue={handleUpsertAnnotationFilter} keyOptions={autocompleteOptions.annotations} />
 
-          {Object.entries(filtersMap.annotations).map(([key, value]) => {
+          {Object.entries(localResourceFilter.annotations).map(([key, value]) => {
             return (
               <KeyValueInput
                 key={key}
@@ -241,7 +295,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           <Select
             showSearch
             disabled={isInPreviewMode || areFiltersDisabled}
-            value={filtersMap.fileOrFolderContainedIn}
+            value={localResourceFilter.fileOrFolderContainedIn}
             defaultValue={ROOT_FILE_ENTRY}
             onChange={updateFileOrFolderContainedIn}
             options={autocompleteOptions.files}

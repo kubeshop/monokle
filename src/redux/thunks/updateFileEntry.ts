@@ -7,7 +7,7 @@ import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
-import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
+import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
 import {deleteResource, extractK8sResources} from '@redux/services/resource';
@@ -38,7 +38,6 @@ export const updateFileEntry = createAsyncThunk(
         if (getFileStats(filePath)?.isDirectory() === false) {
           fs.writeFileSync(filePath, payload.text);
           fileEntry.timestamp = getFileTimestamp(filePath);
-          fileEntry.text = payload.text;
 
           if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
             try {
@@ -122,24 +121,6 @@ export const updateFileEntry = createAsyncThunk(
     if (error) {
       return {...state.main, autosaving: {status: false, error}};
     }
-
-    return nextMainState;
-  }
-);
-
-export const updateFileEntries = createAsyncThunk(
-  'main/updateFileEntries',
-  async (payload: UpdateFilesEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
-
-    const nextMainState: any = createNextState(state.main, mainState => {
-      payload.pathes.forEach(ps => {
-        const fileEntry = mainState.fileMap[ps.relativePath];
-        const content = fs.readFileSync(ps.absolutePath, 'utf8');
-        fileEntry.text = content;
-        return {...mainState.fileMap, fileEntry};
-      });
-    });
 
     return nextMainState;
   }

@@ -18,7 +18,7 @@ import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {removeResources} from '@redux/thunks/removeResources';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {updateFileEntries, updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 import {processResourceRefs} from '@redux/validation/validation.thunks';
@@ -109,7 +109,6 @@ export const performResourceContentUpdate = (resource: K8sResource, newText: str
   if (isLocalResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
     resource.text = updatedFileText;
-    fileMap[resource.origin.filePath].text = updatedFileText;
     resource.object = parseYamlDocument(updatedFileText).toJS();
   } else {
     resource.text = newText;
@@ -129,11 +128,14 @@ export const performResourceContentUpdate = (resource: K8sResource, newText: str
 
 const addResourceReducer = (state: AppState, resource: K8sResource) => {
   const {meta, content} = splitK8sResource(resource);
-  // TODO: how can we fix the types here?
-  // @ts-ignore
-  state.resourceMetaMapByStorage[meta.origin.storage] = meta;
-  // @ts-ignore
-  state.resourceContentMapByStorage[content.origin.storage] = content;
+
+  const resourceMetaMap = state.resourceMetaMapByStorage[meta.storage] as ResourceMetaMap<typeof resource.storage>;
+  resourceMetaMap[meta.id] = meta;
+
+  const resourceContentMap = state.resourceContentMapByStorage[content.storage] as ResourceContentMap<
+    typeof resource.storage
+  >;
+  resourceContentMap[content.id] = content;
 };
 
 export const mainSlice = createSlice({
@@ -504,10 +506,6 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
-      return action.payload;
-    });
-
-    builder.addCase(updateFileEntries.fulfilled, (state, action) => {
       return action.payload;
     });
 

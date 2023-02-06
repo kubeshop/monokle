@@ -59,3 +59,27 @@ export const TitleButton = styled(Button)`
   padding: 0;
   font-size: 16px;
 `;
+
+export const Title = styled.h2`
+  margin-bottom: 0px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+`;
+
+export const FilterHeader = styled.div`
+  display: flex;
+`;
+
+export const Box = styled.div`
+  display: flex;
+`;
+
+export const FilterActionButton = styled(Button)`
+  color: ${Colors.cyan8};
+  padding: 0 !important;
+  margin-right: 18px;
+  &:hover {
+    background-color: unset;
+  }
+`;

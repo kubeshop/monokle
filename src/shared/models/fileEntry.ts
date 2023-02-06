@@ -34,12 +34,6 @@ type FileEntry = {
   timestamp?: number;
   /** the id of the helm chart this file might belong to */
   helmChartId?: string;
-  /** file content */
-  text?: string;
-  /** quantity of found matches for query */
-  matchCount?: number;
-  /** lines containing matches */
-  matchLines?: MatchNode[][];
 };
 
 export type {CurrentMatch, FileEntry, MatchNode};

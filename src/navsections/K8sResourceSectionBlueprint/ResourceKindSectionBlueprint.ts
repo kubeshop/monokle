@@ -1,9 +1,7 @@
-import {isEmpty} from 'lodash';
-
 import navSectionNames from '@constants/navSectionNames';
 
 import {selectResource} from '@redux/reducers/main';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceMetaMapSelector, transientResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -11,7 +9,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {ResourceIdentifier, ResourceMeta, ResourceMetaMap, isTransientResource} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {AppSelection} from '@shared/models/selection';
@@ -25,11 +23,11 @@ import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
 export type ResourceKindScopeType = {
-  activeResourceMetaMap: ResourceMetaMap;
   resourceFilter: ResourceFilterType;
   selection: AppSelection | undefined;
   highlights: AppSelection[] | undefined;
   checkedResourceIdentifiers: ResourceIdentifier[];
+  [filteredResources: string]: ResourceMeta[] | unknown; // TODO: @monokle/tree-navigator will fix this workaround
 };
 
 export function makeResourceKindNavSection(
@@ -42,36 +40,38 @@ export function makeResourceKindNavSection(
     containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
+      const activeResourceMetaMap = activeResourceMetaMapSelector(state);
+      const transientResourceMetaMap = transientResourceMetaMapSelector(state);
+      const newFilteredResources = [
+        ...Object.values(activeResourceMetaMap),
+        ...Object.values(transientResourceMetaMap),
+      ].filter(r => resourceMatchesKindHandler(r, kindHandler));
       return {
-        activeResourceMetaMap: activeResourceMetaMapSelector(state),
         resourceFilter: state.main.resourceFilter,
         selection: state.main.selection,
         highlights: state.main.highlights,
         checkedResourceIdentifiers: state.main.checkedResourceIdentifiers,
+        [`${kindSectionName}-filteredResources`]: newFilteredResources,
       };
     },
     builder: {
       getRawItems: scope => {
-        return Object.values(scope.activeResourceMetaMap)
-          .filter(r => resourceMatchesKindHandler(r, kindHandler))
-          .sort((a, b) => {
-            if (a.namespace && !b.namespace) {
-              return -1;
-            }
-            if (!a.namespace && b.namespace) {
-              return 1;
-            }
-            if (a.namespace && b.namespace && a.namespace !== b.namespace) {
-              return a.namespace.localeCompare(b.namespace);
-            }
-            return a.name.localeCompare(b.name);
-          });
+        const filteredResources = scope[`${kindSectionName}-filteredResources`] as ResourceMeta[];
+        return filteredResources.sort((a, b) => {
+          if (a.namespace && !b.namespace) {
+            return -1;
+          }
+          if (!a.namespace && b.namespace) {
+            return 1;
+          }
+          if (a.namespace && b.namespace && a.namespace !== b.namespace) {
+            return a.namespace.localeCompare(b.namespace);
+          }
+          return a.name.localeCompare(b.name);
+        });
       },
       getMeta: () => {
         return {resourceKind: kindHandler.kind};
-      },
-      isInitialized: scope => {
-        return !isEmpty(scope.activeResourceMetaMap);
       },
       // TODO: reimplement checkable
       // makeCheckable: scope => {
@@ -101,12 +101,12 @@ export function makeResourceKindNavSection(
       builder: {
         isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
         isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
-        isDirty: rawItem => isTransientResource(rawItem),
+        isDirty: rawItem => rawItem.storage === 'transient',
         isVisible: (rawItem, scope) => {
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
-        isCheckable: () => true,
+        // isCheckable: () => true,
         // isChecked: (itemInstance, scope) => {
         //   return scope.checkedResourceIds.includes(itemInstance.id);
         // },
