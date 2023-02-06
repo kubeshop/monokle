@@ -50,7 +50,7 @@ export const K8sVersionSelection = () => {
       <S.MenuBottom>
         <S.WarningText>
           Selecting another K8s Schema can bring <Typography.Text type="danger">new validation errors.</Typography.Text>{' '}
-          Check them out in from the left menu.
+          Check them out in the left menu.
         </S.WarningText>
       </S.MenuBottom>
     </S.MenuContainer>
