@@ -1,6 +1,7 @@
 import {isAnyOf} from '@reduxjs/toolkit';
 
 import {AppListenerFn} from '@redux/listeners/base';
+import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {setConfigK8sSchemaVersion, toggleOPARules, toggleValidation} from './validation.slice';
@@ -8,7 +9,14 @@ import {loadValidation, validateResources} from './validation.thunks';
 
 const loadListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(setRootFolder.fulfilled, setConfigK8sSchemaVersion, toggleOPARules, toggleValidation),
+    matcher: isAnyOf(
+      loadClusterResources.fulfilled,
+      reloadClusterResources.fulfilled,
+      setRootFolder.fulfilled,
+      setConfigK8sSchemaVersion,
+      toggleOPARules,
+      toggleValidation
+    ),
     async effect(_, {dispatch, delay, signal, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
