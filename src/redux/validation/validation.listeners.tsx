@@ -79,7 +79,7 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
       const userDataDir = String(state.config.userDataDir);
 
       const nodeResources = Object.values(clusterResourceMap).filter(
-        resource => resource.object.apiVersion === 'v1' && resource.kind === 'Node'
+        resource => resource.apiVersion === 'v1' && resource.kind === 'Node'
       );
 
       if (isEmpty(nodeResources)) return;
