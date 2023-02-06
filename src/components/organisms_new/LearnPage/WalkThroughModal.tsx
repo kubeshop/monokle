@@ -40,7 +40,7 @@ const WalkThroughModal = () => {
             </WalkThroughCard.Slice>,
 
             <WalkThroughCard.Slice>
-              <WalkThroughCard.SubHeading>3. Quick cluster preview</WalkThroughCard.SubHeading>
+              <WalkThroughCard.SubHeading>3. Quickly connect to cluster</WalkThroughCard.SubHeading>
               <WalkThroughCard.Text>
                 Click
                 <Icon name="cluster-dashboard" />
