@@ -36,8 +36,7 @@ const loadListener: AppListenerFn = listen => {
     matcher: isAnyOf(
       setIsInQuickClusterMode,
       setRootFolder.fulfilled,
-      // updateK8sVersion, is this needed here?
-      setConfigK8sSchemaVersion,
+      updateK8sVersion,
       toggleOPARules,
       toggleValidation
     ),
