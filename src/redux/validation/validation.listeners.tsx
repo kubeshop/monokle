@@ -36,12 +36,17 @@ const loadListener: AppListenerFn = listen => {
     matcher: isAnyOf(
       setIsInQuickClusterMode,
       setRootFolder.fulfilled,
-      updateK8sVersion,
+      // updateK8sVersion, is this needed here?
       setConfigK8sSchemaVersion,
       toggleOPARules,
       toggleValidation
     ),
-    async effect(_, {dispatch, delay, signal, cancelActiveListeners}) {
+    async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
+      if (isAnyOf(setIsInQuickClusterMode)(_action)) {
+        if (!_action.payload) {
+          return;
+        }
+      }
       cancelActiveListeners();
       await delay(1);
       const loading = dispatch(loadValidation());
