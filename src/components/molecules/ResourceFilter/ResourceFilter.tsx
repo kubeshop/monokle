@@ -3,7 +3,7 @@ import {useDebounce} from 'react-use';
 
 import {Select} from 'antd';
 
-import {isEmpty, isEqual, omit} from 'lodash';
+import {isEmpty, isEqual, omit, uniqWith} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 
@@ -62,11 +62,31 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   const autocompleteOptions = useMemo(() => {
     return {
-      namespaces: allNamespaces?.map(n => ({value: n})) ?? [],
-      kinds: allResourceKinds?.map(n => ({value: n})) ?? [],
-      labels: Object.keys(allResourceLabels)?.map(n => ({value: n})) ?? [],
-      annotations: Object.keys(allResourceAnnotations)?.map(n => ({value: n})) ?? [],
-      files: Object.keys(fileMap).map(option => ({value: option})) ?? [],
+      namespaces:
+        uniqWith(
+          allNamespaces?.map(n => ({value: n})),
+          isEqual
+        ) ?? [],
+      kinds:
+        uniqWith(
+          allResourceKinds?.map(n => ({value: n})),
+          isEqual
+        ) ?? [],
+      labels:
+        uniqWith(
+          Object.keys(allResourceLabels)?.map(n => ({value: n})),
+          isEqual
+        ) ?? [],
+      annotations:
+        uniqWith(
+          Object.keys(allResourceAnnotations)?.map(n => ({value: n})),
+          isEqual
+        ) ?? [],
+      files:
+        uniqWith(
+          Object.keys(fileMap).map(option => ({value: option})),
+          isEqual
+        ) ?? [],
     };
   }, [allNamespaces, allResourceKinds, allResourceLabels, allResourceAnnotations, fileMap]);
 
