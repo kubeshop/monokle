@@ -60,7 +60,7 @@ const RenameResourceModel: React.FC = () => {
     if (!newResourceName || resource.name === newResourceName) {
       return;
     }
-    renameResource(resource.id, newResourceName, shouldUpdateRefs, resourceMap, dispatch, isThisResourceSelected);
+    renameResource(resource, newResourceName, shouldUpdateRefs, resourceMap, dispatch, isThisResourceSelected);
     dispatch(closeRenameResourceModal());
   };
 

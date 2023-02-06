@@ -494,11 +494,11 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(updateResource.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(removeResources.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(updateMultipleResources.fulfilled, (state, action) => {

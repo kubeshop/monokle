@@ -136,7 +136,7 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
-// TODO: getIncomingRefMappers and getDependentResourceKinds should probably come from @monokle/validation
+// TODO: 2.0+ getIncomingRefMappers and getDependentResourceKinds should probably come from the validation package
 // const incomingRefMappersCache = new Map<string, RefMapper[]>();
 
 // /**

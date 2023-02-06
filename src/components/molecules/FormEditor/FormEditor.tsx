@@ -113,7 +113,7 @@ const FormEditor: React.FC<IProps> = props => {
         const isChanged = content.trim() !== selectedResource.text.trim();
         setIsResourceUpdated(isChanged);
         if (isChanged) {
-          dispatch(updateResource({resourceId: selectedResource.id, text: content, isUpdateFromForm: true}));
+          dispatch(updateResource({resourceIdentifier: selectedResource, text: content, isUpdateFromForm: true}));
         } else {
           dispatch(setAutosavingStatus(false));
         }

@@ -120,7 +120,7 @@ async function extractResourceToLocal(
   if (target) {
     const result = structuredClone(target);
     result.text = source.text;
-    await dispatch(updateResource({resourceId: target.id, text: source.text}));
+    await dispatch(updateResource({resourceIdentifier: target, text: source.text}));
     return result;
   }
 

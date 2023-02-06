@@ -8,7 +8,7 @@ import {isEmpty, isEqual} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
-import {clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
+import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {currentConfigSelector} from '@redux/selectors';
 import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
@@ -17,11 +17,14 @@ import {loadClusterResources, reloadClusterResources, stopClusterConnection} fro
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {removeResources} from '@redux/thunks/removeResources';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import {doesSchemaExist} from '@utils/index';
 
+import {Incremental} from '@monokle/validation';
 import {isDefined} from '@shared/utils/filter';
 import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
@@ -71,6 +74,43 @@ const validateListener: AppListenerFn = listen => {
       await delay(1);
       if (signal.aborted) return;
       const response = dispatch(validateResources());
+      signal.addEventListener('abort', () => response.abort());
+      await response;
+    },
+  });
+};
+
+const incrementalValidationListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(addResource, addMultipleResources, updateResource.fulfilled, removeResources.fulfilled),
+    async effect(_action, {dispatch, cancelActiveListeners, delay, signal}) {
+      let incremental: Incremental = {resourceIds: []};
+
+      if (isAnyOf(updateResource.fulfilled, removeResources.fulfilled)(_action)) {
+        incremental = {
+          resourceIds: _action.payload.affectedResourceIdentifiers?.map(r => r.id) ?? [],
+        };
+      }
+
+      if (isAnyOf(addResource)(_action)) {
+        incremental = {
+          resourceIds: [_action.payload.id],
+        };
+      }
+
+      if (isAnyOf(addMultipleResources)(_action)) {
+        incremental = {
+          resourceIds: _action.payload.map(r => r.id),
+        };
+      }
+
+      if (incremental.resourceIds.length === 0) return;
+
+      cancelActiveListeners();
+
+      await delay(200);
+      if (signal.aborted) return;
+      const response = dispatch(validateResources({incremental}));
       signal.addEventListener('abort', () => response.abort());
       await response;
     },
@@ -151,4 +191,9 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
   });
 };
 
-export const validationListeners = [clusterK8sSchemaVersionListener, loadListener, validateListener];
+export const validationListeners = [
+  clusterK8sSchemaVersionListener,
+  loadListener,
+  validateListener,
+  incrementalValidationListener,
+];
