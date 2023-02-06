@@ -39,7 +39,7 @@ export function useStartPageOptions() {
       },
       'quick-cluster-mode': {
         icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
-        label: 'Cluster preview',
+        label: 'Connect to Cluster',
         content: null,
         title: '',
       },

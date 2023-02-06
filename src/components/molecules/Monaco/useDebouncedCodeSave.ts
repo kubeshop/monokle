@@ -20,8 +20,12 @@ function useDebouncedCodeSave(
   const dispatch = useAppDispatch();
   const debouncedSaveContent = useRef(
     debounce((code: string) => {
+      const resourceMeta = selectedResourceIdRef.current
+        ? resourceMetaMapRef.current[selectedResourceIdRef.current]
+        : undefined;
+
       // is a file and no resource selected?
-      if (selectedPathRef.current && !selectedResourceIdRef) {
+      if (selectedPathRef.current && !resourceMeta) {
         try {
           dispatch(updateFileEntry({path: selectedPathRef.current, text: code}));
 
@@ -29,9 +33,9 @@ function useDebouncedCodeSave(
         } catch (e) {
           log.warn(`Failed to update file ${e}`, dispatch);
         }
-      } else if (selectedResourceIdRef.current && resourceMetaMapRef.current[selectedResourceIdRef.current]) {
+      } else if (selectedResourceIdRef.current && resourceMeta) {
         try {
-          dispatch(updateResource({resourceId: selectedResourceIdRef.current, text: code.toString()}));
+          dispatch(updateResource({resourceIdentifier: resourceMeta, text: code.toString()}));
           originalCodeRef.current = code;
         } catch (e) {
           log.warn(`Failed to update resource ${e}`, dispatch);

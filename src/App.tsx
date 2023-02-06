@@ -374,11 +374,6 @@ const App = () => {
     }
   };
 
-  // TODO: this should happen in the validation listener after we add @monokle/validation
-  // useEffect(() => {
-  //   dispatch(reprocessAllResources());
-  // }, [k8sVersion, dispatch]);
-
   const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
   }, [dispatch]);

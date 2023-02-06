@@ -162,7 +162,7 @@ const DiffModal = () => {
     }
     dispatch(
       updateResource({
-        resourceId: targetResource.id,
+        resourceIdentifier: targetResource,
         text: cleanMatchingResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })

@@ -4,17 +4,17 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {isIncomingRef} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMap} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMap} from '@shared/models/k8sResource';
 
 export const renameResource = (
-  resourceId: string,
+  resourceIdentifier: ResourceIdentifier,
   newResourceName: string,
   shouldUpdateRefs: boolean,
   resourceMap: ResourceMap,
   dispatch: AppDispatch,
   isResourceSelected?: boolean
 ) => {
-  const resource = resourceMap[resourceId];
+  const resource = resourceMap[resourceIdentifier.id];
   if (!resource || !resource.object) {
     return;
   }
@@ -46,7 +46,7 @@ export const renameResource = (
       });
       dispatch(
         updateResource({
-          resourceId: dependentResource.id,
+          resourceIdentifier: dependentResource,
           text: newDependentResourceText,
           preventSelectionAndHighlightsUpdate: !isResourceSelected,
         })
@@ -55,7 +55,7 @@ export const renameResource = (
   }
   dispatch(
     updateResource({
-      resourceId,
+      resourceIdentifier,
       text: newResourceText,
       preventSelectionAndHighlightsUpdate: !isResourceSelected,
     })

@@ -104,6 +104,7 @@ function transformResourceForValidation(r: K8sResource): ValidationResource | un
   };
 }
 
+// TODO: fix incremental processing of refs
 export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
   'references/process',
   async (payload, {signal}) => {
