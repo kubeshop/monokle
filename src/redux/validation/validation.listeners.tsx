@@ -4,7 +4,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {isAnyOf} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
+import {isEmpty, isEqual} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
@@ -16,7 +16,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {doesSchemaExist} from '@utils/index';
 
-import {activeProjectSelector} from '@shared/utils/selectors';
+import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import {setConfigK8sSchemaVersion, toggleOPARules, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
@@ -65,52 +65,67 @@ const validateListener: AppListenerFn = listen => {
 
 const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(loadClusterResources.fulfilled, reloadClusterResources.fulfilled),
+    matcher: isAnyOf(loadClusterResources.fulfilled),
     async effect(_, {dispatch, getState, cancelActiveListeners, delay}) {
       cancelActiveListeners();
       await delay(1);
 
-      const activeProject = activeProjectSelector(getState());
-      const clusterResourceMap = clusterResourceMapSelector(getState());
-      const userDataDir = String(getState().config.userDataDir);
+      const state = getState();
 
-      const nodeResource = Object.values(clusterResourceMap).find(
+      const activeProject = activeProjectSelector(state);
+      const clusterResourceMap = clusterResourceMapSelector(state);
+      const currentContext = kubeConfigContextSelector(state);
+      const localSchemaVersion = currentConfigSelector(getState()).k8sVersion;
+      const userDataDir = String(state.config.userDataDir);
+
+      const nodeResources = Object.values(clusterResourceMap).filter(
         resource => resource.object.apiVersion === 'v1' && resource.kind === 'Node'
       );
 
-      if (!nodeResource) return;
+      if (isEmpty(nodeResources)) return;
 
-      const clusterSchemaVersion = nodeResource.object?.status?.nodeInfo?.kubeletVersion
-        ?.split('+')[0]
-        .substring(1)
-        .trim();
+      const clusterSchemaVersions = [
+        ...new Set(
+          nodeResources.map(resource =>
+            resource.object?.status?.nodeInfo?.kubeletVersion?.split('+')[0].substring(1).trim()
+          )
+        ),
+      ];
 
-      if (!clusterSchemaVersion) return;
+      if (!isEmpty(clusterSchemaVersions)) return;
 
-      const localSchemaVersion = currentConfigSelector(getState()).k8sVersion;
+      if (clusterSchemaVersions.length === 1) {
+        const clusterSchemaVersion = clusterSchemaVersions[0];
+        if (isEqual(clusterSchemaVersion, localSchemaVersion)) return;
 
-      if (isEqual(clusterSchemaVersion, localSchemaVersion)) return;
+        Modal.confirm({
+          icon: <ExclamationCircleOutlined />,
+          title: 'Kubernetes version mismatch',
+          content: `There is a mismatch between the "${currentContext}" cluster's Kubernetes version (${clusterSchemaVersion}) and the local version (${localSchemaVersion}). Do you want to change the local version to match the cluster's version?`,
+          okText: 'Confirm',
+          cancelText: 'Cancel',
+          onOk: async () => {
+            if (!doesSchemaExist(clusterSchemaVersion, userDataDir)) {
+              await dispatch(downloadK8sSchema(clusterSchemaVersion));
+            }
 
-      Modal.confirm({
-        icon: <ExclamationCircleOutlined />,
-        title: 'Kubernetes version mismatch',
-        content: `There is a mismatch between the cluster's Kubernetes version (${clusterSchemaVersion}) and the local version (${localSchemaVersion}). Do you want to change the local version to match the cluster's version?`,
-        okText: 'Confirm',
-        cancelText: 'Cancel',
-        onOk: async () => {
-          if (!doesSchemaExist(clusterSchemaVersion, userDataDir)) {
-            await dispatch(downloadK8sSchema(clusterSchemaVersion));
-          }
+            if (activeProject) {
+              dispatch(updateProjectK8sVersion(clusterSchemaVersion));
+            } else {
+              dispatch(updateK8sVersion(clusterSchemaVersion));
+            }
 
-          if (activeProject) {
-            dispatch(updateProjectK8sVersion(clusterSchemaVersion));
-          } else {
-            dispatch(updateK8sVersion(clusterSchemaVersion));
-          }
-
-          dispatch(setConfigK8sSchemaVersion(clusterSchemaVersion));
-        },
-      });
+            dispatch(setConfigK8sSchemaVersion(clusterSchemaVersion));
+          },
+        });
+      } else if (clusterSchemaVersions.length > 1) {
+        Modal.warning({
+          title: 'Multiple Kubernetes versions detected',
+          content: `There's a mismatch between the Kubernetes schema versions used by the nodes in "${currentContext}" cluster. Versions found: ${clusterSchemaVersions.join(
+            ', '
+          )}`,
+        });
+      }
     },
   });
 };
