@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Select} from 'antd';
@@ -58,6 +58,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const allResourceAnnotations = useAppSelector(allResourceAnnotationsSelector);
 
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
+  const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
 
   const autocompleteOptions = useMemo(() => {
     return {
@@ -92,6 +93,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   );
 
   const handleChange = useCallback((delta: Partial<any>) => {
+    setWasLocalUpdate(true);
     setLocalResourceFilter(prevState => ({...prevState, ...delta}));
   }, []);
 
@@ -108,7 +110,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     handleChange({
       name: null,
       kinds: null,
-      namespaces: null,
+      namespaces: [],
       labels: {},
       annotations: {},
       fileOrFolderContainedIn: null,
@@ -195,7 +197,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   useDebounce(
     () => {
-      if (isEqual(localResourceFilter, filtersMap)) {
+      if (!wasLocalUpdate) {
         return;
       }
 
@@ -208,6 +210,16 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     DEFAULT_EDITOR_DEBOUNCE,
     [localResourceFilter]
   );
+
+  useEffect(() => {
+    if (!wasLocalUpdate) {
+      setLocalResourceFilter(filtersMap);
+    }
+  }, [filtersMap, wasLocalUpdate]);
+
+  useEffect(() => {
+    setWasLocalUpdate(false);
+  }, [filtersMap]);
 
   return (
     <S.Container>
