@@ -351,6 +351,9 @@ export function extractK8sResources<
             object: resourceObject,
             text,
             isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
+            labels: resourceObject.metadata?.labels || {},
+            templateLabels: resourceObject.spec?.template?.metadata?.labels || {},
+            annotations: resourceObject.metadata?.annotations || {},
           };
 
           if (
@@ -405,6 +408,9 @@ export function extractK8sResources<
             object: resourceObject,
             text: fileContent,
             isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
+            labels: resourceObject.metadata?.labels || {},
+            templateLabels: resourceObject.spec?.template?.metadata?.labels || {},
+            annotations: resourceObject.metadata?.annotations || {},
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
