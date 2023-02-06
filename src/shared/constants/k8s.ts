@@ -3,7 +3,6 @@ export const PREDEFINED_K8S_VERSION = '1.26.0';
 export const K8S_VERSIONS = [
   '1.26.0',
   '1.25.5',
-  '1.24.4',
   '1.25.3',
   '1.25.2',
   '1.25.1',

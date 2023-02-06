@@ -40,7 +40,7 @@ const ValidationPane: React.FC = () => {
 
       <ValidationOverview
         containerStyle={{marginTop: '20px'}}
-        height={height - 190}
+        height={height - 197}
         newProblemsIntroducedType={newProblemsIntroducedType}
         selectedProblem={selectedProblem}
         validationResponse={lastResponse}

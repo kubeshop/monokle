@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
 import {currentConfigSelector} from '@redux/selectors';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
+import {setConfigK8sSchemaVersion} from '@redux/validation/validation.slice';
 
 import {doesSchemaExist} from '@utils/index';
 
@@ -31,6 +32,8 @@ export const K8sVersionSelection = () => {
     } else {
       dispatch(updateK8sVersion(k8sVersion));
     }
+
+    dispatch(setConfigK8sSchemaVersion(k8sVersion));
   };
 
   const menuItems = K8S_VERSIONS.map(version => ({
