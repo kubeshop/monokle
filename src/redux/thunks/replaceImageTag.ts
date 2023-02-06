@@ -42,7 +42,7 @@ export const replaceImageTag = (
       }
     });
 
-    resourcesToUpdate.push({resourceId, content: newResourceText});
+    resourcesToUpdate.push({resourceIdentifier: resource, content: newResourceText});
   });
 
   dispatch(updateMultipleResources(resourcesToUpdate));

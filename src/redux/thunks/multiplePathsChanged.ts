@@ -8,40 +8,53 @@ import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
+import {AppState} from '@shared/models/appState';
+import {FileSideEffect} from '@shared/models/fileEntry';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
-export const multiplePathsChanged = createAsyncThunk(
-  'main/multiplePathsChanged',
-  async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const projectRootFolder = state.config.selectedProjectRootFolder;
+export const multiplePathsChanged = createAsyncThunk<
+  {
+    nextMainState: AppState;
+    affectedResourceIdentifiers: ResourceIdentifier[];
+  },
+  Array<string>
+>('main/multiplePathsChanged', async (filePaths, thunkAPI: {getState: Function; dispatch: Function}) => {
+  const state: RootState = thunkAPI.getState();
+  const projectConfig = currentConfigSelector(state);
+  const projectRootFolder = state.config.selectedProjectRootFolder;
 
-    const nextMainState = createNextState(state.main, mainState => {
-      filePaths.forEach(filePath => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
-        if (fileEntry) {
-          reloadFile(filePath, fileEntry, mainState, projectConfig);
-        } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
-          addPath(filePath, mainState, projectConfig);
-        }
-      });
-    });
+  const fileSideEffect: FileSideEffect = {
+    affectedResourceIds: [],
+  };
 
-    if (state.git.repo) {
-      if (!state.git.loading) {
-        thunkAPI.dispatch(setGitLoading(true));
+  const nextMainState = createNextState(state.main, mainState => {
+    filePaths.forEach(filePath => {
+      let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
+      if (fileEntry) {
+        reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
+      } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
+        addPath(filePath, mainState, projectConfig, fileSideEffect);
       }
+    });
+  });
 
-      promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: projectRootFolder,
-        fileMap: nextMainState.fileMap,
-      }).then(result => {
-        thunkAPI.dispatch(setChangedFiles(result));
-        thunkAPI.dispatch(setGitLoading(false));
-      });
+  if (state.git.repo) {
+    if (!state.git.loading) {
+      thunkAPI.dispatch(setGitLoading(true));
     }
 
-    return nextMainState;
+    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
+      localPath: projectRootFolder,
+      fileMap: nextMainState.fileMap,
+    }).then(result => {
+      thunkAPI.dispatch(setChangedFiles(result));
+      thunkAPI.dispatch(setGitLoading(false));
+    });
   }
-);
+
+  return {
+    nextMainState,
+    affectedResourceIdentifiers: fileSideEffect.affectedResourceIds.map(id => ({id, storage: 'local'})),
+  };
+});
