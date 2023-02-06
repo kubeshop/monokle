@@ -36,7 +36,7 @@ const loadListener: AppListenerFn = listen => {
     matcher: isAnyOf(
       setIsInQuickClusterMode,
       setRootFolder.fulfilled,
-      updateK8sVersion,
+      updateProjectK8sVersion,
       toggleOPARules,
       toggleValidation
     ),
@@ -87,7 +87,7 @@ const validateListener: AppListenerFn = listen => {
 const incrementalValidationListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(addResource, addMultipleResources, updateResource.fulfilled, removeResources.fulfilled),
-    async effect(_action, {dispatch, cancelActiveListeners, delay, signal}) {
+    async effect(_action, {dispatch, delay, signal}) {
       let incremental: Incremental = {resourceIds: []};
 
       if (isAnyOf(updateResource.fulfilled, removeResources.fulfilled)(_action)) {
@@ -110,7 +110,10 @@ const incrementalValidationListener: AppListenerFn = listen => {
 
       if (incremental.resourceIds.length === 0) return;
 
-      cancelActiveListeners();
+      // TODO: should we cancel active listeners or not?
+      // I think it depends on the resource storage?
+      // but maybe validation should actually be cancelled while the processing of refs should not?!
+      // cancelActiveListeners();
 
       await delay(200);
       if (signal.aborted) return;
