@@ -1,8 +1,10 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
+import {set} from 'lodash';
+
 import {DEFAULT_TRIVY_PLUGIN, RuleMap} from '@monokle/validation';
 import {ValidationIntegrationId} from '@shared/models/integrations';
-import {NewProblemsIntroducedType, SelectedProblem, ValidationState} from '@shared/models/validation';
+import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
@@ -17,12 +19,14 @@ export const validationSlice = createSlice({
       state.lastResponse = undefined;
     },
 
-    setNewProblemsIntroducedType: (state: Draft<ValidationState>, action: PayloadAction<NewProblemsIntroducedType>) => {
-      state.validationOverview.newProblemsIntroducedType = action.payload;
-    },
-
     setSelectedProblem: (state: Draft<ValidationState>, action: PayloadAction<SelectedProblem>) => {
       state.validationOverview.selectedProblem = action.payload;
+    },
+
+    setConfigK8sSchemaVersion: (state: Draft<ValidationState>, action: PayloadAction<string>) => {
+      set(state, ['config', 'settings', 'kubernetes-schema', 'schemaVersion'], action.payload);
+      electronStore.set('validation.config.settings.kubernetes-schema.schemaVersion', action.payload);
+      state.validationOverview.newProblemsIntroducedType = 'k8s-schema';
     },
 
     toggleOPARules: (state: Draft<ValidationState>, action: PayloadAction<{ruleName?: string; enable?: boolean}>) => {
@@ -53,6 +57,7 @@ export const validationSlice = createSlice({
         state.config.rules[ruleName] = Boolean(enable);
       }
 
+      state.validationOverview.newProblemsIntroducedType = 'rule';
       electronStore.set('validation.config.rules', state.config.rules);
     },
 
@@ -66,6 +71,7 @@ export const validationSlice = createSlice({
         state.config.plugins[id] = !previousValue;
       }
 
+      state.validationOverview.newProblemsIntroducedType = 'rule';
       electronStore.set('validation.config.plugins', state.config.plugins);
     },
   },
@@ -96,6 +102,6 @@ export const validationSlice = createSlice({
   },
 });
 
-export const {clearValidation, setNewProblemsIntroducedType, setSelectedProblem, toggleOPARules, toggleValidation} =
+export const {clearValidation, setConfigK8sSchemaVersion, setSelectedProblem, toggleOPARules, toggleValidation} =
   validationSlice.actions;
 export default validationSlice.reducer;

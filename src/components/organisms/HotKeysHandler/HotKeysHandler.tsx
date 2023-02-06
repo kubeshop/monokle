@@ -14,7 +14,6 @@ import {
   setLeftMenuSelection,
   toggleRightMenu,
   toggleSettings,
-  toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
@@ -254,30 +253,14 @@ const HotKeysHandler = () => {
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
     if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('file-explorer'));
-    }
-  });
-
-  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('kustomize-pane'));
-    }
-  });
-
-  useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('helm-pane'));
+      dispatch(setLeftMenuSelection('explorer'));
     }
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
     if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('validation-pane'));
+      dispatch(setLeftMenuSelection('validation'));
     }
-  });
-
-  useHotkeys(hotkeys.OPEN_TUTORIAL_PAGE.key, () => {
-    dispatch(setLeftMenuSelection('tutorial'));
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
@@ -292,16 +275,6 @@ const HotKeysHandler = () => {
       }
     },
     [uiState.quickSearchActionsPopup.isOpen]
-  );
-
-  useHotkeys(
-    hotkeys.OPEN_TUTORIAL_PAGE.key,
-    () => {
-      if (!uiState.isStartProjectPaneVisible) {
-        dispatch(toggleStartProjectPane());
-      }
-    },
-    [uiState.isStartProjectPaneVisible]
   );
 
   useHotkeys(hotkeys.FIND.key, () => {

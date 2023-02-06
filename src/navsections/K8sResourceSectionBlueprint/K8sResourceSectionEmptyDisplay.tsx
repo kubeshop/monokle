@@ -1,11 +1,9 @@
-import React from 'react';
-
 import {isEmpty} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, toggleSettings} from '@redux/reducers/ui';
 import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ResourceFilterType} from '@shared/models/appState';
@@ -46,7 +44,8 @@ function K8sResourceSectionEmptyDisplay() {
 
     setTimeout(() => {
       if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        dispatch(setLeftMenuSelection('templates-pane'));
+        // TODO: Browse templates with new template explorer
+        // dispatch(setLeftMenuSelection('templates'));
       } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
         dispatch(openNewResourceWizard());
       } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {

@@ -125,7 +125,7 @@ export enum PanelColors {
 
 export enum BackgroundColors {
   lightThemeBackground = Colors.whitePure,
-  darkThemeBackground = Colors.blackPure,
+  darkThemeBackground = Colors.black100,
   previewModeBackground = Colors.cyan,
   clusterModeBackground = Colors.volcano8,
 }

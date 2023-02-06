@@ -52,6 +52,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     signal.throwIfAborted();
 
     const transformedResources = activeResources.map(transformResourceForValidation).filter(isDefined);
+
     // TODO: could the active resource map change while the validation is running? before we get the refs?
     const response = await VALIDATOR.validate({
       resources: transformedResources,

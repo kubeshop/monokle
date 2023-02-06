@@ -107,7 +107,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
             return;
           }
 
-          dispatch(setLeftMenuSelection('file-explorer'));
+          dispatch(setLeftMenuSelection('explorer'));
           dispatch(selectFile({filePath: helmItem.filePath}));
         },
       },

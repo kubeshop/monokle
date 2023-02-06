@@ -330,7 +330,7 @@ export const electronStoreDefaults = {
     isNewResourceWizardOpen: false,
     leftMenu: {
       bottomSelection: null,
-      selection: 'file-explorer',
+      selection: 'explorer',
       isActive: true,
     },
     rightMenu: {
