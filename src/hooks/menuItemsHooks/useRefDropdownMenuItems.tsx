@@ -7,14 +7,13 @@ import {Menu} from 'antd';
 
 import styled from 'styled-components';
 
-import {Warning} from '@components/organisms/NavigatorPane/WarningsAndErrorsDisplay';
-
+// import {Warning} from '@components/organisms/NavigatorPane/WarningsAndErrorsDisplay';
 import {Icon as RawIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 // TODO: reimplement this after integrating @monokle/validation
 // the Warning model needs a `resourceIdentifier` field or at least resourceId and resourceStorage fields
-export function useRefDropdownMenuItems(type: 'error' | 'warning', warnings: Warning[]) {
+export function useRefDropdownMenuItems(type: 'error' | 'warning') {
   // const dispatch = useAppDispatch();
   // const items: MenuProps['items'] = useMemo(
   //   () =>

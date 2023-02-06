@@ -87,10 +87,10 @@ export const validationSlice = createSlice({
       state.loadRequestId = undefined;
     });
 
-    builder.addCase(loadValidation.fulfilled, (state, {meta}) => {
-      if (state.loadRequestId !== meta.requestId) return;
+    builder.addCase(loadValidation.fulfilled, (state, {payload}) => {
       state.status = 'loaded';
-      state.loadRequestId = undefined;
+      state.metadata = payload.metadata;
+      state.rules = payload.rules as any; // See NOTE_TS
     });
 
     builder.addCase(validateResources.fulfilled, (state, action) => {
