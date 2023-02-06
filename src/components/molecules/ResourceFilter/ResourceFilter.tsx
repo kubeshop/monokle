@@ -4,7 +4,6 @@ import {useDebounce} from 'react-use';
 import {Select} from 'antd';
 
 import {isEmpty, isEqual, omit} from 'lodash';
-import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
 
@@ -211,7 +210,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   );
 
   return (
-    <Container>
+    <S.Container>
       <Filter
         height={NAVIGATOR_FILTER_BODY_HEIGHT}
         search={localResourceFilter?.name}
@@ -304,14 +303,8 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           />
         </FilterField>
       </Filter>
-    </Container>
+    </S.Container>
   );
 };
 
 export default ResourceFilter;
-
-const Container = styled.div`
-  & > div {
-    padding: 0 10px !important;
-  }
-`;
