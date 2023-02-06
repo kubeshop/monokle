@@ -8,10 +8,16 @@ import {isEmpty, isEqual} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
+import {clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
+import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {currentConfigSelector} from '@redux/selectors';
 import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluster';
+import {previewSavedCommand} from '@redux/services/previewCommand';
+import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {doesSchemaExist} from '@utils/index';
@@ -25,9 +31,9 @@ import {loadValidation, validateResources} from './validation.thunks';
 const loadListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(
-      loadClusterResources.fulfilled,
-      reloadClusterResources.fulfilled,
+      setIsInQuickClusterMode,
       setRootFolder.fulfilled,
+      updateK8sVersion,
       setConfigK8sSchemaVersion,
       toggleOPARules,
       toggleValidation
@@ -44,13 +50,20 @@ const loadListener: AppListenerFn = listen => {
 
 const validateListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(loadValidation.fulfilled),
+    matcher: isAnyOf(
+      loadValidation.fulfilled,
+      loadClusterResources.fulfilled,
+      stopClusterConnection.fulfilled,
+      reloadClusterResources.fulfilled,
+      previewKustomization.fulfilled,
+      previewHelmValuesFile.fulfilled,
+      runPreviewConfiguration.fulfilled,
+      previewSavedCommand.fulfilled,
+      clearPreviewAndSelectionHistory,
+      clearPreview
+    ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
       cancelActiveListeners();
-
-      // if (getState().resources.previewLoading) {
-      //   return;
-      // }
 
       const validatorsLoading = getState().validation.status === 'loading';
       if (validatorsLoading) return;
@@ -64,6 +77,7 @@ const validateListener: AppListenerFn = listen => {
   });
 };
 
+// TODO: this should be moved to a different file / folder related to cluster interactions or related to schemas
 const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(loadClusterResources.fulfilled),
