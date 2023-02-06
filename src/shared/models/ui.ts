@@ -56,7 +56,7 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-export const NewLeftMenuSelectionOptions = [
+export const LeftMenuSelectionOptions = [
   'explorer',
   'compare',
   'validation',
@@ -65,7 +65,7 @@ export const NewLeftMenuSelectionOptions = [
   'settings',
   'dashboard',
 ] as const;
-type NewLeftMenuSelectionType = typeof NewLeftMenuSelectionOptions[number];
+type LeftMenuSelectionType = typeof LeftMenuSelectionOptions[number];
 
 type PaneConfiguration = {
   leftPane: number;
@@ -132,7 +132,7 @@ type UiState = {
     expandedSearchedFiles: React.Key[];
     isActive: boolean;
     isValidationDrawerVisible: boolean;
-    selection: NewLeftMenuSelectionType;
+    selection: LeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -192,7 +192,7 @@ export type {
   MonacoSelectionResource,
   MonacoUiSelection,
   MonacoUiState,
-  NewLeftMenuSelectionType,
+  LeftMenuSelectionType,
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,

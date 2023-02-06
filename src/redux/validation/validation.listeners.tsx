@@ -16,6 +16,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {doesSchemaExist} from '@utils/index';
 
+import {isDefined} from '@shared/utils/filter';
 import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import {setConfigK8sSchemaVersion, toggleOPARules, toggleValidation} from './validation.slice';
@@ -88,7 +89,8 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
         ...new Set(
           nodeResources
             .map(resource => {
-              const kubeletVersion = esource.object?.status?.nodeInfo?.kubeletVersion;
+              const kubeletVersion = resource.object?.status?.nodeInfo?.kubeletVersion;
+
               if (typeof kubeletVersion !== 'string') {
                 return undefined;
               }

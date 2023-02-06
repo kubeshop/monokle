@@ -8,14 +8,14 @@ import {useAppSelector} from '@redux/hooks';
 import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
-import {LeftMenuBottomSelectionType, NewLeftMenuSelectionType} from '@shared/models/ui';
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
 import SettingsPane from '../SettingsPane';
 import ValidationPane from '../ValidationPane';
 
-export const activities: ActivityType<NewLeftMenuSelectionType>[] = [
+export const activities: ActivityType<LeftMenuSelectionType>[] = [
   {
     type: 'panel',
     name: 'explorer',
