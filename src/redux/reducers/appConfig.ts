@@ -89,8 +89,8 @@ export const setOpenProject = createAsyncThunk(
       thunkAPI.dispatch(toggleStartProjectPane());
     }
 
-    if (appUi.leftMenu.selection !== 'file-explorer') {
-      thunkAPI.dispatch(setLeftMenuSelection('file-explorer'));
+    if (appUi.leftMenu.selection !== 'explorer') {
+      thunkAPI.dispatch(setLeftMenuSelection('explorer'));
     }
 
     monitorGitFolder(projectRootPath, thunkAPI);

@@ -14,19 +14,6 @@ type LayoutSizeType = {
 
 type LeftMenuBottomSelectionType = 'terminal';
 
-type LeftMenuSelectionType =
-  | 'file-explorer'
-  | 'helm-pane'
-  | 'git-pane'
-  | 'kustomize-pane'
-  | 'templates-pane'
-  | 'images-pane'
-  | 'validation-pane'
-  | 'tutorial'
-  | 'search'
-  | 'crds'
-  | 'dashboard';
-
 type MonacoRange = {
   startLineNumber: number;
   endLineNumber: number;
@@ -69,15 +56,16 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-type NewLeftMenuSelectionType =
-  | 'explorer'
-  | 'compare'
-  | 'validation'
-  | 'git'
-  | 'search'
-  | 'settings'
-  | 'dashboard'
-  | 'tutorial';
+export const NewLeftMenuSelectionOptions = [
+  'explorer',
+  'compare',
+  'validation',
+  'git',
+  'search',
+  'settings',
+  'dashboard',
+] as const;
+type NewLeftMenuSelectionType = typeof NewLeftMenuSelectionOptions[number];
 
 type PaneConfiguration = {
   leftPane: number;
@@ -144,7 +132,7 @@ type UiState = {
     expandedSearchedFiles: React.Key[];
     isActive: boolean;
     isValidationDrawerVisible: boolean;
-    selection: LeftMenuSelectionType | NewLeftMenuSelectionType;
+    selection: NewLeftMenuSelectionType;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -199,7 +187,6 @@ type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {}
 export type {
   LayoutSizeType,
   LeftMenuBottomSelectionType,
-  LeftMenuSelectionType,
   MonacoRange,
   MonacoSelectionFile,
   MonacoSelectionResource,
