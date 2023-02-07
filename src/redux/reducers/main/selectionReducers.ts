@@ -43,6 +43,43 @@ export const selectResourceReducer = (
     },
   };
 
+  const newHighlights: AppSelection[] = [];
+
+  resource.refs?.forEach(ref => {
+    if (ref.target?.type === 'resource' && ref.target.resourceId) {
+      newHighlights.push({
+        type: 'resource',
+        resourceIdentifier: {
+          id: ref.target.resourceId,
+          storage: resource.storage,
+        },
+      });
+    }
+    if (ref.target?.type === 'file' && ref.target.filePath) {
+      newHighlights.push({
+        type: 'file',
+        filePath: ref.target.filePath,
+      });
+    }
+    if (ref.target?.type === 'image' && ref.target.tag) {
+      newHighlights.push({
+        type: 'image',
+        imageId: ref.target.tag,
+      });
+    }
+  });
+
+  // This is taken care of by the FileTreePane
+  // We would need to use the main.highlights array only if we want to highl
+  // if (resource.storage === 'local') {
+  //   newHighlights.push({
+  //     type: 'file',
+  //     filePath: resource.origin.filePath,
+  //   });
+  // }
+
+  state.highlights = newHighlights;
+
   // TODO: highlight resources from resource.refs
 
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
