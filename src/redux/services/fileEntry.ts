@@ -33,7 +33,7 @@ import {
   HelmValuesMapType,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
-import {FileEntry} from '@shared/models/fileEntry';
+import {FileEntry, FileSideEffect} from '@shared/models/fileEntry';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
 import {
   K8sResource,
@@ -175,7 +175,8 @@ export function readFiles(
     helmTemplatesMap: HelmTemplatesMapType;
   },
   depth: number = 1,
-  helmChart?: HelmChart
+  helmChart?: HelmChart,
+  sideEffect?: FileSideEffect
 ) {
   const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
     stateArgs;
@@ -263,6 +264,9 @@ export function readFiles(
         log.info('Extracting resources for file entry: ', fileEntry.name);
         const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
+          if (sideEffect) {
+            sideEffect.affectedResourceIds.push(resource.id);
+          }
           const {meta, content} = splitK8sResource(resource);
           resourceMetaMap[meta.id] = meta;
           resourceContentMap[meta.id] = content;
@@ -444,7 +448,7 @@ function reloadHelmChartFile(fileEntry: FileEntry, fileMap: FileMapType, helmCha
   }
 }
 
-function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
+function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState, sideEffect: FileSideEffect) {
   const existingResourcesFromFile = getLocalResourceMetasForPath(
     fileEntry.filePath,
     state.resourceMetaMapByStorage.local
@@ -476,6 +480,7 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
 
   const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolderPath);
   newResourcesFromFile.forEach(resource => {
+    sideEffect.affectedResourceIds.push(resource.id);
     const {meta, content} = splitK8sResource(resource);
     state.resourceMetaMapByStorage.local[meta.id] = meta;
     state.resourceContentMapByStorage.local[meta.id] = content;
@@ -501,7 +506,13 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
  * Updates the fileEntry from the specified path - and its associated resources
  */
 
-export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState, projectConfig: ProjectConfig) {
+export function reloadFile(
+  absolutePath: string,
+  fileEntry: FileEntry,
+  state: AppState,
+  projectConfig: ProjectConfig,
+  sideEffect: FileSideEffect
+) {
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
@@ -519,7 +530,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
   if (isHelmChartFile(absolutePath)) {
     reloadHelmChartFile(fileEntry, state.fileMap, state.helmChartMap);
   } else if (shouldReloadResourcesFromFile(fileEntry, projectConfig)) {
-    reloadResourcesFromFileEntry(fileEntry, state);
+    reloadResourcesFromFileEntry(fileEntry, state, sideEffect);
   }
 
   if (wasFileSelected) {
@@ -615,7 +626,7 @@ function addHelmChartFile(
  * Helm Charts/Values and regular resource files
  */
 
-function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig, sideEffect: FileSideEffect) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
@@ -638,6 +649,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   else {
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolderEntry.filePath);
     resourcesFromFile.forEach(resource => {
+      sideEffect.affectedResourceIds.push(resource.id);
       const {meta, content} = splitK8sResource(resource);
       state.resourceMetaMapByStorage.local[meta.id] = meta;
       state.resourceContentMapByStorage.local[meta.id] = content;
@@ -653,7 +665,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
  * Adds the folder at the specified path with the specified parent
  */
 
-function addFolder(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+function addFolder(absolutePath: string, state: AppState, projectConfig: ProjectConfig, sideEffect: FileSideEffect) {
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
@@ -662,15 +674,21 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       fileMap: state.fileMap,
       extension: path.extname(absolutePath),
     });
-    folderEntry.children = readFiles(absolutePath, {
-      projectConfig,
-      resourceMetaMap: state.resourceMetaMapByStorage.local,
-      resourceContentMap: state.resourceContentMapByStorage.local,
-      fileMap: state.fileMap,
-      helmChartMap: state.helmChartMap,
-      helmValuesMap: state.helmValuesMap,
-      helmTemplatesMap: state.helmTemplatesMap,
-    });
+    folderEntry.children = readFiles(
+      absolutePath,
+      {
+        projectConfig,
+        resourceMetaMap: state.resourceMetaMapByStorage.local,
+        resourceContentMap: state.resourceContentMapByStorage.local,
+        fileMap: state.fileMap,
+        helmChartMap: state.helmChartMap,
+        helmValuesMap: state.helmValuesMap,
+        helmTemplatesMap: state.helmTemplatesMap,
+      },
+      undefined,
+      undefined,
+      sideEffect
+    );
     return folderEntry;
   }
 
@@ -681,7 +699,12 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+export function addPath(
+  absolutePath: string,
+  state: AppState,
+  projectConfig: ProjectConfig,
+  sideEffect: FileSideEffect
+) {
   const parentPath = absolutePath.slice(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -696,8 +719,8 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
       return undefined;
     }
     const fileEntry = isDirectory
-      ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig);
+      ? addFolder(absolutePath, state, projectConfig, sideEffect)
+      : addFile(absolutePath, state, projectConfig, sideEffect);
 
     if (fileEntry) {
       parentEntry.children = parentEntry.children || [];
