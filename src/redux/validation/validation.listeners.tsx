@@ -15,11 +15,15 @@ import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors'
 import {previewSavedCommand} from '@redux/services/previewCommand';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
+import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
+import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {removeResources} from '@redux/thunks/removeResources';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {doesSchemaExist} from '@utils/index';
@@ -86,11 +90,29 @@ const validateListener: AppListenerFn = listen => {
 
 const incrementalValidationListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(addResource, addMultipleResources, updateResource.fulfilled, removeResources.fulfilled),
+    matcher: isAnyOf(
+      addResource,
+      addMultipleResources,
+      updateResource.fulfilled,
+      updateMultipleResources.fulfilled,
+      updateFileEntry.fulfilled,
+      removeResources.fulfilled,
+      multiplePathsAdded.fulfilled,
+      multiplePathsChanged.fulfilled
+    ),
     async effect(_action, {dispatch, delay, signal}) {
       let incremental: Incremental = {resourceIds: []};
 
-      if (isAnyOf(updateResource.fulfilled, removeResources.fulfilled)(_action)) {
+      if (
+        isAnyOf(
+          updateResource.fulfilled,
+          updateMultipleResources.fulfilled,
+          updateFileEntry.fulfilled,
+          removeResources.fulfilled,
+          multiplePathsAdded.fulfilled,
+          multiplePathsChanged.fulfilled
+        )(_action)
+      ) {
         incremental = {
           resourceIds: _action.payload.affectedResourceIdentifiers?.map(r => r.id) ?? [],
         };

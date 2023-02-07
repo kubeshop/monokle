@@ -2,6 +2,8 @@ import {size} from 'lodash';
 
 import {errorsSelector, useValidationSelector, warningsSelector} from '@redux/validation/validation.selectors';
 
+import {ProblemIcon} from '@monokle/components';
+
 import * as S from './NavigatorTitle.styled';
 
 const NavigatorTitle: React.FC = () => {
@@ -12,8 +14,8 @@ const NavigatorTitle: React.FC = () => {
     <S.NavigatorTitleContainer>
       Kubernetes Resources
       <S.WarningsErrorsContainer>
-        <S.ColoredBox $type="error" /> <S.Count $type="error">{errorsCount}</S.Count>
-        <S.ColoredBox $type="warning" /> <S.Count $type="warning">{warningsCount}</S.Count>
+        <ProblemIcon level="error" /> <S.Count $type="error">{errorsCount}</S.Count>
+        <ProblemIcon level="warning" /> <S.Count $type="warning">{warningsCount}</S.Count>
       </S.WarningsErrorsContainer>
     </S.NavigatorTitleContainer>
   );

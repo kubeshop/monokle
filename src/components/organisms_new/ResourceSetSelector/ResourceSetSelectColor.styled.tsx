@@ -21,13 +21,13 @@ export const SelectColor = styled.div<{$isMainSelector?: boolean}>`
         color: white;
         font-size: 16px;
         font-weight: 700;
-
+        }
+        
         .ant-select-selection-item {
-        font-size: 16px;
-        font-weight: 700;
-        color: ${Colors.whitePure};
-    }
-  }
+          font-size: 16px;
+          font-weight: 700;
+          color: ${Colors.whitePure};
+        }
     `;
     }
   }}
@@ -37,8 +37,6 @@ export const SelectColor = styled.div<{$isMainSelector?: boolean}>`
   }
 
   .ant-select-selection-item {
-    font-size: 16px;
-    font-weight: 700;
     color: ${Colors.whitePure};
   }
 `;

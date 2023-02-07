@@ -23,7 +23,7 @@ const CompareSyncPane: React.FC = () => {
 
   return (
     <S.CompareSyncPaneContainer>
-      <TitleBar title="Sync & compare" description={!inspection ? <CompareActionBar /> : <InspectionActionBar />} />
+      <TitleBar title="Compare & Sync" description={!inspection ? <CompareActionBar /> : <InspectionActionBar />} />
 
       <Row ref={containerRef}>
         <Col span={10}>
