@@ -2,16 +2,15 @@ import {useMemo} from 'react';
 
 import {Button, MenuProps, Tooltip} from 'antd';
 
-import {ApiOutlined, CommentOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {CommentOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
 
 import semver from 'semver';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {FeedbackTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
+import {FeedbackTooltip, SettingsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openPluginsDrawer} from '@redux/reducers/extension';
 import {
   cancelWalkthrough,
   handleWalkthroughStep,
@@ -55,19 +54,6 @@ export function useHelpMenuItems() {
         key: 'settings',
         onClick: () => dispatch(toggleSettings()),
       },
-      ...(!isInQuickClusterMode
-        ? [
-            {
-              label: (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-                  {renderMenuItem('Plugins Manager', <ApiOutlined />, true)}
-                </Tooltip>
-              ),
-              key: 'plugins-manager',
-              onClick: () => dispatch(openPluginsDrawer()),
-            },
-          ]
-        : []),
       {
         key: 'help',
         label: (

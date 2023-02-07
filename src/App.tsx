@@ -18,7 +18,6 @@ import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
-import {closePluginsDrawer} from '@redux/reducers/extension';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
@@ -69,7 +68,6 @@ const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResource
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManager = React.lazy(() => import('@organisms/PluginManager'));
 const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
@@ -98,7 +96,6 @@ const App = () => {
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
-  const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
@@ -118,7 +115,6 @@ const App = () => {
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
@@ -364,10 +360,6 @@ const App = () => {
     dispatch(toggleNotifications());
   };
 
-  const pluginsDrawerOnClose = () => {
-    dispatch(closePluginsDrawer());
-  };
-
   const settingsDrawerOnClose = () => {
     if (isKubeConfigBrowseSettingsOpen) {
       dispatch(toggleSettings());
@@ -405,15 +397,6 @@ const App = () => {
           extra={<S.Button onClick={() => dispatch(clearNotifications())}>Clear</S.Button>}
         >
           <NotificationsManager />
-        </LazyDrawer>
-
-        <LazyDrawer
-          noPadding
-          onClose={pluginsDrawerOnClose}
-          title="Plugins Manager"
-          visible={isPluginManagerDrawerVisible}
-        >
-          <PluginManager />
         </LazyDrawer>
 
         <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
