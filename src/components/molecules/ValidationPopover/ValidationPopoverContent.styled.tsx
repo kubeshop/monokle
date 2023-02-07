@@ -16,4 +16,9 @@ export const Line = styled.span`
 
 export const Message = styled.span`
   color: ${Colors.grey7};
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 `;
