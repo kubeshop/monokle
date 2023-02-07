@@ -1,5 +1,3 @@
-import * as Rt from 'runtypes';
-
 export type HelmPreview = {
   type: 'helm';
   valuesFileId: string;
@@ -23,44 +21,28 @@ export type CommandPreview = {
 
 export type AnyPreview = HelmPreview | HelmConfigPreview | KustomizePreview | CommandPreview;
 
-const HelmPreviewRuntype: Rt.Runtype<HelmPreview> = Rt.Record({
-  type: Rt.Literal('helm'),
-  valuesFileId: Rt.String,
-  chartId: Rt.String,
-});
-
-const HelmConfigPreviewRuntype: Rt.Runtype<HelmConfigPreview> = Rt.Record({
-  type: Rt.Literal('helm-config'),
-  configId: Rt.String,
-});
-
-const KustomizePreviewRuntype: Rt.Runtype<KustomizePreview> = Rt.Record({
-  type: Rt.Literal('kustomize'),
-  kustomizationId: Rt.String,
-});
-
-const CommandPreviewRuntype: Rt.Runtype<CommandPreview> = Rt.Record({
-  type: Rt.Literal('command'),
-  commandId: Rt.String,
-});
-
-export const AnyPreviewRuntype: Rt.Runtype<AnyPreview> = Rt.Union(
-  HelmPreviewRuntype,
-  HelmConfigPreviewRuntype,
-  KustomizePreviewRuntype,
-  CommandPreviewRuntype
-);
-
-// export type HelmPreview = Rt.Static<typeof HelmPreviewRuntype>;
-// export type HelmConfigPreview = Rt.Static<typeof HelmConfigPreviewRuntype>;
-// export type KustomizePreview = Rt.Static<typeof KustomizePreviewRuntype>;
-// export type CommandPreview = Rt.Static<typeof CommandPreviewRuntype>;
-// export type AnyPreview = Rt.Static<typeof AnyPreviewRuntype>;
-
 export type PreviewType = AnyPreview['type'];
 
-export const isHelmPreview = HelmPreviewRuntype.guard;
-export const isHelmConfigPreview = HelmConfigPreviewRuntype.guard;
-export const isKustomizePreview = KustomizePreviewRuntype.guard;
-export const isCommandPreview = CommandPreviewRuntype.guard;
-export const isAnyPreview = AnyPreviewRuntype.guard;
+export const isHelmPreview = (preview: AnyPreview): preview is HelmPreview =>
+  preview.type === 'helm' &&
+  'valuesFileId' in preview &&
+  typeof preview.valuesFileId === 'string' &&
+  'chartId' in preview &&
+  typeof preview.chartId === 'string';
+
+export const isHelmConfigPreview = (preview: AnyPreview): preview is HelmConfigPreview =>
+  preview.type === 'helm-config' && 'configId' in preview && typeof preview.configId === 'string';
+
+export const isKustomizePreview = (preview: AnyPreview): preview is KustomizePreview =>
+  preview.type === 'kustomize' && 'kustomizationId' in preview && typeof preview.kustomizationId === 'string';
+
+export const isCommandPreview = (preview: AnyPreview): preview is CommandPreview =>
+  preview.type === 'command' && 'commandId' in preview && typeof preview.commandId === 'string';
+
+export const isAnyPreview = (preview: any): preview is AnyPreview => {
+  return (
+    typeof preview === 'object' &&
+    'type' in preview &&
+    (isHelmPreview(preview) || isHelmConfigPreview(preview) || isKustomizePreview(preview) || isCommandPreview(preview))
+  );
+};

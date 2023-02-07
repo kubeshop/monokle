@@ -1,6 +1,4 @@
-import * as Rt from 'runtypes';
-
-import {AnyPreview, AnyPreviewRuntype} from './preview';
+import {AnyPreview, isAnyPreview} from './preview';
 
 /*
  * Types
@@ -22,40 +20,36 @@ export type TransientOrigin = {
 
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientOrigin;
 
-/*
- * Runtypes
- */
+export const isLocalOrigin = (origin: any): origin is LocalOrigin => {
+  return (
+    typeof origin === 'object' &&
+    'filePath' in origin &&
+    typeof origin.filePath === 'string' &&
+    'fileOffset' in origin &&
+    typeof origin.fileOffset === 'number'
+  );
+};
 
-export const LocalOriginRuntype: Rt.Runtype<LocalOrigin> = Rt.Record({
-  storage: Rt.Literal('local'),
-  filePath: Rt.String,
-  fileOffset: Rt.Number,
-});
-export const ClusterOriginRuntype: Rt.Runtype<ClusterOrigin> = Rt.Record({
-  storage: Rt.Literal('cluster'),
-  context: Rt.String,
-});
-export const PreviewOriginRuntype: Rt.Runtype<PreviewOrigin> = Rt.Record({
-  storage: Rt.Literal('preview'),
-  preview: AnyPreviewRuntype,
-});
-export const TransientOriginRuntype: Rt.Runtype<TransientOrigin> = Rt.Record({
-  storage: Rt.Literal('transient'),
-});
+export const isClusterOrigin = (origin: any): origin is ClusterOrigin => {
+  return typeof origin === 'object' && 'context' in origin && typeof origin.context === 'string';
+};
 
-export const AnyOriginRuntype: Rt.Runtype<AnyOrigin> = Rt.Union(
-  LocalOriginRuntype,
-  ClusterOriginRuntype,
-  PreviewOriginRuntype,
-  TransientOriginRuntype
-);
+export const isPreviewOrigin = (origin: any): origin is PreviewOrigin => {
+  return (
+    typeof origin === 'object' &&
+    'preview' in origin &&
+    typeof origin.preview === 'object' &&
+    isAnyPreview(origin.preview)
+  );
+};
 
-/*
- * Type guards
- */
+export const isTransientOrigin = (origin: any): origin is TransientOrigin => {
+  return typeof origin === 'object' && Object.keys(origin).length === 0;
+};
 
-export const isLocalOrigin = LocalOriginRuntype.guard;
-export const isClusterOrigin = ClusterOriginRuntype.guard;
-export const isPreviewOrigin = PreviewOriginRuntype.guard;
-export const isTransientOrigin = TransientOriginRuntype.guard;
-export const isAnyOrigin = AnyOriginRuntype.guard;
+export const isAnyOrigin = (origin: any): origin is AnyOrigin => {
+  return (
+    typeof origin === 'object' &&
+    (isLocalOrigin(origin) || isClusterOrigin(origin) || isPreviewOrigin(origin) || isTransientOrigin(origin))
+  );
+};

@@ -1,62 +1,93 @@
-import * as Rt from 'runtypes';
+import {ResourceIdentifier, ResourceStorage, isResourceIdentifier} from './k8sResource';
 
-import {ResourceIdentifier, ResourceIdentifierRuntype, ResourceStorage} from './k8sResource';
+export type FileSelection = {
+  type: 'file';
+  filePath: string;
+};
 
-const FileSelectionRuntype = Rt.Record({
-  type: Rt.Literal('file'),
-  filePath: Rt.String,
-});
-
-const HelmValuesFileSelectionRuntype = Rt.Record({
-  type: Rt.Literal('helm.values.file'),
-  valuesFileId: Rt.String,
-});
+export type HelmValuesFileSelection = {
+  type: 'helm.values.file';
+  valuesFileId: string;
+};
 
 export type ResourceSelection<Storage extends ResourceStorage = ResourceStorage> = {
   type: 'resource';
   resourceIdentifier: ResourceIdentifier<Storage>;
 };
 
-const ResourceSelectionRuntype: Rt.Runtype<ResourceSelection> = Rt.Record({
-  type: Rt.Literal('resource'),
-  resourceIdentifier: ResourceIdentifierRuntype,
-});
+export type ImageSelection = {
+  type: 'image';
+  imageId: string;
+};
 
-const ImageSelectionRuntype = Rt.Record({
-  type: Rt.Literal('image'),
-  imageId: Rt.String,
-});
+export type CommandSelection = {
+  type: 'command';
+  commandId: string;
+};
 
-const CommandSelectionRuntype = Rt.Record({
-  type: Rt.Literal('command'),
-  commandId: Rt.String,
-});
+export type PreviewConfigurationSelection = {
+  type: 'preview.configuration';
+  previewConfigurationId: string;
+};
 
-const PreviewConfigurationSelectionRuntype = Rt.Record({
-  type: Rt.Literal('preview.configuration'),
-  previewConfigurationId: Rt.String,
-});
+export type AppSelection =
+  | FileSelection
+  | HelmValuesFileSelection
+  | ResourceSelection
+  | ImageSelection
+  | CommandSelection
+  | PreviewConfigurationSelection;
 
-const AppSelectionRuntype = Rt.Union(
-  FileSelectionRuntype,
-  HelmValuesFileSelectionRuntype,
-  ResourceSelectionRuntype,
-  ImageSelectionRuntype,
-  CommandSelectionRuntype,
-  PreviewConfigurationSelectionRuntype
-);
+export const isFileSelection = (selection: any): selection is FileSelection => {
+  return typeof selection === 'object' && 'type' in selection && selection.type === 'file' && 'filePath' in selection;
+};
 
-export type FileSelection = Rt.Static<typeof FileSelectionRuntype>;
-export type HelmValuesFileSelection = Rt.Static<typeof HelmValuesFileSelectionRuntype>;
-export type ImageSelection = Rt.Static<typeof ImageSelectionRuntype>;
-export type CommandSelection = Rt.Static<typeof CommandSelectionRuntype>;
-export type PreviewConfigurationSelection = Rt.Static<typeof PreviewConfigurationSelectionRuntype>;
-export type AppSelection = Rt.Static<typeof AppSelectionRuntype>;
+export const isHelmValuesFileSelection = (selection: any): selection is HelmValuesFileSelection => {
+  return (
+    typeof selection === 'object' &&
+    'type' in selection &&
+    selection.type === 'helm.values.file' &&
+    'valuesFileId' in selection &&
+    typeof selection.valuesFileId === 'string'
+  );
+};
 
-export const isFileSelection = FileSelectionRuntype.guard;
-export const isHelmValuesFileSelection = HelmValuesFileSelectionRuntype.guard;
-export const isResourceSelection = ResourceSelectionRuntype.guard;
-export const isImageSelection = ImageSelectionRuntype.guard;
-export const isCommandSelection = CommandSelectionRuntype.guard;
-export const isPreviewConfigurationSelection = PreviewConfigurationSelectionRuntype.guard;
-export const isAppSelection = AppSelectionRuntype.guard;
+export const isResourceSelection = (selection: any): selection is ResourceSelection => {
+  return (
+    typeof selection === 'object' &&
+    'type' in selection &&
+    selection.type === 'resource' &&
+    'resourceIdentifier' in selection &&
+    isResourceIdentifier(selection.resourceIdentifier)
+  );
+};
+
+export const isImageSelection = (selection: any): selection is ImageSelection => {
+  return (
+    typeof selection === 'object' &&
+    'type' in selection &&
+    selection.type === 'image' &&
+    'imageId' in selection &&
+    typeof selection.imageId === 'string'
+  );
+};
+
+export const isCommandSelection = (selection: any): selection is CommandSelection => {
+  return (
+    typeof selection === 'object' &&
+    'type' in selection &&
+    selection.type === 'command' &&
+    'commandId' in selection &&
+    typeof selection.commandId === 'string'
+  );
+};
+
+export const isPreviewConfigurationSelection = (selection: any): selection is PreviewConfigurationSelection => {
+  return (
+    typeof selection === 'object' &&
+    'type' in selection &&
+    selection.type === 'preview.configuration' &&
+    'previewConfigurationId' in selection &&
+    typeof selection.previewConfigurationId === 'string'
+  );
+};
