@@ -15,14 +15,13 @@ type FilePatternListProps = {
   tooltip: string;
   value: string[];
   onChange: (patterns: string[]) => void;
-  isSettingsOpened?: boolean;
   showApplyButton?: boolean;
   showButtonLabel?: string;
   onApplyClick?: () => void;
 };
 
 const FilePatternList: React.FC<FilePatternListProps> = props => {
-  const {value, onChange, tooltip, isSettingsOpened, showButtonLabel, showApplyButton, onApplyClick} = props;
+  const {value, onChange, tooltip, showButtonLabel, showApplyButton, onApplyClick} = props;
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
@@ -67,12 +66,13 @@ const FilePatternList: React.FC<FilePatternListProps> = props => {
     }
   }, [isAddingPattern, focusInput]);
 
-  useEffect(() => {
-    if (!isSettingsOpened) {
-      setIsAddingPattern(false);
-      setPatternInput('');
-    }
-  }, [isSettingsOpened]);
+  // TODO: Do we still need this?
+  // useEffect(() => {
+  //   if (!isSettingsOpened) {
+  //     setIsAddingPattern(false);
+  //     setPatternInput('');
+  //   }
+  // }, [isSettingsOpened]);
 
   return (
     <div>

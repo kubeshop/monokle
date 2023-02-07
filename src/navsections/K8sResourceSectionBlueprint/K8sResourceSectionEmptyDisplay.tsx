@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ResourceFilterType} from '@shared/models/appState';
@@ -61,7 +61,7 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    dispatch(toggleSettings());
+    dispatch(setLeftMenuSelection('settings'));
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);

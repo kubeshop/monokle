@@ -82,7 +82,6 @@ type UiState = {
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;
   isScaleModalOpen: boolean;
-  isSettingsOpen: boolean;
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
   newResourceWizard: {

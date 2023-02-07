@@ -1,7 +1,7 @@
 import {notification} from 'antd';
 
 import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/reducers/appConfig';
-import {setActiveSettingsPanel, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {setActiveSettingsPanel, toggleNotifications} from '@redux/reducers/ui';
 import store from '@redux/store';
 
 import {SettingsPanel} from '@shared/models/config';
@@ -29,7 +29,9 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     disableTelemetryNotification();
 
     store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
-    store.dispatch(toggleSettings());
+
+    // TODO: Do we still need to toggle settings?
+    // store.dispatch(toggleSettings());
     store.dispatch(toggleNotifications());
     store.dispatch(toggleEventTracking(false));
     store.dispatch(toggleErrorReporting(false));

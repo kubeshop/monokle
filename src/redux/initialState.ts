@@ -140,7 +140,6 @@ if (
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
-  isSettingsOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
   isScaleModalOpen: false,
@@ -245,7 +244,6 @@ const initialExtensionState: ExtensionState = {
   pluginMap: {},
   templateMap: {},
   templatePackMap: {},
-  isPluginsDrawerVisible: false,
 };
 
 const initialTerminalState: TerminalState = {

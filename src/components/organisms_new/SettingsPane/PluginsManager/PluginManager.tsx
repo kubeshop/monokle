@@ -9,7 +9,7 @@ import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 import _ from 'lodash';
 
 import {PLUGINS_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
-import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
+import {PluginManagerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
@@ -62,7 +62,7 @@ export const PluginManager: React.FC = () => {
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
         <S.QuestionCircleOutlined onClick={openHelpUrl} />
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerDrawerReloadTooltip} placement="bottom">
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}

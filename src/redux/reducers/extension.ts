@@ -40,12 +40,6 @@ export const extensionSlice = createSlice({
       const {folderPath, extension} = action.payload;
       state.templatePackMap[folderPath] = extension;
     },
-    closePluginsDrawer: (state: Draft<ExtensionState>) => {
-      state.isPluginsDrawerVisible = false;
-    },
-    openPluginsDrawer: (state: Draft<ExtensionState>) => {
-      state.isPluginsDrawerVisible = true;
-    },
     removePlugin: (state: Draft<ExtensionState>, action: PayloadAction<string>) => {
       const folderPath = action.payload;
       delete state.pluginMap[folderPath];
@@ -100,7 +94,5 @@ export const {
   addMultipleTemplatePacks,
   setTemplatePackMap,
   setExtensionsDirs,
-  openPluginsDrawer,
-  closePluginsDrawer,
 } = extensionSlice.actions;
 export default extensionSlice.reducer;
