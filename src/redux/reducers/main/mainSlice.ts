@@ -72,7 +72,7 @@ export type SetRootFolderPayload = {
 };
 
 export type UpdateMultipleResourcesPayload = {
-  resourceId: string;
+  resourceIdentifier: ResourceIdentifier;
   content: string;
 }[];
 
@@ -460,11 +460,11 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(multiplePathsChanged.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(multiplePathsAdded.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(updateResource.fulfilled, (state, action) => {
@@ -476,11 +476,11 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     // TODO: does this work properly?

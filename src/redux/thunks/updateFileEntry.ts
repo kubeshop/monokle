@@ -10,19 +10,29 @@ import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
-import {deleteResource, extractK8sResources} from '@redux/services/resource';
+import {deleteResource, extractK8sResources, splitK8sResource} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppState} from '@shared/models/appState';
+import {FileSideEffect} from '@shared/models/fileEntry';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
-export const updateFileEntry = createAsyncThunk(
+export const updateFileEntry = createAsyncThunk<
+  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
+  UpdateFileEntryPayload
+>(
   'main/updateFileEntry',
   async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
 
     let error: any;
+
+    const fileSideEffect: FileSideEffect = {
+      affectedResourceIds: [],
+    };
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
@@ -57,8 +67,13 @@ export const updateFileEntry = createAsyncThunk(
                 log.warn(`[updateFileEntry]: ${e.message}`);
               }
             }
+          } else if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
+            // TODO: 2.0+ move the reprocessing of helm files to a redux listener, triggered after we save the file
+            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
           } else {
             getLocalResourceMetasForPath(fileEntry.filePath, mainState.resourceMetaMapByStorage.local).forEach(r => {
+              // TODO: 2.0+ do we have to pass the deleted resources to validation?
+              fileSideEffect.affectedResourceIds.push(r.id);
               deleteResource(r, {
                 resourceMetaMap: mainState.resourceMetaMapByStorage.local,
                 resourceContentMap: mainState.resourceContentMapByStorage.local,
@@ -70,41 +85,21 @@ export const updateFileEntry = createAsyncThunk(
               fileOffset: 0,
             });
 
-            // TODO: re-implement when we have @monokle/validation
-            // let resourceIds: string[] = [];
-            // only recalculate refs for resources that already have refs
-            // Object.values(mainState.resourceMap)
-            //   .filter(r => r.refs)
-            //   .forEach(r => resourceIds.push(r.id));
-            // reprocessResources(
-            //   schemaVersion,
-            //   userDataDir,
-            //   resourceIds,
-            //   mainState.resourceMap,
-            //   mainState.fileMap,
-            //   mainState.resourceRefsProcessingOptions,
-            //   {
-            //     resourceKinds: extractedResources.map(r => r.kind),
-            //     policyPlugins: [],
-            //   });
-
-            // TODO: is this correct?
             Object.values(extractedResources).forEach(r => {
-              mainState.resourceMetaMapByStorage.local[r.id] = r;
-              mainState.highlights.push({
-                type: 'resource',
-                resourceIdentifier: {
-                  id: r.id,
-                  storage: r.storage,
+              fileSideEffect.affectedResourceIds.push(r.id);
+              const {meta, content} = splitK8sResource(r);
+              mainState.resourceMetaMapByStorage.local[meta.id] = meta;
+              mainState.resourceContentMapByStorage.local[content.id] = content;
+              mainState.highlights = [
+                {
+                  type: 'resource',
+                  resourceIdentifier: {
+                    id: r.id,
+                    storage: r.storage,
+                  },
                 },
-              });
-              // resourceIds.push(r.id); // this is from the commented out code above
+              ];
             });
-
-            // TODO: move the reprocessing of helm files to a redux listener, triggered after we save the file
-            if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
-              reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
-            }
           }
         }
 
@@ -119,9 +114,12 @@ export const updateFileEntry = createAsyncThunk(
     });
 
     if (error) {
-      return {...state.main, autosaving: {status: false, error}};
+      return {nextMainState: {...state.main, autosaving: {status: false, error}}};
     }
 
-    return nextMainState;
+    return {
+      nextMainState,
+      affectedResourceIdentifiers: fileSideEffect.affectedResourceIds.map(id => ({id, storage: 'local'})),
+    };
   }
 );

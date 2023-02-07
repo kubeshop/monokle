@@ -52,7 +52,7 @@ const ResourceRefsIconPopover = ({
   const incomingColor = useMemo(() => (isSelected ? Colors.blackPure : Colors.blue10), [isSelected]);
 
   if (!resourceRefs || resourceRefs.length === 0) {
-    return <span style={{minWidth: '20px'}} />;
+    return <span style={{minWidth: '30px'}} />;
   }
 
   if (isDisabled) {
@@ -62,7 +62,7 @@ const ResourceRefsIconPopover = ({
   return (
     <Popover
       mouseEnterDelay={0.5}
-      placement="rightTop"
+      placement="bottom"
       content={
         <RefsPopoverContent resource={resourceMeta} resourceRefs={resourceRefs}>
           {type === 'incoming' ? (
@@ -82,8 +82,8 @@ const ResourceRefsIconPopover = ({
           name={iconType}
           style={
             type === 'incoming'
-              ? {...baseIconStyle, marginRight: 5, color: incomingColor}
-              : {...baseIconStyle, marginLeft: 5, color: incomingColor}
+              ? {...baseIconStyle, margin: '0px 8px', color: incomingColor}
+              : {...baseIconStyle, margin: '0px 8px', color: incomingColor}
           }
         />
         {hasUnsatisfiedRefs && (

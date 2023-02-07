@@ -1,28 +1,22 @@
-import * as Rt from 'runtypes';
+import {ResourceRef, isResourceRef} from '@monokle/validation';
 
-import {ResourceRef} from '@monokle/validation';
-
-import {K8sObject, K8sObjectRuntype} from './k8s';
+import {K8sObject} from './k8s';
 import {
-  AnyOriginRuntype,
+  AnyOrigin,
   ClusterOrigin,
-  ClusterOriginRuntype,
   LocalOrigin,
-  LocalOriginRuntype,
   PreviewOrigin,
-  PreviewOriginRuntype,
   TransientOrigin,
-  TransientOriginRuntype,
+  isClusterOrigin,
+  isLocalOrigin,
+  isPreviewOrigin,
+  isTransientOrigin,
 } from './origin';
 
-export type ResourceStorage = 'local' | 'cluster' | 'preview' | 'transient';
+export const RESOURCE_STORAGE = ['local', 'cluster', 'preview', 'transient'] as const;
 
-const ResourceStorageRuntype = Rt.Union(
-  Rt.Literal('local'),
-  Rt.Literal('cluster'),
-  Rt.Literal('preview'),
-  Rt.Literal('transient')
-);
+// export type ResourceStorage = 'local' | 'cluster' | 'preview' | 'transient';
+export type ResourceStorage = typeof RESOURCE_STORAGE[number];
 
 export type ResourceIdentifier<Storage extends ResourceStorage = ResourceStorage> = {
   /** an internally generated UUID
@@ -32,13 +26,10 @@ export type ResourceIdentifier<Storage extends ResourceStorage = ResourceStorage
   // origin: Origin;
 };
 
-export const ResourceIdentifierRuntype: Rt.Runtype<ResourceIdentifier<ResourceStorage>> = Rt.Record({
-  id: Rt.String,
-  storage: ResourceStorageRuntype,
-  // origin: AnyOriginRuntype,
-});
-
-export const isResourceIdentifier = ResourceIdentifierRuntype.guard;
+export type ResourceRange = {
+  start: number;
+  length: number;
+};
 
 export interface ResourceMeta<Storage extends ResourceStorage = ResourceStorage> extends ResourceIdentifier<Storage> {
   origin: Storage extends 'local'
@@ -69,118 +60,17 @@ export interface ResourceMeta<Storage extends ResourceStorage = ResourceStorage>
   /** if a resource is cluster scoped ( kind is namespaced ) */
   isClusterScoped: boolean;
   /** specifies the range in the file's content, applies only to file locations  */
-  range?: {
-    start: number;
-    length: number;
-  };
+  range?: ResourceRange;
   refs?: ResourceRef[];
 }
-
-const ResourceMetaRuntype: Rt.Runtype<ResourceMeta<ResourceStorage>> = Rt.Record({
-  id: Rt.String,
-  storage: ResourceStorageRuntype,
-  origin: AnyOriginRuntype,
-  name: Rt.String,
-  kind: Rt.String,
-  apiVersion: Rt.String,
-  namespace: Rt.Optional(Rt.String),
-  labels: Rt.Optional(Rt.Dictionary(Rt.String)),
-  annotations: Rt.Optional(Rt.Dictionary(Rt.String)),
-  templateLabels: Rt.Optional(Rt.Dictionary(Rt.String)),
-  isClusterScoped: Rt.Boolean,
-  range: Rt.Optional(
-    Rt.Record({
-      start: Rt.Number,
-      length: Rt.Number,
-    })
-  ),
-  isTransient: Rt.Optional(Rt.Boolean),
-});
-
-const LocalResourceMetaRuntype: Rt.Runtype<ResourceMeta<'local'>> = Rt.Intersect(
-  ResourceMetaRuntype,
-  Rt.Record({storage: Rt.Literal('local'), origin: LocalOriginRuntype})
-);
-const ClusterResourceMetaRuntype: Rt.Runtype<ResourceMeta<'cluster'>> = Rt.Intersect(
-  ResourceMetaRuntype,
-  Rt.Record({storage: Rt.Literal('cluster'), origin: ClusterOriginRuntype})
-);
-const PreviewResourceMetaRuntype: Rt.Runtype<ResourceMeta<'preview'>> = Rt.Intersect(
-  ResourceMetaRuntype,
-  Rt.Record({storage: Rt.Literal('preview'), origin: PreviewOriginRuntype})
-);
-const TransientResourceMetaRuntype: Rt.Runtype<ResourceMeta<'transient'>> = Rt.Intersect(
-  ResourceMetaRuntype,
-  Rt.Record({storage: Rt.Literal('transient'), origin: TransientOriginRuntype})
-);
-
-export const isLocalResourceMeta = LocalResourceMetaRuntype.guard;
-export const isClusterResourceMeta = ClusterResourceMetaRuntype.guard;
-export const isPreviewResourceMeta = PreviewResourceMetaRuntype.guard;
-export const isTransientResourceMeta = TransientResourceMetaRuntype.guard;
 
 export interface ResourceContent<Storage extends ResourceStorage = ResourceStorage>
   extends ResourceIdentifier<Storage> {
   text: string;
   object: K8sObject;
 }
-
-const ResourceContentRuntype: Rt.Runtype<ResourceContent<ResourceStorage>> = Rt.Record({
-  id: Rt.String,
-  storage: ResourceStorageRuntype,
-  origin: AnyOriginRuntype,
-  text: Rt.String,
-  object: K8sObjectRuntype,
-});
-
-const LocalResourceContentRuntype: Rt.Runtype<ResourceContent<'local'>> = Rt.Intersect(
-  ResourceContentRuntype,
-  Rt.Record({storage: Rt.Literal('local'), origin: LocalOriginRuntype})
-);
-const ClusterResourceContentRuntype: Rt.Runtype<ResourceContent<'cluster'>> = Rt.Intersect(
-  ResourceContentRuntype,
-  Rt.Record({storage: Rt.Literal('cluster'), origin: ClusterOriginRuntype})
-);
-const PreviewResourceContentRuntype: Rt.Runtype<ResourceContent<'preview'>> = Rt.Intersect(
-  ResourceContentRuntype,
-  Rt.Record({storage: Rt.Literal('preview'), origin: PreviewOriginRuntype})
-);
-const TransientResourceContentRuntype: Rt.Runtype<ResourceContent<'transient'>> = Rt.Intersect(
-  ResourceContentRuntype,
-  Rt.Record({storage: Rt.Literal('transient'), origin: TransientOriginRuntype})
-);
-
-export const isLocalResourceContent = LocalResourceContentRuntype.guard;
-export const isClusterResourceContent = ClusterResourceContentRuntype.guard;
-export const isPreviewResourceContent = PreviewResourceContentRuntype.guard;
-export const isTransientResourceContent = TransientResourceContentRuntype.guard;
-
 export type K8sResource<Storage extends ResourceStorage = ResourceStorage> = ResourceMeta<Storage> &
   ResourceContent<Storage>;
-
-const ResourceRuntype: Rt.Runtype<K8sResource> = Rt.Intersect(ResourceMetaRuntype, ResourceContentRuntype);
-const LocalResourceRuntype: Rt.Runtype<K8sResource<'local'>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({storage: Rt.Literal('local'), origin: LocalOriginRuntype})
-);
-const ClusterResourceRuntype: Rt.Runtype<K8sResource<'cluster'>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({storage: Rt.Literal('cluster'), origin: ClusterOriginRuntype})
-);
-const PreviewResourceRuntype: Rt.Runtype<K8sResource<'preview'>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({storage: Rt.Literal('preview'), origin: PreviewOriginRuntype})
-);
-const TransientResourceRuntype: Rt.Runtype<K8sResource<'transient'>> = Rt.Intersect(
-  ResourceRuntype,
-  Rt.Record({storage: Rt.Literal('transient'), origin: TransientOriginRuntype})
-);
-
-export const isResource = ResourceRuntype.guard;
-export const isLocalResource = LocalResourceRuntype.guard;
-export const isClusterResource = ClusterResourceRuntype.guard;
-export const isPreviewResource = PreviewResourceRuntype.guard;
-export const isTransientResource = TransientResourceRuntype.guard;
 
 export type ResourceMetaMap<Storage extends ResourceStorage = ResourceStorage> = Record<string, ResourceMeta<Storage>>;
 
@@ -208,3 +98,73 @@ export type OriginFromStorage<T extends ResourceStorage> = T extends 'local'
   : T extends 'transient'
   ? TransientOrigin
   : never;
+
+export const isResourceIdentifier = (value: any): value is ResourceIdentifier => {
+  return (
+    typeof value === 'object' &&
+    typeof value.id === 'string' &&
+    typeof value.storage === 'string' &&
+    RESOURCE_STORAGE.includes(value.storage)
+  );
+};
+
+export const isResourceRange = (value: any): value is ResourceRange => {
+  return typeof value === 'object' && typeof value.start === 'number' && typeof value.length === 'number';
+};
+
+const createIsResourceMeta =
+  <Storage extends ResourceStorage, Origin extends AnyOrigin>(storage: Storage, isOrigin: (x: any) => x is Origin) =>
+  (value: any): value is ResourceMeta<Storage> => {
+    return (
+      typeof value === 'object' &&
+      value.storage === storage &&
+      isOrigin(value.origin) &&
+      typeof value.name === 'string' &&
+      typeof value.kind === 'string' &&
+      typeof value.apiVersion === 'string' &&
+      typeof value.isClusterScoped === 'boolean' &&
+      ('namespace' in value ? typeof value.namespace === 'string' : true) &&
+      ('labels' in value ? typeof value.labels === 'object' : true) &&
+      ('annotations' in value ? typeof value.annotations === 'object' : true) &&
+      ('templateLabels' in value ? typeof value.templateLabels === 'object' : true) &&
+      ('range' in value ? isResourceRange(value.range) : true) &&
+      ('refs' in value ? Array.isArray(value.refs) && value.refs.every(isResourceRef) : true)
+    );
+  };
+
+export const isLocalResourceMeta = createIsResourceMeta('local', isLocalOrigin);
+export const isClusterResourceMeta = createIsResourceMeta('cluster', isClusterOrigin);
+export const isPreviewResourceMeta = createIsResourceMeta('preview', isPreviewOrigin);
+export const isTransientResourceMeta = createIsResourceMeta('transient', isTransientOrigin);
+
+const createIsResourceContent =
+  <Storage extends ResourceStorage>(storage: Storage) =>
+  (value: any): value is ResourceContent => {
+    return (
+      typeof value === 'object' &&
+      value.storage === storage &&
+      typeof value.text === 'string' &&
+      typeof value.object === 'object'
+    );
+  };
+
+export const isLocalResourceContent = createIsResourceContent('local');
+export const isClusterResourceContent = createIsResourceContent('cluster');
+export const isPreviewResourceContent = createIsResourceContent('preview');
+export const isTransientResourceContent = createIsResourceContent('transient');
+
+export const isLocalResource = (value: any): value is K8sResource<'local'> => {
+  return isLocalResourceMeta(value) && isLocalResourceContent(value);
+};
+
+export const isClusterResource = (value: any): value is K8sResource<'cluster'> => {
+  return isClusterResourceMeta(value) && isClusterResourceContent(value);
+};
+
+export const isPreviewResource = (value: any): value is K8sResource<'preview'> => {
+  return isPreviewResourceMeta(value) && isPreviewResourceContent(value);
+};
+
+export const isTransientResource = (value: any): value is K8sResource<'transient'> => {
+  return isTransientResourceMeta(value) && isTransientResourceContent(value);
+};
