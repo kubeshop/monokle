@@ -26,7 +26,7 @@ const ValidationPopover: React.FC<IProps> = props => {
       style={{zIndex: 50}}
       content={<ValidationPopoverContent results={results} />}
     >
-      <span>
+      <span style={{transform: 'translateY(-2px)'}}>
         <ProblemIcon level={level} disabled={disabled} />
       </span>
     </Popover>
