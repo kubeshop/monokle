@@ -2,13 +2,6 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-export const ColoredBox = styled.div<{$type: 'warning' | 'error'}>`
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background-color: ${({$type}) => ($type === 'warning' ? Colors.yellow12 : Colors.red7)};
-`;
-
 export const Count = styled.span<{$type: 'warning' | 'error'}>`
   font-size: 12px;
   font-weight: 400;
