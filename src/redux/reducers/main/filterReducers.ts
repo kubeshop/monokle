@@ -42,16 +42,16 @@ export const filterReducers = createSliceReducers('main', {
 
     // construct new filter
     let newFilter: ResourceFilterType = {
-      names: filter.names
-        ? isEqual(filter.names, state.resourceFilter.names)
+      name: filter.name
+        ? isEqual(filter.name, state.resourceFilter.name)
           ? undefined
-          : filter.names
-        : state.resourceFilter.names,
-      namespace: filter.namespace
-        ? filter.namespace === state.resourceFilter.namespace
+          : filter.name
+        : state.resourceFilter.name,
+      namespaces: filter.namespaces
+        ? isEqual(filter.namespaces, state.resourceFilter.namespaces)
           ? undefined
-          : filter.namespace
-        : state.resourceFilter.namespace,
+          : filter.namespaces
+        : state.resourceFilter.namespaces,
       kinds: filter.kinds
         ? isEqual(filter.kinds, state.resourceFilter.kinds)
           ? undefined

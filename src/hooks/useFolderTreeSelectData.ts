@@ -11,9 +11,9 @@ import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
 
 const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: string, isGitFileMap?: boolean) => {
-  const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
-  const filePath = isRoot ? ROOT_FILE_ENTRY : fileEntry.filePath;
-  const name = isRoot ? rootFolderName : fileEntry.name;
+  const isRoot = fileEntry?.name === ROOT_FILE_ENTRY;
+  const filePath = isRoot ? ROOT_FILE_ENTRY : fileEntry?.filePath;
+  const name = isRoot ? rootFolderName : fileEntry?.name;
 
   const node: any = {
     value: filePath,
@@ -22,7 +22,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: 
     children: [],
   };
 
-  if (fileEntry.children?.length) {
+  if (fileEntry?.children?.length) {
     node.children = fileEntry.children
       .map(child => (isGitFileMap ? fileMap[child] : fileMap[getChildFilePath(child, fileEntry, fileMap)]))
       .filter(childEntry => childEntry)
@@ -34,7 +34,6 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: 
 
 export const useFolderTreeSelectData = (gitFileMap?: FileMapType) => {
   const fileMap = useAppSelector(state => gitFileMap || state.main.fileMap);
-
   const rootFolderName = useMemo(() => {
     return gitFileMap
       ? ROOT_FILE_ENTRY

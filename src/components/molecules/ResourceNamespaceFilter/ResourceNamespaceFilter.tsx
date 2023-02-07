@@ -32,7 +32,7 @@ const ResourceNamespaceFilter: React.FC<IProps> = props => {
     dispatch(
       updateResourceFilter({
         ...resourceFilter,
-        namespace: selectedNamespace === ALL_OPTIONS ? undefined : selectedNamespace,
+        namespaces: selectedNamespace === ALL_OPTIONS ? undefined : [selectedNamespace],
       })
     );
   };
@@ -41,7 +41,7 @@ const ResourceNamespaceFilter: React.FC<IProps> = props => {
     <Select
       showSearch
       defaultValue={ALL_OPTIONS}
-      value={resourceFilter.namespace ? resourceFilter.namespace : ALL_OPTIONS}
+      value={resourceFilter.namespaces ? resourceFilter.namespaces[0] : ALL_OPTIONS}
       onChange={updateNamespace}
       style={{width: '100%'}}
     >

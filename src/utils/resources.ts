@@ -10,11 +10,7 @@ import {K8sResource, ResourceMeta, isLocalResource} from '@shared/models/k8sReso
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
-  if (
-    filters.names &&
-    filters.names.length &&
-    !filters.names.some(name => resourceMeta.name.toLowerCase().includes(name.toLowerCase()))
-  ) {
+  if (filters.name && filters.name.length && !resourceMeta.name.toLowerCase().includes(filters.name.toLowerCase())) {
     return false;
   }
 
@@ -22,12 +18,10 @@ export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: Res
     return false;
   }
 
-  if (filters.namespace) {
-    const resourceNamespace = resourceMeta.namespace || 'default';
-    if (resourceNamespace !== filters.namespace) {
-      return false;
-    }
+  if (filters.namespaces?.length && !filters.namespaces?.includes(resourceMeta?.namespace || 'default')) {
+    return false;
   }
+
   if (
     filters.fileOrFolderContainedIn &&
     isLocalResource(resourceMeta) &&

@@ -53,7 +53,7 @@ const StyledModal = styled(Modal)`
 
 const applyFilterWithConfirm = (
   option: string,
-  type: 'namespace' | 'kinds',
+  type: 'namespaces' | 'kinds',
   resourceFilter: ResourceFilterType,
   dispatch: AppDispatch
 ) => {
@@ -138,16 +138,16 @@ const QuickSearchActionsV3: React.FC = () => {
 
   const applyOption = useCallback(
     (type: string, option: string, resourceStorage?: ResourceStorage) => {
-      if (type === 'namespace' || type === 'kinds') {
+      if (type === 'namespaces' || type === 'kinds') {
         if (resourceFilter[type]) {
-          if (resourceFilter[type] !== option) {
+          if (!resourceFilter[type]?.includes(option)) {
             applyFilterWithConfirm(option, type, resourceFilter, dispatch);
           }
         } else {
           dispatch(
             updateResourceFilter({
               ...resourceFilter,
-              [type]: type === 'kinds' ? [option] : option,
+              [type]: [option],
             })
           );
           dispatch(closeQuickSearchActionsPopup());

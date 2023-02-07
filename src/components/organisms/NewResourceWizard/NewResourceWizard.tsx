@@ -8,6 +8,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
 import {JSONSchemaFaker} from 'json-schema-faker';
+import {first} from 'lodash';
 import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -75,7 +76,7 @@ const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const resourceFilterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const [localResourceMetaMap, localResourceMetaMapRef] = useSelectorWithRef(localResourceMetaMapSelector);
   const [, localResourceContentMapRef] = useSelectorWithRef(localResourceContentMapSelector);
@@ -114,13 +115,13 @@ const NewResourceWizard = () => {
       defaultInput
         ? {
             ...defaultInput,
-            namespace: resourceFilterNamespace || defaultInput.namespace || SELECT_OPTION_NONE,
+            namespace: first(resourceFilterNamespaces) || defaultInput.namespace || SELECT_OPTION_NONE,
             selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
           }
-        : resourceFilterNamespace
-        ? ({namespace: resourceFilterNamespace} as NewResourceWizardInput)
+        : first(resourceFilterNamespaces)
+        ? ({namespace: first(resourceFilterNamespaces)} as NewResourceWizardInput)
         : ({namespace: SELECT_OPTION_NONE} as NewResourceWizardInput),
-    [defaultInput, resourceFilterNamespace]
+    [defaultInput, resourceFilterNamespaces]
   );
 
   const kindsByApiVersion = useMemo(
@@ -614,7 +615,7 @@ const NewResourceWizard = () => {
               ),
               icon: <InfoCircleOutlined />,
             }}
-            initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
+            initialValue={first(resourceFilterNamespaces) || SELECT_OPTION_NONE}
           >
             <Select
               showSearch

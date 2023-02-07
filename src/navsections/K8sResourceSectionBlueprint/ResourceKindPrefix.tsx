@@ -19,7 +19,9 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const filterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+
+  const filterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
+
   const resourceMeta = useAppSelector(state =>
     resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
@@ -30,7 +32,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
     if (!resourceMeta) {
       return;
     }
-    dispatch(extendResourceFilter({namespace: resourceMeta.namespace, labels: {}, annotations: {}}));
+    dispatch(extendResourceFilter({namespaces: [String(resourceMeta.namespace)], labels: {}, annotations: {}}));
   }, [resourceMeta, dispatch]);
 
   if (!resourceMeta) {
@@ -48,7 +50,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
         type="incoming"
       />
 
-      {resourceMeta.namespace && !filterNamespace && (
+      {resourceMeta.namespace && !filterNamespaces && (
         <Popover
           title="Filter"
           overlayClassName="resource-prefix-popover-overlay"
