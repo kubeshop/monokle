@@ -3,6 +3,7 @@ export {default as CheckedResourcesActionsMenu} from './CheckedResourcesActionsM
 export {default as FormEditor} from './FormEditor';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
 export {default as ImageDetails} from './ImageDetails';
+export {default as Logs} from './Logs';
 export {default as ModalConfirm} from './ModalConfirm';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
 export {default as Monaco} from './Monaco';
@@ -18,7 +19,5 @@ export {default as ResourceRefsIconPopover} from './ResourceRefsIconPopover';
 export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFolderModal';
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
-export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
 export {default as ValidationPopover} from './ValidationPopover';
 export {default as Walkthrough} from './Walkthrough';
-export {default as Logs} from './Logs';
