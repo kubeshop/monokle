@@ -24,7 +24,6 @@ import {
   closeReleaseNotesDrawer,
   handleWalkthroughStep,
   toggleNotifications,
-  toggleSettings,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
@@ -75,7 +74,6 @@ const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceMo
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
-const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const TemplateExplorer = React.lazy(() => import('@organismsNew/TemplateExplorer'));
 
 const App = () => {
@@ -92,7 +90,6 @@ const App = () => {
   const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
-  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
@@ -105,7 +102,6 @@ const App = () => {
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
-  const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
@@ -360,12 +356,6 @@ const App = () => {
     dispatch(toggleNotifications());
   };
 
-  const settingsDrawerOnClose = () => {
-    if (isKubeConfigBrowseSettingsOpen) {
-      dispatch(toggleSettings());
-    }
-  };
-
   const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
   }, [dispatch]);
@@ -397,10 +387,6 @@ const App = () => {
           extra={<S.Button onClick={() => dispatch(clearNotifications())}>Clear</S.Button>}
         >
           <NotificationsManager />
-        </LazyDrawer>
-
-        <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
-          <SettingsManager />
         </LazyDrawer>
 
         <LazyDrawer

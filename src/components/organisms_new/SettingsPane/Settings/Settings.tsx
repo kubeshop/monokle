@@ -61,7 +61,6 @@ export const Settings = ({
 }: SettingsProps) => {
   const dispatch = useAppDispatch();
   const [settingsForm] = useForm();
-  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   // const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
@@ -372,7 +371,6 @@ export const Settings = ({
             value={localConfig?.fileIncludes || []}
             onChange={onChangeFileIncludes}
             tooltip={AddInclusionPatternTooltip}
-            isSettingsOpened={isSettingsOpened}
             showApplyButton={isScanIncludesUpdated === 'outdated'}
             onApplyClick={() => {
               dispatch(setRootFolder(filePath));
@@ -385,7 +383,6 @@ export const Settings = ({
             value={localConfig?.scanExcludes || []}
             onChange={onChangeScanExcludes}
             tooltip={AddExclusionPatternTooltip}
-            isSettingsOpened={isSettingsOpened}
             showApplyButton={isScanExcludesUpdated === 'outdated'}
             onApplyClick={() => {
               dispatch(setRootFolder(filePath));

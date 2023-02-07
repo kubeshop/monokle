@@ -2,13 +2,13 @@ import {useMemo} from 'react';
 
 import {Button, MenuProps, Tooltip} from 'antd';
 
-import {CommentOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {CommentOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
 import semver from 'semver';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {FeedbackTooltip, SettingsTooltip} from '@constants/tooltips';
+import {FeedbackTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -17,7 +17,6 @@ import {
   openAboutModal,
   openKeyboardShortcutsModal,
   openReleaseNotesDrawer,
-  toggleSettings,
 } from '@redux/reducers/ui';
 
 import {StepEnum} from '@shared/models/walkthrough';
@@ -45,15 +44,6 @@ export function useHelpMenuItems() {
 
   const items: MenuProps['items'] = useMemo(
     () => [
-      {
-        label: (
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-            {renderMenuItem('Settings', <SettingOutlined />, true)}
-          </Tooltip>
-        ),
-        key: 'settings',
-        onClick: () => dispatch(toggleSettings()),
-      },
       {
         key: 'help',
         label: (

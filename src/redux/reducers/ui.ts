@@ -47,9 +47,6 @@ export const uiSlice = createSlice({
       electronStore.set('ui.zoomFactor', newZoomFactor);
       webFrame.setZoomFactor(newZoomFactor);
     },
-    toggleSettings: (state: Draft<UiState>) => {
-      state.isSettingsOpen = !state.isSettingsOpen;
-    },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
@@ -423,7 +420,6 @@ export const {
   toggleNotifications,
   toggleResourceFilters,
   toggleRightMenu,
-  toggleSettings,
   toggleStartProjectPane,
   zoomIn,
   zoomOut,

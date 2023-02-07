@@ -10,7 +10,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterNamespaceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
+import {highlightItem, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   currentClusterAccessSelector,
   isInClusterModeSelector,
@@ -73,7 +73,7 @@ const ClusterSelection = () => {
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    dispatch(toggleSettings());
+    dispatch(setLeftMenuSelection('settings'));
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);

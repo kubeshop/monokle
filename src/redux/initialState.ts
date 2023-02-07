@@ -140,7 +140,6 @@ if (
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
-  isSettingsOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
   isScaleModalOpen: false,

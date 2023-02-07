@@ -13,7 +13,6 @@ import {
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
-  toggleSettings,
 } from '@redux/reducers/ui';
 import {
   currentConfigSelector,
@@ -109,7 +108,9 @@ const HotKeysHandler = () => {
   );
 
   useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
-    dispatch(toggleSettings());
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('settings'));
+    }
   });
 
   const applySelection = useCallback(() => {
