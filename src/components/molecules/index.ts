@@ -19,5 +19,6 @@ export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFo
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
 export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
+export {default as ValidationPopover} from './ValidationPopover';
 export {default as Walkthrough} from './Walkthrough';
 export {default as Logs} from './Logs';
