@@ -1,28 +1,31 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Select} from 'antd';
+import {Select, Tooltip, TreeSelect} from 'antd';
 
 import {isEmpty, isEqual, omit, uniqWith} from 'lodash';
 
-import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES} from '@constants/constants';
+import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
+import {QuickFilterTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {
+  activeResourceCountSelector,
   allResourceAnnotationsSelector,
   allResourceKindsSelector,
   allResourceLabelsSelector,
 } from '@redux/selectors/resourceMapSelectors';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
+import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
 
-import {Filter, FilterField, FilterHeader, KeyValueInput, NewKeyValueInput} from '@monokle/components';
+import {Filter, FilterButton, FilterField, FilterHeader, KeyValueInput, NewKeyValueInput} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
@@ -44,6 +47,9 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
+  const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
+  const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
+
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
@@ -59,7 +65,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
-
+  const folderTree = useFolderTreeSelectData();
   const autocompleteOptions = useMemo(() => {
     return {
       namespaces:
@@ -82,13 +88,8 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           Object.keys(allResourceAnnotations)?.map(n => ({value: n})),
           isEqual
         ) ?? [],
-      files:
-        uniqWith(
-          Object.keys(fileMap).map(option => ({value: option})),
-          isEqual
-        ) ?? [],
     };
-  }, [allNamespaces, allResourceKinds, allResourceLabels, allResourceAnnotations, fileMap]);
+  }, [allNamespaces, allResourceKinds, allResourceLabels, allResourceAnnotations]);
 
   const isSavePresetDisabled = useMemo(() => {
     return (
@@ -102,15 +103,17 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     );
   }, [localResourceFilter]);
 
-  const hasActiveFilters = useMemo(
+  const appliedFiltersCount = useMemo(
     () =>
       Object.entries(localResourceFilter)
         .map(([key, value]) => {
           return {filterName: key, filterValue: value};
         })
-        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length > 0,
+        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length).length,
     [localResourceFilter]
   );
+
+  const hasActiveFilters = appliedFiltersCount > 0;
 
   const handleChange = useCallback((delta: Partial<any>) => {
     setWasLocalUpdate(true);
@@ -200,10 +203,10 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   }, [handleChange]);
 
   const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
-    if (selectedFileOrFolder === ROOT_FILE_ENTRY) {
+    if (!selectedFileOrFolder || !fileMap[selectedFileOrFolder] || selectedFileOrFolder === ROOT_FILE_ENTRY) {
       handleChange({fileOrFolderContainedIn: undefined});
     } else {
-      handleChange({fileOrFolderContainedIn: selectedFileOrFolder});
+      handleChange({fileOrFolderContainedIn: fileMap[selectedFileOrFolder].filePath});
     }
   };
 
@@ -251,6 +254,18 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         active={active}
         hasActiveFilters={hasActiveFilters}
         onToggle={onToggle}
+        filterButton={
+          <S.Badge count={appliedFiltersCount} size="small" offset={[-4, 4]}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
+              <FilterButton
+                active={active}
+                iconHighlight={hasActiveFilters}
+                onClick={onToggle}
+                disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || !hasAnyActiveResources}
+              />
+            </Tooltip>
+          </S.Badge>
+        }
         header={
           <FilterHeader
             onClear={handleClear}
@@ -323,13 +338,14 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         </FilterField>
 
         <FilterField name="Contained in file/folder:">
-          <Select
+          <TreeSelect
             showSearch
             disabled={isInPreviewMode || areFiltersDisabled}
             value={localResourceFilter.fileOrFolderContainedIn}
             defaultValue={ROOT_FILE_ENTRY}
             onChange={updateFileOrFolderContainedIn}
-            options={autocompleteOptions.files}
+            treeData={[folderTree]}
+            treeDefaultExpandAll
             onClear={onClearFileOrFolderContainedInHandler}
             allowClear
           />

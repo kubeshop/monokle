@@ -1,4 +1,4 @@
-import {Button} from 'antd';
+import {Badge as AntBadge, Button} from 'antd';
 
 import styled from 'styled-components';
 
@@ -16,5 +16,19 @@ export const FilterActionButton = styled(Button)`
 export const Container = styled.div`
   & > div {
     padding: 0 10px !important;
+  }
+`;
+
+export const Badge = styled(AntBadge)`
+  .ant-badge-count-sm {
+    font-size: 8px;
+    line-height: 12px;
+    color: ${Colors.grey2};
+    background-color: ${Colors.greenOkay};
+    border: unset;
+    height: 12px;
+    min-width: 12px;
+    border-radius: 6px;
+    box-shadow: none;
   }
 `;

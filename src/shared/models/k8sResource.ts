@@ -177,7 +177,8 @@ const TransientResourceRuntype: Rt.Runtype<K8sResource<'transient'>> = Rt.Inters
 );
 
 export const isResource = ResourceRuntype.guard;
-export const isLocalResource = LocalResourceRuntype.guard;
+export const isLocalResource = (resource: ResourceMeta): resource is K8sResource<'local'> =>
+  resource.storage === 'local'; // || LocalResourceRuntype.guard;
 export const isClusterResource = ClusterResourceRuntype.guard;
 export const isPreviewResource = PreviewResourceRuntype.guard;
 export const isTransientResource = TransientResourceRuntype.guard;
