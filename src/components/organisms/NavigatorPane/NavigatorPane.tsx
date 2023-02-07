@@ -26,8 +26,7 @@ import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 import * as S from './NavigatorPane.styled';
-import OPAValidationStatus from './OPAValidationStatus';
-import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
+import NavigatorTitle from './NavigatorTitle';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -56,12 +55,7 @@ const NavPane: React.FC = () => {
         <TitleBarWrapper>
           <TitleBar
             type="secondary"
-            title="Kubernetes Resources"
-            description={
-              <div style={{display: 'flex', alignItems: 'center'}}>
-                <WarningsAndErrorsDisplay /> <OPAValidationStatus />
-              </div>
-            }
+            title={<NavigatorTitle />}
             actions={
               <S.TitleBarRightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>

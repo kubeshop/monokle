@@ -8,7 +8,7 @@ export const macOSKeyIcon: Record<string, string> = {
 };
 
 export const ClusterExplorerTooltips = {
-  default: 'Show/hide Cluster Preview',
+  default: 'Show/hide Cluster Connection',
   firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
   noKubeconfigPath: 'Kubeconfig path is missing, configure it to enable Cluster features',
   notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',

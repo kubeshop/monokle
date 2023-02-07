@@ -1,5 +1,5 @@
 import {AlertType} from './alert';
-import {CurrentMatch, FileEntry} from './fileEntry';
+import {FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
 import {ValidationIntegration} from './integrations';
@@ -58,14 +58,6 @@ type AppState = {
   helmTemplatesMap: HelmTemplatesMapType;
   /** if we are currently applying a resource - room for improvement... */
   isApplyingResource: boolean;
-  /** the line number for the match in file */
-  search: {
-    searchQuery: string;
-    replaceQuery: string;
-    queryMatchParams: MatchParamProps;
-    currentMatch: CurrentMatch | null;
-    searchHistory: string[];
-  };
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;

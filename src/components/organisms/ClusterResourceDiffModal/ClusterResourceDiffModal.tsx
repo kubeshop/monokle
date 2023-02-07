@@ -171,7 +171,7 @@ const ClusterResourceDiffModal = () => {
 
     dispatch(
       updateResource({
-        resourceId: selectedMatchingResourceId,
+        resourceIdentifier: {id: selectedMatchingResourceId, storage: 'local'},
         text: cleanTargetResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })

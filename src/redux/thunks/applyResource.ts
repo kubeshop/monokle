@@ -119,7 +119,7 @@ export async function applyResource(
               if (resourceMap[resourceFromCluster?.metadata?.uid]) {
                 dispatch(
                   updateResource({
-                    resourceId: resourceFromCluster?.metadata?.uid,
+                    resourceIdentifier: {id: resourceFromCluster?.metadata?.uid, storage: 'cluster'},
                     text: updatedResourceText,
                   })
                 );

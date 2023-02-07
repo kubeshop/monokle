@@ -33,10 +33,9 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  MatchParamProps,
 } from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
-import {CurrentMatch, FileEntry} from '@shared/models/fileEntry';
+import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart} from '@shared/models/helm';
 import {ValidationIntegration} from '@shared/models/integrations';
 import {
@@ -178,23 +177,6 @@ export const mainSlice = createSlice({
         }
       });
     },
-
-    updateSearchQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.search.searchQuery = action.payload;
-    },
-    updateReplaceQuery: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      state.search.replaceQuery = action.payload;
-    },
-    toggleMatchParams: (state: Draft<AppState>, action: PayloadAction<keyof MatchParamProps>) => {
-      const param = action.payload;
-      state.search.queryMatchParams = {
-        ...state.search.queryMatchParams,
-        [param]: !state.search.queryMatchParams[param],
-      };
-    },
-    highlightFileMatches: (state: Draft<AppState>, action: PayloadAction<CurrentMatch | null>) => {
-      state.search.currentMatch = action.payload;
-    },
     setSelectionHistory: (
       state: Draft<AppState>,
       action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: AppSelection[]}>
@@ -283,14 +265,6 @@ export const mainSlice = createSlice({
 
     updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
       state.validationIntegration = action.payload;
-    },
-    updateSearchHistory: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let newSearchHistory: string[] = [...state.search.searchHistory];
-      if (state.search.searchHistory.length >= 5) {
-        newSearchHistory.shift();
-      }
-      electronStore.set('appConfig.recentSearch', [...newSearchHistory, action.payload]);
-      state.search.searchHistory = [...newSearchHistory, action.payload];
     },
     updateMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
@@ -494,11 +468,11 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(updateResource.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(removeResources.fulfilled, (state, action) => {
-      return action.payload;
+      return action.payload.nextMainState;
     });
 
     builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
@@ -591,16 +565,11 @@ export const {
   setImagesList,
   setImagesSearchedValue,
   setSelectionHistory,
-  toggleMatchParams,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
   uncheckResourceId,
   updateResourceFilter,
   updateValidationIntegration,
-  highlightFileMatches,
-  updateSearchHistory,
-  updateSearchQuery,
-  updateReplaceQuery,
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
