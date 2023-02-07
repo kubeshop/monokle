@@ -21,26 +21,15 @@ export type TransientOrigin = {
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientOrigin;
 
 export const isLocalOrigin = (origin: any): origin is LocalOrigin => {
-  return (
-    typeof origin === 'object' &&
-    'filePath' in origin &&
-    typeof origin.filePath === 'string' &&
-    'fileOffset' in origin &&
-    typeof origin.fileOffset === 'number'
-  );
+  return typeof origin === 'object' && typeof origin.filePath === 'string' && typeof origin.fileOffset === 'number';
 };
 
 export const isClusterOrigin = (origin: any): origin is ClusterOrigin => {
-  return typeof origin === 'object' && 'context' in origin && typeof origin.context === 'string';
+  return typeof origin === 'object' && typeof origin.context === 'string';
 };
 
 export const isPreviewOrigin = (origin: any): origin is PreviewOrigin => {
-  return (
-    typeof origin === 'object' &&
-    'preview' in origin &&
-    typeof origin.preview === 'object' &&
-    isAnyPreview(origin.preview)
-  );
+  return typeof origin === 'object' && typeof origin.preview === 'object' && isAnyPreview(origin.preview);
 };
 
 export const isTransientOrigin = (origin: any): origin is TransientOrigin => {

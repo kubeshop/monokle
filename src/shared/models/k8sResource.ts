@@ -109,13 +109,7 @@ export const isResourceIdentifier = (value: any): value is ResourceIdentifier =>
 };
 
 export const isResourceRange = (value: any): value is ResourceRange => {
-  return (
-    typeof value === 'object' &&
-    'start' in value &&
-    typeof value.start === 'number' &&
-    'number' in value &&
-    typeof value.length === 'number'
-  );
+  return typeof value === 'object' && typeof value.start === 'number' && typeof value.length === 'number';
 };
 
 const createIsResourceMeta =
@@ -123,23 +117,17 @@ const createIsResourceMeta =
   (value: any): value is ResourceMeta<Storage> => {
     return (
       typeof value === 'object' &&
-      'storage' in value &&
       value.storage === storage &&
-      'origin' in value &&
       isOrigin(value.origin) &&
-      'name' in value &&
       typeof value.name === 'string' &&
-      'kind' in value &&
       typeof value.kind === 'string' &&
-      'apiVersion' in value &&
       typeof value.apiVersion === 'string' &&
-      'isClusterScoped' in value &&
       typeof value.isClusterScoped === 'boolean' &&
       ('namespace' in value ? typeof value.namespace === 'string' : true) &&
       ('labels' in value ? typeof value.labels === 'object' : true) &&
       ('annotations' in value ? typeof value.annotations === 'object' : true) &&
       ('templateLabels' in value ? typeof value.templateLabels === 'object' : true) &&
-      ('range' in value ? typeof value.range === 'object' : true) && // TODO: isResourceRange
+      ('range' in value ? isResourceRange(value.range) : true) &&
       ('refs' in value ? Array.isArray(value.refs) && value.refs.every(isResourceRef) : true)
     );
   };
@@ -154,11 +142,8 @@ const createIsResourceContent =
   (value: any): value is ResourceContent => {
     return (
       typeof value === 'object' &&
-      'storage' in value &&
       value.storage === storage &&
-      'text' in value &&
       typeof value.text === 'string' &&
-      'object' in value &&
       typeof value.object === 'object'
     );
   };

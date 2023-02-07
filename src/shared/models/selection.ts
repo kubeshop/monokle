@@ -44,50 +44,28 @@ export const isFileSelection = (selection: any): selection is FileSelection => {
 
 export const isHelmValuesFileSelection = (selection: any): selection is HelmValuesFileSelection => {
   return (
-    typeof selection === 'object' &&
-    'type' in selection &&
-    selection.type === 'helm.values.file' &&
-    'valuesFileId' in selection &&
-    typeof selection.valuesFileId === 'string'
+    typeof selection === 'object' && selection.type === 'helm.values.file' && typeof selection.valuesFileId === 'string'
   );
 };
 
 export const isResourceSelection = (selection: any): selection is ResourceSelection => {
   return (
-    typeof selection === 'object' &&
-    'type' in selection &&
-    selection.type === 'resource' &&
-    'resourceIdentifier' in selection &&
-    isResourceIdentifier(selection.resourceIdentifier)
+    typeof selection === 'object' && selection.type === 'resource' && isResourceIdentifier(selection.resourceIdentifier)
   );
 };
 
 export const isImageSelection = (selection: any): selection is ImageSelection => {
-  return (
-    typeof selection === 'object' &&
-    'type' in selection &&
-    selection.type === 'image' &&
-    'imageId' in selection &&
-    typeof selection.imageId === 'string'
-  );
+  return typeof selection === 'object' && selection.type === 'image' && typeof selection.imageId === 'string';
 };
 
 export const isCommandSelection = (selection: any): selection is CommandSelection => {
-  return (
-    typeof selection === 'object' &&
-    'type' in selection &&
-    selection.type === 'command' &&
-    'commandId' in selection &&
-    typeof selection.commandId === 'string'
-  );
+  return typeof selection === 'object' && selection.type === 'command' && typeof selection.commandId === 'string';
 };
 
 export const isPreviewConfigurationSelection = (selection: any): selection is PreviewConfigurationSelection => {
   return (
     typeof selection === 'object' &&
-    'type' in selection &&
     selection.type === 'preview.configuration' &&
-    'previewConfigurationId' in selection &&
     typeof selection.previewConfigurationId === 'string'
   );
 };
