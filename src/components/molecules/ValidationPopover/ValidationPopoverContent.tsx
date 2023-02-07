@@ -1,10 +1,14 @@
+import {useCallback} from 'react';
+
 import {Space} from 'antd';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
 import {MonacoRange} from '@shared/models/ui';
@@ -21,34 +25,37 @@ const ValidationPopoverContent: React.FC<IProps> = props => {
   const {results} = props;
 
   const dispatch = useAppDispatch();
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
-  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const [, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
+  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
+  const [, selectedResourceRef] = useSelectorWithRef(selectedResourceSelector);
 
-  const onMessageClickHandler = (result: ValidationResult) => {
-    trackEvent('explore/navigate_resource_error');
+  const onMessageClickHandler = useCallback(
+    (result: ValidationResult) => {
+      trackEvent('explore/navigate_resource_error');
 
-    const resourceId = getResourceId(result) ?? '';
-    const location = getResourceLocation(result);
-    const region = location.physicalLocation?.region;
+      const resourceId = getResourceId(result) ?? '';
+      const location = getResourceLocation(result);
+      const region = location.physicalLocation?.region;
 
-    if (selectedResource?.id !== resourceId) {
-      if (activeResourceMetaMap[resourceId]) {
-        dispatch(selectResource({resourceIdentifier: {id: resourceId, storage: activeResourceStorage}}));
+      if (selectedResourceRef.current?.id !== resourceId) {
+        if (activeResourceMetaMapRef.current[resourceId]) {
+          dispatch(selectResource({resourceIdentifier: {id: resourceId, storage: activeResourceStorageRef.current}}));
+        }
       }
-    }
 
-    if (!region) return;
+      if (!region) return;
 
-    const targetOutgoingRefRange: MonacoRange = {
-      endColumn: region.endColumn,
-      endLineNumber: region.endLine,
-      startColumn: region.startColumn,
-      startLineNumber: region.startLine,
-    };
+      const targetOutgoingRefRange: MonacoRange = {
+        endColumn: region.endColumn,
+        endLineNumber: region.endLine,
+        startColumn: region.startColumn,
+        startLineNumber: region.startLine,
+      };
 
-    dispatch(setMonacoEditor({selection: {type: 'resource', resourceId, range: targetOutgoingRefRange}}));
-  };
+      dispatch(setMonacoEditor({selection: {type: 'resource', resourceId, range: targetOutgoingRefRange}}));
+    },
+    [activeResourceMetaMapRef, activeResourceStorageRef, dispatch, selectedResourceRef]
+  );
 
   return (
     <S.Container direction="vertical">
