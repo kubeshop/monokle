@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
@@ -39,6 +39,7 @@ import {
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {sortFoldersFiles} from '@utils/fileExplorer';
+import {useStateWithRef} from '@utils/hooks';
 
 import {Icon, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -51,7 +52,7 @@ import {TreeNode} from './types';
 import * as S from './styled';
 
 const FilePane: React.FC = () => {
-  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [tree, setTree, treeRef] = useStateWithRef<TreeNode | null>(null);
   const dispatch = useAppDispatch();
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -88,8 +89,8 @@ const FilePane: React.FC = () => {
 
   const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
-  const treeRef = useRef<any>();
-  const highlightFilePath = useHighlightNode(tree, treeRef, expandedFolders);
+  const treeElementRef = useRef<any>();
+  const highlightFilePath = useHighlightNode(tree, treeElementRef, expandedFolders);
 
   const isButtonDisabled = !rootEntry;
   const isCollapsed = expandedFolders.length === 0 || expandedFolders.length === 1;
@@ -140,15 +141,15 @@ const FilePane: React.FC = () => {
     rootFolderName,
     dispatch,
     rootEntry,
+    setTree,
   ]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
    * when a resource is selected
    */
-
   useEffect(() => {
-    if (localResourceSelection && tree) {
+    if (localResourceSelection && treeRef.current) {
       const resource = localResourceMetaMap[localResourceSelection.resourceIdentifier.id];
 
       if (resource) {
@@ -157,7 +158,7 @@ const FilePane: React.FC = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tree]);
+  }, [localResourceSelection?.resourceIdentifier.id, treeRef]);
 
   const onExpand = (newExpandedFolders: Key[]) => {
     dispatch(setExpandedFolders(newExpandedFolders));
@@ -266,7 +267,7 @@ const FilePane: React.FC = () => {
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onFileSelect}
             treeData={[sortFoldersFiles(fileExplorerSortOrder, tree)]}
-            ref={treeRef}
+            ref={treeElementRef}
             expandedKeys={expandedFolders}
             onExpand={onExpand}
             titleRender={(event: any) => (
