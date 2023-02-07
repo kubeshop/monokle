@@ -122,7 +122,8 @@ const createIsResourceMeta =
   <Storage extends ResourceStorage, Origin extends AnyOrigin>(storage: Storage, isOrigin: (x: any) => x is Origin) =>
   (value: any): value is ResourceMeta<Storage> => {
     return (
-      isResourceIdentifier(value) &&
+      typeof value === 'object' &&
+      'storage' in value &&
       value.storage === storage &&
       'origin' in value &&
       isOrigin(value.origin) &&
@@ -152,7 +153,8 @@ const createIsResourceContent =
   <Storage extends ResourceStorage>(storage: Storage) =>
   (value: any): value is ResourceContent => {
     return (
-      isResourceIdentifier(value) &&
+      typeof value === 'object' &&
+      'storage' in value &&
       value.storage === storage &&
       'text' in value &&
       typeof value.text === 'string' &&
