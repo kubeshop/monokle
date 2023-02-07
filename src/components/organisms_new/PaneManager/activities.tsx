@@ -20,7 +20,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'explorer',
     tooltip: <FileExplorerTabTooltip />,
-    icon: () => <Icon name="explorer" />,
+    icon: () => <Icon name="document" />,
     component: <ExplorerPane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
