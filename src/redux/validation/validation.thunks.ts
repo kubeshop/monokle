@@ -27,7 +27,7 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     merge(config, state.config);
     electronStore.set('validation.config', config);
 
-    await VALIDATOR.preload(config);
+    await VALIDATOR.loadValidation({config});
 
     return {
       metadata: VALIDATOR.metadata,
@@ -54,7 +54,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     const transformedResources = activeResources.map(transformResourceForValidation).filter(isDefined);
 
     // TODO: could the active resource map change while the validation is running? before we get the refs?
-    const response = await VALIDATOR.validate({
+    const {response} = await VALIDATOR.runValidation({
       resources: transformedResources,
     });
 
