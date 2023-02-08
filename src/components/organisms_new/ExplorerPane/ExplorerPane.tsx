@@ -1,27 +1,29 @@
-import {Collapse} from 'antd';
+import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
 
-import HelmConfigPane from './HelmConfigPane';
-import HelmPane from './HelmPane/HelmPane';
-import ImagePane from './ImagePane';
+import FilePane from './FilePane';
+import HelmPane from './HelmPane';
+import ImagesPane from './ImagesPane';
 import KustomizePane from './KustomizePane';
 
-export default function ExplorerPane() {
+const ExplorerPane: React.FC = () => {
   return (
-    <StyledCollapse accordion ghost>
-      <HelmPane key="helm" />
-      <HelmConfigPane key="helm-config" />
+    <Collapse accordion ghost defaultActiveKey="files">
+      <FilePane key="files" />
       <KustomizePane key="kustomize" />
-      <ImagePane key="images" />
-    </StyledCollapse>
+      <HelmPane key="helm" />
+      <ImagesPane key="images" />
+    </Collapse>
   );
-}
+};
 
-const StyledCollapse = styled(Collapse)`
+export default ExplorerPane;
+
+const Collapse = styled(RawCollapse)`
+  padding-top: 8px;
   box-sizing: border-box;
   height: 100%;
-  padding-top: 14px;
   padding-bottom: 14px;
   overflow: hidden;
   max-height: 100%;
