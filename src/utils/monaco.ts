@@ -11,7 +11,7 @@ const KUBESHOP_THEME_DATA: monaco.editor.IStandaloneThemeData = {
   ],
   colors: {
     'editor.lineHighlightBackground': '#112e40',
-    'editor.background': '#000000',
+    'editor.background': '#0a0d0e',
     'editorWarning.foreground': '#e65a6d',
   },
 };

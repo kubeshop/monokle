@@ -1,9 +1,12 @@
 import {useMemo} from 'react';
 
+import styled from 'styled-components';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ActivityBar} from '@monokle/components';
+import {Colors} from '@shared/styles';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
 import {activities, extraActivities} from './activities';
@@ -22,34 +25,42 @@ const NewPaneManagerLeftMenu: React.FC = () => {
   );
 
   return (
-    <ActivityBar
-      activities={activities}
-      extraActivities={extraActivities}
-      isActive={isActive}
-      value={leftMenuSelection}
-      extraValue={leftMenuBottomSelection}
-      onChange={activityName => {
-        if (activityName === leftMenuSelection && leftActive) {
-          dispatch(setLeftMenuIsActive(false));
-          return;
-        }
+    <Container>
+      <ActivityBar
+        activities={activities}
+        extraActivities={extraActivities}
+        isActive={isActive}
+        value={leftMenuSelection}
+        extraValue={leftMenuBottomSelection}
+        onChange={activityName => {
+          if (activityName === leftMenuSelection && leftActive) {
+            dispatch(setLeftMenuIsActive(false));
+            return;
+          }
 
-        if (!leftActive) {
-          dispatch(setLeftMenuIsActive(true));
-        }
+          if (!leftActive) {
+            dispatch(setLeftMenuIsActive(true));
+          }
 
-        dispatch(setLeftMenuSelection(activityName));
-      }}
-      onChangeExtra={activityName => {
-        if (leftMenuBottomSelection === activityName) {
-          dispatch(setLeftBottomMenuSelection(undefined));
-          return;
-        }
+          dispatch(setLeftMenuSelection(activityName));
+        }}
+        onChangeExtra={activityName => {
+          if (leftMenuBottomSelection === activityName) {
+            dispatch(setLeftBottomMenuSelection(undefined));
+            return;
+          }
 
-        dispatch(setLeftBottomMenuSelection(activityName));
-      }}
-    />
+          dispatch(setLeftBottomMenuSelection(activityName));
+        }}
+      />
+    </Container>
   );
 };
 
 export default NewPaneManagerLeftMenu;
+
+const Container = styled.div`
+  div {
+    background-color: ${Colors.black100} !important;
+  }
+`;
