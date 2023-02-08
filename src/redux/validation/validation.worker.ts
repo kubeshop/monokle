@@ -1,6 +1,4 @@
 /// <reference lib="webworker" />
-import log from 'loglevel';
-
 import {ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
@@ -31,7 +29,7 @@ const handleEvent = <Message extends WorkerMessage>(
 };
 
 onmessage = async event => {
-  log.info(`[WORKER_EVENT]`, event);
+  console.info(`[WORKER_EVENT_PENDING]`, event);
 
   const {data} = event;
 

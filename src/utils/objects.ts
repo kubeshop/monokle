@@ -1,3 +1,4 @@
+import fastJsonStableStringify from 'fast-json-stable-stringify';
 import _ from 'lodash';
 
 export function removeNestedEmptyObjects(obj: any): any {
@@ -49,3 +50,7 @@ export const mapKeyValuesFromNestedObjects = <T extends Record<string, any>, NT 
   });
   return keyValues;
 };
+
+export function stableStringify(obj: any): string {
+  return fastJsonStableStringify(obj);
+}

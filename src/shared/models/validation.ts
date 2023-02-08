@@ -1,6 +1,5 @@
 import type {
   Config,
-  Incremental,
   PluginMetadataWithConfig,
   PluginName,
   RefPosition,
@@ -9,6 +8,7 @@ import type {
   ValidationResult,
 } from '@monokle/validation';
 
+import {ResourceIdentifier, ResourceStorage} from './k8sResource';
 import type {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
@@ -57,6 +57,14 @@ export type LoadValidationResult = {
   metadata: Record<PluginName, PluginMetadataWithConfig>;
 };
 
-export type ValidationArgs = {
-  incremental?: Incremental;
+export type FullValidationArgs = {
+  type: 'full';
+  resourceStorage?: ResourceStorage;
 };
+
+export type IncrementalValidationArgs = {
+  type: 'incremental';
+  resourceIdentifiers: ResourceIdentifier[];
+};
+
+export type ValidationArgs = FullValidationArgs | IncrementalValidationArgs;
