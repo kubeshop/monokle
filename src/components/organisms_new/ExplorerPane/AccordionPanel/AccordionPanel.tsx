@@ -31,7 +31,7 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
     containerRef(document.querySelector(`#${id}`));
   });
 
-  return <S.Panel id={id} contentHeight={contentHeight} {...props} />;
+  return <S.Panel id={id} $contentHeight={contentHeight} $panelKey={props.panelKey || ''} {...props} />;
 };
 
 export default AccordionPanel;
