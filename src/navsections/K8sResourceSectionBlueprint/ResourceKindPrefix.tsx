@@ -5,23 +5,32 @@ import {Button, Popover, Tag as RawTag} from 'antd';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {extendResourceFilter} from '@redux/reducers/main';
-import {resourceMetaSelector} from '@redux/selectors/resourceSelectors';
+import {extendResourceFilter, selectResource} from '@redux/reducers/main';
+import {setMonacoEditor} from '@redux/reducers/ui';
+import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
+import {resourceMetaSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 
-import {ResourceRefsIconPopover, ValidationPopover} from '@molecules';
+import {ResourceRefsIconPopover} from '@molecules';
 
 import {useValidationLevel} from '@hooks/useValidationLevel';
 
+import {useSelectorWithRef} from '@utils/hooks';
+
+import {ValidationPopover} from '@monokle/components';
+import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
 import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {MonacoRange} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-
+  const [, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
+  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
+  const [, selectedResourceRef] = useSelectorWithRef(selectedResourceSelector);
   const filterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
-
   const resourceMeta = useAppSelector(state =>
     resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
   );
@@ -35,13 +44,47 @@ const Prefix = (props: ItemCustomComponentProps) => {
     dispatch(extendResourceFilter({namespaces: [String(resourceMeta.namespace)], labels: {}, annotations: {}}));
   }, [resourceMeta, dispatch]);
 
+  const onMessageClickHandler = useCallback(
+    (result: ValidationResult) => {
+      trackEvent('explore/navigate_resource_error');
+
+      const resourceId = getResourceId(result) ?? '';
+      const location = getResourceLocation(result);
+      const region = location.physicalLocation?.region;
+
+      if (selectedResourceRef.current?.id !== resourceId) {
+        if (activeResourceMetaMapRef.current[resourceId]) {
+          dispatch(selectResource({resourceIdentifier: {id: resourceId, storage: activeResourceStorageRef.current}}));
+        }
+      }
+
+      if (!region) return;
+
+      const targetOutgoingRefRange: MonacoRange = {
+        endColumn: region.endColumn,
+        endLineNumber: region.endLine,
+        startColumn: region.startColumn,
+        startLineNumber: region.startLine,
+      };
+
+      dispatch(setMonacoEditor({selection: {type: 'resource', resourceId, range: targetOutgoingRefRange}}));
+    },
+    [activeResourceMetaMapRef, activeResourceStorageRef, dispatch, selectedResourceRef]
+  );
+
   if (!resourceMeta) {
     return null;
   }
 
   return (
     <Container>
-      <ValidationPopover disabled={itemInstance.isDisabled} level={level} results={[...warnings, ...errors]} />
+      <ValidationPopover
+        disabled={itemInstance.isDisabled}
+        level={level}
+        results={[...warnings, ...errors]}
+        onMessageClickHandler={onMessageClickHandler}
+        popoverIconStyle={{transform: 'translateY(-2px)'}}
+      />
 
       <ResourceRefsIconPopover
         isSelected={itemInstance.isSelected}
