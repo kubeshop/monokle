@@ -1,11 +1,5 @@
 import styled from 'styled-components';
 
-export const HelmPaneContainer = styled.div`
-  height: 100%;
-  display: grid;
-  grid-template-rows: max-content 1fr;
-`;
-
 export const List = styled.ol`
   height: 100%;
   list-style-type: none;

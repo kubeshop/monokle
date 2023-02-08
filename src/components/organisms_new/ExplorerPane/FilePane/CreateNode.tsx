@@ -9,12 +9,11 @@ import {getChildFilePath, getLocalResourceMetasForPath} from '@redux/services/fi
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
+import {TreeNode} from '@shared/models/explorer';
 import {FileEntry} from '@shared/models/fileEntry';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
 
-import {TreeNode} from './types';
-
-import * as S from './styled';
+import * as S from './CreateNode.styled';
 
 export const createNode = (
   fileEntry: FileEntry,

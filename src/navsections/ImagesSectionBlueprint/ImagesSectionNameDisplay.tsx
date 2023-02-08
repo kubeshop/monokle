@@ -13,11 +13,7 @@ interface IProps {
   sectionInstance: SectionInstance;
 }
 
-const ImagesSectionNameDisplay: React.FC<IProps> = props => {
-  const {
-    sectionInstance: {itemIds},
-  } = props;
-
+const ImagesSectionNameDisplay: React.FC<IProps> = () => {
   const dispatch = useAppDispatch();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
@@ -57,11 +53,7 @@ const ImagesSectionNameDisplay: React.FC<IProps> = props => {
 
   return (
     <S.NameDisplayContainer>
-      <div>
-        <S.ImagesCount>{itemIds.length} images in your project</S.ImagesCount>
-        <S.HelperLabel>Find out where they are used and get + info</S.HelperLabel>
-        {OutputTag}
-      </div>
+      {OutputTag}
 
       <S.SearchInput placeholder="Search project images" value={value} onChange={e => setValue(e.target.value)} />
     </S.NameDisplayContainer>

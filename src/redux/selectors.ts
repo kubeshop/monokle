@@ -10,6 +10,8 @@ import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/s
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
+import {localResourceMetaMapSelector} from './selectors/resourceMapSelectors';
+import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
 export const rootFolderSelector = createSelector(
@@ -179,6 +181,15 @@ export const scanExcludesSelector = createSelector(currentConfigSelector, curren
 export const fileIncludesSelector = createSelector(currentConfigSelector, currentConfig => {
   currentConfig.fileIncludes || [];
 });
+
+export const kustomizationResourcesSelectors = createSelector(
+  (state: RootState) => localResourceMetaMapSelector(state),
+  localResourceMetaMap => {
+    return Object.values(localResourceMetaMap)
+      .filter(i => isKustomizationResource(i))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+);
 
 export const kubeConfigContextColorSelector = createSelector(
   [

@@ -7,6 +7,7 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
+import {DeleteEntityCallback} from '@shared/models/fileExplorer';
 
 export function doesPathExist(absolutePath: string) {
   try {
@@ -43,12 +44,6 @@ export function getFileStats(filePath: string, silent?: boolean): fs.Stats | und
     }
   }
   return undefined;
-}
-
-export interface DeleteEntityCallback {
-  isDirectory: boolean;
-  name: string;
-  err: NodeJS.ErrnoException | null;
 }
 
 /**
