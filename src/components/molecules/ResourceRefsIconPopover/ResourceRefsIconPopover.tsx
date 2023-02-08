@@ -35,12 +35,6 @@ const ResourceRefsIconPopover = ({
       }),
     [resourceMeta, type]
   );
-  const hasUnsatisfiedRefs = useMemo(() => {
-    if (type === 'incoming') {
-      return false;
-    }
-    return resourceRefs?.some(r => isUnsatisfiedRef(r.type));
-  }, [resourceRefs, type]);
 
   const iconType = useMemo(() => {
     if (type === 'incoming') {
@@ -86,12 +80,6 @@ const ResourceRefsIconPopover = ({
               : {...baseIconStyle, margin: '0px 8px', color: incomingColor}
           }
         />
-        {hasUnsatisfiedRefs && (
-          <Icon
-            name="warning"
-            style={{...baseIconStyle, marginLeft: 5, color: isSelected ? Colors.blackPure : Colors.yellowWarning}}
-          />
-        )}
       </S.IconsContainer>
     </Popover>
   );
