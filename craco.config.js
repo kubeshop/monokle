@@ -37,7 +37,6 @@ module.exports = {
             },
           ],
         }),
-        new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true}),
         ...additionalWebpackPlugins,
       ],
     },
