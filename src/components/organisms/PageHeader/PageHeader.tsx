@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
@@ -46,12 +46,15 @@ const PageHeader = () => {
   const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
+  const previewType = useAppSelector(state => state.main.preview?.type);
   // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
@@ -168,11 +171,14 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {/* {isInPreviewMode &&
+      {(isInPreviewMode || isInClusterMode) && (
         <S.PreviewRow
-          // $previewType={previewType}
-          $kubeConfigContextColor={kubeConfigContextColor} />
-      } */}
+          $previewType={previewType}
+          $kubeConfigContextColor={kubeConfigContextColor}
+          $isInClusterMode={isInClusterMode}
+          $isInPreviewMode={isInPreviewMode}
+        />
+      )}
 
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>

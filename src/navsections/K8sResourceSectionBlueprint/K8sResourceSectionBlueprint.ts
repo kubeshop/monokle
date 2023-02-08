@@ -21,7 +21,7 @@ import {SectionBlueprint} from '@shared/models/navigator';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
-import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';
+import K8sResourceSectionNameDisplay from './K8sResourceSectionNameDisplay';
 import {makeResourceKindNavSection} from './ResourceKindSectionBlueprint';
 
 const childSectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
@@ -158,8 +158,8 @@ const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceSco
     emptyDisplay: {
       component: K8sResourceSectionEmptyDisplay,
     },
-    nameContext: {
-      component: K8sResourceSectionNameSuffix,
+    nameDisplay: {
+      component: K8sResourceSectionNameDisplay,
     },
     isCheckVisibleOnHover: true,
   },

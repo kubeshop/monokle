@@ -97,9 +97,21 @@ export const LogoContainer = styled.div`
   justify-content: center;
 `;
 
-export const PreviewRow = styled(RawRow)<{$previewType?: PreviewType; $kubeConfigContextColor?: ClusterColors}>`
+export const PreviewRow = styled(RawRow)<{
+  $previewType?: PreviewType;
+  $kubeConfigContextColor?: ClusterColors;
+  $isInClusterMode: boolean;
+  $isInPreviewMode: boolean;
+}>`
   background: ${props =>
-    getPreviewTheme(Colors.blackPure, props.$previewType, 0, true, true, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.blackPure,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   padding: 0;
   margin: 0;
   height: 8px;
