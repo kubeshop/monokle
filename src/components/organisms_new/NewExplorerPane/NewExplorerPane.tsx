@@ -3,6 +3,7 @@ import {Collapse as RawCollapse} from 'antd';
 import styled from 'styled-components';
 
 import FilePane from './FilePane';
+import HelmPane from './HelmPane';
 import KustomizePane from './KustomizePane';
 
 const ExplorerPane: React.FC = () => {
@@ -10,6 +11,7 @@ const ExplorerPane: React.FC = () => {
     <Collapse accordion ghost defaultActiveKey="files">
       <FilePane key="files" />
       <KustomizePane key="kustomize" />
+      <HelmPane key="helm" />
     </Collapse>
   );
 };
