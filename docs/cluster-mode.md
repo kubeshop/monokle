@@ -24,3 +24,16 @@ All existing validation functionality already available in Monokle is applied to
 
 These errors are of course also highlighted in the source view - allowing you to immediately fix them and deploy the fixed resource back to your cluster.
 
+## Working with Pods
+
+### The Log Tab
+
+After selecting a pod resource in the cluster dashboard, the log tab allows you to see logs in a specific pod.
+
+![Pods Log Tab](img/pods-log-tab.png)
+
+### The Shell Tab
+
+On the shell tab, you can interact with a pod, you can run shell commands in this pod and see the results.
+
+![Pods Shell Tab](img/pods-shell-tab.png)
