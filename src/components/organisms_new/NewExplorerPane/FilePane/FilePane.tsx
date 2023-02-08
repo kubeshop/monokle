@@ -18,8 +18,6 @@ import {settingsSelector} from '@redux/selectors';
 import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {TitleBarWrapper} from '@components/atoms';
-
 import {useTreeKeys} from '@hooks/fileTreeHooks/useTreeKeys';
 
 import {useStateWithRef} from '@utils/hooks';
@@ -28,7 +26,8 @@ import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps, TreeNode} from '@shared/models/explorer';
 
-import {AccordionPanel} from '../AccordionPanel/AccordionPanel';
+import AccordionPanel from '../AccordionPanel';
+import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 import {createNode} from './CreateNode';
 import * as S from './FilePane.styled';
 import FilePaneTree from './FilePaneTree';
@@ -116,10 +115,10 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
       {...props}
       showArrow={false}
       header={
-        <TitleBarWrapper>
+        <AccordionTitleBarContainer>
           <TitleBar
             expandable
-            isOpen={isActive}
+            isOpen={Boolean(isActive)}
             title="Files"
             actions={
               isActive ? (
@@ -164,7 +163,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
               </S.RootFolderText>
             }
           />
-        </TitleBarWrapper>
+        </AccordionTitleBarContainer>
       }
       key={panelKey as CollapsePanelProps['key']}
     >

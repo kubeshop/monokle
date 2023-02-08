@@ -17,7 +17,7 @@ export type InjectedPanelProps = {
   panelKey?: string;
 };
 
-export function AccordionPanel(props: CollapsePanelProps & InjectedPanelProps) {
+const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props => {
   const id = getPanelId(props.panelKey);
   const [contentHeight, setContentHeight] = useState<number>(1);
 
@@ -32,4 +32,6 @@ export function AccordionPanel(props: CollapsePanelProps & InjectedPanelProps) {
   });
 
   return <S.Panel id={id} contentHeight={contentHeight} {...props} />;
-}
+};
+
+export default AccordionPanel;

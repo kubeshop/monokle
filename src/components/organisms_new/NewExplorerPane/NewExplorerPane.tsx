@@ -7,7 +7,7 @@ import KustomizePane from './KustomizePane';
 
 const ExplorerPane: React.FC = () => {
   return (
-    <Collapse accordion ghost>
+    <Collapse accordion ghost defaultActiveKey="files">
       <FilePane key="files" />
       <KustomizePane key="kustomize" />
     </Collapse>
@@ -17,6 +17,7 @@ const ExplorerPane: React.FC = () => {
 export default ExplorerPane;
 
 const Collapse = styled(RawCollapse)`
+  padding-top: 8px;
   box-sizing: border-box;
   height: 100%;
   padding-bottom: 14px;
