@@ -15,6 +15,7 @@ import {ResourceKindInformation} from '../K8sResourceSectionBlueprint/ResourceKi
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
 import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffix';
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import UnknownResourceNameDisplay from './UnknownResourceNameDisplay';
 
 export type UnknownResourceScopeType = {
   unknownResources: K8sResource[];
@@ -41,6 +42,11 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       selection: state.main.selection,
       highlights: state.main.highlights,
     };
+  },
+  customization: {
+    nameDisplay: {
+      component: UnknownResourceNameDisplay,
+    },
   },
   builder: {
     getRawItems: scope => scope.unknownResources,

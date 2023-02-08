@@ -104,7 +104,7 @@ export const Name = styled.span<NameProps>`
     if (props.$nameSize) {
       return `font-size: ${props.$nameSize}px;`;
     }
-    return `font-size: ${24 - 4 * props.$level}px;`;
+    return `font-size: ${22 - 4 * props.$level}px;`;
   }}
   ${props => {
     if (props.$isSelected) {

@@ -235,7 +235,7 @@ function SectionRenderer(props: SectionRendererProps) {
           return (
             <React.Fragment key={group.id}>
               <S.SectionContainer style={{color: 'red'}}>
-                <S.Name $level={level + 1}>
+                <S.Name $level={level + 2}>
                   {group.name}
                   <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
                 </S.Name>

@@ -197,23 +197,22 @@ const ClusterSelection = () => {
     <S.ClusterContainer id="ClusterContainer">
       {(activeProject || isInQuickClusterMode) && (
         <>
-          {(!isPreviewLoading && isInPreviewMode) ||
-            (!isClusterLoading && isInClusterMode && size.width > 1350 && (
-              <S.PreviewMode
-                $isInPreviewMode={isInPreviewMode}
-                $isInClusterMode={isInClusterMode}
-                $previewType={preview?.type}
-                $kubeConfigContextColor={kubeConfigContextColor}
-              >
-                {isInClusterMode && <span>CLUSTER MODE</span>}
-                {preview?.type === 'kustomize' && <span>KUSTOMIZATION PREVIEW</span>}
-                {preview?.type === 'helm' && <span>HELM PREVIEW</span>}
-                {preview?.type === 'helm-config' && <span>HELM CONFIG PREVIEW</span>}
-                {preview?.type === 'command' && <span>COMMAND PREVIEW</span>}
-              </S.PreviewMode>
-            ))}
+          {((!isPreviewLoading && isInPreviewMode) || (!isClusterLoading && isInClusterMode)) && size.width > 1350 && (
+            <S.PreviewMode
+              $isInPreviewMode={isInPreviewMode}
+              $isInClusterMode={isInClusterMode}
+              $previewType={preview?.type}
+              $kubeConfigContextColor={kubeConfigContextColor}
+            >
+              {isInClusterMode && <span>CLUSTER MODE</span>}
+              {preview?.type === 'kustomize' && <span>KUSTOMIZATION PREVIEW</span>}
+              {preview?.type === 'helm' && <span>HELM PREVIEW</span>}
+              {preview?.type === 'helm-config' && <span>HELM CONFIG PREVIEW</span>}
+              {preview?.type === 'command' && <span>COMMAND PREVIEW</span>}
+            </S.PreviewMode>
+          )}
 
-          <S.ClusterStatus isHalfBordered={!isPreviewLoading && isInPreviewMode && size.width > 950}>
+          <S.ClusterStatus isHalfBordered={!isClusterLoading && isInClusterMode && size.width > 950}>
             {isKubeConfigPathValid && (
               <>
                 <S.ClusterOutlined />
@@ -230,7 +229,7 @@ const ClusterSelection = () => {
                   placement="bottomLeft"
                   arrow
                   trigger={['click']}
-                  disabled={isPreviewLoading || isInPreviewMode}
+                  disabled={isClusterLoading || isInClusterMode}
                   open={isClusterDropdownOpen}
                   onOpenChange={setIsClusterDropdownOpen}
                 >
@@ -244,7 +243,6 @@ const ClusterSelection = () => {
 
             <S.ClusterStatusText
               $isKubeConfigPathValid={isKubeConfigPathValid}
-              $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
               $isInClusterMode={!isClusterLoading && isInClusterMode}
               $kubeConfigContextColor={kubeConfigContextColor}
               $previewType={preview?.type}
@@ -300,18 +298,17 @@ const ClusterSelection = () => {
           </>
         )}
 
-        {(!isPreviewLoading && isInPreviewMode) ||
-          (!isClusterLoading && isInClusterMode && (
-            <S.ExitButton
-              onClick={onClickExit}
-              $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
-              $isInClusterMode={!isClusterLoading && isInClusterMode}
-              $previewType={preview?.type}
-              $kubeConfigContextColor={kubeConfigContextColor}
-            >
-              Exit
-            </S.ExitButton>
-          ))}
+        {((!isPreviewLoading && isInPreviewMode) || (!isClusterLoading && isInClusterMode)) && (
+          <S.ExitButton
+            onClick={onClickExit}
+            $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
+            $isInClusterMode={!isClusterLoading && isInClusterMode}
+            $previewType={preview?.type}
+            $kubeConfigContextColor={kubeConfigContextColor}
+          >
+            Exit
+          </S.ExitButton>
+        )}
       </>
     </S.ClusterContainer>
   );
