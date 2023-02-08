@@ -1,8 +1,7 @@
 import {useCallback, useEffect, useRef} from 'react';
+import {useMeasure} from 'react-use';
 
 import {FileOutlined, FolderOutlined} from '@ant-design/icons';
-
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
@@ -23,7 +22,6 @@ import {
   useProcessing,
   useRename,
 } from '@hooks/fileTreeHooks';
-import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {sortFoldersFiles} from '@utils/fileExplorer';
 
@@ -58,6 +56,8 @@ const FilePaneTree: React.FC<IProps> = props => {
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const selectedPath = useAppSelector(selectedFilePathSelector);
 
+  const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
+
   const treeElementRef = useRef<any>();
   const highlightFilePath = useHighlightNode(tree, treeElementRef, expandedFolders);
 
@@ -72,7 +72,6 @@ const FilePaneTree: React.FC<IProps> = props => {
     setFolder(rootEntry.filePath);
   }, [rootEntry?.filePath, setFolder]);
 
-  const height = usePaneHeight();
   const {onCreateResource} = useCreate();
   const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
@@ -95,9 +94,9 @@ const FilePaneTree: React.FC<IProps> = props => {
   }, [localResourceSelection?.resourceIdentifier.id, treeRef]);
 
   return (
-    <S.TreeContainer>
+    <S.TreeContainer ref={containerRef}>
       <S.TreeDirectoryTree
-        height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
+        height={containerHeight}
         onSelect={onFileSelect}
         ref={treeElementRef}
         expandedKeys={expandedFolders}

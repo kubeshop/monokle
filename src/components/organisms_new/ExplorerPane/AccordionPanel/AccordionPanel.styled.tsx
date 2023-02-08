@@ -11,5 +11,6 @@ export const Panel = styled(Collapse.Panel)<{$contentHeight: number; $panelKey: 
     padding: 0 !important;
     overflow-y: ${props => (props.$panelKey === 'files' ? 'hidden' : 'auto')};
     max-height: ${props => props.$contentHeight}px;
+    height: ${props => props.$contentHeight}px;
   }
 `;
