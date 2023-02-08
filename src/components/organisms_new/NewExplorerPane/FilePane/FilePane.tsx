@@ -2,7 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect, useMemo} from 'react';
 
-import {Button, Tooltip} from 'antd';
+import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -18,19 +18,24 @@ import {settingsSelector} from '@redux/selectors';
 import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {TitleBarWrapper} from '@components/atoms';
+
 import {useTreeKeys} from '@hooks/fileTreeHooks/useTreeKeys';
 
 import {useStateWithRef} from '@utils/hooks';
 
-import {Icon, TitleBar} from '@monokle/components';
+import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {TreeNode} from '@shared/models/explorer';
+import {InjectedPanelProps, TreeNode} from '@shared/models/explorer';
 
+import {AccordionPanel} from '../AccordionPanel/AccordionPanel';
 import {createNode} from './CreateNode';
 import * as S from './FilePane.styled';
 import FilePaneTree from './FilePaneTree';
 
-const FilePane: React.FC = () => {
+const FilePane: React.FC<InjectedPanelProps> = props => {
+  const {isActive, panelKey} = props;
+
   const dispatch = useAppDispatch();
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -107,58 +112,74 @@ const FilePane: React.FC = () => {
   }, [onSelectRootFolderFromMainThread]);
 
   return (
-    <S.FileTreeContainer>
-      <TitleBar
-        expandable
-        isOpen
-        title="Files"
-        actions={
-          <S.TitleBarActions>
-            {isScanExcludesUpdated === 'outdated' && (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
-                <ExclamationCircleOutlined />
-              </Tooltip>
-            )}
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-              <Button
-                size="small"
-                onClick={() => setRootFolder(rootEntry.filePath)}
-                icon={<ReloadOutlined />}
-                type="link"
-                disabled={isButtonDisabled}
-              />
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
-              <Button
-                icon={<Icon name="collapse" />}
-                onClick={() => dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : tree ? [tree.key] : []))}
-                type="link"
-                size="small"
-                disabled={isButtonDisabled}
-              />
-            </Tooltip>
-          </S.TitleBarActions>
-        }
-        description={
-          <S.RootFolderText>
-            <span id="file-explorer-count">
-              <b>{filesOnly.length || 0} files</b>
-            </span>{' '}
-            in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
-          </S.RootFolderText>
-        }
-      />
-
-      {isFolderLoading ? (
-        <S.Skeleton active />
-      ) : tree ? (
-        <FilePaneTree tree={tree} treeRef={treeRef} />
-      ) : (
-        <S.NoFilesContainer>
-          Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
-        </S.NoFilesContainer>
-      )}
-    </S.FileTreeContainer>
+    <AccordionPanel
+      {...props}
+      showArrow={false}
+      header={
+        <TitleBarWrapper>
+          <TitleBar
+            expandable
+            isOpen={isActive}
+            title="Files"
+            actions={
+              isActive ? (
+                <S.TitleBarActions>
+                  {isScanExcludesUpdated === 'outdated' && (
+                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
+                      <ExclamationCircleOutlined />
+                    </Tooltip>
+                  )}
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                    <Button
+                      size="small"
+                      onClick={() => setRootFolder(rootEntry.filePath)}
+                      icon={<ReloadOutlined />}
+                      type="link"
+                      disabled={isButtonDisabled}
+                    />
+                  </Tooltip>
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}
+                  >
+                    <Button
+                      icon={<Icon name="collapse" />}
+                      onClick={() => dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : tree ? [tree.key] : []))}
+                      type="link"
+                      size="small"
+                      disabled={isButtonDisabled}
+                    />
+                  </Tooltip>
+                </S.TitleBarActions>
+              ) : (
+                <TitleBarCount count={filesOnly.length} isActive={false} />
+              )
+            }
+            description={
+              <S.RootFolderText>
+                <span id="file-explorer-count">
+                  <b>{filesOnly.length || 0} files</b>
+                </span>{' '}
+                in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
+              </S.RootFolderText>
+            }
+          />
+        </TitleBarWrapper>
+      }
+      key={panelKey as CollapsePanelProps['key']}
+    >
+      <S.FileTreeContainer>
+        {isFolderLoading ? (
+          <S.Skeleton active />
+        ) : tree ? (
+          <FilePaneTree tree={tree} treeRef={treeRef} />
+        ) : (
+          <S.NoFilesContainer>
+            Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
+          </S.NoFilesContainer>
+        )}
+      </S.FileTreeContainer>
+    </AccordionPanel>
   );
 };
 

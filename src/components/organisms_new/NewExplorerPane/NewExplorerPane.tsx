@@ -3,11 +3,13 @@ import {Collapse as RawCollapse} from 'antd';
 import styled from 'styled-components';
 
 import FilePane from './FilePane';
+import KustomizePane from './KustomizePane';
 
 const ExplorerPane: React.FC = () => {
   return (
     <Collapse accordion ghost>
       <FilePane key="files" />
+      <KustomizePane key="kustomize" />
     </Collapse>
   );
 };

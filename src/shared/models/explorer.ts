@@ -4,6 +4,12 @@ import {DataNode} from 'antd/lib/tree';
 
 import {DeleteEntityCallback} from './fileExplorer';
 
+// Props injected by Collapse when it clones the Panel
+export type InjectedPanelProps = {
+  isActive?: boolean;
+  panelKey?: string;
+};
+
 export type ProcessingEntity = {
   processingEntityID?: string;
   processingType?: 'delete' | 'rename';
