@@ -1,3 +1,9 @@
+export type DeleteEntityCallback = {
+  isDirectory: boolean;
+  name: string;
+  err: NodeJS.ErrnoException | null;
+};
+
 export type DirectoryOptions = {
   isDirectoryExplorer: true;
   defaultPath?: string;
