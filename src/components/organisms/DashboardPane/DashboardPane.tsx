@@ -13,8 +13,6 @@ import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
-import {getRegisteredKindHandlers} from '@src/kindhandlers';
-
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -26,7 +24,7 @@ import * as S from './DashboardPane.style';
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
-  const [, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
+  const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
   const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
@@ -53,7 +51,8 @@ const DashboardPane = () => {
             0
           ) > 0
       );
-  }, [filterText, menuListRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterText, menuListRef, menuList]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -72,7 +71,7 @@ const DashboardPane = () => {
       });
     });
 
-    getRegisteredKindHandlers().forEach((kindHandler: ResourceKindHandler) => {
+    registeredKindHandlers.forEach((kindHandler: ResourceKindHandler) => {
       const parent: DashboardMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
       if (parent) {
         const child: DashboardMenu | undefined = parent.children?.find(m => m.key === kindHandler.navigatorPath[2]);
