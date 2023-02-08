@@ -16,19 +16,19 @@ const UNSORTED_VALUE = -9999999;
 
 export const CellStatus = {
   title: 'Status',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'status',
   width: '120px',
-  render: (content: any) => (
+  render: (object: any) => (
     <div>
-      {(content?.status?.phase === 'Running' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
-        (content?.status?.phase === 'Bound' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
-        (content?.status?.phase === 'Pending' && <S.StatusPending>{content?.status?.phase}</S.StatusPending>) ||
-        (content?.status?.phase === 'Terminating' && (
-          <S.StatusTerminating>{content?.status?.phase}</S.StatusTerminating>
+      {(object?.status?.phase === 'Running' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+        (object?.status?.phase === 'Bound' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+        (object?.status?.phase === 'Pending' && <S.StatusPending>{object?.status?.phase}</S.StatusPending>) ||
+        (object?.status?.phase === 'Terminating' && (
+          <S.StatusTerminating>{object?.status?.phase}</S.StatusTerminating>
         )) ||
-        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) ||
-        (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
+        (object?.status?.phase === 'Active' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
+        (object?.status?.phase ? <Tag color="magenta">{object?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.object?.status?.phase?.localeCompare(b.object?.status?.phase),
@@ -36,7 +36,7 @@ export const CellStatus = {
 
 export const CellAge = {
   title: 'Age',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'age',
   width: '120px',
   render: ({metadata: {creationTimestamp}}: any) => <div>{timeAgo(creationTimestamp)}</div>,
@@ -72,10 +72,10 @@ export const CellNamespace = {
 
 export const CellNode = {
   title: 'Node',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'node',
   width: '240px',
-  render: (content: any) => <div>{content?.spec?.nodeName}</div>,
+  render: (object: any) => <div>{object?.spec?.nodeName}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
     a?.object?.spec?.nodeName?.localeCompare(b?.object?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
@@ -90,7 +90,7 @@ export const CellError = {
   //   !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
   //     <span style={{padding: '2px 4px'}}>-</span>
   //   ) : (
-  //     <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
+  //     <Popover mouseEnterDelay={0.5} placement="rightTop" object={<ErrorsPopoverContent resource={resource} />}>
   //       <S.ErrorCell>
   //         {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
   //           Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
