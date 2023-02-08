@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Col, Row, Skeleton} from 'antd';
+import {Col, Row} from 'antd';
 
 import {resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -16,6 +16,7 @@ import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';
 import ResourceList from '../ResourceList';
 import * as S from './CompareModalSelecting.styled';
+import Loading from './Loading';
 
 const CompareModalSelecting: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -36,7 +37,7 @@ const CompareModalSelecting: React.FC = () => {
         <S.ListRow>
           <Col span={10}>
             {left.loading ? (
-              <Skeleton active />
+              <Loading />
             ) : left.error ? (
               <ErrorFigure onRetry={() => handleRetry('left')} />
             ) : (
@@ -53,7 +54,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : right.error ? (
             <ErrorFigure onRetry={() => handleRetry('right')} />
           ) : (
-            <Skeleton active />
+            <Loading />
           )}
         </S.FloatingFigure>
       </>
@@ -68,7 +69,7 @@ const CompareModalSelecting: React.FC = () => {
 
           <Col span={10}>
             {right.loading ? (
-              <Skeleton active />
+              <Loading />
             ) : right.error ? (
               <ErrorFigure onRetry={() => handleRetry('right')} />
             ) : (
@@ -85,7 +86,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : left.error ? (
             <ErrorFigure onRetry={() => handleRetry('left')} />
           ) : (
-            <Skeleton active />
+            <Loading />
           )}
         </S.FloatingFigure>
       </>
