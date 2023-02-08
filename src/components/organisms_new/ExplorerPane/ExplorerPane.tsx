@@ -2,7 +2,6 @@ import {Collapse} from 'antd';
 
 import styled from 'styled-components';
 
-import FilePane from './FilePane';
 import HelmConfigPane from './HelmConfigPane';
 import HelmPane from './HelmPane/HelmPane';
 import ImagePane from './ImagePane';
@@ -11,7 +10,6 @@ import KustomizePane from './KustomizePane';
 export default function ExplorerPane() {
   return (
     <StyledCollapse accordion ghost>
-      <FilePane key="files" />
       <HelmPane key="helm" />
       <HelmConfigPane key="helm-config" />
       <KustomizePane key="kustomize" />

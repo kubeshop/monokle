@@ -1,10 +1,11 @@
 import {useState} from 'react';
 import {useEffectOnce} from 'react-use';
 
-import {Collapse, CollapsePanelProps} from 'antd';
+import {CollapsePanelProps} from 'antd';
 
 import {useResizeObserverRef} from 'rooks';
-import styled from 'styled-components';
+
+import * as S from './AccordionPanel.styled';
 
 export const PANEL_HEADER_HEIGHT = 72;
 
@@ -30,17 +31,5 @@ export function AccordionPanel(props: CollapsePanelProps & InjectedPanelProps) {
     containerRef(document.querySelector(`#${id}`));
   });
 
-  return <StyledPanel id={id} contentHeight={contentHeight} {...props} />;
+  return <S.Panel id={id} contentHeight={contentHeight} {...props} />;
 }
-
-export const StyledPanel = styled(Collapse.Panel)`
-  &.ant-collapse-item-active {
-    height: 100%;
-  }
-
-  .ant-collapse-content-box {
-    padding: 0 !important;
-    overflow-y: hidden;
-    max-height: ${(props: {contentHeight: number}) => props.contentHeight}px;
-  }
-`;
