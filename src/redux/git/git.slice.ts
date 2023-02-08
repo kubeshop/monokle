@@ -1,8 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {GitBranchCommit, GitChangedFile, GitRemoteRepo, GitRepo, GitSliceState} from '@models/git';
-
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {GitBranchCommit, GitChangedFile, GitRemoteRepo, GitRepo, GitSliceState} from '@shared/models/git';
 
 import {gitInitialState} from './git.initialState';
 

@@ -6,12 +6,12 @@ import {Button} from 'antd';
 
 import {CloseOutlined} from '@ant-design/icons';
 
-import {NewVersionCode} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 
 import NewUpdate from '@assets/NewUpdate.svg';
+
+import {NewVersionCode} from '@shared/models/config';
 
 import * as S from './styled';
 

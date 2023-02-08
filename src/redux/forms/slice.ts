@@ -1,8 +1,9 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {trackEvent} from '@utils/telemetry';
+import {FormsState} from '@shared/models/form';
+import {trackEvent} from '@shared/utils/telemetry';
 
-import {FormsState, initialState} from './state';
+import {initialState} from './state';
 
 export const formSlice = createSlice({
   name: 'forms',

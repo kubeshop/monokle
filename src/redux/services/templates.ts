@@ -5,22 +5,20 @@ import asyncLib from 'async';
 import fs from 'fs';
 import log from 'loglevel';
 
-import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {KubernetesObject, isKubernetesObject} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {AnyPlugin} from '@models/plugin';
-import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
-
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 
-import electronStore from '@utils/electronStore';
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@shared/constants/urls';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sObject, isK8sObject} from '@shared/models/k8s';
+import {K8sResource} from '@shared/models/k8sResource';
+import {AnyPlugin} from '@shared/models/plugin';
+import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@shared/models/template';
+import electronStore from '@shared/utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
-import {createMultipleUnsavedResources} from './unsavedResource';
+import {createMultipleTransientResources} from './transientResource';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
@@ -93,11 +91,6 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
 
-export type InterpolateTemplateOptions = {
-  templateText: string;
-  formsData: any[];
-};
-
 export const interpolateTemplate = async (templateText: string, formsData: any[]) => {
   return new Promise<string>(resolve => {
     ipcRenderer.once('interpolate-vanilla-template-result', (event, arg) => {
@@ -110,7 +103,7 @@ export const interpolateTemplate = async (templateText: string, formsData: any[]
   });
 };
 
-export const createUnsavedResourcesFromVanillaTemplate = async (
+export const createTransientResourcesFromVanillaTemplate = async (
   template: VanillaTemplate,
   formsData: any[],
   dispatch: AppDispatch
@@ -124,14 +117,14 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
         return interpolatedTemplateText;
       } catch (e) {
         if (e instanceof Error) {
-          log.warn(`[createUnsavedResourcesFromVanillaTemplate]: ${e.message}`);
+          log.warn(`[createTransientResourcesFromVanillaTemplate]: ${e.message}`);
           return undefined;
         }
       }
     }
   );
 
-  let objects: KubernetesObject[] = [];
+  let objects: K8sObject[] = [];
 
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
@@ -140,7 +133,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
     });
 
   const inputs = objects
-    .filter(obj => isKubernetesObject(obj))
+    .filter(obj => isK8sObject(obj))
     .map(obj => ({
       name: obj.metadata.name,
       namespace: obj.metadata.namespace,
@@ -149,7 +142,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       obj,
     }));
 
-  const createdResources: K8sResource[] = createMultipleUnsavedResources(inputs, dispatch);
+  const createdResources: K8sResource[] = createMultipleTransientResources(inputs, dispatch);
 
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };

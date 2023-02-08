@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  background: ${Colors.blackPure};
 `;
 
 export const Title = styled.p`

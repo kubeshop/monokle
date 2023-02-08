@@ -11,16 +11,12 @@ import os from 'os';
 import path, {join} from 'path';
 import semver from 'semver';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {AnyExtension} from '@models/extension';
-
-import {createProject} from '@redux/reducers/appConfig';
-import {loadResource} from '@redux/services';
-
-import electronStore from '@utils/electronStore';
-import {getSegmentClient} from '@utils/segment';
-import {APP_DOWNGRADED, APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@utils/telemetry';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import type {AnyExtension} from '@shared/models/extension';
+import {APP_DOWNGRADED, APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@shared/models/telemetry';
+import electronStore from '@shared/utils/electronStore';
+import {loadResource} from '@shared/utils/resource';
+import {getSegmentClient} from '@shared/utils/segment';
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -85,7 +81,7 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
 
   if (recentFolders && recentFolders.length > 0) {
     recentFolders.forEach((folder: string) => {
-      dispatch(createProject({rootFolder: folder}));
+      dispatch({type: 'config/createProject', payload: {rootFolder: folder}});
     });
     electronStore.delete('appConfig.recentFolders');
   }

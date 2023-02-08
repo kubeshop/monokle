@@ -6,9 +6,6 @@ import fs from 'fs';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
-import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
 import {setAlert} from '@redux/reducers/alert';
 import {
   addNamespaceToContext,
@@ -17,8 +14,10 @@ import {
   updateProjectKubeConfig,
 } from '@redux/reducers/appConfig';
 
-import {watchFunctions} from '@utils/helpers';
-import {getKubeAccess} from '@utils/kubeclient';
+import {AlertEnum} from '@shared/models/alert';
+import {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import {getKubeAccess} from '@shared/utils/kubeclient';
+import {watchFunctions} from '@shared/utils/watch';
 
 let watcher: FSWatcher;
 let clusterNamespacesWatchInterval: number | null = null;

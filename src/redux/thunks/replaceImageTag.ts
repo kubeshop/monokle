@@ -1,15 +1,15 @@
-import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-import {ImageType} from '@models/image';
-
 import {UpdateMultipleResourcesPayload, selectImage} from '@redux/reducers/main';
+
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ImageType} from '@shared/models/image';
+import {ResourceMap} from '@shared/models/k8sResource';
 
 import {updateMultipleResources} from './updateMultipleResources';
 
 export const replaceImageTag = (
   image: ImageType,
   newImageTag: string,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   dispatch: AppDispatch
 ) => {
   const {resourcesIds} = image;
@@ -42,9 +42,11 @@ export const replaceImageTag = (
       }
     });
 
-    resourcesToUpdate.push({resourceId, content: newResourceText});
+    resourcesToUpdate.push({resourceIdentifier: resource, content: newResourceText});
   });
 
   dispatch(updateMultipleResources(resourcesToUpdate));
-  dispatch(selectImage({image: {...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}}));
+  // dispatch(selectImage({image: {...image, id: `${image.name}:${newImageTag}`, tag: newImageTag}}));
+  // TODO: do we have to update the imageList / imageMap or will that happen by updating the resources?
+  dispatch(selectImage({imageId: `${image.name}:${newImageTag}`}));
 };

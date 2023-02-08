@@ -4,7 +4,7 @@ import {LeftOutlined as RawLeftOutlined, RightOutlined as RawRightOutlined} from
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Drawer = styled(RawDrawer)`
   & .ant-drawer-content {

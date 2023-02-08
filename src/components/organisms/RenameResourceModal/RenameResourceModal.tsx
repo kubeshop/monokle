@@ -4,11 +4,13 @@ import {Checkbox, Form, Input, Modal} from 'antd';
 
 import styled from 'styled-components';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
+import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {isResourceSelected} from '@redux/services/resource';
 import {renameResource} from '@redux/thunks/renameResource';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;
@@ -16,10 +18,16 @@ const CheckboxContainer = styled.div`
 
 const RenameResourceModel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const uiState = useAppSelector(state => state.ui.renameResourceModal);
+  const {isOpen, resourceIdentifier} = useAppSelector(
+    state => state.ui.renameResourceModal || {isOpen: undefined, resourceIdentifier: undefined}
+  );
 
+  const resourceMap = useAppSelector(state =>
+    resourceIdentifier ? resourceMapSelector(state, resourceIdentifier.storage) : undefined
+  );
+  const isThisResourceSelected = useAppSelector(state =>
+    resourceIdentifier ? isResourceSelected(resourceIdentifier, state.main.selection) : undefined
+  );
   const [newResourceName, setNewResourceName] = useState<string>();
   const [resource, setResource] = useState<K8sResource>();
   const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
@@ -29,22 +37,22 @@ const RenameResourceModel: React.FC = () => {
   const inputNameRef = useRef<any>();
 
   useEffect(() => {
-    if (uiState) {
-      const newResource = resourceMap[uiState.resourceId];
+    if (resourceIdentifier && resourceMap) {
+      const newResource = resourceMap[resourceIdentifier.id];
       if (newResource) {
         setResource(newResource);
         setNewResourceName(newResource.name);
       }
     }
-    if (!uiState || uiState?.isOpen === false) {
+    if (!resourceIdentifier || isOpen === false) {
       setResource(undefined);
       setNewResourceName(undefined);
     }
     setShouldUpdateRefs(false);
     inputNameRef?.current?.focus();
-  }, [uiState, resourceMap]);
+  }, [resourceIdentifier, isOpen, resourceMap]);
 
-  if (!uiState || !resource) {
+  if (!resource || !resourceIdentifier || !resourceMap) {
     return null;
   }
 
@@ -52,7 +60,7 @@ const RenameResourceModel: React.FC = () => {
     if (!newResourceName || resource.name === newResourceName) {
       return;
     }
-    renameResource(resource.id, newResourceName, shouldUpdateRefs, resourceMap, dispatch, selectedResourceId);
+    renameResource(resource, newResourceName, shouldUpdateRefs, resourceMap, dispatch, isThisResourceSelected);
     dispatch(closeRenameResourceModal());
   };
 
@@ -63,7 +71,7 @@ const RenameResourceModel: React.FC = () => {
   return (
     <Modal
       title={`Rename resource - ${resource.name}`}
-      open={uiState.isOpen}
+      open={isOpen}
       onOk={handleOk}
       okButtonProps={{disabled: isButtonDisabled}}
       onCancel={handleCancel}

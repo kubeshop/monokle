@@ -1,10 +1,9 @@
 import {useCallback} from 'react';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {useMainPaneDimensions} from '@utils/hooks';
+import {useMainPaneDimensions, useSelectorWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -58,18 +57,15 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
-    return Object.values(resourceMap)
-      .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      .filter(
-        (resource: K8sResource) =>
-          activeMenu.key.replace(`${resource.content.apiVersion}-`, '') === resource.kind &&
-          resource.kind === activeMenu.label
-      );
-  }, [resourceMap, activeMenu]);
+    return Object.values(clusterResourceMapRef.current).filter(
+      resource =>
+        activeMenu.key.replace(`${resource.apiVersion}-`, '') === resource.kind && resource.kind === activeMenu.label
+    );
+  }, [activeMenu, clusterResourceMapRef]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {

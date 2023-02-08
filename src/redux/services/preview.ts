@@ -1,68 +1,52 @@
-import {AppDispatch} from '@models/appdispatch';
-import {PreviewType} from '@models/appstate';
-
-import {setClusterProxyPort} from '@redux/reducers/appConfig';
-import {
-  clearPreview,
-  clearPreviewAndSelectionHistory,
-  startPreviewLoader,
-  stopPreviewLoader,
-} from '@redux/reducers/main';
+import {clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
-import {startClusterPreview} from '@redux/thunks/startClusterPreview';
 
-import {closeKubectlProxy} from '@utils/commands/kubectl';
-import {trackEvent} from '@utils/telemetry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {AnyPreview} from '@shared/models/preview';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {disconnectFromCluster} from './clusterResourceWatcher';
 import {previewSavedCommand} from './previewCommand';
 
-export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
+export const startPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());
-  dispatch(startPreviewLoader({previewType: type, targetId}));
 
-  if (type === 'kustomization') {
-    dispatch(previewKustomization(targetId));
+  if (preview.type === 'kustomize') {
+    dispatch(previewKustomization(preview.kustomizationId));
   }
-  if (type === 'cluster') {
-    dispatch(startClusterPreview({clusterContext: targetId}));
+
+  if (preview.type === 'helm') {
+    dispatch(previewHelmValuesFile(preview.valuesFileId));
   }
-  if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetId));
+  if (preview.type === 'helm-config') {
+    dispatch(runPreviewConfiguration(preview.configId));
   }
-  if (type === 'helm-preview-config') {
-    dispatch(runPreviewConfiguration(targetId));
-  }
-  if (type === 'command') {
-    dispatch(previewSavedCommand(targetId));
+  if (preview.type === 'command') {
+    dispatch(previewSavedCommand(preview.commandId));
   }
 };
 
-export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
-  trackEvent('preview/restart', {type});
+// TODO: do we really need a separate function for this?
+export const restartPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
+  trackEvent('preview/restart', {type: preview.type});
   disconnectFromCluster();
   dispatch(clearPreview({type: 'restartPreview'}));
-  dispatch(startPreviewLoader({previewType: type, targetId}));
-  if (type === 'kustomization') {
-    dispatch(previewKustomization(targetId));
+  if (preview.type === 'kustomize') {
+    dispatch(previewKustomization(preview.kustomizationId));
   }
-  if (type === 'cluster') {
-    dispatch(startClusterPreview({clusterContext: targetId, isRestart: true}));
+  if (preview.type === 'helm') {
+    dispatch(previewHelmValuesFile(preview.valuesFileId));
   }
-  if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetId));
+  if (preview.type === 'helm-config') {
+    dispatch(runPreviewConfiguration(preview.configId));
   }
-  if (type === 'helm-preview-config') {
-    dispatch(runPreviewConfiguration(targetId));
+  if (preview.type === 'command') {
+    dispatch(previewSavedCommand(preview.commandId));
   }
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
-  dispatch(setClusterProxyPort(undefined));
-  disconnectFromCluster();
-  dispatch(stopPreviewLoader());
   dispatch(clearPreviewAndSelectionHistory());
-  closeKubectlProxy();
 };

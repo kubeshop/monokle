@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@components": ["src/components/"],
+      "@constants/*": ["src/constants/*"],
+      "@constants": ["src/constants/"],
+      "@atoms/*": ["src/components/atoms/*"],
+      "@atoms": ["src/components/atoms/"],
+      "@organisms/*": ["src/components/organisms/*"],
+      "@organisms": ["src/components/organisms/"],
+      "@organismsNew/*": ["src/components/organisms_new/*"],
+      "@organismsNew": ["src/components/organisms_new/"],
+      "@molecules/*": ["src/components/molecules/*"],
+      "@molecules": ["src/components/molecules/"],
+      "@moleculesNew/*": ["src/components/molecules_new/*"],
+      "@moleculesNew": ["src/components/molecules_new/"],
+      "@hooks/*": ["src/hooks/*"],
+      "@hooks": ["src/hooks"],
+      "@redux/*": ["src/redux/*"],
+      "@redux": ["src/redux/"],
+      "@actions/*": ["src/actions/*"],
+      "@actions": ["src/actions/"],
+      "@assets/*": ["src/assets/*"],
+      "@assets": ["src/assets/"],
+      "@utils/*": ["src/utils/*"],
+      "@utils": ["src/utils/"],
+      "@shared": ["src/shared/"],
+      "@shared/*": ["src/shared/*"],
+      "@src/*": ["src/*"],
+      "@src": ["src/"],
+      "@root/*": ["./*"],
+      "@root": ["./"]
+    }
+  }
+}

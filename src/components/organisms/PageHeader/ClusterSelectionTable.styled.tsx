@@ -4,9 +4,8 @@ import {EditOutlined as RawEditOutlined} from '@ant-design/icons/lib/icons';
 
 import styled from 'styled-components';
 
-import {ClusterColors} from '@models/cluster';
-
-import Colors from '@styles/Colors';
+import {ClusterColors} from '@shared/models/cluster';
+import {Colors} from '@shared/styles/colors';
 
 export const ActionsContainer = styled.div`
   display: flex;

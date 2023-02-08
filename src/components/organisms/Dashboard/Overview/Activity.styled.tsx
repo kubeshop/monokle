@@ -2,7 +2,7 @@ import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   padding: 12px 8px 3px 8px;

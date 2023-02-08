@@ -6,7 +6,7 @@ import log from 'loglevel';
 
 import {getChannelName} from '@utils/ipc';
 
-import {FileExplorerOptions} from './FileExplorerOptions';
+import {FileExplorerOptions} from '@shared/models/fileExplorer';
 
 export type FileExplorerProps = {
   isOpen: boolean;

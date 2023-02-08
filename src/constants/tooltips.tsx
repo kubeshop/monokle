@@ -1,4 +1,4 @@
-import {HotkeyLabel} from '@components/molecules';
+import {HotkeyLabel} from '@atoms';
 
 export const macOSKeyIcon: Record<string, string> = {
   alt: '⌥',
@@ -8,7 +8,7 @@ export const macOSKeyIcon: Record<string, string> = {
 };
 
 export const ClusterExplorerTooltips = {
-  default: 'Show/hide Cluster Preview',
+  default: 'Show/hide Cluster Connection',
   firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
   noKubeconfigPath: 'Kubeconfig path is missing, configure it to enable Cluster features',
   notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',
@@ -18,8 +18,6 @@ export const AddInclusionPatternTooltip = 'Add pattern for files that contain re
 export const AddTerminalTooltip = 'Add new terminal';
 export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
-export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
-export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
 export const EditWithFormTooltip = 'Edit resource with form';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Compare is disabled while previewing Cluster resources';
@@ -57,13 +55,12 @@ export const NotificationsTooltip = 'Show latest notifications';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
 export const OpenHelmChartDocumentationTooltip = 'Open documentation for Helm Charts in external browser';
 export const OpenKustomizeDocumentationTooltip = 'Open documentation for Kustomize in external browser';
-export const PluginDrawerTooltip = 'Open Plugins Manager';
-export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a newer version available';
+export const PluginManagerReloadTooltip = 'Updates all plugins that have a newer version available';
 export const ProjectManagementTooltip = 'Select and manage your projects';
 export const ReloadHelmPreviewTooltip = 'Reload the Helm Chart preview with this values file';
 export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
 export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
-export const SaveUnsavedResourceTooltip = 'Save resource to file/folder';
+export const SaveTransientResourceTooltip = 'Save resource to file/folder';
 export const SearchProjectTooltip = 'Search for project by name or path';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
 export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
@@ -76,17 +73,15 @@ export const ApplyTooltip = () => (
   <HotkeyLabel text="Deploy this resource to your selected cluster" name="APPLY_SELECTION" />
 );
 export const ClusterModeTooltip = () => (
-  <HotkeyLabel text="Retrieve and show resources in selected context" name="PREVIEW_CLUSTER" />
+  <HotkeyLabel text="Retrieve and show resources in selected context" name="LOAD_CLUSTER" />
 );
 export const DiffTooltip = () => (
   <HotkeyLabel text="Diff this resource against your selected cluster" name="DIFF_RESOURCE" />
 );
 export const FileExplorerTabTooltip = () => <HotkeyLabel text="View File Explorer" name="OPEN_EXPLORER_TAB" />;
-export const HelmTabTooltip = () => <HotkeyLabel text="View Helm Charts" name="OPEN_HELM_TAB" />;
 export const InstallValuesFileTooltip = () => (
   <HotkeyLabel text="Install Helm Chart using this values file in your selected cluster" name="APPLY_SELECTION" />
 );
-export const KustomizeTabTooltip = () => <HotkeyLabel text="View Kustomizations" name="OPEN_KUSTOMIZATION_TAB" />;
 export const NewResourceTooltip = () => <HotkeyLabel text="Create new resource" name="CREATE_NEW_RESOURCE" />;
 export const QuickFilterTooltip = () => <HotkeyLabel text="Filter results" name="OPEN_QUICK_SEARCH" />;
 export const ReloadFolderTooltip = () => (

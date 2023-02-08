@@ -27,10 +27,11 @@ export const ActionsPaneFooterContainer = styled.div`
 `;
 
 export const ActionsPaneMainContainer = styled.div<{$height: number}>`
-  height: ${({$height}) => $height}px;
-  width: 100%;
   display: flex;
+  height: ${({$height}) => $height}px;
   flex-direction: column;
+  margin: 10px;
+  border-radius: 10px;
 `;
 
 export const ExtraRightButton = styled(Button)`
@@ -52,12 +53,15 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   overflow: visible;
 
   & .ant-tabs-nav {
-    padding: 0 16px;
+    padding: 8px 16px 0 0;
     margin-bottom: 0px;
+    background: rgba(25, 31, 33, 0.7);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 
   & .ant-tabs-nav::before {
-    border-bottom: 1px solid #363636;
+    border-bottom: none;
   }
 
   & .ant-tabs-content {
@@ -67,5 +71,24 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-extra-content {
     display: flex;
     align-items: center;
+  }
+
+  & .ant-tabs-tab {
+    padding: 0px 16px;
+    margin-left: 8px;
+    background: black;
+    border-radius: 5px 5px 0 0;
+    border-bottom: none;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  & .ant-tabs-tab-active {
+    border-bottom: none;
+    background: black;
+  }
+
+  & .ant-tabs-ink-bar {
+    background: transparent;
   }
 `;

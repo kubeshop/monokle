@@ -2,17 +2,16 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {FileMapType} from '@models/appstate';
-import {HelmChart, HelmValuesFile} from '@models/helm';
-
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {runCommandInMainThread} from '@utils/commands';
-import {trackEvent} from '@utils/telemetry';
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {FileMapType} from '@shared/models/appState';
+import {HelmChart, HelmValuesFile} from '@shared/models/helm';
+import {runCommandInMainThread} from '@shared/utils/commands';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Invokes helm install for the specified helm chart and values file

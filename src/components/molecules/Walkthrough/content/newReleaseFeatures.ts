@@ -1,4 +1,4 @@
-import {WalkthroughContentProps} from '@models/walkthrough';
+import {WalkthroughContentProps} from '@shared/models/walkthrough';
 
 export const newReleaseFeaturesContent: WalkthroughContentProps['data'][] = [
   {

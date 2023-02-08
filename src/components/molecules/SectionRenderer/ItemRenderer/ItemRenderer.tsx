@@ -1,12 +1,11 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {ScrollIntoView} from '@molecules';
+import {ScrollIntoView} from '@atoms';
+import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
-import {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {ItemBlueprint, ItemCustomComponentProps} from '@shared/models/navigator';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -41,7 +40,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const {instanceHandler} = blueprint;
 
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);

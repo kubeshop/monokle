@@ -14,6 +14,5 @@ export const MonacoContainer = styled.div`
   width: 100%;
   height: 100%;
   padding-left: 0px;
-  padding-right: 8px;
   margin: 0px;
 `;

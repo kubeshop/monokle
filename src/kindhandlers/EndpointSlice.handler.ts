@@ -2,14 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {
-  implicitNamespaceMatcher,
-  optionalExplicitNamespaceMatcher,
-  targetKindMatcher,
-} from '@src/kindhandlers/common/customMatchers';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const EndpointSliceHandler: ResourceKindHandler = {
   kind: 'EndpointSlice',
@@ -19,7 +13,7 @@ const EndpointSliceHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.discovery.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const discoveryV1Api = kubeconfig.makeApiClient(k8s.DiscoveryV1Api);
     return discoveryV1Api.readNamespacedEndpointSlice(resource.name, resource.namespace || 'default', 'true');
   },
@@ -30,37 +24,10 @@ const EndpointSliceHandler: ResourceKindHandler = {
       : await discoveryV1Api.listEndpointSliceForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const discoveryV1Api = kubeconfig.makeApiClient(k8s.DiscoveryV1Api);
     await discoveryV1Api.deleteNamespacedEndpointSlice(resource.name, resource.namespace || 'default');
   },
-  outgoingRefMappers: [
-    {
-      source: {
-        pathParts: ['metadata', 'labels', 'kubernetes.io/service-name'],
-        siblingMatchers: {
-          namespace: implicitNamespaceMatcher,
-        },
-      },
-      target: {
-        kind: 'Service',
-      },
-      type: 'name',
-    },
-    {
-      source: {
-        pathParts: ['targetRef', 'name'],
-        siblingMatchers: {
-          namespace: optionalExplicitNamespaceMatcher,
-          kind: targetKindMatcher,
-        },
-      },
-      target: {
-        kind: '$.*',
-      },
-      type: 'name',
-    },
-  ],
   helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpointslice-v1-discovery-k8s-io',
 };
 

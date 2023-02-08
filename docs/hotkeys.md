@@ -2,7 +2,7 @@
 
 Monokle Desktop currently supports the following keyboard shortcuts:
 
-- Cluster Preview: Ctrl/Cmd I
+- Connect to Cluster: Ctrl/Cmd I
 - Settings: Ctrl/Cmd , (Comma)
 - Exit Preview: ESC
 - Browse Folder: Ctrl/Cmd O

@@ -5,12 +5,12 @@ import _ from 'lodash';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
-import {RootState} from '@models/rootstate';
-
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import {setPaneConfiguration, toggleLeftMenu, toggleResourceFilters} from '@redux/reducers/ui';
+
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@shared/models/navigator';
+import {RootState} from '@shared/models/rootState';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 

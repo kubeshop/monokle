@@ -2,8 +2,8 @@ import {PullRequestOutlined as RawPullRequestOutlined, StarFilled as RawStarFill
 
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-import Colors from '@styles/Colors';
+import {AppBorders} from '@shared/styles/borders';
+import {Colors} from '@shared/styles/colors';
 
 export const ImageDetailsContainer = styled.div`
   display: flex;

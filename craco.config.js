@@ -1,4 +1,4 @@
-const CracoAlias = require('craco-alias');
+const {CracoAliasPlugin} = require('react-app-alias-ex');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
@@ -6,18 +6,41 @@ const lodash = require('lodash');
 const path = require('path');
 const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
-module.exports = {
-  webpack: {
-    devtool: 'source-map',
-    plugins: [
-      new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true}),
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const additionalWebpackPlugins = isDevelopment
+  ? []
+  : [
       new SentryWebpackPlugin({
         org: 'kubeshop',
         project: 'monokle-desktop',
         include: './build',
         authToken: process.env.SENTRY_AUTH_TOKEN,
       }),
-    ],
+    ];
+
+module.exports = {
+  webpack: {
+    plugins: {
+      add: [
+        new MonacoWebpackPlugin({
+          languages: ['yaml'],
+          globalAPI: true,
+          customLanguages: [
+            {
+              label: 'yaml',
+              entry: 'monaco-yaml',
+              worker: {
+                id: 'monaco-yaml/yamlWorker',
+                entry: 'monaco-yaml/yaml.worker',
+              },
+            },
+          ],
+        }),
+        ...additionalWebpackPlugins,
+      ],
+    },
+    devtool: 'source-map',
     configure: webpackConfig => {
       webpackConfig.node = {__dirname: false};
       webpackConfig.target = 'electron-renderer';
@@ -54,14 +77,8 @@ module.exports = {
   },
   plugins: [
     {
-      plugin: CracoAlias,
-      options: {
-        source: 'tsconfig',
-        baseUrl: './',
-        tsConfigPath: './paths.json',
-        unsafeAllowModulesOutsideOfSrc: false,
-        debug: false,
-      },
+      plugin: CracoAliasPlugin,
+      options: {},
     },
     {
       plugin: CracoLessPlugin,

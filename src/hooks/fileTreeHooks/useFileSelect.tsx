@@ -1,12 +1,12 @@
 import {useSelector} from 'react-redux';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {selectFile} from '@redux/reducers/main';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
 export const useFileSelect = () => {
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
   const dispatch = useAppDispatch();
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
 
@@ -27,10 +27,10 @@ export const useFileSelect = () => {
     }
 
     if (nodeKey) {
+      // TODO: should the cluster be stopped when a file is selected?
       if (isInPreviewMode) {
         stopPreview(dispatch);
       }
-      dispatch(setSelectingFile(true));
       dispatch(selectFile({filePath: nodeKey}));
     }
   };

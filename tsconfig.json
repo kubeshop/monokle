@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
@@ -19,5 +19,5 @@
     "strictPropertyInitialization": false
   },
   "include": ["src"],
-  "extends": "./paths.json"
+  "extends": "./tsconfig.paths.json"
 }

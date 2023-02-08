@@ -1,8 +1,8 @@
 import {monaco} from 'react-monaco-editor';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {createGlyphDecoration} from '@molecules/Monaco/editorHelpers';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 import {GlyphDecorationTypes} from '../../editorConstants';
 
@@ -11,7 +11,9 @@ const applyErrorIntel = (
 ): {
   decorations: monaco.editor.IModelDeltaDecoration[];
 } => {
-  const validations = resource.validation?.errors ?? [];
+  // const validations = resource.validation?.errors ?? [];
+  // TODO: re-implement after @monokle/validation
+  const validations: any[] = [];
 
   const glyphs = validations.map(validation =>
     createGlyphDecoration(validation.errorPos?.line ?? 1, GlyphDecorationTypes.ErrorRef)

@@ -1,11 +1,11 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
+
+import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@shared/models/navigator';
 
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
@@ -235,7 +235,7 @@ function SectionRenderer(props: SectionRendererProps) {
           return (
             <React.Fragment key={group.id}>
               <S.SectionContainer style={{color: 'red'}}>
-                <S.Name $level={level + 1}>
+                <S.Name $level={level + 2}>
                   {group.name}
                   <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
                 </S.Name>

@@ -1,7 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
-import {useMount} from 'react-use';
+import {useEffectOnce, useMount} from 'react-use';
 
 import {Modal} from 'antd';
 
@@ -13,47 +13,30 @@ import semver from 'semver';
 
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {AlertEnum, ExtraContentType} from '@models/alert';
-import {NewVersionCode, Project} from '@models/appconfig';
-import {StepEnum} from '@models/walkthrough';
-import {Size} from '@models/window';
-
-import {compareToggled} from '@redux/compare';
 import {toggleForm} from '@redux/forms';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
-import {closePluginsDrawer} from '@redux/reducers/extension';
-import {clearNotifications, closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
+import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
   handleWalkthroughStep,
   toggleNotifications,
-  toggleSettings,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {
-  GitCloneModal,
-  HotKeysHandler,
-  LazyDrawer,
-  MessageBox,
-  NewPaneManager,
-  PageHeader,
-  PaneManager,
-  UpdateNotice,
-} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
+
+import {PaneManager} from '@components/organisms_new';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {fetchAppVersion} from '@utils/appVersion';
-import electronStore from '@utils/electronStore';
-import {setMainProcessEnv} from '@utils/env';
-import {FeatureFlag} from '@utils/features';
 import {getFileStats} from '@utils/files';
 import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -61,22 +44,29 @@ import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
+import {AlertEnum, ExtraContentType} from '@shared/models/alert';
+import {NewVersionCode, Project} from '@shared/models/config';
+import {StepEnum} from '@shared/models/walkthrough';
+import {Size} from '@shared/models/window';
+import electronStore from '@shared/utils/electronStore';
+import {setMainProcessEnv} from '@shared/utils/env';
+import {activeProjectSelector} from '@shared/utils/selectors';
+
 import * as S from './App.styled';
 import AppContext from './AppContext';
 
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
-const ClusterDiffModal = React.lazy(() => import('@organisms/ClusterDiffModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
-const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const CreateProjectModal = React.lazy(() => import('@organismsNew/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
+const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManager = React.lazy(() => import('@organisms/PluginManager'));
 const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
@@ -84,9 +74,7 @@ const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceMo
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
-const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
-const CompareModal = React.lazy(() => import('@organisms/CompareModal'));
-const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
+const TemplateExplorer = React.lazy(() => import('@organismsNew/TemplateExplorer'));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -94,20 +82,18 @@ const App = () => {
   const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
   const [appVersion, setAppVersion] = useState<string>();
 
+  const activeProject = useAppSelector(activeProjectSelector);
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-  const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
-  const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
-  const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
   const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
   const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
@@ -115,17 +101,16 @@ const App = () => {
   const isSaveResourcesToFileFolderModalVisible = useAppSelector(
     state => state.ui.saveResourcesToFileFolderModal.isOpen
   );
-  const isCompareModalVisible = useAppSelector(state => state.compare.isOpen);
   const isFormModalVisible = useAppSelector(state => state.form.isOpen);
-  const isSettingsDrawerVisible = useAppSelector(state => state.ui.isSettingsOpen);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
+  const isTemplateExplorerVisible = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const newVersion = useAppSelector(state => state.config.newVersion);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
@@ -297,6 +282,10 @@ const App = () => {
     });
   }, []);
 
+  useEffectOnce(() => {
+    dispatch(loadValidation());
+  });
+
   useEffect(() => {
     ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);
     return () => {
@@ -367,30 +356,12 @@ const App = () => {
     dispatch(toggleNotifications());
   };
 
-  const pluginsDrawerOnClose = () => {
-    dispatch(closePluginsDrawer());
-  };
-
-  const settingsDrawerOnClose = () => {
-    if (isKubeConfigBrowseSettingsOpen) {
-      dispatch(toggleSettings());
-    }
-  };
-
-  useEffect(() => {
-    dispatch(reprocessAllResources());
-  }, [k8sVersion, dispatch]);
-
   const previewConfigurationDrawerOnClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
   }, [dispatch]);
 
   const onCloseReleaseNotesDrawer = useCallback(() => {
     dispatch(closeReleaseNotesDrawer());
-  }, [dispatch]);
-
-  const onCloseCompareModal = useCallback(() => {
-    dispatch(compareToggled({value: false}));
   }, [dispatch]);
 
   const onCloseFormModal = useCallback(() => {
@@ -402,11 +373,9 @@ const App = () => {
       <S.AppContainer>
         <MessageBox />
         <S.MainContainer>
-          <PageHeader />
+          {(isInQuickClusterMode || (activeProject && !isStartProjectPaneVisible)) && <PageHeader />}
 
-          <FeatureFlag name="TwoZero" fallback={<PaneManager />}>
-            <NewPaneManager />
-          </FeatureFlag>
+          <PaneManager />
         </S.MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
@@ -418,19 +387,6 @@ const App = () => {
           extra={<S.Button onClick={() => dispatch(clearNotifications())}>Clear</S.Button>}
         >
           <NotificationsManager />
-        </LazyDrawer>
-
-        <LazyDrawer
-          noPadding
-          onClose={pluginsDrawerOnClose}
-          title="Plugins Manager"
-          visible={isPluginManagerDrawerVisible}
-        >
-          <PluginManager />
-        </LazyDrawer>
-
-        <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
-          <SettingsManager />
         </LazyDrawer>
 
         <LazyDrawer
@@ -450,9 +406,7 @@ const App = () => {
         <Suspense fallback={null}>
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
-          {isClusterDiffModalVisible && <ClusterDiffModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
-          {isCompareModalVisible && <CompareModal visible={isCompareModalVisible} onClose={onCloseCompareModal} />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
@@ -479,6 +433,7 @@ const App = () => {
               <ReleaseNotes onClose={onCloseReleaseNotes} />
             </Modal>
           )}
+          {isTemplateExplorerVisible && <TemplateExplorer />}
         </Suspense>
       </S.AppContainer>
     </AppContext.Provider>

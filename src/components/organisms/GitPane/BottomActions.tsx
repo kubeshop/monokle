@@ -1,13 +1,11 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {Menu, Modal, Tooltip} from 'antd';
+import {Modal, Tooltip} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
 import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
-
-import {AlertEnum} from '@models/alert';
 
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -15,6 +13,8 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
+
+import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './BottomActions.styled';
 import CommitModal from './CommitModal';
@@ -226,7 +226,7 @@ const BottomActions: React.FC = () => {
           placement="topLeft"
           trigger={['click']}
           type="primary"
-          overlay={<Menu items={publishMenuItems} />}
+          menu={{items: publishMenuItems}}
           onClick={publishHandler}
         >
           Publish branch
@@ -236,7 +236,7 @@ const BottomActions: React.FC = () => {
           disabled={!gitRepo.remoteRepo.exists || isSyncDisabled}
           loading={gitLoading}
           icon={<DownOutlined />}
-          overlay={<Menu items={syncMenuItems} />}
+          menu={{items: syncMenuItems}}
           placement="topLeft"
           trigger={['click']}
           type="primary"

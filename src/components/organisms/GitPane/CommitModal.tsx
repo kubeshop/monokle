@@ -4,12 +4,12 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {AlertEnum} from '@shared/models/alert';
 
 type IProps = {
   visible: boolean;

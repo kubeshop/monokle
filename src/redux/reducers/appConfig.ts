@@ -8,24 +8,6 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {
-  AppConfig,
-  ClusterAccess,
-  FileExplorerSortOrder,
-  KubeConfig,
-  Languages,
-  NewVersionCode,
-  Project,
-  ProjectConfig,
-  Settings,
-  TextSizes,
-  Themes,
-} from '@models/appconfig';
-import {ClusterColors} from '@models/cluster';
-import {UiState} from '@models/ui';
-
 import {AppListenerFn} from '@redux/listeners/base';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
@@ -42,13 +24,29 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import electronStore from '@utils/electronStore';
-import {createKubeClient, getKubeAccess} from '@utils/kubeclient';
 import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import {init as sentryInit} from '@sentry/electron/renderer';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {ClusterColors} from '@shared/models/cluster';
+import {
+  AppConfig,
+  ClusterAccess,
+  FileExplorerSortOrder,
+  KubeConfig,
+  Languages,
+  NewVersionCode,
+  Project,
+  ProjectConfig,
+  Settings,
+  TextSizes,
+  Themes,
+} from '@shared/models/config';
+import {UiState} from '@shared/models/ui';
+import electronStore from '@shared/utils/electronStore';
+import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
@@ -91,8 +89,8 @@ export const setOpenProject = createAsyncThunk(
       thunkAPI.dispatch(toggleStartProjectPane());
     }
 
-    if (appUi.leftMenu.selection !== 'file-explorer') {
-      thunkAPI.dispatch(setLeftMenuSelection('file-explorer'));
+    if (appUi.leftMenu.selection !== 'explorer') {
+      thunkAPI.dispatch(setLeftMenuSelection('explorer'));
     }
 
     monitorGitFolder(projectRootPath, thunkAPI);
@@ -398,6 +396,12 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
+    updateProjectK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (state.selectedProjectRootFolder && state.projectConfig) {
+        state.projectConfig.k8sVersion = action.payload;
+        writeProjectConfigFile(state);
+      }
+    },
     setUserDirs: (
       state: Draft<AppConfig>,
       action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string; crdsDir: string}>
@@ -550,10 +554,6 @@ export const configSlice = createSlice({
         log.warn("Couldn't initialize Sentry.");
       }
     },
-    setClusterPreviewNamespace: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      state.clusterPreviewNamespace = action.payload;
-      electronStore.set('appConfig.clusterPreviewNamespace', action.payload);
-    },
     setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
       state.clusterProxyPort = action.payload;
     },
@@ -605,7 +605,6 @@ export const {
   removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
-  setClusterPreviewNamespace,
   setCurrentContext,
   setFilterObjects,
   setKubeConfig,
@@ -625,6 +624,7 @@ export const {
   updateK8sVersion,
   updateNewVersion,
   updateProjectConfig,
+  updateProjectK8sVersion,
   updateProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,

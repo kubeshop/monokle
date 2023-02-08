@@ -16,12 +16,8 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelector,
-  selectedResourceSelector,
-  settingsSelector,
-} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, settingsSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
@@ -29,8 +25,9 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
-import {trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
@@ -60,8 +57,8 @@ const FormEditor: React.FC<IProps> = props => {
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const selection = useAppSelector(state => state.main.selection);
   const selectedResource = useAppSelector(selectedResourceSelector);
   const settings = useAppSelector(settingsSelector);
 
@@ -81,15 +78,16 @@ const FormEditor: React.FC<IProps> = props => {
       return content.trim() !== selectedResource.text.trim();
     }
 
-    if (selectedPath) {
-      const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-      const fileContent = fs.readFileSync(filePath, 'utf8');
+    if (selection?.type === 'file') {
+      // TODO: don't we store the content of all files in the fileMap?
+      const absoluteFilePath = getAbsoluteFilePath(selection.filePath, fileMap);
+      const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
       const content = mergeManifests(fileContent, formString);
       return content.trim() !== fileContent.trim();
     }
 
     return false;
-  }, [fileMap, formData, selectedPath, selectedResource]);
+  }, [fileMap, formData, selection, selectedResource]);
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -115,55 +113,55 @@ const FormEditor: React.FC<IProps> = props => {
         const isChanged = content.trim() !== selectedResource.text.trim();
         setIsResourceUpdated(isChanged);
         if (isChanged) {
-          dispatch(updateResource({resourceId: selectedResource.id, text: content, isUpdateFromForm: true}));
+          dispatch(updateResource({resourceIdentifier: selectedResource, text: content, isUpdateFromForm: true}));
         } else {
           dispatch(setAutosavingStatus(false));
         }
-      } else if (selectedPath) {
+      } else if (selection?.type === 'file') {
         try {
-          const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const absoluteFilePath = getAbsoluteFilePath(selection.filePath, fileMap);
+          const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
           const content = mergeManifests(fileContent, formString);
           const isChanged = content.trim() !== fileContent.trim();
           setIsResourceUpdated(isChanged);
           if (isChanged) {
-            fs.writeFileSync(filePath, content);
+            fs.writeFileSync(absoluteFilePath, content);
           }
         } catch (e: any) {
           const {message, stack} = e;
 
           dispatch(setAutosavingError({message, stack}));
 
-          log.error(`Failed to update file [${selectedPath}]`, e);
+          log.error(`Failed to update file [${selection.filePath}]`, e);
         } finally {
           dispatch(setAutosavingStatus(false));
         }
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [formData, selectedResource, selectedPath]
+    [formData, selectedResource, selection]
   );
 
   useEffect(() => {
     if (selectedResource) {
-      setFormData(selectedResource.content);
-    } else if (selectedPath) {
+      setFormData(selectedResource.object);
+    } else if (selection?.type === 'file') {
       try {
-        const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const absoluteFilePath = getAbsoluteFilePath(selection.filePath, fileMap);
+        const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
         setFormData(parseYamlDocument(fileContent).toJS());
       } catch (e) {
-        log.error(`Failed to read file [${selectedPath}]`, e);
+        log.error(`Failed to read file [${selection.filePath}]`, e);
       }
     }
 
     return () => {
-      if ((selectedResource || selectedPath) && isResourceUpdated) {
+      if ((selectedResource || selection?.type === 'file') && isResourceUpdated) {
         trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, selectedPath, fileMap]);
+  }, [selectedResource, selection, fileMap]);
 
   useEffect(() => {
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
@@ -178,7 +176,7 @@ const FormEditor: React.FC<IProps> = props => {
     [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
   );
 
-  if (!selectedResource && !selectedPath) {
+  if (!selectedResource && selection?.type !== 'file') {
     return <div>Nothing selected..</div>;
   }
 

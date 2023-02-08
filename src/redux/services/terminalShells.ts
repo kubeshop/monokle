@@ -4,10 +4,10 @@ import path from 'path';
 
 import {SUPPORTED_SHELLS} from '@constants/terminal';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ShellsMapType, TerminalSettingsType} from '@models/terminal';
-
 import {setShells, setTerminalSettings} from '@redux/reducers/terminal';
+
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ShellsMapType, TerminalSettingsType} from '@shared/models/terminal';
 
 // get available shells for mac/linux
 const detectAvailableUnixShells = (osPlatform: NodeJS.Platform): ShellsMapType => {

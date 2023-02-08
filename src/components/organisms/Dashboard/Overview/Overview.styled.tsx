@@ -6,7 +6,7 @@ import {
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   padding: 0 16px 16px 16px;

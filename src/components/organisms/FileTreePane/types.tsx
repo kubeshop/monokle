@@ -2,9 +2,7 @@ import {Dispatch, SetStateAction} from 'react';
 
 import {DataNode} from 'antd/lib/tree';
 
-import {MatchNode} from '@models/fileentry';
-
-import {DeleteEntityCallback} from '@utils/files';
+import {DeleteEntityCallback} from '@shared/models/fileExplorer';
 
 export interface ProcessingEntity {
   processingEntityID?: string;
@@ -60,7 +58,4 @@ export interface TreeNode {
 
 export interface FilterTreeNode extends Omit<TreeNode, 'children'> {
   children: MatchLine[];
-  matchCount?: number;
-  matches?: RegExpMatchArray | null;
-  matchLines?: MatchNode[][];
 }

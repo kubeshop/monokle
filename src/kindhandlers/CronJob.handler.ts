@@ -2,10 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const CronJobHandler: ResourceKindHandler = {
   kind: 'CronJob',
@@ -15,7 +13,7 @@ const CronJobHandler: ResourceKindHandler = {
   clusterApiVersion: 'batch/v1',
   validationSchemaPrefix: 'io.k8s.api.batch.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
     return k8sBatchV1Api.readNamespacedCronJob(resource.name, resource.namespace || 'default', 'true');
   },
@@ -26,11 +24,10 @@ const CronJobHandler: ResourceKindHandler = {
       : await k8sBatchV1Api.listCronJobForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
     await k8sBatchV1Api.deleteNamespacedCronJob(resource.name, resource.namespace || 'default');
   },
-  outgoingRefMappers: [...PodOutgoingRefMappers],
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/',
 };
 

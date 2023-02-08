@@ -7,4 +7,7 @@ export const PrimaryButton = styled(Button)`
   padding: 0px 14px;
   font-weight: 600;
   border: none;
+  &.ant-btn-link {
+    padding: 0px 6px;
+  }
 `;

@@ -2,9 +2,6 @@ import {clipboard} from 'electron';
 
 import {monaco} from 'react-monaco-editor';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-
 import {
   createCommandMarkdownLink,
   createHoverProvider,
@@ -13,6 +10,9 @@ import {
 } from '@molecules/Monaco/editorHelpers';
 
 import SecretHandler from '@src/kindhandlers/Secret.handler';
+
+import {ResourceFilterType} from '@shared/models/appState';
+import {K8sResource} from '@shared/models/k8sResource';
 
 function getSymbolValue(lines: string[], symbol: monaco.languages.DocumentSymbol, includeName?: boolean) {
   const line = lines[symbol.range.startLineNumber - 1];
@@ -41,7 +41,7 @@ function addNamespaceFilterLink(
       `${namespace}`,
       'Add/remove namespace to/from current filter',
       () => {
-        filterResources({namespace, labels: {}, annotations: {}});
+        filterResources({namespaces: [namespace], labels: {}, annotations: {}});
       }
     );
     newDisposables.push(commandDisposable);

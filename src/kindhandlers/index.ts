@@ -5,13 +5,6 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {getStaticResourcePath} from '@redux/services';
-import {refMapperMatchesKind} from '@redux/services/resourceRefs';
-
-import {getSubfolders, readFiles} from '@utils/fileSystem';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -21,6 +14,11 @@ import ResourceQuotaHandler from '@src/kindhandlers/ResourceQuota.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {getSubfolders, readFiles} from '@shared/utils/fileSystem';
+import {getStaticResourcePath} from '@shared/utils/resource';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -138,45 +136,46 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
-const incomingRefMappersCache = new Map<string, RefMapper[]>();
+// TODO: 2.0+ getIncomingRefMappers and getDependentResourceKinds should probably come from the validation package
+// const incomingRefMappersCache = new Map<string, RefMapper[]>();
 
-/**
- * Gets all incoming refMappers for the specified resource kind
- */
+// /**
+//  * Gets all incoming refMappers for the specified resource kind
+//  */
 
-export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-  if (!incomingRefMappersCache.has(resourceKind)) {
-    incomingRefMappersCache.set(
-      resourceKind,
-      ResourceKindHandlers.map(
-        resourceKindHandler =>
-          resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
-            refMapperMatchesKind(outgoingRefMapper, resourceKind)
-          ) || []
-      ).flat()
-    );
-  }
-  return incomingRefMappersCache.get(resourceKind) || [];
-};
+// export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
+//   if (!incomingRefMappersCache.has(resourceKind)) {
+//     incomingRefMappersCache.set(
+//       resourceKind,
+//       ResourceKindHandlers.map(
+//         resourceKindHandler =>
+//           resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
+//             refMapperMatchesKind(outgoingRefMapper, resourceKind)
+//           ) || []
+//       ).flat()
+//     );
+//   }
+//   return incomingRefMappersCache.get(resourceKind) || [];
+// };
 
-/**
- * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
- */
+// /**
+//  * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
+//  */
 
-export const getDependentResourceKinds = (resourceKinds: string[]) => {
-  const dependentResourceKinds: string[] = [];
-  ResourceKindHandlers.forEach(kindHandler => {
-    if (!kindHandler.outgoingRefMappers || kindHandler.outgoingRefMappers.length === 0) {
-      return;
-    }
-    kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      if (resourceKinds.some(kind => refMapperMatchesKind(outgoingRefMapper, kind))) {
-        dependentResourceKinds.push(kindHandler.kind);
-      }
-    });
-  });
-  return [...new Set(dependentResourceKinds)];
-};
+// export const getDependentResourceKinds = (resourceKinds: string[]) => {
+//   const dependentResourceKinds: string[] = [];
+//   ResourceKindHandlers.forEach(kindHandler => {
+//     if (!kindHandler.outgoingRefMappers || kindHandler.outgoingRefMappers.length === 0) {
+//       return;
+//     }
+//     kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+//       if (resourceKinds.some(kind => refMapperMatchesKind(outgoingRefMapper, kind))) {
+//         dependentResourceKinds.push(kindHandler.kind);
+//       }
+//     });
+//   });
+//   return [...new Set(dependentResourceKinds)];
+// };
 
 /**
  * Read bundled kindhandlers and emit event to notify when finished (used in tests)
@@ -261,6 +260,6 @@ async function* findFiles(dir: string, ext: string): any {
  * Matches the specified resource against the kind and apiVersionMatcher of the specified ResourceKindHandler
  */
 
-export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
-  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
+export function resourceMatchesKindHandler(resource: ResourceMeta, kindHandler: ResourceKindHandler) {
+  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.apiVersion, kindHandler.apiVersionMatcher);
 }

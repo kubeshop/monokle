@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -6,33 +6,29 @@ import {Button, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import {parse, stringify} from 'yaml';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
-
-import {Icon} from '@atoms';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+
+import {Icon} from '@monokle/components';
+import {K8sResource} from '@shared/models/k8sResource';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';
-
-// @ts-ignore
-const {yaml} = languages || {};
 
 const options = {
   renderSideBySide: true,
@@ -43,23 +39,26 @@ const options = {
   readOnly: true,
 };
 
+// TODO: this component will need some refactoring, we should find a way to avoid getting an entire resourceMap
 const ResourceDiff = (props: {
-  localResource: K8sResource;
+  localResource: K8sResource<'local'>;
   clusterResourceText: string;
-  isInClusterDiff?: boolean;
   onApply?: () => void;
 }) => {
   const dispatch = useAppDispatch();
-  const {localResource, clusterResourceText, isInClusterDiff, onApply} = props;
+  const {localResource, clusterResourceText, onApply} = props;
+
+  const localResourceRef = useRef(localResource);
+  localResourceRef.current = localResource;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
-  const previewType = useAppSelector(state => state.main.previewType);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const localResourceMap = useAppSelector(localResourceMapSelector);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
@@ -68,7 +67,7 @@ const ResourceDiff = (props: {
 
   const windowSize = useWindowSize();
 
-  useResourceYamlSchema(yaml, String(userDataDir), String(k8sVersion), localResource);
+  useResourceYamlSchema(String(userDataDir), String(k8sVersion), localResource.id, localResourceRef);
 
   const confirmModalTitle = useMemo(
     () =>
@@ -78,8 +77,9 @@ const ResourceDiff = (props: {
     [localResource, kubeConfigContext, kubeConfigContextColor]
   );
 
+  // TODO: can't we just use localResource.text here?
   const localResourceText = useMemo(() => {
-    return stringify(localResource.content, {sortMapEntries: true});
+    return stringify(localResource.object, {sortMapEntries: true});
   }, [localResource]);
 
   const cleanClusterResourceText = useMemo(() => {
@@ -87,7 +87,7 @@ const ResourceDiff = (props: {
       return clusterResourceText;
     }
     const originalClusterResourceContent = parse(clusterResourceText);
-    const cleanClusterResourceContent = removeIgnoredPathsFromResourceContent(originalClusterResourceContent);
+    const cleanClusterResourceContent = removeIgnoredPathsFromResourceObject(originalClusterResourceContent);
 
     return stringify(cleanClusterResourceContent, {sortMapEntries: true});
   }, [clusterResourceText, shouldDiffIgnorePaths]);
@@ -110,7 +110,7 @@ const ResourceDiff = (props: {
     }
     dispatch(
       updateResource({
-        resourceId: localResource.id,
+        resourceIdentifier: localResource,
         text: cleanClusterResourceText,
         preventSelectionAndHighlightsUpdate: true,
       })
@@ -122,10 +122,9 @@ const ResourceDiff = (props: {
       onApply();
     }
 
-    applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-      isClusterPreview: previewType === 'cluster',
+    applyResource(localResource.id, localResourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+      isInClusterMode,
       shouldPerformDiff: true,
-      isInClusterDiff,
     });
     setIsApplyModalVisible(false);
   };
@@ -160,9 +159,7 @@ const ResourceDiff = (props: {
           type="primary"
           ghost
           onClick={handleReplace}
-          disabled={
-            !shouldDiffIgnorePaths || !areResourcesDifferent || localResource.filePath.startsWith(PREVIEW_PREFIX)
-          }
+          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent || localResource.storage !== 'local'}
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>
@@ -177,7 +174,7 @@ const ResourceDiff = (props: {
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
-          resources={[localResource]}
+          resourceMetaList={[localResource]}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}

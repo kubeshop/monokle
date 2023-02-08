@@ -1,5 +1,7 @@
 import {useState} from 'react';
 
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
 import {TitleBar} from '@monokle/components';
 
 import {Activity} from './Activity';
@@ -14,7 +16,9 @@ export const Overview = () => {
   return (
     <S.Container>
       <S.TitleBarContainer style={{gridArea: 'status'}}>
-        <TitleBar type="secondary" title="Status" description={<Status />} />
+        <TitleBarWrapper>
+          <TitleBar type="secondary" title="Status" description={<Status />} />
+        </TitleBarWrapper>
       </S.TitleBarContainer>
       <S.TitleBarContainer style={{gridArea: 'utilization'}}>
         <TitleBar type="secondary" title="Utilization" description={<Utilization />} />

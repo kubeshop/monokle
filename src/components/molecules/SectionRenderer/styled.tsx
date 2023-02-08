@@ -2,7 +2,7 @@ import {Checkbox as RawCheckbox, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors, {FontColors} from '@styles/Colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 type NameContainerProps = {
   $hasCustomNameDisplay: boolean;
@@ -104,7 +104,7 @@ export const Name = styled.span<NameProps>`
     if (props.$nameSize) {
       return `font-size: ${props.$nameSize}px;`;
     }
-    return `font-size: ${24 - 4 * props.$level}px;`;
+    return `font-size: ${22 - 4 * props.$level}px;`;
   }}
   ${props => {
     if (props.$isSelected) {
