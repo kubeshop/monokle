@@ -10,6 +10,7 @@ import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 import {K8sResource} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 
+import ErrorCell from './ErrorCell';
 import * as S from './TableCells.styled';
 
 const UNSORTED_VALUE = -9999999;
@@ -80,28 +81,13 @@ export const CellNode = {
     a?.object?.spec?.nodeName?.localeCompare(b?.object?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
 
-// TODO: reimplement after @monokle/validation
 export const CellError = {
   title: 'Errors',
   dataIndex: '',
   key: 'error',
   width: '150px',
-  // render: (resource: K8sResource) =>
-  //   !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
-  //     <span style={{padding: '2px 4px'}}>-</span>
-  //   ) : (
-  //     <Popover mouseEnterDelay={0.5} placement="rightTop" object={<ErrorsPopoverContent resource={resource} />}>
-  //       <S.ErrorCell>
-  //         {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
-  //           Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
-  //       </S.ErrorCell>
-  //     </Popover>
-  //   ),
-  render: () => <span style={{padding: '2px 4px'}}>-</span>,
+  render: (resource: K8sResource) => <ErrorCell resourceId={resource.id} />,
   sorter: () => UNSORTED_VALUE,
-  // sorter: (a: K8sResource, b: K8sResource) =>
-  //   Number(Number(a.validation?.errors?.length) + Number(a.issues?.errors?.length)) -
-  //     Number(Number(b.validation?.errors?.length) + Number(b.issues?.errors?.length)) || UNSORTED_VALUE,
 };
 
 export const CellLabels = {
