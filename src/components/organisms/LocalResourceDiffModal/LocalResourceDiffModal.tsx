@@ -75,6 +75,7 @@ const DiffModal = () => {
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
+  const [clusterNamespacesMatchingResources, setClusterNamespacesMatchingResources] = useState<string[]>([]);
   const [defaultNamespace, setDefaultNamespace] = useState<string>('');
   const [hasDiffModalLoaded, setHasDiffModalLoaded] = useState(false);
   const [applyModalType, setApplyModalType] = useState<ModalTypes | null>(null);
@@ -256,6 +257,8 @@ const DiffModal = () => {
         return;
       }
 
+      setClusterNamespacesMatchingResources(resourcesFromCluster.map(r => r.metadata.namespace));
+
       setMatchingResourcesById(
         resourcesFromCluster?.reduce((matchingResources, r) => {
           delete r.metadata?.managedFields;
@@ -345,7 +348,7 @@ const DiffModal = () => {
                   style={{width: '300px', marginLeft: '16px'}}
                 >
                   {namespaces?.map(ns => (
-                    <Select.Option key={ns} value={ns}>
+                    <Select.Option key={ns} value={ns} disabled={!clusterNamespacesMatchingResources.includes(ns)}>
                       {ns}
                     </Select.Option>
                   ))}
