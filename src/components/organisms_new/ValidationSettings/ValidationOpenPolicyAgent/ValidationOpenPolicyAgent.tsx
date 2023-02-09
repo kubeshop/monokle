@@ -1,9 +1,7 @@
 import {useCallback} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
-// import {reprocessAllResources, toggleAllRules} from '@redux/reducers/main';
-import {toggleOPARules} from '@redux/validation/validation.slice';
-import {loadValidation} from '@redux/validation/validation.thunks';
+import {toggleRule} from '@redux/validation/validation.slice';
 
 import {Button} from '@src/App.styled';
 
@@ -18,12 +16,7 @@ const ValidationOpenPolicyAgent: React.FC = () => {
 
   const toggleRules = useCallback(
     (enable: boolean) => {
-      // TODO: reimplemnet this when we integrate @monokle/validation
-      // dispatch(toggleAllRules(enable));
-      // dispatch(reprocessAllResources());
-
-      dispatch(toggleOPARules({enable}));
-      dispatch(loadValidation());
+      dispatch(toggleRule({plugin: 'open-policy-agent', enable}));
     },
     [dispatch]
   );

@@ -4,9 +4,8 @@ import {SearchOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import type {Rule} from '@shared/models/validation';
 import {Colors} from '@shared/styles/colors';
-
-import type {Rule} from './ValidationOpenPolicyAgentTable';
 
 export const Container = styled.div``;
 
