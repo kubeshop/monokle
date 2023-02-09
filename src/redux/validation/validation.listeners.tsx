@@ -28,7 +28,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {doesSchemaExist} from '@utils/index';
 
-import {Incremental} from '@monokle/validation';
+import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
@@ -64,12 +64,12 @@ const validateListener: AppListenerFn = listen => {
     matcher: isAnyOf(
       loadValidation.fulfilled,
       loadClusterResources.fulfilled,
-      stopClusterConnection.fulfilled,
       reloadClusterResources.fulfilled,
       previewKustomization.fulfilled,
       previewHelmValuesFile.fulfilled,
       runPreviewConfiguration.fulfilled,
       previewSavedCommand.fulfilled,
+      stopClusterConnection.fulfilled,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
@@ -81,7 +81,29 @@ const validateListener: AppListenerFn = listen => {
 
       await delay(1);
       if (signal.aborted) return;
-      const response = dispatch(validateResources());
+
+      let resourceStorage: ResourceStorage | undefined;
+
+      if (isAnyOf(loadClusterResources.fulfilled, reloadClusterResources.fulfilled)(_action)) {
+        resourceStorage = 'cluster';
+      }
+
+      if (
+        isAnyOf(
+          previewKustomization.fulfilled,
+          previewHelmValuesFile.fulfilled,
+          runPreviewConfiguration.fulfilled,
+          previewSavedCommand.fulfilled
+        )(_action)
+      ) {
+        resourceStorage = 'preview';
+      }
+
+      if (isAnyOf(stopClusterConnection.fulfilled, clearPreviewAndSelectionHistory, clearPreview)(_action)) {
+        resourceStorage = 'local';
+      }
+
+      const response = dispatch(validateResources({type: 'full', resourceStorage}));
       signal.addEventListener('abort', () => response.abort());
       await response;
     },
@@ -101,7 +123,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       multiplePathsChanged.fulfilled
     ),
     async effect(_action, {dispatch, delay, signal}) {
-      let incremental: Incremental = {resourceIds: []};
+      let resourceIdentifiers: ResourceIdentifier[] = [];
 
       if (
         isAnyOf(
@@ -113,24 +135,18 @@ const incrementalValidationListener: AppListenerFn = listen => {
           multiplePathsChanged.fulfilled
         )(_action)
       ) {
-        incremental = {
-          resourceIds: _action.payload.affectedResourceIdentifiers?.map(r => r.id) ?? [],
-        };
+        resourceIdentifiers = _action.payload.affectedResourceIdentifiers ?? [];
       }
 
       if (isAnyOf(addResource)(_action)) {
-        incremental = {
-          resourceIds: [_action.payload.id],
-        };
+        resourceIdentifiers = [_action.payload];
       }
 
       if (isAnyOf(addMultipleResources)(_action)) {
-        incremental = {
-          resourceIds: _action.payload.map(r => r.id),
-        };
+        resourceIdentifiers = _action.payload;
       }
 
-      if (incremental.resourceIds.length === 0) return;
+      if (resourceIdentifiers.length === 0) return;
 
       // TODO: should we cancel active listeners or not?
       // I think it depends on the resource storage?
@@ -139,7 +155,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
 
       await delay(200);
       if (signal.aborted) return;
-      const response = dispatch(validateResources({incremental}));
+      const response = dispatch(validateResources({type: 'incremental', resourceIdentifiers}));
       signal.addEventListener('abort', () => response.abort());
       await response;
     },

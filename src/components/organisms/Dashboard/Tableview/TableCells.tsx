@@ -10,25 +10,26 @@ import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 import {K8sResource} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 
+import ErrorCell from './ErrorCell';
 import * as S from './TableCells.styled';
 
 const UNSORTED_VALUE = -9999999;
 
 export const CellStatus = {
   title: 'Status',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'status',
   width: '120px',
-  render: (content: any) => (
+  render: (object: any) => (
     <div>
-      {(content?.status?.phase === 'Running' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
-        (content?.status?.phase === 'Bound' && <S.StatusRunning>{content?.status?.phase}</S.StatusRunning>) ||
-        (content?.status?.phase === 'Pending' && <S.StatusPending>{content?.status?.phase}</S.StatusPending>) ||
-        (content?.status?.phase === 'Terminating' && (
-          <S.StatusTerminating>{content?.status?.phase}</S.StatusTerminating>
+      {(object?.status?.phase === 'Running' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+        (object?.status?.phase === 'Bound' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+        (object?.status?.phase === 'Pending' && <S.StatusPending>{object?.status?.phase}</S.StatusPending>) ||
+        (object?.status?.phase === 'Terminating' && (
+          <S.StatusTerminating>{object?.status?.phase}</S.StatusTerminating>
         )) ||
-        (content?.status?.phase === 'Active' && <S.StatusActive>{content?.status?.phase}</S.StatusActive>) ||
-        (content?.status?.phase ? <Tag color="magenta">{content?.status?.phase}</Tag> : <span>-</span>)}
+        (object?.status?.phase === 'Active' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
+        (object?.status?.phase ? <Tag color="magenta">{object?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.object?.status?.phase?.localeCompare(b.object?.status?.phase),
@@ -36,7 +37,7 @@ export const CellStatus = {
 
 export const CellAge = {
   title: 'Age',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'age',
   width: '120px',
   render: ({metadata: {creationTimestamp}}: any) => <div>{timeAgo(creationTimestamp)}</div>,
@@ -72,36 +73,21 @@ export const CellNamespace = {
 
 export const CellNode = {
   title: 'Node',
-  dataIndex: 'content',
+  dataIndex: 'object',
   key: 'node',
   width: '240px',
-  render: (content: any) => <div>{content?.spec?.nodeName}</div>,
+  render: (object: any) => <div>{object?.spec?.nodeName}</div>,
   sorter: (a: K8sResource, b: K8sResource) =>
     a?.object?.spec?.nodeName?.localeCompare(b?.object?.spec?.nodeName || '') || UNSORTED_VALUE,
 };
 
-// TODO: reimplement after @monokle/validation
 export const CellError = {
   title: 'Errors',
   dataIndex: '',
   key: 'error',
   width: '150px',
-  // render: (resource: K8sResource) =>
-  //   !((resource.validation && !resource.validation?.isValid) || (resource.issues && !resource.issues?.isValid)) ? (
-  //     <span style={{padding: '2px 4px'}}>-</span>
-  //   ) : (
-  //     <Popover mouseEnterDelay={0.5} placement="rightTop" content={<ErrorsPopoverContent resource={resource} />}>
-  //       <S.ErrorCell>
-  //         {Number(resource.validation?.errors ? resource.validation?.errors?.length : 0) +
-  //           Number(resource.issues?.errors ? resource.issues?.errors?.length : 0)}
-  //       </S.ErrorCell>
-  //     </Popover>
-  //   ),
-  render: () => <span style={{padding: '2px 4px'}}>-</span>,
+  render: (resource: K8sResource) => <ErrorCell resourceId={resource.id} />,
   sorter: () => UNSORTED_VALUE,
-  // sorter: (a: K8sResource, b: K8sResource) =>
-  //   Number(Number(a.validation?.errors?.length) + Number(a.issues?.errors?.length)) -
-  //     Number(Number(b.validation?.errors?.length) + Number(b.issues?.errors?.length)) || UNSORTED_VALUE,
 };
 
 export const CellLabels = {

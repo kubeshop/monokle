@@ -20,18 +20,10 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'explorer',
     tooltip: <FileExplorerTabTooltip />,
-    icon: () => <Icon name="document" />,
+    icon: () => <Icon name="document" style={{fontSize: '16px', marginTop: 4}} />,
     component: <ExplorerPane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
-  },
-  {
-    type: 'panel',
-    name: 'dashboard',
-    tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: '4px'}} />,
-    component: <DashboardPane />,
-    useBadge: () => undefined,
   },
   {
     type: 'fullscreen',
@@ -46,7 +38,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'validation',
     tooltip: 'View validation errors',
-    icon: () => <Icon name="validation" />,
+    icon: () => <Icon name="validation" style={{fontSize: '16px', marginTop: 4}} />,
     component: <ValidationPane />,
     useBadge: () => undefined,
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
@@ -63,6 +55,14 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       return {count: changedFiles.length, size: 'small'};
     },
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+  },
+  {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: 4}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
   },
   {
     type: 'fullscreen',

@@ -71,6 +71,7 @@ const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
   payload: {resources: K8sResource<'preview'>[]; preview: Preview},
   initialSelection?: AppSelection
 ) => {
+  state.preview = payload.preview;
   state.previewOptions.isLoading = false;
   state.checkedResourceIdentifiers = [];
 

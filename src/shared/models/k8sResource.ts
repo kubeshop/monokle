@@ -1,17 +1,7 @@
-import {ResourceRef, isResourceRef} from '@monokle/validation';
+import {ResourceRef} from '@monokle/validation';
 
 import {K8sObject} from './k8s';
-import {
-  AnyOrigin,
-  ClusterOrigin,
-  LocalOrigin,
-  PreviewOrigin,
-  TransientOrigin,
-  isClusterOrigin,
-  isLocalOrigin,
-  isPreviewOrigin,
-  isTransientOrigin,
-} from './origin';
+import {ClusterOrigin, LocalOrigin, PreviewOrigin, TransientOrigin} from './origin';
 
 export const RESOURCE_STORAGE = ['local', 'cluster', 'preview', 'transient'] as const;
 
@@ -108,63 +98,50 @@ export const isResourceIdentifier = (value: any): value is ResourceIdentifier =>
   );
 };
 
-export const isResourceRange = (value: any): value is ResourceRange => {
-  return typeof value === 'object' && typeof value.start === 'number' && typeof value.length === 'number';
+export const isLocalResourceMeta = (value: ResourceMeta): value is ResourceMeta<'local'> => {
+  return value.storage === 'local';
 };
 
-const createIsResourceMeta =
-  <Storage extends ResourceStorage, Origin extends AnyOrigin>(storage: Storage, isOrigin: (x: any) => x is Origin) =>
-  (value: any): value is ResourceMeta<Storage> => {
-    return (
-      typeof value === 'object' &&
-      value.storage === storage &&
-      isOrigin(value.origin) &&
-      typeof value.name === 'string' &&
-      typeof value.kind === 'string' &&
-      typeof value.apiVersion === 'string' &&
-      typeof value.isClusterScoped === 'boolean' &&
-      ('namespace' in value ? typeof value.namespace === 'string' : true) &&
-      ('labels' in value ? typeof value.labels === 'object' : true) &&
-      ('annotations' in value ? typeof value.annotations === 'object' : true) &&
-      ('templateLabels' in value ? typeof value.templateLabels === 'object' : true) &&
-      ('range' in value ? isResourceRange(value.range) : true) &&
-      ('refs' in value ? Array.isArray(value.refs) && value.refs.every(isResourceRef) : true)
-    );
-  };
-
-export const isLocalResourceMeta = createIsResourceMeta('local', isLocalOrigin);
-export const isClusterResourceMeta = createIsResourceMeta('cluster', isClusterOrigin);
-export const isPreviewResourceMeta = createIsResourceMeta('preview', isPreviewOrigin);
-export const isTransientResourceMeta = createIsResourceMeta('transient', isTransientOrigin);
-
-const createIsResourceContent =
-  <Storage extends ResourceStorage>(storage: Storage) =>
-  (value: any): value is ResourceContent => {
-    return (
-      typeof value === 'object' &&
-      value.storage === storage &&
-      typeof value.text === 'string' &&
-      typeof value.object === 'object'
-    );
-  };
-
-export const isLocalResourceContent = createIsResourceContent('local');
-export const isClusterResourceContent = createIsResourceContent('cluster');
-export const isPreviewResourceContent = createIsResourceContent('preview');
-export const isTransientResourceContent = createIsResourceContent('transient');
-
-export const isLocalResource = (value: any): value is K8sResource<'local'> => {
-  return isLocalResourceMeta(value) && isLocalResourceContent(value);
+export const isClusterResourceMeta = (value: ResourceMeta): value is ResourceMeta<'cluster'> => {
+  return value.storage === 'cluster';
 };
 
-export const isClusterResource = (value: any): value is K8sResource<'cluster'> => {
-  return isClusterResourceMeta(value) && isClusterResourceContent(value);
+export const isPreviewResourceMeta = (value: ResourceMeta): value is ResourceMeta<'preview'> => {
+  return value.storage === 'preview';
 };
 
-export const isPreviewResource = (value: any): value is K8sResource<'preview'> => {
-  return isPreviewResourceMeta(value) && isPreviewResourceContent(value);
+export const isTransientResourceMeta = (value: ResourceMeta): value is ResourceMeta<'transient'> => {
+  return value.storage === 'transient';
 };
 
-export const isTransientResource = (value: any): value is K8sResource<'transient'> => {
-  return isTransientResourceMeta(value) && isTransientResourceContent(value);
+export const isLocalResourceContent = (value: ResourceContent): value is ResourceContent<'local'> => {
+  return value.storage === 'local';
+};
+
+export const isClusterResourceContent = (value: ResourceContent): value is ResourceContent<'cluster'> => {
+  return value.storage === 'cluster';
+};
+
+export const isPreviewResourceContent = (value: ResourceContent): value is ResourceContent<'preview'> => {
+  return value.storage === 'preview';
+};
+
+export const isTransientResourceContent = (value: ResourceContent): value is ResourceContent<'transient'> => {
+  return value.storage === 'transient';
+};
+
+export const isLocalResource = (value: K8sResource): value is K8sResource<'local'> => {
+  return value.storage === 'local';
+};
+
+export const isClusterResource = (value: K8sResource): value is K8sResource<'cluster'> => {
+  return value.storage === 'cluster';
+};
+
+export const isPreviewResource = (value: K8sResource): value is K8sResource<'preview'> => {
+  return value.storage === 'preview';
+};
+
+export const isTransientResource = (value: K8sResource): value is K8sResource<'transient'> => {
+  return value.storage === 'transient';
 };

@@ -2,11 +2,18 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {merge} from 'lodash';
 
-import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceMapSelector, resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {resourceSelector} from '@redux/selectors/resourceSelectors';
 
 import {Incremental, ValidationResponse, processRefs} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
-import {K8sResource} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  isClusterResource,
+  isLocalResource,
+  isPreviewResource,
+  isTransientResource,
+} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -27,7 +34,7 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     merge(config, state.config);
     electronStore.set('validation.config', config);
 
-    await VALIDATOR.preload(config);
+    await VALIDATOR.loadValidation({config});
 
     return {
       metadata: VALIDATOR.metadata,
@@ -39,22 +46,43 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
   'validation/validate',
   async (payload, {getState, dispatch, signal}) => {
-    const incremental = payload?.incremental;
-    RESOURCE_PARSER.clear(incremental?.resourceIds);
-    const activeResources = Object.values(activeResourceMapSelector(getState()));
+    let resources: K8sResource[] = [];
+
+    if (payload?.type === 'full') {
+      const resourceStorage = payload.resourceStorage;
+      if (resourceStorage) {
+        resources = Object.values(resourceMapSelector(getState(), resourceStorage) || {}).filter(isDefined);
+      } else {
+        resources = Object.values(activeResourceMapSelector(getState())).filter(isDefined);
+      }
+    } else if (payload?.type === 'incremental') {
+      resources = payload.resourceIdentifiers
+        .map(identifier => resourceSelector(getState(), identifier))
+        .filter(isDefined);
+    }
+
+    const incrementalResourceIds =
+      payload?.type === 'incremental' ? payload.resourceIdentifiers.map(r => r.id) : undefined;
+    RESOURCE_PARSER.clear(incrementalResourceIds);
 
     // Build references
-    const references = dispatch(processResourceRefs({resources: activeResources, incremental}));
+    const references = dispatch(
+      processResourceRefs({
+        resources,
+        incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
+      })
+    );
     signal.addEventListener('abort', () => {
       references.abort();
     });
     await references;
     signal.throwIfAborted();
 
-    const transformedResources = activeResources.map(transformResourceForValidation).filter(isDefined);
+    // TODO: do we have to fetch the resources again after processing the refs?
+    const transformedResources = resources.map(transformResourceForValidation).filter(isDefined);
 
     // TODO: could the active resource map change while the validation is running? before we get the refs?
-    const response = await VALIDATOR.validate({
+    const {response} = await VALIDATOR.runValidation({
       resources: transformedResources,
     });
 
@@ -91,21 +119,35 @@ type ProcessArgs = {
 type ValidationResource = K8sResource & {filePath: string; fileOffset: number; fileId: string; content: any};
 
 function transformResourceForValidation(r: K8sResource): ValidationResource | undefined {
-  // if (!isLocalResource(r)) {
-  //   return undefined;
-  // }
-  const cast = r as K8sResource<'local'>;
+  let filePath = '';
+  let fileOffset = 0;
+
+  if (isLocalResource(r)) {
+    filePath = r.origin.filePath;
+    fileOffset = r.origin.fileOffset;
+  } else if (isClusterResource(r)) {
+    filePath = r.origin.context;
+    fileOffset = 0;
+  } else if (isPreviewResource(r)) {
+    filePath = r.origin.preview.type;
+    fileOffset = 0;
+  } else if (isTransientResource(r)) {
+    filePath = 'transient';
+    fileOffset = 0;
+  }
+
   return {
     ...r,
-    filePath: cast.origin.filePath,
-    fileOffset: cast.origin.fileOffset,
-    fileId: cast.origin.filePath,
+    // id: stableStringify({id: r.id, storage: r.storage}), // TODO: do we need this?
+    filePath,
+    fileOffset,
+    fileId: filePath,
     content: r.object,
   };
 }
 
 // TODO: fix incremental processing of refs
-export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
+export const processResourceRefs = createAsyncThunk<K8sResource[], ProcessArgs, ThunkApi>(
   'references/process',
   async (payload, {signal}) => {
     const transformedResources = payload.resources.map(transformResourceForValidation).filter(isDefined);

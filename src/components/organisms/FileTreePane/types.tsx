@@ -2,7 +2,7 @@ import {Dispatch, SetStateAction} from 'react';
 
 import {DataNode} from 'antd/lib/tree';
 
-import {DeleteEntityCallback} from '@utils/files';
+import {DeleteEntityCallback} from '@shared/models/fileExplorer';
 
 export interface ProcessingEntity {
   processingEntityID?: string;

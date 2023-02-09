@@ -22,13 +22,12 @@ import {deleteEntity} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
+import {TreeItemProps} from '@shared/models/explorer';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
 import {showItemInFolder} from '@shared/utils/shell';
 
-import {TreeItemProps} from './types';
-
-import * as S from './styled';
+import * as S from './TreeItem.styled';
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
   const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;

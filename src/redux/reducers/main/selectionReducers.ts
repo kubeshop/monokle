@@ -122,6 +122,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'helm.values.file',
       valuesFileId,
     };
+    state.highlights = [];
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
   selectPreviewConfiguration: (
@@ -133,6 +134,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'preview.configuration',
       previewConfigurationId,
     };
+    state.highlights = [];
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
   selectImage: (state: Draft<AppState>, action: PayloadAction<{imageId: string; isVirtualSelection?: boolean}>) => {
@@ -140,6 +142,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'image',
       imageId: action.payload.imageId,
     };
+    state.highlights = [];
     // TODO: fix highlighting of resources from image
     // highlightResourcesUsingImage(action.payload.image, state);
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
