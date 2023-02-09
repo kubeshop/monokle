@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import {useCallback, useEffect, useMemo} from 'react';
+import {memo, useCallback, useEffect, useMemo} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
@@ -182,4 +182,4 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   );
 };
 
-export default FilePane;
+export default memo(FilePane);

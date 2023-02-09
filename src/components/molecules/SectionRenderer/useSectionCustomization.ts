@@ -3,7 +3,9 @@ import {useMemo} from 'react';
 import {SectionCustomization} from '@shared/models/navigator';
 
 export function useSectionCustomization(customization: SectionCustomization = {}) {
-  const NameDisplay = useMemo(() => ({Component: customization.nameDisplay?.component}), [customization.nameDisplay]);
+  const NameDisplay = useMemo(() => {
+    return {Component: customization.nameDisplay?.component};
+  }, [customization.nameDisplay]);
   const NamePrefix = useMemo(
     () => ({
       Component: customization.namePrefix?.component,

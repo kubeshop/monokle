@@ -1,3 +1,7 @@
+import {memo} from 'react';
+
+import {isEqual} from 'lodash';
+
 import {useAppSelector} from '@redux/hooks';
 import {resourceMetaSelector} from '@redux/selectors/resourceSelectors';
 
@@ -27,4 +31,4 @@ const Suffix = (props: ItemCustomComponentProps) => {
   );
 };
 
-export default Suffix;
+export default memo(Suffix, isEqual);

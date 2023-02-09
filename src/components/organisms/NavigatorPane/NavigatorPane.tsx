@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {memo, useCallback} from 'react';
 import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
 
 import {Dropdown, Tooltip} from 'antd';
@@ -88,8 +88,8 @@ const NavPane: React.FC = () => {
 
         <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
           <S.List id="navigator-sections-container">
-            <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
-            <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
+            <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
+            <SectionRenderer sectionId={UnknownResourceSectionBlueprint.id} level={0} isLastSection={false} />
           </S.List>
         </ReflexElement>
       </ReflexContainer>
@@ -97,4 +97,4 @@ const NavPane: React.FC = () => {
   );
 };
 
-export default NavPane;
+export default memo(NavPane);

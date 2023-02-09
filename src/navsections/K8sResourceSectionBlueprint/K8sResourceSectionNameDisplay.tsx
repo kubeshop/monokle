@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
@@ -74,4 +76,4 @@ function K8sResourceSectionNameDisplay() {
   );
 }
 
-export default K8sResourceSectionNameDisplay;
+export default memo(K8sResourceSectionNameDisplay);

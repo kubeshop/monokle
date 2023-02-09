@@ -1,11 +1,13 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+
+import {isEqual} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@shared/models/navigator';
+import {ItemBlueprint, ItemGroupInstance, SectionInstance} from '@shared/models/navigator';
 
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
@@ -14,7 +16,7 @@ import {useSectionCustomization} from './useSectionCustomization';
 import * as S from './styled';
 
 type SectionRendererProps = {
-  sectionBlueprint: SectionBlueprint<any>;
+  sectionId: string;
   level: number;
   isLastSection: boolean;
   parentIndentation?: number;
@@ -22,33 +24,33 @@ type SectionRendererProps = {
 };
 
 function SectionRenderer(props: SectionRendererProps) {
-  const {sectionBlueprint, level, isLastSection, itemRendererOptions, parentIndentation} = props;
+  const {sectionId, level, isLastSection, itemRendererOptions, parentIndentation} = props;
 
-  const {itemBlueprint, id: sectionId} = sectionBlueprint;
+  const sectionBlueprintRef = useRef(navSectionMap.getById(sectionId));
+  const itemBlueprintRef = useRef(sectionBlueprintRef.current?.itemBlueprint);
 
   const sectionInstance: SectionInstance | undefined = useAppSelector(
-    state => state.navigator.sectionInstanceMap[sectionId]
+    state => state.navigator.sectionInstanceMap[sectionId],
+    isEqual
   );
+  const sectionInstanceRef = useRef(sectionInstance);
+  sectionInstanceRef.current = sectionInstance;
 
   const registeredSectionIds = useAppSelector(state => state.navigator.registeredSectionBlueprintIds);
-  const childSectionIds = useMemo(() => {
-    return sectionBlueprint.childSectionIds?.filter(id => registeredSectionIds.includes(id));
-  }, [sectionBlueprint.childSectionIds, registeredSectionIds]);
 
-  const childSections = useMemo(() => {
-    return childSectionIds
-      ?.map(id => navSectionMap.getById(id))
-      .filter((s): s is SectionBlueprint<any, any> => s !== undefined);
-  }, [childSectionIds]);
+  const visibleChildSectionIds = useMemo(
+    () => sectionInstance.visibleChildSectionIds?.filter(id => registeredSectionIds.includes(id)),
+    [sectionInstance.visibleChildSectionIds, registeredSectionIds]
+  );
 
   const dispatch = useAppDispatch();
 
-  const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
+  const {EmptyDisplay} = useSectionCustomization(sectionBlueprintRef.current?.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
 
   const sectionIndentation = useMemo(() => {
-    const indentation = sectionBlueprint.customization?.indentation;
+    const indentation = sectionBlueprintRef.current?.customization?.indentation;
     if (!parentIndentation && !indentation) {
       return undefined;
     }
@@ -62,7 +64,7 @@ function SectionRenderer(props: SectionRendererProps) {
       return parentIndentation + indentation;
     }
     return undefined;
-  }, [parentIndentation, sectionBlueprint.customization?.indentation]);
+  }, [parentIndentation]);
 
   const isCollapsedMode = useMemo(() => {
     if (!sectionInstance?.id) {
@@ -95,26 +97,36 @@ function SectionRenderer(props: SectionRendererProps) {
   }, [isCollapsedMode]);
 
   const expandSection = useCallback(() => {
-    if (!sectionInstance?.id) {
+    if (!sectionInstanceRef.current?.id) {
       return;
     }
-    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
-      dispatch(expandSectionIds([sectionInstance.id]));
+    if (
+      !sectionInstanceRef.current?.visibleDescendantSectionIds ||
+      sectionInstanceRef.current.visibleDescendantSectionIds.length === 0
+    ) {
+      dispatch(expandSectionIds([sectionInstanceRef.current.id]));
     } else {
-      dispatch(expandSectionIds([sectionInstance.id, ...sectionInstance.visibleDescendantSectionIds]));
+      dispatch(
+        expandSectionIds([sectionInstanceRef.current.id, ...sectionInstanceRef.current.visibleDescendantSectionIds])
+      );
     }
-  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
+  }, [dispatch]);
 
   const collapseSection = useCallback(() => {
-    if (!sectionInstance?.id) {
+    if (!sectionInstanceRef.current?.id) {
       return;
     }
-    if (!sectionInstance?.visibleDescendantSectionIds || sectionInstance.visibleDescendantSectionIds.length === 0) {
-      dispatch(collapseSectionIds([sectionInstance?.id]));
+    if (
+      !sectionInstanceRef.current?.visibleDescendantSectionIds ||
+      sectionInstanceRef.current.visibleDescendantSectionIds.length === 0
+    ) {
+      dispatch(collapseSectionIds([sectionInstanceRef.current?.id]));
     } else {
-      dispatch(collapseSectionIds([sectionInstance?.id, ...sectionInstance.visibleDescendantSectionIds]));
+      dispatch(
+        collapseSectionIds([sectionInstanceRef.current?.id, ...sectionInstanceRef.current.visibleDescendantSectionIds])
+      );
     }
-  }, [sectionInstance?.id, sectionInstance?.visibleDescendantSectionIds, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (sectionInstance?.shouldExpand) {
@@ -140,16 +152,14 @@ function SectionRenderer(props: SectionRendererProps) {
       : undefined;
   }, [sectionInstance?.visibleChildSectionIds]);
 
-  const isLastVisibleItemId = useCallback(
-    (itemId: string) => {
-      if (!sectionInstance?.visibleItemIds) {
-        return false;
-      }
-      const lastVisibleItemId = sectionInstance.visibleItemIds[sectionInstance.visibleItemIds.length - 1];
-      return itemId === lastVisibleItemId;
-    },
-    [sectionInstance?.visibleItemIds]
-  );
+  const isLastVisibleItemId = useCallback((itemId: string) => {
+    if (!sectionInstanceRef.current?.visibleItemIds) {
+      return false;
+    }
+    const lastVisibleItemId =
+      sectionInstanceRef.current.visibleItemIds[sectionInstanceRef.current.visibleItemIds.length - 1];
+    return itemId === lastVisibleItemId;
+  }, []);
 
   const isLastVisibleItemIdInGroup = useCallback(
     (groupId: string, itemId: string) => {
@@ -163,10 +173,10 @@ function SectionRenderer(props: SectionRendererProps) {
     [groupInstanceById]
   );
 
-  if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
+  if (!sectionInstance?.isInitialized && sectionBlueprintRef.current?.customization?.beforeInitializationText) {
     return (
       <S.BeforeInitializationContainer level={level}>
-        <p>{sectionBlueprint.customization.beforeInitializationText}</p>
+        <p>{sectionBlueprintRef.current?.customization.beforeInitializationText}</p>
       </S.BeforeInitializationContainer>
     );
   }
@@ -200,7 +210,6 @@ function SectionRenderer(props: SectionRendererProps) {
       <SectionHeader
         name={sectionInstance.name}
         sectionInstance={sectionInstance}
-        sectionBlueprint={sectionBlueprint}
         isCollapsed={isCollapsed}
         isLastSection={isLastSection}
         level={level}
@@ -211,24 +220,24 @@ function SectionRenderer(props: SectionRendererProps) {
       {sectionInstance &&
         sectionInstance.isVisible &&
         !isCollapsed &&
-        itemBlueprint &&
+        itemBlueprintRef.current &&
         sectionInstance.groups.length === 0 &&
         sectionInstance.visibleItemIds.map(itemId => (
           <ItemRenderer
             key={itemId}
             itemId={itemId}
-            blueprint={itemBlueprint}
+            blueprint={itemBlueprintRef.current as ItemBlueprint<any, any>}
             level={level + 1}
             isLastItem={isLastVisibleItemId(itemId)}
             isSectionCheckable={Boolean(sectionInstance.checkable)}
-            sectionContainerElementId={sectionBlueprint.containerElementId}
+            sectionContainerElementId={sectionBlueprintRef.current?.containerElementId || ''}
             options={itemRendererOptions}
             indentation={sectionIndentation || 0}
           />
         ))}
       {sectionInstance?.isVisible &&
         !isCollapsed &&
-        itemBlueprint &&
+        itemBlueprintRef.current &&
         groupInstanceById &&
         sectionInstance.visibleGroupIds.map(groupId => {
           const group = groupInstanceById[groupId];
@@ -245,30 +254,30 @@ function SectionRenderer(props: SectionRendererProps) {
                   <ItemRenderer
                     key={itemId}
                     itemId={itemId}
-                    blueprint={itemBlueprint}
+                    blueprint={itemBlueprintRef.current as ItemBlueprint<any, any>}
                     level={level + 2}
                     isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
                     isSectionCheckable={Boolean(sectionInstance.checkable)}
-                    sectionContainerElementId={sectionBlueprint.containerElementId}
+                    sectionContainerElementId={sectionBlueprintRef.current?.containerElementId || ''}
                     options={itemRendererOptions}
                     indentation={sectionIndentation || 0}
                   />
                 ))
               ) : (
                 <S.EmptyGroupText>
-                  {sectionBlueprint.customization?.emptyGroupText || 'No items in this group.'}
+                  {sectionBlueprintRef.current?.customization?.emptyGroupText || 'No items in this group.'}
                 </S.EmptyGroupText>
               )}
             </React.Fragment>
           );
         })}
-      {childSections &&
-        childSections.map(child => (
+      {visibleChildSectionIds &&
+        visibleChildSectionIds.map(childId => (
           <SectionRenderer
-            key={child.name}
-            sectionBlueprint={child}
+            key={childId}
+            sectionId={childId}
             level={level + 1}
-            isLastSection={child.id === lastVisibleChildSectionId}
+            isLastSection={childId === lastVisibleChildSectionId}
             parentIndentation={sectionIndentation}
           />
         ))}
@@ -276,4 +285,4 @@ function SectionRenderer(props: SectionRendererProps) {
   );
 }
 
-export default React.memo(SectionRenderer);
+export default React.memo(SectionRenderer, isEqual);
