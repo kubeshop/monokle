@@ -32,7 +32,7 @@ import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
-import {setConfigK8sSchemaVersion, toggleOPARules, toggleValidation} from './validation.slice';
+import {setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
 
 const loadListener: AppListenerFn = listen => {
@@ -41,7 +41,7 @@ const loadListener: AppListenerFn = listen => {
       setIsInQuickClusterMode,
       setRootFolder.fulfilled,
       updateProjectK8sVersion,
-      toggleOPARules,
+      toggleRule,
       toggleValidation
     ),
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {

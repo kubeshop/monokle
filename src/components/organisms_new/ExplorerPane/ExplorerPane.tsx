@@ -10,10 +10,10 @@ import KustomizePane from './KustomizePane';
 const ExplorerPane: React.FC = () => {
   return (
     <Collapse accordion ghost defaultActiveKey="files">
-      <FilePane panelKey="files" />
-      <KustomizePane panelKey="kustomize" />
-      <HelmPane panelKey="helm" />
-      <ImagesPane panelKey="images" />
+      <FilePane key="files" />
+      <KustomizePane key="kustomize" />
+      <HelmPane key="helm" />
+      <ImagesPane key="images" />
     </Collapse>
   );
 };

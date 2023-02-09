@@ -127,6 +127,37 @@ export const warningsByFilePathSelector = (state: ValidationState, path: string)
 };
 
 /* * * * * * * * * * * * * * * * * *
+ * Problems by rule
+ * * * * * * * * * * * * * * * * * */
+
+export const problemsByRulesSelector = createSelector(
+  [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
+  (problems, level): Record<string, ValidationResult[] | undefined> => {
+    const problemsByRule: Map<string, ValidationResult[]> = new Map();
+
+    problems.forEach(problem => {
+      if (level && (problem.level ?? 'warning') !== level) {
+        return;
+      }
+
+      const resourceId = getResourceId(problem);
+
+      if (resourceId === undefined) {
+        return;
+      }
+
+      if (!problemsByRule.has(problem.ruleId)) {
+        problemsByRule.set(problem.ruleId, []);
+      }
+
+      problemsByRule.get(problem.ruleId)?.push(problem);
+    });
+
+    return Object.fromEntries(problemsByRule);
+  }
+);
+
+/* * * * * * * * * * * * * * * * * *
  * Miscellaneous
  * * * * * * * * * * * * * * * * * */
 
