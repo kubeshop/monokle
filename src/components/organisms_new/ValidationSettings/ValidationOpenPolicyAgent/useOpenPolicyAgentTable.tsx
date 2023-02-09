@@ -5,12 +5,9 @@ import {useCallback, useMemo} from 'react';
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-import {size} from 'lodash';
-
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
-import {problemsByRulesSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {toggleRule} from '@redux/validation/validation.slice';
 
 import {Icon, IconNames} from '@monokle/components';
@@ -22,8 +19,6 @@ import * as S from './ValidationOpenPolicyAgentTable.styled';
 
 export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width: number) {
   const dispatch = useAppDispatch();
-
-  const problemsByResource = useValidationSelector(problemsByRulesSelector);
 
   const handleToggle = useCallback(
     (rule: Rule) => {
@@ -58,15 +53,6 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         },
       },
       {
-        key: 'violations',
-        title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Violations'}`,
-        dataIndex: 'violations',
-        ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
-          sorter: (a, b) => (size(problemsByResource[a.id]) || 0) - (size(problemsByResource[b.id]) || 0),
-        }),
-        render: (_value, record) => (!record.enabled ? '-' : size(problemsByResource[record.id]) || 0),
-      },
-      {
         key: 'severity',
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
@@ -84,14 +70,20 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         key: 'enabled',
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
-          return <Switch checked={rule.enabled} onChange={() => handleToggle(rule)} />;
+          return (
+            <Switch
+              checked={rule.enabled}
+              disabled={!plugin?.configuration.enabled ?? true}
+              onChange={() => handleToggle(rule)}
+            />
+          );
         },
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
           sorter: (a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1),
         }),
       },
     ];
-  }, [handleToggle, problemsByResource, width]);
+  }, [handleToggle, plugin?.configuration.enabled, width]);
 
   return columns;
 }
