@@ -1,7 +1,5 @@
 import {useMemo} from 'react';
 
-import styled from 'styled-components';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
 
@@ -25,42 +23,35 @@ const NewPaneManagerLeftMenu: React.FC = () => {
   );
 
   return (
-    <Container>
-      <ActivityBar
-        activities={activities}
-        extraActivities={extraActivities}
-        isActive={isActive}
-        value={leftMenuSelection}
-        extraValue={leftMenuBottomSelection}
-        onChange={activityName => {
-          if (activityName === leftMenuSelection && leftActive) {
-            dispatch(setLeftMenuIsActive(false));
-            return;
-          }
+    <ActivityBar
+      style={{backgroundColor: Colors.black100}}
+      activities={activities}
+      extraActivities={extraActivities}
+      isActive={isActive}
+      value={leftMenuSelection}
+      extraValue={leftMenuBottomSelection}
+      onChange={activityName => {
+        if (activityName === leftMenuSelection && leftActive) {
+          dispatch(setLeftMenuIsActive(false));
+          return;
+        }
 
-          if (!leftActive) {
-            dispatch(setLeftMenuIsActive(true));
-          }
+        if (!leftActive) {
+          dispatch(setLeftMenuIsActive(true));
+        }
 
-          dispatch(setLeftMenuSelection(activityName));
-        }}
-        onChangeExtra={activityName => {
-          if (leftMenuBottomSelection === activityName) {
-            dispatch(setLeftBottomMenuSelection(undefined));
-            return;
-          }
+        dispatch(setLeftMenuSelection(activityName));
+      }}
+      onChangeExtra={activityName => {
+        if (leftMenuBottomSelection === activityName) {
+          dispatch(setLeftBottomMenuSelection(undefined));
+          return;
+        }
 
-          dispatch(setLeftBottomMenuSelection(activityName));
-        }}
-      />
-    </Container>
+        dispatch(setLeftBottomMenuSelection(activityName));
+      }}
+    />
   );
 };
 
 export default NewPaneManagerLeftMenu;
-
-const Container = styled.div`
-  div {
-    background-color: ${Colors.black100} !important;
-  }
-`;
