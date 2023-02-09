@@ -14,6 +14,52 @@ export const validationSlice = createSlice({
   name: 'validation',
   initialState: validationInitialState,
   reducers: {
+    changeRuleLevel: (
+      state: Draft<ValidationState>,
+      action: PayloadAction<{plugin: string; rule: string; level: 'default' | 'warning' | 'error'}>
+    ) => {
+      const {payload} = action;
+
+      const config = state.config;
+      const pluginName = payload.plugin;
+
+      // @ts-ignore
+      const pluginMetadata = pluginMetadataSelector(state, pluginName);
+      const pluginRules = pluginRulesSelector(state, payload.plugin);
+
+      if (!pluginMetadata) {
+        return;
+      }
+
+      if (!config.rules) {
+        config.rules = {};
+      }
+
+      const isEnabled = pluginRules.find(r => r.name === payload.rule)?.configuration.enabled ?? false;
+
+      if (!isEnabled) {
+        return;
+      }
+
+      const ruleName = `${pluginMetadata.name}/${payload.rule}`;
+      const ruleValue = payload.level === 'default' ? true : payload.level === 'error' ? 'err' : 'warn';
+
+      config.rules[ruleName] = ruleValue;
+
+      // optimistic update of rule metadata
+      const rule = state.rules?.[pluginMetadata.name]?.find(r => r.name === payload.rule);
+      if (rule) {
+        rule.configuration.level =
+          ruleValue === true
+            ? rule.defaultConfiguration?.level ?? 'warning'
+            : ruleValue === 'err'
+            ? 'error'
+            : 'warning';
+      }
+
+      electronStore.set('validation.config.rules', config.rules);
+    },
+
     clearValidation: (state: Draft<ValidationState>) => {
       state.lastResponse = undefined;
     },
@@ -126,6 +172,12 @@ export const validationSlice = createSlice({
   },
 });
 
-export const {clearValidation, setConfigK8sSchemaVersion, setSelectedProblem, toggleRule, toggleValidation} =
-  validationSlice.actions;
+export const {
+  changeRuleLevel,
+  clearValidation,
+  setConfigK8sSchemaVersion,
+  setSelectedProblem,
+  toggleRule,
+  toggleValidation,
+} = validationSlice.actions;
 export default validationSlice.reducer;

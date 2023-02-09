@@ -5,16 +5,19 @@ import {useCallback, useMemo} from 'react';
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
+import styled from 'styled-components';
+
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
-import {toggleRule} from '@redux/validation/validation.slice';
+import {changeRuleLevel, toggleRule} from '@redux/validation/validation.slice';
 
 import {Icon, IconNames} from '@monokle/components';
 import {PluginMetadataWithConfig} from '@monokle/validation';
+import type {Rule} from '@shared/models/validation';
 import {Colors} from '@shared/styles/colors';
 
-import type {Rule} from './ValidationOpenPolicyAgentTable';
+import ValidationLevelSelect from './ValidationLevelSelect';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 
 export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width: number) {
@@ -23,6 +26,19 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
   const handleToggle = useCallback(
     (rule: Rule) => {
       dispatch(toggleRule({plugin: 'open-policy-agent', rule: rule.name}));
+    },
+    [dispatch]
+  );
+
+  const changeLevelHandler = useCallback(
+    (rule: Rule, level: 'error' | 'warning' | 'default') => {
+      dispatch(
+        changeRuleLevel({
+          plugin: 'open-policy-agent',
+          rule: rule.name,
+          level,
+        })
+      );
     },
     [dispatch]
   );
@@ -71,11 +87,19 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Enabled?'}`,
         render: (_value, rule) => {
           return (
-            <Switch
-              checked={rule.enabled}
-              disabled={!plugin?.configuration.enabled ?? true}
-              onChange={() => handleToggle(rule)}
-            />
+            <Box>
+              <Switch
+                checked={rule.enabled}
+                disabled={!plugin?.configuration.enabled ?? true}
+                onChange={() => handleToggle(rule)}
+              />
+
+              <ValidationLevelSelect
+                rule={rule}
+                disabled={!plugin.configuration.enabled || !rule.enabled}
+                handleChange={changeLevelHandler}
+              />
+            </Box>
           );
         },
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
@@ -83,10 +107,16 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         }),
       },
     ];
-  }, [handleToggle, plugin?.configuration.enabled, width]);
+  }, [changeLevelHandler, handleToggle, plugin.configuration.enabled, width]);
 
   return columns;
 }
+
+const Box = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+`;
 
 const SEVERITY_ORDER_MAP: Record<'low' | 'medium' | 'high', number> = {
   low: 1,

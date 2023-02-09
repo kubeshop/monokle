@@ -68,3 +68,16 @@ export type IncrementalValidationArgs = {
 };
 
 export type ValidationArgs = FullValidationArgs | IncrementalValidationArgs;
+
+export type Severity = 'error' | 'warning' | 'recommendation';
+export type Rule = {
+  id: string;
+  name: string;
+  shortDescription: string;
+  fullDescription: string;
+  learnMoreUrl?: string;
+  severity: 'low' | 'medium' | 'high';
+  enabled: boolean;
+  level: 'warning' | 'error';
+  defaultLevel: 'warning' | 'error';
+};

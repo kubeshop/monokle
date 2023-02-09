@@ -9,21 +9,10 @@ import {
   useValidationSelector,
 } from '@redux/validation/validation.selectors';
 
+import type {Rule} from '@shared/models/validation';
+
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
-
-export type Severity = 'error' | 'warning' | 'recommendation';
-export type Rule = {
-  id: string;
-  name: string;
-  shortDescription: string;
-  fullDescription: string;
-  learnMoreUrl?: string;
-  severity: 'low' | 'medium' | 'high';
-  enabled: boolean;
-  level: 'warning' | 'error';
-  defaultLevel: 'warning' | 'error';
-};
 
 export const ValidationOpenPolicyAgentTable: React.FC = () => {
   const plugin = useValidationSelector(s => pluginMetadataSelector(s, 'open-policy-agent')!);

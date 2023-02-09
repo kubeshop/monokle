@@ -43,6 +43,7 @@ export const ImageTagTooltip = 'Open in external browser';
 export const InitializeGitTooltip = 'Make your project a Git repository';
 export const InstallGitTooltip = 'Git is not installed';
 export const KillTerminalTooltip = 'Kill terminal';
+export const KubeConfigNoValid = 'Your kubeconfig is not valid !';
 export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
 export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and deploying kustomization files';
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
@@ -65,7 +66,9 @@ export const SearchProjectTooltip = 'Search for project by name or path';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';
 export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
 export const TemplatesTabTooltip = `View Templates`;
-export const KubeConfigNoValid = 'Your kubeconfig is not valid !';
+export const ValidationLevelSelectTooltip =
+  'Select how you want the violation of this rule to be highlighted in your code.';
+
 export const ApplyFileTooltip = () => (
   <HotkeyLabel text="Deploy this file to your selected cluster" name="APPLY_SELECTION" />
 );
