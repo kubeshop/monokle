@@ -27,13 +27,11 @@ const ValidationPane: React.FC = () => {
   return (
     <S.ValidationPaneContainer>
       <TitleBar
-        title="Validation errors"
+        title="Validation"
         description={
           <S.DescriptionContainer>
             <Image src={ValidationFigure} width={95} />
-            <div>
-              Visualize & fix <b>errors</b> according to your validation setup.
-            </div>
+            <div>Fix your resources according to your validation setup.</div>
           </S.DescriptionContainer>
         }
       />
