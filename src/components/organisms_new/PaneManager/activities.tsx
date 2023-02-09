@@ -26,14 +26,6 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
   {
-    type: 'panel',
-    name: 'dashboard',
-    tooltip: 'View cluster dashboard',
-    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: 4}} />,
-    component: <DashboardPane />,
-    useBadge: () => undefined,
-  },
-  {
     type: 'fullscreen',
     name: 'compare',
     tooltip: 'Compare resources',
@@ -63,6 +55,14 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       return {count: changedFiles.length, size: 'small'};
     },
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+  },
+  {
+    type: 'panel',
+    name: 'dashboard',
+    tooltip: 'View cluster dashboard',
+    icon: () => <Icon name="cluster-dashboard" style={{fontSize: '16px', marginTop: 4}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
   },
   {
     type: 'fullscreen',
