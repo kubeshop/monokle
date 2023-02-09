@@ -29,8 +29,6 @@ const handleEvent = <Message extends WorkerMessage>(
 };
 
 onmessage = async event => {
-  console.info(`[WORKER_EVENT_PENDING]`, event);
-
   const {data} = event;
 
   handleEvent<LoadValidationMessage>(event, LoadValidationMessageType, async () => {

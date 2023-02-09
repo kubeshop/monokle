@@ -163,11 +163,16 @@ export const validationSlice = createSlice({
       state.rules = payload.rules as any; // See NOTE_TS
     });
 
+    builder.addCase(validateResources.pending, state => {
+      state.status = 'loading';
+    });
+
     builder.addCase(validateResources.fulfilled, (state, action) => {
       if (action.payload) {
         // @ts-ignore
         state.lastResponse = action.payload;
       }
+      state.status = 'loaded';
     });
   },
 });
