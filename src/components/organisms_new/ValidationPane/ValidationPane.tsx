@@ -28,7 +28,7 @@ const ValidationPane: React.FC = () => {
   return (
     <S.ValidationPaneContainer>
       <TitleBar
-        title="Validation"
+        title="Validation Overview"
         description={
           <S.DescriptionContainer>
             <Image src={ValidationFigure} width={95} />
