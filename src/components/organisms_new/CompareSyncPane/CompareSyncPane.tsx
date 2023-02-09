@@ -18,8 +18,10 @@ import TransferButton from './TransferButton';
 const CompareSyncPane: React.FC = () => {
   const inspection = useAppSelector(state => state.compare.current.inspect);
   const status = useAppSelector(state => selectCompareStatus(state.compare));
+  const {left, right} = useAppSelector(state => state.compare.current);
 
   const [containerRef, {height}] = useMeasure<HTMLDivElement>();
+  const hasSideSelected = Boolean(left?.resources.length) || Boolean(right?.resources.length);
 
   return (
     <S.CompareSyncPaneContainer>
@@ -34,8 +36,7 @@ const CompareSyncPane: React.FC = () => {
           <ResourceSetSelector side="right" />
         </Col>
       </Row>
-
-      <S.Content style={{height: `calc(100% - ${height}px - 100px - 60px)`}}>
+      <S.Content style={{height: `calc(100% - ${height}px - 100px - 60px)`}} $hasSideSelected={hasSideSelected}>
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.Content>
 

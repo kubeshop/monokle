@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Col, Row, Skeleton} from 'antd';
+import {Col, Row} from 'antd';
 
 import {resourceSetRefreshed} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -16,18 +16,19 @@ import CompareFigure from '../CompareFigure';
 import {FigureDescription, FigureTitle} from '../CompareFigure/CompareFigure.styled';
 import ResourceList from '../ResourceList';
 import * as S from './CompareModalSelecting.styled';
+import Loading from './Loading';
 
 const CompareModalSelecting: React.FC = () => {
   const dispatch = useAppDispatch();
   const {left, right} = useAppSelector(state => state.compare.current);
   const leftSuccess = left && !left.loading && !left.error;
   const rightSuccess = right && !right.loading && !right.error;
-
   const handleRetry = useCallback((side: CompareSide) => dispatch(resourceSetRefreshed({side})), [dispatch]);
+  const hasSideSelected = Boolean(left?.resources.length) || Boolean(right?.resources.length);
 
   if (leftSuccess && rightSuccess) {
     // Invalid state - it should be comparing.
-    return <div />;
+    return null;
   }
 
   if (left && !rightSuccess) {
@@ -36,7 +37,7 @@ const CompareModalSelecting: React.FC = () => {
         <S.ListRow>
           <Col span={10}>
             {left.loading ? (
-              <Skeleton active />
+              <Loading />
             ) : left.error ? (
               <ErrorFigure onRetry={() => handleRetry('left')} />
             ) : (
@@ -53,7 +54,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : right.error ? (
             <ErrorFigure onRetry={() => handleRetry('right')} />
           ) : (
-            <Skeleton active />
+            <Loading />
           )}
         </S.FloatingFigure>
       </>
@@ -68,11 +69,15 @@ const CompareModalSelecting: React.FC = () => {
 
           <Col span={10}>
             {right.loading ? (
-              <Skeleton active />
+              <div style={{paddingLeft: hasSideSelected ? 6 : 0, height: '100%', overflow: 'hidden'}}>
+                <Loading />
+              </div>
             ) : right.error ? (
               <ErrorFigure onRetry={() => handleRetry('right')} />
             ) : (
-              <ResourceList data={right} />
+              <div style={{paddingLeft: 6}}>
+                <ResourceList data={right} />
+              </div>
             )}
           </Col>
         </S.ListRow>
@@ -85,7 +90,7 @@ const CompareModalSelecting: React.FC = () => {
           ) : left.error ? (
             <ErrorFigure onRetry={() => handleRetry('left')} />
           ) : (
-            <Skeleton active />
+            <Loading />
           )}
         </S.FloatingFigure>
       </>

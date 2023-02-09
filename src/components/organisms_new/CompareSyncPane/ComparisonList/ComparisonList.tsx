@@ -42,7 +42,7 @@ function HeaderItem({kind, countLeft, countRight, apiVersionGroup}: HeaderItemPr
 
       <Col span={4} />
 
-      <Col span={10}>
+      <Col span={10} style={{paddingLeft: 4}}>
         <S.Title>
           {kind} <S.ApiVersionGroup>{apiVersionGroup}</S.ApiVersionGroup>
           <S.ResourceCount>{countRight}</S.ResourceCount>
@@ -120,7 +120,7 @@ function ComparisonItem({
         </S.ActionsDiv>
       </S.ActionsCol>
 
-      <Col span={10}>
+      <Col span={10} style={{paddingLeft: 8}}>
         <S.ResourceDiv>
           {rightNamespace || namespace ? (
             <S.ResourceNamespace $isActive={rightActive}>{rightNamespace || namespace}</S.ResourceNamespace>
