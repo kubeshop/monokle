@@ -34,7 +34,7 @@ export type ValuesFilesScopeType = {
   fileOrFolderContainedIn: string;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
-  selectedFile: string | undefined;
+  selectedHelmValuesId: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
@@ -231,7 +231,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
         previewValuesFileId: state.main.preview?.type === 'helm' ? state.main.preview.valuesFileId : undefined,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        selectedFile: state.main.selection?.type === 'file' ? state.main.selection.filePath : undefined,
+        selectedHelmValuesId:
+          state.main.selection?.type === 'helm.values.file' ? state.main.selection.valuesFileId : undefined,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -268,7 +269,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getInstanceId: rawItem => rawItem.id,
       builder: {
         isSelected: (rawItem, scope) => {
-          return rawItem.filePath === scope.selectedFile;
+          return rawItem.id === scope.selectedHelmValuesId;
         },
         isDisabled: (rawItem, scope) =>
           Boolean(

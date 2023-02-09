@@ -27,6 +27,7 @@ import {
   isInClusterModeSelector,
   isInPreviewModeSelectorNew,
   selectedFilePathSelector,
+  selectedHelmValuesSelector,
   settingsSelector,
 } from '@redux/selectors';
 import {
@@ -113,7 +114,15 @@ const Monaco = (props: {
 
   const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const localResourceContentMap = useAppSelector(localResourceContentMapSelector);
-  const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(selectedFilePathSelector);
+  // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
+  const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
+    const _selectedFilePath = selectedFilePathSelector(state);
+    if (_selectedFilePath) {
+      return _selectedFilePath;
+    }
+    const _selectedHelmValues = selectedHelmValuesSelector(state);
+    return _selectedHelmValues?.filePath;
+  });
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selection = useAppSelector(state => state.main.selection);
   const settings = useAppSelector(settingsSelector);
