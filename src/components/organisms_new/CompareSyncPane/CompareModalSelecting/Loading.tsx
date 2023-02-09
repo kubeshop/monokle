@@ -2,7 +2,7 @@ import {Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import loadingBar from '@assets/loadingbar.gif';
+import loadingBar from '@assets/monokleprogressbar.gif';
 
 import {Colors} from '@shared/styles';
 
@@ -29,9 +29,11 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background-color: ${Colors.blackPure};
+  background-color: ${Colors.black100};
+
   .ant-typography {
     width: 364px;
+    max-width: 80%;
     text-align: center;
     line-height: 24px;
   }

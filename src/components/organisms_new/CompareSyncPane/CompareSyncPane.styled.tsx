@@ -14,10 +14,12 @@ export const CompareSyncPaneContainer = styled.div`
   background-color: ${Colors.grey10};
   height: 100%;
   width: 100%;
+  overflow: hidden;
 `;
 
 export const Content = styled.div`
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable both-edges;
 `;

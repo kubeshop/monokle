@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 export const ListRow = styled(Row)`
   height: 100%;
+  margin-right: -23px;
+  overflow: auto;
 `;
 
 export const FloatingFigure = styled.div<{side: 'left' | 'right'; noEvents?: boolean}>`
