@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 import {CollapsePanelProps} from 'antd';
 
 import {size} from 'lodash';
@@ -37,10 +39,10 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       key={panelKey as CollapsePanelProps['key']}
     >
       <S.List id="helm-sections-container">
-        <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />
+        <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
       </S.List>
     </AccordionPanel>
   );
 };
 
-export default HelmPane;
+export default memo(HelmPane);

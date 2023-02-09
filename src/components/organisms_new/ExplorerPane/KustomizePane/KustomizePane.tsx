@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 import {CollapsePanelProps} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
@@ -37,11 +39,11 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
       key={panelKey as CollapsePanelProps['key']}
     >
       <S.List id="kustomize-sections-container">
-        <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
-        <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
+        <SectionRenderer sectionId={KustomizationSectionBlueprint.id} level={0} isLastSection={false} />
+        <SectionRenderer sectionId={KustomizePatchSectionBlueprint.id} level={0} isLastSection={false} />
       </S.List>
     </AccordionPanel>
   );
 };
 
-export default KustomizePane;
+export default memo(KustomizePane);

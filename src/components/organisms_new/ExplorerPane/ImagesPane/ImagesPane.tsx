@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 import {CollapsePanelProps} from 'antd';
 
 import {size} from 'lodash';
@@ -37,10 +39,10 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       key={panelKey as CollapsePanelProps['key']}
     >
       <S.List id="images-section-container">
-        <SectionRenderer sectionBlueprint={ImagesSectionBlueprint} level={0} isLastSection={false} />
+        <SectionRenderer sectionId={ImagesSectionBlueprint.id} level={0} isLastSection={false} />
       </S.List>
     </AccordionPanel>
   );
 };
 
-export default ImagesPane;
+export default memo(ImagesPane);

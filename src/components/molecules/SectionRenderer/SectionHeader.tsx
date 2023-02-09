@@ -1,10 +1,12 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
 
 import {Walkthrough} from '@molecules';
 
-import {SectionBlueprint, SectionCustomComponent, SectionInstance} from '@shared/models/navigator';
+import navSectionMap from '@src/navsections/sectionBlueprintMap';
+
+import {SectionCustomComponent, SectionInstance} from '@shared/models/navigator';
 
 import SectionHeaderDefaultNameCounter from './SectionHeaderDefaultNameCounter';
 import {useSectionCustomization} from './useSectionCustomization';
@@ -14,7 +16,6 @@ import * as S from './styled';
 interface SectionHeaderProps {
   name: string;
   sectionInstance: SectionInstance;
-  sectionBlueprint: SectionBlueprint<any>;
   isCollapsed: boolean;
   isLastSection: boolean;
   level: number;
@@ -24,21 +25,14 @@ interface SectionHeaderProps {
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {
-    name,
-    sectionInstance,
-    sectionBlueprint,
-    isCollapsed,
-    isLastSection,
-    level,
-    indentation,
-    expandSection,
-    collapseSection,
-  } = props;
+  const {name, sectionInstance, isCollapsed, isLastSection, level, indentation, expandSection, collapseSection} = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const sectionBlueprintRef = useRef(navSectionMap.getById(sectionInstance.id));
+
   const {NameDisplay, NamePrefix, NameSuffix, NameContext, NameCounter} = useSectionCustomization(
-    sectionBlueprint.customization
+    sectionBlueprintRef.current?.customization
   );
 
   const Counter: SectionCustomComponent = useMemo(
@@ -70,13 +64,15 @@ function SectionHeader(props: SectionHeaderProps) {
   return (
     <S.SectionContainer
       isHovered={isHovered}
-      hasChildSections={Boolean(sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0)}
-      disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
+      hasChildSections={Boolean(
+        sectionInstance.visibleChildSectionIds && sectionInstance.visibleChildSectionIds.length > 0
+      )}
+      disableHoverStyle={Boolean(sectionBlueprintRef.current?.customization?.disableHoverStyle)}
       isSelected={Boolean(sectionInstance.isSelected && isCollapsed)}
       isHighlighted={Boolean(sectionInstance.isHighlighted && isCollapsed)}
       isInitialized={Boolean(sectionInstance.isInitialized)}
       isVisible={Boolean(sectionInstance.isVisible)}
-      isSectionCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
+      isSectionCheckable={Boolean(sectionBlueprintRef.current?.builder?.makeCheckable)}
       hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       isLastSection={isLastSection}
       isCollapsed={isCollapsed}
@@ -85,13 +81,13 @@ function SectionHeader(props: SectionHeaderProps) {
     >
       <S.NameContainer
         isHovered={isHovered}
-        isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
+        isCheckable={Boolean(sectionBlueprintRef.current?.builder?.makeCheckable)}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
         $indentation={indentation}
       >
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
-          (sectionBlueprint.customization?.isCheckVisibleOnHover
+          (sectionBlueprintRef.current?.customization?.isCheckVisibleOnHover
             ? sectionInstance.checkable.value === 'partial' ||
               sectionInstance.checkable.value === 'checked' ||
               isHovered
@@ -118,11 +114,11 @@ function SectionHeader(props: SectionHeaderProps) {
                   $isSelected={sectionInstance.isSelected && isCollapsed}
                   $isHighlighted={sectionInstance.isSelected && isCollapsed}
                   $isCheckable={Boolean(sectionInstance.checkable)}
-                  $nameColor={sectionBlueprint.customization?.nameColor}
-                  $nameSize={sectionBlueprint.customization?.nameSize}
-                  $nameWeight={sectionBlueprint.customization?.nameWeight}
-                  $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
-                  $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                  $nameColor={sectionBlueprintRef.current?.customization?.nameColor}
+                  $nameSize={sectionBlueprintRef.current?.customization?.nameSize}
+                  $nameWeight={sectionBlueprintRef.current?.customization?.nameWeight}
+                  $nameVerticalPadding={sectionBlueprintRef.current?.customization?.nameVerticalPadding}
+                  $nameHorizontalPadding={sectionBlueprintRef.current?.customization?.nameHorizontalPadding}
                   $level={level}
                   onClick={toggleCollapse}
                 >
@@ -134,11 +130,11 @@ function SectionHeader(props: SectionHeaderProps) {
                 $isSelected={sectionInstance.isSelected && isCollapsed}
                 $isHighlighted={sectionInstance.isSelected && isCollapsed}
                 $isCheckable={Boolean(sectionInstance.checkable)}
-                $nameColor={sectionBlueprint.customization?.nameColor}
-                $nameSize={sectionBlueprint.customization?.nameSize}
-                $nameWeight={sectionBlueprint.customization?.nameWeight}
-                $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
-                $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
+                $nameColor={sectionBlueprintRef.current?.customization?.nameColor}
+                $nameSize={sectionBlueprintRef.current?.customization?.nameSize}
+                $nameWeight={sectionBlueprintRef.current?.customization?.nameWeight}
+                $nameVerticalPadding={sectionBlueprintRef.current?.customization?.nameVerticalPadding}
+                $nameHorizontalPadding={sectionBlueprintRef.current?.customization?.nameHorizontalPadding}
                 $level={level}
                 onClick={toggleCollapse}
               >

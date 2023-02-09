@@ -261,7 +261,7 @@ export function readFiles(
           fileMap,
         });
       } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
-        log.info('Extracting resources for file entry: ', fileEntry.name);
+        // log.info('Extracting resources for file entry: ', fileEntry.name);
         const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
           if (sideEffect) {

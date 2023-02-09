@@ -1,7 +1,8 @@
-import {useCallback} from 'react';
+import {memo, useCallback} from 'react';
 
 import {Button, Popover, Tag as RawTag} from 'antd';
 
+import {isEqual} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -112,7 +113,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
   );
 };
 
-export default Prefix;
+export default memo(Prefix, isEqual);
 
 // Styled Components
 
