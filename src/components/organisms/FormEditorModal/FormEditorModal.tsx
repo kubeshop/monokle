@@ -56,7 +56,7 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
       <Row>
         <Col span={24}>
           <S.SourceNameBlock>
-            {isLocalResourceMeta(selectedResourceMeta) && (
+            {selectedResourceMeta && isLocalResourceMeta(selectedResourceMeta) && (
               <S.FilePath>
                 <span>File:</span>
                 {selectedResourceMeta.origin.filePath}
