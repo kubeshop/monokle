@@ -37,6 +37,7 @@ import {
   ResourceMetaMap,
   ResourceStorage,
   isLocalResource,
+  isLocalResourceMeta,
 } from '@shared/models/k8sResource';
 import {isLocalOrigin} from '@shared/models/origin';
 import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
@@ -228,7 +229,7 @@ export function removeResourceFromFile(
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   const resourceMap: ResourceMap = joinK8sResourceMap(resourceMetaMap, resourceContentMap);
 
-  if (!isLocalResource(removedResource)) {
+  if (!isLocalResourceMeta(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
   }
 

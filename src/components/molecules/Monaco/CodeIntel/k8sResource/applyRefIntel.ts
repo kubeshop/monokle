@@ -19,7 +19,7 @@ import {
   ResourceMeta,
   ResourceMetaMap,
   ResourceStorage,
-  isLocalResource,
+  isLocalResourceMeta,
 } from '@shared/models/k8sResource';
 
 function applyRefIntel(
@@ -94,7 +94,7 @@ function applyRefIntel(
               createResource(
                 matchRef,
                 resourceMeta.namespace,
-                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
+                isLocalResourceMeta(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
               );
             }
           );
@@ -110,7 +110,7 @@ function applyRefIntel(
         }
 
         let text = `${outgoingRefResourceMeta.kind}: ${outgoingRefResourceMeta.name}`;
-        if (isLocalResource(outgoingRefResourceMeta)) {
+        if (isLocalResourceMeta(outgoingRefResourceMeta)) {
           text += ` in ${outgoingRefResourceMeta.origin.filePath}`;
         }
 
@@ -193,7 +193,7 @@ function applyRefIntel(
               createResource(
                 matchRef,
                 resourceMeta.namespace,
-                isLocalResource(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
+                isLocalResourceMeta(resourceMeta) ? getResourceFolder(resourceMeta) : undefined
               );
             } else if (matchRef.target?.type === 'resource' && matchRef.target.resourceId) {
               // is the storage of the target resource the same as the current resource?

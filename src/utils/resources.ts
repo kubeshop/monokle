@@ -6,7 +6,7 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource, ResourceMeta, isLocalResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
@@ -24,7 +24,7 @@ export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: Res
 
   if (
     filters.fileOrFolderContainedIn &&
-    isLocalResource(resourceMeta) &&
+    isLocalResourceMeta(resourceMeta) &&
     !resourceMeta.origin.filePath.startsWith(filters.fileOrFolderContainedIn)
   ) {
     return false;
