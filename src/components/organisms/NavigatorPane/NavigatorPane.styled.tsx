@@ -23,6 +23,7 @@ export const NavigatorPaneContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: ${Colors.black100};
 `;
 
 export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`

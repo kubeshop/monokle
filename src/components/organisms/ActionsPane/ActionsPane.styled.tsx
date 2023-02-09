@@ -2,6 +2,8 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles';
+
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;
@@ -32,6 +34,7 @@ export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   flex-direction: column;
   margin: 10px;
   border-radius: 10px;
+  background-color: ${Colors.black100};
 `;
 
 export const ExtraRightButton = styled(Button)`
