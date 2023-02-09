@@ -10,16 +10,18 @@ export const ActionsRow = styled(Row)`
 `;
 
 export const CompareSyncPaneContainer = styled.div`
-  padding: 10px;
+  padding: 0 6px 6px 6px;
   background-color: ${Colors.grey10};
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
+  scrollbar-gutter: stable both-edges;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{$hasSideSelected: boolean}>`
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-gutter: stable both-edges;
+
+  scrollbar-gutter: ${({$hasSideSelected}) => ($hasSideSelected ? 'stable' : 'none')};
 `;

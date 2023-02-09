@@ -23,12 +23,12 @@ const CompareModalSelecting: React.FC = () => {
   const {left, right} = useAppSelector(state => state.compare.current);
   const leftSuccess = left && !left.loading && !left.error;
   const rightSuccess = right && !right.loading && !right.error;
-
   const handleRetry = useCallback((side: CompareSide) => dispatch(resourceSetRefreshed({side})), [dispatch]);
+  const hasSideSelected = Boolean(left?.resources.length) || Boolean(right?.resources.length);
 
   if (leftSuccess && rightSuccess) {
     // Invalid state - it should be comparing.
-    return <div />;
+    return null;
   }
 
   if (left && !rightSuccess) {
@@ -69,11 +69,15 @@ const CompareModalSelecting: React.FC = () => {
 
           <Col span={10}>
             {right.loading ? (
-              <Loading />
+              <div style={{paddingLeft: hasSideSelected ? 6 : 0, height: '100%', overflow: 'hidden'}}>
+                <Loading />
+              </div>
             ) : right.error ? (
               <ErrorFigure onRetry={() => handleRetry('right')} />
             ) : (
-              <ResourceList data={right} />
+              <div style={{paddingLeft: 6}}>
+                <ResourceList data={right} />
+              </div>
             )}
           </Col>
         </S.ListRow>
