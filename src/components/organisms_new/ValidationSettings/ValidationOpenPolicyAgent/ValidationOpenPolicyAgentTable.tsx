@@ -3,10 +3,11 @@ import {useMeasure} from 'react-use';
 
 import {Input, Skeleton} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
-import {VALIDATOR} from '@redux/validation/validation.services';
-
-import {DEFAULT_TRIVY_PLUGIN} from '@monokle/validation';
+import {
+  pluginMetadataSelector,
+  pluginRulesSelector,
+  useValidationSelector,
+} from '@redux/validation/validation.selectors';
 
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
@@ -18,41 +19,43 @@ export type Rule = {
   shortDescription: string;
   fullDescription: string;
   learnMoreUrl?: string;
-  severity: Severity;
-  securitySeverity: number;
+  severity: 'low' | 'medium' | 'high';
   enabled: boolean;
+  level: 'warning' | 'error';
+  defaultLevel: 'warning' | 'error';
 };
 
 export const ValidationOpenPolicyAgentTable: React.FC = () => {
-  const configRules = useAppSelector(state => state.validation.config.rules);
+  const plugin = useValidationSelector(s => pluginMetadataSelector(s, 'open-policy-agent')!);
+  const pluginRules = useValidationSelector(state => pluginRulesSelector(state, 'open-policy-agent'));
 
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
-  const columns = useOpenPolicyAgentTable(width);
+  const columns = useOpenPolicyAgentTable(plugin, width);
 
-  const rules = useMemo(() => {
-    const metadata = DEFAULT_TRIVY_PLUGIN;
-
-    return metadata.rules.map(rule => {
-      const ruleName = `open-policy-agent/${rule.name}`;
-      const enabled = VALIDATOR.isRuleEnabled(ruleName);
-      const severity = rule.properties?.problem?.severity ?? 'recommendation';
-      const securitySeverity = rule.properties?.['security-severity'] ?? 0;
+  const rules: Rule[] = useMemo(() => {
+    return pluginRules.map(rule => {
+      const enabled = rule.configuration.enabled ?? false;
+      const severity = rule.properties?.['security-severity'];
+      const severityLabel = !severity ? 'low' : severity < 4 ? 'low' : severity < 7 ? 'medium' : 'high';
+      const level = rule.configuration.level === 'error' ? 'error' : 'warning';
+      const defaultLevel = rule.defaultConfiguration?.level === 'error' ? 'error' : 'warning';
 
       return {
         id: rule.id,
         name: rule.name,
         shortDescription: rule.shortDescription.text,
-        fullDescription: `${rule.fullDescription?.text} ${rule.help.text}`,
+        fullDescription: `${rule.fullDescription ? rule.fullDescription.text : rule.shortDescription.text} ${
+          rule.help.text
+        }`,
         learnMoreUrl: rule.helpUri,
         enabled,
-        severity,
-        securitySeverity,
+        severity: severityLabel,
+        defaultLevel,
+        level,
       };
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configRules]);
+  }, [pluginRules]);
 
   const [filter, setFilter] = useState<string>('');
 
@@ -61,7 +64,7 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
   }, [rules, filter]);
 
   if (rules.length === 0) {
-    return <Skeleton />;
+    return <Skeleton active />;
   }
 
   return (

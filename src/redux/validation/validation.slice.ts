@@ -2,13 +2,12 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {set} from 'lodash';
 
-import {DEFAULT_TRIVY_PLUGIN, RuleMap} from '@monokle/validation';
 import {ValidationIntegrationId} from '@shared/models/integrations';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
-import {VALIDATOR} from './validation.services';
+import {pluginMetadataSelector, pluginRulesSelector} from './validation.selectors';
 import {loadValidation, validateResources} from './validation.thunks';
 
 export const validationSlice = createSlice({
@@ -29,36 +28,61 @@ export const validationSlice = createSlice({
       state.validationOverview.newProblemsIntroducedType = 'k8s-schema';
     },
 
-    toggleOPARules: (state: Draft<ValidationState>, action: PayloadAction<{ruleName?: string; enable?: boolean}>) => {
+    toggleRule: (
+      state: Draft<ValidationState>,
+      action: PayloadAction<{plugin: string; rule?: string; enable?: boolean}>
+    ) => {
       const {payload} = action;
 
-      if (!state.config.rules) {
-        state.config.rules = {};
+      const config = state.config;
+      const pluginName = payload.plugin;
+
+      // @ts-ignore
+      const pluginMetadata = pluginMetadataSelector(state, pluginName);
+      const pluginRules = pluginRulesSelector(state, payload.plugin);
+
+      if (!pluginMetadata) {
+        return;
       }
 
-      if (payload.ruleName === undefined) {
+      if (!config.rules) {
+        config.rules = {};
+      }
+
+      if (payload.rule === undefined) {
         // toggle all rules
         const enable = payload.enable ?? true;
 
-        const rules: RuleMap = {};
-
-        DEFAULT_TRIVY_PLUGIN.rules.forEach(rule => {
-          const ruleName = `open-policy-agent/${rule.name}`;
-          rules[ruleName] = Boolean(enable);
-        });
-
-        state.config.rules = rules;
+        if (enable) {
+          pluginRules.forEach(rule => {
+            const ruleName = `${pluginMetadata.name}/${rule.name}`;
+            // @ts-ignore
+            config.rules[ruleName] = true;
+          });
+        } else {
+          pluginRules.forEach(rule => {
+            const ruleName = `${pluginMetadata.name}/${rule.name}`;
+            // @ts-ignore
+            config.rules[ruleName] = false;
+          });
+        }
       } else {
         // toggle given rule
-        const ruleName = payload.ruleName;
+        const ruleName = `${pluginMetadata.name}/${payload.rule}`;
         const shouldToggle = payload.enable === undefined;
-        const isEnabled = VALIDATOR.isRuleEnabled(ruleName);
-        const enable = shouldToggle ? !isEnabled : payload.enable;
-        state.config.rules[ruleName] = Boolean(enable);
+        const isEnabled = pluginRules.find(r => r.name === payload.rule)?.configuration.enabled ?? false;
+        const enabled = shouldToggle ? !isEnabled : Boolean(payload.enable);
+        config.rules[ruleName] = enabled;
+
+        // optimistic update of rule metadata
+        const rule = state.rules?.[pluginMetadata.name]?.find(r => r.name === payload.rule);
+        if (rule) {
+          rule.configuration.enabled = enabled;
+        }
       }
 
       state.validationOverview.newProblemsIntroducedType = 'rule';
-      electronStore.set('validation.config.rules', state.config.rules);
+      electronStore.set('validation.config.rules', config.rules);
     },
 
     toggleValidation: (state: Draft<ValidationState>, action: PayloadAction<ValidationIntegrationId>) => {
@@ -102,6 +126,6 @@ export const validationSlice = createSlice({
   },
 });
 
-export const {clearValidation, setConfigK8sSchemaVersion, setSelectedProblem, toggleOPARules, toggleValidation} =
+export const {clearValidation, setConfigK8sSchemaVersion, setSelectedProblem, toggleRule, toggleValidation} =
   validationSlice.actions;
 export default validationSlice.reducer;

@@ -5,49 +5,32 @@ import {useCallback, useMemo} from 'react';
 import {Switch, Tooltip} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
+import {size} from 'lodash';
+
 import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
+import {problemsByRulesSelector, useValidationSelector} from '@redux/validation/validation.selectors';
+import {toggleRule} from '@redux/validation/validation.slice';
 
 import {Icon, IconNames} from '@monokle/components';
+import {PluginMetadataWithConfig} from '@monokle/validation';
 import {Colors} from '@shared/styles/colors';
 
-import type {Rule, Severity} from './ValidationOpenPolicyAgentTable';
+import type {Rule} from './ValidationOpenPolicyAgentTable';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
 
-export function useOpenPolicyAgentTable(width: number) {
+export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width: number) {
   const dispatch = useAppDispatch();
-  // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  // TODO: re-implement this when we integrate @monokle/validation
+  const problemsByResource = useValidationSelector(problemsByRulesSelector);
+
   const handleToggle = useCallback(
     (rule: Rule) => {
-      // dispatch(toggleRule({ruleId: rule.id}));
-      // dispatch(reprocessAllResources());
-      // const ruleName = `open-policy-agent/${rule.name}`;
-      // dispatch(toggleOPARules({ruleName}));
+      dispatch(toggleRule({plugin: 'open-policy-agent', rule: rule.name}));
     },
     [dispatch]
   );
-
-  const errorsCounter = useMemo<Record<string, number>>(() => {
-    // return Object.values(resourceMap).reduce<{[key: string]: number}>((validationsCounter, resource) => {
-    //   if (!resource.issues?.errors.length) {
-    //     return validationsCounter;
-    //   }
-
-    //   resource.issues.errors.forEach(error => {
-    //     if (validationsCounter[error.message]) {
-    //       validationsCounter[error.message] += 1;
-    //     } else {
-    //       validationsCounter[error.message] = 1;
-    //     }
-    //   });
-
-    //   return validationsCounter;
-    // }, {});
-    return {};
-  }, []);
 
   const columns: ColumnsType<Rule> = useMemo(() => {
     return [
@@ -79,22 +62,21 @@ export function useOpenPolicyAgentTable(width: number) {
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Violations'}`,
         dataIndex: 'violations',
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
-          sorter: (a, b) => (errorsCounter[a.id] || 0) - (errorsCounter[b.id] || 0),
+          sorter: (a, b) => (size(problemsByResource[a.id]) || 0) - (size(problemsByResource[b.id]) || 0),
         }),
-        render: (_value, record) => (!record.enabled ? '-' : errorsCounter[record.id] || 0),
+        render: (_value, record) => (!record.enabled ? '-' : size(problemsByResource[record.id]) || 0),
       },
       {
         key: 'severity',
         title: `${width < VALIDATION_HIDING_LABELS_WIDTH ? '' : 'Severity'}`,
         dataIndex: 'severity',
         ...(width >= VALIDATION_HIDING_LABELS_WIDTH && {
-          sorter: (a, b) =>
-            SEVERITY_ORDER_MAP[b.severity] - SEVERITY_ORDER_MAP[a.severity] || b.securitySeverity - a.securitySeverity,
+          sorter: (a, b) => SEVERITY_ORDER_MAP[a.severity] - SEVERITY_ORDER_MAP[b.severity],
         }),
         render: (_value, record) => (
           <Icon
-            name={severityIconMapper(record.securitySeverity).name}
-            style={{height: 15, width: 15, paddingTop: 15, color: severityIconMapper(record.securitySeverity).color}}
+            name={SEVERITY_ICON_MAP[record.severity].name}
+            style={{height: 15, width: 15, paddingTop: 15, color: SEVERITY_ICON_MAP[record.severity].color}}
           />
         ),
       },
@@ -109,25 +91,19 @@ export function useOpenPolicyAgentTable(width: number) {
         }),
       },
     ];
-  }, [errorsCounter, handleToggle, width]);
+  }, [handleToggle, problemsByResource, width]);
 
   return columns;
 }
 
-const SEVERITY_ORDER_MAP: Record<Severity, number> = {
-  recommendation: 1,
-  warning: 2,
-  error: 3,
+const SEVERITY_ORDER_MAP: Record<'low' | 'medium' | 'high', number> = {
+  low: 1,
+  medium: 2,
+  high: 3,
 };
 
-const severityIconMapper = (securitySeverity: number): {name: IconNames; color: Colors} => {
-  if (securitySeverity < 3.9) {
-    return {name: 'severity-low', color: Colors.green7};
-  }
-
-  if (securitySeverity < 6.9) {
-    return {name: 'severity-medium', color: Colors.red7};
-  }
-
-  return {name: 'severity-high', color: Colors.red7};
+const SEVERITY_ICON_MAP: Record<'low' | 'medium' | 'high', {name: IconNames; color: Colors}> = {
+  high: {name: 'severity-high', color: Colors.red7},
+  medium: {name: 'severity-medium', color: Colors.red7},
+  low: {name: 'severity-low', color: Colors.green7},
 };
