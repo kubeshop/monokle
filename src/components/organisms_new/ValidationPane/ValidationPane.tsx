@@ -1,4 +1,4 @@
-import {Image} from 'antd';
+import {Image, Skeleton} from 'antd';
 
 import {useAppDispatch} from '@redux/hooks';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
@@ -14,6 +14,7 @@ import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
+  const status = useValidationSelector(state => state.status);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
@@ -27,7 +28,7 @@ const ValidationPane: React.FC = () => {
   return (
     <S.ValidationPaneContainer>
       <TitleBar
-        title="Validation"
+        title="Validation Overview"
         description={
           <S.DescriptionContainer>
             <Image src={ValidationFigure} width={95} />
@@ -36,14 +37,18 @@ const ValidationPane: React.FC = () => {
         }
       />
 
-      <ValidationOverview
-        containerStyle={{marginTop: '20px'}}
-        height={height - 197}
-        newProblemsIntroducedType={newProblemsIntroducedType}
-        selectedProblem={selectedProblem}
-        validationResponse={lastResponse}
-        onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
-      />
+      {status === 'loading' ? (
+        <Skeleton active style={{marginTop: '15px'}} />
+      ) : (
+        <ValidationOverview
+          containerStyle={{marginTop: '20px'}}
+          height={height - 197}
+          newProblemsIntroducedType={newProblemsIntroducedType}
+          selectedProblem={selectedProblem}
+          validationResponse={lastResponse}
+          onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
+        />
+      )}
     </S.ValidationPaneContainer>
   );
 };
