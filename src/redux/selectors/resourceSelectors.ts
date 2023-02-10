@@ -4,6 +4,8 @@ import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource} from '@redux/services/resource';
 
+import {useRefSelector} from '@utils/hooks';
+
 import {
   K8sResource,
   ResourceContent,
@@ -33,16 +35,40 @@ export const createResourceSelector = <Storage extends ResourceStorage>(storage:
   );
 };
 
+const useMemoResourceSelector = <Storage extends ResourceStorage>(storage?: Storage) => {
+  return useMemo(() => (storage ? createResourceSelector(storage) : undefined), [storage]);
+};
+
 export const useResource = <Storage extends ResourceStorage>(
   resourceIdentifier?: ResourceIdentifier<Storage>
 ): K8sResource<Storage> | undefined => {
-  const resourceSelector = useMemo(
-    () => (resourceIdentifier?.storage ? createResourceSelector(resourceIdentifier.storage) : undefined),
-    [resourceIdentifier?.storage]
-  );
+  const resourceSelector = useMemoResourceSelector(resourceIdentifier?.storage);
   return useAppSelector(state =>
     resourceIdentifier?.id && resourceSelector ? resourceSelector(state, resourceIdentifier.id) : undefined
   );
+};
+
+export const useResourceRef = <Storage extends ResourceStorage>(
+  resourceIdentifier?: ResourceIdentifier<Storage>
+): React.MutableRefObject<K8sResource<Storage> | undefined> => {
+  const resourceSelector = useMemoResourceSelector(resourceIdentifier?.storage);
+  return useRefSelector(state =>
+    resourceIdentifier?.id && resourceSelector ? resourceSelector(state, resourceIdentifier.id) : undefined
+  );
+};
+
+export const useSelectedResource = (): K8sResource | undefined => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResource(resourceIdentifier);
+};
+
+export const useSelectedResourceRef = (): React.MutableRefObject<K8sResource | undefined> => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResourceRef(resourceIdentifier);
 };
 
 export const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -69,16 +95,27 @@ export const createResourceMetaSelector = <Storage extends ResourceStorage>(stor
   );
 };
 
+const useMemoResourceMetaSelector = <Storage extends ResourceStorage>(storage?: Storage) => {
+  return useMemo(() => (storage ? createResourceMetaSelector(storage) : undefined), [storage]);
+};
+
 export const useResourceMeta = <Storage extends ResourceStorage>(
   resourceIdentifier?: ResourceIdentifier<Storage>
 ): ResourceMeta<Storage> | undefined => {
-  const resourceMetaSelector = useMemo(
-    () => (resourceIdentifier?.storage ? createResourceMetaSelector(resourceIdentifier.storage) : undefined),
-    [resourceIdentifier?.storage]
-  );
+  const resourceMetaSelector = useMemoResourceMetaSelector(resourceIdentifier?.storage);
   return useAppSelector(state =>
     resourceIdentifier?.id && resourceMetaSelector ? resourceMetaSelector(state, resourceIdentifier.id) : undefined
   );
+};
+
+export const useResourceMetaRef = <Storage extends ResourceStorage>(
+  resourceIdentifier?: ResourceIdentifier<Storage>
+): React.MutableRefObject<ResourceMeta<Storage> | undefined> => {
+  const resourceMetaSelector = useMemoResourceMetaSelector(resourceIdentifier?.storage);
+  const resourceMetaRef = useRefSelector(state =>
+    resourceIdentifier?.id && resourceMetaSelector ? resourceMetaSelector(state, resourceIdentifier.id) : undefined
+  );
+  return resourceMetaRef;
 };
 
 export const useSelectedResourceMeta = (): ResourceMeta | undefined => {
@@ -86,6 +123,13 @@ export const useSelectedResourceMeta = (): ResourceMeta | undefined => {
     state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
   );
   return useResourceMeta(resourceIdentifier);
+};
+
+export const useSelectedResourceMetaRef = (): React.MutableRefObject<ResourceMeta | undefined> => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResourceMetaRef(resourceIdentifier);
 };
 
 export const useResourceContent = <Storage extends ResourceStorage>(
@@ -100,13 +144,6 @@ export const useResourceContent = <Storage extends ResourceStorage>(
       ? resourceContentSelector(state, resourceIdentifier.id)
       : undefined
   );
-};
-
-export const useSelectedResource = (): K8sResource | undefined => {
-  const resourceIdentifier = useAppSelector(state =>
-    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
-  );
-  return useResource(resourceIdentifier);
 };
 
 export const useSelectedResourceContent = (): ResourceContent | undefined => {
