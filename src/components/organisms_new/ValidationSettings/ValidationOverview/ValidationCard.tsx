@@ -51,7 +51,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
         </S.ConfigureButton>
       )}
 
-      <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />
+      {!integration.disableToggle && <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />}
     </S.ValidationCardContainer>
   );
 };
