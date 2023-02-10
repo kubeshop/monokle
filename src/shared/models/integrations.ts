@@ -13,6 +13,7 @@ type ValidationIntegration = {
   name: string;
   description: string;
   learnMoreUrl: string;
+  disableToggle?: boolean;
   isConfigurable?: boolean;
 };
 
@@ -58,6 +59,7 @@ export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
   name: 'CRDs Schema',
   description: 'Configure schema validation for Custom Resources based on Custom Resource Definitions.',
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-crds/',
+  disableToggle: true,
   isConfigurable: true,
 };
 
