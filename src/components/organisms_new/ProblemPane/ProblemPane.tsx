@@ -4,7 +4,7 @@ import {useMeasure} from 'react-use';
 
 import {useAppSelector} from '@redux/hooks';
 
-import SelectItemImage from '@components/atoms/SelectItemImage/SelectItemImage';
+import {SelectItemImage} from '@atoms';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 

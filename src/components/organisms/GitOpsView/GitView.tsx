@@ -5,8 +5,7 @@ import {isEmpty} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import SelectItemImage from '@components/atoms/SelectItemImage/SelectItemImage';
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+import {SelectItemImage, TitleBarWrapper} from '@atoms';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
