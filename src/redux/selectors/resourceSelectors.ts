@@ -15,7 +15,7 @@ import {RootState} from '@shared/models/rootState';
 
 import {createDeepEqualSelector} from './utils';
 
-const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
   return createDeepEqualSelector(
     [
       (state: RootState) => state.main.resourceMetaMapByStorage[storage],
@@ -33,7 +33,7 @@ const createResourceSelector = <Storage extends ResourceStorage>(storage: Storag
   );
 };
 
-const useResource = <Storage extends ResourceStorage>(
+export const useResource = <Storage extends ResourceStorage>(
   resourceIdentifier?: ResourceIdentifier<Storage>
 ): K8sResource<Storage> | undefined => {
   const resourceSelector = useMemo(
@@ -45,7 +45,7 @@ const useResource = <Storage extends ResourceStorage>(
   );
 };
 
-const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
   return createDeepEqualSelector(
     [
       (state: RootState) => state.main.resourceContentMapByStorage[storage],
@@ -57,7 +57,7 @@ const createResourceContentSelector = <Storage extends ResourceStorage>(storage:
   );
 };
 
-const createResourceMetaSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceMetaSelector = <Storage extends ResourceStorage>(storage: Storage) => {
   return createDeepEqualSelector(
     [
       (state: RootState) => state.main.resourceMetaMapByStorage[storage],
@@ -88,7 +88,7 @@ export const useSelectedResourceMeta = (): ResourceMeta | undefined => {
   return useResourceMeta(resourceIdentifier);
 };
 
-const useResourceContent = <Storage extends ResourceStorage>(
+export const useResourceContent = <Storage extends ResourceStorage>(
   resourceIdentifier?: ResourceIdentifier<Storage>
 ): ResourceContent<Storage> | undefined => {
   const resourceContentSelector = useMemo(
