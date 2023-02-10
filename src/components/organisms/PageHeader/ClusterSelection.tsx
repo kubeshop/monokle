@@ -293,7 +293,7 @@ const ClusterSelection = () => {
               size="small"
               $kubeConfigContextColor={kubeConfigContextColor}
             >
-              {isPreviewLoading || isClusterLoading ? '' : isInPreviewMode || isInClusterMode ? 'Reload' : 'Load'}
+              {isPreviewLoading || isClusterLoading ? '' : isInPreviewMode || isInClusterMode ? 'Reload' : 'Connect'}
             </S.Button>
           </>
         )}

@@ -16,6 +16,10 @@ export const ContentContainer = styled.div`
   height: 100%;
   overflow-y: auto;
   padding-right: 10px;
+
+  @media ${Device.laptopM} {
+    padding-right: 250px;
+  }
 `;
 
 export const ContentTitle = styled.div`
@@ -30,10 +34,6 @@ export const MainContainer = styled.div`
   grid-column-gap: 50px;
   overflow: hidden;
   height: 100%;
-
-  @media ${Device.laptopM} {
-    grid-template-columns: 190px 1fr 190px;
-  }
 `;
 
 export const Menu = styled.div`

@@ -2,7 +2,9 @@ import {useMemo, useState} from 'react';
 
 import {Select} from 'antd';
 
-import {orderBy} from 'lodash';
+import {PlusOutlined} from '@ant-design/icons';
+
+import {orderBy, size} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 import {sortProjects} from '@redux/reducers/appConfig';
@@ -54,6 +56,21 @@ const ProjectsList: React.FC<IProps> = props => {
 
     return projects.filter(p => !p.isGitRepo);
   }, [creationFilter, currentProjects, type, typeFilter]);
+
+  if (size(filteredAndSortedProjects) === 0) {
+    return (
+      <S.EmptyList>
+        Click on
+        <div style={{marginTop: '2px'}}>
+          <S.NewProjectIcon $size="small">
+            <PlusOutlined />
+          </S.NewProjectIcon>
+          <b>New project</b>
+        </div>
+        on the left menu to create a project.
+      </S.EmptyList>
+    );
+  }
 
   return (
     <>
