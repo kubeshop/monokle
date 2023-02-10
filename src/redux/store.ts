@@ -73,7 +73,10 @@ const rootReducer: typeof appReducer = (state, action) => {
 const store = configureStore({
   reducer: rootReducer,
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    })
       .prepend(listenerMiddleware.middleware)
       .concat(middlewares)
       .concat(sectionBlueprintMiddleware),

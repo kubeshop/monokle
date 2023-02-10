@@ -1,5 +1,6 @@
-import {createSelector} from 'reselect';
+import {useMemo} from 'react';
 
+import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource} from '@redux/services/resource';
 
@@ -11,7 +12,6 @@ import {
   ResourceStorage,
 } from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
-import {isResourceSelection} from '@shared/models/selection';
 
 import {createDeepEqualSelector} from './utils';
 
@@ -33,77 +33,88 @@ const createResourceSelector = <Storage extends ResourceStorage>(storage: Storag
   );
 };
 
-export const localResourceSelector = createResourceSelector('local');
-export const clusterResourceSelector = createResourceSelector('cluster');
-export const previewResourceSelector = createResourceSelector('preview');
-export const transientResourceSelector = createResourceSelector('transient');
-export const resourceSelector = (state: RootState, resourceIdentifier: ResourceIdentifier) => {
-  if (resourceIdentifier.storage === 'local') {
-    return localResourceSelector(state, resourceIdentifier.id);
-  }
-  if (resourceIdentifier.storage === 'cluster') {
-    return clusterResourceSelector(state, resourceIdentifier.id);
-  }
-  if (resourceIdentifier.storage === 'preview') {
-    return previewResourceSelector(state, resourceIdentifier.id);
-  }
-  if (resourceIdentifier.storage === 'transient') {
-    return transientResourceSelector(state, resourceIdentifier.id);
-  }
+const useResource = <Storage extends ResourceStorage>(
+  resourceIdentifier?: ResourceIdentifier<Storage>
+): K8sResource<Storage> | undefined => {
+  const resourceSelector = useMemo(
+    () => (resourceIdentifier?.storage ? createResourceSelector(resourceIdentifier.storage) : undefined),
+    [resourceIdentifier?.storage]
+  );
+  return useAppSelector(state =>
+    resourceIdentifier?.id && resourceSelector ? resourceSelector(state, resourceIdentifier.id) : undefined
+  );
 };
 
-export const resourceMetaSelector = createSelector(
-  [
-    (state: RootState) => state.main.resourceMetaMapByStorage,
-    (state: RootState, resourceIdentifier: ResourceIdentifier) => resourceIdentifier,
-  ],
-  (resourceMetaMapByStorage, resourceIdentifier): ResourceMeta<typeof resourceIdentifier.storage> => {
-    return resourceMetaMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
-  }
-);
-
-export const resourceContentSelector = createSelector(
-  [
-    (state: RootState) => state.main.resourceContentMapByStorage,
-    (state: RootState, resourceIdentifier: ResourceIdentifier) => resourceIdentifier,
-  ],
-  (resourceContentMapByStorage, resourceIdentifier): ResourceContent<typeof resourceIdentifier.storage> => {
-    return resourceContentMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
-  }
-);
-
-export const selectedResourceSelector = createSelector(
-  (state: RootState) => {
-    const selection = state.main.selection;
-    if (!isResourceSelection(selection)) {
-      return undefined;
+const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+  return createDeepEqualSelector(
+    [
+      (state: RootState) => state.main.resourceContentMapByStorage[storage],
+      (state: RootState, resourceId: string) => resourceId,
+    ],
+    (resourceContentMap, resourceId): ResourceContent<Storage> | undefined => {
+      return resourceContentMap[resourceId];
     }
-    return resourceSelector(state, selection.resourceIdentifier);
-  },
-  resource => resource
-);
+  );
+};
 
-export const selectedResourceMetaSelector = createSelector(
-  (state: RootState) => {
-    const selection = state.main.selection;
-    if (!isResourceSelection(selection)) {
-      return undefined;
+const createResourceMetaSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+  return createDeepEqualSelector(
+    [
+      (state: RootState) => state.main.resourceMetaMapByStorage[storage],
+      (state: RootState, resourceId: string) => resourceId,
+    ],
+    (resourceMetaMap, resourceId): ResourceMeta<Storage> | undefined => {
+      return resourceMetaMap[resourceId];
     }
-    return resourceMetaSelector(state, selection.resourceIdentifier);
-  },
-  resource => resource
-);
+  );
+};
 
-export const selectedResourceContentSelector = createSelector(
-  (state: RootState) => {
-    const selection = state.main.selection;
-    if (!isResourceSelection(selection)) {
-      return undefined;
-    }
-    return resourceContentSelector(state, selection.resourceIdentifier);
-  },
-  resource => resource
-);
+export const useResourceMeta = <Storage extends ResourceStorage>(
+  resourceIdentifier?: ResourceIdentifier<Storage>
+): ResourceMeta<Storage> | undefined => {
+  const resourceMetaSelector = useMemo(
+    () => (resourceIdentifier?.storage ? createResourceMetaSelector(resourceIdentifier.storage) : undefined),
+    [resourceIdentifier?.storage]
+  );
+  return useAppSelector(state =>
+    resourceIdentifier?.id && resourceMetaSelector ? resourceMetaSelector(state, resourceIdentifier.id) : undefined
+  );
+};
+
+export const useSelectedResourceMeta = (): ResourceMeta | undefined => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResourceMeta(resourceIdentifier);
+};
+
+const useResourceContent = <Storage extends ResourceStorage>(
+  resourceIdentifier?: ResourceIdentifier<Storage>
+): ResourceContent<Storage> | undefined => {
+  const resourceContentSelector = useMemo(
+    () => (resourceIdentifier?.storage ? createResourceContentSelector(resourceIdentifier.storage) : undefined),
+    [resourceIdentifier?.storage]
+  );
+  return useAppSelector(state =>
+    resourceIdentifier?.id && resourceContentSelector
+      ? resourceContentSelector(state, resourceIdentifier.id)
+      : undefined
+  );
+};
+
+export const useSelectedResource = (): K8sResource | undefined => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResource(resourceIdentifier);
+};
+
+export const useSelectedResourceContent = (): ResourceContent | undefined => {
+  const resourceIdentifier = useAppSelector(state =>
+    state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
+  );
+  return useResourceContent(resourceIdentifier);
+};
 
 export const kustomizationsSelector = createDeepEqualSelector(
   [
