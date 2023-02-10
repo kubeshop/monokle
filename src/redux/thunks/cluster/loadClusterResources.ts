@@ -52,6 +52,8 @@ const loadClusterResourcesHandler = async (
 
   let currentNamespace: string = namespace || '<all>';
 
+  trackEvent('preview/cluster/start');
+
   try {
     let kc = createKubeClient(kubeConfigPath, context);
 
@@ -148,7 +150,7 @@ const loadClusterResourcesHandler = async (
 
     const endTime = new Date().getTime();
 
-    trackEvent('preview/cluster', {
+    trackEvent('preview/cluster/end', {
       resourcesCount: Object.keys(clusterResourceMap).length,
       executionTime: endTime - startTime,
     });
