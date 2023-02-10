@@ -1,5 +1,6 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
+import {useStore} from 'react-redux';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
@@ -23,8 +24,8 @@ import {
   rootFilePathSelector,
   selectedFilePathSelector,
 } from '@redux/selectors';
-import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {getActiveResourceMapFromState} from '@redux/selectors/resourceMapGetters';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {stopPreview} from '@redux/services/preview';
@@ -42,10 +43,12 @@ import {useFeatureFlags} from '@utils/features';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
+import {RootState} from '@shared/models/rootState';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
+  const store = useStore();
   const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const uiState = useAppSelector(state => state.ui);
@@ -59,11 +62,8 @@ const HotKeysHandler = () => {
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const rootFilePath = useAppSelector(rootFilePathSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const selectedResource = useSelectedResource();
 
-  const [, resourceMapRef] = useSelectorWithRef(state =>
-    selectedResource ? resourceMapSelector(state, selectedResource?.storage) : undefined
-  );
   const [, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
   const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
   const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
@@ -122,14 +122,16 @@ const HotKeysHandler = () => {
   }, [selectedResource, fileMapRef, kubeConfigPath, kubeConfigContext, selectedFilePath, dispatch]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (!selectedResource || !resourceMapRef.current) {
+    if (!selectedResource) {
       setIsApplyModalVisible(false);
       return;
     }
 
+    const resourceMap = getActiveResourceMapFromState(store.getState() as RootState);
+
     applyResource(
       selectedResource.id,
-      resourceMapRef.current,
+      resourceMap,
       fileMapRef.current,
       dispatch,
       projectConfig,

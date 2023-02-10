@@ -2,9 +2,9 @@ import {useState} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
 
-import {ProcessingEntity} from '@components/organisms/FileTreePane/types';
-
 import {dispatchDeleteAlert} from '@utils/files';
+
+import {ProcessingEntity} from '@shared/models/explorer';
 
 export const useDelete = () => {
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({

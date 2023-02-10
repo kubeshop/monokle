@@ -7,8 +7,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {selectedFilePathSelector} from '@redux/selectors';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useResource, useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import RefLink from '@components/molecules/ResourceRefsIconPopover/RefLink';
 import {getRefKind} from '@components/molecules/ResourceRefsIconPopover/RefsPopoverContent';
@@ -33,7 +33,7 @@ import * as S from './InfoTab.styled';
 import * as TableStyle from './TableCells.styled';
 
 export const InfoTab = ({resourceId}: {resourceId: string}) => {
-  const resource = useAppSelector(state => resourceSelector(state, {id: resourceId, storage: 'cluster'}));
+  const resource = useResource({id: resourceId, storage: 'cluster'});
 
   return (
     <>
@@ -173,9 +173,9 @@ export const CreationTimestamp = ({time}: {time: string}) => {
 
 export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resource: K8sResource}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
+  const clusterResourceMap = useResourceMap('cluster');
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const selectedResource = useSelectedResource();
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const preview = useAppSelector(state => state.main.preview);
 

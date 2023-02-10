@@ -5,9 +5,9 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {
-  activeResourceMetaMapSelector,
   activeResourceStorageSelector,
-  localResourceMetaMapSelector,
+  useActiveResourceMetaMap,
+  useResourceMetaMap,
 } from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
@@ -43,9 +43,9 @@ const RefsPopoverContent = (props: {
 }) => {
   const {children, resourceRefs, resource} = props;
   const dispatch = useAppDispatch();
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const activeResourceMetaMap = useActiveResourceMetaMap();
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const localResourceMetaMap = useResourceMetaMap('local');
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);

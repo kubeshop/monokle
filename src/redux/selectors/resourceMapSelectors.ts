@@ -7,6 +7,7 @@ import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource, joinK8sResourceMap} from '@redux/services/resource';
 
+import {useRefSelector} from '@utils/hooks';
 import {mapKeyValuesFromNestedObjects} from '@utils/objects';
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -49,7 +50,16 @@ export const useActiveResourceMap = (): ResourceMap<ResourceStorage> => {
     () => createResourceMapSelector(activeResourceStorage),
     [activeResourceStorage]
   );
-  return useAppSelector(state => activeResourceMapSelector(state));
+  return useAppSelector(activeResourceMapSelector);
+};
+
+export const useActiveResourceMapRef = (): React.MutableRefObject<ResourceMap<ResourceStorage>> => {
+  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
+  const activeResourceMapSelector = useMemo(
+    () => createResourceMapSelector(activeResourceStorage),
+    [activeResourceStorage]
+  );
+  return useRefSelector(activeResourceMapSelector);
 };
 
 export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -64,6 +74,11 @@ export const useResourceMetaMap = <Storage extends ResourceStorage>(storage: Sto
   return useAppSelector(resourceMetaMapSelector);
 };
 
+export const useResourceMetaMapRef = <Storage extends ResourceStorage>(storage: Storage) => {
+  const resourceMetaMapSelector = useMemo(() => createResourceMetaMapSelector(storage), [storage]);
+  return useRefSelector(resourceMetaMapSelector);
+};
+
 export const useActiveResourceMetaMap = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
   const activeResourceMetaMapSelector = useMemo(
@@ -71,6 +86,15 @@ export const useActiveResourceMetaMap = () => {
     [activeResourceStorage]
   );
   return useAppSelector(activeResourceMetaMapSelector);
+};
+
+export const useActiveResourceMetaMapRef = () => {
+  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
+  const activeResourceMetaMapSelector = useMemo(
+    () => createResourceMetaMapSelector(activeResourceStorage),
+    [activeResourceStorage]
+  );
+  return useRefSelector(activeResourceMetaMapSelector);
 };
 
 export const createResourceContentMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -84,7 +108,14 @@ export const useResourceContentMap = <Storage extends ResourceStorage>(
   storage: Storage
 ): ResourceContentMap<Storage> => {
   const resourceContentMapSelector = useMemo(() => createResourceContentMapSelector(storage), [storage]);
-  return useAppSelector(state => resourceContentMapSelector(state));
+  return useAppSelector(resourceContentMapSelector);
+};
+
+export const useResourceContentMapRef = <Storage extends ResourceStorage>(
+  storage: Storage
+): React.MutableRefObject<ResourceContentMap<Storage>> => {
+  const resourceContentMapSelector = useMemo(() => createResourceContentMapSelector(storage), [storage]);
+  return useRefSelector(resourceContentMapSelector);
 };
 
 export const useActiveResourceContentMap = () => {
@@ -94,6 +125,15 @@ export const useActiveResourceContentMap = () => {
     [activeResourceStorage]
   );
   return useAppSelector(activeResourceContentMapSelector);
+};
+
+export const useActiveResourceContentMapRef = () => {
+  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
+  const activeResourceContentMapSelector = useMemo(
+    () => createResourceContentMapSelector(activeResourceStorage),
+    [activeResourceStorage]
+  );
+  return useRefSelector(activeResourceContentMapSelector);
 };
 
 export const activeResourceStorageSelector = createSelector(

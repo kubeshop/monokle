@@ -27,7 +27,7 @@ import {
   kubeConfigContextColorSelector,
   kubeConfigPathSelector,
 } from '@redux/selectors';
-import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -62,15 +62,15 @@ const DiffModal = () => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useAppSelector(activeResourceMapSelector);
+  const resourceMap = useActiveResourceMap();
   const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
-  const targetResource = useAppSelector(state =>
-    state.main.resourceDiff.targetResourceId
-      ? activeResourceMapSelector(state)[state.main.resourceDiff.targetResourceId]
-      : undefined
+  const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
+  const targetResource = useMemo(
+    () => (targetResourceId ? resourceMap[targetResourceId] : undefined),
+    [targetResourceId, resourceMap]
   );
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();

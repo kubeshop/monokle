@@ -8,7 +8,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {useSelectorWithRef} from '@utils/hooks';
@@ -25,7 +25,7 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
-  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
+  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
@@ -110,7 +110,7 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMapRef]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace]);
 
   useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -127,9 +127,9 @@ const DashboardPane = () => {
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(clusterResourceMapRef.current).filter(r => r.kind === kind).length;
+      return Object.values(clusterResourceMetaMapRef.current).filter(r => r.kind === kind).length;
     },
-    [clusterResourceMapRef]
+    [clusterResourceMetaMapRef]
   );
 
   // TODO: refactor after @monokle/validation integration
@@ -149,7 +149,7 @@ const DashboardPane = () => {
       //   }, 0);
       return 0;
     },
-    [clusterResourceMapRef]
+    [clusterResourceMetaMapRef]
   );
 
   return (

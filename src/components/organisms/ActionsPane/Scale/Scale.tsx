@@ -8,7 +8,7 @@ import {ScaleTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
@@ -25,7 +25,7 @@ const Scale: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
-  const currentResource = useAppSelector(selectedResourceSelector);
+  const currentResource = useSelectedResource();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
 

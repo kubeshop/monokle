@@ -11,7 +11,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMetaMap, useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -30,7 +30,8 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const resourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const resourceMetaMap = useActiveResourceMetaMap();
+  const transientResourceMetaMap = useResourceMap('transient');
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 
@@ -63,10 +64,9 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const areOnlyTransientResourcesChecked = useMemo(
     () =>
-      checkedResourceIdentifiers
-        .map(identifier => resourceMetaMap[identifier.id])
-        .every(r => r.storage === 'transient'),
-    [checkedResourceIdentifiers, resourceMetaMap]
+      checkedResourceIdentifiers.map(identifier => transientResourceMetaMap[identifier.id]).filter(isDefined).length ===
+      checkedResourceIdentifiers.length,
+    [checkedResourceIdentifiers, transientResourceMetaMap]
   );
 
   const checkedResources = useMemo(

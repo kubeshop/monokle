@@ -1,7 +1,8 @@
 import {isEqual} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
-import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
+import {getActiveResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ImagesListType} from '@shared/models/appState';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
@@ -39,8 +40,8 @@ export const imageListParserListener: AppListenerFn = listen => {
     predicate: (action, currentState, previousState) => {
       const currentActiveStorage = activeResourceStorageSelector(currentState);
       const previousActiveStorage = activeResourceStorageSelector(previousState);
-      const currentActiveResourceMetaMap = activeResourceMetaMapSelector(currentState);
-      const previousActiveResourceMetaMap = activeResourceMetaMapSelector(previousState);
+      const currentActiveResourceMetaMap = getActiveResourceMetaMapFromState(currentState);
+      const previousActiveResourceMetaMap = getActiveResourceMetaMapFromState(previousState);
       return (
         currentActiveStorage !== previousActiveStorage ||
         !isEqual(currentActiveResourceMetaMap, previousActiveResourceMetaMap)
@@ -48,7 +49,7 @@ export const imageListParserListener: AppListenerFn = listen => {
     },
 
     effect: async (_action, {dispatch, getState}) => {
-      const activeResourceMetaMap = activeResourceMetaMapSelector(getState());
+      const activeResourceMetaMap = getActiveResourceMetaMapFromState(getState());
 
       const imagesList = getState().main.imagesList;
       const images = parseImages(activeResourceMetaMap);

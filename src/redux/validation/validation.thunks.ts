@@ -2,8 +2,8 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {merge} from 'lodash';
 
-import {activeResourceMapSelector, resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {getResourceFromState} from '@redux/selectors/resourceGetters';
+import {getActiveResourceMapFromState, getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 
 import {Incremental, ValidationResponse, processRefs} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
@@ -51,13 +51,13 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     if (payload?.type === 'full') {
       const resourceStorage = payload.resourceStorage;
       if (resourceStorage) {
-        resources = Object.values(resourceMapSelector(getState(), resourceStorage) || {}).filter(isDefined);
+        resources = Object.values(getResourceMapFromState(getState(), resourceStorage) || {}).filter(isDefined);
       } else {
-        resources = Object.values(activeResourceMapSelector(getState())).filter(isDefined);
+        resources = Object.values(getActiveResourceMapFromState(getState())).filter(isDefined);
       }
     } else if (payload?.type === 'incremental') {
       resources = payload.resourceIdentifiers
-        .map(identifier => resourceSelector(getState(), identifier))
+        .map(identifier => getResourceFromState(getState(), identifier))
         .filter(isDefined);
     }
 

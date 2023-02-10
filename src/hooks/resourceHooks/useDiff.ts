@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
@@ -18,7 +18,7 @@ export const useDiff = (resourceMeta?: ResourceMeta) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
+  const selectedResourceMeta = useSelectedResourceMeta();
 
   const currentResourceMeta = resourceMeta || selectedResourceMeta;
 

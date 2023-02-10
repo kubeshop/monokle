@@ -2,12 +2,8 @@ import {isEmpty} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {
-  activeResourceCountSelector,
-  activeResourceMetaMapSelector,
-  transientResourceCountSelector,
-  transientResourceMetaMapSelector,
-} from '@redux/selectors/resourceMapSelectors';
+import {getActiveResourceMetaMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {activeResourceCountSelector, transientResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -120,8 +116,8 @@ const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceSco
       isFolderLoading: state.ui.isFolderLoading,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
-      activeResourceMetaMap: activeResourceMetaMapSelector(state),
-      transientResourceMetaMap: transientResourceMetaMapSelector(state),
+      activeResourceMetaMap: getActiveResourceMetaMapFromState(state),
+      transientResourceMetaMap: getResourceMetaMapFromState(state, 'transient'),
       resourceFilter: state.main.resourceFilter,
       checkedResourceIds: state.main.checkedResourceIdentifiers,
     };

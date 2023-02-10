@@ -1,6 +1,6 @@
 import {selectResource} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {isKustomizationPreviewed, isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
@@ -44,7 +44,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, Kus
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
-      localResourceMetaMap: localResourceMetaMapSelector(state),
+      localResourceMetaMap: getResourceMetaMapFromState(state, 'local'),
       resourceFilters: state.main.resourceFilter,
       isInClusterMode: isInClusterModeSelector(state),
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),

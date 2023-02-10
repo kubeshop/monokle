@@ -2,13 +2,12 @@ import {useCallback} from 'react';
 
 import {size} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './Status.styled';
 
 export const Status = () => {
-  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
+  const clusterResourceMap = useResourceMap('cluster');
 
   const getResourceCount = useCallback(() => {
     return size(clusterResourceMap);

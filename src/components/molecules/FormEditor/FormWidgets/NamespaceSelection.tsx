@@ -1,13 +1,11 @@
 import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -20,8 +18,8 @@ const EMPTY_VALUE = 'NONE';
 
 export const NamespaceSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMetaMap = useAppSelector(localResourceMetaMapSelector);
-  const selectedResource = useSelector(selectedResourceSelector);
+  const resourceMetaMap = useResourceMetaMap('local');
+  const selectedResource = useSelectedResource();
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
