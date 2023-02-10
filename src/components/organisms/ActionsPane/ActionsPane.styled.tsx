@@ -32,7 +32,6 @@ export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   display: flex;
   height: ${({$height}) => $height}px;
   flex-direction: column;
-  margin: 10px;
   border-radius: 10px;
   background-color: ${Colors.black100};
 `;
@@ -54,6 +53,8 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
   height: ${({$height}) => `${$height}px`};
   overflow: visible;
+  padding: 0px 16px 0px 16px;
+  margin-top: -10px;
 
   & .ant-tabs-nav {
     padding: 8px 16px 0 0;
