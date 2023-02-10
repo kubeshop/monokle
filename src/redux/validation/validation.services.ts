@@ -5,6 +5,8 @@ import {MonokleValidator, ResourceParser, SchemaLoader, createDefaultMonokleVali
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
+  RegisterCustomSchemaMessage,
+  RegisterCustomSchemaMessageType,
   RunValidationMessage,
   RunValidationMessageType,
   matchWorkerEvent,
@@ -56,6 +58,15 @@ class ValidationWorker {
   runValidation(input: RunValidationMessage['input']) {
     return createWorkerEventPromise<RunValidationMessage['output']>({
       type: RunValidationMessageType,
+      worker: this.#worker,
+      input,
+    });
+  }
+
+  async registerCustomSchema(input: RegisterCustomSchemaMessage['input']) {
+    await this.#validator.registerCustomSchema(input.schema);
+    return createWorkerEventPromise<RegisterCustomSchemaMessage['output']>({
+      type: RegisterCustomSchemaMessageType,
       worker: this.#worker,
       input,
     });

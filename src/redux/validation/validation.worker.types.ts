@@ -1,7 +1,8 @@
-import {Config, Resource, ValidationResponse} from '@monokle/validation';
+import {Config, CustomSchema, Resource, ValidationResponse} from '@monokle/validation';
 
 export const LoadValidationMessageType = 'loadValidation' as const;
 export const RunValidationMessageType = 'runValidation' as const;
+export const RegisterCustomSchemaMessageType = 'registerCustomSchema' as const;
 
 export interface WorkerMessage {
   type: string;
@@ -24,6 +25,16 @@ export interface RunValidationMessage extends WorkerMessage {
   };
   output: {
     response: ValidationResponse;
+  };
+}
+
+export interface RegisterCustomSchemaMessage extends WorkerMessage {
+  type: typeof RegisterCustomSchemaMessageType;
+  input: {
+    schema: CustomSchema;
+  };
+  output: {
+    response: void;
   };
 }
 
