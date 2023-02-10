@@ -52,6 +52,6 @@ export const FileName = styled.div`
 `;
 
 export const StyledCol = styled(Col)`
-  background: ${Colors.blackPure};
+  background: ${Colors.black100};
   overflow: hidden;
 `;

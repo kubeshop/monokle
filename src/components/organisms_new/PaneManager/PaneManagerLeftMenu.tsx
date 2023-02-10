@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ActivityBar} from '@monokle/components';
+import {Colors} from '@shared/styles';
 import {activeProjectSelector} from '@shared/utils/selectors';
 
 import {activities, extraActivities} from './activities';
@@ -23,6 +24,7 @@ const NewPaneManagerLeftMenu: React.FC = () => {
 
   return (
     <ActivityBar
+      style={{backgroundColor: Colors.black100}}
       activities={activities}
       extraActivities={extraActivities}
       isActive={isActive}

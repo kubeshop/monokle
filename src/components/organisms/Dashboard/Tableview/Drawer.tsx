@@ -72,23 +72,6 @@ export const Drawer = () => {
               resourceMeta={localResource}
               type="outgoing"
             />
-
-            {/*
-              // TODO: revisit this after @monokle/validation
-              {Number(Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)) >
-              0 && (
-              <Popover
-                mouseEnterDelay={0.5}
-                placement="rightTop"
-                content={<ErrorsPopoverContent resource={localResource} />}
-              >
-                <S.ErrorCount>
-                  {Number(
-                    Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)
-                  )}
-                </S.ErrorCount>
-              </Popover>
-            )} */}
           </S.TitleContainer>
         ) : (
           <S.TitleContainer> - </S.TitleContainer>

@@ -2,6 +2,8 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles';
+
 export const ActionsPaneContainer = styled.div`
   height: 100%;
   width: 100%;
@@ -30,8 +32,8 @@ export const ActionsPaneMainContainer = styled.div<{$height: number}>`
   display: flex;
   height: ${({$height}) => $height}px;
   flex-direction: column;
-  margin: 10px;
   border-radius: 10px;
+  background-color: ${Colors.black100};
 `;
 
 export const ExtraRightButton = styled(Button)`
@@ -51,6 +53,8 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
   height: ${({$height}) => `${$height}px`};
   overflow: visible;
+  padding: 0px 16px 0px 16px;
+  margin-top: -10px;
 
   & .ant-tabs-nav {
     padding: 8px 16px 0 0;
