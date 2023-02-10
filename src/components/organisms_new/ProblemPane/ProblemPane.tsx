@@ -4,6 +4,8 @@ import {useMeasure} from 'react-use';
 
 import {useAppSelector} from '@redux/hooks';
 
+import SelectItemImage from '@components/atoms/SelectItemImage/SelectItemImage';
+
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {ProblemInfo, TitleBar} from '@monokle/components';
@@ -39,7 +41,9 @@ const ProblemPane: React.FC = () => {
   }, [rule, selectedProblem]);
 
   if (!rule || !selectedProblem) {
-    return null;
+    return (
+      <SelectItemImage text="Select an error from the left to examine it, and receive hints and additional information on fixing it" />
+    );
   }
 
   return (

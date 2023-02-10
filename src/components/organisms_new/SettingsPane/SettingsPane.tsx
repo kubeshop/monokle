@@ -23,7 +23,7 @@ const SettingsPane = () => {
     [activeProject, isStartProjectPaneVisible]
   );
 
-  const [activeTabKey, setActiveTabKey] = useState('validation');
+  const [activeTabKey, setActiveTabKey] = useState(activeProject ? 'validation' : 'global-settings');
 
   const tabItems = useMemo(
     () => [
