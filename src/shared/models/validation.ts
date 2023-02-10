@@ -8,7 +8,7 @@ import type {
   ValidationResult,
 } from '@monokle/validation';
 
-import {ResourceIdentifier, ResourceStorage} from './k8sResource';
+import {K8sResource, ResourceIdentifier, ResourceStorage} from './k8sResource';
 import type {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
@@ -81,3 +81,5 @@ export type Rule = {
   level: 'warning' | 'error';
   defaultLevel: 'warning' | 'error';
 };
+
+export type ValidationResource = K8sResource & {filePath: string; fileOffset: number; fileId: string; content: any};

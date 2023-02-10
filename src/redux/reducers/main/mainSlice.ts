@@ -6,6 +6,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 import initialState from '@redux/initialState';
+import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
@@ -21,7 +22,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
-import {processResourceRefs} from '@redux/validation/validation.thunks';
 
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -483,7 +483,6 @@ export const mainSlice = createSlice({
       return action.payload.nextMainState;
     });
 
-    // TODO: does this work properly?
     builder.addCase(processResourceRefs.fulfilled, (state, action) => {
       action.payload.forEach((resource: K8sResource) => {
         const resourceMetaMap = getResourceMetaMapFromState({main: state} as RootState, resource.storage);

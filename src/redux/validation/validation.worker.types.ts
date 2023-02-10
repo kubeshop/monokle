@@ -1,14 +1,10 @@
+import {WorkerMessage} from '@utils/worker';
+
 import {Config, CustomSchema, Incremental, Resource, ValidationResponse} from '@monokle/validation';
 
 export const LoadValidationMessageType = 'loadValidation' as const;
 export const RunValidationMessageType = 'runValidation' as const;
 export const RegisterCustomSchemaMessageType = 'registerCustomSchema' as const;
-
-export interface WorkerMessage {
-  type: string;
-  input: any;
-  output: any;
-}
 
 export interface LoadValidationMessage extends WorkerMessage {
   type: typeof LoadValidationMessageType;
@@ -38,5 +34,3 @@ export interface RegisterCustomSchemaMessage extends WorkerMessage {
     response: void;
   };
 }
-
-export const matchWorkerEvent = (event: MessageEvent, type: string) => event.data.type === type;
