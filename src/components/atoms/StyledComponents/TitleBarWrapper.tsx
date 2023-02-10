@@ -1,11 +1,20 @@
 import styled from 'styled-components';
 
 export const TitleBarWrapper = styled.div<{$closable?: boolean}>`
-  padding: 10px 16px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  & > :first-child > div {
+    padding-left: 10px;
+  }
+
+  & > :last-child {
+    flex-grow: 1;
+  }
 
   ${({$closable}) => {
     if ($closable) {
       return `padding-right: 24px;`;
     }
-  }}
+  }};
 `;
