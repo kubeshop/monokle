@@ -17,6 +17,8 @@ import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
+import {TitleBarWrapper} from '@components/atoms';
+
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
@@ -135,30 +137,64 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
 
   if (selectedHelmConfig) {
     return (
-      <TitleBar
-        title="Helm Command"
-        actions={
-          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
-              <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
-                Preview
-              </Button>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
-              <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
-                Edit
-              </Button>
-            </Tooltip>
-          </div>
-        }
-      />
+      <TitleBarWrapper>
+        <TitleBar
+          title="Helm Command"
+          type="secondary"
+          actions={
+            <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
+                <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
+                  Preview
+                </Button>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
+                <Button size="small" type="primary" ghost onClick={onClickEditPreviewConfiguration}>
+                  Edit
+                </Button>
+              </Tooltip>
+            </div>
+          }
+        />
+      </TitleBarWrapper>
     );
   }
 
   if (selectedImage) {
     return (
+      <TitleBarWrapper>
+        <TitleBar
+          title="Image Info"
+          type="secondary"
+          actions={
+            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+              <S.LeftArrowButton
+                onClick={onClickLeftArrow}
+                disabled={!isLeftArrowEnabled}
+                type="link"
+                size="small"
+                icon={<LeftOutlined />}
+              />
+
+              <S.RightArrowButton
+                onClick={onClickRightArrow}
+                disabled={!isRightArrowEnabled}
+                type="link"
+                size="small"
+                icon={<RightOutlined />}
+              />
+            </div>
+          }
+        />
+      </TitleBarWrapper>
+    );
+  }
+
+  return (
+    <TitleBarWrapper>
       <TitleBar
-        title="Image Info"
+        type="secondary"
+        title="Editor"
         actions={
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <S.LeftArrowButton
@@ -176,85 +212,59 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
               size="small"
               icon={<RightOutlined />}
             />
+
+            {isSelectedResourceTransient && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveTransientResourceTooltip}>
+                <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
+                  Save
+                </S.SaveButton>
+              </Tooltip>
+            )}
+
+            <S.ButtonContainer>
+              {showActionsDropdown ? (
+                <>
+                  {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
+                    <>
+                      <Scale />
+                      <Restart />
+                    </>
+                  )}
+                  <InstallDeploy applySelection={applySelection} />
+                  <Diff />
+                </>
+              ) : (
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'actions',
+                        label: (
+                          <S.DropdownActionContainer>
+                            {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
+                              <>
+                                <Scale isDropdownActive />
+                                <Restart isDropdownActive />
+                              </>
+                            )}
+                            <InstallDeploy applySelection={applySelection} />
+                            <Diff />
+                          </S.DropdownActionContainer>
+                        ),
+                      },
+                    ],
+                  }}
+                  placement="bottomLeft"
+                  overlayClassName="dropdown-custom-styling"
+                >
+                  <S.EllipsisOutlined />
+                </Dropdown>
+              )}
+            </S.ButtonContainer>
           </div>
         }
       />
-    );
-  }
-
-  return (
-    <TitleBar
-      type="secondary"
-      title="Editor"
-      actions={
-        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <S.LeftArrowButton
-            onClick={onClickLeftArrow}
-            disabled={!isLeftArrowEnabled}
-            type="link"
-            size="small"
-            icon={<LeftOutlined />}
-          />
-
-          <S.RightArrowButton
-            onClick={onClickRightArrow}
-            disabled={!isRightArrowEnabled}
-            type="link"
-            size="small"
-            icon={<RightOutlined />}
-          />
-
-          {isSelectedResourceTransient && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveTransientResourceTooltip}>
-              <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
-                Save
-              </S.SaveButton>
-            </Tooltip>
-          )}
-
-          <S.ButtonContainer>
-            {showActionsDropdown ? (
-              <>
-                {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
-                  <>
-                    <Scale />
-                    <Restart />
-                  </>
-                )}
-                <InstallDeploy applySelection={applySelection} />
-                <Diff />
-              </>
-            ) : (
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 'actions',
-                      label: (
-                        <S.DropdownActionContainer>
-                          {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
-                            <>
-                              <Scale isDropdownActive />
-                              <Restart isDropdownActive />
-                            </>
-                          )}
-                          <InstallDeploy applySelection={applySelection} />
-                          <Diff />
-                        </S.DropdownActionContainer>
-                      ),
-                    },
-                  ],
-                }}
-                placement="bottomLeft"
-                overlayClassName="dropdown-custom-styling"
-              >
-                <S.EllipsisOutlined />
-              </Dropdown>
-            )}
-          </S.ButtonContainer>
-        </div>
-      }
-    />
+    </TitleBarWrapper>
   );
 };
 

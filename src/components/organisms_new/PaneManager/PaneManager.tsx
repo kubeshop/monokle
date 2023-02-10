@@ -96,6 +96,7 @@ const NewPaneManager: React.FC = () => {
                 )
               ) : (
                 <ResizableColumnsPanel
+                  paneCloseIconStyle={{top: 15}}
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
                     !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null

@@ -10,8 +10,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resetResourceFilter, selectResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
+import {useActiveResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -107,8 +107,8 @@ const QuickSearchActionsV3: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
-  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const selectedResourceMeta = useSelectedResourceMeta();
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const [namespaces] = useNamespaces({extra: ['default']});

@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {isResourceSelected} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
@@ -19,7 +19,7 @@ interface IProps {
 
 const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
   const dispatch = useAppDispatch();
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const activeResourceMetaMap = useActiveResourceMetaMap();
   const selection = useAppSelector(state => state.main.selection);
 
   const refs = useMemo(() => {

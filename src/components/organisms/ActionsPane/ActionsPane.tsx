@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useStore} from 'react-redux';
 import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
@@ -29,8 +30,8 @@ import {
   selectedHelmValuesSelector,
   settingsSelector,
 } from '@redux/selectors';
-import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -63,6 +64,7 @@ import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandle
 
 import {Icon} from '@monokle/components';
 import {HelmChart} from '@shared/models/helm';
+import {RootState} from '@shared/models/rootState';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
@@ -77,6 +79,8 @@ const ActionsPane: React.FC = () => {
   const [kubeConfigContext, kubeConfigContextRef] = useSelectorWithRef(kubeConfigContextSelector);
   const [, projectConfigRef] = useSelectorWithRef(currentConfigSelector);
 
+  const store = useStore();
+
   const [helmChartMap, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -87,14 +91,9 @@ const ActionsPane: React.FC = () => {
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedHelmValues = useAppSelector(selectedHelmValuesSelector);
   const isClusterModeLoading = useAppSelector(state => state.main.clusterConnectionOptions.isLoading);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const selectedResource = useSelectedResource();
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
-  const resourceMap = useAppSelector(state =>
-    selectedResource ? resourceMapSelector(state, selectedResource?.storage) : undefined
-  );
-  const resourceMapRef = useRef(resourceMap);
-  resourceMapRef.current = resourceMap;
 
   const selectedResourceId = selectedResource?.id;
   const selectedHelmValuesId = selectedHelmValues?.id;
@@ -206,13 +205,14 @@ const ActionsPane: React.FC = () => {
 
   const onClickApplyResource = useCallback(
     (namespace?: {name: string; new: boolean}) => {
-      if (!selectedResourceId || !resourceMapRef.current) {
+      if (!selectedResource) {
         setIsApplyModalVisible(false);
         return;
       }
+      const resourceMap = getResourceMapFromState(store.getState() as RootState, selectedResource?.storage);
       applyResource(
-        selectedResourceId,
-        resourceMapRef.current,
+        selectedResource.id,
+        resourceMap,
         fileMapRef.current,
         dispatch,
         projectConfigRef.current,
@@ -224,15 +224,7 @@ const ActionsPane: React.FC = () => {
       );
       setIsApplyModalVisible(false);
     },
-    [
-      dispatch,
-      fileMapRef,
-      kubeConfigContextRef,
-      projectConfigRef,
-      resourceMapRef,
-      selectedResourceId,
-      isInClusterModeRef,
-    ]
+    [dispatch, fileMapRef, kubeConfigContextRef, projectConfigRef, selectedResource, isInClusterModeRef, store]
   );
 
   const onClickApplyHelmChart = useCallback(

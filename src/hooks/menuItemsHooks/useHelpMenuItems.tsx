@@ -149,8 +149,7 @@ const MenuItemLinks = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-left: 37px;
-  padding-bottom: 0.5rem;
+  padding: 0px 10px 0.5rem 37px;
   margin-top: -0.5rem;
   border-bottom: 1px solid ${Colors.grey5b};
 `;

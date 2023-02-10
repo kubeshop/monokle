@@ -9,7 +9,7 @@ import {
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
-import {localResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {isKustomizationPreviewed, isResourceSelected} from '@redux/services/resource';
 
@@ -31,7 +31,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
 
-  const thisKustomization = useAppSelector(state => localResourceSelector(state, itemInstance.id));
+  const thisKustomization = useResource({id: itemInstance.id, storage: 'local'});
 
   const isThisPreviewed = useMemo(
     () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),

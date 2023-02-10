@@ -1,4 +1,5 @@
 import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import {useStore} from 'react-redux';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -82,4 +83,11 @@ export const useSelectorWithRef = <T>(selector: (state: RootState) => T): [T, Mu
   const ref = useRef(state);
   ref.current = state;
   return [state, ref];
+};
+
+export const useRefSelector = <T>(selector: (state: RootState) => T): MutableRefObject<T> => {
+  const store = useStore<RootState>();
+  const ref = useRef(selector(store.getState()));
+  ref.current = selector(store.getState());
+  return ref;
 };

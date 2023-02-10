@@ -15,7 +15,7 @@ import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolde
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExpandedFolders} from '@redux/reducers/ui';
 import {settingsSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useTreeKeys} from '@hooks/fileTreeHooks/useTreeKeys';
@@ -41,7 +41,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
-  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const {hideExcludedFilesInFileExplorer, hideUnsupportedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
@@ -81,7 +81,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
       createNode(
         rootEntry,
         fileMap,
-        localResourceMetaMap,
+        localResourceMetaMapRef.current,
         Boolean(hideExcludedFilesInFileExplorer),
         Boolean(hideUnsupportedFilesInFileExplorer),
         fileOrFolderContainedInFilter,
@@ -91,7 +91,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
     setTree(treeData);
   }, [
     isFolderLoading,
-    localResourceMetaMap,
+    localResourceMetaMapRef,
     fileMap,
     hideExcludedFilesInFileExplorer,
     hideUnsupportedFilesInFileExplorer,

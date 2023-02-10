@@ -117,7 +117,7 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBarWrapper>
+      <TitleBarWrapper $closable>
         <TitleBar title="Git" />
       </TitleBarWrapper>
 

@@ -26,8 +26,8 @@ import {
   kubeConfigContextColorSelector,
 } from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {useActiveResourceMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {isResourceSelected} from '@redux/services/resource';
@@ -98,10 +98,9 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const resource = useAppSelector(state =>
-    resourceSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
-  );
-  const resourceMap = useAppSelector(activeResourceMapSelector);
+
+  const resource = useResource({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
+  const resourceMapRef = useActiveResourceMapRef();
   const isThisResourceSelected = useAppSelector(state =>
     Boolean(resource && isResourceSelected(resource, state.main.selection))
   );
@@ -144,19 +143,28 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         setIsApplyModalVisible(false);
         return;
       }
-      applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-        isInClusterMode,
-      });
+      applyResource(
+        resource.id,
+        resourceMapRef.current,
+        fileMap,
+        dispatch,
+        projectConfig,
+        kubeConfigContext,
+        namespace,
+        {
+          isInClusterMode,
+        }
+      );
       setIsApplyModalVisible(false);
     },
-    [resource, isInClusterMode, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext]
+    [resource, isInClusterMode, resourceMapRef, fileMap, dispatch, projectConfig, kubeConfigContext]
   );
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
     () => {
       if (isThisResourceSelected && resource) {
-        deleteResourceWithConfirm(resource, resourceMap, dispatch);
+        deleteResourceWithConfirm(resource, resourceMapRef.current, dispatch);
       }
     },
     [isThisResourceSelected]
@@ -185,7 +193,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const onClickDelete = () => {
-    deleteResourceWithConfirm(resource, resourceMap, dispatch);
+    deleteResourceWithConfirm(resource, resourceMapRef.current, dispatch);
   };
 
   const onClickSaveToFileFolder = () => {

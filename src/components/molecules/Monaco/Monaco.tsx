@@ -31,14 +31,14 @@ import {
   settingsSelector,
 } from '@redux/selectors';
 import {
-  activeResourceContentMapSelector,
-  activeResourceMetaMapSelector,
   activeResourceStorageSelector,
-  localResourceContentMapSelector,
-  localResourceMetaMapSelector,
-  transientResourceContentMapSelector,
+  useActiveResourceContentMapRef,
+  useActiveResourceMetaMap,
+  useResourceContentMap,
+  useResourceContentMapRef,
+  useResourceMetaMap,
 } from '@redux/selectors/resourceMapSelectors';
-import {resourceSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResource, useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
@@ -92,14 +92,20 @@ const Monaco = (props: {
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-  const [activeResourceMetaMap, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
-  const [, activeResourceContentMapRef] = useSelectorWithRef(activeResourceContentMapSelector);
-  const [, transientResourceContentMapRef] = useSelectorWithRef(transientResourceContentMapSelector);
-  const [selectedResource, selectedResourceRef] = useSelectorWithRef(state =>
-    providedResourceSelection
-      ? resourceSelector(state, providedResourceSelection.resourceIdentifier)
-      : selectedResourceSelector(state)
-  );
+
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const activeResourceMetaMapRef = useRef(activeResourceMetaMap);
+  activeResourceMetaMapRef.current = activeResourceMetaMap;
+  const activeResourceContentMapRef = useActiveResourceContentMapRef();
+  const transientResourceContentMapRef = useResourceContentMapRef('transient');
+
+  const stateSelectedResource = useSelectedResource();
+  const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
+
+  const selectedResource = providedResourceSelection ? providedResource : stateSelectedResource;
+  const selectedResourceRef = useRef(selectedResource);
+  selectedResourceRef.current = selectedResource;
+
   const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
   const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
 
@@ -112,8 +118,8 @@ const Monaco = (props: {
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const preview = useAppSelector(state => state.main.preview);
 
-  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
-  const localResourceContentMap = useAppSelector(localResourceContentMapSelector);
+  const localResourceMetaMap = useResourceMetaMap('local');
+  const localResourceContentMap = useResourceContentMap('local');
   // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
     const _selectedFilePath = selectedFilePathSelector(state);

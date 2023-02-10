@@ -1,8 +1,8 @@
 import {useCallback} from 'react';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useAppDispatch} from '@redux/hooks';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -19,7 +19,7 @@ import * as S from './InventoryInfo.styled';
 
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
+  const clusterResourceMap = useResourceMap('cluster');
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {

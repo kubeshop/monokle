@@ -1,9 +1,6 @@
-import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useMemo, useRef, useState} from 'react';
 
-import {isEqual} from 'lodash';
-
-import {useAppSelector} from '@redux/hooks';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {getNamespaces} from '@redux/services/resource';
 
 export const ALL_NAMESPACES = '<all>';
@@ -13,7 +10,9 @@ export function useNamespaces(options: {
   extra?: ('all' | 'none' | 'default')[];
 }): [string[], Dispatch<SetStateAction<string[]>>] {
   // TODO: maybe this should become a selector
-  const activeNamespaces = useAppSelector(state => getNamespaces(activeResourceMetaMapSelector(state)), isEqual);
+
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const activeNamespaces = useMemo(() => getNamespaces(activeResourceMetaMap), [activeResourceMetaMap]);
   const optionsExtra = useRef<string[]>([]);
   optionsExtra.current = options.extra || [];
 

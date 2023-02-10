@@ -32,7 +32,6 @@ export const LearnButton = styled(Button)<{$isActive: boolean}>`
 
 export const Logo = styled.img`
   height: 31px;
-  cursor: pointer;
 `;
 
 export const LogoContainer = styled.div`

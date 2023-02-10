@@ -4,7 +4,7 @@ import log from 'loglevel';
 
 import {performResourceContentUpdate} from '@redux/reducers/main';
 import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {getResourceFromState} from '@redux/selectors/resourceGetters';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
 
@@ -33,7 +33,7 @@ export const updateResource = createAsyncThunk<
 
   const nextMainState = createNextState(state.main, mainState => {
     try {
-      const resource = resourceSelector(state, resourceIdentifier);
+      const resource = getResourceFromState(state, resourceIdentifier);
 
       const fileMap = mainState.fileMap;
 

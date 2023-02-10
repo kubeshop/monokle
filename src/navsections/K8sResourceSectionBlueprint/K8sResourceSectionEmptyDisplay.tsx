@@ -1,10 +1,9 @@
-import {isEmpty} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, setLeftMenuSelection} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {HighlightItems} from '@shared/models/ui';
@@ -30,7 +29,7 @@ const StyledLink = styled.div`
 
 function K8sResourceSectionEmptyDisplay() {
   const dispatch = useAppDispatch();
-  const hasAnyActiveResources = useAppSelector(state => !isEmpty(activeResourceMetaMapSelector(state)));
+  const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   // const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 

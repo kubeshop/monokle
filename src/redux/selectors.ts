@@ -10,7 +10,7 @@ import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/s
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
-import {localResourceMetaMapSelector} from './selectors/resourceMapSelectors';
+import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
 import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
@@ -183,7 +183,7 @@ export const fileIncludesSelector = createSelector(currentConfigSelector, curren
 });
 
 export const kustomizationResourcesSelectors = createSelector(
-  (state: RootState) => localResourceMetaMapSelector(state),
+  (state: RootState) => getResourceMetaMapFromState(state, 'local'),
   localResourceMetaMap => {
     return Object.values(localResourceMetaMap)
       .filter(i => isKustomizationResource(i))

@@ -1,6 +1,6 @@
 import {selectResource} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {ResourceFilterType} from '@shared/models/appState';
@@ -31,7 +31,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, Ku
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
-      localResourceMetaMap: localResourceMetaMapSelector(state),
+      localResourceMetaMap: getResourceMetaMapFromState(state, 'local'),
       resourceFilter: state.main.resourceFilter,
       selection: state.main.selection,
       highlights: state.main.highlights,

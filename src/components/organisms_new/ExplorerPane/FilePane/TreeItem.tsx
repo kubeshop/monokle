@@ -12,7 +12,7 @@ import path from 'path';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
@@ -74,7 +74,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(selectedFilePathSelector);
-  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const git = useAppSelector(state => state.git);
 
@@ -121,11 +121,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       const fileEntry = fileMap[entryPath];
       return (
         fileEntry &&
-        (isKustomizationFile(fileEntry, localResourceMetaMap) ||
+        (isKustomizationFile(fileEntry, localResourceMetaMapRef.current) ||
           getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
       );
     },
-    [fileMap, localResourceMetaMap, helmValuesMap]
+    [fileMap, localResourceMetaMapRef, helmValuesMap]
   );
 
   const handleOnMouseEnter = () => setTitleHoverState(true);
@@ -177,7 +177,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       disabled:
         isInPreviewMode ||
         isInClusterMode ||
-        isKustomizationFile(fileMap[relativePath], localResourceMetaMap) ||
+        isKustomizationFile(fileMap[relativePath], localResourceMetaMapRef.current) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
@@ -200,7 +200,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
-        isKustomizationFile(fileMap[relativePath], localResourceMetaMap) ||
+        isKustomizationFile(fileMap[relativePath], localResourceMetaMapRef.current) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
