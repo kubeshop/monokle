@@ -7,7 +7,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import initialState from '@redux/initialState';
 import {setAlert} from '@redux/reducers/alert';
-import {resourceContentMapSelector, resourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {joinK8sResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
@@ -486,8 +486,8 @@ export const mainSlice = createSlice({
     // TODO: does this work properly?
     builder.addCase(processResourceRefs.fulfilled, (state, action) => {
       action.payload.forEach((resource: K8sResource) => {
-        const resourceMetaMap = resourceMetaMapSelector({main: state} as RootState, resource.storage);
-        const resourceContentMap = resourceContentMapSelector({main: state} as RootState, resource.storage);
+        const resourceMetaMap = getResourceMetaMapFromState({main: state} as RootState, resource.storage);
+        const resourceContentMap = getResourceContentMapFromState({main: state} as RootState, resource.storage);
         const {meta, content} = splitK8sResource(resource);
         if (resourceMetaMap && resourceContentMap) {
           resourceMetaMap[resource.id] = meta;

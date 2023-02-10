@@ -8,14 +8,14 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceMetaSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {activeResourceStorageSelector, useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMeta, useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
 import {useValidationLevel} from '@hooks/useValidationLevel';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
@@ -28,13 +28,12 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const [, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
-  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
-  const [, selectedResourceRef] = useSelectorWithRef(selectedResourceSelector);
+  const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
+  const selectedResourceRef = useSelectedResourceRef();
   const filterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
-  const resourceMeta = useAppSelector(state =>
-    resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
-  );
+
+  const resourceMeta = useResourceMeta({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
 
   const {level, errors, warnings} = useValidationLevel(itemInstance.id);
 

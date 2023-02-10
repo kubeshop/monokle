@@ -10,7 +10,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
-import {localResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -43,7 +43,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const resource = useAppSelector(state => localResourceSelector(state, itemInstance.id));
+  const resource = useResource({id: itemInstance.id, storage: 'local'});
 
   const absolutePath = useMemo(
     () => (resource?.origin.filePath ? getAbsoluteFilePath(resource.origin.filePath, fileMap) : undefined),

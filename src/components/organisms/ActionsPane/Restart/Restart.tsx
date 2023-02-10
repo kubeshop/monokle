@@ -9,7 +9,7 @@ import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
@@ -26,7 +26,7 @@ const Restart: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
-  const currentResource = useAppSelector(selectedResourceSelector);
+  const currentResource = useSelectedResource();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 

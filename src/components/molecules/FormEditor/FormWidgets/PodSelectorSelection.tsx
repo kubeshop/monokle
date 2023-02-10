@@ -4,8 +4,7 @@ import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
-import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {getResourcesOfKind} from '@redux/services/resource';
 
 import * as S from './styled';
@@ -17,7 +16,7 @@ const EMPTY_VALUE = 'NONE';
 
 export const PodSelectorSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMap = useAppSelector(localResourceMapSelector);
+  const resourceMap = useResourceMap('local');
   const [podSelectors, setPodSelectors] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();

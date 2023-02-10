@@ -3,7 +3,7 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 import log from 'loglevel';
 
 import {UpdateMultipleResourcesPayload, performResourceContentUpdate} from '@redux/reducers/main';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {getResourceFromState} from '@redux/selectors/resourceGetters';
 
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
@@ -18,7 +18,7 @@ export const updateMultipleResources = createAsyncThunk<
   const nextMainState = createNextState(state.main, mainState => {
     try {
       payload.forEach(({resourceIdentifier, content}) => {
-        const resource = resourceSelector(state, resourceIdentifier);
+        const resource = getResourceFromState(state, resourceIdentifier);
 
         if (resource) {
           performResourceContentUpdate(resource, content, mainState.fileMap);

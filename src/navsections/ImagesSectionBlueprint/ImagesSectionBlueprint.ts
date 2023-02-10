@@ -1,11 +1,9 @@
 import {selectImage} from '@redux/reducers/main';
 import {selectedImageSelector} from '@redux/selectors';
-import {activeResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ImagesListType} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceMap} from '@shared/models/k8sResource';
 import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -15,7 +13,6 @@ import ImagesSectionNameDisplay from './ImagesSectionNameDisplay';
 import ImagesSectionNameSuffix from './ImagesSectionNameSuffix';
 
 export type ImagesScopeType = {
-  resourceMap: ResourceMap;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
   imagesList: ImagesListType;
@@ -46,7 +43,6 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
   containerElementId: 'images-section-container',
   rootSectionId: IMAGES_SECTION_NAME,
   getScope: state => ({
-    resourceMap: activeResourceMapSelector(state),
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
     imagesList: state.main.imagesList,

@@ -6,7 +6,7 @@ import {FileOutlined, FolderOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -52,7 +52,7 @@ const FilePaneTree: React.FC<IProps> = props => {
       ? state.main.selection
       : undefined
   );
-  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const selectedPath = useAppSelector(selectedFilePathSelector);
 
@@ -83,7 +83,7 @@ const FilePaneTree: React.FC<IProps> = props => {
 
   useEffect(() => {
     if (localResourceSelection && treeRef.current) {
-      const resource = localResourceMetaMap[localResourceSelection.resourceIdentifier.id];
+      const resource = localResourceMetaMapRef.current[localResourceSelection.resourceIdentifier.id];
 
       if (resource) {
         const filePath = resource.origin.filePath;

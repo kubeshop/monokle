@@ -6,7 +6,7 @@ import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
 import {useAppSelector} from '@redux/hooks';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
 
 import * as S from './TerminalTab.styled';
 
@@ -17,7 +17,8 @@ export const TerminalTab = ({resourceId}: {resourceId: string}) => {
   const webContentsId = useAppSelector(state => state.terminal.webContentsId);
 
   const addonRef = useRef<FitAddon>();
-  const resource = useAppSelector(state => resourceSelector(state, {id: resourceId, storage: 'cluster'}));
+  const resource = useResource({id: resourceId, storage: 'cluster'});
+
   useEffect(() => {
     if (webContentsId && resource && clusterConnection) {
       ipcRenderer.send('pod.terminal.init', {

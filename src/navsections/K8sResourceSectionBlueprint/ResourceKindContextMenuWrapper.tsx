@@ -16,8 +16,8 @@ import {
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {activeResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -64,11 +64,10 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const resource = useAppSelector(state =>
-    resourceSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
-  );
 
-  const activeResourceMetaMap = useAppSelector(activeResourceMetaMapSelector);
+  const resource = useResource({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
+
+  const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const shellCommand = useMemo(() => {
@@ -111,7 +110,7 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
   };
 
   const onClickDelete = () => {
-    deleteResourceWithConfirm(resource, activeResourceMetaMap, dispatch);
+    deleteResourceWithConfirm(resource, activeResourceMetaMapRef.current, dispatch);
   };
 
   const onClickSaveToFileFolder = () => {

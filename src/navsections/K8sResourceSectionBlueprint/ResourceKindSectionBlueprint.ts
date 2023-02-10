@@ -1,7 +1,7 @@
 import navSectionNames from '@constants/navSectionNames';
 
 import {selectResource} from '@redux/reducers/main';
-import {activeResourceMetaMapSelector, transientResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getActiveResourceMetaMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -40,8 +40,8 @@ export function makeResourceKindNavSection(
     containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
-      const activeResourceMetaMap = activeResourceMetaMapSelector(state);
-      const transientResourceMetaMap = transientResourceMetaMapSelector(state);
+      const activeResourceMetaMap = getActiveResourceMetaMapFromState(state);
+      const transientResourceMetaMap = getResourceMetaMapFromState(state, 'transient');
       const newFilteredResources = [
         ...Object.values(activeResourceMetaMap),
         ...Object.values(transientResourceMetaMap),

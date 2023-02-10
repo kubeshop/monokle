@@ -11,7 +11,7 @@ import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConf
 import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {currentConfigSelector} from '@redux/selectors';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
@@ -173,7 +173,7 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
       const state = getState();
 
       const activeProject = activeProjectSelector(state);
-      const clusterResourceMap = clusterResourceMapSelector(state);
+      const clusterResourceMap = getResourceMapFromState(state, 'cluster');
       const currentContext = kubeConfigContextSelector(state);
       const localSchemaVersion = currentConfigSelector(getState()).k8sVersion;
       const userDataDir = String(state.config.userDataDir);
