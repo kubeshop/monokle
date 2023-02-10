@@ -1,6 +1,8 @@
 import {Image, Skeleton} from 'antd';
+import Link from 'antd/lib/typography/Link';
 
 import {useAppDispatch} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem} from '@redux/validation/validation.slice';
 
@@ -32,7 +34,11 @@ const ValidationPane: React.FC = () => {
         description={
           <S.DescriptionContainer>
             <Image src={ValidationFigure} width={95} />
-            <div>Fix your resources according to your validation setup.</div>
+            <div>
+              Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
+              off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
+              section, located in the left menu.
+            </div>
           </S.DescriptionContainer>
         }
       />

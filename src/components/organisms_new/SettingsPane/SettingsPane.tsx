@@ -23,12 +23,21 @@ const SettingsPane = () => {
     [activeProject, isStartProjectPaneVisible]
   );
 
-  const [activeTabKey, setActiveTabKey] = useState(isOnStartProjectPage ? 'validation' : 'current-project-settings');
+  const [activeTabKey, setActiveTabKey] = useState('validation');
 
   const tabItems = useMemo(
     () => [
       ...(activeProject && !isStartProjectPaneVisible
         ? [
+            {
+              key: 'validation',
+              label: <S.TabOption>Validation</S.TabOption>,
+              children: (
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
+                  <ValidationSettings />
+                </S.TabItemContainer>
+              ),
+            },
             {
               key: 'current-project-settings',
               label: <S.TabOption>Current project settings</S.TabOption>,
@@ -40,15 +49,7 @@ const SettingsPane = () => {
             },
           ]
         : []),
-      {
-        key: 'validation',
-        label: <S.TabOption>Validation</S.TabOption>,
-        children: (
-          <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
-            <ValidationSettings />
-          </S.TabItemContainer>
-        ),
-      },
+
       ...(!activeProject || isStartProjectPaneVisible
         ? [
             {
