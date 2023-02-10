@@ -37,7 +37,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
       return message;
     }
 
-    return _.truncate(message, {length: 200});
+    return _.truncate(message, {length: 240});
   }, [message]);
 
   const handleSeeMore = () => {
@@ -45,7 +45,19 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     Modal[type]({
       content: (
         <S.NotificationModalContent>
-          <ReactMarkdown>{message}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              a({href, children, ...restProps}) {
+                return (
+                  <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
+                    {children}
+                  </a>
+                );
+              },
+            }}
+          >
+            {message}
+          </ReactMarkdown>
         </S.NotificationModalContent>
       ),
       title: (
