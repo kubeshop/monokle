@@ -2,7 +2,6 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {merge} from 'lodash';
 
-import {getResourceFromState} from '@redux/selectors/resourceGetters';
 import {getActiveResourceMapFromState, getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 
 import {Incremental, ValidationResponse, processRefs} from '@monokle/validation';
@@ -56,9 +55,11 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
         resources = Object.values(getActiveResourceMapFromState(getState())).filter(isDefined);
       }
     } else if (payload?.type === 'incremental') {
-      resources = payload.resourceIdentifiers
-        .map(identifier => getResourceFromState(getState(), identifier))
-        .filter(isDefined);
+      const affectedStorages = new Set(payload.resourceIdentifiers.map(r => r.storage));
+      affectedStorages.forEach(storage => {
+        const resourceMap = getResourceMapFromState(getState(), storage);
+        resources = resources.concat(Object.values(resourceMap).filter(isDefined));
+      });
     }
 
     const incrementalResourceIds =
@@ -84,6 +85,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     // TODO: could the active resource map change while the validation is running? before we get the refs?
     const {response} = await VALIDATOR.runValidation({
       resources: transformedResources,
+      incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
     });
 
     return response;

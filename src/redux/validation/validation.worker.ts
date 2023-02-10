@@ -38,7 +38,7 @@ onmessage = async event => {
 
   handleEvent<RunValidationMessage>(event, RunValidationMessageType, async () => {
     const {input} = data as RunValidationMessage;
-    const response = await VALIDATOR.validate({resources: input.resources});
+    const response = await VALIDATOR.validate({resources: input.resources, incremental: input.incremental});
     return {response};
   });
 };
