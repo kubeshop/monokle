@@ -6,7 +6,16 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
 import {ResourceFilterType} from '@shared/models/appState';
-import {K8sResource, ResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
+import {
+  K8sResource,
+  ResourceMeta,
+  isClusterResource,
+  isLocalResource,
+  isLocalResourceMeta,
+  isPreviewResource,
+  isTransientResource,
+} from '@shared/models/k8sResource';
+import {ValidationResource} from '@shared/models/validation';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
@@ -143,4 +152,32 @@ export function getDefaultNamespaceForApply(
 
 export function getApiVersionGroup(resource: K8sResource) {
   return resource.apiVersion.includes('/') ? resource.apiVersion.split('/')[0] : 'kubernetes';
+}
+
+export function transformResourceForValidation(r: K8sResource): ValidationResource | undefined {
+  let filePath = '';
+  let fileOffset = 0;
+
+  if (isLocalResource(r)) {
+    filePath = r.origin.filePath;
+    fileOffset = r.origin.fileOffset;
+  } else if (isClusterResource(r)) {
+    filePath = r.origin.context;
+    fileOffset = 0;
+  } else if (isPreviewResource(r)) {
+    filePath = r.origin.preview.type;
+    fileOffset = 0;
+  } else if (isTransientResource(r)) {
+    filePath = 'transient';
+    fileOffset = 0;
+  }
+
+  return {
+    ...r,
+    // id: stableStringify({id: r.id, storage: r.storage}), // TODO: do we need this?
+    filePath,
+    fileOffset,
+    fileId: filePath,
+    content: r.object,
+  };
 }
