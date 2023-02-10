@@ -8,16 +8,14 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {RestartTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {SecondaryButton} from '@atoms';
+
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 type IProps = {
   isDropdownActive?: boolean;
@@ -43,7 +41,8 @@ const Restart: React.FC<IProps> = props => {
       onOk() {
         if (name && namespace) {
           restartDeployment({currentContext, kubeConfigPath, name, namespace});
-          restartPreview(currentContext, 'cluster', dispatch);
+          // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
+          dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
         }
       },
       onCancel() {},

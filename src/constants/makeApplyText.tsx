@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 
-import {ClusterColors} from '@models/cluster';
-
-import Colors, {BackgroundColors} from '@styles/Colors';
+import {ClusterColors} from '@shared/models/cluster';
+import {BackgroundColors, Colors} from '@shared/styles/colors';
 
 export const ClusterName = styled.div<{$kubeConfigContextColor?: ClusterColors}>`
   display: inline;

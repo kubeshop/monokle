@@ -10,9 +10,9 @@ Object.keys(additionalEnvironmentVariables).forEach((key: string) => {
 
 moduleAlias.addAliases({
   '@constants': `${__dirname}/../src/constants`,
-  '@models': `${__dirname}/../src/models`,
   '@redux': `${__dirname}/../src/redux`,
   '@utils': `${__dirname}/../src/utils`,
+  '@shared': `${__dirname}/../src/shared`,
   '@src': `${__dirname}/../src/`,
   '@root': `${__dirname}/../`,
 });

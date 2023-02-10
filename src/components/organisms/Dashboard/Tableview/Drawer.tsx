@@ -1,18 +1,17 @@
 import {useEffect, useState} from 'react';
 
-import {Popover} from 'antd';
-
-import {K8sResource} from '@models/k8sresource';
-
-import {setActiveTab, setSelectedResourceId} from '@redux/dashboard';
+import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentConfigSelector} from '@redux/selectors';
+import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {applyResource} from '@redux/thunks/applyResource';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
-import ErrorsPopoverContent from '@components/molecules/ValidationErrorsPopover/ErrorsPopoverContent';
 
 import PodHandler from '@src/kindhandlers/Pod.handler';
+
+import {K8sResource} from '@shared/models/k8sResource';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
@@ -22,31 +21,31 @@ import {TerminalTab} from './TerminalTab';
 export const Drawer = () => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
   const [localResource, setLocalResource] = useState<K8sResource | undefined>();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
   const projectConfig = useAppSelector(currentConfigSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap[selectedResourceId]) {
-      setLocalResource(resourceMap[selectedResourceId]);
+    if (selectedResourceId && clusterResourceMap[selectedResourceId]) {
+      setLocalResource(clusterResourceMap[selectedResourceId]);
       return;
     }
     setLocalResource(undefined);
-  }, [resourceMap, selectedResourceId]);
+  }, [clusterResourceMap, selectedResourceId]);
 
   const handleApplyResource = () => {
-    if (localResource && localResource.namespace && selectedResourceId && resourceMap[selectedResourceId]) {
+    if (localResource && localResource.namespace && selectedResourceId && clusterResourceMap[selectedResourceId]) {
       applyResource(
         selectedResourceId,
-        resourceMap,
+        clusterResourceMap,
         {},
         dispatch,
         projectConfig,
         kubeConfigContext,
         localResource.namespace ? {name: localResource.namespace, new: false} : undefined,
-        {isClusterPreview: true}
+        {isInClusterMode: true}
       );
     }
   };
@@ -60,31 +59,26 @@ export const Drawer = () => {
       title={
         localResource ? (
           <S.TitleContainer>
-            <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="incoming" />
+            <ResourceRefsIconPopover
+              isSelected={false}
+              isDisabled={false}
+              resourceMeta={localResource}
+              type="incoming"
+            />
             <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
-            <ResourceRefsIconPopover isSelected={false} isDisabled={false} resource={localResource} type="outgoing" />
-
-            {Number(Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)) >
-              0 && (
-              <Popover
-                mouseEnterDelay={0.5}
-                placement="rightTop"
-                content={<ErrorsPopoverContent resource={localResource} />}
-              >
-                <S.ErrorCount>
-                  {Number(
-                    Number(localResource.validation?.errors.length) + Number(localResource.issues?.errors.length)
-                  )}
-                </S.ErrorCount>
-              </Popover>
-            )}
+            <ResourceRefsIconPopover
+              isSelected={false}
+              isDisabled={false}
+              resourceMeta={localResource}
+              type="outgoing"
+            />
           </S.TitleContainer>
         ) : (
           <S.TitleContainer> - </S.TitleContainer>
         )
       }
       onClose={() => {
-        dispatch(setSelectedResourceId());
+        dispatch(setDashboardSelectedResourceId());
       }}
     >
       <S.TabsContainer>

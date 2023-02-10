@@ -2,10 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
@@ -15,7 +13,7 @@ const NetworkPolicyHandler: ResourceKindHandler = {
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     return k8sNetworkingV1Api.readNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
@@ -26,12 +24,11 @@ const NetworkPolicyHandler: ResourceKindHandler = {
       : await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     await k8sNetworkingV1Api.deleteNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/network-policies/',
-  outgoingRefMappers: createPodSelectorOutgoingRefMappers(['podSelector', 'matchLabels']),
 };
 
 export default NetworkPolicyHandler;

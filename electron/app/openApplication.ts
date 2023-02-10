@@ -5,7 +5,7 @@ import ElectronStore from 'electron-store';
 import log from 'loglevel';
 import * as path from 'path';
 
-import {logToFile} from '@utils/logToFile';
+import {logToFile} from '@shared/utils/logs';
 
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';

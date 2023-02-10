@@ -6,25 +6,15 @@ import log from 'loglevel';
 import path from 'path';
 import {AnyAction} from 'redux';
 
-import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/appconfig';
-
-import {setAlert} from '@redux/reducers/alert';
-import {
-  addNamespaceToContext,
-  removeNamespaceFromContext,
-  setAccessLoading,
-  setKubeConfig,
-  updateProjectKubeConfig,
-} from '@redux/reducers/appConfig';
-
-import electronStore from '@utils/electronStore';
-import {watchFunctions} from '@utils/helpers';
-import {getKubeAccess} from '@utils/kubeclient';
+import {AlertEnum} from '@shared/models/alert';
+import type {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import electronStore from '@shared/utils/electronStore';
+import {getKubeAccess} from '@shared/utils/kubeclient';
+import {watchFunctions} from '@shared/utils/watch';
 
 function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: string, kubeConfigPath?: string) {
   if (kubeConfigPath) {
-    dispatch(setKubeConfig(getKubeConfigContext(kubeConfigPath)));
+    dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(kubeConfigPath)});
     monitorKubeConfig(dispatch, kubeConfigPath);
     return;
   }
@@ -32,18 +22,19 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   if (process.env.KUBECONFIG) {
     const envKubeconfigParts = process.env.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
-      dispatch(setKubeConfig(getKubeConfigContext(envKubeconfigParts[0])));
+      dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(envKubeconfigParts[0])});
       monitorKubeConfig(dispatch, envKubeconfigParts[0]);
 
-      dispatch(
-        setAlert({
+      dispatch({
+        type: 'alert/setAlert',
+        payload: {
           title: 'KUBECONFIG warning',
           message: 'Found multiple configs, selected the first one.',
           type: AlertEnum.Warning,
-        })
-      );
+        },
+      });
     } else {
-      dispatch(setKubeConfig(getKubeConfigContext(process.env.KUBECONFIG)));
+      dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(process.env.KUBECONFIG)});
       monitorKubeConfig(dispatch, process.env.KUBECONFIG);
     }
     return;
@@ -51,13 +42,14 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
-    dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));
+    dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(storedKubeconfig)});
     monitorKubeConfig(dispatch, storedKubeconfig);
+
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
-  dispatch(setKubeConfig(getKubeConfigContext(possibleKubeconfig)));
+  dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(possibleKubeconfig)});
   monitorKubeConfig(dispatch, possibleKubeconfig);
 }
 
@@ -174,23 +166,29 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
         if (type === 'ADDED') {
           getKubeAccess(apiObj.metadata.name, key)
             .then(clusterAccess => {
-              dispatch(setAccessLoading(true));
-              dispatch(addNamespaceToContext(clusterAccess));
+              // TODO: is setKubeConfig needed? on main branch it was removed..
+              dispatch({type: 'config/setKubeConfig', payload: getKubeConfigContext(kubeConfigPath)});
+              dispatch({type: 'config/setAccessLoading', payload: true});
+              dispatch({type: 'config/addNamespaceToContext', payload: clusterAccess});
             })
             .catch(() => {
-              dispatch(
-                setAlert({
+              dispatch({
+                type: 'alert/setAlert',
+                payload: {
                   type: AlertEnum.Warning,
                   title: 'Cluster Watcher Error',
                   message:
                     "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
-                })
-              );
-              dispatch(setAccessLoading(false));
+                },
+              });
+              dispatch({type: 'config/setAccessLoading', payload: false});
             });
         } else if (type === 'DELETED') {
-          dispatch(setAccessLoading(true));
-          dispatch(removeNamespaceFromContext({namespace: apiObj.metadata.name, context: key}));
+          dispatch({type: 'config/setAccessLoading', payload: true});
+          dispatch({
+            type: 'config/removeNamespaceFromContext',
+            payload: {namespace: apiObj.metadata.name, context: key},
+          });
         }
       },
       () => {
@@ -207,7 +205,7 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
 
 const readAndNotifyKubeConfig = (kubeConfigPath: string, dispatch: (action: AnyAction) => void) => {
   const kubeConfig: KubeConfig = getKubeConfigContext(kubeConfigPath);
-  dispatch(updateProjectKubeConfig(kubeConfig));
+  dispatch({type: 'config/updateProjectKubeConfig', payload: kubeConfig});
 };
 
 export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {

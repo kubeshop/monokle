@@ -2,7 +2,7 @@ import {Progress as RawProgress} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   height: 100%;

@@ -9,12 +9,11 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
 
-import {SectionCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
-import Colors from '@styles/Colors';
+import {SectionCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
 
 const SuffixContainer = styled.span`
   display: inline-block;

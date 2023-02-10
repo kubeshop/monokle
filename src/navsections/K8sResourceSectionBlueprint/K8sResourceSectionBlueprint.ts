@@ -1,21 +1,27 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {isEmpty} from 'lodash';
+
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {
+  activeResourceCountSelector,
+  activeResourceMetaMapSelector,
+  transientResourceCountSelector,
+  transientResourceMetaMapSelector,
+} from '@redux/selectors/resourceMapSelectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceIdentifier, ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
-import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';
+import K8sResourceSectionNameDisplay from './K8sResourceSectionNameDisplay';
 import {makeResourceKindNavSection} from './ResourceKindSectionBlueprint';
 
 const childSectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
@@ -39,27 +45,33 @@ ResourceKindHandlers.forEach(kindHandler => {
 });
 
 const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
-  const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
+  const subsection: SectionBlueprint<
+    ResourceMeta,
+    {activeResourcesLength: number; transientResourcesLength: number; checkedResourceIds: ResourceIdentifier[]}
+  > = {
     name: subsectionName,
     id: subsectionName,
     containerElementId: 'navigator-sections-container',
     childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
-      const activeResources = activeResourcesSelector(state);
-      return {activeResourcesLength: activeResources.length, checkedResourceIds: state.main.checkedResourceIds};
+      return {
+        activeResourcesLength: activeResourceCountSelector(state),
+        transientResourcesLength: transientResourceCountSelector(state),
+        checkedResourceIds: state.main.checkedResourceIdentifiers,
+      };
     },
     builder: {
       isInitialized: scope => {
-        return scope.activeResourcesLength > 0;
+        return scope.activeResourcesLength > 0 || scope.transientResourcesLength > 0;
       },
-      makeCheckable: scope => {
-        return {
-          checkedItemIds: scope.checkedResourceIds,
-          checkItemsActionCreator: checkMultipleResourceIds,
-          uncheckItemsActionCreator: uncheckMultipleResourceIds,
-        };
-      },
+      // makeCheckable: scope => {
+      //   return {
+      //     checkedItemIds: scope.checkedResourceIds,
+      //     checkItemsActionCreator: checkMultipleResourceIds,
+      //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+      //   };
+      // },
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
@@ -89,15 +101,15 @@ export type K8sResourceScopeType = {
   isFolderLoading: boolean;
   isFolderOpen: boolean;
   isPreviewLoading: boolean;
-  activeResources: K8sResource[];
+  activeResourceMetaMap: ResourceMetaMap;
+  transientResourceMetaMap: ResourceMetaMap<'transient'>;
   resourceFilter: ResourceFilterType;
-  checkedResourceIds: string[];
-  isInPreviewMode?: boolean;
+  checkedResourceIds: ResourceIdentifier[];
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
 
-const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
+const K8sResourceSectionBlueprint: SectionBlueprint<ResourceMeta, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
   containerElementId: 'navigator-sections-container',
@@ -107,11 +119,11 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     return {
       isFolderLoading: state.ui.isFolderLoading,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-      isPreviewLoading: state.main.previewLoader.isLoading,
-      activeResources: activeResourcesSelector(state),
+      isPreviewLoading: Boolean(state.main.previewOptions.isLoading),
+      activeResourceMetaMap: activeResourceMetaMapSelector(state),
+      transientResourceMetaMap: transientResourceMetaMapSelector(state),
       resourceFilter: state.main.resourceFilter,
-      checkedResourceIds: state.main.checkedResourceIds,
-      isInPreviewMode: isInPreviewModeSelector(state),
+      checkedResourceIds: state.main.checkedResourceIdentifiers,
     };
   },
   builder: {
@@ -119,32 +131,35 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       return scope.isFolderLoading || scope.isPreviewLoading;
     },
     isInitialized: scope => {
-      return scope.activeResources.length > 0;
+      return !isEmpty(scope.activeResourceMetaMap) || !isEmpty(scope.transientResourceMetaMap);
     },
     isEmpty: scope => {
       return (
         scope.isFolderOpen &&
-        (scope.activeResources.length === 0 ||
-          scope.activeResources.every(
-            resource => !isResourcePassingFilter(resource, scope.resourceFilter, scope.isInPreviewMode)
-          ))
+        ((isEmpty(scope.activeResourceMetaMap) && isEmpty(scope.transientResourceMetaMap)) ||
+          (Object.values(scope.activeResourceMetaMap).every(
+            resource => !isResourcePassingFilter(resource, scope.resourceFilter)
+          ) &&
+            Object.values(scope.transientResourceMetaMap).every(
+              resource => !isResourcePassingFilter(resource, scope.resourceFilter)
+            )))
       );
     },
-    makeCheckable: scope => {
-      return {
-        checkedItemIds: scope.checkedResourceIds,
-        checkItemsActionCreator: checkMultipleResourceIds,
-        uncheckItemsActionCreator: uncheckMultipleResourceIds,
-      };
-    },
+    // makeCheckable: scope => {
+    //   return {
+    //     checkedItemIds: scope.checkedResourceIds,
+    //     checkItemsActionCreator: checkMultipleResourceIds,
+    //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+    //   };
+    // },
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
     emptyDisplay: {
       component: K8sResourceSectionEmptyDisplay,
     },
-    nameContext: {
-      component: K8sResourceSectionNameSuffix,
+    nameDisplay: {
+      component: K8sResourceSectionNameDisplay,
     },
     isCheckVisibleOnHover: true,
   },

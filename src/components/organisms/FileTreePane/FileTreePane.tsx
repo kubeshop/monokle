@@ -1,7 +1,6 @@
 import {ipcRenderer} from 'electron';
 
 import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {Button, Tooltip} from 'antd';
 
@@ -10,20 +9,21 @@ import {ExclamationCircleOutlined, FileOutlined, FolderOutlined, ReloadOutlined}
 import log from 'loglevel';
 import path from 'path';
 
-import {DEFAULT_PANE_TITLE_HEIGHT, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_PANE_TITLE_HEIGHT, TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectingFile} from '@redux/reducers/main';
 import {openCreateFileFolderModal, setExpandedFolders} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  isInPreviewModeSelectorNew,
+  selectedFilePathSelector,
+  settingsSelector,
+} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFilePath} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-import {TitleBar} from '@molecules';
-
-import {Icon} from '@atoms';
 
 import {
   useCreate,
@@ -40,6 +40,10 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {sortFoldersFiles} from '@utils/fileExplorer';
 
+import {Icon, TitleBar} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {isResourceSelection} from '@shared/models/selection';
+
 import {createNode} from './CreateNode';
 import TreeItem from './TreeItem';
 import {TreeNode} from './types';
@@ -48,20 +52,23 @@ import * as S from './styled';
 
 const FileTreePane: React.FC = () => {
   const [tree, setTree] = useState<TreeNode | null>(null);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
   const dispatch = useAppDispatch();
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
-  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const selectedPath = useAppSelector(selectedFilePathSelector);
+  const localResourceSelection = useAppSelector(state =>
+    isResourceSelection(state.main.selection) && state.main.selection.resourceIdentifier.storage === 'local'
+      ? state.main.selection
+      : undefined
+  );
 
   const {onFileSelect} = useFileSelect();
   const {onPreview} = usePreview();
@@ -114,7 +121,7 @@ const FileTreePane: React.FC = () => {
       createNode(
         rootEntry,
         fileMap,
-        resourceMap,
+        localResourceMetaMap,
         Boolean(hideExcludedFilesInFileExplorer),
         Boolean(hideUnsupportedFilesInFileExplorer),
         fileOrFolderContainedInFilter,
@@ -124,7 +131,7 @@ const FileTreePane: React.FC = () => {
     setTree(treeData);
   }, [
     isFolderLoading,
-    resourceMap,
+    localResourceMetaMap,
     fileMap,
     hideExcludedFilesInFileExplorer,
     hideUnsupportedFilesInFileExplorer,
@@ -139,22 +146,16 @@ const FileTreePane: React.FC = () => {
    */
 
   useEffect(() => {
-    if (selectedResourceId && tree) {
-      const resource = resourceMap[selectedResourceId];
+    if (localResourceSelection && tree) {
+      const resource = localResourceMetaMap[localResourceSelection.resourceIdentifier.id];
 
       if (resource) {
-        const filePath = resource.filePath;
+        const filePath = resource.origin.filePath;
         highlightFilePath(filePath);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
-
-  useEffect(() => {
-    if (isSelectingFile) {
-      dispatch(setSelectingFile(false));
-    }
-  }, [isSelectingFile, dispatch]);
 
   const onExpand = (newExpandedFolders: Key[]) => {
     dispatch(setExpandedFolders(newExpandedFolders));
@@ -215,10 +216,11 @@ const FileTreePane: React.FC = () => {
   return (
     <S.FileTreeContainer id="FileExplorer">
       <TitleBar
-        title="File Explorer"
-        closable
-        leftButtons={
-          <>
+        expandable
+        isOpen
+        title="Files"
+        actions={
+          <S.TitleBarActions>
             {isScanExcludesUpdated === 'outdated' && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
                 <ExclamationCircleOutlined />
@@ -242,7 +244,15 @@ const FileTreePane: React.FC = () => {
                 disabled={isButtonDisabled}
               />
             </Tooltip>
-          </>
+          </S.TitleBarActions>
+        }
+        description={
+          <S.RootFolderText>
+            <span id="file-explorer-count">
+              <b>{filesOnly.length || 0} files</b>
+            </span>{' '}
+            in <span id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</span>
+          </S.RootFolderText>
         }
       />
 
@@ -250,10 +260,6 @@ const FileTreePane: React.FC = () => {
         <S.Skeleton active />
       ) : tree ? (
         <S.TreeContainer>
-          <S.RootFolderText style={{height: DEFAULT_PANE_TITLE_HEIGHT}}>
-            <S.FilePathLabel id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</S.FilePathLabel>
-            {tree && <div id="file-explorer-count">{filesOnly.length} files</div>}
-          </S.RootFolderText>
           <S.TreeDirectoryTree
             height={height - 2 * DEFAULT_PANE_TITLE_HEIGHT - 20}
             onSelect={onFileSelect}
@@ -285,7 +291,7 @@ const FileTreePane: React.FC = () => {
               // @ts-ignore
               return node.highlight;
             }}
-            disabled={isInPreviewMode || previewLoader.isLoading}
+            disabled={isInPreviewMode || isInClusterMode || isPreviewLoading}
             icon={(props: any) => {
               if (props.isFolder) {
                 return <FolderOutlined />;

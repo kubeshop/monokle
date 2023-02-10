@@ -5,11 +5,10 @@ import {sep} from 'path';
 import {AnyAction} from 'redux';
 import invariant from 'tiny-invariant';
 
-import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {AppConfig, ProjectConfig} from '@models/appconfig';
-
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+
+import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {AppConfig, ProjectConfig} from '@shared/models/config';
 
 export interface SerializableObject {
   [name: string]: any;

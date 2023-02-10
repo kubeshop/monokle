@@ -1,10 +1,9 @@
 import {monaco} from 'react-monaco-editor';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {createGlyphDecoration, createMarkdownString, createMarker} from '@molecules/Monaco/editorHelpers';
 
-import {isDefined} from '@utils/filter';
+import {K8sResource} from '@shared/models/k8sResource';
+import {isDefined} from '@shared/utils/filter';
 
 import {GlyphDecorationTypes} from '../../editorConstants';
 
@@ -12,7 +11,9 @@ function applyPolicyIntel(resource: K8sResource): {
   decorations: monaco.editor.IModelDeltaDecoration[];
   markers: monaco.editor.IMarkerData[];
 } {
-  const issues = resource.issues?.errors ?? [];
+  // TODO: re-implement after @monokle/validation
+  // const issues = resource.issues?.errors ?? [];
+  const issues: any[] = [];
 
   const glyphs = issues.map(issue => {
     const rule = issue.rule!;

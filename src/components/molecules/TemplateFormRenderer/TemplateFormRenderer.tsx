@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Button, Divider, Skeleton} from 'antd';
+import {Button, Skeleton} from 'antd';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
@@ -13,11 +13,9 @@ import {Primitive} from 'type-fest';
 
 import {VALID_IMAGE_NAME_REGEX} from '@constants/constants';
 
-import {TemplateForm} from '@models/template';
-
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
-import Colors from '@styles/Colors';
+import {TemplateForm} from '@shared/models/template';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 
@@ -30,15 +28,18 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
 };
 
 interface IProps {
+  defaultFormData: Record<string, Primitive>;
+  isFirstForm: boolean;
   isLastForm: boolean;
   templateForm: TemplateForm;
+  onBackHandler: () => void;
   onSubmit: (formData: any) => void;
 }
 
 const TemplateFormRenderer: React.FC<IProps> = props => {
-  const {templateForm, isLastForm, onSubmit} = props;
+  const {defaultFormData, templateForm, isFirstForm, isLastForm, onBackHandler, onSubmit} = props;
 
-  const [formData, setFormData] = useState<Record<string, Primitive>>({});
+  const [formData, setFormData] = useState<Record<string, Primitive>>(defaultFormData);
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
@@ -78,8 +79,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       setErrorMessage("Couldn't read the schemas for this template form.");
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [templateForm]);
 
   if (isLoading) {
     return <Skeleton />;
@@ -91,9 +91,6 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   return (
     <TemplateFormErrorBoundary>
-      <h2>{templateForm.name}</h2>
-      <p style={{color: Colors.grey7}}>{templateForm.description}</p>
-      <Divider />
       <Form
         onSubmit={e => onSubmit(e.formData)}
         schema={schema}
@@ -105,6 +102,12 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
         customValidate={customValidate}
         validator={validator}
       >
+        {!isFirstForm && (
+          <Button style={{marginRight: '10px'}} onClick={onBackHandler}>
+            Back
+          </Button>
+        )}
+
         <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
           {isLastForm ? 'Submit' : 'Next'}
         </Button>

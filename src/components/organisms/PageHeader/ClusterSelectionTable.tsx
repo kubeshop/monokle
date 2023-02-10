@@ -7,19 +7,18 @@ import {v4 as uuid} from 'uuid';
 
 import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
-import {ClusterColors} from '@models/cluster';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/reducers/appConfig';
-import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
+import {kubeConfigContextsSelector} from '@redux/selectors';
 
-import {FilePatternList} from '@molecules';
+import {FilePatternList} from '@atoms';
 
-import {runCommandInMainThread} from '@utils/commands';
-
-import {BackgroundColors} from '@styles/Colors';
+import {AlertEnum} from '@shared/models/alert';
+import {ClusterColors} from '@shared/models/cluster';
+import {BackgroundColors} from '@shared/styles/colors';
+import {runCommandInMainThread} from '@shared/utils/commands';
+import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelectionTable.styled';
 

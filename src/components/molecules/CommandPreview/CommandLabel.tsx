@@ -4,13 +4,13 @@ import {Modal} from 'antd';
 
 import {cloneDeep} from 'lodash';
 
-import {AlertEnum} from '@models/alert';
-import {SavedCommand} from '@models/appconfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {openSaveEditCommandModal} from '@redux/reducers/ui';
+
+import {AlertEnum} from '@shared/models/alert';
+import {SavedCommand} from '@shared/models/config';
 
 import * as S from './CommandLabel.styled';
 

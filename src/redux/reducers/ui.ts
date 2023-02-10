@@ -5,30 +5,28 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import path from 'path';
 import {Entries} from 'type-fest';
 
-import {DEFAULT_PANE_CONFIGURATION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {SavedCommand} from '@models/appconfig';
+import initialState from '@redux/initialState';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
   HighlightItems,
   LayoutSizeType,
+  LearnTopicType,
   LeftMenuBottomSelectionType,
   LeftMenuSelectionType,
   MonacoUiState,
-  NewLeftMenuSelectionType,
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
   UiState,
-} from '@models/ui';
-import {WalkthroughCollection} from '@models/walkthrough';
-
-import initialState from '@redux/initialState';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-import {SettingsPanel} from '@organisms/SettingsManager/types';
-
-import electronStore from '@utils/electronStore';
+} from '@shared/models/ui';
+import {WalkthroughCollection} from '@shared/models/walkthrough';
+import electronStore from '@shared/utils/electronStore';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -48,15 +46,6 @@ export const uiSlice = createSlice({
 
       electronStore.set('ui.zoomFactor', newZoomFactor);
       webFrame.setZoomFactor(newZoomFactor);
-    },
-    toggleSettings: (state: Draft<UiState>) => {
-      state.isSettingsOpen = !state.isSettingsOpen;
-    },
-    openClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = true;
-    },
-    closeClusterDiff: (state: Draft<UiState>) => {
-      state.isClusterDiffVisible = false;
     },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;
@@ -78,10 +67,7 @@ export const uiSlice = createSlice({
         electronStore.set('ui.leftMenu.bottomSelection', action.payload);
       }
     },
-    setLeftMenuSelection: (
-      state: Draft<UiState>,
-      action: PayloadAction<LeftMenuSelectionType | NewLeftMenuSelectionType>
-    ) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -131,6 +117,20 @@ export const uiSlice = createSlice({
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
     },
+    openTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.isVisible = true;
+    },
+    closeTemplateExplorer: (state: Draft<UiState>) => {
+      state.templateExplorer.selectedTemplatePath = undefined;
+      state.templateExplorer.isVisible = false;
+      state.templateExplorer.projectCreate = undefined;
+    },
+    setSelectedTemplatePath: (state: Draft<UiState>, action: PayloadAction<string | undefined>) => {
+      state.templateExplorer.selectedTemplatePath = action.payload;
+    },
+    setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
+      state.templateExplorer.projectCreate = action.payload;
+    },
     openRenameEntityModal: (
       state: Draft<UiState>,
       action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
@@ -150,10 +150,10 @@ export const uiSlice = createSlice({
         absolutePathToEntity: '',
       };
     },
-    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier>) => {
       state.renameResourceModal = {
         isOpen: true,
-        resourceId: action.payload,
+        resourceIdentifier: action.payload,
       };
     },
     closeReplaceImageModal: (state: Draft<UiState>) => {
@@ -177,10 +177,10 @@ export const uiSlice = createSlice({
         type: action.payload,
       };
     },
-    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<ResourceIdentifier[]>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: true,
-        resourcesIds: action.payload,
+        resourcesIdentifiers: action.payload,
       };
     },
     closeSaveEditCommandModal: (state: Draft<UiState>) => {
@@ -197,7 +197,7 @@ export const uiSlice = createSlice({
     closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
       state.saveResourcesToFileFolderModal = {
         isOpen: false,
-        resourcesIds: [],
+        resourcesIdentifiers: [],
       };
     },
     openCreateFileFolderModal: (
@@ -271,9 +271,6 @@ export const uiSlice = createSlice({
     openKubeConfigBrowseSetting: (state: Draft<UiState>) => {
       state.kubeConfigBrowseSettings = {isOpen: true};
     },
-    setPreviewingCluster: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.previewingCluster = action.payload;
-    },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
@@ -329,12 +326,21 @@ export const uiSlice = createSlice({
       const collection = action.payload;
       state.walkThrough[collection].currentStep = -1;
     },
+    setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.startPageLearn.isVisible = action.payload;
+    },
+    setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
+      state.startPageLearn.learnTopic = action.payload;
+    },
     handleWalkthroughStep: (
       state: Draft<UiState>,
       action: PayloadAction<{step: number; collection: WalkthroughCollection}>
     ) => {
       const {step, collection} = action.payload;
       state.walkThrough[collection].currentStep += step;
+    },
+    setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.isInQuickClusterMode = action.payload;
     },
   },
   extraReducers: builder => {
@@ -350,16 +356,6 @@ export const uiSlice = createSlice({
         const folders = nodes.filter(node => node.children?.length);
         const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
         state.leftMenu.expandedFolders = folderKeys;
-
-        if (
-          state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
-        ) {
-          state.leftMenu.selection = 'file-explorer';
-        }
-        if (state.leftMenu.selection === 'helm-pane' && Object.values(action.payload.helmChartMap).length === 0) {
-          state.leftMenu.selection = 'file-explorer';
-        }
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
@@ -370,7 +366,6 @@ export const uiSlice = createSlice({
 export const {
   cancelWalkthrough,
   closeAboutModal,
-  closeClusterDiff,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
   closeFiltersPresetModal,
@@ -384,12 +379,12 @@ export const {
   closeReplaceImageModal,
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
+  closeTemplateExplorer,
   collapseNavSections,
   expandNavSections,
   handleWalkthroughStep,
   highlightItem,
   openAboutModal,
-  openClusterDiff,
   openCreateFileFolderModal,
   openCreateProjectModal,
   openFiltersPresetModal,
@@ -403,6 +398,7 @@ export const {
   openReplaceImageModal,
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
+  openTemplateExplorer,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
@@ -413,15 +409,17 @@ export const {
   setLeftMenuSelection,
   setMonacoEditor,
   setPaneConfiguration,
-  setPreviewingCluster,
   setRightMenuIsActive,
   setRightMenuSelection,
+  setSelectedTemplatePath,
+  setShowStartPageLearn,
+  setStartPageLearnTopic,
+  setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
   toggleNotifications,
   toggleResourceFilters,
   toggleRightMenu,
-  toggleSettings,
   toggleStartProjectPane,
   zoomIn,
   zoomOut,
@@ -430,5 +428,6 @@ export const {
   setActiveTab,
   openScaleModal,
   closeScaleModal,
+  setIsInQuickClusterMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;

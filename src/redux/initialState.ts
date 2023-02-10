@@ -1,25 +1,44 @@
 import os from 'os';
 
-import {DEFAULT_PANE_CONFIGURATION, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {AlertState} from '@models/alert';
-import {AppConfig, NewVersionCode} from '@models/appconfig';
-import {AppState} from '@models/appstate';
-import {ExtensionState} from '@models/extension';
-import {LogsState} from '@models/logs';
-import {NavigatorState} from '@models/navigator';
-import {TerminalState} from '@models/terminal';
-import {PaneConfiguration, UiState} from '@models/ui';
-import {UiCoachState} from '@models/uiCoach';
-
-import electronStore from '@utils/electronStore';
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {AlertState} from '@shared/models/alert';
+import {AppState} from '@shared/models/appState';
+import {AppConfig, NewVersionCode} from '@shared/models/config';
+import {ExtensionState} from '@shared/models/extension';
+import {NavigatorState} from '@shared/models/navigator';
+import {TerminalState} from '@shared/models/terminal';
+import {LeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
+import electronStore from '@shared/utils/electronStore';
 
 const initialAppState: AppState = {
+  resourceMetaMapByStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+    transient: {},
+  },
+  resourceContentMapByStorage: {
+    local: {},
+    cluster: {},
+    preview: {},
+    transient: {},
+  },
+  selection: undefined,
+  selectionOptions: {},
+  selectionHistory: {
+    current: [],
+    previous: [],
+    index: 0,
+  },
+  highlights: [],
+  previewOptions: {},
+  clusterConnectionOptions: {
+    lastNamespaceLoaded: electronStore.get('appConfig.lastNamespaceLoaded') || 'default',
+  },
   isRehydrating: false,
   wasRehydrated: false,
-  selectionHistory: [],
-  previousSelectionHistory: [],
-  resourceMap: {},
   resourceFilter: {
     labels: {},
     annotations: {},
@@ -28,11 +47,7 @@ const initialAppState: AppState = {
   helmChartMap: {},
   helmValuesMap: {},
   helmTemplatesMap: {},
-  previewLoader: {
-    isLoading: false,
-  },
   resourceDiff: {},
-  isSelectingFile: false,
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
@@ -40,19 +55,8 @@ const initialAppState: AppState = {
       false
     ),
   },
-  clusterDiff: {
-    clusterToLocalResourcesMatches: [],
-    hasLoaded: false,
-    hasFailed: false,
-    hideClusterOnlyResources: true,
-    selectedMatches: [],
-  },
-  policies: {
-    plugins: [],
-  },
   notifications: [],
-  shouldEditorReloadSelectedPath: false,
-  checkedResourceIds: [],
+  checkedResourceIdentifiers: [],
   registeredKindHandlers: [],
   prevConfEditor: {
     isOpen: false,
@@ -62,19 +66,7 @@ const initialAppState: AppState = {
   imagesList: [],
   validationIntegration: undefined,
   autosaving: {},
-  search: {
-    searchQuery: '',
-    replaceQuery: '',
-    queryMatchParams: {
-      matchCase: false,
-      matchWholeWord: false,
-      regExp: false,
-    },
-    searchHistory: electronStore.get('appConfig.recentSearch') || [],
-    currentMatch: null,
-  },
   lastChangedLine: 0,
-  isClusterConnected: false,
 };
 
 const initialAppConfigState: AppConfig = {
@@ -125,16 +117,13 @@ const initialAppConfigState: AppConfig = {
   clusterAccess: [],
   isAccessLoading: false,
   kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
-  clusterPreviewNamespace: electronStore.get('appConfig.clusterPreviewNamespace') || 'default',
 };
 
 const initialAlertState: AlertState = {};
 
-const initialLogsState: LogsState = {
-  logs: [''],
-};
-
-const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+const uiLeftMenuSelection = LeftMenuSelectionOptions.includes(electronStore.get('ui.leftMenu.selection'))
+  ? electronStore.get('ui.leftMenu.selection')
+  : 'explorer';
 const uiLeftMenuBottomSelection = electronStore.get('ui.leftMenu.bottomSelection');
 
 let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfiguration');
@@ -151,11 +140,9 @@ if (
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
-  isSettingsOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
   isScaleModalOpen: false,
-  isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
@@ -173,17 +160,13 @@ const initialUiState: UiState = {
     isOpen: false,
     fromTemplate: false,
   },
-  renameResourceModal: {
-    isOpen: false,
-    resourceId: '',
-  },
   saveEditCommandModal: {
     isOpen: false,
   },
   isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
-    resourcesIds: [],
+    resourcesIdentifiers: [],
   },
   renameEntityModal: {
     isOpen: false,
@@ -239,6 +222,12 @@ const initialUiState: UiState = {
       currentStep: -1,
     },
   },
+  startPageLearn: {
+    isVisible: false,
+  },
+  templateExplorer: {
+    isVisible: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {
@@ -248,10 +237,6 @@ const initialNavigatorState: NavigatorState = {
   registeredSectionBlueprintIds: [],
 };
 
-const initialUiCoachState: UiCoachState = {
-  hasUserPerformedClickOnClusterIcon: false,
-};
-
 const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
@@ -259,7 +244,6 @@ const initialExtensionState: ExtensionState = {
   pluginMap: {},
   templateMap: {},
   templatePackMap: {},
-  isPluginsDrawerVisible: false,
 };
 
 const initialTerminalState: TerminalState = {
@@ -275,10 +259,8 @@ export default {
   alert: initialAlertState,
   config: initialAppConfigState,
   extension: initialExtensionState,
-  logs: initialLogsState,
   main: initialAppState,
   navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  uiCoach: initialUiCoachState,
 };

@@ -4,29 +4,27 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
+import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
-import {ContextMenu} from '@molecules';
+import {ContextMenu, Dots, Spinner} from '@atoms';
 
-import {Dots, Spinner} from '@atoms';
-
-import {defineHotkey} from '@utils/defineHotkey';
 import {deleteEntity} from '@utils/files';
-import {showItemInFolder} from '@utils/shell';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {Colors} from '@shared/styles/colors';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {showItemInFolder} from '@shared/utils/shell';
 
 import {TreeItemProps} from './types';
 
@@ -76,12 +74,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedPath = useAppSelector(selectedFilePathSelector);
+  const localResourceMetaMap = useAppSelector(localResourceMetaMapSelector);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const git = useAppSelector(state => state.git);
 
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
   const isFileSelected = useMemo(() => treeKey === selectedPath, [treeKey, selectedPath]);
   const isRoot = useMemo(() => treeKey === ROOT_FILE_ENTRY, [treeKey]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -123,10 +122,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       const fileEntry = fileMap[entryPath];
       return (
         fileEntry &&
-        (isKustomizationFile(fileEntry, resourceMap) || getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
+        (isKustomizationFile(fileEntry, localResourceMetaMap) ||
+          getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
       );
     },
-    [fileMap, resourceMap, helmValuesMap]
+    [fileMap, localResourceMetaMap, helmValuesMap]
   );
 
   const handleOnMouseEnter = () => setTitleHoverState(true);
@@ -155,7 +155,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'create_directory',
             label: 'New Folder',
-            disabled: isInPreviewMode,
+            disabled: isInPreviewMode || isInClusterMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onCreateFileFolder(absolutePath, 'folder');
@@ -164,7 +164,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'create_file',
             label: 'New File',
-            disabled: isInPreviewMode,
+            disabled: isInPreviewMode || isInClusterMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onCreateFileFolder(absolutePath, 'file');
@@ -177,7 +177,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       label: isFolder ? 'New Resource' : 'Add Resource',
       disabled:
         isInPreviewMode ||
-        isKustomizationFile(fileMap[relativePath], resourceMap) ||
+        isInClusterMode ||
+        isKustomizationFile(fileMap[relativePath], localResourceMetaMap) ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
@@ -196,10 +197,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           : `Filter on this ${isFolder ? 'folder' : 'file'}`,
       disabled:
         isInPreviewMode ||
+        isInClusterMode ||
         isHelmChartFile(relativePath) ||
         isHelmValuesFile(relativePath) ||
         isHelmTemplateFile(relativePath) ||
-        isKustomizationFile(fileMap[relativePath], resourceMap) ||
+        isKustomizationFile(fileMap[relativePath], localResourceMetaMap) ||
         (!isFolder && (isExcluded || !isSupported)),
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
@@ -218,6 +220,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             label: `${isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
             disabled:
               isInPreviewMode ||
+              isInClusterMode ||
               isHelmChartFile(relativePath) ||
               isHelmValuesFile(relativePath) ||
               isHelmTemplateFile(relativePath) ||
@@ -256,7 +259,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'duplicate_entity',
             label: 'Duplicate',
-            disabled: isInPreviewMode,
+            disabled: isInPreviewMode || isInClusterMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onDuplicate(absolutePath, getBasename(absolutePath), getDirname(absolutePath));
@@ -265,7 +268,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'rename_entity',
             label: 'Rename',
-            disabled: isInPreviewMode,
+            disabled: isInPreviewMode || isInClusterMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               onRename(absolutePath, osPlatform);
@@ -274,7 +277,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           {
             key: 'delete_entity',
             label: 'Delete',
-            disabled: isInPreviewMode,
+            disabled: isInPreviewMode || isInClusterMode,
             onClick: (e: any) => {
               e.domEvent.stopPropagation();
               deleteEntityWizard(
@@ -313,7 +316,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   ];
 
   return (
-    <ContextMenu disabled={isDisabled} overlay={<Menu items={menuItems} />} triggerOnRightClick>
+    <ContextMenu disabled={isDisabled} items={menuItems} triggerOnRightClick>
       <S.TreeTitleWrapper $isDisabled={isDisabled} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
         <S.TitleWrapper>
           <S.TreeTitleText>{title as React.ReactNode}</S.TreeTitleText>
@@ -335,7 +338,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
                 type="text"
                 size="small"
                 disabled={
-                  isInPreviewMode || !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')
+                  isInPreviewMode ||
+                  isInClusterMode ||
+                  !fileMap[relativePath].filePath.startsWith(fileOrFolderContainedInFilter || '')
                 }
                 $isItemSelected={isFileSelected}
                 onClick={handlePreview}
@@ -345,7 +350,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             )}
 
             {!isDisabled && (
-              <ContextMenu overlay={<Menu items={menuItems} />}>
+              <ContextMenu items={menuItems}>
                 <div
                   onClick={e => {
                     e.stopPropagation();

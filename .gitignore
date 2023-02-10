@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
+*/node_modules
 /.pnp
 .idea
 .pnp.js
@@ -12,8 +13,10 @@
 /test-output
 
 # production
-/build
-/dist
+build
+dist
+*/build
+*/dist
 
 # misc
 .DS_Store
@@ -35,4 +38,4 @@ k8sdumps
 /site
 
 electron/env.ts
-shared
+docs-new/.docusaurus

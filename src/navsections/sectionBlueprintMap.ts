@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import _ from 'lodash';
 import log from 'loglevel';
 
-import {SectionBlueprint} from '@models/navigator';
+import {SectionBlueprint} from '@shared/models/navigator';
 
 const SectionBlueprintMap: Record<string, SectionBlueprint<any, any>> = {};
 

@@ -1,4 +1,4 @@
-import {IMenu} from '@components/organisms/DashboardPane/menu';
+import {DashboardState} from '@shared/models/dashboard';
 
 export const initialState: DashboardState = {
   isOpen: false,
@@ -7,19 +7,5 @@ export const initialState: DashboardState = {
     activeTab: 'Info',
     menuList: [],
   },
-  tableDrawer: {
-    selectedResourceId: undefined,
-  },
-};
-
-export type DashboardState = {
-  isOpen: boolean;
-  ui: {
-    activeMenu: IMenu;
-    activeTab: 'Info' | 'Manifest';
-    menuList: Array<IMenu>;
-  };
-  tableDrawer: {
-    selectedResourceId?: string;
-  };
+  tableDrawer: {},
 };

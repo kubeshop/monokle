@@ -2,7 +2,7 @@ import {Select as AntdSelect, Input} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Divider = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);

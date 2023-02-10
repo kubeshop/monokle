@@ -11,7 +11,7 @@ import applyRefIntel from './applyRefIntel';
 export const resourceCodeIntel: CodeIntelApply = {
   name: 'resource',
   shouldApply: params => {
-    return Boolean(params.selectedResource);
+    return Boolean(params.selectedResourceMeta);
   },
   codeIntel: async ({
     resource,
@@ -20,14 +20,23 @@ export const resourceCodeIntel: CodeIntelApply = {
     createResource,
     filterResources,
     selectImageHandler,
-    resourceMap,
+    resourceMetaMap,
     fileMap,
     model,
     lastChangedLine,
+    activeResourceStorage,
   }) => {
     const disposables: monaco.IDisposable[] = [];
     const decorations: monaco.editor.IModelDeltaDecoration[] = [];
     const markers: monaco.editor.IMarkerData[] = [];
+
+    if (!resource) {
+      return {
+        newDecorations: decorations,
+        newDisposables: disposables,
+        newMarkers: markers,
+      };
+    }
 
     if (model) {
       await processSymbols(model, resource, filterResources, disposables, decorations);
@@ -39,8 +48,9 @@ export const resourceCodeIntel: CodeIntelApply = {
       selectFilePath,
       createResource,
       selectImageHandler,
-      resourceMap,
-      fileMap
+      resourceMetaMap,
+      fileMap,
+      activeResourceStorage
     );
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);

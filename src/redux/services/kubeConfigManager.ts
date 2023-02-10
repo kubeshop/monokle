@@ -1,7 +1,7 @@
 /* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
-import {createKubeClient} from '@utils/kubeclient';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 export class KubeConfigManager {
   private static instance: KubeConfigManager;

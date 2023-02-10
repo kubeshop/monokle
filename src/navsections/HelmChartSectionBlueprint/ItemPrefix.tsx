@@ -2,11 +2,9 @@ import {useMemo} from 'react';
 
 import {EyeOutlined, FileOutlined} from '@ant-design/icons';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
-import {Icon} from '@atoms';
-
-import Colors from '@styles/Colors';
+import {Icon} from '@monokle/components';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
 
 const ItemPrefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

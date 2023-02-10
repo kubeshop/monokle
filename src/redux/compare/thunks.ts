@@ -3,17 +3,15 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import invariant from 'tiny-invariant';
 
-import {ERROR_MSG_FALLBACK} from '@constants/constants';
-
-import {AlertType} from '@models/alert';
-import {ThunkApi} from '@models/thunk';
-
 import {setAlert} from '@redux/reducers/alert';
 import {doTransferResource} from '@redux/services/compare/transferResource';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
-import {CompareSide, MatchingResourceComparison, TransferDirection} from './state';
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
+import {AlertType} from '@shared/models/alert';
+import {CompareSide, MatchingResourceComparison, TransferDirection} from '@shared/models/compare';
+import {ThunkApi} from '@shared/models/thunk';
 
 type TransferResourceArgs = {
   ids: string[];

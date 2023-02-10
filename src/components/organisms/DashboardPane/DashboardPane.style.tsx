@@ -9,9 +9,8 @@ import {
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
-
 import {TitleBar} from '@monokle/components';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   padding: 16px 0px 16px 0;
@@ -37,7 +36,7 @@ export const MainSection = styled.div<{$active: boolean; $clickable: boolean}>`
   `}
 
   ${props => `
-    color: ${props.$active ? Colors.grey6000 : Colors.whitePure};
+    color: ${props.$active ? Colors.grey2 : Colors.whitePure};
     background-color: ${props.$active ? Colors.blue9 : 'transparent'};
     cursor:${props.$clickable ? 'pointer' : 'inherit'};`}
 `;
@@ -55,7 +54,7 @@ export const SubSection = styled.div<{$active: boolean}>`
   }
 
   ${props => `
-    color: ${props.$active ? Colors.grey6000 : Colors.grey9};
+    color: ${props.$active ? Colors.grey2 : Colors.grey9};
     background-color: ${props.$active ? Colors.blue9 : 'transparent'}`}
 `;
 

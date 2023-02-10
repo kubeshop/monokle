@@ -9,7 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {ANY_VALUE} from '@constants/form';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import KeyValueEntryRenderer from './KeyValueEntryRenderer';
 import * as S from './KeyValueInput.styled';

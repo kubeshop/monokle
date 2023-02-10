@@ -4,9 +4,10 @@ import {Select} from 'antd';
 
 import styled from 'styled-components';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {useAppSelector} from '@redux/hooks';
+import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+
+import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './styled';
 
@@ -19,7 +20,7 @@ const FormContainer = styled.div`
 
 export const SecretKindSelection = ({schema, onChange, formData, disabled}: any) => {
   const {secretType} = schema;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMap = useAppSelector(localResourceMapSelector);
   const [refs, setRefs] = useState<string[]>([]);
   const [properties, setProperties] = useState<string[]>([]);
   const [selectedRef, setSelectedRef] = useState<string | undefined>(
@@ -44,7 +45,7 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled}: any)
       setRefs(
         Object.values(resourceMap)
           .filter(
-            (resource: K8sResource) => resource.kind === 'Secret' && allowedSecretTypes.includes(resource.content.type)
+            (resource: K8sResource) => resource.kind === 'Secret' && allowedSecretTypes.includes(resource.object.type)
           )
           .map((resource: K8sResource) => resource.name)
       );
@@ -58,7 +59,7 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled}: any)
       const selectedResource: K8sResource | undefined = Object.values(resourceMap).find(
         (resource: K8sResource) => resource.kind === 'Secret' && resource.name === selectedRef
       );
-      setProperties(selectedResource ? Object.keys(selectedResource.content.data) : []);
+      setProperties(selectedResource ? Object.keys(selectedResource.object.data) : []);
     } else {
       setProperties([]);
     }

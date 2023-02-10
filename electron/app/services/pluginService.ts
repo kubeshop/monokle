@@ -2,16 +2,10 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
-import {AnyExtension} from '@models/extension';
-import {
-  AnyPlugin,
-  PluginPackageJson,
-  isTemplatePluginModule,
-  validatePluginPackageJson,
-  validateTemplatePluginModule,
-} from '@models/plugin';
-
-import {createFolder, doesPathExist} from '@utils/fileSystem';
+import type {AnyExtension} from '@shared/models/extension';
+import {isTemplatePluginModule, validatePluginPackageJson, validateTemplatePluginModule} from '@shared/models/plugin';
+import type {AnyPlugin, PluginPackageJson} from '@shared/models/plugin';
+import {createFolder, doesPathExist} from '@shared/utils/fileSystem';
 
 import downloadExtension from '../extensions/downloadExtension';
 import downloadExtensionEntry from '../extensions/downloadExtensionEntry';

@@ -5,6 +5,7 @@ import {Button, Col, Modal, Row} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLastChangedLine} from '@redux/reducers/main';
+import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 
@@ -12,6 +13,8 @@ import {FormEditor, Monaco} from '@components/molecules';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {isLocalResourceMeta} from '@shared/models/k8sResource';
 
 import * as S from './FormEditorModal.styled';
 
@@ -21,11 +24,9 @@ type Props = {
 };
 
 export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId) || 0;
-  const selectedResource = resourceMap[selectedResourceId];
+  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
   const sizeProps = useModalSize();
   const dispatch = useAppDispatch();
 
@@ -33,10 +34,10 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
     dispatch(setLastChangedLine(0));
   }, [dispatch]);
 
-  const isKustomization = useMemo(() => isKustomizationResource(selectedResource), [selectedResource]);
+  const isKustomization = useMemo(() => isKustomizationResource(selectedResourceMeta), [selectedResourceMeta]);
   const resourceKindHandler = useMemo(
-    () => (selectedResource && !isKustomization ? getResourceKindHandler(selectedResource.kind) : undefined),
-    [isKustomization, selectedResource]
+    () => (selectedResourceMeta && !isKustomization ? getResourceKindHandler(selectedResourceMeta.kind) : undefined),
+    [isKustomization, selectedResourceMeta]
   );
 
   return (
@@ -55,13 +56,15 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
       <Row>
         <Col span={24}>
           <S.SourceNameBlock>
-            <S.FilePath>
-              <span>File:</span>
-              {selectedResource?.filePath}
-            </S.FilePath>
+            {selectedResourceMeta && isLocalResourceMeta(selectedResourceMeta) && (
+              <S.FilePath>
+                <span>File:</span>
+                {selectedResourceMeta.origin.filePath}
+              </S.FilePath>
+            )}
             <S.FileName>
               <span>Resource:</span>
-              {selectedResource?.name}
+              {selectedResourceMeta?.name}
             </S.FileName>
           </S.SourceNameBlock>
         </Col>
@@ -74,10 +77,10 @@ export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
         <Col span={1} />
         <S.StyledCol span={11}>
           <S.BlockTitle>Form</S.BlockTitle>
-          {isKustomization && selectedResource ? (
+          {isKustomization && selectedResourceMeta ? (
             <FormEditor
               formSchema={extractFormSchema(
-                getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                getResourceSchema(selectedResourceMeta, String(k8sVersion), String(userDataDir))
               )}
             />
           ) : (

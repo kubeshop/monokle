@@ -1,12 +1,13 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
+import {isEqual} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {ScrollIntoView} from '@molecules';
+import {ScrollIntoView} from '@atoms';
+import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
-import {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {ItemBlueprint, ItemCustomComponentProps} from '@shared/models/navigator';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -38,11 +39,13 @@ const WrapperPlacehoder: React.FC<ItemCustomComponentProps> = props => {
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
   const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, indentation, options} =
     props;
-  const {instanceHandler} = blueprint;
+
+  const instanceHandlerRef = useRef(blueprint.instanceHandler);
+  instanceHandlerRef.current = blueprint.instanceHandler;
 
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
-  const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIdentifiers);
+  const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId], isEqual);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -54,16 +57,16 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const scrollContainer = useRef<ScrollContainerRef>(null);
 
   const onClick = useCallback(() => {
-    if (instanceHandler && instanceHandler.onClick && !itemInstance.isDisabled) {
-      instanceHandler.onClick(itemInstance, dispatch);
+    if (instanceHandlerRef.current && instanceHandlerRef.current.onClick && !itemInstance.isDisabled) {
+      instanceHandlerRef.current.onClick(itemInstance, dispatch);
     }
-  }, [instanceHandler, itemInstance, dispatch]);
+  }, [itemInstance, dispatch]);
 
   const onCheck = useCallback(() => {
-    if (instanceHandler && instanceHandler.onCheck && !itemInstance.isDisabled) {
-      instanceHandler.onCheck(itemInstance, dispatch);
+    if (instanceHandlerRef.current && instanceHandlerRef.current.onCheck && !itemInstance.isDisabled) {
+      instanceHandlerRef.current.onCheck(itemInstance, dispatch);
     }
-  }, [instanceHandler, itemInstance, dispatch]);
+  }, [itemInstance, dispatch]);
 
   useEffect(() => {
     if (!itemInstance.shouldScrollIntoView) {
@@ -98,7 +101,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             isHovered={isHovered}
             level={level}
             isLastItem={isLastItem}
-            hasOnClick={Boolean(instanceHandler?.onClick)}
+            hasOnClick={Boolean(instanceHandlerRef.current?.onClick)}
             $indentation={indentation}
             $isSectionCheckable={isSectionCheckable}
             $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
@@ -173,4 +176,4 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   );
 }
 
-export default ItemRenderer;
+export default memo(ItemRenderer, isEqual);

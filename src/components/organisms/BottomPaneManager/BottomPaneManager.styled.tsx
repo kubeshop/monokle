@@ -11,8 +11,8 @@ import {
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {AppBorders} from '@styles/Borders';
-import Colors, {PanelColors} from '@styles/Colors';
+import {AppBorders} from '@shared/styles/borders';
+import {Colors, PanelColors} from '@shared/styles/colors';
 
 export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean}>`
   height: 100%;
