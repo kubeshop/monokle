@@ -36,9 +36,10 @@ export const TitleBarContainer = styled.div<{$disableScroll?: boolean}>`
     border-top-right-radius: 0;
     overflow: ${({$disableScroll}) => ($disableScroll ? 'hidden' : 'auto')};
     padding: ${({$disableScroll}) => ($disableScroll ? '0px' : '9px 10px 6px 10px')};
-    height: calc(100% - 32px);
-
     margin-top: 4px;
+    height: calc(100% - 32px);
+    display: flex;
+    align-items: center;
   }
 `;
 

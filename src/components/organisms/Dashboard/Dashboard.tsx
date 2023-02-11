@@ -1,7 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -57,15 +57,19 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const clusterResourceMapRef = useResourceMetaMapRef('cluster');
+  const clusterResourceContentMapRef = useResourceContentMapRef('cluster');
+  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
-    return Object.values(clusterResourceMapRef.current).filter(
-      resource =>
-        activeMenu.key.replace(`${resource.apiVersion}-`, '') === resource.kind && resource.kind === activeMenu.label
-    );
-  }, [activeMenu, clusterResourceMapRef]);
+    return Object.values(clusterResourceContentMapRef.current)
+      .map(r => ({...r, ...clusterResourceMetaMapRef.current[r.id]}))
+      .filter(
+        resource =>
+          activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
+          resource.object.kind === activeMenu.label
+      );
+  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef]);
 
   const filteredResources = useMemo(() => {
     return filterResources();
