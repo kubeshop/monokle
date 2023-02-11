@@ -9,6 +9,7 @@ import {join} from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
@@ -56,6 +57,23 @@ export const useDelete = (fileEntry?: FileEntry) => {
     deleteEntry,
     isDeleteLoading: isLoading,
   };
+};
+
+export const useCreateResource = () => {
+  const dispatch = useAppDispatch();
+
+  const createResource = useCallback(
+    (entry: FileEntry) => {
+      if (isDefined(entry.children)) {
+        dispatch(openNewResourceWizard({defaultInput: {targetFolder: entry.filePath}}));
+      } else {
+        dispatch(openNewResourceWizard({defaultInput: {targetFile: entry.filePath}}));
+      }
+    },
+    [dispatch]
+  );
+
+  return createResource;
 };
 
 export const useIsDisabled = (fileEntry?: FileEntry) => {
@@ -212,6 +230,7 @@ export const useFileMenuItems = (
   const commonMenuItems = useCommonMenuItems(fileEntry);
   const dispatch = useAppDispatch();
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
+  const createNewResource = useCreateResource();
 
   const onClickPreviewRef = useRef(() => {});
 
@@ -249,6 +268,9 @@ export const useFileMenuItems = (
       key: 'add-resource',
       label: 'Add Resource',
       disabled: isNonResourceFile,
+      onClick: () => {
+        createNewResource(fileEntry);
+      },
     });
 
     newMenuItems.push({
@@ -266,7 +288,7 @@ export const useFileMenuItems = (
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, canBePreviewed, commonMenuItems, localResourceMetaMapRef]);
+  }, [fileEntry, canBePreviewed, commonMenuItems, localResourceMetaMapRef, createNewResource]);
 
   return menuItems;
 };
@@ -281,6 +303,8 @@ export const useFolderMenuItems = (
   const dispatch = useAppDispatch();
 
   const onClickPreviewRef = useRef(() => {});
+
+  const createNewResource = useCreateResource();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -300,13 +324,15 @@ export const useFolderMenuItems = (
       key: 'new-resource',
       label: 'New Resource',
       disabled: isInClusterMode || isInPreviewMode,
-      onClick: () => {},
+      onClick: () => {
+        createNewResource(fileEntry);
+      },
     });
 
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode]);
+  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource]);
 
   return menuItems;
 };
