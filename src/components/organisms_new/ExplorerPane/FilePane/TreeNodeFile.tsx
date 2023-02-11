@@ -1,0 +1,36 @@
+import {useAppSelector} from '@redux/hooks';
+
+import {FileEntry} from '@shared/models/fileEntry';
+
+import * as S from './TreeNode.styled';
+import {useCanPreview} from './hooks';
+
+type Props = {
+  filePath: string;
+};
+
+const TreeNodeFile: React.FC<Props> = props => {
+  const {filePath} = props;
+  const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
+
+  const isSelected = useAppSelector(
+    state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
+  );
+  const canBePreviewed = useCanPreview(fileEntry);
+
+  if (!fileEntry) {
+    return null;
+  }
+
+  return (
+    <S.NodeContainer $isDisabled={false}>
+      <S.TitleContainer>
+        <S.TitleText>{fileEntry.name}</S.TitleText>
+
+        {canBePreviewed && <S.PreviewIcon $isSelected={isSelected} />}
+      </S.TitleContainer>
+    </S.NodeContainer>
+  );
+};
+
+export default TreeNodeFile;

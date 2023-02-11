@@ -310,7 +310,7 @@ export function getLocalResourcesForPath(
 export function getAbsoluteResourceFolder(resource: ResourceMeta<'local'>, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
-    resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf(path.sep))
+    resource.origin.filePath.substring(0, resource.origin.filePath.lastIndexOf(path.sep))
   );
 }
 
@@ -320,7 +320,7 @@ export function getAbsoluteResourceFolder(resource: ResourceMeta<'local'>, fileM
  */
 
 export function getResourceFolder(resource: ResourceMeta<'local'>) {
-  return resource.origin.filePath.substr(0, resource.origin.filePath.lastIndexOf('/'));
+  return resource.origin.filePath.substring(0, resource.origin.filePath.lastIndexOf(path.sep));
 }
 
 /**
