@@ -2,6 +2,7 @@ import fs from 'fs';
 import {lstat, rm} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
+import textExtensions from 'text-extensions';
 
 import {setAlert} from '@redux/reducers/alert';
 
@@ -198,3 +199,18 @@ export function hasValidExtension(file: string | undefined, extensions: string[]
 export function createFileWithContent(filePath: string, content: string) {
   return fs.writeFileSync(filePath, content, {flag: 'wx'});
 }
+
+export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
+  if (!fileEntry) {
+    return true;
+  }
+  const isFolder = isDefined(fileEntry?.children);
+  const fileExtension = path.extname(fileEntry?.filePath);
+  const hasTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
+
+  if (!isFolder && !fileEntry.isSupported && !hasTextExtension) {
+    return true;
+  }
+
+  return false;
+};

@@ -9,6 +9,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
 
+import {isFileEntryDisabled} from '@utils/files';
+
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
 import {isDefined} from '@shared/utils/filter';
@@ -62,6 +64,7 @@ function createFileNodes(folderPath: string, fileMap: FileMapType) {
     key: entry.filePath,
     title: path.basename(entry.filePath),
     isLeaf: true,
+    disabled: isFileEntryDisabled(entry),
   }));
 
   return fileNodes;
@@ -84,6 +87,7 @@ function createFolderTree(folderPath: string, fileMap: FileMapType) {
         .filter(isDefined) || []),
       ...fileNodes,
     ],
+    disabled: isFileEntryDisabled(folderEntry),
   };
   return treeNode;
 }
