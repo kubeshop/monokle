@@ -112,7 +112,7 @@ export const useFileScanning = (onConfirm: () => void) => {
   return {addEntryToScanExcludes, removeEntryFromScanExcludes};
 };
 
-export const useFileMenuItems = (
+export const useMenuItems = (
   stateArgs: {canBePreviewed: boolean; isInClusterMode: boolean; isInPreviewMode: boolean},
   fileEntry?: FileEntry
 ) => {
@@ -237,6 +237,8 @@ export const useFileMenuItems = (
       key: 'reveal',
       label: `Reveal in ${platformFileManagerName}`,
     });
+
+    return newMenuItems;
   }, [
     fileEntry,
     canBePreviewed,
