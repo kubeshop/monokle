@@ -214,3 +214,21 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
 
   return false;
 };
+
+const getParentFolderPath = (relativePath: string): string | undefined => {
+  const parentFolderPath = path.dirname(relativePath);
+  if (parentFolderPath.trim() === '' || parentFolderPath === path.sep) {
+    return undefined;
+  }
+  return parentFolderPath;
+};
+
+export const getAllParentFolderPaths = (filePath: string): string[] => {
+  const parentFolderPaths: string[] = [];
+  let parentFolderPath = getParentFolderPath(filePath);
+  while (parentFolderPath) {
+    parentFolderPaths.push(parentFolderPath);
+    parentFolderPath = getParentFolderPath(parentFolderPath);
+  }
+  return parentFolderPaths;
+};

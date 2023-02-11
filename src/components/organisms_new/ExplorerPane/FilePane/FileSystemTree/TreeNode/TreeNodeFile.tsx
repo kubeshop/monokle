@@ -1,5 +1,11 @@
 import {useCallback, useRef, useState} from 'react';
 
+import {Tooltip} from 'antd';
+
+import {join} from 'path';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useAppSelector} from '@redux/hooks';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 
@@ -24,6 +30,9 @@ const TreeNodeFile: React.FC<Props> = props => {
   const [isHovered, setIsHovered] = useState(false);
   const isSelected = useAppSelector(
     state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
+  );
+  const isHighlighted = useAppSelector(state =>
+    state.main.highlights.some(h => h.type === 'file' && h.filePath === filePath)
   );
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
@@ -52,7 +61,32 @@ const TreeNodeFile: React.FC<Props> = props => {
       $isDisabled={isDisabled}
     >
       <S.TitleContainer>
-        <S.TitleText>{fileEntry.name}</S.TitleText>
+        <S.TitleText>
+          <Tooltip
+            overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={
+              fileEntry.rootFolderPath === fileEntry.filePath
+                ? fileEntry.filePath
+                : join(fileEntry.rootFolderPath, fileEntry.filePath)
+            }
+            placement="bottom"
+          >
+            <span
+              className={
+                isHighlighted
+                  ? 'highlighted-node'
+                  : fileEntry.isExcluded
+                  ? 'excluded-file-entry-name'
+                  : fileEntry.isSupported
+                  ? 'file-entry-name'
+                  : 'not-supported-file-entry-name'
+              }
+            >
+              {fileEntry.name}
+            </span>
+          </Tooltip>
+        </S.TitleText>
 
         {canBePreviewed && <S.PreviewIcon $isSelected={isSelected} />}
       </S.TitleContainer>

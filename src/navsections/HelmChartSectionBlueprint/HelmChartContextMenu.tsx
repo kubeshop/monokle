@@ -175,7 +175,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
         label: 'Rename',
         disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
-          onRename(absolutePath, osPlatform);
+          onRename(absolutePath);
         },
       },
       {
@@ -216,7 +216,6 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       onExcludeFromProcessing,
       onFilterByFileOrFolder,
       onRename,
-      osPlatform,
       platformFileManagerName,
       target,
       fileEntry,

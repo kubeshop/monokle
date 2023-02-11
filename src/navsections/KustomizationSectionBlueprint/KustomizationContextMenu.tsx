@@ -173,7 +173,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
           if (!absolutePath) {
             return;
           }
-          onRename(absolutePath, osPlatform);
+          onRename(absolutePath);
         },
       },
       {
@@ -211,7 +211,6 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       isRoot,
       absolutePath,
       fileOrFolderContainedInFilter,
-      osPlatform,
       platformFileManagerName,
       targetFile,
       resourceRef,
