@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {Modal} from 'antd';
 import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
@@ -9,11 +9,13 @@ import {join} from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
 import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
-import {isKustomizationFile} from '@redux/services/kustomize';
+import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
+import {startPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {deleteFileEntry, dispatchDeleteAlert, isFileEntryDisabled} from '@utils/files';
@@ -76,11 +78,52 @@ export const useCreateResource = () => {
   return createResource;
 };
 
+export const useRename = () => {
+  const dispatch = useAppDispatch();
+
+  const rename = useCallback(
+    (fileEntry: FileEntry) => {
+      dispatch(openRenameEntityModal({absolutePathToEntity: join(fileEntry.rootFolderPath, fileEntry.filePath)}));
+    },
+    [dispatch]
+  );
+
+  return rename;
+};
+
 export const useIsDisabled = (fileEntry?: FileEntry) => {
   const isDisabled = useMemo(() => {
     return isFileEntryDisabled(fileEntry);
   }, [fileEntry]);
   return isDisabled;
+};
+
+export const usePreview = () => {
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
+  const helmValuesMapRef = useRefSelector(state => state.main.helmValuesMap);
+
+  const dispatch = useAppDispatch();
+
+  const preview = useCallback(
+    (relativePath: string) => {
+      const resourceMetas = getLocalResourceMetasForPath(relativePath, localResourceMetaMapRef.current);
+      if (resourceMetas && resourceMetas.length === 1 && isKustomizationResource(resourceMetas[0])) {
+        startPreview({type: 'kustomize', kustomizationId: resourceMetas[0].id}, dispatch);
+      } else {
+        const fileEntry = fileMapRef.current[relativePath];
+        if (fileEntry) {
+          const valuesFile = getHelmValuesFile(fileEntry, helmValuesMapRef.current);
+          if (valuesFile) {
+            startPreview({type: 'helm', valuesFileId: valuesFile.id, chartId: valuesFile.helmChartId}, dispatch);
+          }
+        }
+      }
+    },
+    [dispatch, localResourceMetaMapRef, fileMapRef, helmValuesMapRef]
+  );
+
+  return preview;
 };
 
 export const useFileScanning = (onConfirm: () => void) => {
@@ -140,7 +183,7 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(fileEntry?.filePath);
-
+  const renameFileEntry = useRename();
   const reloadRootFolder = useCallback(() => {
     if (!fileEntry) {
       return;
@@ -189,7 +232,9 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
-      onClick: () => {},
+      onClick: () => {
+        renameFileEntry(fileEntry);
+      },
     });
 
     newMenuItems.push({
@@ -216,23 +261,20 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     removeEntryFromScanExcludes,
     openOnGithub,
     canOpenOnGithub,
+    renameFileEntry,
   ]);
 
   return menuItems;
 };
 
-export const useFileMenuItems = (
-  stateArgs: {canBePreviewed: boolean; isInClusterMode: boolean; isInPreviewMode: boolean},
-  fileEntry?: FileEntry
-) => {
-  const {canBePreviewed, isInClusterMode, isInPreviewMode} = stateArgs;
+export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry?: FileEntry) => {
+  const {canBePreviewed} = stateArgs;
 
   const commonMenuItems = useCommonMenuItems(fileEntry);
-  const dispatch = useAppDispatch();
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
 
-  const onClickPreviewRef = useRef(() => {});
+  const preview = usePreview();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -254,7 +296,9 @@ export const useFileMenuItems = (
       newMenuItems.push({
         key: 'preview',
         label: 'Preview',
-        onClick: onClickPreviewRef.current,
+        onClick: () => {
+          preview(fileEntry.filePath);
+        },
       });
     }
 
@@ -288,7 +332,7 @@ export const useFileMenuItems = (
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, canBePreviewed, commonMenuItems, localResourceMetaMapRef, createNewResource]);
+  }, [fileEntry, canBePreviewed, commonMenuItems, createNewResource, preview, localResourceMetaMapRef]);
 
   return menuItems;
 };
@@ -300,9 +344,6 @@ export const useFolderMenuItems = (
   const {isInClusterMode, isInPreviewMode} = stateArgs;
 
   const commonMenuItems = useCommonMenuItems(fileEntry);
-  const dispatch = useAppDispatch();
-
-  const onClickPreviewRef = useRef(() => {});
 
   const createNewResource = useCreateResource();
 
