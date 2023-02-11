@@ -112,16 +112,10 @@ export const useFileScanning = (onConfirm: () => void) => {
   return {addEntryToScanExcludes, removeEntryFromScanExcludes};
 };
 
-export const useMenuItems = (
-  stateArgs: {canBePreviewed: boolean; isInClusterMode: boolean; isInPreviewMode: boolean},
-  fileEntry?: FileEntry
-) => {
-  const {canBePreviewed, isInClusterMode, isInPreviewMode} = stateArgs;
-
+export const useCommonMenuItems = (fileEntry?: FileEntry) => {
   const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
-  const localResourceMetaMapRef = useResourceMetaMapRef('local');
 
   const reloadRootFolder = useCallback(() => {
     if (!fileEntry) {
@@ -132,70 +126,11 @@ export const useMenuItems = (
 
   const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
-  const onClickPreviewRef = useRef(() => {});
-
   const menuItems = useMemo(() => {
     if (!fileEntry) {
       return [];
     }
-
-    const isNonResourceFile =
-      isKustomizationFile(fileEntry, localResourceMetaMapRef.current) ||
-      isHelmChartFile(fileEntry.filePath) ||
-      isHelmValuesFile(fileEntry.filePath) ||
-      isHelmTemplateFile(fileEntry.filePath) ||
-      !fileEntry.isSupported ||
-      !fileEntry.isExcluded;
-
-    const isFolder = isDefined(fileEntry?.children);
     const newMenuItems: AntdMenuItem[] = [];
-
-    if (canBePreviewed) {
-      newMenuItems.push({
-        key: 'preview',
-        label: 'Preview',
-        onClick: onClickPreviewRef.current,
-      });
-    }
-
-    if (isFolder) {
-      newMenuItems.push({
-        key: 'new-folder',
-        label: 'New Folder',
-        onClick: () => {},
-      });
-
-      newMenuItems.push({
-        key: 'new-resource',
-        label: 'New Resource',
-        disabled: isInClusterMode || isInPreviewMode,
-        onClick: () => {},
-      });
-    } else {
-      newMenuItems.push({
-        key: 'new-file',
-        label: 'New File',
-        onClick: () => {},
-      });
-
-      newMenuItems.push({
-        key: 'add-resource',
-        label: 'Add Resource',
-        disabled: isNonResourceFile,
-      });
-
-      newMenuItems.push({
-        key: 'filter_on_file',
-        label: 'Filter on this file',
-        disabled: isNonResourceFile,
-      });
-
-      newMenuItems.push({
-        key: 'duplicate',
-        label: 'Duplicate',
-        onClick: () => {},
-      });
-    }
 
     newMenuItems.push({
       key: 'update_scanning',
@@ -239,16 +174,112 @@ export const useMenuItems = (
     });
 
     return newMenuItems;
-  }, [
-    fileEntry,
-    canBePreviewed,
-    isInClusterMode,
-    isInPreviewMode,
-    platformFileManagerName,
-    addEntryToScanExcludes,
-    removeEntryFromScanExcludes,
-    localResourceMetaMapRef,
-  ]);
+  }, [fileEntry, platformFileManagerName, addEntryToScanExcludes, removeEntryFromScanExcludes]);
+
+  return menuItems;
+};
+
+export const useFileMenuItems = (
+  stateArgs: {canBePreviewed: boolean; isInClusterMode: boolean; isInPreviewMode: boolean},
+  fileEntry?: FileEntry
+) => {
+  const {canBePreviewed, isInClusterMode, isInPreviewMode} = stateArgs;
+
+  const dispatch = useAppDispatch();
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
+
+  const onClickPreviewRef = useRef(() => {});
+
+  const menuItems = useMemo(() => {
+    const isFolder = isDefined(fileEntry?.children);
+    if (!fileEntry || isFolder) {
+      return [];
+    }
+
+    const isNonResourceFile =
+      isKustomizationFile(fileEntry, localResourceMetaMapRef.current) ||
+      isHelmChartFile(fileEntry.filePath) ||
+      isHelmValuesFile(fileEntry.filePath) ||
+      isHelmTemplateFile(fileEntry.filePath) ||
+      !fileEntry.isSupported ||
+      !fileEntry.isExcluded;
+
+    const newMenuItems: AntdMenuItem[] = [];
+
+    if (canBePreviewed) {
+      newMenuItems.push({
+        key: 'preview',
+        label: 'Preview',
+        onClick: onClickPreviewRef.current,
+      });
+    }
+
+    newMenuItems.push({
+      key: 'new-file',
+      label: 'New File',
+      onClick: () => {},
+    });
+
+    newMenuItems.push({
+      key: 'add-resource',
+      label: 'Add Resource',
+      disabled: isNonResourceFile,
+    });
+
+    newMenuItems.push({
+      key: 'filter_on_file',
+      label: 'Filter on this file',
+      disabled: isNonResourceFile,
+    });
+
+    newMenuItems.push({
+      key: 'duplicate',
+      label: 'Duplicate',
+      onClick: () => {},
+    });
+
+    return newMenuItems;
+  }, [fileEntry, canBePreviewed, localResourceMetaMapRef]);
+
+  return menuItems;
+};
+
+export const useFolderMenuItems = (
+  stateArgs: {isInClusterMode: boolean; isInPreviewMode: boolean},
+  fileEntry?: FileEntry
+) => {
+  const {isInClusterMode, isInPreviewMode} = stateArgs;
+
+  const commonMenuItems = useCommonMenuItems(fileEntry);
+  const dispatch = useAppDispatch();
+
+  const onClickPreviewRef = useRef(() => {});
+
+  const menuItems = useMemo(() => {
+    const isFolder = isDefined(fileEntry?.children);
+    if (!fileEntry || !isFolder) {
+      return [];
+    }
+
+    const newMenuItems: AntdMenuItem[] = [];
+
+    newMenuItems.push({
+      key: 'new-folder',
+      label: 'New Folder',
+      onClick: () => {},
+    });
+
+    newMenuItems.push({
+      key: 'new-resource',
+      label: 'New Resource',
+      disabled: isInClusterMode || isInPreviewMode,
+      onClick: () => {},
+    });
+
+    newMenuItems.push(...commonMenuItems);
+
+    return newMenuItems;
+  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode]);
 
   return menuItems;
 };

@@ -10,7 +10,7 @@ import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
 
 import * as S from './TreeNode.styled';
-import {useCanPreview, useDelete, useIsDisabled, useMenuItems} from './hooks';
+import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled} from './hooks';
 
 type Props = {
   filePath: string;
@@ -31,7 +31,7 @@ const TreeNodeFile: React.FC<Props> = props => {
 
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
 
-  const menuItems = useMenuItems({canBePreviewed, isInClusterMode, isInPreviewMode}, fileEntry);
+  const menuItems = useFileMenuItems({canBePreviewed, isInClusterMode, isInPreviewMode}, fileEntry);
 
   const onContextMenu = useCallback(() => {
     if (isDisabled || !contextMenuButtonRef.current) {
